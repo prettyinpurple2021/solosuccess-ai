@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
     const BodySchema = z.object({
       title: z.string().min(1, 'Task title is required'),
       description: z.string().optional(),
-      priority: z.string().optional(),
+      status: z.enum(['todo', 'in_progress', 'completed', 'cancelled']).optional(),
+      priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
       due_date: z.union([z.string(), z.date()]).optional(),
       category: z.string().optional(),
     })
@@ -46,14 +47,14 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { title, description, priority, due_date, category } = parsed.data
+    const { title, description, status, priority, due_date, category } = parsed.data
 
     const client = await createClient()
     const { rows } = await client.query(
       `INSERT INTO tasks (user_id, title, description, priority, due_date, category, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [user.id, title, description || '', priority || 'medium', due_date, category || 'general']
+      [user.id, title, description || '', priority || 'medium', due_date, category || 'general', status || 'todo']
     )
 
     return NextResponse.json({ task: rows[0] }, { status: 201 })

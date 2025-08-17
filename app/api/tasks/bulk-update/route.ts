@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
 
     const BodySchema = z.object({
       ids: z.array(z.union([z.string(), z.number()])).min(1),
-      status: z.string().min(1).optional(),
-      priority: z.string().min(1).optional(),
+      status: z.enum(['todo', 'in_progress', 'completed', 'cancelled']).optional(),
+      priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
     }).refine((data) => !!(data.status || data.priority), {
       message: 'Nothing to update',
       path: ['status'],
