@@ -246,7 +246,7 @@ export default function BrandStylerStudioDemo() {
     } : selectedTypography
   }
 
-  const saveBrandKitDemo = async () => {
+  const handleSave = async () => {
     if (!brandName.trim()) {
       setSaveError("Please enter a brand name before saving")
       setTimeout(() => setSaveError(null), 3000)
@@ -258,29 +258,41 @@ export default function BrandStylerStudioDemo() {
     setSaveMessage(null)
 
     try {
-      // Simulate save operation for demo
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const brandData = {
-        brandName,
+      const payload = {
+        brandName: brandName,
         tagline: brandTagline,
         description: brandDescription,
-        industry,
-        colors: getActiveColors(),
+        industry: industry,
+        colors: {
+          primary: getActiveColors().primary,
+          secondary: getActiveColors().secondary,
+          accent: getActiveColors().accent
+        },
         typography: getActiveTypography(),
         logoData: selectedGeneratedLogo,
         logoStyle: selectedLogo.name
       }
 
-      // In a real app, this would save to database
-      console.log('Demo: Brand kit saved:', brandData)
+      const response = await fetch('/api/brand/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
       
-      setSaveMessage("Brand kit saved successfully! (Demo mode - data not persisted)")
-      setTimeout(() => setSaveMessage(null), 5000)
-
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Brand saved successfully:', result)
+        setSaveMessage("Brand kit saved successfully!")
+        setTimeout(() => setSaveMessage(null), 5000)
+      } else {
+        const errorData = await response.json()
+        console.error('Save failed:', errorData)
+        setSaveError(errorData.error || "Failed to save brand kit")
+        setTimeout(() => setSaveError(null), 5000)
+      }
     } catch (error) {
-      console.error('Demo save error:', error)
-      setSaveError("Failed to save brand kit (demo mode)")
+      console.error('Error saving brand:', error)
+      setSaveError("Failed to save brand kit")
       setTimeout(() => setSaveError(null), 5000)
     } finally {
       setIsSaving(false)
@@ -906,7 +918,7 @@ export default function BrandStylerStudioDemo() {
 
                   <Button 
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white"
-                    onClick={saveBrandKitDemo}
+                    onClick={handleSave}
                     disabled={isSaving || !brandName.trim()}
                   >
                     {isSaving ? (
