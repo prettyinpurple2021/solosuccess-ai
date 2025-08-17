@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
-import { Save, Download } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 export function DecisionDashboard() {
   const [decision, setDecision] = useState('');

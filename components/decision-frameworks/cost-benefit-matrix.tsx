@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Brain, TrendingUp, TrendingDown, Shield, Save, Download } from "lucide-react"
+import { Brain, TrendingUp, TrendingDown, Shield, Save } from "lucide-react"
 
 interface DecisionOption {
   id: string

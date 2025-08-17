@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Users, Target, FileText, Brain, Save, TrendingUp } from "lucide-react"
+import { Users, FileText, Brain, Save, TrendingUp } from "lucide-react"
 
 interface SelfAnalysis {
   strengths: string[]
