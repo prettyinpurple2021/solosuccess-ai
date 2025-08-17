@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -78,7 +79,7 @@ export function SavedTemplatesList() {
               Save your work from the templates to see them here.
             </p>
             <Button asChild>
-              <a href="/templates">Go to Templates</a>
+              <Link href="/templates">Go to Templates</Link>
             </Button>
           </CardContent>
         </Card>
