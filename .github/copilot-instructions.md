@@ -1,47 +1,32 @@
 # SoloBoss AI Platform - GitHub Copilot Instructions
 
-**Always reference these instructions first and fallback to additional search or context gathering only when the information here is incomplete or foun### Common Commands Reference:
-```bash
-# Development
-npm run dev                    # Start development server
-npm run build                 # Production build
-npm run lint                  # Run ESLint (runs cleanly)
-
-# Database
-npm run setup-neon-db        # Initialize Neon database
-npm run verify-triggers      # Verify database triggers
-npm run db:migrate           # Run database migrations
-
-# Testing
-npm test                     # Run Jest tests (limited tests exist)
-npm run test:coverage        # Jest with coverage
-npm run test:api             # Test API routes with database
-```**
+**Always reference these instructions first and fallback to additional search or context gathering only when the information here is incomplete or found to be in error.**
 
 ## Working Effectively
 
 ### Bootstrap, Build, and Test the Repository:
-- Install Node.js 18+ (check with `node --version`)
+- Install Node.js 18+ (check with `node --version`) - Current environment uses Node.js 20.19.4
 - `npm install` -- takes 30-40 seconds. **NEVER CANCEL**. Peer dependency warnings are safe to ignore.
 - **ENVIRONMENT SETUP REQUIRED**: Copy `.env.local.example` to `.env.local` and configure required environment variables (see Environment Variables section below)
-- **BUILD STATUS**: ✅ Builds successfully! Previous ESLint issues have been resolved.
-- Build: ~45 seconds. **NEVER CANCEL**. Set timeout to 90+ seconds.
-- `npm run lint` -- runs cleanly with minor warnings only
-- `npm test` -- Jest is configured. Limited test coverage currently exists.
+- **BUILD STATUS**: ✅ Builds successfully! ESLint has warnings but build completes.
+- Build: ~102 seconds (1 minute 42 seconds). **NEVER CANCEL**. Set timeout to 120+ seconds.
+- `npm run lint` -- completes in ~8 seconds with warnings but no errors
+- `npm test` -- Jest runs 5 tests in ~3 seconds successfully
 
 ### Run the Application:
 - **ALWAYS run the bootstrapping steps and environment setup first**
-- Development server: `npm run dev` -- starts in ~2 seconds
-- Production build: `npm run build && npm run start`
+- Development server: `npm run dev` -- starts in ~2.3 seconds
+- Production build required before start: `npm run build && npm run start`
 - Access at: `http://localhost:3000`
-- API health check: `http://localhost:3000/api/health`
+- API health check: `http://localhost:3000/api/health` returns `{"status":"ok",...}`
 
 ### Database Setup:
 - **Database**: Neon PostgreSQL with Drizzle ORM
 - **Setup command**: `npm run setup-neon-db` (requires DATABASE_URL in .env.local)
 - **Schema files**: Located in `lib/db/schema.ts` with Drizzle definitions
-- **Migration commands**: `npm run db:migrate`, `npm run db:push`, `npm run db:generate`
+- **Migration commands**: `npm run db:migrate`, `npm run db:generate`, `npm run db:studio`
 - **Schema**: 15+ tables including users, goals, tasks, ai_agents, conversations, documents, compliance tables
+- **Verification**: `npm run verify-triggers` and `npm run db:verify` (both require DATABASE_URL)
 
 ## Environment Variables (Required for Build)
 
@@ -79,10 +64,11 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
 **CRITICAL - NEVER CANCEL these commands. Always set appropriate timeouts:**
 
 - `npm install`: 30-40 seconds. **NEVER CANCEL**. Timeout: 60+ seconds.
-- `npm run build`: ✅ **BUILDS SUCCESSFULLY** - Takes ~45 seconds. **NEVER CANCEL**. Timeout: 90+ seconds.
-- `npm run dev`: ~2 seconds startup. Timeout: 30+ seconds.
+- `npm run build`: ✅ **BUILDS SUCCESSFULLY** - Takes ~102 seconds (1 minute 42 seconds). **NEVER CANCEL**. Timeout: 120+ seconds.
+- `npm run dev`: ~2.3 seconds startup. Timeout: 30+ seconds.
 - Database setup (`npm run setup-neon-db`): 10-30 seconds depending on data size.
-- `npm run lint`: Runs cleanly with only minor warnings.
+- `npm run lint`: ~8 seconds with warnings but no errors.
+- `npm test`: ~3 seconds running 5 Jest tests successfully.
 - All placeholder content has been removed and the codebase is production-ready.
 
 ## Validation Scenarios
@@ -99,7 +85,8 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
    - Run `npm run build` to test production build
    - Verify core TypeScript compilation succeeds
    - Check for any new ESLint warnings (should be minimal)
-   - Ensure build completes within 90 seconds
+   - Ensure build completes within 120 seconds
+   - **Expected Output**: 84 static pages generated successfully
 
 3. **Authentication Flow** (if auth env vars are configured):
    - Visit `/sign-up` and verify Stack Auth form renders
@@ -107,14 +94,20 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
    - Test form submissions (should handle gracefully even with dummy auth config)
 
 4. **API Routes Validation**:
-   - Check `/api/health` returns proper JSON
+   - Check `/api/health` returns proper JSON: `{"status":"ok","timestamp":"...","environment":"development","nextVersion":"edge"}`
    - Verify API routes compile without TypeScript errors
    - Test basic CRUD operations if database is configured
+   - Note: `npm run test:api` requires DATABASE_URL and JWT_SECRET environment variables
 
 5. **UI Component Validation**:
    - Navigate to `/dashboard` and verify UI components render
    - Check `/features` page for marketing components
    - Verify responsive design on different screen sizes
+
+6. **Testing Validation**:
+   - Run `npm test` - should complete in ~3 seconds with 5 passing tests
+   - Run `npm run test:coverage` for coverage report
+   - E2E tests available via `npx playwright test` (requires Playwright setup)
 
 ## Repository Structure
 
@@ -140,9 +133,10 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
 ## Common Tasks and Known Issues
 
 ### Linting:
-- **STATUS**: ✅ ESLint runs cleanly with only minor warnings
-- **Previous Issues**: All major ESLint errors have been resolved
-- **Current State**: Production builds work without linting issues
+- **STATUS**: ✅ ESLint runs successfully in ~8 seconds
+- **Current Issues**: 229 warnings (mostly react/no-unescaped-entities and @typescript-eslint/no-explicit-any)
+- **2 Errors**: In lib/idempotency.ts (unused variables that must match /^_/u pattern)
+- **Exit Code**: 1 (due to errors) but build still succeeds
 - **Best Practice**: Continue to maintain clean code standards
 - **Before Committing**: Run `npm run lint` to check for any new issues
 
@@ -158,6 +152,7 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
 - **Migrations**: Located in `drizzle/` directory, managed by Drizzle Kit
 - **Tables**: 15+ tables for full functionality (users, goals, tasks, ai_agents, etc.)
 - **Storage**: Pure Neon database - no Supabase dependencies
+- **Requirement**: All database commands require valid DATABASE_URL in .env.local
 
 ### AI Integration:
 - **Providers**: OpenAI GPT-4, Google Gemini (Anthropic Claude removed)
@@ -201,9 +196,12 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
 
 ### Deployment:
 - **Platform**: Netlify (configured with netlify.toml)
-- **Build**: Static site generation where possible
-- **Environment**: Production environment variables required
+- **Build Command**: `npm run build` (includes prebuild check script)
+- **Node Version**: 20 (specified in netlify.toml)
+- **Flags**: `--production=false --legacy-peer-deps`
+- **Memory**: `--max-old-space-size=4096`
 - **CI/CD**: GitHub Actions workflow for Jest coverage (`.github/workflows/ci.yml`)
+- **Environment**: Production environment variables required for deployment
 
 ## Performance Considerations
 
@@ -240,26 +238,39 @@ STATSIG_SERVER_SECRET_KEY=your-statsig-secret
 ### Common Commands Reference:
 ```bash
 # Development
-npm run dev                    # Start development server
-npm run build                 # Production build
-npm run lint                  # Run ESLint (expect many errors)
+npm run dev                    # Start development server (~2.3 seconds)
+npm run build                 # Production build (~102 seconds)
+npm run start                 # Production server (requires build first)
+npm run lint                  # Run ESLint (~8 seconds, 229 warnings, 2 errors)
 
 # Database
 npm run setup-neon-db        # Initialize Neon database
 npm run verify-triggers      # Verify database triggers
 npm run db:migrate           # Run database migrations
+npm run db:generate          # Generate Drizzle types
+npm run db:studio            # Open Drizzle studio
+npm run db:verify            # Verify database (requires DATABASE_URL)
 
 # Testing
-npm test                     # Run Jest tests (no tests exist yet)
+npm test                     # Run Jest tests (~3 seconds, 5 tests)
 npm run test:coverage        # Jest with coverage
-npm run test:api             # Test API routes with database
+npm run test:api             # Test API routes (requires DATABASE_URL & JWT_SECRET)
+npm run e2e                  # Playwright e2e tests (requires setup)
+
+# Additional Scripts
+npm run setup-db             # Legacy database setup
+npm run setup-templates      # Setup template system
+npm run setup-compliance     # Setup compliance system  
+npm run netlify-check        # Verify crypto/JWT modules
 ```
 
 ### Troubleshooting:
 1. **Build Fails**: Check all required environment variables are set
 2. **TypeScript Errors**: Focus on new errors, many existing errors are ignored
-3. **Database Issues**: Verify DATABASE_URL format and network access
+3. **Database Issues**: Verify DATABASE_URL format and network access  
 4. **Auth Issues**: Confirm Stack Auth environment variables are valid
 5. **Development Server**: Ensure port 3000 is available
+6. **Linting Errors**: Fix unused variables in lib/idempotency.ts (add _ prefix)
+7. **Production Start**: Must run `npm run build` first before `npm start`
 
 **Remember: This is a production-ready AI platform with 8 specialized agents, comprehensive goal/task management, compliance tools, and a complete gamification system. Always test thoroughly after making changes.**
