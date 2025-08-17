@@ -38,7 +38,6 @@ export default function BrandPage() {
     setBrandData(prev => ({ ...prev, [field]: value }))
   }
 
-  // This handleSave function has the PROBLEMATIC payload structure described in the issue
   const handleSave = async () => {
     if (!brandData.name.trim()) {
       setSaveError("Please enter a brand name before saving")
@@ -51,17 +50,18 @@ export default function BrandPage() {
     setSaveMessage(null)
 
     try {
-      // PROBLEM: This payload structure doesn't match the API schema
-      // - Sends 'name' instead of 'brandName' 
-      // - Sends separate 'primaryColor'/'secondaryColor' instead of 'colors' object
+      // FIXED: Transform payload to match the API contract
       const payload = {
-        name: brandData.name,  // ❌ Should be 'brandName'
+        brandName: brandData.name,  // ✅ Fixed: use 'brandName' instead of 'name'
         tagline: brandData.tagline,
         description: brandData.description,
         industry: brandData.industry,
-        primaryColor: brandData.primaryColor,  // ❌ Should be part of 'colors' object
-        secondaryColor: brandData.secondaryColor,  // ❌ Should be part of 'colors' object
+        colors: {  // ✅ Fixed: combine colors into an object
+          primary: brandData.primaryColor,
+          secondary: brandData.secondaryColor,
+        },
         logoStyle: brandData.logoStyle
+        // You may need to add other fields like typography here
       }
 
       const response = await fetch('/api/brand/save', {
