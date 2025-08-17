@@ -28,7 +28,7 @@ export default function TermsOfServicePage() {
             </div>
             <div className="flex items-center space-x-4">
               <Button 
-                onClick={() => router.push('/sign-up')}
+                onClick={() => router.push('/signup')}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full"
               >
                 Start Building Empire
@@ -387,7 +387,7 @@ export default function TermsOfServicePage() {
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Button
-              onClick={() => router.push('/sign-up')}
+              onClick={() => router.push('/signup')}
               size="lg"
               className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
             >

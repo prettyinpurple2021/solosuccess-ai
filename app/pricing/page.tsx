@@ -132,7 +132,7 @@ export default function PricingPage() {
 
   const handleCTAClick = (plan: typeof PRICING_PLANS[0]) => {
     if (plan.ctaType === "signup") {
-      router.push('/sign-up')
+      router.push('/signup')
     } else if (plan.ctaType === "contact") {
       // For now, we'll scroll to the contact section or show a simple alert
       // In a real app, this could open a contact modal or navigate to a contact page
