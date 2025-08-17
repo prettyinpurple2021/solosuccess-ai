@@ -226,7 +226,7 @@ export function BossCommunity() {
     if (!newPostContent.trim()) return
 
     const newPost: BossPost = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       author: {
         name: "You",
         avatar: "/default-user.svg",

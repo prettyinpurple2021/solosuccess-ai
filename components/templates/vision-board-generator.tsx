@@ -36,7 +36,7 @@ export function VisionBoardGenerator() {
 
   const addElement = (category: VisionElement['category']) => {
     const newElement: VisionElement = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       category,
       title: '',
       description: '',

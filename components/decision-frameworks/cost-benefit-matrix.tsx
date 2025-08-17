@@ -44,7 +44,7 @@ export function CostBenefitMatrix() {
   const addOption = () => {
     if (currentOption.name && currentOption.description) {
       const newOption: DecisionOption = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         name: currentOption.name || "",
         description: currentOption.description || "",
         costs: currentOption.costs || [],

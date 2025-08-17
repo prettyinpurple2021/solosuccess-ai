@@ -7,7 +7,7 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 
 // Typed global cache for simple in-memory rate limiting
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __signinRateLimit: Map<string, { count: number; ts: number }> | undefined
 }
 

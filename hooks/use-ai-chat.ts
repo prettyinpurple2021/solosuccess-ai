@@ -53,7 +53,7 @@ export function useAiChat(options: UseAiChatOptions = {}): UseAiChatReturn {
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const generateId = useCallback(() => {
-    return Math.random().toString(36).substring(2) + Date.now().toString(36)
+    return crypto.randomUUID()
   }, [])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

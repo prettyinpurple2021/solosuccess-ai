@@ -1,7 +1,7 @@
 type RateLimitEntry = { count: number; ts: number }
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __rateLimits: Map<string, Map<string, RateLimitEntry>> | undefined
 }
 
