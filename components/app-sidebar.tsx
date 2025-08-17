@@ -23,7 +23,17 @@ import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
-import { useUser } from "@stackframe/stack"
+
+// User data interface
+interface UserData {
+  name: string
+  email: string
+  avatar: string
+}
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  userData?: UserData
+}
 
 // This is sample data.
 const data = {
@@ -91,13 +101,11 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = useUser()
-  
-  // Create user data with fallbacks for missing information
-  const userData = {
-    name: user?.displayName || user?.primaryEmail?.split('@')[0] || "SoloBoss User",
-    email: user?.primaryEmail || "user@soloboss.ai",
+export function AppSidebar({ userData, ...props }: AppSidebarProps) {
+  // Use provided user data or create fallback
+  const finalUserData = userData || {
+    name: "User",
+    email: "No email available",
     avatar: "/default-user.svg",
   }
 
@@ -111,7 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={userData} />
+        <NavUser user={finalUserData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
