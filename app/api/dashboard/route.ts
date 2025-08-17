@@ -24,14 +24,18 @@ export async function GET(_request: NextRequest) {
     const [todaysStatsRes, todaysTasksRes, activeGoalsRes, conversationsRes, achievementsRes, weeklyFocusRes] = await Promise.all([
       client.query(
         `SELECT 
-            COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END),0) AS tasks_completed,
-            COUNT(*) AS total_tasks,
+            COALESCE(SUM(CASE WHEN status = 'completed' AND completed_at IS NOT NULL THEN 1 ELSE 0 END),0) AS tasks_completed,
+            COALESCE(COUNT(CASE WHEN DATE(due_date) = CURRENT_DATE OR DATE(created_at) = CURRENT_DATE THEN 1 END),0) AS total_tasks,
             0 AS focus_minutes,
             0 AS ai_interactions,
             0 AS goals_achieved,
             0 AS productivity_score
          FROM tasks 
-         WHERE user_id = $1 AND DATE(updated_at) = CURRENT_DATE`,
+         WHERE user_id = $1 AND (
+           completed_at >= CURRENT_DATE AND completed_at < CURRENT_DATE + INTERVAL '1 day'
+           OR DATE(due_date) = CURRENT_DATE 
+           OR DATE(created_at) = CURRENT_DATE
+         )`,
         [user.id]
       ),
       client.query(
