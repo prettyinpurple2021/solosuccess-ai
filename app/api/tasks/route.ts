@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       title: z.string().min(1, 'Task title is required'),
       description: z.string().optional(),
       priority: z.string().optional(),
-      due_date: z.union([z.string(), z.date()]).optional(),
+      due_date: z.string().datetime({ message: "Invalid datetime string! Must be UTC." }).optional().nullable(),
       category: z.string().optional(),
     })
     const parsed = BodySchema.safeParse(await request.json())
