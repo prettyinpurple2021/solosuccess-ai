@@ -328,7 +328,7 @@ export default function BriefcasePage() {
   }
 
   // Preview file
-  const previewFile = (file: BriefcaseFile) => {
+  const handlePreviewFile = (file: BriefcaseFile) => {
     const convertedFile = {
       id: file.id,
       name: file.name,
@@ -1092,7 +1092,7 @@ export default function BriefcasePage() {
                         <h3 
                           className="font-medium text-sm mb-2 truncate cursor-pointer hover:text-purple-600 transition-colors" 
                           title={file.name}
-                          onClick={() => previewFile(file)}
+                          onClick={() => handlePreviewFile(file)}
                         >
                           {file.name}
                         </h3>
@@ -1130,7 +1130,7 @@ export default function BriefcasePage() {
                           <Button 
                             size="sm" 
                             variant="outline" 
-                            onClick={() => previewFile(file)}
+                            onClick={() => handlePreviewFile(file)}
                             className="flex-1"
                           >
                             <Eye className="w-3 h-3 mr-1" />
