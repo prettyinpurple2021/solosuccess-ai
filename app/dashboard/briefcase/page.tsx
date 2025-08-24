@@ -34,7 +34,6 @@ import {
   Calendar,
   User,
   FileSpreadsheet,
-  FilePdf,
   FileCode,
   MoreHorizontal,
   Crown,
@@ -482,7 +481,7 @@ export default function BriefcasePage() {
     if (mimeType.startsWith('image/')) return <ImageIcon className="w-5 h-5" />
     if (mimeType.startsWith('video/')) return <Video className="w-5 h-5" />
     if (mimeType.startsWith('audio/')) return <Music className="w-5 h-5" />
-    if (mimeType.includes('pdf')) return <FilePdf className="w-5 h-5" />
+    if (mimeType.includes('pdf')) return <FileText className="w-5 h-5" />
     if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return <FileSpreadsheet className="w-5 h-5" />
     if (mimeType.includes('code') || mimeType.includes('javascript') || mimeType.includes('json')) return <FileCode className="w-5 h-5" />
     if (mimeType.includes('zip') || mimeType.includes('archive')) return <Archive className="w-5 h-5" />
