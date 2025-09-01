@@ -242,3 +242,6 @@ export function getTeamMemberConfig(memberId: string) {
   const memberKey = memberId.toLowerCase()
   return teamMemberModels[memberKey as keyof typeof teamMemberModels] || teamMemberModels.roxy
 }
+
+// Export openai for compatibility
+export { openai } from "@ai-sdk/openai"

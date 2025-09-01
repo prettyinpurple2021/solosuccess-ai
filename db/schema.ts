@@ -94,6 +94,22 @@ export const taskCategories = pgTable('task_categories', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
+// Competitors table
+export const competitors = pgTable('competitors', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  website: varchar('website', { length: 500 }),
+  description: text('description'),
+  strengths: jsonb('strengths').default('[]'),
+  weaknesses: jsonb('weaknesses').default('[]'),
+  opportunities: jsonb('opportunities').default('[]'),
+  threats: jsonb('threats').default('[]'),
+  market_position: varchar('market_position', { length: 100 }),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+});
+
 // Task Analytics table
 export const taskAnalytics = pgTable('task_analytics', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
