@@ -1,6 +1,9 @@
 import { openai } from "@ai-sdk/openai"
 import { anthropic } from "@ai-sdk/anthropic"
 
+// Export openai for use in other modules
+export { openai }
+
 // AI model configurations for different team members
 export const teamMemberModels = {
   roxy: {
