@@ -1,5 +1,5 @@
 import { db } from '@/db'
-import { competitors, intelligenceData, competitorAlerts } from '@/db/schema'
+import { competitorProfiles, intelligenceData, competitorAlerts } from '@/db/schema'
 import { eq, desc, gte, and, sql } from 'drizzle-orm'
 import { generateObject } from 'ai'
 import { openai } from '@/lib/ai-config'
@@ -292,11 +292,11 @@ export class IntelligenceBriefingService {
     let targetCompetitorIds = competitorIds
     if (!targetCompetitorIds) {
       const userCompetitors = await db
-        .select({ id: competitors.id })
-        .from(competitors)
-        .where(eq(competitors.userId, userId))
+        .select({ id: competitorProfiles.id })
+        .from(competitorProfiles)
+        .where(eq(competitorProfiles.user_id, userId))
       
-      targetCompetitorIds = userCompetitors.map(c => c.id)
+      targetCompetitorIds = userCompetitors.map(c => c.id.toString())
     }
     
     if (targetCompetitorIds.length === 0) {
@@ -308,13 +308,13 @@ export class IntelligenceBriefingService {
     }
     
     // Get competitor profiles
-    const competitorProfiles = await db
+    const competitorProfilesData = await db
       .select()
-      .from(competitors)
+      .from(competitorProfiles)
       .where(
         and(
-          eq(competitors.userId, userId),
-          sql`${competitors.id} = ANY(${targetCompetitorIds})`
+          eq(competitorProfiles.user_id, userId),
+          sql`${competitorProfiles.id} = ANY(${targetCompetitorIds})`
         )
       )
     
@@ -324,12 +324,12 @@ export class IntelligenceBriefingService {
       .from(intelligenceData)
       .where(
         and(
-          sql`${intelligenceData.competitorId} = ANY(${targetCompetitorIds})`,
-          gte(intelligenceData.collectedAt, startDate),
-          sql`${intelligenceData.collectedAt} <= ${endDate}`
+          sql`${intelligenceData.competitor_id} = ANY(${targetCompetitorIds})`,
+          gte(intelligenceData.collected_at, startDate),
+          sql`${intelligenceData.collected_at} <= ${endDate}`
         )
       )
-      .orderBy(desc(intelligenceData.collectedAt))
+      .orderBy(desc(intelligenceData.collected_at))
     
     // Get alerts for the period
     const alerts = await db
@@ -337,16 +337,16 @@ export class IntelligenceBriefingService {
       .from(competitorAlerts)
       .where(
         and(
-          eq(competitorAlerts.userId, userId),
-          sql`${competitorAlerts.competitorId} = ANY(${targetCompetitorIds})`,
-          gte(competitorAlerts.createdAt, startDate),
-          sql`${competitorAlerts.createdAt} <= ${endDate}`
+          eq(competitorAlerts.user_id, userId),
+          sql`${competitorAlerts.competitor_id} = ANY(${targetCompetitorIds})`,
+          gte(competitorAlerts.created_at, startDate),
+          sql`${competitorAlerts.created_at} <= ${endDate}`
         )
       )
-      .orderBy(desc(competitorAlerts.createdAt))
+      .orderBy(desc(competitorAlerts.created_at))
     
     return {
-      competitors: competitorProfiles,
+      competitors: competitorProfilesData,
       intelligence,
       alerts
     }
@@ -430,24 +430,24 @@ CONTEXT:
 COMPETITOR DATA:
 ${competitors.map((c: any) => `
 - ${c.name} (${c.domain})
-  - Threat Level: ${c.threatLevel}
+  - Threat Level: ${c.threat_level}
   - Industry: ${c.industry}
-  - Size: ${c.employeeCount} employees
+  - Size: ${c.employee_count} employees
 `).join('')}
 
 INTELLIGENCE DATA:
 ${intelligence.slice(0, 20).map((intel: any) => `
-- ${intel.dataType} from ${intel.sourceUrl}
+- ${intel.data_type} from ${intel.source_url}
   - Importance: ${intel.importance}
-  - Collected: ${intel.collectedAt}
-  - Key insights: ${intel.extractedData?.keyInsights?.join(', ') || 'N/A'}
+  - Collected: ${intel.collected_at}
+  - Key insights: ${intel.extracted_data?.keyInsights?.join(', ') || 'N/A'}
 `).join('')}
 
 RECENT ALERTS:
 ${alerts.slice(0, 10).map((alert: any) => `
 - ${alert.title} (${alert.severity})
   - Description: ${alert.description}
-  - Created: ${alert.createdAt}
+  - Created: ${alert.created_at}
 `).join('')}
 
 BRIEFING REQUIREMENTS:
