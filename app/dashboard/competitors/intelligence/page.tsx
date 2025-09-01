@@ -18,6 +18,9 @@ import {
   Lightbulb
 } from "lucide-react"
 
+// Force dynamic rendering to avoid prerender errors
+export const dynamic = 'force-dynamic'
+
 export default function IntelligencePage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(false)

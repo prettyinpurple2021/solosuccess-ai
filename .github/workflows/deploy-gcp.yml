@@ -17,7 +17,8 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write' # Required for Workload Identity Federation, if using.
-
+    env:
+      NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
