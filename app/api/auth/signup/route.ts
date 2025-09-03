@@ -24,14 +24,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already exists
+    // Check if user already exists (by email or username)
     const existingUsers = await sql`
-      SELECT id FROM users WHERE email = ${email.toLowerCase()}
+      SELECT id FROM users WHERE email = ${email.toLowerCase()} OR username = ${metadata?.username?.toLowerCase() || ''}
     `
 
     if (existingUsers.length > 0) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: 'User with this email or username already exists' },
         { status: 409 }
       )
     }

@@ -2,7 +2,6 @@
 
 ## Root Directory Structure
 
-```
 soloboss-ai-platform/
 ├── app/                    # Next.js App Router pages and layouts
 ├── components/             # Reusable React components
@@ -15,11 +14,9 @@ soloboss-ai-platform/
 ├── docs/                   # Documentation
 ├── test/ & tests/          # Test files
 └── .kiro/                  # Kiro AI assistant configuration
-```
 
 ## App Directory (Next.js App Router)
 
-```
 app/
 ├── layout.tsx              # Root layout with providers
 ├── page.tsx                # Landing page
@@ -33,11 +30,9 @@ app/
 ├── auth/                   # Authentication pages
 ├── profile/                # User profile pages
 └── [feature]/              # Feature-specific pages
-```
 
 ## Components Organization
 
-```
 components/
 ├── ui/                     # Base UI components (shadcn/ui)
 │   ├── button.tsx
@@ -50,11 +45,9 @@ components/
 ├── forms/                  # Form components
 ├── shared/                 # Shared utility components
 └── [feature]/              # Feature-specific components
-```
 
 ## Library Organization
 
-```
 lib/
 ├── utils.ts                # General utilities (cn function)
 ├── auth.ts                 # Authentication utilities
@@ -64,51 +57,51 @@ lib/
 ├── rate-limit.ts           # Rate limiting utilities
 ├── types.ts                # TypeScript type definitions
 └── [service]/              # Service-specific utilities
-```
 
 ## Database Structure
 
-```
 db/
 ├── index.ts                # Database connection
 ├── schema.ts               # Drizzle schema definitions
 └── migrations/             # Generated migrations
-```
 
 ## Hooks Organization
 
-```
 hooks/
 ├── use-auth.tsx            # Authentication hook
 ├── use-dashboard-data.ts   # Dashboard data fetching
 ├── use-ai-chat.ts          # AI chat functionality
 ├── use-projects.ts         # Project management
 └── use-[feature].ts        # Feature-specific hooks
-```
 
 ## Naming Conventions
 
 ### Files and Directories
+
 - **kebab-case** for directories: `auth-example/`, `sign-in/`
 - **kebab-case** for component files: `nav-main.tsx`, `team-switcher.tsx`
 - **camelCase** for utility files: `useAuth.tsx`, `aiConfig.ts`
 
 ### Components
+
 - **PascalCase** for component names: `Button`, `NavMain`, `TeamSwitcher`
 - **camelCase** for props and variables
 - **SCREAMING_SNAKE_CASE** for constants
 
 ### API Routes
+
 - **RESTful** naming: `/api/goals`, `/api/tasks`, `/api/chat`
 - **Nested resources**: `/api/goals/[id]`, `/api/users/[id]/tasks`
 
 ## Import Patterns
 
 ### Path Aliases
+
 - Use `@/` for imports from project root
 - Example: `import { Button } from "@/components/ui/button"`
 
 ### Import Order
+
 1. React and Next.js imports
 2. Third-party libraries
 3. Internal components and utilities
@@ -127,6 +120,7 @@ import type { User } from "@/lib/types"
 ## Component Structure
 
 ### UI Components (shadcn/ui pattern)
+
 ```typescript
 // components/ui/button.tsx
 import * as React from "react"
@@ -152,6 +146,7 @@ export { Button, buttonVariants }
 ```
 
 ### Feature Components
+
 ```typescript
 // components/dashboard/stats-card.tsx
 interface StatsCardProps {
@@ -205,16 +200,19 @@ export async function POST(request: NextRequest) {
 ## Special Directories
 
 ### Documentation
+
 - `docs/` - Project documentation
 - `wiki/` - Detailed guides and architecture docs
 - `README.md` - Main project overview
 
 ### Deployment
+
 - `Dockerfile` - Container configuration
 - `cloudbuild.yaml` - Google Cloud Build
 - `deploy-gcp.sh` - Deployment script
 
 ### Assets
+
 - `public/images/` - Static images
 - `public/icons/` - Icon files
 - `uploads/` - User-uploaded files (development)

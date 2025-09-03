@@ -1,11 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/neon/server'
-import { authenticateRequest } from '@/lib/auth-server'
+import jwt from 'jsonwebtoken'
 
-export async function GET(_request: NextRequest) {
+// JWT authentication helper
+async function authenticateJWTRequest(request: NextRequest) {
   try {
-    // Authenticate the request
-    const { user, error } = await authenticateRequest()
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { user: null, error: 'No authorization header' }
+    }
+
+    const token = authHeader.substring(7)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    
+    return { 
+      user: {
+        id: decoded.userId,
+        email: decoded.email,
+        full_name: decoded.full_name || null,
+        avatar_url: null,
+        subscription_tier: 'free',
+        level: 1,
+        total_points: 0,
+        current_streak: 0,
+        wellness_score: 50,
+        focus_minutes: 0,
+        onboarding_completed: false
+      }, 
+      error: null 
+    }
+  } catch (error) {
+    console.error('JWT authentication error:', error)
+    return { user: null, error: 'Invalid token' }
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    // Authenticate the request using JWT
+    const { user, error } = await authenticateJWTRequest(request)
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

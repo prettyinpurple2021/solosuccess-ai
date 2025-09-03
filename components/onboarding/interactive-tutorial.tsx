@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -32,12 +32,15 @@ interface TutorialStep {
   description: string
   target: string // CSS selector for the element to highlight
   position: "top" | "bottom" | "left" | "right"
-  content: React.ReactNode
+  content: any
   action?: {
     label: string
     onClick: () => void
   }
   optional?: boolean
+  estimatedTime?: number // Estimated time to complete this step
+  difficulty?: "easy" | "medium" | "hard" // Step difficulty level
+  tags?: string[] // Tags for categorization
 }
 
 interface InteractiveTutorialProps {
@@ -45,11 +48,35 @@ interface InteractiveTutorialProps {
   onCompleteAction: () => void
   onSkipAction: () => void
   tutorialType: "dashboard" | "ai-agents" | "tasks" | "goals" | "files" | "complete"
+  customSteps?: TutorialStep[] // Allow custom tutorial steps
+  showProgressBar?: boolean // Toggle progress bar visibility
+  allowSkipping?: boolean // Allow users to skip steps
+  showTimeEstimates?: boolean // Show estimated completion times
+  onStepChange?: (stepIndex: number, stepData: TutorialStep) => void // Callback for step changes
 }
 
-export function InteractiveTutorial({ open, onCompleteAction, onSkipAction, tutorialType }: InteractiveTutorialProps) {
+export function InteractiveTutorial({ 
+  open, 
+  onCompleteAction, 
+  onSkipAction, 
+  tutorialType,
+  customSteps,
+  showProgressBar = true,
+  allowSkipping = true,
+  showTimeEstimates = false,
+  onStepChange
+}: InteractiveTutorialProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [highlightedElement, setHighlightedElement] = useState<HTMLElement | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set())
+  const [startTime, setStartTime] = useState<Date | null>(null)
+  const [showTips, setShowTips] = useState(false)
+  const [userPreferences, setUserPreferences] = useState({
+    showAnimations: true,
+    autoAdvance: false,
+    voiceEnabled: false
+  })
   const overlayRef = useRef<HTMLDivElement>(null)
   const highlightRef = useRef<HTMLDivElement>(null)
 
@@ -62,6 +89,9 @@ export function InteractiveTutorial({ open, onCompleteAction, onSkipAction, tuto
         description: "Let's take a quick tour of your SoloBoss AI dashboard",
         target: ".dashboard-header",
         position: "bottom",
+        estimatedTime: 30,
+        difficulty: "easy",
+        tags: ["welcome", "overview"],
         content: (
           <div className="space-y-4">
             <div className="text-center">
@@ -91,6 +121,11 @@ export function InteractiveTutorial({ open, onCompleteAction, onSkipAction, tuto
                 <span>Files & Docs</span>
               </div>
             </div>
+            {showTimeEstimates && (
+              <div className="text-center p-2 bg-purple-50 rounded-lg">
+                <p className="text-xs text-purple-600">⏱️ Estimated time: 30 seconds</p>
+              </div>
+            )}
           </div>
         )
       },
@@ -463,47 +498,270 @@ export function InteractiveTutorial({ open, onCompleteAction, onSkipAction, tuto
     ]
   }
 
-  const currentSteps = tutorialSteps[tutorialType] || []
-  const totalSteps = currentSteps.length
-  const progress = totalSteps > 0 ? ((currentStep + 1) / totalSteps) * 100 : 0
+  // Use custom steps if provided, otherwise use default steps
+  const finalSteps = useMemo(() => customSteps || tutorialSteps[tutorialType] || [], [customSteps, tutorialType])
+  
+  // Performance optimizations with useMemo
+  const currentSteps = useMemo(() => finalSteps, [finalSteps])
+  const totalSteps = useMemo(() => currentSteps.length, [currentSteps])
+  const progress = useMemo(() => totalSteps > 0 ? ((currentStep + 1) / totalSteps) * 100 : 0, [currentStep, totalSteps])
 
+  // Calculate estimated completion time
+  const estimatedTotalTime = useMemo(() => {
+    return currentSteps.reduce((total, step) => total + (step.estimatedTime || 0), 0)
+  }, [currentSteps])
 
+  // Progress persistence with localStorage
+  const storageKey = useMemo(() => `tutorial-progress-${tutorialType}`, [tutorialType])
+  
+  // Load saved progress on mount
+  useEffect(() => {
+    if (open) {
+      try {
+        const savedProgress = localStorage.getItem(storageKey)
+        if (savedProgress) {
+          const { step, completed, startTime: savedStartTime, preferences } = JSON.parse(savedProgress)
+          setCurrentStep(step || 0)
+          setCompletedSteps(new Set(completed || []))
+          if (savedStartTime) {
+            setStartTime(new Date(savedStartTime))
+          } else {
+            setStartTime(new Date())
+          }
+          if (preferences) {
+            setUserPreferences(prev => ({ ...prev, ...preferences }))
+          }
+        } else {
+          setStartTime(new Date())
+        }
+      } catch (error) {
+        console.warn('Failed to load tutorial progress:', error)
+        setStartTime(new Date())
+      }
+    }
+  }, [open, storageKey])
 
+  // Save progress on step change
+  useEffect(() => {
+    if (open && startTime) {
+      try {
+        const progressData = {
+          step: currentStep,
+          completed: Array.from(completedSteps),
+          startTime: startTime.toISOString(),
+          lastUpdated: new Date().toISOString(),
+          preferences: userPreferences
+        }
+        localStorage.setItem(storageKey, JSON.stringify(progressData))
+      } catch (error) {
+        console.warn('Failed to save tutorial progress:', error)
+      }
+    }
+  }, [open, currentStep, completedSteps, startTime, storageKey, userPreferences])
+
+  // Tutorial analytics tracking
+  const trackTutorialEvent = (event: string, data?: any) => {
+    try {
+      // You can integrate this with your analytics service
+      console.log('Tutorial Event:', { event, tutorialType, step: currentStep, data })
+      
+      // Example: Send to analytics service
+      // analytics.track('tutorial_event', { event, tutorialType, step: currentStep, data })
+      
+      // Example: Send to Google Analytics 4
+      // if (typeof gtag !== 'undefined') {
+      //   gtag('event', 'tutorial_event', {
+      //     event_category: 'tutorial',
+      //     event_label: tutorialType,
+      //     value: currentStep,
+      //     custom_parameters: data
+      //   })
+      // }
+    } catch (error) {
+      console.warn('Failed to track tutorial event:', error)
+    }
+  }
+
+  // Voice command integration hints
+  const voiceCommands = useMemo(() => [
+    { command: "next", action: "Go to next step" },
+    { command: "previous", action: "Go to previous step" },
+    { command: "skip", action: "Skip current step" },
+    { command: "close", action: "Close tutorial" },
+    { command: "tips", action: "Show/hide tips" },
+    { command: "help", action: "Show help" }
+  ], [])
+
+  // Enhanced error handling and element highlighting
   useEffect(() => {
     if (open && currentSteps.length > 0) {
       const currentStepData = currentSteps[currentStep]
       if (!currentStepData) return
 
+      // Add error handling for missing elements
       const element = document.querySelector(currentStepData.target) as HTMLElement
-      if (element && highlightRef.current) {
-        setHighlightedElement(element)
-        element.scrollIntoView({ behavior: "smooth", block: "center" })
+      if (!element) {
+        console.warn(`Tutorial target element not found: ${currentStepData.target}`)
+        trackTutorialEvent('element_not_found', { target: currentStepData.target })
         
-        // Set position using CSS custom properties
-        highlightRef.current.style.setProperty('--highlight-top', `${element.offsetTop - 4}px`)
-        highlightRef.current.style.setProperty('--highlight-left', `${element.offsetLeft - 4}px`)
-        highlightRef.current.style.setProperty('--highlight-width', `${element.offsetWidth + 8}px`)
-        highlightRef.current.style.setProperty('--highlight-height', `${element.offsetHeight + 8}px`)
+        // Try to find alternative elements or show helpful message
+        const alternativeElements = document.querySelectorAll('[data-tutorial-target]')
+        if (alternativeElements.length > 0) {
+          console.log('Found alternative tutorial targets:', alternativeElements)
+        }
+        return
+      }
+      
+      if (highlightRef.current) {
+        setHighlightedElement(element)
+        
+        // Add try-catch for scroll behavior
+        try {
+          element.scrollIntoView({ behavior: "smooth", block: "center" })
+        } catch (error) {
+          console.warn('Smooth scroll not supported, using fallback')
+          element.scrollIntoView()
+        }
+        
+        // Set position with error handling using getBoundingClientRect
+        const rect = element.getBoundingClientRect()
+        if (highlightRef.current) {
+          highlightRef.current.style.setProperty('--highlight-top', `${rect.top - 4}px`)
+          highlightRef.current.style.setProperty('--highlight-left', `${rect.left - 4}px`)
+          highlightRef.current.style.setProperty('--highlight-width', `${rect.width + 8}px`)
+          highlightRef.current.style.setProperty('--highlight-height', `${rect.height + 8}px`)
+        }
+        
+        // Track step view
+        trackTutorialEvent('step_viewed', { stepId: currentStepData.id, stepTitle: currentStepData.title })
+        
+        // Call step change callback
+        onStepChange?.(currentStep, currentStepData)
       }
     }
-  }, [open, currentStep, currentSteps])
+  }, [open, currentStep, currentSteps, onStepChange])
 
-  const nextStep = () => {
+  // Keyboard navigation for better accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!open) return
+      
+      switch (e.key) {
+        case 'ArrowRight':
+        case ' ':
+          e.preventDefault()
+          nextStep()
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          prevStep()
+          break
+        case 'Escape':
+          e.preventDefault()
+          onSkipAction()
+          break
+        case 'h':
+        case 'H':
+          e.preventDefault()
+          setShowTips(prev => !prev)
+          break
+        case '?':
+          e.preventDefault()
+          setShowTips(true)
+          break
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [open, currentStep, totalSteps])
+
+  // Auto-advance functionality
+  useEffect(() => {
+    if (userPreferences.autoAdvance && !isTransitioning && open) {
+      const timer = setTimeout(() => {
+        if (currentStep < totalSteps - 1) {
+          nextStep()
+        }
+      }, 5000) // Auto-advance after 5 seconds
+
+      return () => clearTimeout(timer)
+    }
+  }, [userPreferences.autoAdvance, isTransitioning, open, currentStep, totalSteps])
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      setHighlightedElement(null)
+      setCompletedSteps(new Set())
+    }
+  }, [])
+
+  // Enhanced step management with completion tracking
+  const markStepComplete = (stepId: string) => {
+    setCompletedSteps(prev => new Set([...prev, stepId]))
+    trackTutorialEvent('step_completed', { stepId })
+  }
+  
+  const nextStep = async () => {
+    if (isTransitioning) return
+    
+    setIsTransitioning(true)
+    
+    // Mark current step as complete
+    const currentStepData = currentSteps[currentStep]
+    if (currentStepData) {
+      markStepComplete(currentStepData.id)
+    }
+    
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1)
     } else {
+      // Track tutorial completion
+      const completionTime = startTime ? new Date().getTime() - startTime.getTime() : 0
+      trackTutorialEvent('tutorial_completed', { 
+        duration: completionTime,
+        totalSteps,
+        completedSteps: Array.from(completedSteps)
+      })
       onCompleteAction()
     }
+    
+    // Add small delay for smooth transitions
+    setTimeout(() => setIsTransitioning(false), 300)
   }
 
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
+      trackTutorialEvent('step_previous', { stepId: currentSteps[currentStep]?.id })
     }
   }
 
   const skipTutorial = () => {
+    trackTutorialEvent('tutorial_skipped', { 
+      currentStep, 
+      completedSteps: Array.from(completedSteps),
+      startTime: startTime?.toISOString()
+    })
     onSkipAction()
+  }
+
+  const skipCurrentStep = () => {
+    if (currentStep < totalSteps - 1) {
+      nextStep()
+    }
+  }
+
+  const toggleUserPreference = (key: keyof typeof userPreferences) => {
+    setUserPreferences(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const resetTutorial = () => {
+    setCurrentStep(0)
+    setCompletedSteps(new Set())
+    setStartTime(new Date())
+    trackTutorialEvent('tutorial_reset')
   }
 
   const currentStepData = currentSteps[currentStep]
@@ -515,55 +773,102 @@ export function InteractiveTutorial({ open, onCompleteAction, onSkipAction, tuto
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto boss-card border-2 border-purple-200">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto boss-card border-2 border-purple-200 mx-4 sm:mx-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex-1">
                 <DialogTitle className="boss-heading text-xl flex items-center gap-2">
                   <Lightbulb className="h-5 w-5 text-purple-600" />
                   Interactive Tutorial
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-sm sm:text-base">
                   Step {currentStep + 1} of {totalSteps} - {currentStepData.title}
                 </DialogDescription>
+                {showTimeEstimates && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ⏱️ {currentStepData.estimatedTime || 0}s • Total: ~{Math.round(estimatedTotalTime / 60)}m
+                  </p>
+                )}
+                {currentStepData.difficulty && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-muted-foreground">Difficulty:</span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      currentStepData.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                      currentStepData.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {currentStepData.difficulty}
+                    </span>
+                  </div>
+                )}
               </div>
-                             <div className="flex items-center gap-2">
-                 <Button variant="ghost" size="sm" onClick={skipTutorial} className="text-sm">
-                   <SkipForward className="h-4 w-4 mr-1" />
-                   Skip
-                 </Button>
-                 <Button variant="ghost" size="sm" onClick={onSkipAction} className="text-sm">
-                   <X className="h-4 w-4" />
-                 </Button>
-               </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {allowSkipping && (
+                  <Button variant="ghost" size="sm" onClick={skipTutorial} className="text-sm hover:bg-purple-50 transition-colors">
+                    <SkipForward className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Skip</span>
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm" onClick={onSkipAction} className="text-sm hover:bg-purple-50 transition-colors">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <Progress value={progress} className="w-full" />
+            {showProgressBar && <Progress value={progress} className="w-full" />}
           </DialogHeader>
+
+          {/* Quick Tips Section */}
+          {showTips && (
+            <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200 mb-4">
+              <h4 className="font-medium text-sm text-purple-800 mb-2">💡 Quick Tips:</h4>
+              <ul className="text-xs text-purple-700 space-y-1">
+                <li>• Use arrow keys or spacebar to navigate</li>
+                <li>• Press 'H' to toggle this tips panel</li>
+                <li>• Press 'Escape' to close tutorial</li>
+                <li>• Press '?' for help</li>
+                <li>• Voice commands coming soon! 🎤</li>
+              </ul>
+              
+              {/* Voice Commands Preview */}
+              <div className="mt-3 pt-3 border-t border-purple-200">
+                <h5 className="font-medium text-xs text-purple-800 mb-2">🎤 Voice Commands (Coming Soon):</h5>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {voiceCommands.map((cmd, index) => (
+                    <div key={index} className="flex justify-between">
+                      <span className="text-purple-600">"{cmd.command}"</span>
+                      <span className="text-purple-700">{cmd.action}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="py-4">
             {currentStepData.content}
           </div>
 
-          <div className="flex justify-between pt-4 border-t">
+          <div className="flex flex-col sm:flex-row justify-between pt-4 border-t gap-4">
             <Button
               variant="outline"
               onClick={prevStep}
-              disabled={currentStep === 0}
-              className="flex items-center gap-2 bg-transparent"
+              disabled={currentStep === 0 || isTransitioning}
+              className="flex items-center gap-2 bg-transparent hover:bg-purple-50 transition-colors order-2 sm:order-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Previous
             </Button>
 
-            <div className="flex items-center gap-2">
-              {currentStepData.optional && (
-                <Button variant="ghost" onClick={nextStep} className="text-sm">
+            <div className="flex items-center gap-2 order-1 sm:order-2">
+              {currentStepData.optional && allowSkipping && (
+                <Button variant="ghost" onClick={skipCurrentStep} className="text-sm hover:bg-purple-50 transition-colors">
                   Skip This
                 </Button>
               )}
               <Button
                 onClick={currentStepData.action ? currentStepData.action.onClick : nextStep}
-                className="punk-button text-white flex items-center gap-2"
+                disabled={isTransitioning}
+                className="punk-button text-white flex items-center gap-2 hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentStepData.action ? (
                   <>
@@ -584,19 +889,54 @@ export function InteractiveTutorial({ open, onCompleteAction, onSkipAction, tuto
               </Button>
             </div>
           </div>
+
+          {/* User Preferences Footer */}
+          <div className="pt-3 border-t border-gray-100">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => toggleUserPreference('showAnimations')}
+                  className={`flex items-center gap-1 ${userPreferences.showAnimations ? 'text-purple-600' : ''}`}
+                >
+                  <Sparkles className="h-3 w-3" />
+                  Animations
+                </button>
+                <button
+                  onClick={() => toggleUserPreference('autoAdvance')}
+                  className={`flex items-center gap-1 ${userPreferences.autoAdvance ? 'text-purple-600' : ''}`}
+                >
+                  <ArrowRight className="h-3 w-3" />
+                  Auto-advance
+                </button>
+                <button
+                  onClick={resetTutorial}
+                  className="text-muted-foreground hover:text-purple-600 transition-colors"
+                  title="Reset tutorial progress"
+                >
+                  🔄 Reset
+                </button>
+              </div>
+              <button
+                onClick={() => setShowTips(prev => !prev)}
+                className="text-purple-600 hover:text-purple-800"
+              >
+                Press 'H' for tips
+              </button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* Highlight overlay */}
-      {highlightedElement && (
+      {highlightedElement && userPreferences.showAnimations && (
         <div
           ref={overlayRef}
           className="fixed inset-0 z-40 pointer-events-none tutorial-overlay"
         >
-                     <div
-             ref={highlightRef}
-             className="absolute border-2 border-purple-500 rounded-lg shadow-lg tutorial-highlight tutorial-highlight-position"
-           />
+          <div
+            ref={highlightRef}
+            className="absolute border-2 border-purple-500 rounded-lg shadow-lg tutorial-highlight tutorial-highlight-position animate-pulse"
+          />
         </div>
       )}
     </TooltipProvider>

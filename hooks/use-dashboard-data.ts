@@ -90,16 +90,33 @@ export function useDashboardData() {
       setLoading(true)
       setError(null)
       
+      // Get the JWT token from localStorage
+      const token = localStorage.getItem('authToken')
+      if (!token) {
+        setError('No authentication token found. Please sign in again.')
+        setLoading(false)
+        return
+      }
+      
       const response = await fetch('/api/dashboard', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         // Add cache busting to ensure fresh data
         cache: 'no-cache',
       })
       
       if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired or invalid
+          localStorage.removeItem('authToken')
+          setError('Authentication expired. Please sign in again.')
+          // Redirect to sign in
+          window.location.href = '/signin'
+          return
+        }
         throw new Error(`Failed to fetch dashboard data: ${response.status}`)
       }
       

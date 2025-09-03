@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 
 interface ResponsiveImageProps {
   src: string
@@ -36,13 +37,15 @@ export function ResponsiveImage({
   }
 
   return (
-    <img
+    <Image
       src={imgSrc}
       alt={alt}
       width={width}
       height={height}
       className={className}
+      priority={priority}
       onError={handleError}
+      unoptimized={false}
     />
   )
 }

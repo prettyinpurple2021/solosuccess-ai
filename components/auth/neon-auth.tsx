@@ -16,12 +16,11 @@ export function NeonAuth() {
   const pathname = usePathname()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [_loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
-  const [user, _setUser] = useState<any>(null)
-  const [_stackApp, _setStackApp] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
   
   // Enhanced sign-up form state
   const [signUpData, setSignUpData] = useState({
@@ -44,19 +43,36 @@ export function NeonAuth() {
   useEffect(() => {
     setIsClient(true)
     
-    // Dynamically import Stack Auth to avoid SSR issues
-    const initStackAuth = async () => {
-      try {
-        const { useUser: _useUser, useStackApp: _useStackApp } = await import("@stackframe/stack")
-        // We can't use hooks conditionally, so we'll handle this differently
-        // For now, we'll use a simple approach
-      } catch (error) {
-        console.warn('Stack Auth not available:', error)
-      }
+    // Check if user is already logged in
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      // Verify token and set user
+      verifyToken(token)
     }
-    
-    initStackAuth()
   }, [])
+
+  // Verify JWT token and set user
+  const verifyToken = async (token: string) => {
+    try {
+      const response = await fetch('/api/auth/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const userData = await response.json()
+        setUser(userData.user)
+        router.push("/dashboard")
+      } else {
+        // Token is invalid, remove it
+        localStorage.removeItem('authToken')
+      }
+    } catch (error) {
+      console.error('Token verification failed:', error)
+      localStorage.removeItem('authToken')
+    }
+  }
 
   // Redirect to dashboard when user is authenticated
   useEffect(() => {
@@ -71,16 +87,42 @@ export function NeonAuth() {
     setSuccess(null)
     
     try {
-      // For now, use a simple approach that works without Stack Auth
       if (!email || !password) {
-        throw new Error("Please enter both email and password")
+        throw new Error("Please enter both email/username and password")
       }
       
-      // Simulate successful sign in
+      // Determine if input is email or username
+      const isEmail = email.includes('@')
+      const identifier = isEmail ? email : email.toLowerCase()
+      
+      // Call your real authentication API
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          identifier, // Send as identifier (can be email or username)
+          password,
+          isEmail // Flag to indicate if it's email or username
+        }),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Sign in failed')
+      }
+      
+      const data = await response.json()
+      
+      // Store the token (you might want to use a more secure method)
+      localStorage.setItem('authToken', data.token)
+      
       setSuccess("Sign in successful! Redirecting to dashboard...")
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 1000)
+      
+      // Set user and redirect immediately
+      setUser(data.user)
+      router.push("/dashboard")
       
     } catch (err: any) {
       setError(err.message || 'Sign in failed')
@@ -170,18 +212,38 @@ export function NeonAuth() {
     setSuccess(null)
     
     try {
-      // For now, simulate successful sign up
-      setSuccess("Account created successfully! You can now sign in.")
-      // Reset form
-      setSignUpData({
-        firstName: "",
-        lastName: "",
-        dateOfBirth: "",
-        email: "",
-        username: "",
-        password: "",
-        confirmPassword: ""
+      // Call your real sign-up API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: signUpData.email,
+          password: signUpData.password,
+          metadata: {
+            full_name: `${signUpData.firstName} ${signUpData.lastName}`,
+            username: signUpData.username,
+            date_of_birth: signUpData.dateOfBirth,
+          }
+        }),
       })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Sign up failed')
+      }
+      
+      const data = await response.json()
+      
+      // Auto-login after successful signup
+      localStorage.setItem('authToken', data.token)
+      setUser(data.user)
+      setSuccess("Account created successfully! Welcome to SoloBoss AI!")
+      
+      // Redirect to dashboard immediately
+      router.push("/dashboard")
+      
       return { success: true }
 
     } catch (err: any) {
@@ -283,20 +345,20 @@ export function NeonAuth() {
             {/* Sign In Form */}
             {isSignInPage && (
               <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="glass"
-                    required
-                    autoComplete="email"
-                  />
-                </div>
+                                 <div className="space-y-2">
+                   <Label htmlFor="email" className="text-sm font-medium">Email or Username</Label>
+                   <Input
+                     id="email"
+                     name="email"
+                     type="text"
+                     value={email}
+                     onChange={(e) => setEmail(e.target.value)}
+                     placeholder="Enter your email or username"
+                     className="glass"
+                     required
+                     autoComplete="username"
+                   />
+                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium">Password</Label>

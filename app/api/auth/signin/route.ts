@@ -14,25 +14,36 @@ function getSql() {
 export async function POST(request: NextRequest) {
   try {
     const sql = getSql()
-    const { email, password } = await request.json()
+    const { identifier, password, isEmail } = await request.json()
 
-    if (!email || !password) {
+    if (!identifier || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Email/username and password are required' },
         { status: 400 }
       )
     }
 
-    // Get user from database
-    const users = await sql`
-      SELECT id, email, password_hash, full_name, username, date_of_birth, created_at
-      FROM users 
-      WHERE email = ${email.toLowerCase()}
-    `
+    // Get user from database - check both email and username
+    let users
+    if (isEmail) {
+      // Search by email
+      users = await sql`
+        SELECT id, email, password_hash, full_name, username, date_of_birth, created_at
+        FROM users 
+        WHERE email = ${identifier.toLowerCase()}
+      `
+    } else {
+      // Search by username
+      users = await sql`
+        SELECT id, email, password_hash, full_name, username, date_of_birth, created_at
+        FROM users 
+        WHERE username = ${identifier.toLowerCase()}
+      `
+    }
 
     if (users.length === 0) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Invalid email/username or password' },
         { status: 401 }
       )
     }
@@ -51,7 +62,7 @@ export async function POST(request: NextRequest) {
     const isValidPassword = await bcrypt.compare(password, user.password_hash)
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        { error: 'Invalid email/username or password' },
         { status: 401 }
       )
     }

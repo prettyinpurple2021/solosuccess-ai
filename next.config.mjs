@@ -27,7 +27,17 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: true, // Disable optimization for static images
+    unoptimized: false, // Enable optimization for better static asset handling
+    // Remove domain restrictions for local development
+    // domains: ['solobossai.fun'],
+    // remotePatterns: [
+    //   {
+    //     protocol: 'https',
+    //     hostname: 'solobossai.fun',
+    //     port: '',
+    //     pathname: '/images/**',
+    //   },
+    // ],
   },
   
   // Bundle optimization

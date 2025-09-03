@@ -1,154 +1,136 @@
 "use client"
 
-// Force dynamic rendering to avoid static generation issues with StackAuth
-export const dynamic = 'force-dynamic'
-
-import { useSafeUser, useSafeStackApp } from "@/hooks/use-safe-stack"
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { EmpowermentCard } from "@/components/ui/boss-card"
+import { Crown, CheckCircle, XCircle, ArrowRight } from "lucide-react"
 
 export default function TestAuthPage() {
-  const user = useSafeUser()
-  const stackApp = useSafeStackApp()
-  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const [authStatus, setAuthStatus] = useState<'checking' | 'authenticated' | 'unauthenticated'>('checking')
+  const [userData, setUserData] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setLoading(false), 1000)
-    return () => clearTimeout(timer)
+    checkAuthStatus()
   }, [])
 
-  // If StackAuth is not available (during SSR/build), show loading
-  if (!stackApp) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p>Loading authentication...</p>
-        </div>
-      </div>
-    )
+  const checkAuthStatus = async () => {
+    try {
+      const token = localStorage.getItem('authToken')
+      
+      if (!token) {
+        setAuthStatus('unauthenticated')
+        return
+      }
+
+      const response = await fetch('/api/auth/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUserData(data.user)
+        setAuthStatus('authenticated')
+      } else {
+        localStorage.removeItem('authToken')
+        setAuthStatus('unauthenticated')
+        setError('Invalid or expired token')
+      }
+    } catch (err) {
+      setAuthStatus('unauthenticated')
+      setError('Failed to verify authentication')
+    }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p>Loading authentication status...</p>
-        </div>
-      </div>
-    )
+  const goToDashboard = () => {
+    router.push('/dashboard')
   }
 
-  if (!user) {
+  const goToSignIn = () => {
+    router.push('/signin')
+  }
+
+  if (authStatus === 'checking') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Authentication Test</CardTitle>
-            <CardDescription>You are not authenticated</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => window.location.href = '/signin'}>
-              Go to Sign In
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen gradient-background flex items-center justify-center p-6">
+        <EmpowermentCard className="max-w-md text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p>Checking authentication status...</p>
+        </EmpowermentCard>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Authentication Test</h1>
-          <p className="text-gray-600">Your authentication is working correctly!</p>
+    <div className="min-h-screen gradient-background flex items-center justify-center p-6">
+      <EmpowermentCard className="max-w-md">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+            <Crown className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold boss-heading mb-2">Authentication Test</h1>
+          <p className="text-muted-foreground">Testing your SoloBoss AI authentication system</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>User Information</CardTitle>
-            <CardDescription>Details from Stack Auth</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-500">User ID</label>
-                <p className="text-sm text-gray-900">{user.id}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Email</label>
-                <p className="text-sm text-gray-900">{user.primaryEmail || user.email}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Display Name</label>
-                <p className="text-sm text-gray-900">{user.displayName || 'Not set'}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Avatar URL</label>
-                <p className="text-sm text-gray-900">{user.avatarUrl || 'Not set'}</p>
+        {authStatus === 'authenticated' ? (
+          <div className="space-y-4">
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 text-green-800">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">Authentication Successful!</span>
               </div>
             </div>
+            
+            {userData && (
+              <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                <h3 className="font-medium text-purple-800 mb-2">User Information:</h3>
+                <div className="text-sm text-purple-700 space-y-1">
+                  <p><strong>Name:</strong> {userData.full_name}</p>
+                  <p><strong>Email:</strong> {userData.email}</p>
+                  <p><strong>Username:</strong> {userData.username}</p>
+                  <p><strong>ID:</strong> {userData.id}</p>
+                </div>
+              </div>
+            )}
 
-            <div className="flex items-center gap-2">
-              <Badge variant="success">Authenticated</Badge>
-              <Badge variant="outline">Stack Auth</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Test Actions</CardTitle>
-            <CardDescription>Test various functionality</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => window.location.href = '/dashboard'}>
-                Go to Dashboard
-              </Button>
-              <Button onClick={() => window.location.href = '/dashboard/agents'}>
-                Test AI Agents
-              </Button>
-              <Button onClick={() => window.location.href = '/dashboard/briefcase'}>
-                Test Briefcase
-              </Button>
-              <Button variant="outline" onClick={() => stackApp?.signOut()}>
-                Sign Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>API Test</CardTitle>
-            <CardDescription>Test API endpoints</CardDescription>
-          </CardHeader>
-          <CardContent>
             <Button 
-              onClick={async () => {
-                try {
-                  const response = await fetch('/api/dashboard')
-                  if (response.ok) {
-                    alert('Dashboard API working!')
-                  } else {
-                    alert('Dashboard API failed: ' + response.status)
-                  }
-                } catch (error) {
-                  alert('Dashboard API error: ' + error)
-                }
-              }}
+              onClick={goToDashboard} 
+              className="w-full punk-button text-white"
             >
-              Test Dashboard API
+              Go to Dashboard
+              <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center gap-2 text-red-800">
+                <XCircle className="h-5 w-5" />
+                <span className="font-medium">Not Authenticated</span>
+              </div>
+              {error && <p className="text-sm text-red-700 mt-1">{error}</p>}
+            </div>
+
+            <Button 
+              onClick={goToSignIn} 
+              className="w-full punk-button text-white"
+            >
+              Sign In
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        )}
+
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <p className="text-xs text-muted-foreground text-center">
+            This page helps verify that your authentication system is working correctly.
+          </p>
+        </div>
+      </EmpowermentCard>
     </div>
   )
 }

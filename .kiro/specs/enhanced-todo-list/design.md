@@ -34,6 +34,7 @@ graph TB
 ### Database Schema Extensions
 
 #### Enhanced Tasks Table (Extend Existing)
+
 ```sql
 -- Add new columns to existing tasks table
 ALTER TABLE tasks ADD COLUMN estimated_minutes INTEGER;
@@ -48,6 +49,7 @@ ALTER TABLE tasks ADD COLUMN parent_task_id INTEGER REFERENCES tasks(id);
 ```
 
 #### New Task Categories Table
+
 ```sql
 CREATE TABLE task_categories (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -62,6 +64,7 @@ CREATE TABLE task_categories (
 ```
 
 #### Task Analytics Table
+
 ```sql
 CREATE TABLE task_analytics (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -74,6 +77,7 @@ CREATE TABLE task_analytics (
 ```
 
 #### Productivity Insights Table
+
 ```sql
 CREATE TABLE productivity_insights (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -90,50 +94,59 @@ CREATE TABLE productivity_insights (
 
 #### Enhanced Task Management API
 
-**GET /api/tasks**
+*GET /api/tasks**
+
 - Query parameters: `category`, `priority`, `status`, `due_date`, `search`
 - Response: Paginated task list with smart sorting
 - Features: Intelligent filtering and search
 
-**POST /api/tasks**
+*POST /api/tasks**
+
 - Enhanced task creation with AI suggestions
 - Auto-categorization based on content analysis
 - Smart time estimation using historical data
 
 **PUT /api/tasks/[id]**
+
 - Task updates with progress tracking
 - AI-powered optimization suggestions
 - Automatic analytics logging
 
 **DELETE /api/tasks/[id]**
+
 - Soft delete with analytics preservation
 - Cascade handling for subtasks
 
 #### AI Intelligence API
 
-**POST /api/tasks/ai/suggest**
+*POST /api/tasks/ai/suggest**
+
 - Input: Task description, user context
 - Output: Suggested improvements, categories, time estimates
 - AI Model: GPT-4 or Claude for task analysis
 
-**POST /api/tasks/ai/optimize**
+*POST /api/tasks/ai/optimize**
+
 - Input: User's task list and preferences
 - Output: Optimized task ordering and scheduling
 - Features: Energy level matching, dependency analysis
 
-**GET /api/tasks/ai/insights**
+*GET /api/tasks/ai/insights**
+
 - Productivity insights and recommendations
 - Personalized tips based on completion patterns
 - Weekly/monthly productivity reports
 
 #### Analytics API
 
-**GET /api/analytics/productivity**
+*GET /api/analytics/productivity**
+
 - Comprehensive productivity metrics
 - Time-based analytics (daily, weekly, monthly)
 - Completion rates and trend analysis
 
-**GET /api/analytics/insights**
+*GET /api/analytics/insights**
+
 - AI-generated productivity insights
 - Personalized recommendations
 - Performance benchmarking
@@ -143,6 +156,7 @@ CREATE TABLE productivity_insights (
 #### Core Components
 
 **TaskManager** - Main container component
+
 ```typescript
 interface TaskManagerProps {
   initialTasks?: Task[]
@@ -152,6 +166,7 @@ interface TaskManagerProps {
 ```
 
 **TaskList** - Enhanced task display
+
 ```typescript
 interface TaskListProps {
   tasks: Task[]
@@ -163,6 +178,7 @@ interface TaskListProps {
 ```
 
 **TaskCard** - Individual task component
+
 ```typescript
 interface TaskCardProps {
   task: Task
@@ -174,6 +190,7 @@ interface TaskCardProps {
 ```
 
 **TaskCreationModal** - Enhanced task creation
+
 ```typescript
 interface TaskCreationModalProps {
   isOpen: boolean
@@ -185,6 +202,7 @@ interface TaskCreationModalProps {
 ```
 
 **ProductivityDashboard** - Analytics display
+
 ```typescript
 interface ProductivityDashboardProps {
   userId: string
@@ -196,11 +214,13 @@ interface ProductivityDashboardProps {
 #### Mobile-Optimized Components
 
 **MobileTaskList** - Touch-optimized task list
+
 - Swipe gestures for quick actions
 - Pull-to-refresh functionality
 - Infinite scroll for large task lists
 
 **QuickTaskEntry** - Fast task creation
+
 - Voice input support
 - Smart autocomplete
 - One-tap category selection
@@ -208,6 +228,7 @@ interface ProductivityDashboardProps {
 ## Data Models
 
 ### Enhanced Task Model
+
 ```typescript
 interface Task {
   id: string
@@ -235,6 +256,7 @@ interface Task {
 ```
 
 ### AI Suggestions Model
+
 ```typescript
 interface AISuggestions {
   suggested_category?: string
@@ -247,6 +269,7 @@ interface AISuggestions {
 ```
 
 ### Productivity Metrics Model
+
 ```typescript
 interface ProductivityMetrics {
   tasks_completed: number
@@ -263,6 +286,7 @@ interface ProductivityMetrics {
 ## Error Handling
 
 ### API Error Responses
+
 - **400 Bad Request** - Invalid task data or parameters
 - **401 Unauthorized** - Authentication required
 - **403 Forbidden** - Insufficient permissions
@@ -271,6 +295,7 @@ interface ProductivityMetrics {
 - **500 Internal Server Error** - Server-side errors
 
 ### Frontend Error Handling
+
 - Graceful degradation when AI services are unavailable
 - Offline task creation with sync when online
 - User-friendly error messages with recovery suggestions
@@ -279,24 +304,28 @@ interface ProductivityMetrics {
 ## Testing Strategy
 
 ### Unit Tests
+
 - Task CRUD operations
 - AI suggestion algorithms
 - Analytics calculations
 - Component rendering and interactions
 
 ### Integration Tests
+
 - API endpoint functionality
 - Database operations
 - AI service integration
 - Authentication flows
 
 ### End-to-End Tests
+
 - Complete task management workflows
 - Mobile responsiveness
 - Cross-browser compatibility
 - Performance under load
 
 ### AI Testing
+
 - Task suggestion accuracy
 - Category prediction validation
 - Time estimation precision
@@ -305,18 +334,21 @@ interface ProductivityMetrics {
 ## Performance Considerations
 
 ### Database Optimization
+
 - Indexed queries for task filtering and sorting
 - Efficient pagination for large task lists
 - Optimized analytics queries with aggregations
 - Connection pooling for high concurrency
 
 ### Frontend Performance
+
 - Virtual scrolling for large task lists
 - Lazy loading of task details
 - Optimistic updates for better UX
 - Efficient state management with React Query
 
 ### AI Service Optimization
+
 - Caching of AI suggestions
 - Batch processing for multiple tasks
 - Fallback mechanisms when AI is unavailable
@@ -325,12 +357,14 @@ interface ProductivityMetrics {
 ## Security Considerations
 
 ### Data Protection
+
 - User task data isolation
 - Encrypted sensitive information
 - Secure API authentication
 - GDPR compliance for analytics data
 
 ### AI Privacy
+
 - No sensitive data sent to AI services
 - User consent for AI features
 - Data anonymization for insights
@@ -339,12 +373,14 @@ interface ProductivityMetrics {
 ## Accessibility Features
 
 ### WCAG 2.1 Compliance
+
 - Keyboard navigation for all features
 - Screen reader compatibility
 - High contrast mode support
 - Focus management for modals
 
 ### Inclusive Design
+
 - Voice input for task creation
 - Customizable text sizes
 - Color-blind friendly indicators

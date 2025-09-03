@@ -246,5 +246,4 @@ export function getTeamMemberConfig(memberId: string) {
   return teamMemberModels[memberKey as keyof typeof teamMemberModels] || teamMemberModels.roxy
 }
 
-// Export openai for compatibility
-export { openai } from "@ai-sdk/openai"
+// Export openai for compatibility (already exported above)

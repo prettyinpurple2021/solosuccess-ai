@@ -2,8 +2,6 @@
 
 - [-] 1. Database Schema Extensions
 
-
-
   - Extend existing tasks table with new columns for enhanced functionality
   - Create new tables for categories, analytics, and productivity insights
   - Add database indexes for optimal query performance
