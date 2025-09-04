@@ -23,6 +23,9 @@ export const metadata = {
     statusBarStyle: 'default',
     title: 'SoloBoss AI',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
   formatDetection: {
     telephone: false,
   },
