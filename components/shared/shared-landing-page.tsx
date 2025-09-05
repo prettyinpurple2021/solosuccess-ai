@@ -25,7 +25,6 @@ import {
 
 import Link from "next/link"
 import { ScheduleDemoModal } from "@/components/schedule/schedule-demo-modal"
-import { ResponsiveImage } from "@/components/ui/responsive-image"
 
 interface SharedLandingPageProps {
   showAuthModal?: boolean
@@ -159,19 +158,24 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-cyan-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-cyan-100 to-pink-100 dark:from-purple-900/30 dark:via-cyan-900/30 dark:to-pink-900/30 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-cyan-400/20 to-pink-400/20 animate-pulse"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10"></div>
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-purple-200 dark:border-teal-800">
         <div className="container-responsive py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <ResponsiveImage 
+              <img 
                 src="/images/soloboss-logo.png" 
                 alt="SoloBoss AI" 
                 width={40} 
                 height={40} 
                 className="rounded-lg"
-                fallbackSrc="/images/logo.png"
+                onError={(e) => {
+                  e.currentTarget.src = "/images/logo.png";
+                }}
               />
               <span className="text-responsive-xl lg:text-responsive-2xl font-bold bg-gradient-to-r from-purple-600 via-teal-500 to-pink-600 bg-clip-text text-transparent">
                 SoloBoss AI
@@ -327,10 +331,10 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               <Badge className="mb-6 bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 text-white">
                 ✨ AI-Powered Productivity Revolution
               </Badge>
-              <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
                 Become the Ultimate
                 <br />
-                <span className="text-responsive-5xl lg:text-responsive-7xl">SoloBoss</span>
+                <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-pink-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">SoloBoss</span>
               </h1>
               <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 mb-8">
                 Transform your productivity with AI agents that work 24/7. Automate everything, achieve more, and dominate
@@ -361,14 +365,15 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             {/* Right side - Hero Image */}
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <ResponsiveImage
+                <img
                   src="/images/soloboss-hero-silhouette.jpg"
                   alt="SoloBoss - Confident entrepreneur working in her office"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"
-                  priority
-                  fallbackSrc="/images/soloboss-hero-silhouette.png"
+                  onError={(e) => {
+                    e.currentTarget.src = "/images/soloboss-hero-silhouette.png";
+                  }}
                 />
                 {/* Gradient overlay to enhance the integration */}
                 <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 via-transparent to-teal-900/20" />
@@ -406,13 +411,15 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             viewport={{ once: true }}
             className="relative rounded-3xl overflow-hidden shadow-2xl"
           >
-            <ResponsiveImage
+            <img
               src="/images/soloboss-banner.jpg"
               alt="Confident. Creative. In control. That's the SoloBoss way."
               width={1200}
               height={300}
               className="w-full h-auto object-cover"
-              fallbackSrc="/images/soloboss-banner.png"
+              onError={(e) => {
+                e.currentTarget.src = "/images/soloboss-banner.png";
+              }}
             />
             {/* Optional overlay for better text readability if needed */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10" />
@@ -504,7 +511,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 border-purple-200 dark:border-teal-800 hover:border-purple-300 dark:hover:border-teal-600 text-center">
+                <Card className="h-full hover:shadow-xl transition-all duration-300 border-purple-200 dark:border-teal-800 hover:border-purple-300 dark:hover:border-teal-600 text-center bg-gradient-to-br from-white/80 to-purple-50/80 dark:from-slate-800/80 dark:to-purple-900/20 hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/30 dark:hover:to-teal-900/20">
                   <CardHeader>
                     <div className={`w-20 h-20 bg-gradient-to-r ${agent.color} rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden`}>
                       <img

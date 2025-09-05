@@ -147,7 +147,7 @@
     /* Smooth scrolling */
     scroll-behavior: smooth;
     @apply bg-background text-foreground;
-    background: var(--gradient-background);
+    background: linear-gradient(135deg, #fdf2f8 0%, #e0f2fe 25%, #f3e8ff 50%, #e0e7ff 75%, #fef3c7 100%);
     background-size: 400% 400%;
     animation: gradient-shift 15s ease infinite;
     font-family: 'Inter', system-ui, sans-serif;
@@ -321,7 +321,7 @@
 
   /* Boss Button Styles */
   .btn-boss {
-    background: var(--gradient-boss);
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 25%, #06B6D4 50%, #F59E0B 75%, #10B981 100%);
     background-size: 200% 200%;
     color: white;
     font-weight: 700;
