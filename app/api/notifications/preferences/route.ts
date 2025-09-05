@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Get user's notification preferences
     // In a real implementation, this would come from the database
     // For now, we'll return default preferences
-    const preferences = await notificationDelivery.getDefaultNotificationPreferences(authResult.user.id);
+    const preferences = await notificationDelivery.getDefaultNotificationPreferences(user.id);
 
     return NextResponse.json({
       preferences,
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 20, window: 60 });
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -79,8 +79,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -93,13 +93,13 @@ export async function PUT(request: NextRequest) {
 
     // Add user ID to preferences
     const fullPreferences: NotificationPreferences = {
-      userId: authResult.user.id,
+      userId: user.id,
       ...preferences,
     };
 
     // In a real implementation, save to database
     // For now, we'll just validate and return success
-    console.log('Saving notification preferences for user:', authResult.user.id, fullPreferences);
+    console.log('Saving notification preferences for user:', user.id, fullPreferences);
 
     return NextResponse.json({
       success: true,

@@ -26,8 +26,8 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -35,8 +35,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -61,7 +61,7 @@ export async function GET(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, authResult.user.id)
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -80,7 +80,7 @@ export async function GET(
     // Build query conditions
     let whereConditions = and(
       eq(intelligenceData.competitor_id, competitorId),
-      eq(intelligenceData.user_id, authResult.user.id),
+      eq(intelligenceData.user_id, user.id),
       eq(intelligenceData.source_type, 'social_media'),
       gte(intelligenceData.collected_at, dateThreshold)
     );

@@ -4,7 +4,7 @@ import { competitorAlerts, competitorProfiles } from '@/db/schema'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
-import { eq, and, gte, desc, inArray } from 'drizzle-orm'
+import { eq, and, gte, desc, inArray, sql } from 'drizzle-orm'
 import type { AlertSeverity } from '@/lib/competitor-intelligence-types'
 
 // Validation schema for notification preferences (for future use)
@@ -257,10 +257,10 @@ export async function POST(request: NextRequest) {
     await db
       .update(competitorAlerts)
       .set({
-        source_data: db.raw(`
+        source_data: sql`
           COALESCE(source_data, '{}') || 
-          '{"lastNotified": "${notificationTimestamp.toISOString()}", "notificationChannels": ${JSON.stringify(deliveryResult.deliveredChannels)}}'
-        `),
+          '{"lastNotified": "${notificationTimestamp.toISOString()}", "notificationChannels": ${JSON.stringify(deliveryResult.deliveredChannels)}}'::jsonb
+        `,
         updated_at: notificationTimestamp,
       })
       .where(

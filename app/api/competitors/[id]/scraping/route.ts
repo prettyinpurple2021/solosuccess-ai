@@ -27,8 +27,8 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -36,8 +36,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -53,7 +53,7 @@ export async function GET(
     }
 
     // Get jobs for the competitor
-    const jobs = await queueProcessor.getCompetitorJobs(competitorId, authResult.user.id)
+    const jobs = await queueProcessor.getCompetitorJobs(competitorId, user.id)
 
     return NextResponse.json({
       success: true,
@@ -78,8 +78,8 @@ export async function POST(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -87,8 +87,8 @@ export async function POST(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -110,7 +110,7 @@ export async function POST(
     // Create default monitoring jobs
     const jobIds = await queueProcessor.createDefaultJobs(
       competitorId,
-      authResult.user.id,
+      user.id,
       validatedData
     )
 
@@ -152,8 +152,8 @@ export async function PUT(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -161,8 +161,8 @@ export async function PUT(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -184,7 +184,7 @@ export async function PUT(
     // Update job frequencies
     await queueProcessor.updateJobFrequencies(
       competitorId,
-      authResult.user.id,
+      user.id,
       validatedData.threatLevel
     )
 
@@ -224,8 +224,8 @@ export async function DELETE(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -233,8 +233,8 @@ export async function DELETE(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -250,7 +250,7 @@ export async function DELETE(
     }
 
     // Delete all jobs for the competitor
-    await queueProcessor.deleteCompetitorJobs(competitorId, authResult.user.id)
+    await queueProcessor.deleteCompetitorJobs(competitorId, user.id)
 
     return NextResponse.json({
       success: true,

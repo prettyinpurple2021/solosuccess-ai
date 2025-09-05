@@ -10,8 +10,8 @@ import { scrapingScheduler } from '@/lib/scraping-scheduler'
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     // Get user-specific job statistics
     const allJobs = Array.from(scrapingScheduler['jobQueue'].values())
-    const userJobs = allJobs.filter(job => job.userId === authResult.user.id)
+    const userJobs = allJobs.filter(job => job.userId === user.id)
 
     const userMetrics = {
       totalJobs: userJobs.length,

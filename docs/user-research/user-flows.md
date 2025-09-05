@@ -14,11 +14,11 @@ This document illustrates the step-by-step paths that users will take to accompl
 
 New user (Sam, the Overwhelmed Freelancer) discovers SoloBoss AI and wants to create their first project.
 
-### User Goal
+### Flow 1 User Goal
 
 Sign up, create a goal for a new client project, and add the first task to get started with task management.
 
-### Steps
+### Flow 1 Steps
 
 1. **Landing Page Visit**
    - **User Action:** Sam arrives at the SoloBoss AI landing page and clicks "Sign Up"
@@ -52,14 +52,14 @@ Sign up, create a goal for a new client project, and add the first task to get s
    - **User Action:** Sam types "Draft first blog post: The Future of AI" and hits Enter
    - **System Response:** Task appears under the goal with success notification; option to add due date or description available
 
-### Success Criteria
+### Flow 1 Success Criteria
 
 - User successfully creates account and completes email verification
 - First goal is created and visible in SlayList
 - First task is added to the goal
 - User understands basic navigation and task creation process
 
-### Alternative Paths
+### Flow 1 Alternative Paths
 
 - **Email already registered:** Display error message with login option
 - **Password validation fails:** Show password requirements and retry
@@ -73,11 +73,11 @@ Sign up, create a goal for a new client project, and add the first task to get s
 
 Maya (Creative Side-Hustler) needs social media captions for a new art print she's launching.
 
-### User Goal
+### Flow 2 User Goal
 
 Use Echo (Marketing Maven) AI agent to generate social media captions for a new art print.
 
-### Steps
+### Flow 2 Steps
 
 1. **Account Access**
    - **User Action:** Maya logs into her account
@@ -118,14 +118,14 @@ Use Echo (Marketing Maven) AI agent to generate social media captions for a new 
    - **User Action:** Maya clicks "Save to Briefcase" on the fifth caption for later use
    - **System Response:** Caption saved as new text file in Briefcase with confirmation
 
-### Success Criteria
+### Flow 2 Success Criteria
 
 - AI agent generates relevant, on-brand social media captions
 - User can easily copy content to clipboard
 - Content can be saved to Briefcase for future use
 - Process feels intuitive and efficient
 
-### Alternative Paths
+### Flow 2 Alternative Paths
 
 - **AI service temporarily unavailable:** Display error message with retry option
 - **Insufficient context provided:** Prompt user for more details
@@ -139,11 +139,11 @@ Use Echo (Marketing Maven) AI agent to generate social media captions for a new 
 
 David (Experienced Consultant) receives a new client contract that needs secure storage and organization.
 
-### User Goal
+### Flow 3 User Goal
 
 Upload a new client contract to a secure, organized folder in the Briefcase.
 
-### Steps
+### Flow 3 Steps
 
 1. **Platform Access**
    - **User Action:** David logs in
@@ -176,14 +176,14 @@ Upload a new client contract to a secure, organized folder in the Briefcase.
    - **User Action:** David types "ClientX" into search bar
    - **System Response:** List instantly filters to show only "Contract-ClientX.pdf" file
 
-### Success Criteria
+### Flow 3 Success Criteria
 
 - File uploads successfully without corruption
 - Metadata (categories, tags) is properly assigned and searchable
 - Search and filter functionality works accurately
 - File is accessible and properly organized
 
-### Alternative Paths
+### Flow 3 Alternative Paths
 
 - **File too large:** Display size limit error with compression suggestions
 - **Unsupported file type:** Show supported formats and conversion options
@@ -198,11 +198,11 @@ Upload a new client contract to a secure, organized folder in the Briefcase.
 
 Alex (Aspiring Innovator) tries to access a premium AI agent but is on the free plan.
 
-### User Goal
+### Flow 4 User Goal
 
 Upgrade from the free plan to the "Accelerator" tier to access all AI agents.
 
-### Steps
+### Flow 4 Steps
 
 1. **Feature Access Attempt**
    - **User Action:** Alex clicks on "Blaze (Growth & Sales Strategist)" from AI Team page
@@ -236,14 +236,14 @@ Upgrade from the free plan to the "Accelerator" tier to access all AI agents.
    - **User Action:** Alex navigates back to AI Team page and clicks "Blaze" again
    - **System Response:** Blaze AI agent interface loads successfully
 
-### Success Criteria
+### Flow 4 Success Criteria
 
 - Payment processing is secure and seamless
 - Subscription upgrade is immediately reflected in account
 - Previously restricted features become accessible
 - User receives clear confirmation of upgrade
 
-### Alternative Paths
+### Flow 4 Alternative Paths
 
 - **Payment fails:** Display specific error message with retry options
 - **Card declined:** Suggest alternative payment methods
@@ -258,11 +258,11 @@ Upgrade from the free plan to the "Accelerator" tier to access all AI agents.
 
 Sam (Overwhelmed Freelancer) has a blog post to write and wants to use focused work session to avoid distractions.
 
-### User Goal
+### Flow 5 User Goal
 
 Start a focused work session to complete a blog post without distractions.
 
-### Steps
+### Flow 5 Steps
 
 1. **Task Review**
    - **User Action:** Sam logs in and navigates to SlayList to view daily tasks
@@ -296,14 +296,14 @@ Start a focused work session to complete a blog post without distractions.
    - **User Action:** Sam clicks "Mark task as 'In Progress'" button in completion modal
    - **System Response:** Task status updated in SlayList; 5-minute break suggestion appears
 
-### Success Criteria
+### Flow 5 Success Criteria
 
 - Focus mode successfully minimizes distractions
 - Timer functions accurately and provides clear feedback
 - Task progress can be updated seamlessly
 - User feels more productive and focused
 
-### Alternative Paths
+### Flow 5 Alternative Paths
 
 - **User needs to exit early:** Provide "End Session" option with progress save
 - **Distractions occur:** Offer pause/resume functionality
@@ -318,11 +318,11 @@ Start a focused work session to complete a blog post without distractions.
 
 Alex (Aspiring Innovator) has developed a new SaaS product idea and wants strategic feedback before proceeding.
 
-### User Goal
+### Flow 6 User Goal
 
 Get strategic feedback from Blaze AI agent on a new SaaS product idea.
 
-### Steps
+### Flow 6 Steps
 
 1. **Platform Access**
    - **User Action:** Alex logs in and navigates to "AI Team" page from sidebar
@@ -355,14 +355,14 @@ Get strategic feedback from Blaze AI agent on a new SaaS product idea.
    - **User Action:** Alex finds feedback valuable and clicks "Save to Briefcase" button
    - **System Response:** Entire analysis saved as "Idea Validation - SaaS Product" document in Briefcase with confirmation
 
-### Success Criteria
+### Flow 6 Success Criteria
 
 - AI provides comprehensive, actionable business analysis
 - Analysis is well-structured and easy to understand
 - Feedback can be saved for future reference
 - User gains clear next steps for idea development
 
-### Alternative Paths
+### Flow 6 Alternative Paths
 
 - **Insufficient idea description:** AI requests more details before analysis
 - **AI analysis is unclear:** User can request clarification or examples
