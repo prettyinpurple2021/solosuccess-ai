@@ -1,9 +1,10 @@
+import 'dotenv/config'; // <-- FIX: Load environment variables
 import { Worker } from '@temporalio/worker';
-import * as activities from './activities/index.js'; // <-- FIX: Point directly to the index file
+import * as activities from './activities/index.js';
 
 async function run() {
   const worker = await Worker.create({
-    workflowsPath: require.resolve('./workflows/index.js'), // <-- FIX: Point directly to the index file
+    workflowsPath: require.resolve('./workflows/index.js'),
     activities,
     taskQueue: 'soloboss-task-queue',
   });

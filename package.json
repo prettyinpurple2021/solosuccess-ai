@@ -26,7 +26,7 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "temporal:worker": "tsx watch ./temporal/worker.ts",
+    "temporal:worker": "dotenv -e .env.local -- tsx watch ./temporal/worker.ts",
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
     "setup:analytics": "node scripts/setup-analytics.js"
@@ -139,6 +139,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/parser": "^6.21.0",
+    "dotenv-cli": "^7.4.2",
     "drizzle-kit": "^0.20.9",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.15",
