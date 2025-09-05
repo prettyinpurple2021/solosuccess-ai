@@ -23,6 +23,8 @@ const ColorPicker = ({ label, value, onChange }: { label: string; value: string;
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-10 h-10 rounded border border-gray-300 cursor-pointer"
+        aria-label={`Color picker for ${label}`}
+        title={`Select ${label.toLowerCase()}`}
       />
       <Input
         value={value}

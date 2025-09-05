@@ -1,0 +1,230 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { stripe, STRIPE_WEBHOOK_EVENTS } from '@/lib/stripe'
+import { headers } from 'next/headers'
+import Stripe from 'stripe'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.text()
+    const signature = headers().get('stripe-signature')
+
+    if (!signature) {
+      return NextResponse.json(
+        { error: 'Missing stripe-signature header' },
+        { status: 400 }
+      )
+    }
+
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      throw new Error('STRIPE_WEBHOOK_SECRET is not set')
+    }
+
+    // Verify webhook signature
+    let event: Stripe.Event
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET
+      )
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err)
+      return NextResponse.json(
+        { error: 'Invalid signature' },
+        { status: 400 }
+      )
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case STRIPE_WEBHOOK_EVENTS.CUSTOMER_SUBSCRIPTION_CREATED:
+        await handleSubscriptionCreated(event.data.object as Stripe.Subscription)
+        break
+
+      case STRIPE_WEBHOOK_EVENTS.CUSTOMER_SUBSCRIPTION_UPDATED:
+        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription)
+        break
+
+      case STRIPE_WEBHOOK_EVENTS.CUSTOMER_SUBSCRIPTION_DELETED:
+        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription)
+        break
+
+      case STRIPE_WEBHOOK_EVENTS.INVOICE_PAYMENT_SUCCEEDED:
+        await handlePaymentSucceeded(event.data.object as Stripe.Invoice)
+        break
+
+      case STRIPE_WEBHOOK_EVENTS.INVOICE_PAYMENT_FAILED:
+        await handlePaymentFailed(event.data.object as Stripe.Invoice)
+        break
+
+      case STRIPE_WEBHOOK_EVENTS.CUSTOMER_CREATED:
+        await handleCustomerCreated(event.data.object as Stripe.Customer)
+        break
+
+      case STRIPE_WEBHOOK_EVENTS.CUSTOMER_UPDATED:
+        await handleCustomerUpdated(event.data.object as Stripe.Customer)
+        break
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`)
+    }
+
+    return NextResponse.json({ received: true })
+
+  } catch (error) {
+    console.error('Webhook error:', error)
+    return NextResponse.json(
+      { error: 'Webhook handler failed' },
+      { status: 500 }
+    )
+  }
+}
+
+// Handle subscription created
+async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
+  try {
+    const customerId = subscription.customer as string
+    const priceId = subscription.items.data[0].price.id
+    
+    // Get user by Stripe customer ID
+    // const user = await getUserByStripeCustomerId(customerId)
+    // if (!user) {
+    //   console.error('User not found for customer:', customerId)
+    //   return
+    // }
+
+    // Determine subscription tier based on price ID
+    let tier = 'launch' // default
+    if (priceId.includes('accelerator')) {
+      tier = 'accelerator'
+    } else if (priceId.includes('dominator')) {
+      tier = 'dominator'
+    }
+
+    // Update user subscription in database
+    // await updateUserSubscription(user.id, {
+    //   stripe_subscription_id: subscription.id,
+    //   stripe_customer_id: customerId,
+    //   subscription_tier: tier,
+    //   subscription_status: subscription.status,
+    //   current_period_start: new Date(subscription.current_period_start * 1000),
+    //   current_period_end: new Date(subscription.current_period_end * 1000),
+    //   cancel_at_period_end: subscription.cancel_at_period_end
+    // })
+
+    console.log(`Subscription created for customer ${customerId}: ${tier}`)
+  } catch (error) {
+    console.error('Error handling subscription created:', error)
+  }
+}
+
+// Handle subscription updated
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  try {
+    const customerId = subscription.customer as string
+    const priceId = subscription.items.data[0].price.id
+    
+    // Determine subscription tier based on price ID
+    let tier = 'launch' // default
+    if (priceId.includes('accelerator')) {
+      tier = 'accelerator'
+    } else if (priceId.includes('dominator')) {
+      tier = 'dominator'
+    }
+
+    // Update user subscription in database
+    // await updateUserSubscription(user.id, {
+    //   subscription_tier: tier,
+    //   subscription_status: subscription.status,
+    //   current_period_start: new Date(subscription.current_period_start * 1000),
+    //   current_period_end: new Date(subscription.current_period_end * 1000),
+    //   cancel_at_period_end: subscription.cancel_at_period_end
+    // })
+
+    console.log(`Subscription updated for customer ${customerId}: ${tier}`)
+  } catch (error) {
+    console.error('Error handling subscription updated:', error)
+  }
+}
+
+// Handle subscription deleted
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  try {
+    const customerId = subscription.customer as string
+
+    // Update user subscription in database
+    // await updateUserSubscription(user.id, {
+    //   subscription_tier: 'launch',
+    //   subscription_status: 'canceled',
+    //   stripe_subscription_id: null,
+    //   cancel_at_period_end: false
+    // })
+
+    console.log(`Subscription deleted for customer ${customerId}`)
+  } catch (error) {
+    console.error('Error handling subscription deleted:', error)
+  }
+}
+
+// Handle payment succeeded
+async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
+  try {
+    const customerId = invoice.customer as string
+    const subscriptionId = invoice.subscription as string
+
+    // Update user payment status in database
+    // await updateUserPaymentStatus(user.id, {
+    //   last_payment_date: new Date(invoice.created * 1000),
+    //   next_payment_date: new Date(invoice.period_end * 1000),
+    //   payment_status: 'succeeded'
+    // })
+
+    console.log(`Payment succeeded for customer ${customerId}, subscription ${subscriptionId}`)
+  } catch (error) {
+    console.error('Error handling payment succeeded:', error)
+  }
+}
+
+// Handle payment failed
+async function handlePaymentFailed(invoice: Stripe.Invoice) {
+  try {
+    const customerId = invoice.customer as string
+    const subscriptionId = invoice.subscription as string
+
+    // Update user payment status in database
+    // await updateUserPaymentStatus(user.id, {
+    //   payment_status: 'failed',
+    //   payment_failure_reason: invoice.last_payment_error?.message
+    // })
+
+    // Send notification to user about failed payment
+    // await sendPaymentFailedNotification(user.id, invoice)
+
+    console.log(`Payment failed for customer ${customerId}, subscription ${subscriptionId}`)
+  } catch (error) {
+    console.error('Error handling payment failed:', error)
+  }
+}
+
+// Handle customer created
+async function handleCustomerCreated(customer: Stripe.Customer) {
+  try {
+    console.log(`Customer created: ${customer.id}`)
+    // Additional customer creation logic if needed
+  } catch (error) {
+    console.error('Error handling customer created:', error)
+  }
+}
+
+// Handle customer updated
+async function handleCustomerUpdated(customer: Stripe.Customer) {
+  try {
+    console.log(`Customer updated: ${customer.id}`)
+    // Additional customer update logic if needed
+  } catch (error) {
+    console.error('Error handling customer updated:', error)
+  }
+}

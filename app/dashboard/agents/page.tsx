@@ -16,6 +16,7 @@ import {
   Briefcase
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useAnalytics, usePageTracking } from "@/hooks/use-analytics"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -133,6 +134,10 @@ export default function AgentsPage() {
   })
   const [isSaving, setIsSaving] = useState(false)
   const { toast } = useToast()
+  const { track } = useAnalytics()
+
+  // Track page views
+  usePageTracking()
 
   useEffect(() => {
     fetchConversations()
@@ -160,6 +165,14 @@ export default function AgentsPage() {
       timestamp: new Date(),
       agentId: selectedAgent.id
     }
+
+    // Track AI agent interaction
+    track('ai_agent_interaction', {
+      agentName: selectedAgent.name,
+      agentId: selectedAgent.id,
+      messageLength: input.length,
+      timestamp: new Date().toISOString()
+    })
 
     setMessages(prev => [...prev, userMessage])
     setInput("")

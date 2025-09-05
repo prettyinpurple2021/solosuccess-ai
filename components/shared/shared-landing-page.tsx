@@ -35,56 +35,55 @@ interface SharedLandingPageProps {
 const features = [
   {
     icon: Sparkles,
-    title: "8 AI Agents at Your Service",
-    description: "Meet Nova, Echo, Atlas, Luna, Phoenix, Orion, Vega, and Nova - your personal AI team that never sleeps.",
+    title: "8 Specialized AI Agents",
+    description: "Meet Roxy (Strategic Decisions), Blaze (Growth Strategy), Echo (Marketing), Lumi (Compliance), Vex (Technical), Lexi (Analytics), Nova (Design), and Glitch (Problem-Solving) - your personal AI team that never sleeps.",
   },
   {
     icon: Target,
-    title: "Goal Achievement System",
-    description: "Set, track, and crush your goals with our intelligent goal-setting framework and progress analytics.",
+    title: "Intelligent Goal & Task Management",
+    description: "Set, track, and crush your goals with AI-powered prioritization, progress analytics, and automatic task creation from competitive intelligence.",
   },
   {
     icon: Zap,
-    title: "Instant Automation",
-    description: "Automate repetitive tasks and workflows with our no-code automation engine.",
+    title: "Competitive Intelligence Automation",
+    description: "Monitor competitors, track market changes, and get automated alerts with our AI-powered competitive intelligence system.",
   },
   {
     icon: TrendingUp,
-    title: "Performance Analytics",
-    description: "Get detailed insights into your productivity patterns and optimize your workflow.",
+    title: "Real-Time Analytics Dashboard",
+    description: "Get detailed insights into your productivity patterns, user engagement, and business performance with live analytics.",
   },
   {
     icon: Users,
-    title: "Smart File Management",
-    description: "Upload, organize, and analyze documents with AI-powered briefcase and content parsing.",
+    title: "AI-Powered Briefcase",
+    description: "Upload, organize, and analyze documents with AI-powered content parsing, template generation, and intelligent file management.",
   },
   {
     icon: Shield,
-    title: "Enterprise Security",
-    description: "Bank-level security with end-to-end encryption and compliance certifications.",
+    title: "Guardian AI Compliance",
+    description: "Automated GDPR/CCPA compliance scanning, policy generation, and trust score certification to protect your business.",
   },
 ]
 
 const testimonials = [
   {
     name: "Sarah Chen",
-    role: "CEO, TechStart",
-    content: "SoloBoss AI transformed how I manage my business. The 8 AI agents work 24/7, and I've increased productivity by 300% in just 3 months.",
+    role: "Solo Founder, TechStart",
+    content: "SoloBoss AI is like having a full team of experts working for me 24/7. Roxy helps me make strategic decisions, Blaze tracks my competitors, and I've increased my productivity by 200% in just 2 months.",
     rating: 5,
     avatar: "/default-user.svg",
   },
   {
     name: "Marcus Rodriguez",
-    role: "Freelance Designer",
-    content:
-      "The AI agents are like having a full team. Nova handles my scheduling, Echo manages my finances, and I can focus on creative work.",
+    role: "Freelance Consultant",
+    content: "The competitive intelligence features are incredible. I can track my competitors' moves in real-time and get automated alerts. It's like having a business intelligence team at my fingertips.",
     rating: 5,
     avatar: "/default-user.svg",
   },
   {
     name: "Emily Watson",
-    role: "Marketing Director",
-    content: "Game-changer for our agency. The file management and AI insights have increased client satisfaction by 40% while reducing our workload by 60%.",
+    role: "Marketing Agency Owner",
+    content: "The Guardian AI compliance system saved me thousands in legal fees. It automatically generates privacy policies and tracks GDPR compliance. Plus, the AI agents help me create better marketing strategies.",
     rating: 5,
     avatar: "/default-user.svg",
   },

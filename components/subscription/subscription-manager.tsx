@@ -1,502 +1,493 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
 import { 
-  CreditCard, 
+  CheckCircle, 
   Crown, 
   Zap, 
-  Users, 
-  CheckCircle, 
-  XCircle,
-  ArrowUpRight,
-  Settings,
-  Download
+  Star,
+  ArrowRight,
+  CreditCard,
+  Calendar,
+  Users,
+  FileText,
+  Bot,
+  Target,
+  Shield,
+  BarChart3,
+  Settings
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/hooks/use-auth'
 
-interface Plan {
+interface SubscriptionTier {
   id: string
   name: string
   price: number
-  interval: 'month' | 'year'
+  period: string
+  yearlyPrice?: number
+  yearlyPeriod?: string
+  description: string
   features: string[]
   limits: {
-    tasks: number
-    goals: number
     aiAgents: number
-    storage: number
-    teamMembers: number
+    dailyConversations: number
+    fileStorage: string
+    goals: number
+    tasks: number
+    competitors: number
+    templates: number
+    teamMembers?: number
   }
-  popular?: boolean
+  popular: boolean
 }
 
-interface Subscription {
-  id: string
-  planId: string
-  status: 'active' | 'canceled' | 'past_due' | 'trialing'
+interface UserSubscription {
+  tier: string
+  status: string
   currentPeriodStart: string
   currentPeriodEnd: string
   cancelAtPeriodEnd: boolean
-  usage: {
-    tasks: number
-    goals: number
-    aiAgents: number
-    storage: number
-    teamMembers: number
-  }
+  stripeCustomerId?: string
 }
 
-interface SubscriptionManagerProps {
-  className?: string
-}
-
-export function SubscriptionManager({ className = "" }: SubscriptionManagerProps) {
-  const [currentPlan, setCurrentPlan] = useState<Plan | null>(null)
-  const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [showUpgrade, setShowUpgrade] = useState(false)
+export function SubscriptionManager() {
+  const { user } = useAuth()
   const { toast } = useToast()
+  const [loading, setLoading] = useState(false)
+  const [subscription, setSubscription] = useState<UserSubscription | null>(null)
+  const [usage, setUsage] = useState({
+    aiConversations: 0,
+    fileStorage: 0,
+    goals: 0,
+    tasks: 0,
+    competitors: 0,
+    templates: 0
+  })
 
-  const plans: Plan[] = [
+  const tiers: SubscriptionTier[] = [
     {
-      id: 'free',
-      name: 'Free',
+      id: 'launch',
+      name: 'Launch',
       price: 0,
-      interval: 'month',
+      period: 'month',
+      description: 'Perfect for ambitious beginners ready to start their empire',
       features: [
-        'Up to 10 tasks',
-        '3 goals',
-        '1 AI agent',
-        '100MB storage',
-        'Basic templates'
+        'Access to 2 AI agents (Nova & Echo)',
+        '5 AI conversations per day',
+        'Basic task automation',
+        'Email support',
+        'Community access',
+        'Mobile app access'
       ],
       limits: {
-        tasks: 10,
-        goals: 3,
-        aiAgents: 1,
-        storage: 100,
-        teamMembers: 1
-      }
+        aiAgents: 2,
+        dailyConversations: 5,
+        fileStorage: '1GB',
+        goals: 5,
+        tasks: 20,
+        competitors: 3,
+        templates: 5
+      },
+      popular: false
     },
     {
-      id: 'pro',
-      name: 'Pro',
-      price: 29,
-      interval: 'month',
+      id: 'accelerator',
+      name: 'Accelerator',
+      price: 19,
+      period: 'month',
+      yearlyPrice: 190,
+      yearlyPeriod: 'year',
+      description: 'For solo founders ready to scale their empire',
       features: [
-        'Unlimited tasks',
-        'Unlimited goals',
-        '5 AI agents',
-        '10GB storage',
-        'All templates',
+        'Access to all 8 AI agents',
+        'Unlimited AI conversations',
+        'Advanced automation',
         'Priority support',
-        'Analytics dashboard'
+        'Advanced analytics',
+        'File management (10GB)',
+        'Competitive intelligence',
+        'Guardian AI compliance',
+        'Template library access',
+        'API access'
       ],
       limits: {
-        tasks: -1,
-        goals: -1,
-        aiAgents: 5,
-        storage: 10240,
-        teamMembers: 5
+        aiAgents: 8,
+        dailyConversations: -1, // Unlimited
+        fileStorage: '10GB',
+        goals: -1, // Unlimited
+        tasks: -1, // Unlimited
+        competitors: 10,
+        templates: -1 // Unlimited
       },
       popular: true
     },
     {
-      id: 'business',
-      name: 'Business',
-      price: 99,
-      interval: 'month',
+      id: 'dominator',
+      name: 'Dominator',
+      price: 29,
+      period: 'month',
+      yearlyPrice: 290,
+      yearlyPeriod: 'year',
+      description: 'For empire builders who demand the best',
       features: [
-        'Everything in Pro',
-        'Unlimited AI agents',
-        '100GB storage',
-        'Team collaboration',
+        'Everything in Accelerator',
         'White-label options',
-        'API access',
-        'Dedicated support'
+        'Advanced API access',
+        'Custom integrations',
+        'File management (100GB)',
+        'Priority feature requests',
+        'Dedicated support',
+        'Advanced analytics',
+        'Custom workflows',
+        'Team collaboration tools'
       ],
       limits: {
-        tasks: -1,
-        goals: -1,
-        aiAgents: -1,
-        storage: 102400,
-        teamMembers: -1
-      }
+        aiAgents: 8,
+        dailyConversations: -1, // Unlimited
+        fileStorage: '100GB',
+        goals: -1, // Unlimited
+        tasks: -1, // Unlimited
+        competitors: -1, // Unlimited
+        templates: -1, // Unlimited
+        teamMembers: 5
+      },
+      popular: false
     }
   ]
 
   useEffect(() => {
-    loadSubscriptionData()
-  }, [loadSubscriptionData])
+    fetchSubscriptionData()
+  }, [])
 
-  const loadSubscriptionData = useCallback(async () => {
+  const fetchSubscriptionData = async () => {
     try {
-      setIsLoading(true)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // Mock subscription data
-      const mockSubscription: Subscription = {
-        id: 'sub_123',
-        planId: 'pro',
-        status: 'active',
-        currentPeriodStart: '2024-01-01T00:00:00Z',
-        currentPeriodEnd: '2024-02-01T00:00:00Z',
-        cancelAtPeriodEnd: false,
-        usage: {
-          tasks: 47,
-          goals: 8,
-          aiAgents: 3,
-          storage: 2.5,
-          teamMembers: 2
-        }
+      // Fetch user subscription and usage data
+      // This would typically come from your API
+      const response = await fetch('/api/subscription')
+      if (response.ok) {
+        const data = await response.json()
+        setSubscription(data.subscription)
+        setUsage(data.usage)
       }
-      
-      const currentPlanData = plans.find(p => p.id === mockSubscription.planId)
-      
-      setSubscription(mockSubscription)
-      setCurrentPlan(currentPlanData || null)
-    } catch {
-      console.error('Failed to load subscription data')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [plans])
-
-  const upgradePlan = async (planId: string) => {
-    try {
-      setIsLoading(true)
-      
-      // Simulate upgrade process
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const newPlan = plans.find(p => p.id === planId)
-      setCurrentPlan(newPlan || null)
-      
-      toast({
-        title: "✅ Plan upgraded successfully!",
-        description: `You're now on the ${newPlan?.name} plan`,
-      })
-      
-      setShowUpgrade(false)
-    } catch {
-      toast({
-        title: "❌ Upgrade failed",
-        description: "Please try again or contact support",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+    } catch (error) {
+      console.error('Error fetching subscription data:', error)
     }
   }
 
-  const cancelSubscription = async () => {
+  const handleUpgrade = async (tierId: string, billing: 'monthly' | 'yearly' = 'monthly') => {
+    if (tierId === 'launch') {
+      toast({
+        title: 'Already on Launch Plan',
+        description: 'You are currently on the free Launch plan.',
+      })
+      return
+    }
+
+    setLoading(true)
     try {
-      setIsLoading(true)
-      
-      // Simulate cancellation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (subscription) {
-        setSubscription({
-          ...subscription,
-          cancelAtPeriodEnd: true
+      const response = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tier: tierId,
+          billing: billing
         })
-      }
-      
-      toast({
-        title: "Subscription canceled",
-        description: "Your subscription will end at the current billing period",
       })
-    } catch {
+
+      if (response.ok) {
+        const { url } = await response.json()
+        window.location.href = url
+      } else {
+        throw new Error('Failed to create checkout session')
+      }
+    } catch (error) {
+      console.error('Error upgrading subscription:', error)
       toast({
-        title: "Failed to cancel",
-        description: "Please try again or contact support",
-        variant: "destructive",
+        title: 'Upgrade Failed',
+        description: 'There was an error processing your upgrade. Please try again.',
+        variant: 'destructive'
       })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
-  const reactivateSubscription = async () => {
+  const handleManageBilling = async () => {
+    if (!subscription?.stripeCustomerId) {
+      toast({
+        title: 'No Billing Information',
+        description: 'No billing information found for your account.',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    setLoading(true)
     try {
-      setIsLoading(true)
-      
-      // Simulate reactivation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (subscription) {
-        setSubscription({
-          ...subscription,
-          cancelAtPeriodEnd: false
-        })
-      }
-      
-      toast({
-        title: "✅ Subscription reactivated!",
-        description: "Your subscription will continue as normal",
+      const response = await fetch('/api/stripe/billing-portal', {
+        method: 'POST'
       })
-    } catch {
+
+      if (response.ok) {
+        const { url } = await response.json()
+        window.location.href = url
+      } else {
+        throw new Error('Failed to create billing portal session')
+      }
+    } catch (error) {
+      console.error('Error opening billing portal:', error)
       toast({
-        title: "Failed to reactivate",
-        description: "Please try again or contact support",
-        variant: "destructive",
+        title: 'Billing Portal Error',
+        description: 'There was an error opening the billing portal. Please try again.',
+        variant: 'destructive'
       })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
-  const getUsagePercentage = (current: number, limit: number) => {
-    if (limit === -1) return 0 // Unlimited
-    return Math.min((current / limit) * 100, 100)
+  const getCurrentTier = () => {
+    return tiers.find(tier => tier.id === subscription?.tier) || tiers[0]
   }
 
-  const formatStorage = (mb: number) => {
-    if (mb >= 1024) {
-      return `${(mb / 1024).toFixed(1)} GB`
-    }
-    return `${mb} MB`
+  const getUsagePercentage = (current: number, limit: number | string) => {
+    if (limit === -1 || limit === 'unlimited') return 0
+    const limitNum = typeof limit === 'string' ? parseInt(limit) : limit
+    return Math.min((current / limitNum) * 100, 100)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+  const formatStorage = (bytes: number) => {
+    const gb = bytes / (1024 * 1024 * 1024)
+    return `${gb.toFixed(2)} GB`
   }
 
-  if (isLoading) {
-    return (
-      <Card className={className}>
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+  return (
+    <div className="space-y-6">
+      {/* Current Subscription */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5" />
+            Current Subscription
+          </CardTitle>
+          <CardDescription>
+            Manage your SoloBoss AI subscription and billing
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">{getCurrentTier().name} Plan</h3>
+              <p className="text-sm text-muted-foreground">
+                {subscription?.status === 'active' ? 'Active' : 'Inactive'}
+              </p>
+            </div>
+            <Badge variant={subscription?.status === 'active' ? 'default' : 'secondary'}>
+              {subscription?.status === 'active' ? 'Active' : 'Inactive'}
+            </Badge>
+          </div>
+
+          {subscription?.status === 'active' && (
             <div className="space-y-2">
-              <div className="h-3 bg-gray-200 rounded"></div>
-              <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+              <div className="flex items-center justify-between text-sm">
+                <span>Current period</span>
+                <span>
+                  {new Date(subscription.currentPeriodStart).toLocaleDateString()} - {' '}
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                </span>
+              </div>
+              {subscription.cancelAtPeriodEnd && (
+                <div className="flex items-center gap-2 text-sm text-orange-600">
+                  <Calendar className="h-4 w-4" />
+                  <span>Subscription will cancel at the end of the current period</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleManageBilling}
+              disabled={loading || !subscription?.stripeCustomerId}
+              variant="outline"
+              className="flex-1"
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Manage Billing
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Usage Overview
+          </CardTitle>
+          <CardDescription>
+            Your current usage across all features
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  AI Conversations
+                </span>
+                <span>
+                  {usage.aiConversations} / {getCurrentTier().limits.dailyConversations === -1 ? '∞' : getCurrentTier().limits.dailyConversations}
+                </span>
+              </div>
+              {getCurrentTier().limits.dailyConversations !== -1 && (
+                <Progress 
+                  value={getUsagePercentage(usage.aiConversations, getCurrentTier().limits.dailyConversations)} 
+                  className="h-2" 
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  File Storage
+                </span>
+                <span>
+                  {formatStorage(usage.fileStorage)} / {getCurrentTier().limits.fileStorage}
+                </span>
+              </div>
+              <Progress 
+                value={getUsagePercentage(usage.fileStorage, getCurrentTier().limits.fileStorage)} 
+                className="h-2" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Goals
+                </span>
+                <span>
+                  {usage.goals} / {getCurrentTier().limits.goals === -1 ? '∞' : getCurrentTier().limits.goals}
+                </span>
+              </div>
+              {getCurrentTier().limits.goals !== -1 && (
+                <Progress 
+                  value={getUsagePercentage(usage.goals, getCurrentTier().limits.goals)} 
+                  className="h-2" 
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" />
+                  Tasks
+                </span>
+                <span>
+                  {usage.tasks} / {getCurrentTier().limits.tasks === -1 ? '∞' : getCurrentTier().limits.tasks}
+                </span>
+              </div>
+              {getCurrentTier().limits.tasks !== -1 && (
+                <Progress 
+                  value={getUsagePercentage(usage.tasks, getCurrentTier().limits.tasks)} 
+                  className="h-2" 
+                />
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
-    )
-  }
 
-  return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Current Plan */}
-      {currentPlan && subscription && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Crown className="w-5 h-5 text-yellow-600" />
-              Current Plan: {currentPlan.name}
-            </CardTitle>
-            <CardDescription>
-              {subscription.cancelAtPeriodEnd 
-                ? "Your subscription will end on " + formatDate(subscription.currentPeriodEnd)
-                : "Next billing date: " + formatDate(subscription.currentPeriodEnd)
-              }
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            {/* Plan Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium mb-3">Plan Features</h4>
+      {/* Available Plans */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Available Plans</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {tiers.map((tier) => (
+            <Card key={tier.id} className={`relative ${tier.popular ? 'ring-2 ring-purple-500' : ''}`}>
+              {tier.popular && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-purple-500 text-white">
+                    <Star className="h-3 w-3 mr-1" />
+                    Most Popular
+                  </Badge>
+                </div>
+              )}
+              
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {tier.id === 'launch' && <Zap className="h-5 w-5" />}
+                  {tier.id === 'accelerator' && <Crown className="h-5 w-5" />}
+                  {tier.id === 'dominator' && <Star className="h-5 w-5" />}
+                  {tier.name}
+                </CardTitle>
+                <CardDescription>{tier.description}</CardDescription>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold">
+                    ${tier.price}
+                  </span>
+                  <span className="text-muted-foreground">/{tier.period}</span>
+                </div>
+                {tier.yearlyPrice && (
+                  <div className="text-sm text-muted-foreground">
+                    or ${tier.yearlyPrice}/{tier.yearlyPeriod} (save 17%)
+                  </div>
+                )}
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
                 <ul className="space-y-2">
-                  {currentPlan.features.map((feature, index) => (
+                  {tier.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
                 </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-medium mb-3">Usage</h4>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>Tasks</span>
-                      <span>{subscription.usage.tasks} / {currentPlan.limits.tasks === -1 ? '∞' : currentPlan.limits.tasks}</span>
-                    </div>
-                    <Progress value={getUsagePercentage(subscription.usage.tasks, currentPlan.limits.tasks)} />
-                  </div>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full"
+                    variant={tier.id === subscription?.tier ? 'outline' : 'default'}
+                    disabled={loading || tier.id === subscription?.tier}
+                    onClick={() => handleUpgrade(tier.id)}
+                  >
+                    {tier.id === subscription?.tier ? 'Current Plan' : `Upgrade to ${tier.name}`}
+                    {tier.id !== subscription?.tier && <ArrowRight className="h-4 w-4 ml-2" />}
+                  </Button>
                   
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>Goals</span>
-                      <span>{subscription.usage.goals} / {currentPlan.limits.goals === -1 ? '∞' : currentPlan.limits.goals}</span>
-                    </div>
-                    <Progress value={getUsagePercentage(subscription.usage.goals, currentPlan.limits.goals)} />
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>AI Agents</span>
-                      <span>{subscription.usage.aiAgents} / {currentPlan.limits.aiAgents === -1 ? '∞' : currentPlan.limits.aiAgents}</span>
-                    </div>
-                    <Progress value={getUsagePercentage(subscription.usage.aiAgents, currentPlan.limits.aiAgents)} />
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>Storage</span>
-                      <span>{formatStorage(subscription.usage.storage)} / {formatStorage(currentPlan.limits.storage)}</span>
-                    </div>
-                    <Progress value={getUsagePercentage(subscription.usage.storage, currentPlan.limits.storage)} />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Actions */}
-            <div className="flex gap-3">
-              {subscription.cancelAtPeriodEnd ? (
-                <Button onClick={reactivateSubscription} disabled={isLoading}>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Reactivate Subscription
-                </Button>
-              ) : (
-                <Button variant="outline" onClick={cancelSubscription} disabled={isLoading}>
-                  <XCircle className="w-4 h-4 mr-2" />
-                  Cancel Subscription
-                </Button>
-              )}
-              
-              <Button onClick={() => setShowUpgrade(true)} disabled={isLoading}>
-                <ArrowUpRight className="w-4 h-4 mr-2" />
-                Upgrade Plan
-              </Button>
-              
-              <Button variant="outline" disabled={isLoading}>
-                <Settings className="w-4 h-4 mr-2" />
-                Billing Settings
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Plan Comparison */}
-      {showUpgrade && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Choose Your Plan</CardTitle>
-            <CardDescription>
-              Select the plan that best fits your needs
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {plans.map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className={`relative ${plan.popular ? 'border-blue-500 ring-2 ring-blue-500' : ''}`}
-                >
-                  {plan.popular && (
-                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      Most Popular
-                    </Badge>
-                  )}
-                  
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      {plan.id === 'free' && <Zap className="w-4 h-4" />}
-                      {plan.id === 'pro' && <Crown className="w-4 h-4 text-yellow-600" />}
-                      {plan.id === 'business' && <Users className="w-4 h-4 text-blue-600" />}
-                      {plan.name}
-                    </CardTitle>
-                    <div className="text-3xl font-bold">
-                      ${plan.price}
-                      <span className="text-sm font-normal text-gray-600">
-                        /{plan.interval}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-4">
-                    <ul className="space-y-2">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    
+                  {tier.yearlyPrice && tier.id !== subscription?.tier && (
                     <Button 
                       className="w-full"
-                      variant={plan.id === currentPlan?.id ? "outline" : "default"}
-                      onClick={() => upgradePlan(plan.id)}
-                      disabled={plan.id === currentPlan?.id || isLoading}
+                      variant="outline"
+                      disabled={loading}
+                      onClick={() => handleUpgrade(tier.id, 'yearly')}
                     >
-                      {plan.id === currentPlan?.id ? 'Current Plan' : 'Choose Plan'}
+                      Save 17% with Yearly
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            
-            <div className="mt-6 text-center">
-              <Button variant="outline" onClick={() => setShowUpgrade(false)}>
-                Cancel
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Billing History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Billing History
-          </CardTitle>
-          <CardDescription>
-            View your past invoices and payments
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          <div className="space-y-3">
-            {[
-              { id: '1', date: '2024-01-01', amount: 29, status: 'paid', description: 'Pro Plan - Monthly' },
-              { id: '2', date: '2023-12-01', amount: 29, status: 'paid', description: 'Pro Plan - Monthly' },
-              { id: '3', date: '2023-11-01', amount: 29, status: 'paid', description: 'Pro Plan - Monthly' }
-            ].map((invoice) => (
-              <div key={invoice.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium">{invoice.description}</p>
-                  <p className="text-sm text-gray-600">{formatDate(invoice.date)}</p>
+                  )}
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-medium">${invoice.amount}</span>
-                  <Badge variant={invoice.status === 'paid' ? 'default' : 'secondary'}>
-                    {invoice.status}
-                  </Badge>
-                  <Button variant="ghost" size="sm">
-                    <Download className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

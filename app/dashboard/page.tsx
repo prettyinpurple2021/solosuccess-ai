@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
+import { useAnalytics, usePageTracking, usePerformanceTracking } from "@/hooks/use-analytics"
 import { EnhancedOnboarding } from "@/components/onboarding/enhanced-onboarding"
 import { Loading } from "@/components/ui/loading"
 import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
@@ -25,7 +26,12 @@ import Link from "next/link"
 
 export default function DashboardPage() {
   const { data, loading, error } = useDashboardData()
+  const { track } = useAnalytics()
   const [showOnboarding, setShowOnboarding] = useState(false)
+
+  // Track page views and performance
+  usePageTracking()
+  usePerformanceTracking()
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -33,6 +39,17 @@ export default function DashboardPage() {
       setShowOnboarding(true)
     }
   }, [data])
+
+  // Track dashboard view
+  useEffect(() => {
+    if (data) {
+      track('dashboard_viewed', {
+        userLevel: data.user.level,
+        totalPoints: data.user.total_points,
+        streak: data.user.current_streak
+      })
+    }
+  }, [data, track])
 
   const handleOnboardingComplete = async (onboardingData: unknown) => {
     try {
@@ -49,12 +66,23 @@ export default function DashboardPage() {
       })
 
       if (response.ok) {
+        // Track onboarding completion
+        track('feature_used', {
+          feature: 'onboarding',
+          action: 'completed',
+          onboardingData
+        })
+        
         setShowOnboarding(false)
         // Refresh dashboard data
         window.location.reload()
       }
     } catch (error) {
       console.error('Error saving onboarding data:', error)
+      track('error_occurred', {
+        error: 'onboarding_completion_failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      })
     }
   }
 
