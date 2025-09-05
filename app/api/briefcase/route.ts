@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     }
 
     query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
-    params.push(limit.toString(), offset.toString())
+    params.push(limit, offset)
 
     const { rows: files } = await client.query(query, params)
 
