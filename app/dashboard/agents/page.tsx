@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -121,7 +121,7 @@ export default function AgentsPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [_conversations, setConversations] = useState<any[]>([])
+  const [_conversations, setConversations] = useState<unknown[]>([])
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [selectedMessageToSave, setSelectedMessageToSave] = useState<Message | null>(null)
   const [saveForm, setSaveForm] = useState({
@@ -425,8 +425,8 @@ export default function AgentsPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                          style={{ backgroundColor: agent.accent_color }}
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
+                          data-agent-color={agent.accent_color}
                         >
                           {agent.display_name.charAt(0)}
                         </div>
@@ -465,8 +465,8 @@ export default function AgentsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                        style={{ backgroundColor: selectedAgent.accent_color }}
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
+                        data-agent-color={selectedAgent.accent_color}
                       >
                         {selectedAgent.display_name.charAt(0)}
                       </div>
@@ -502,8 +502,8 @@ export default function AgentsPage() {
                     {messages.length === 0 ? (
                       <div className="text-center py-12">
                         <div 
-                          className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4"
-                          style={{ backgroundColor: selectedAgent.accent_color }}
+                          className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 agent-avatar"
+                          data-agent-color={selectedAgent.accent_color}
                         >
                           {selectedAgent.display_name.charAt(0)}
                         </div>

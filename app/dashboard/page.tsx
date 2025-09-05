@@ -34,7 +34,7 @@ export default function DashboardPage() {
     }
   }, [data])
 
-  const handleOnboardingComplete = async (onboardingData: any) => {
+  const handleOnboardingComplete = async (onboardingData: unknown) => {
     try {
       // Save onboarding data to user profile
       const response = await fetch('/api/profile', {
@@ -236,7 +236,7 @@ export default function DashboardPage() {
                   Welcome back, {user.full_name || user.email.split('@')[0]}! 👑
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-400">
-                  Here's what's happening with your empire today
+                  Here&apos;s what&apos;s happening with your empire today
                 </p>
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
                   <Target className="w-6 h-6" />
-                  <span>Today's Tasks</span>
+                  <span>Today&apos;s Tasks</span>
                 </h2>
                 <ZapButton size="sm">
                   View All
@@ -446,8 +446,8 @@ export default function DashboardPage() {
                       className="flex items-center space-x-3 p-3 glass rounded-lg hover-lift cursor-pointer"
                     >
                       <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                        style={{ background: conversation.agent.accent_color }}
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
+                        data-agent-color={conversation.agent.accent_color}
                       >
                         {conversation.agent.display_name.charAt(0)}
                       </div>

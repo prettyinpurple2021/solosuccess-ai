@@ -493,7 +493,8 @@ module.exports = {
     },
   },
 }
-```
+
+```typescript
 
 ### CSS Custom Properties
 

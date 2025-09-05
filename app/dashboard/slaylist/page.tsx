@@ -524,6 +524,7 @@ export default function SlaylistPage() {
                           checked={task.status === 'completed'}
                           onChange={(e) => updateTaskStatus(task.id, e.target.checked ? 'completed' : 'todo')}
                           className="mt-1"
+                          aria-label={`Mark task "${task.title}" as ${task.status === 'completed' ? 'incomplete' : 'completed'}`}
                         />
                         <div className="flex-1">
                           <h4 className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : ''}`}>

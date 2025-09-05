@@ -1,5 +1,8 @@
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind components;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -94,7 +97,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   /* Responsive base font sizes */
@@ -626,6 +629,11 @@
     }
   }
   
+  /* Agent avatar styles */
+  .agent-avatar {
+    background-color: attr(data-agent-color);
+  }
+
   /* Mobile-specific improvements */
   @media (max-width: 768px) {
     /* Ensure buttons are large enough for touch */
