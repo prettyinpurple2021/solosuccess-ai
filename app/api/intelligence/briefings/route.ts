@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
       window: 60 * 1000 // 1 minute
     })
     
-    if (!allowed) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
