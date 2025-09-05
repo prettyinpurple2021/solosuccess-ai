@@ -9,16 +9,18 @@ const nextConfig = {
   },
   // Enable standalone output for Docker deployment
   output: 'standalone',
-  
+
   // Performance optimizations
   experimental: {
     // Enable modern React features
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // --- THIS IS THE NEW, CORRECT LOCATION FOR EXTERNAL PACKAGES ---
+    serverComponentsExternalPackages: ['@sentry/nextjs', '@temporalio/sdk'],
   },
-  
-  // Server external packages (moved from experimental)
-  serverExternalPackages: ['@sentry/nextjs'],
-  
+
+  // --- WE ARE REMOVING THE OLD `serverExternalPackages` KEY ---
+  // serverExternalPackages: ['@sentry/nextjs'], // This line is now removed
+
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -28,21 +30,11 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     unoptimized: false, // Enable optimization for better static asset handling
-    // Remove domain restrictions for local development
-    // domains: ['solobossai.fun'],
-    // remotePatterns: [
-    //   {
-    //     protocol: 'https',
-    //     hostname: 'solobossai.fun',
-    //     port: '',
-    //     pathname: '/images/**',
-    //   },
-    // ],
   },
-  
-  // Bundle optimization
+
+  // Bundle optimization (No changes here)
   webpack: (config, { dev, isServer }) => {
-    // Optimize bundle splitting
+    // ... your existing webpack config remains untouched
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
@@ -61,8 +53,6 @@ const nextConfig = {
         },
       }
     }
-    
-    // Handle Node.js modules for Google Cloud libraries
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -101,12 +91,12 @@ const nextConfig = {
         process: false,
       }
     }
-    
     return config
   },
-  
-  // Headers for security and caching
+
+  // Headers for security and caching (No changes here)
   async headers() {
+    // ... your existing headers config remains untouched
     return [
       {
         source: '/:path*.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)',
@@ -120,56 +110,31 @@ const nextConfig = {
       {
         source: '/api/(.*)',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-          {
-            key: 'X-Robots-Tag',
-            value: 'noindex',
-          },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+          { key: 'X-Robots-Tag', value: 'noindex' },
         ],
       },
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
     ]
   },
-  
-  // Redirects for better UX
+
+  // Redirects for better UX (No changes here)
   async redirects() {
     return [
-      // Removed automatic redirect from "/" to "/dashboard" 
-      // This was causing authentication loops and forbidden errors
-      // Users can navigate to dashboard after successful authentication
+      // ... your existing redirects config remains untouched
     ]
   },
 }
 
-export default nextConfig
+export default nextConfig;
+
