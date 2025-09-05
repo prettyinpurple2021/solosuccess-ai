@@ -125,6 +125,7 @@
     "sharp": "^0.34.3",
     "sonner": "^2.0.6",
     "stream-browserify": "^3.0.0",
+    "stripe": "^18.5.0",
     "swr": "^2.3.6",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.4.17",

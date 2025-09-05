@@ -1,40 +1,40 @@
 # ✅ Stripe Setup Checklist
 
-**Status:** Ready to Start  
+**Status:** 90% Complete - Almost Ready! 🚀  
 **Platform:** SoloBoss AI Platform
 
 ---
 
 ## 🚀 **Quick Setup Checklist**
 
-### **Phase 1: Account & Keys (5 minutes)**
-- [ ] Create Stripe account at [stripe.com](https://stripe.com)
-- [ ] Complete account verification
-- [ ] Get API keys from Dashboard → Developers → API keys
-- [ ] Update `.env.local` with your actual keys:
-  - `STRIPE_SECRET_KEY=sk_test_your_actual_key`
-  - `STRIPE_PUBLISHABLE_KEY=pk_test_your_actual_key`
-  - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_actual_key`
+### **Phase 1: Account & Keys (5 minutes)** ✅ **COMPLETED**
+- [x] Create Stripe account at [stripe.com](https://stripe.com)
+- [x] Complete account verification
+- [x] Get API keys from Dashboard → Developers → API keys
+- [x] Update `.env.local` with your actual keys:
+  - `STRIPE_SECRET_KEY=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` ✅
+  - `STRIPE_PUBLISHABLE_KEY=pk_live_51S465ZPpYfwm37m7hz989mofZ75LzK7OYk7nsFyVVHiIJIzsxQ4phqvOp5mfNaxw3czUIN1KutAJBCeIjExE7p1S00vZL7dX7q` ✅
+  - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_51S465ZPpYfwm37m7hz989mofZ75LzK7OYk7nsFyVVHiIJIzsxQ4phqvOp5mfNaxw3czUIN1KutAJBCeIjExE7p1S00vZL7dX7q` ✅
 
-### **Phase 2: Products & Prices (10 minutes)**
-- [ ] Create **Launch Plan** product (Free)
-- [ ] Create **Accelerator Plan** product ($19/month, $190/year)
-- [ ] Create **Dominator Plan** product ($29/month, $290/year)
-- [ ] Create prices for each product
-- [ ] Copy Price IDs from Stripe Dashboard
+### **Phase 2: Products & Prices (10 minutes)** ✅ **COMPLETED**
+- [x] Create **Launch Plan** product (Free) - `prod_T06VzLBN9hna1l`
+- [x] Create **Accelerator Plan** product ($19/month, $190/year) - `prod_T06ZE5uUl56Ez1`
+- [x] Create **Dominator Plan** product ($29/month, $290/year) - `prod_T06cdEqWcdrKgy`
+- [x] Create prices for each product
+- [x] Copy Price IDs from Stripe Dashboard
 
-### **Phase 3: Update Code (5 minutes)**
-- [ ] Update `lib/stripe.ts` with your actual Price IDs
-- [ ] Replace placeholder values with real Stripe Price IDs
+### **Phase 3: Update Code (5 minutes)** ✅ **COMPLETED**
+- [x] Update `lib/stripe.ts` with your actual Price IDs
+- [x] Replace placeholder values with real Stripe Price IDs
 
-### **Phase 4: Webhooks (10 minutes)**
-- [ ] Create webhook endpoint in Stripe Dashboard
-- [ ] Set endpoint URL to: `https://yourdomain.com/api/stripe/webhook`
-- [ ] Select required events (see list below)
-- [ ] Copy webhook signing secret
-- [ ] Add `STRIPE_WEBHOOK_SECRET` to `.env.local`
+### **Phase 4: Webhooks (10 minutes)** ✅ **COMPLETED**
+- [x] Create webhook endpoint in Stripe Dashboard
+- [x] Set endpoint URL to: `https://solobossai.fun/api/stripe/webhook`
+- [x] Select required events (see list below)
+- [x] Copy webhook signing secret
+- [x] Add `STRIPE_WEBHOOK_SECRET` to `.env.local` - `whsec_HNIRg0ZlAr5a3kP1lAEy51Czqx57Agav` ✅
 
-### **Phase 5: Testing (5 minutes)**
+### **Phase 5: Testing (5 minutes)** ⏳ **PENDING**
 - [ ] Test with Stripe test card: `4242 4242 4242 4242`
 - [ ] Verify subscription creation works
 - [ ] Check webhook events are received

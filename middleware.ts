@@ -42,31 +42,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // For all other routes, check authentication
-  try {
-    // Dynamically import Stack Auth to avoid build issues
-    const { getStackServerApp } = await import('@/stack')
-    const app = getStackServerApp()
-    
-    if (!app) {
-      // If Stack Auth is not configured, redirect to signin
-      return NextResponse.redirect(new URL('/signin', request.url))
-    }
-
-    const user = await app.getUser()
-    
-    if (!user) {
-      // User is not authenticated, redirect to signin
-      return NextResponse.redirect(new URL('/signin', request.url))
-    }
-
-    // User is authenticated, allow access
-    return NextResponse.next()
-  } catch (error) {
-    console.error('Middleware authentication error:', error)
-    // On error, redirect to signin
-    return NextResponse.redirect(new URL('/signin', request.url))
-  }
+  // For all other routes, allow access (client-side auth will handle redirects)
+  // The client-side authentication will handle redirecting to signin if needed
+  return NextResponse.next()
 }
 
 export const config = {

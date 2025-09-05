@@ -29,7 +29,7 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: false, // Enable optimization for better static asset handling
+    unoptimized: true, // Disable optimization to fix image loading issues
   },
 
   // Bundle optimization (No changes here)

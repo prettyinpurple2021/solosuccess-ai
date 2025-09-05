@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ResponsiveImage } from "@/components/ui/responsive-image"
 import {
   ArrowRight,
   Sparkles,
@@ -159,7 +160,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-cyan-100 to-pink-100 dark:from-purple-900/30 dark:via-cyan-900/30 dark:to-pink-900/30 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-cyan-400/20 to-pink-400/20 animate-pulse"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-cyan-400/20 to-pink-400/20"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10"></div>
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-purple-200 dark:border-teal-800">
@@ -173,7 +174,11 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 height={40} 
                 className="rounded-lg"
                 onError={(e) => {
+                  console.error('Logo image failed to load:', e.currentTarget.src);
                   e.currentTarget.src = "/images/logo.png";
+                }}
+                onLoad={() => {
+                  console.log('Logo image loaded successfully');
                 }}
               />
               <span className="text-responsive-xl lg:text-responsive-2xl font-bold bg-gradient-to-r from-purple-600 via-teal-500 to-pink-600 bg-clip-text text-transparent">
@@ -520,12 +525,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                         height={60}
                         className="rounded-full object-cover"
                         onError={(e) => {
-                          // Fallback to initials if image fails to load
-                          e.currentTarget.style.display = 'none';
-                          const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
-                          if (nextSibling) {
-                            nextSibling.style.display = 'flex';
-                          }
+                          e.currentTarget.src = "/default-user.svg";
                         }}
                       />
                       <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-white agent-initial">

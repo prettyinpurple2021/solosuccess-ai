@@ -1,30 +1,32 @@
 import Stripe from 'stripe'
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set')
+// Initialize Stripe only when the secret key is available
+export const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-08-27.basil',
+      typescript: true,
+    })
+  : null
+
+// Helper function to check if Stripe is configured
+export function isStripeConfigured(): boolean {
+  return !!process.env.STRIPE_SECRET_KEY
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia',
-  typescript: true,
-})
-
-// Stripe Product IDs - These will be created in your Stripe dashboard
+// Stripe Product IDs - From your Stripe dashboard
 export const STRIPE_PRODUCTS = {
-  LAUNCH: 'prod_launch_free', // Free tier
-  ACCELERATOR: 'prod_accelerator_monthly', // $19/month
-  ACCELERATOR_YEARLY: 'prod_accelerator_yearly', // $190/year
-  DOMINATOR: 'prod_dominator_monthly', // $29/month
-  DOMINATOR_YEARLY: 'prod_dominator_yearly', // $290/year
+  LAUNCH: 'prod_T06VzLBN9hna1l', // SoloBoss AI - Launch Plan (Free)
+  ACCELERATOR: 'prod_T06ZE5uUl56Ez1', // SoloBoss AI - Accelerator Plan
+  DOMINATOR: 'prod_T06cdEqWcdrKgy', // SoloBoss AI - Dominator Plan
 } as const
 
-// Stripe Price IDs - These will be created in your Stripe dashboard
+// Stripe Price IDs - From your Stripe dashboard
 export const STRIPE_PRICES = {
-  LAUNCH: 'price_launch_free', // Free tier
-  ACCELERATOR_MONTHLY: 'price_accelerator_monthly', // $19/month
-  ACCELERATOR_YEARLY: 'price_accelerator_yearly', // $190/year
-  DOMINATOR_MONTHLY: 'price_dominator_monthly', // $29/month
-  DOMINATOR_YEARLY: 'price_dominator_yearly', // $290/year
+  LAUNCH: 'price_1S46IjPpYfwm37m7EKFi7H4C', // SoloBoss AI - Launch Plan (Free)
+  ACCELERATOR_MONTHLY: 'price_1S46LyPpYfwm37m7M5nOAYW7', // SoloBoss AI - Accelerator Plan ($19/month)
+  ACCELERATOR_YEARLY: 'price_1S46LyPpYfwm37m7lyRhudBs', // SoloBoss AI - Accelerator Plan ($190/year)
+  DOMINATOR_MONTHLY: 'price_1S46P6PpYfwm37m76hqohlw0', // SoloBoss AI - Dominator Plan ($29/month)
+  DOMINATOR_YEARLY: 'price_1S46PXPpYfwm37m7yVhLS7j2', // SoloBoss AI - Dominator Plan ($290/year)
 } as const
 
 // Subscription tiers configuration
@@ -140,7 +142,7 @@ export function hasFeatureAccess(
   if (!tier) return false
   
   const limit = tier.limits[feature]
-  return limit === -1 || limit > 0 // -1 means unlimited
+  return limit === -1 || (typeof limit === 'number' && limit > 0) // -1 means unlimited
 }
 
 // Helper function to get usage limit for feature
@@ -151,7 +153,7 @@ export function getFeatureLimit(
   const tier = getSubscriptionTier(userTier)
   if (!tier) return 0
   
-  return tier.limits[feature]
+  return typeof tier.limits[feature] === 'number' ? tier.limits[feature] : 0
 }
 
 // Stripe webhook event types
@@ -171,6 +173,10 @@ export async function createStripeCustomer(
   name?: string,
   metadata?: Record<string, string>
 ): Promise<Stripe.Customer> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   return await stripe.customers.create({
     email,
     name,
@@ -189,6 +195,10 @@ export async function createCheckoutSession(
   cancelUrl: string,
   metadata?: Record<string, string>
 ): Promise<Stripe.Checkout.Session> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   return await stripe.checkout.sessions.create({
     customer: customerId,
     payment_method_types: ['card'],
@@ -219,6 +229,10 @@ export async function createBillingPortalSession(
   customerId: string,
   returnUrl: string
 ): Promise<Stripe.BillingPortal.Session> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   return await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
@@ -229,6 +243,10 @@ export async function createBillingPortalSession(
 export async function getStripeSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   return await stripe.subscriptions.retrieve(subscriptionId)
 }
 
@@ -237,6 +255,10 @@ export async function cancelStripeSubscription(
   subscriptionId: string,
   immediately: boolean = false
 ): Promise<Stripe.Subscription> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   if (immediately) {
     return await stripe.subscriptions.cancel(subscriptionId)
   } else {
@@ -251,6 +273,10 @@ export async function updateStripeSubscription(
   subscriptionId: string,
   newPriceId: string
 ): Promise<Stripe.Subscription> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   const subscription = await stripe.subscriptions.retrieve(subscriptionId)
   
   return await stripe.subscriptions.update(subscriptionId, {
@@ -268,6 +294,10 @@ export async function updateStripeSubscription(
 export async function getStripeCustomer(
   customerId: string
 ): Promise<Stripe.Customer> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   return await stripe.customers.retrieve(customerId) as Stripe.Customer
 }
 
@@ -275,6 +305,10 @@ export async function getStripeCustomer(
 export async function listStripeSubscriptions(
   customerId: string
 ): Promise<Stripe.Subscription[]> {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
   const subscriptions = await stripe.subscriptions.list({
     customer: customerId,
     status: 'all'
@@ -283,30 +317,5 @@ export async function listStripeSubscriptions(
   return subscriptions.data
 }
 
-// Get Stripe usage records for metered billing
-export async function getStripeUsageRecords(
-  subscriptionItemId: string,
-  startDate: Date,
-  endDate: Date
-): Promise<Stripe.UsageRecord[]> {
-  const usageRecords = await stripe.usageRecords.list({
-    subscription_item: subscriptionItemId,
-    starting_after: Math.floor(startDate.getTime() / 1000).toString(),
-    ending_before: Math.floor(endDate.getTime() / 1000).toString()
-  })
-  
-  return usageRecords.data
-}
-
-// Create Stripe usage record for metered billing
-export async function createStripeUsageRecord(
-  subscriptionItemId: string,
-  quantity: number,
-  timestamp?: Date
-): Promise<Stripe.UsageRecord> {
-  return await stripe.usageRecords.create({
-    subscription_item: subscriptionItemId,
-    quantity,
-    timestamp: timestamp ? Math.floor(timestamp.getTime() / 1000) : undefined
-  })
-}
+// Note: Usage records functionality removed as it's not available in current Stripe API version
+// For metered billing, use Stripe's dashboard or implement custom usage tracking
