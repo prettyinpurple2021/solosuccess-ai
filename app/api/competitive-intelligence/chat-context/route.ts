@@ -7,10 +7,10 @@ import { z } from 'zod'
 // GET /api/competitive-intelligence/chat-context - Get competitive intelligence context for chat
 export async function GET(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const { searchParams } = new URL(request.url)
     const agentId = searchParams.get('agent_id')
@@ -44,10 +44,10 @@ export async function GET(request: NextRequest) {
 // POST /api/competitive-intelligence/chat-context - Analyze message for competitive intelligence relevance
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-chat-analysis', ip, 60_000, 50)

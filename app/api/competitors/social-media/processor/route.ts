@@ -12,8 +12,8 @@ import { z } from 'zod';
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const processorStatus = socialMediaJobProcessor.getStatus();
     
     // Get monitoring statistics for the user
-    const monitoringStats = await socialMediaScheduler.getMonitoringStats(authResult.user.id);
+    const monitoringStats = await socialMediaScheduler.getMonitoringStats(user.id);
 
     return NextResponse.json({
       success: true,
@@ -65,8 +65,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -164,8 +164,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -173,8 +173,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

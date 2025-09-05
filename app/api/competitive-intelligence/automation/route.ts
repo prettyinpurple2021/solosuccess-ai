@@ -7,8 +7,8 @@ import { z } from 'zod'
 // POST /api/competitive-intelligence/automation - Trigger automation for alert
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

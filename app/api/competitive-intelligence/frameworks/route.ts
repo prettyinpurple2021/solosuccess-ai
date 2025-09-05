@@ -7,10 +7,10 @@ import { z } from 'zod'
 // POST /api/competitive-intelligence/frameworks - Generate decision framework with competitive intelligence
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-frameworks', ip, 60_000, 20)
@@ -91,10 +91,10 @@ export async function POST(request: NextRequest) {
 // GET /api/competitive-intelligence/frameworks - Get available frameworks and templates
 export async function GET(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const frameworks = {
       spade: {

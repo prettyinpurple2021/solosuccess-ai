@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const params = getAlertsSchema.parse(Object.fromEntries(searchParams));
 
     // Get alerts
-    const alerts = await alertSystem.getActiveAlerts(authResult.user.id, params.limit);
+    const alerts = await alertSystem.getActiveAlerts(user.id, params.limit);
     
     // Filter by severity if specified
     let filteredAlerts = alerts;
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get alert statistics
-    const stats = await alertSystem.getAlertStats(authResult.user.id);
+    const stats = await alertSystem.getAlertStats(user.id);
 
     return NextResponse.json({
       alerts: filteredAlerts,
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 50, window: 60 });
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

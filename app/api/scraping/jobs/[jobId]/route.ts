@@ -32,8 +32,8 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -41,8 +41,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -61,7 +61,7 @@ export async function GET(
     }
 
     // Verify job belongs to the authenticated user
-    if (job.userId !== authResult.user.id) {
+    if (job.userId !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized access to job' },
         { status: 403 }
@@ -106,8 +106,8 @@ export async function PUT(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -115,8 +115,8 @@ export async function PUT(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -135,7 +135,7 @@ export async function PUT(
     }
 
     // Verify job belongs to the authenticated user
-    if (job.userId !== authResult.user.id) {
+    if (job.userId !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized access to job' },
         { status: 403 }
@@ -239,8 +239,8 @@ export async function DELETE(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -248,8 +248,8 @@ export async function DELETE(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -268,7 +268,7 @@ export async function DELETE(
     }
 
     // Verify job belongs to the authenticated user
-    if (job.userId !== authResult.user.id) {
+    if (job.userId !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized access to job' },
         { status: 403 }

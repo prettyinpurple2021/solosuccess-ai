@@ -15,7 +15,7 @@ export async function PATCH(
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -23,8 +23,8 @@ export async function PATCH(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -46,10 +46,10 @@ export async function PATCH(
     // Perform the requested action
     switch (action) {
       case 'mark_read':
-        await alertSystem.markAlertAsRead(alertId, authResult.user.id);
+        await alertSystem.markAlertAsRead(alertId, user.id);
         break;
       case 'archive':
-        await alertSystem.archiveAlert(alertId, authResult.user.id);
+        await alertSystem.archiveAlert(alertId, user.id);
         break;
     }
 
@@ -74,7 +74,7 @@ export async function GET(
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -82,8 +82,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
