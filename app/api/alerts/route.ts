@@ -72,40 +72,46 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url)
     const queryParams = Object.fromEntries(url.searchParams.entries())
     
+    // Parse parameters into correct types for schema
+    const parsedParams: any = { ...queryParams }
+    
     // Parse arrays from query string
-    if (queryParams.competitorIds) {
-      queryParams.competitorIds = queryParams.competitorIds.split(',').map(id => parseInt(id))
+    if (parsedParams.competitorIds) {
+      parsedParams.competitorIds = parsedParams.competitorIds
+        .split(',')
+        .map((id: string) => parseInt(id, 10))
+        .filter((id: number) => Number.isInteger(id) && id > 0)
     }
-    if (queryParams.alertTypes) {
-      queryParams.alertTypes = queryParams.alertTypes.split(',')
+    if (parsedParams.alertTypes) {
+      parsedParams.alertTypes = parsedParams.alertTypes.split(',')
     }
-    if (queryParams.severity) {
-      queryParams.severity = queryParams.severity.split(',')
+    if (parsedParams.severity) {
+      parsedParams.severity = parsedParams.severity.split(',')
     }
     
     // Parse booleans
-    if (queryParams.isRead) {
-      queryParams.isRead = queryParams.isRead === 'true'
+    if (parsedParams.isRead) {
+      parsedParams.isRead = parsedParams.isRead === 'true'
     }
-    if (queryParams.isArchived) {
-      queryParams.isArchived = queryParams.isArchived === 'true'
+    if (parsedParams.isArchived) {
+      parsedParams.isArchived = parsedParams.isArchived === 'true'
     }
     
     // Parse date range
-    if (queryParams.startDate && queryParams.endDate) {
-      queryParams.dateRange = {
-        start: queryParams.startDate,
-        end: queryParams.endDate,
+    if (parsedParams.startDate && parsedParams.endDate) {
+      parsedParams.dateRange = {
+        start: parsedParams.startDate,
+        end: parsedParams.endDate,
       }
-      delete queryParams.startDate
-      delete queryParams.endDate
+      delete parsedParams.startDate
+      delete parsedParams.endDate
     }
     
     // Convert string numbers to numbers
-    if (queryParams.page) queryParams.page = parseInt(queryParams.page as string)
-    if (queryParams.limit) queryParams.limit = parseInt(queryParams.limit as string)
+    if (parsedParams.page) parsedParams.page = parseInt(parsedParams.page as string)
+    if (parsedParams.limit) parsedParams.limit = parseInt(parsedParams.limit as string)
 
-    const filters = AlertFiltersSchema.parse(queryParams)
+    const filters = AlertFiltersSchema.parse(parsedParams)
 
     // Build query conditions
     const conditions = [eq(competitorAlerts.user_id, user.id)]

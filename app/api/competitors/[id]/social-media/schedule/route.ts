@@ -28,8 +28,8 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -37,8 +37,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -55,7 +55,7 @@ export async function GET(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, authResult.user.id)
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -70,7 +70,7 @@ export async function GET(
     // Get monitoring status
     const status = await socialMediaScheduler.getMonitoringStatus(
       competitorId,
-      authResult.user.id
+      user.id
     );
 
     return NextResponse.json({
@@ -113,8 +113,8 @@ export async function POST(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -122,8 +122,8 @@ export async function POST(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -144,7 +144,7 @@ export async function POST(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, authResult.user.id)
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -188,7 +188,7 @@ export async function POST(
     // Schedule monitoring
     const jobIds = await socialMediaScheduler.scheduleMonitoring(
       competitorId,
-      authResult.user.id,
+      user.id,
       { ...config, platforms: platformsToMonitor }
     );
 
@@ -243,8 +243,8 @@ export async function PUT(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -252,8 +252,8 @@ export async function PUT(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -281,7 +281,7 @@ export async function PUT(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, authResult.user.id)
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -296,7 +296,7 @@ export async function PUT(
     // Update monitoring configuration
     await socialMediaScheduler.updateMonitoringConfig(
       competitorId,
-      authResult.user.id,
+      user.id,
       updates
     );
 
@@ -314,7 +314,7 @@ export async function PUT(
     // Get updated status
     const updatedStatus = await socialMediaScheduler.getMonitoringStatus(
       competitorId,
-      authResult.user.id
+      user.id
     );
 
     return NextResponse.json({
@@ -354,8 +354,8 @@ export async function DELETE(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request);
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -363,8 +363,8 @@ export async function DELETE(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -381,7 +381,7 @@ export async function DELETE(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, authResult.user.id)
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -394,7 +394,7 @@ export async function DELETE(
     }
 
     // Pause monitoring
-    await socialMediaScheduler.pauseMonitoring(competitorId, authResult.user.id);
+    await socialMediaScheduler.pauseMonitoring(competitorId, user.id);
 
     // Update competitor status
     await db

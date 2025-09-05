@@ -15,8 +15,8 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -24,8 +24,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -41,7 +41,7 @@ export async function GET(
       .where(
         and(
           eq(scrapingJobs.id, jobId),
-          eq(scrapingJobs.user_id, authResult.user.id)
+          eq(scrapingJobs.user_id, user.id)
         )
       )
       .limit(1)
@@ -87,8 +87,8 @@ export async function PATCH(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -96,8 +96,8 @@ export async function PATCH(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -122,7 +122,7 @@ export async function PATCH(
       .where(
         and(
           eq(scrapingJobs.id, jobId),
-          eq(scrapingJobs.user_id, authResult.user.id)
+          eq(scrapingJobs.user_id, user.id)
         )
       )
       .limit(1)
@@ -167,8 +167,8 @@ export async function DELETE(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -176,8 +176,8 @@ export async function DELETE(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -193,7 +193,7 @@ export async function DELETE(
       .where(
         and(
           eq(scrapingJobs.id, jobId),
-          eq(scrapingJobs.user_id, authResult.user.id)
+          eq(scrapingJobs.user_id, user.id)
         )
       )
       .limit(1)

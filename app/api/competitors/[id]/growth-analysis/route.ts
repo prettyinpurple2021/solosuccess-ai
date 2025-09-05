@@ -34,10 +34,10 @@ export async function GET(
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const competitorId = parseInt(params.id)
     if (isNaN(competitorId)) {
@@ -152,10 +152,10 @@ export async function POST(
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const competitorId = parseInt(params.id)
     if (isNaN(competitorId)) {

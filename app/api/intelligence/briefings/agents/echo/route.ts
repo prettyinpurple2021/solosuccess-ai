@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       window: 60 * 1000 // 1 minute
     })
     
-    if (!rateLimitResult.success) {
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -25,15 +25,15 @@ export async function POST(request: NextRequest) {
     }
     
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
     
-    const userId = authResult.user.id
+    const userId = user.id
     
     // Parse request body
     const body = await request.json().catch(() => ({}))

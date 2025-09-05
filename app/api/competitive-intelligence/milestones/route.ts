@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration } from '@/lib/competitive-intelligence-integration'
-import { createClient } from '@/lib/db'
+import { db } from '@/db'
+import { createClient } from '@/lib/neon/server'
 import { z } from 'zod'
 
 // GET /api/competitive-intelligence/milestones - Get competitive milestones
 export async function GET(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const { searchParams } = new URL(request.url)
     const goalId = searchParams.get('goal_id')
@@ -73,10 +74,12 @@ export async function GET(request: NextRequest) {
 // POST /api/competitive-intelligence/milestones - Create competitive milestone
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+    
+    const client = await createClient()
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-milestones:create', ip, 60_000, 20)
@@ -117,7 +120,6 @@ export async function POST(request: NextRequest) {
     }
     
     // Get the created milestone
-    const client = await createClient()
     const { rows: milestoneRows } = await client.query(
       'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
       [milestoneId, user.id]
@@ -136,10 +138,12 @@ export async function POST(request: NextRequest) {
 // PUT /api/competitive-intelligence/milestones/[id] - Update milestone progress
 export async function PUT(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+    
+    const client = await createClient()
 
     const body = await request.json()
     const BodySchema = z.object({
@@ -151,7 +155,6 @@ export async function PUT(request: NextRequest) {
 
     const { milestone_id, current_value, progress_notes, status } = BodySchema.parse(body)
 
-    const client = await createClient()
     
     // Get current milestone
     const { rows: milestoneRows } = await client.query(

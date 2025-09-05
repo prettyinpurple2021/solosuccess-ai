@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration } from '@/lib/competitive-intelligence-integration'
-import { createClient } from '@/lib/db'
+import { db } from '@/db'
+import { createClient } from '@/lib/neon/server'
 import { z } from 'zod'
 
 // GET /api/competitive-intelligence/tasks - Get competitive intelligence tasks
 export async function GET(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
     const { searchParams } = new URL(request.url)
     const competitorId = searchParams.get('competitor_id')
@@ -57,10 +58,12 @@ export async function GET(request: NextRequest) {
 // POST /api/competitive-intelligence/tasks - Create task from alert
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, error } = await authenticateRequest()
+      if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+    
+    const client = await createClient()
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-tasks:create', ip, 60_000, 30)
@@ -80,7 +83,6 @@ export async function POST(request: NextRequest) {
 
     const { alert_id, template_id, custom_title, custom_description, priority, goal_id } = BodySchema.parse(body)
 
-    const client = await createClient()
     
     // Get the alert
     const { rows: alertRows } = await client.query(

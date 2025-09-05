@@ -28,8 +28,8 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -37,8 +37,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -54,7 +54,7 @@ export async function GET(
       .where(
         and(
           eq(competitiveOpportunities.id, opportunityId),
-          eq(competitiveOpportunities.user_id, authResult.user.id)
+          eq(competitiveOpportunities.user_id, user.id)
         )
       )
       .limit(1)
@@ -90,8 +90,8 @@ export async function POST(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -99,8 +99,8 @@ export async function POST(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -116,7 +116,7 @@ export async function POST(
       .where(
         and(
           eq(competitiveOpportunities.id, opportunityId),
-          eq(competitiveOpportunities.user_id, authResult.user.id)
+          eq(competitiveOpportunities.user_id, user.id)
         )
       )
       .limit(1)
@@ -137,7 +137,7 @@ export async function POST(
       .insert(opportunityMetrics)
       .values({
         opportunity_id: opportunityId,
-        user_id: authResult.user.id,
+        user_id: user.id,
         metric_name: validatedData.metricName,
         metric_type: validatedData.metricType,
         baseline_value: validatedData.baselineValue?.toString(),
@@ -173,8 +173,8 @@ export async function PUT(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'; const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -182,8 +182,8 @@ export async function PUT(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -199,7 +199,7 @@ export async function PUT(
       .where(
         and(
           eq(competitiveOpportunities.id, opportunityId),
-          eq(competitiveOpportunities.user_id, authResult.user.id)
+          eq(competitiveOpportunities.user_id, user.id)
         )
       )
       .limit(1)
@@ -218,7 +218,7 @@ export async function PUT(
     // Update metric
     const success = await opportunityRecommendationSystem.updateMetric(
       opportunityId,
-      authResult.user.id,
+      user.id,
       validatedData.metricName,
       validatedData.value,
       validatedData.notes

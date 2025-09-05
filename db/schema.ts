@@ -138,6 +138,23 @@ export const posts = pgTable('posts', {
   content: text('content').notNull().default(''),
 });
 
+// User Competitive Stats table for gamification
+export const userCompetitiveStats = pgTable('user_competitive_stats', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  competitors_monitored: integer('competitors_monitored').default(0),
+  intelligence_gathered: integer('intelligence_gathered').default(0),
+  alerts_processed: integer('alerts_processed').default(0),
+  opportunities_identified: integer('opportunities_identified').default(0),
+  competitive_tasks_completed: integer('competitive_tasks_completed').default(0),
+  market_victories: integer('market_victories').default(0),
+  threat_responses: integer('threat_responses').default(0),
+  intelligence_streaks: integer('intelligence_streaks').default(0),
+  competitive_advantage_points: integer('competitive_advantage_points').default(0),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+});
+
 // Competitor Profiles table
 export const competitorProfiles = pgTable('competitor_profiles', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -380,6 +397,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   competitiveOpportunities: many(competitiveOpportunities),
   opportunityActions: many(opportunityActions),
   opportunityMetrics: many(opportunityMetrics),
+  competitiveStats: many(userCompetitiveStats),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
@@ -452,6 +470,13 @@ export const taskAnalyticsRelations = relations(taskAnalytics, ({ one }) => ({
 export const productivityInsightsRelations = relations(productivityInsights, ({ one }) => ({
   user: one(users, {
     fields: [productivityInsights.user_id],
+    references: [users.id],
+  }),
+}));
+
+export const userCompetitiveStatsRelations = relations(userCompetitiveStats, ({ one }) => ({
+  user: one(users, {
+    fields: [userCompetitiveStats.user_id],
     references: [users.id],
   }),
 }));

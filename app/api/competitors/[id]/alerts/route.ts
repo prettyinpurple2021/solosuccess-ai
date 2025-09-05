@@ -14,8 +14,9 @@ export async function GET(
 ) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const { allowed } = rateLimitByIp('competitor-alerts', ip, 60000, 100);
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -23,8 +24,8 @@ export async function GET(
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request);
-    if (!authResult.success || !authResult.user) {
+    const { user, error } = await authenticateRequest();
+    if (error || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -45,7 +46,7 @@ export async function GET(
 
     // Get alerts for specific competitor
     const alerts = await alertSystem.getAlertsByCompetitor(
-      authResult.user.id,
+      user.id,
       competitorId,
       limit
     );
