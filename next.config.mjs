@@ -15,7 +15,7 @@ const nextConfig = {
     // Enable modern React features
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
     // --- THIS IS THE NEW, CORRECT LOCATION FOR EXTERNAL PACKAGES ---
-    serverComponentsExternalPackages: ['@sentry/nextjs', '@temporalio/sdk'],
+    serverComponentsExternalPackages: ['@sentry/nextjs'],
   },
 
   // --- WE ARE REMOVING THE OLD `serverExternalPackages` KEY ---
