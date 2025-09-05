@@ -194,11 +194,13 @@ app/
 ├── pricing/               # Pricing page
 ├── profile/               # User profile
 └── team/                  # AI team chat
+
 ```
 
 ### Component Organization
 
 ```
+
 components/
 ├── ui/                    # Base UI components (Radix + Tailwind)
 │   ├── button.tsx
@@ -215,6 +217,7 @@ components/
     ├── ai-team/
     ├── analytics/
     └── collaboration/
+
 ```
 
 ## 🔧 Development Workflow

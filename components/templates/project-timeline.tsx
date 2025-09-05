@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
 
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { Switch } from "@/components/ui/switch"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { motion } from "framer-motion"
 import { 
@@ -30,20 +30,9 @@ import {
   BarChart3,
   Flag,
   Lightbulb,
-  TrendingUp,
-  Edit3,
   Trash2,
   ChevronRight,
-  ChevronDown,
-  DollarSign,
-  GitBranch,
-  PlayCircle,
-  PauseCircle,
-  StopCircle,
-  Circle,
-  CheckCircle,
-  CalendarDays,
-  Briefcase
+  ChevronDown
 } from "lucide-react"
 
 interface ProjectTask {
@@ -65,6 +54,7 @@ interface ProjectTask {
   subtasks: ProjectTask[]
   parentId?: string
   isExpanded?: boolean
+  category?: 'technical' | 'resource' | 'timeline' | 'budget' | 'external'
 }
 
 interface ProjectMilestone {
@@ -145,17 +135,17 @@ interface ProjectTimelineData {
 
 interface ProjectTimelineProps {
   template: TemplateData
-  onSave?: (data: ProjectTimelineData) => Promise<void>
-  onExport?: (format: 'json' | 'pdf' | 'csv' | 'mpp') => void
+  onSave?: (_data: ProjectTimelineData) => Promise<void>
+  onExport?: (_format: 'json' | 'pdf' | 'csv' | 'mpp') => void
 }
 
-export default function ProjectTimeline({ template, onSave: _onSave, onExport: _onExport }: ProjectTimelineProps) {
+export default function ProjectTimeline({ template: _template, onSave: _onSave, onExport: _onExport }: ProjectTimelineProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [viewMode, setViewMode] = useState<'gantt' | 'kanban' | 'calendar' | 'list'>('gantt')
-  const [_selectedTask, setSelectedTask] = useState<ProjectTask | null>(null)
-  const [_timelineZoom, setTimelineZoom] = useState<'days' | 'weeks' | 'months'>('weeks')
+  const [_selectedTask, _setSelectedTask] = useState<ProjectTask | null>(null)
+  const [_timelineZoom, _setTimelineZoom] = useState<'days' | 'weeks' | 'months'>('weeks')
   const [showCriticalPath, setShowCriticalPath] = useState(false)
-  const [_data, setData] = useState<ProjectTimelineData>({
+  const [data, setData] = useState<ProjectTimelineData>({
     projectName: "",
     projectDescription: "",
     startDate: new Date(),
@@ -349,31 +339,31 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
 
   // Calculate project analytics
   const analytics = useMemo(() => {
-    const totalTasks = data.tasks.length + data.tasks.reduce((sum, task) => sum + task.subtasks.length, 0)
-    const completedTasks = data.tasks.filter(task => task.status === 'completed').length +
-      data.tasks.reduce((sum, task) => sum + task.subtasks.filter(st => st.status === 'completed').length, 0)
+    const totalTasks = data.tasks.length + data.tasks.reduce((sum: number, task: ProjectTask) => sum + task.subtasks.length, 0)
+    const completedTasks = data.tasks.filter((task: ProjectTask) => task.status === 'completed').length +
+      data.tasks.reduce((sum: number, task: ProjectTask) => sum + task.subtasks.filter((st: ProjectTask) => st.status === 'completed').length, 0)
     
     const totalProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
     
-    const totalEstimatedHours = data.tasks.reduce((sum, task) => 
-      sum + task.estimatedHours + task.subtasks.reduce((subSum, subtask) => subSum + subtask.estimatedHours, 0), 0)
+    const totalEstimatedHours = data.tasks.reduce((sum: number, task: ProjectTask) => 
+      sum + task.estimatedHours + task.subtasks.reduce((subSum: number, subtask: ProjectTask) => subSum + subtask.estimatedHours, 0), 0)
     
-    const totalActualHours = data.tasks.reduce((sum, task) =>
-      sum + task.actualHours + task.subtasks.reduce((subSum, subtask) => subSum + subtask.actualHours, 0), 0)
+    const totalActualHours = data.tasks.reduce((sum: number, task: ProjectTask) =>
+      sum + task.actualHours + task.subtasks.reduce((subSum: number, subtask: ProjectTask) => subSum + subtask.actualHours, 0), 0)
     
     const efficiency = totalEstimatedHours > 0 ? Math.round((totalEstimatedHours / Math.max(totalActualHours, 1)) * 100) : 100
     
-    const budgetUsed = data.resources.reduce((sum, resource) => {
-      const resourceTasks = data.tasks.filter(task => task.assignees.includes(resource.id))
-      const resourceHours = resourceTasks.reduce((hours, task) => hours + task.actualHours, 0)
+    const budgetUsed = data.resources.reduce((sum: number, resource: ProjectResource) => {
+      const resourceTasks = data.tasks.filter((task: ProjectTask) => task.assignees.includes(resource.id))
+      const resourceHours = resourceTasks.reduce((hours: number, task: ProjectTask) => hours + task.actualHours, 0)
       return sum + (resourceHours * resource.hourlyRate)
     }, 0)
 
-    const overdueTasks = data.tasks.filter(task => 
+    const overdueTasks = data.tasks.filter((task: ProjectTask) => 
       task.status !== 'completed' && new Date(task.endDate) < new Date()
     ).length
 
-    const upcomingMilestones = data.milestones.filter(milestone => 
+    const upcomingMilestones = data.milestones.filter((milestone: ProjectMilestone) => 
       milestone.status === 'upcoming' && 
       new Date(milestone.date) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     )
@@ -388,7 +378,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
       budgetUsed,
       overdueTasks,
       upcomingMilestones: upcomingMilestones.length,
-      criticalRisks: data.risks.filter(risk => risk.probability >= 4 && risk.impact >= 4).length
+      criticalRisks: data.risks.filter((risk: ProjectRisk) => risk.probability >= 4 && risk.impact >= 4).length
     }
   }, [data])
 
@@ -436,7 +426,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
 
     return (
       <div className="overflow-x-auto">
-        <div className="min-w-full" style={{ width: chartWidth }}>
+        <div className="min-w-full" style={{ width: `${chartWidth}px` }}>
           {/* Timeline Header */}
           <div className="flex bg-gray-50 p-2 border-b sticky top-0 z-10">
             <div className="w-64 font-semibold">Task</div>
@@ -457,7 +447,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
 
           {/* Tasks */}
           <div className="space-y-1">
-            {data.tasks.map((task, index) => (
+            {data.tasks.map((task: ProjectTask, index: number) => (
               <div key={task.id} className="flex items-center hover:bg-gray-50">
                 <div className="w-64 p-2 border-r">
                   <div className="flex items-center gap-2">
@@ -476,7 +466,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 relative" style={{ height: '40px' }}>
+                <div className="flex-1 relative h-10">
                   <div
                     className={`absolute top-2 h-6 rounded ${getStatusColor(task.status)} border-l-4 ${getPriorityColor(task.priority)} flex items-center justify-center text-xs`}
                     style={{
@@ -493,7 +483,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
 
           {/* Milestones */}
           <div className="relative mt-4">
-            {data.milestones.map(milestone => (
+            {data.milestones.map((milestone: ProjectMilestone) => (
               <div
                 key={milestone.id}
                 className="absolute top-0"
@@ -510,14 +500,14 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
   }
 
   const handleSave = async () => {
-    if (onSave) {
-      await onSave(data)
+    if (_onSave) {
+      await _onSave(data)
     }
   }
 
   const handleExport = (format: 'json' | 'pdf' | 'csv' | 'mpp') => {
-    if (onExport) {
-      onExport(format)
+    if (_onExport) {
+      _onExport(format)
     }
   }
 
@@ -546,12 +536,12 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
       efficiency: 0
     })
     setCurrentStep(1)
-    setSelectedTask(null)
+    _setSelectedTask(null)
   }
 
   return (
     <BaseTemplate
-      template={template}
+      template={_template}
       currentStep={currentStep}
       totalSteps={totalSteps}
       showProgress={true}
@@ -613,7 +603,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                 </div>
                 <div>
                   <Label htmlFor="project-status">Project Status</Label>
-                  <Select onValueChange={(value: any) => setData(prev => ({ ...prev, status: value }))}>
+                  <Select onValueChange={(value: string) => setData(prev => ({ ...prev, status: value as ProjectTimelineData['status'] }))}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
@@ -647,7 +637,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                     id="start-date"
                     type="date"
                     value={data.startDate.toISOString().split('T')[0]}
-                    onChange={(e) => setData(prev => ({ ...prev, startDate: e.target.value }))}
+                    onChange={(e) => setData(prev => ({ ...prev, startDate: new Date(e.target.value) }))}
                     className="mt-2"
                   />
                 </div>
@@ -657,7 +647,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                     id="end-date"
                     type="date"
                     value={data.endDate.toISOString().split('T')[0]}
-                    onChange={(e) => setData(prev => ({ ...prev, endDate: e.target.value }))}
+                    onChange={(e) => setData(prev => ({ ...prev, endDate: new Date(e.target.value) }))}
                     className="mt-2"
                   />
                 </div>
@@ -792,14 +782,14 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                   <h4 className="font-semibold">Team Members</h4>
                   <p className="text-sm text-gray-600">Manage your project team and their capabilities</p>
                 </div>
-                  <BossButton onClick={addResource} variant="outline" size="sm">
+                  <BossButton onClick={addResource} variant="secondary" size="sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Team Member
                   </BossButton>
               </div>
 
               <div className="space-y-4">
-                {data.resources.map((resource) => (
+                {data.resources.map((resource: ProjectResource) => (
                   <motion.div
                     key={resource.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -948,7 +938,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(1)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -981,7 +971,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                     <h4 className="font-semibold">Project Tasks</h4>
                     <p className="text-sm text-gray-600">Break down your project into manageable tasks</p>
                   </div>
-                  <BossButton onClick={addTask} variant="outline" size="sm">
+                  <BossButton onClick={addTask} variant="secondary" size="sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Task
                   </BossButton>
@@ -989,7 +979,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
 
                 <div className="space-y-4">
 
-                  {data.tasks.map((task) => (
+                  {data.tasks.map((task: ProjectTask) => (
                     <motion.div
                       key={task.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -1041,7 +1031,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                         </div>
                         <div>
                           <Label className="text-sm">Priority</Label>
-                          <Select onValueChange={(value: any) => updateTask(task.id, { priority: value })}>
+                          <Select onValueChange={(value: string) => updateTask(task.id, { priority: value as ProjectTask['priority'] })}>
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder={task.priority} />
                             </SelectTrigger>
@@ -1055,7 +1045,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                         </div>
                         <div>
                           <Label className="text-sm">Status</Label>
-                          <Select onValueChange={(value: any) => updateTask(task.id, { status: value })}>
+                          <Select onValueChange={(value: string) => updateTask(task.id, { status: value as ProjectTask['status'] })}>
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder={task.status} />
                             </SelectTrigger>
@@ -1094,7 +1084,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           <Input
                             placeholder="e.g., Development, Design"
                             value={task.category}
-                            onChange={(e) => updateTask(task.id, { category: e.target.value })}
+                            onChange={(e) => updateTask(task.id, { category: e.target.value as ProjectTask['category'] })}
                             className="mt-1"
                           />
                         </div>
@@ -1119,11 +1109,11 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           </SelectContent>
                         </Select>
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {task.assignees.map(assigneeId => {
-                            const assignee = data.resources.find(r => r.id === assigneeId)
+                          {task.assignees.map((assigneeId: string) => {
+                            const assignee = data.resources.find((r: ProjectResource) => r.id === assigneeId)
                             if (!assignee) return null
                             return (
-                              <Badge key={assigneeId} variant="outline" className="text-xs">
+                              <Badge key={assigneeId} variant="secondary" className="text-xs">
                                 {assignee.name}
                                 <Button
                                   variant="ghost"
@@ -1207,14 +1197,14 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                     <h4 className="font-semibold">Milestones</h4>
                     <p className="text-sm text-gray-600">Mark important checkpoints in your project</p>
                   </div>
-                  <BossButton onClick={addMilestone} variant="outline" size="sm">
+                  <BossButton onClick={addMilestone} variant="secondary" size="sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Milestone
                   </BossButton>
                 </div>
 
                 <div className="space-y-4">
-                  {data.milestones.map((milestone) => (
+                  {data.milestones.map((milestone: ProjectMilestone) => (
                     <motion.div
                       key={milestone.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -1259,7 +1249,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           <Label className="text-sm">Status</Label>
                           <Select 
                             value={milestone.status} 
-                            onValueChange={(value: any) => updateMilestone(milestone.id, { status: value })}
+                            onValueChange={(value: string) => updateMilestone(milestone.id, { status: value as ProjectMilestone['status'] })}
                           >
                             <SelectTrigger className="mt-1">
                               <SelectValue />
@@ -1322,7 +1312,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(2)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1353,7 +1343,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                   <h4 className="font-semibold">Milestones</h4>
                   <p className="text-sm text-gray-600">Track important project checkpoints and deliverables</p>
                 </div>
-                <BossButton onClick={addMilestone} variant="outline" size="sm">
+                <BossButton onClick={addMilestone} variant="secondary" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Milestone
                 </BossButton>
@@ -1411,7 +1401,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                         <Label className="text-sm">Status</Label>
                         <Select 
                           value={milestone.status} 
-                          onValueChange={(value: any) => updateMilestone(milestone.id, { status: value })}
+                          onValueChange={(value: string) => updateMilestone(milestone.id, { status: value as ProjectMilestone['status'] })}
                         >
                           <SelectTrigger className="mt-1">
                             <SelectValue />
@@ -1469,7 +1459,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(3)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1500,14 +1490,14 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                   <h4 className="font-semibold">Project Risks</h4>
                   <p className="text-sm text-gray-600">Identify potential issues and mitigation strategies</p>
                 </div>
-                <BossButton onClick={addRisk} variant="outline" size="sm">
+                <BossButton onClick={addRisk} variant="secondary" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Risk
                 </BossButton>
               </div>
 
               <div className="space-y-4">
-                {data.risks.map((risk) => {
+                {data.risks.map((risk: ProjectRisk) => {
                   const riskScore = risk.probability * risk.impact
                   const riskLevel = riskScore >= 20 ? 'Critical' : riskScore >= 12 ? 'High' : riskScore >= 6 ? 'Medium' : 'Low'
                   const riskColor = riskScore >= 20 ? 'border-red-500' : riskScore >= 12 ? 'border-orange-500' : riskScore >= 6 ? 'border-yellow-500' : 'border-green-500'
@@ -1525,7 +1515,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           value={risk.title}
                           onChange={(e) => setData(prev => ({
                             ...prev,
-                            risks: prev.risks.map(r => r.id === risk.id ? { ...r, title: e.target.value } : r)
+                                                          risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, title: e.target.value } : r)
                           }))}
                           className="flex-1 mr-4"
                         />
@@ -1548,7 +1538,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           value={risk.description}
                           onChange={(e) => setData(prev => ({
                             ...prev,
-                            risks: prev.risks.map(r => r.id === risk.id ? { ...r, description: e.target.value } : r)
+                                                          risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, description: e.target.value } : r)
                           }))}
                           className="mt-1"
                           rows={2}
@@ -1560,9 +1550,9 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           <Label className="text-sm">Category</Label>
                           <Select 
                             value={risk.category} 
-                            onValueChange={(value: any) => setData(prev => ({
+                            onValueChange={(value: string) => setData(prev => ({
                               ...prev,
-                              risks: prev.risks.map(r => r.id === risk.id ? { ...r, category: value } : r)
+                              risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, category: value as ProjectRisk['category'] } : r)
                             }))}
                           >
                             <SelectTrigger className="mt-1">
@@ -1583,7 +1573,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                             value={[risk.probability]}
                             onValueChange={([value]) => setData(prev => ({
                               ...prev,
-                              risks: prev.risks.map(r => r.id === risk.id ? { ...r, probability: value } : r)
+                              risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, probability: value } : r)
                             }))}
                             max={5}
                             min={1}
@@ -1597,7 +1587,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                             value={[risk.impact]}
                             onValueChange={([value]) => setData(prev => ({
                               ...prev,
-                              risks: prev.risks.map(r => r.id === risk.id ? { ...r, impact: value } : r)
+                              risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, impact: value } : r)
                             }))}
                             max={5}
                             min={1}
@@ -1609,9 +1599,9 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           <Label className="text-sm">Status</Label>
                           <Select 
                             value={risk.status} 
-                            onValueChange={(value: any) => setData(prev => ({
+                            onValueChange={(value: string) => setData(prev => ({
                               ...prev,
-                              risks: prev.risks.map(r => r.id === risk.id ? { ...r, status: value } : r)
+                              risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, status: value as ProjectRisk['status'] } : r)
                             }))}
                           >
                             <SelectTrigger className="mt-1">
@@ -1633,7 +1623,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                           value={risk.mitigation}
                           onChange={(e) => setData(prev => ({
                             ...prev,
-                            risks: prev.risks.map(r => r.id === risk.id ? { ...r, mitigation: e.target.value } : r)
+                            risks: prev.risks.map((r: ProjectRisk) => r.id === risk.id ? { ...r, mitigation: e.target.value } : r)
                           }))}
                           className="mt-1"
                           rows={2}
@@ -1642,7 +1632,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
 
                       <div className="flex items-center justify-between pt-3 border-t">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className={`${riskScore >= 20 ? 'text-red-600 border-red-200' : riskScore >= 12 ? 'text-orange-600 border-orange-200' : riskScore >= 6 ? 'text-yellow-600 border-yellow-200' : 'text-green-600 border-green-200'}`}>
+                          <Badge variant="secondary" className={`${riskScore >= 20 ? 'text-red-600 border-red-200' : riskScore >= 12 ? 'text-orange-600 border-orange-200' : riskScore >= 6 ? 'text-yellow-600 border-yellow-200' : 'text-green-600 border-green-200'}`}>
                             {riskLevel} Risk
                           </Badge>
                           <span className="text-sm text-gray-500">Score: {riskScore}/25</span>
@@ -1666,19 +1656,19 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                   <h4 className="font-semibold mb-2">Risk Summary</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <div className="font-bold text-lg">{data.risks.filter(r => r.probability * r.impact >= 20).length}</div>
+                      <div className="font-bold text-lg">{data.risks.filter((r: ProjectRisk) => r.probability * r.impact >= 20).length}</div>
                       <div className="text-gray-600">Critical Risks</div>
                     </div>
                     <div>
-                      <div className="font-bold text-lg">{data.risks.filter(r => r.probability * r.impact >= 12 && r.probability * r.impact < 20).length}</div>
+                      <div className="font-bold text-lg">{data.risks.filter((r: ProjectRisk) => r.probability * r.impact >= 12 && r.probability * r.impact < 20).length}</div>
                       <div className="text-gray-600">High Risks</div>
                     </div>
                     <div>
-                      <div className="font-bold text-lg">{data.risks.filter(r => r.status === 'mitigated').length}</div>
+                      <div className="font-bold text-lg">{data.risks.filter((r: ProjectRisk) => r.status === 'mitigated').length}</div>
                       <div className="text-gray-600">Mitigated</div>
                     </div>
                     <div>
-                      <div className="font-bold text-lg">{data.risks.filter(r => r.status === 'resolved').length}</div>
+                      <div className="font-bold text-lg">{data.risks.filter((r: ProjectRisk) => r.status === 'resolved').length}</div>
                       <div className="text-gray-600">Resolved</div>
                     </div>
                   </div>
@@ -1690,7 +1680,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(4)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1746,7 +1736,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Label className="text-sm">View:</Label>
-                      <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
+                      <Select value={viewMode} onValueChange={(value: string) => setViewMode(value as typeof viewMode)}>
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
@@ -1785,7 +1775,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                   <div className="border rounded-lg p-4">
                     <h4 className="font-semibold mb-4">Task List</h4>
                     <div className="space-y-2">
-                      {data.tasks.map((task, index) => (
+                      {data.tasks.map((task: ProjectTask, index: number) => (
                         <div key={task.id} className="flex items-center justify-between p-3 border rounded">
                           <div className="flex items-center gap-3">
                             <div className={`w-3 h-3 rounded-full ${task.status === 'completed' ? 'bg-green-500' : task.status === 'in-progress' ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
@@ -1797,7 +1787,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className={getStatusColor(task.status)}>
+                            <Badge variant="secondary" className={getStatusColor(task.status)}>
                               {task.status}
                             </Badge>
                             <div className="w-16 text-right text-sm">{task.progress}%</div>
@@ -1870,7 +1860,7 @@ export default function ProjectTimeline({ template, onSave: _onSave, onExport: _
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(5)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>

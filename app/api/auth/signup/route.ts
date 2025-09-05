@@ -85,6 +85,31 @@ export async function POST(request: NextRequest) {
       created_at: newUser.created_at
     }
 
+    // Start Temporal onboarding workflow in the background
+    try {
+      const { startWorkflow, generateWorkflowId, WORKFLOW_CONFIGS } = await import('@/lib/temporal-client')
+      const { solobossUserOnboardingWorkflow } = await import('@/src/workflows')
+      
+      const workflowId = generateWorkflowId('onboarding', newUser.id)
+      
+      await startWorkflow(solobossUserOnboardingWorkflow, [
+        newUser.id,
+        {
+          email: newUser.email,
+          fullName: newUser.full_name,
+          username: newUser.username
+        }
+      ], {
+        workflowId,
+        ...WORKFLOW_CONFIGS.ONBOARDING
+      })
+      
+      console.log(`Started onboarding workflow ${workflowId} for user ${newUser.id}`)
+    } catch (error) {
+      // Don't fail the signup if Temporal workflow fails
+      console.error('Failed to start onboarding workflow:', error)
+    }
+
     return NextResponse.json({
       user: userData,
       token

@@ -111,11 +111,9 @@ lib/
 
 ### 1. User Interaction Flow
 
-
 User Action → Component → Hook/Service → API Route → Supabase → Database
                 ↓
             UI Update ← State Update ← Response ← JSON ← Query Result
-
 
 ### 2. Real-Time Updates
 
