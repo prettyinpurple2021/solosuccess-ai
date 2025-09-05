@@ -77,7 +77,10 @@ export async function GET(request: NextRequest) {
     
     // Parse arrays from query string
     if (parsedParams.competitorIds) {
-      parsedParams.competitorIds = parsedParams.competitorIds.split(',').map((id: string) => parseInt(id))
+      parsedParams.competitorIds = parsedParams.competitorIds
+        .split(',')
+        .map((id: string) => parseInt(id, 10))
+        .filter((id: number) => Number.isInteger(id) && id > 0)
     }
     if (parsedParams.alertTypes) {
       parsedParams.alertTypes = parsedParams.alertTypes.split(',')
