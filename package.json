@@ -24,6 +24,9 @@
     "test:coverage": "jest --coverage",
     "coverage:ci": "jest --coverage --runInBand",
     "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "temporal:worker": "ts-node-dev --log-error --respawn ./temporal/worker.ts",
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
     "setup:analytics": "node scripts/setup-analytics.js"
@@ -64,6 +67,8 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@sentry/nextjs": "^10.5.0",
+    "@temporalio/client": "^1.13.0",
+    "@temporalio/worker": "^1.13.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/exceljs": "^0.5.3",
     "@types/jsonwebtoken": "^9.0.5",
