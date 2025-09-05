@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!allowed) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 20, window: 60 });
-    if (!allowed) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }

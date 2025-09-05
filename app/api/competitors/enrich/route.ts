@@ -8,6 +8,9 @@ import { z } from 'zod'
 import { eq, and, inArray } from 'drizzle-orm'
 import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for batch enrichment request
 const BatchEnrichmentRequestSchema = z.object({
   competitorIds: z.array(z.number().int().positive()).min(1).max(10), // Limit to 10 competitors per batch

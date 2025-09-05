@@ -5,6 +5,9 @@ import { opportunityRecommendationSystem } from '@/lib/opportunity-recommendatio
 import { competitiveOpportunityDetector } from '@/lib/competitive-opportunity-detection'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const createOpportunitySchema = z.object({
   competitorId: z.string(),
   opportunityType: z.enum([

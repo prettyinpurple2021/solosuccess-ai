@@ -5,6 +5,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey } from '@/lib/idempotency'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'

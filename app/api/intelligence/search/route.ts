@@ -13,6 +13,9 @@ import type {
   AnalysisResult
 } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Enhanced search schema with full-text search capabilities
 const IntelligenceSearchSchema = z.object({
   query: z.string().optional(), // Full-text search query

@@ -1,5 +1,5 @@
 import { CompetitiveIntelligenceGamification } from './competitive-intelligence-gamification'
-import { createClient } from '@/lib/db'
+import { createClient } from '@/lib/neon/client'
 
 export class CompetitiveIntelligenceGamificationTriggers {
   /**

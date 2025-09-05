@@ -12,6 +12,9 @@ import type {
   ImportanceLevel
 } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for processing request
 const ProcessingRequestSchema = z.object({
   analysisResults: z.array(z.object({

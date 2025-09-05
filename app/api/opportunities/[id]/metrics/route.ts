@@ -7,6 +7,9 @@ import { competitiveOpportunities, opportunityMetrics } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const updateMetricSchema = z.object({
   metricName: z.string().min(1).max(100),
   value: z.number(),

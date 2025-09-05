@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/neon/server'
 import jwt from 'jsonwebtoken'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // JWT authentication helper
 async function authenticateJWTRequest(request: NextRequest) {
   try {

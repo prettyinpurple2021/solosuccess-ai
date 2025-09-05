@@ -6,6 +6,9 @@ import { competitiveOpportunities, opportunityActions } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const createActionSchema = z.object({
   actionType: z.string().min(1).max(50),
   title: z.string().min(1).max(255),

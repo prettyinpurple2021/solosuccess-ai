@@ -3,6 +3,9 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for discovery request
 const DiscoveryRequestSchema = z.object({
   businessDomain: z.string().min(1, 'Business domain is required').max(500),

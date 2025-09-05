@@ -7,15 +7,15 @@ let client: Client | null = null
 export async function getTemporalClient(): Promise<Client> {
   if (!client) {
     if (!connection) {
+      const isTemporalCloud = process.env.TEMPORAL_ADDRESS?.includes('temporal.io')
+      
       connection = await Connection.connect({
         address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
-        // Add TLS configuration if needed for production
-        // tls: {
-        //   clientCertPair: {
-        //     crt: Buffer.from(process.env.TEMPORAL_CLIENT_CERT || ''),
-        //     key: Buffer.from(process.env.TEMPORAL_CLIENT_KEY || ''),
-        //   },
-        // },
+        // Add TLS and API key configuration for Temporal Cloud
+        ...(isTemporalCloud && {
+          tls: true,
+          apiKey: process.env.TEMPORAL_API_KEY,
+        }),
       })
     }
 

@@ -6,6 +6,9 @@ import { db } from '@/db'
 import { scrapingJobs, scrapingJobResults } from '@/db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/competitors/scraping/[jobId] - Get job details and results
  */

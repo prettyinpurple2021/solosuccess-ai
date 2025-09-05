@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/db'
+import { createClient } from '@/lib/neon/client'
 import type { CompetitorAlert, CompetitiveOpportunity } from '@/lib/types'
 
 export interface CompetitiveTaskTemplate {

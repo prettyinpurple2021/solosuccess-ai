@@ -6,13 +6,16 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray } from 'drizzle-orm'
 import type { 
-  IntelligenceData, 
-  IntelligenceFilters, 
-  SourceType, 
+  IntelligenceData,
+  IntelligenceFilters,
+  SourceType,
   ImportanceLevel,
   ExtractedData,
   AnalysisResult
 } from '@/lib/competitor-intelligence-types'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
 
 // Validation schemas
 const IntelligenceCreateSchema = z.object({

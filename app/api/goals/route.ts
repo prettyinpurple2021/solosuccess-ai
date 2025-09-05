@@ -5,6 +5,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey } from '@/lib/idempotency'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()

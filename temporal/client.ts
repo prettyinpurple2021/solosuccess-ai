@@ -10,14 +10,19 @@ import {
 } from '../src/workflows';
 
 async function run() {
-  // Connect to the default server location (localhost:7233)
+  // Connect to Temporal server using environment variables
   const connection = await Connection.connect({
-    address: 'localhost:7233',
+    address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
+    // Add TLS and API key configuration for Temporal Cloud
+    ...(process.env.TEMPORAL_ADDRESS?.includes('temporal.io') && {
+      tls: true,
+      apiKey: process.env.TEMPORAL_API_KEY,
+    }),
   });
 
   const client = new Client({
     connection,
-    namespace: 'default',
+    namespace: process.env.TEMPORAL_NAMESPACE || 'default',
   });
 
   console.log('🚀 Starting SoloBoss AI Platform Temporal workflows...\n');

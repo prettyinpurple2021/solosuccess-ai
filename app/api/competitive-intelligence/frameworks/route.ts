@@ -4,6 +4,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveDecisionFrameworks } from '@/lib/competitive-decision-frameworks'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // POST /api/competitive-intelligence/frameworks - Generate decision framework with competitive intelligence
 export async function POST(request: NextRequest) {
   try {

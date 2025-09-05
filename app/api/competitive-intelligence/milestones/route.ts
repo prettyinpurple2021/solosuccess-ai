@@ -6,6 +6,9 @@ import { db } from '@/db'
 import { createClient } from '@/lib/neon/server'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET /api/competitive-intelligence/milestones - Get competitive milestones
 export async function GET(request: NextRequest) {
   try {

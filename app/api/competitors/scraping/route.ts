@@ -4,6 +4,9 @@ import { queueProcessor } from '@/lib/scraping-queue-processor'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const createJobSchema = z.object({
   competitorId: z.number(),
   jobType: z.enum(['website', 'pricing', 'products', 'jobs', 'social']),

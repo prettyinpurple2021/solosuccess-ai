@@ -7,6 +7,9 @@ import { competitiveOpportunities, opportunityActions, opportunityMetrics } from
 import { eq, and } from 'drizzle-orm'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const updateOpportunitySchema = z.object({
   status: z.enum(['identified', 'planned', 'in_progress', 'completed', 'paused', 'cancelled']).optional(),
   progress: z.number().min(0).max(100).optional(),

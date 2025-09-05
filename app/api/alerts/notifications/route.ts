@@ -7,6 +7,9 @@ import { z } from 'zod'
 import { eq, and, gte, desc, inArray, sql } from 'drizzle-orm'
 import type { AlertSeverity } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for notification preferences (for future use)
 const _NotificationPreferencesSchema = z.object({
   email: z.boolean().default(true),

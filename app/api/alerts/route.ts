@@ -11,6 +11,9 @@ import type {
   Recommendation
 } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schemas
 const AlertCreateSchema = z.object({
   competitorId: z.number().int().positive(),

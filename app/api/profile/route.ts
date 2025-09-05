@@ -4,6 +4,9 @@ import { createClient } from '@/lib/neon/server'
 import { z } from 'zod'
 import { info, error as logError } from '@/lib/log'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Edge runtime disabled because jsonwebtoken is not compatible with Edge
 // export const runtime = 'edge'
 

@@ -7,6 +7,9 @@ import { eq, and, gte, desc } from 'drizzle-orm'
 import { blazeGrowthIntelligence } from '@/lib/blaze-growth-intelligence'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const analysisRequestSchema = z.object({
   analysis_type: z.enum(['pricing_strategy', 'growth_analysis', 'market_positioning', 'revenue_optimization']).optional(),
   include_cost_benefit: z.boolean().optional().default(false),

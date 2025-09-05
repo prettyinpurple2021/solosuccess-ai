@@ -42,6 +42,11 @@ export async function POST(request: NextRequest) {
     // Connect to Temporal
     const connection = await Connection.connect({
       address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
+      // Add TLS and API key configuration for Temporal Cloud
+      ...(process.env.TEMPORAL_ADDRESS?.includes('temporal.io') && {
+        tls: true,
+        apiKey: process.env.TEMPORAL_API_KEY,
+      }),
     })
 
     const client = new Client({
@@ -95,6 +100,11 @@ export async function GET(request: NextRequest) {
     // Connect to Temporal
     const connection = await Connection.connect({
       address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
+      // Add TLS and API key configuration for Temporal Cloud
+      ...(process.env.TEMPORAL_ADDRESS?.includes('temporal.io') && {
+        tls: true,
+        apiKey: process.env.TEMPORAL_API_KEY,
+      }),
     })
 
     const client = new Client({

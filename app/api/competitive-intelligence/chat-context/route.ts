@@ -4,6 +4,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService } from '@/lib/competitive-intelligence-context'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET /api/competitive-intelligence/chat-context - Get competitive intelligence context for chat
 export async function GET(request: NextRequest) {
   try {

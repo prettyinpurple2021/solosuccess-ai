@@ -8,6 +8,9 @@ import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for enrichment request
 const EnrichmentRequestSchema = z.object({
   userBusinessDomain: z.string().max(500).optional(),

@@ -4,15 +4,19 @@ import * as activities from '../src/activities';
 async function run() {
   // Step 1: Establish a connection with Temporal server.
   const connection = await NativeConnection.connect({
-    address: 'localhost:7233',
-    // TLS and gRPC metadata configuration goes here.
+    address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
+    // Add TLS and API key configuration for Temporal Cloud
+    ...(process.env.TEMPORAL_ADDRESS?.includes('temporal.io') && {
+      tls: true,
+      apiKey: process.env.TEMPORAL_API_KEY,
+    }),
   });
   
   try {
     // Step 2: Register Workflows and Activities with the Worker.
     const worker = await Worker.create({
       connection,
-      namespace: 'default',
+      namespace: process.env.TEMPORAL_NAMESPACE || 'default',
       taskQueue: 'soloboss-tasks',
       // Workflows are registered using a path as they run in a separate JS context.
       workflowsPath: require.resolve('../src/workflows'),

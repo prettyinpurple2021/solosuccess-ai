@@ -7,6 +7,9 @@ import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for updates
 const CompetitorUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),

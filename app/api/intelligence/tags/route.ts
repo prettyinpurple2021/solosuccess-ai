@@ -6,6 +6,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { eq, sql } from 'drizzle-orm'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schemas
 const TagOperationSchema = z.object({
   intelligenceIds: z.array(z.number().int().positive()),

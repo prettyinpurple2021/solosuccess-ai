@@ -5,6 +5,9 @@ import { socialMediaJobProcessor } from '@/lib/social-media-job-processor';
 import { socialMediaScheduler } from '@/lib/social-media-scheduler';
 import { z } from 'zod';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/competitors/social-media/processor
  * Get social media job processor status and statistics

@@ -6,6 +6,9 @@ import { z } from 'zod'
 import { eq, and, desc } from 'drizzle-orm'
 import { pgTable, varchar, text, jsonb, timestamp, integer, boolean } from 'drizzle-orm/pg-core'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Saved searches table schema (this would normally be in schema.ts)
 export const savedIntelligenceSearches = pgTable('saved_intelligence_searches', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),

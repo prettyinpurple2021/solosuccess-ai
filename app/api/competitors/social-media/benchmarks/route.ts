@@ -7,6 +7,9 @@ import { competitorProfiles } from '@/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const querySchema = z.object({
   competitor_ids: z.string().transform(str => str.split(',').map(Number)),
   platform: z.enum(['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']).optional(),

@@ -4,19 +4,24 @@ async function testConnection() {
   console.log('🔍 Testing Temporal connection...');
   
   try {
-    // Try to connect to Temporal server
+    // Try to connect to Temporal server using environment variables
     const connection = await Connection.connect({
-      address: 'localhost:7233',
+      address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
+      // Add TLS and API key configuration for Temporal Cloud
+      ...(process.env.TEMPORAL_ADDRESS?.includes('temporal.io') && {
+        tls: true,
+        apiKey: process.env.TEMPORAL_API_KEY,
+      }),
     });
 
     const client = new Client({
       connection,
-      namespace: 'default',
+      namespace: process.env.TEMPORAL_NAMESPACE || 'default',
     });
 
     console.log('✅ Successfully connected to Temporal server!');
-    console.log('🌐 Server address: localhost:7233');
-    console.log('📋 Namespace: default');
+    console.log('🌐 Server address:', process.env.TEMPORAL_ADDRESS || 'localhost:7233');
+    console.log('📋 Namespace:', process.env.TEMPORAL_NAMESPACE || 'default');
     
     // Test basic connectivity
     try {

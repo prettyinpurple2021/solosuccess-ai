@@ -6,6 +6,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { eq, and, inArray } from 'drizzle-orm'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for bulk operations
 const BulkOperationSchema = z.object({
   alertIds: z.array(z.number().int().positive()).min(1).max(100),

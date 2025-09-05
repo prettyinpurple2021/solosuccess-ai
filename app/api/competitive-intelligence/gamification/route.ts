@@ -7,6 +7,9 @@ import { users, userCompetitiveStats } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET /api/competitive-intelligence/gamification - Get competitive intelligence gamification data
 export async function GET(request: NextRequest) {
   try {

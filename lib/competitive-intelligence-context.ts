@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/db'
+import { createClient } from '@/lib/neon/client'
 
 export interface CompetitiveIntelligenceContext {
   competitors: {

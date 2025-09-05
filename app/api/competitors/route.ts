@@ -8,6 +8,9 @@ import { z } from 'zod'
 import { eq, and, or, ilike, desc, asc } from 'drizzle-orm'
 import type { CompetitorProfile, CompetitorFilters, ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schemas
 const CompetitorCreateSchema = z.object({
   name: z.string().min(1, 'Competitor name is required').max(255),

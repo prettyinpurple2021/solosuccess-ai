@@ -6,6 +6,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { eq, and } from 'drizzle-orm'
 import type { AlertSeverity, ActionItem, Recommendation } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }

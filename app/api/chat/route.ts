@@ -7,6 +7,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService } from '@/lib/competitive-intelligence-context'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     // Basic rate limiting per IP for chat

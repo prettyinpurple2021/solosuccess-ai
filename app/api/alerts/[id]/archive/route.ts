@@ -7,6 +7,9 @@ import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import type { AlertSeverity, ActionItem, Recommendation } from '@/lib/competitor-intelligence-types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for archive request
 const ArchiveRequestSchema = z.object({
   archive: z.boolean().default(true),

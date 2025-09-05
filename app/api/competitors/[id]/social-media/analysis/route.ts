@@ -6,6 +6,9 @@ import { competitorProfiles, intelligenceData } from '@/db/schema';
 import { eq, and, desc, gte } from 'drizzle-orm';
 import { z } from 'zod';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const paramsSchema = z.object({
   id: z.string().transform(Number)
 });

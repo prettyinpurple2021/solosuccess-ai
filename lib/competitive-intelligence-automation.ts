@@ -1,5 +1,5 @@
 import { CompetitiveIntelligenceIntegration } from './competitive-intelligence-integration'
-import { createClient } from '@/lib/db'
+import { createClient } from '@/lib/neon/client'
 
 export interface AutomationRule {
   id: string

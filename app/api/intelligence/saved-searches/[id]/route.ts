@@ -6,6 +6,9 @@ import { z } from 'zod'
 import { eq, and, sql } from 'drizzle-orm'
 import { savedIntelligenceSearches } from '../route'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Validation schema for updates
 const SavedSearchUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),

@@ -4,6 +4,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceAutomation } from '@/lib/competitive-intelligence-automation'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // POST /api/competitive-intelligence/automation - Trigger automation for alert
 export async function POST(request: NextRequest) {
   try {

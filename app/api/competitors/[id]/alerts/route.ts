@@ -4,6 +4,9 @@ import { rateLimitByIp } from '@/lib/rate-limit';
 import { alertSystem } from '@/lib/competitor-alert-system';
 import { z } from 'zod';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const getCompetitorAlertsSchema = z.object({
   limit: z.string().optional().transform(val => val ? parseInt(val) : 20),
 });

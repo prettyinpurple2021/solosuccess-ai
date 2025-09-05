@@ -4,6 +4,9 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { opportunityRecommendationSystem } from '@/lib/opportunity-recommendation-system'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const analyticsSchema = z.object({
   timeframe: z.enum(['week', 'month', 'quarter', 'year']).optional().default('month')
 })

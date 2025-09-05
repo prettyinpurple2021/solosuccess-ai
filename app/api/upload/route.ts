@@ -5,6 +5,9 @@ import { createClient } from '@/lib/neon/server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey } from '@/lib/idempotency'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'

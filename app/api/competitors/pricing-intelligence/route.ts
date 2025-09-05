@@ -7,6 +7,9 @@ import { eq, and, gte, desc, inArray } from 'drizzle-orm'
 import { blazeGrowthIntelligence } from '@/lib/blaze-growth-intelligence'
 import { z } from 'zod'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const pricingAnalysisSchema = z.object({
   competitor_ids: z.array(z.number()).min(1).max(10),
   analysis_scope: z.enum(['pricing_only', 'competitive_positioning', 'revenue_optimization', 'comprehensive']).default('pricing_only'),
