@@ -3,6 +3,9 @@
 import { useState } from "react"
 import { OnboardingWizard } from "./onboarding-wizard"
 import { InteractiveTutorial } from "./interactive-tutorial"
+import { EnhancedWelcomeFlow } from "./enhanced-welcome-flow"
+import { FeatureDiscovery } from "./feature-discovery"
+import { ProgressiveOnboarding } from "./progressive-onboarding"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,22 +32,35 @@ interface EnhancedOnboardingProps {
 }
 
 export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userData }: EnhancedOnboardingProps) {
-  const [currentPhase, setCurrentPhase] = useState<"wizard" | "tutorial" | "complete">("wizard")
+  const [currentPhase, setCurrentPhase] = useState<"welcome" | "wizard" | "discovery" | "progressive" | "complete">("welcome")
   const [onboardingData, setOnboardingData] = useState<any>(null)
   const [tutorialType, setTutorialType] = useState<"dashboard" | "ai-agents" | "tasks" | "goals" | "files" | "complete">("dashboard")
   const [completedTutorials, setCompletedTutorials] = useState<string[]>([])
   const [showTutorial, setShowTutorial] = useState(false)
+  const [userPreferences, setUserPreferences] = useState<any>(null)
 
-  const totalPhases = 3
-  const currentPhaseIndex = currentPhase === "wizard" ? 0 : currentPhase === "tutorial" ? 1 : 2
+  const totalPhases = 5
+  const currentPhaseIndex = currentPhase === "welcome" ? 0 : currentPhase === "wizard" ? 1 : currentPhase === "discovery" ? 2 : currentPhase === "progressive" ? 3 : 4
   const _progress = ((currentPhaseIndex + 1) / totalPhases) * 100
 
   const tutorialOrder = ["dashboard", "ai-agents", "tasks", "goals", "files", "complete"]
 
+  const handleWelcomeComplete = (data: Record<string, unknown>) => {
+    setUserPreferences(data)
+    setCurrentPhase("wizard")
+  }
+
   const handleWizardComplete = (data: Record<string, unknown>) => {
     setOnboardingData(data)
-    setCurrentPhase("tutorial")
-    setShowTutorial(true)
+    setCurrentPhase("discovery")
+  }
+
+  const handleDiscoveryComplete = () => {
+    setCurrentPhase("progressive")
+  }
+
+  const handleProgressiveComplete = () => {
+    setCurrentPhase("complete")
   }
 
   const handleTutorialComplete = () => {
@@ -73,6 +89,7 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
   const handleComplete = () => {
     const finalData = {
       ...onboardingData,
+      userPreferences,
       completedTutorials,
       onboardingCompleted: true,
       completionDate: new Date().toISOString()
@@ -249,11 +266,38 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
 
   return (
     <>
+      {currentPhase === "welcome" && (
+        <EnhancedWelcomeFlow
+          open={open}
+          onComplete={handleWelcomeComplete}
+          onSkip={onSkip}
+          userData={_userData}
+        />
+      )}
+
       {currentPhase === "wizard" && (
         <OnboardingWizard
           open={open}
           onComplete={handleWizardComplete}
           onSkip={onSkip}
+        />
+      )}
+
+      {currentPhase === "discovery" && (
+        <FeatureDiscovery
+          open={open}
+          onComplete={handleDiscoveryComplete}
+          onSkip={onSkip}
+          userPreferences={userPreferences}
+        />
+      )}
+
+      {currentPhase === "progressive" && (
+        <ProgressiveOnboarding
+          open={open}
+          onComplete={handleProgressiveComplete}
+          onSkip={onSkip}
+          userData={_userData}
         />
       )}
 

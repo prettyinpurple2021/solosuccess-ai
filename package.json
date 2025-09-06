@@ -39,6 +39,7 @@
     "cancelsubscription": "tsx src/scripts/cancel-subscription.ts",
     "updatechargeamount": "tsx src/scripts/update-chargeamt.ts",
     "test-workflows": "tsx src/scripts/test-workflows.ts",
+    "test-workflows-simple": "tsx src/scripts/test-workflows-simple.ts",
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
     "setup:analytics": "node scripts/setup-analytics.js"

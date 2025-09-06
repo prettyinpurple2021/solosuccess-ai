@@ -136,6 +136,10 @@ import { SoloBossCustomer, SubscriptionTier, SubscriptionWorkflowData } from "./
 // Welcome and onboarding activities
 export async function sendWelcomeEmail(customer: SoloBossCustomer) {
   log.info(`Sending welcome email to ${customer.email} for ${customer.subscriptionTier} tier`);
+  
+  // Simulate email sending with a short delay
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
   // In a real implementation, you would integrate with your email service (Resend, SendGrid, etc.)
   // await sendEmail({
   //   to: customer.email,
@@ -143,10 +147,16 @@ export async function sendWelcomeEmail(customer: SoloBossCustomer) {
   //   template: 'welcome',
   //   data: { customer, tier: customer.subscriptionTier }
   // });
+  
+  log.info(`Welcome email sent successfully to ${customer.email}`);
 }
 
 export async function setupFreeTierAccess(customer: SoloBossCustomer) {
   log.info(`Setting up free tier access for ${customer.email}`);
+  
+  // Simulate setup with a short delay
+  await new Promise(resolve => setTimeout(resolve, 150));
+  
   // Set up free tier limits and features
   // - 2 AI agents (Nova & Echo)
   // - 5 AI conversations per day
@@ -154,6 +164,8 @@ export async function setupFreeTierAccess(customer: SoloBossCustomer) {
   // - Email support
   // - Community access
   // - Mobile app access
+  
+  log.info(`Free tier access set up successfully for ${customer.email}`);
 }
 
 export async function setupPaidTierAccess(customer: SoloBossCustomer, tier: SubscriptionTier) {
@@ -287,6 +299,9 @@ export async function sendPaymentSucceededEmail(customer: SoloBossCustomer, amou
 export async function updateUserSubscriptionInDatabase(customer: SoloBossCustomer) {
   log.info(`Updating user subscription in database for ${customer.email}`);
   
+  // Simulate database update with a short delay
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
   // In a real implementation, you would update your database
   // await db.update(users)
   //   .set({
@@ -300,6 +315,8 @@ export async function updateUserSubscriptionInDatabase(customer: SoloBossCustome
   //     updated_at: new Date()
   //   })
   //   .where(eq(users.id, customer.id));
+  
+  log.info(`User subscription updated successfully for ${customer.email}`);
 }
 
 export async function downgradeToFreeTier(customer: SoloBossCustomer) {

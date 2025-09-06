@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
 import { useAnalytics, usePageTracking, usePerformanceTracking } from "@/hooks/use-analytics"
 import { EnhancedOnboarding } from "@/components/onboarding/enhanced-onboarding"
+import { WelcomeDashboard } from "@/components/onboarding/welcome-dashboard"
 import { Loading } from "@/components/ui/loading"
 import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
 import { BossButton, ZapButton } from "@/components/ui/boss-button"
@@ -28,6 +29,7 @@ export default function DashboardPage() {
   const { data, loading, error } = useDashboardData()
   const { track } = useAnalytics()
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showWelcomeDashboard, setShowWelcomeDashboard] = useState(false)
 
   // Track page views and performance
   usePageTracking()
@@ -36,7 +38,8 @@ export default function DashboardPage() {
   // Check if onboarding should be shown
   useEffect(() => {
     if (data && !data.user.onboarding_completed) {
-      setShowOnboarding(true)
+      // Show welcome dashboard first, then onboarding
+      setShowWelcomeDashboard(true)
     }
   }, [data])
 
@@ -88,6 +91,26 @@ export default function DashboardPage() {
 
   const handleOnboardingSkip = () => {
     setShowOnboarding(false)
+  }
+
+  const handleStartOnboarding = () => {
+    setShowWelcomeDashboard(false)
+    setShowOnboarding(true)
+  }
+
+  const handleSkipWelcome = () => {
+    setShowWelcomeDashboard(false)
+  }
+
+  // Show welcome dashboard for first-time users
+  if (showWelcomeDashboard && data) {
+    return (
+      <WelcomeDashboard
+        userData={data.user}
+        onStartOnboarding={handleStartOnboarding}
+        onSkipOnboarding={handleSkipWelcome}
+      />
+    )
   }
 
   if (loading) {
