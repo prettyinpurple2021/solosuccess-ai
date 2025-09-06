@@ -28,9 +28,10 @@ import {
   FileSpreadsheet,
   FileType,
   FileCode,
-  Loader2
+  Loader2,
+  Download
 } from "lucide-react"
-import { _motion, _AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 import FilePreviewModal from "@/components/file-preview-modal"
 

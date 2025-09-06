@@ -88,11 +88,10 @@ export async function POST(request: NextRequest) {
     // Start Temporal onboarding workflow in the background
     try {
       const { startWorkflow, generateWorkflowId, WORKFLOW_CONFIGS } = await import('@/lib/temporal-client')
-      const { solobossUserOnboardingWorkflow } = await import('@/src/workflows')
       
       const workflowId = generateWorkflowId('onboarding', newUser.id)
       
-      await startWorkflow(solobossUserOnboardingWorkflow, [
+      await startWorkflow('solobossUserOnboardingWorkflow', [
         newUser.id,
         {
           email: newUser.email,

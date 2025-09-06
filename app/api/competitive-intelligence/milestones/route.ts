@@ -194,7 +194,7 @@ export async function PUT(request: NextRequest) {
       }
     }
     
-    updateValues.push(milestone_id, user.id)
+    updateValues.push(milestone_id.toString(), user.id)
     
     const { rows: updatedRows } = await client.query(
       `UPDATE tasks SET ${updateFields.join(', ')} 

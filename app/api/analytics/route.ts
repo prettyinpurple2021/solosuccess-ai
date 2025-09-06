@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { event, properties, timestamp } = AnalyticsEventSchema.parse(body)
+    const { event, properties, timestamp: _timestamp } = AnalyticsEventSchema.parse(body)
 
     // Add user ID to properties
     const eventProperties = {

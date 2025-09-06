@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import { Crown, Heart, Sparkles, Twitter, Instagram, Linkedin, Github, Mail, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -46,7 +46,7 @@ export function AppFooter() {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!email || isSubmitting) return
 

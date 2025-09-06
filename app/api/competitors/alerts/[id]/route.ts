@@ -15,7 +15,7 @@ export async function PATCH(
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!allowed) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }
@@ -74,7 +74,7 @@ export async function GET(
   try {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 60 });
-    if (!allowed) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }

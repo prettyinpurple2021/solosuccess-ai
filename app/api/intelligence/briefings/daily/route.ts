@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
     // Rate limiting
     const rateLimitResult = await rateLimitByIp(request, {
       requests: 5,
-      window: 60 * 1000 // 1 minute
+      window: 60 // 1 minute in seconds
     })
     
-    if (!allowed) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
         { status: 429 }

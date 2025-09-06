@@ -1,32 +1,26 @@
 module.exports = {
-  root: true,
-  env: {
-    browser: true,
-    es2021: true,
-    node: true,
-  },
-  extends: [
-    'eslint:recommended',
-    'plugin:import/recommended',
-    'plugin:import/typescript', // This is important for TS integration
-  ],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-  },
-  plugins: ['@typescript-eslint', 'import'],
-  settings: {
-    'import/resolver': {
-      typescript: {
-        project: './tsconfig.json', // Tells the resolver where to find your tsconfig
-      },
-    },
-  },
+  extends: ['next/core-web-vitals', 'next/typescript'],
   rules: {
-    // You can add your project-specific rules here.
-    // For example, to enforce alias usage:
-    'import/no-relative-parent-imports': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      },
+    ],
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      },
+    ],
+    'import/no-relative-parent-imports': 'off',
+    'react/no-unescaped-entities': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-empty-object-type': 'off',
+    '@next/next/no-img-element': 'warn',
   },
-  ignorePatterns: ['node_modules/', '.next/'],
 };

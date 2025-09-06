@@ -1,3 +1,4 @@
+import '@/lib/server-polyfills'
 import { NextRequest, NextResponse } from 'next/server';
 import { DocumentParser } from '@/lib/documentParser';
 import fs from 'fs';

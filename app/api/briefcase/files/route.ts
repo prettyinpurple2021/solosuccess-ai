@@ -49,7 +49,7 @@ export const MOCK_FILES = [
   }
 ]
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: Request) {
   try {
     return NextResponse.json({
       success: true,

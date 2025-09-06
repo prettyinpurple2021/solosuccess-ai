@@ -16,8 +16,8 @@ const paramsSchema = z.object({
 
 const querySchema = z.object({
   platform: z.enum(['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']).optional(),
-  limit: z.string().transform(Number).default(50),
-  offset: z.string().transform(Number).default(0)
+  limit: z.string().transform(Number).default('50'),
+  offset: z.string().transform(Number).default('0')
 });
 
 /**

@@ -3,7 +3,7 @@
 // Force dynamic rendering to avoid static generation issues with StackAuth
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { EmpowermentButton } from "@/components/ui/boss-button"
 import { EmpowermentCard } from "@/components/ui/boss-card"
@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
     )
   }
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: FormEvent) => {
     e.preventDefault()
     if (!email.trim()) {
       setError("Please enter your email address")

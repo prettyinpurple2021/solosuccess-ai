@@ -1,4 +1,5 @@
 import "./globals.css"
+import type { ReactNode } from 'react'
 import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -43,7 +44,7 @@ export const viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <html lang="en" suppressHydrationWarning>

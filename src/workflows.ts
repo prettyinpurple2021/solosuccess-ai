@@ -1,9 +1,38 @@
-import { proxyActivities, sleep } from '@temporalio/workflow';
+import { 
+  proxyActivities, 
+  sleep, 
+  log, 
+  workflowInfo, 
+  defineQuery, 
+  defineSignal, 
+  setHandler, 
+  condition 
+} from '@temporalio/workflow';
 // Only import the activity types
 import type * as activities from './activities';
+import { SoloBossCustomer, SubscriptionTier, SubscriptionWorkflowData } from './shared';
 
 const { greet, processUserData, sendNotification, updateUserProfile } = proxyActivities<typeof activities>({
   startToCloseTimeout: '1 minute',
+});
+
+// SoloBoss subscription workflow activities
+const {
+  sendWelcomeEmail,
+  setupFreeTierAccess,
+  setupPaidTierAccess,
+  createStripeSubscription,
+  cancelStripeSubscription,
+  updateStripeSubscription,
+  sendSubscriptionUpgradeEmail,
+  sendSubscriptionDowngradeEmail,
+  sendSubscriptionCancellationEmail,
+  sendPaymentFailedEmail,
+  sendPaymentSucceededEmail,
+  updateUserSubscriptionInDatabase,
+  downgradeToFreeTier,
+} = proxyActivities<typeof activities>({
+  startToCloseTimeout: "30 seconds",
 });
 
 /** A workflow that simply calls an activity */
@@ -11,8 +40,8 @@ export async function example(name: string): Promise<string> {
   return await greet(name);
 }
 
-/** A more complex workflow for user onboarding */
-export async function userOnboardingWorkflow(userId: string, userData: any): Promise<{ success: boolean; steps: string[] }> {
+/** A more complex workflow for user onboarding (legacy) */
+export async function legacyUserOnboardingWorkflow(userId: string, userData: any): Promise<{ success: boolean; steps: string[] }> {
   const steps: string[] = [];
   
   try {
@@ -74,19 +103,18 @@ export async function scheduledDataProcessingWorkflow(): Promise<{ processed: nu
   return { processed, errors };
 }
 
-// SoloBoss AI Platform specific workflows
+// SoloBoss AI Platform specific workflows (legacy)
 const { 
   createInitialGoals, 
   setupCompetitiveIntelligence, 
   initializeAIAgents, 
-  sendWelcomeEmail, 
   createOnboardingTasks, 
   scheduleIntelligenceBriefing 
 } = proxyActivities<typeof import('./activities')>({
   startToCloseTimeout: '2 minutes',
 });
 
-/** Complete SoloBoss AI Platform user onboarding workflow */
+/** Complete SoloBoss AI Platform user onboarding workflow (legacy) */
 export async function solobossUserOnboardingWorkflow(
   userId: string, 
   userData: { email: string; fullName: string; username?: string }
@@ -119,11 +147,17 @@ export async function solobossUserOnboardingWorkflow(
     const tasksResult = await createOnboardingTasks(userId, goalsResult.goalIds);
     steps.push(`Created ${tasksResult.tasksCreated} onboarding tasks`);
     
-    // Step 5: Send welcome email
-    const emailResult = await sendWelcomeEmail(userId, userData.email, userData.fullName);
-    if (emailResult.sent) {
-      steps.push('Welcome email sent');
-    }
+    // Step 5: Send welcome email (using the new subscription workflow version)
+    const emailResult = await sendWelcomeEmail({ 
+      id: userId, 
+      email: userData.email, 
+      fullName: userData.fullName,
+      subscriptionTier: 'launch',
+      subscriptionStatus: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    steps.push('Welcome email sent');
     
     // Step 6: Schedule intelligence briefing
     const briefingResult = await scheduleIntelligenceBriefing(userId);
@@ -311,5 +345,290 @@ export async function goalAchievementTrackingWorkflow(
   } catch (error) {
     console.error('Goal achievement tracking failed:', error);
     throw error;
+  }
+}
+
+// SoloBoss AI Platform subscription workflow definitions
+export const customerTierQuery = defineQuery<SubscriptionTier>("customerTier");
+export const customerStatusQuery = defineQuery<string>("customerStatus");
+export const subscriptionAmountQuery = defineQuery<number>("subscriptionAmount");
+
+export const cancelSubscription = defineSignal("cancelSubscription");
+export const upgradeSubscription = defineSignal<[SubscriptionTier, string]>("upgradeSubscription");
+export const downgradeSubscription = defineSignal<[SubscriptionTier]>("downgradeSubscription");
+
+/**
+ * SoloBoss AI Platform User Onboarding Workflow
+ * Handles new user signup and initial subscription setup
+ */
+export async function userOnboardingWorkflow(
+  customer: SoloBossCustomer
+): Promise<{ success: boolean; message: string; tier: SubscriptionTier }> {
+  try {
+    log.info(`Starting onboarding workflow for ${customer.email}`);
+
+    // Send welcome email
+    await sendWelcomeEmail(customer);
+
+    // Set up access based on tier
+    if (customer.subscriptionTier === 'launch') {
+      await setupFreeTierAccess(customer);
+    } else {
+      await setupPaidTierAccess(customer, customer.subscriptionTier);
+    }
+
+    // Update database
+    await updateUserSubscriptionInDatabase(customer);
+
+    log.info(`Onboarding completed for ${customer.email} on ${customer.subscriptionTier} tier`);
+    
+    return {
+      success: true,
+      message: `Welcome to SoloBoss AI Platform! You're now on the ${customer.subscriptionTier} tier.`,
+      tier: customer.subscriptionTier
+    };
+
+  } catch (error) {
+    log.error(`Onboarding failed for ${customer.email}:`, error);
+    return {
+      success: false,
+      message: `Onboarding failed: ${error}`,
+      tier: 'launch'
+    };
+  }
+}
+
+/**
+ * SoloBoss AI Platform Subscription Management Workflow
+ * Handles ongoing subscription management, upgrades, downgrades, and cancellations
+ */
+export async function subscriptionManagementWorkflow(
+  workflowData: SubscriptionWorkflowData
+): Promise<{ success: boolean; message: string; finalTier: SubscriptionTier }> {
+  const { customer, tier, billingCycle, priceId, amount, isFreeTier } = workflowData;
+  
+  let currentTier = customer.subscriptionTier;
+  let subscriptionCancelled = false;
+  let pendingUpgrade: { tier: SubscriptionTier; priceId: string } | null = null;
+  let pendingDowngrade: SubscriptionTier | null = null;
+
+  // Set up query and signal handlers
+  setHandler(customerTierQuery, () => currentTier);
+  setHandler(customerStatusQuery, () => customer.subscriptionStatus);
+  setHandler(subscriptionAmountQuery, () => amount);
+
+  setHandler(cancelSubscription, () => {
+    subscriptionCancelled = true;
+    log.info(`Cancellation signal received for ${customer.email}`);
+  });
+
+  setHandler(upgradeSubscription, (newTier: SubscriptionTier, newPriceId: string) => {
+    pendingUpgrade = { tier: newTier, priceId: newPriceId };
+    log.info(`Upgrade signal received for ${customer.email} to ${newTier}`);
+  });
+
+  setHandler(downgradeSubscription, (newTier: SubscriptionTier) => {
+    pendingDowngrade = newTier;
+    log.info(`Downgrade signal received for ${customer.email} to ${newTier}`);
+  });
+
+  try {
+    // Handle free tier users
+    if (isFreeTier) {
+      log.info(`Managing free tier subscription for ${customer.email}`);
+      
+      // Free tier users can upgrade at any time
+      while (!subscriptionCancelled) {
+        // Wait for upgrade signal or cancellation
+        await condition(() => pendingUpgrade !== null || subscriptionCancelled, "1 hour");
+        
+        if (subscriptionCancelled) {
+          break;
+        }
+        
+        if (pendingUpgrade) {
+          const { tier: newTier, priceId: newPriceId } = pendingUpgrade;
+          
+          // Create Stripe subscription
+          const subscriptionId = await createStripeSubscription(customer, newPriceId);
+          
+          // Update customer data
+          customer.subscriptionTier = newTier;
+          customer.subscriptionStatus = 'active';
+          customer.stripeSubscriptionId = subscriptionId;
+          currentTier = newTier;
+          
+          // Set up paid tier access
+          await setupPaidTierAccess(customer, newTier);
+          
+          // Send upgrade email
+          await sendSubscriptionUpgradeEmail(customer, newTier);
+          
+          // Update database
+          await updateUserSubscriptionInDatabase(customer);
+          
+          log.info(`Successfully upgraded ${customer.email} to ${newTier} tier`);
+          pendingUpgrade = null;
+          
+          // Continue with paid subscription management
+          break;
+        }
+      }
+    }
+
+    // Handle paid tier users
+    if (!isFreeTier && !subscriptionCancelled) {
+      log.info(`Managing paid subscription for ${customer.email} on ${currentTier} tier`);
+      
+      // Monitor for subscription changes
+      while (!subscriptionCancelled) {
+        // Wait for signals or billing period
+        await condition(() => 
+          pendingUpgrade !== null || 
+          pendingDowngrade !== null || 
+          subscriptionCancelled, 
+          "1 day"
+        );
+        
+        if (subscriptionCancelled) {
+          // Cancel subscription
+          await cancelStripeSubscription(customer);
+          await sendSubscriptionCancellationEmail(customer);
+          
+          // Downgrade to free tier
+          await downgradeToFreeTier(customer);
+          currentTier = 'launch';
+          
+          log.info(`Subscription cancelled for ${customer.email}, downgraded to free tier`);
+          break;
+        }
+        
+        if (pendingUpgrade) {
+          const { tier: newTier, priceId: newPriceId } = pendingUpgrade;
+          
+          // Update Stripe subscription
+          await updateStripeSubscription(customer, newPriceId);
+          
+          // Update customer data
+          customer.subscriptionTier = newTier;
+          currentTier = newTier;
+          
+          // Set up new tier access
+          await setupPaidTierAccess(customer, newTier);
+          
+          // Send upgrade email
+          await sendSubscriptionUpgradeEmail(customer, newTier);
+          
+          // Update database
+          await updateUserSubscriptionInDatabase(customer);
+          
+          log.info(`Successfully upgraded ${customer.email} to ${newTier} tier`);
+          pendingUpgrade = null;
+        }
+        
+        if (pendingDowngrade) {
+          const newTier = pendingDowngrade;
+          
+          if (newTier === 'launch') {
+            // Downgrade to free tier
+            await cancelStripeSubscription(customer);
+            await downgradeToFreeTier(customer);
+            currentTier = 'launch';
+            
+            // Send downgrade email
+            await sendSubscriptionDowngradeEmail(customer, 'launch');
+            
+            log.info(`Successfully downgraded ${customer.email} to free tier`);
+            break; // Exit paid subscription management
+          } else {
+            // Downgrade to different paid tier
+            // This would require updating the Stripe subscription with new price
+            await sendSubscriptionDowngradeEmail(customer, newTier);
+            currentTier = newTier;
+            
+            log.info(`Successfully downgraded ${customer.email} to ${newTier} tier`);
+          }
+          
+          pendingDowngrade = null;
+        }
+      }
+    }
+
+    return {
+      success: true,
+      message: `Subscription management completed for ${customer.email}`,
+      finalTier: currentTier
+    };
+
+  } catch (error) {
+    log.error(`Subscription management failed for ${customer.email}:`, error);
+    return {
+      success: false,
+      message: `Subscription management failed: ${error}`,
+      finalTier: currentTier
+    };
+  }
+}
+
+/**
+ * SoloBoss AI Platform Payment Processing Workflow
+ * Handles payment success/failure scenarios
+ */
+export async function paymentProcessingWorkflow(
+  customer: SoloBossCustomer,
+  paymentEvent: 'succeeded' | 'failed',
+  amount?: number,
+  retryCount?: number
+): Promise<{ success: boolean; message: string }> {
+  try {
+    if (paymentEvent === 'succeeded' && amount) {
+      // Payment succeeded
+      await sendPaymentSucceededEmail(customer, amount);
+      
+      // Update subscription status
+      customer.subscriptionStatus = 'active';
+      await updateUserSubscriptionInDatabase(customer);
+      
+      log.info(`Payment succeeded for ${customer.email}: $${amount / 100}`);
+      
+      return {
+        success: true,
+        message: `Payment of $${amount / 100} processed successfully for ${customer.email}`
+      };
+      
+    } else if (paymentEvent === 'failed') {
+      // Payment failed
+      const currentRetryCount = retryCount || 1;
+      await sendPaymentFailedEmail(customer, currentRetryCount);
+      
+      // Update subscription status
+      customer.subscriptionStatus = 'past_due';
+      await updateUserSubscriptionInDatabase(customer);
+      
+      log.info(`Payment failed for ${customer.email} (retry ${currentRetryCount})`);
+      
+      // If this is the final retry, downgrade to free tier
+      if (currentRetryCount >= 3) {
+        await downgradeToFreeTier(customer);
+        log.info(`Final payment retry failed for ${customer.email}, downgraded to free tier`);
+      }
+      
+      return {
+        success: false,
+        message: `Payment failed for ${customer.email} (retry ${currentRetryCount})`
+      };
+    }
+    
+    return {
+      success: false,
+      message: `Invalid payment event: ${paymentEvent}`
+    };
+    
+  } catch (error) {
+    log.error(`Payment processing failed for ${customer.email}:`, error);
+    return {
+      success: false,
+      message: `Payment processing failed: ${error}`
+    };
   }
 }

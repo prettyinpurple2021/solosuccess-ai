@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type DragEvent, type ChangeEvent } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { 
@@ -70,24 +70,24 @@ TechRival Corp,techrival.com,AI-powered productivity platform,Technology,San Fra
 StartupSlayer,startupslayer.io,Business automation tools,Technology,Austin TX,75,series-a,critical
 BizBoost Solutions,bizboost.com,Business management platform,Technology,New York NY,200,series-c,medium`
 
-  const handleDragEnter = (e: React.DragEvent) => {
+  const handleDragEnter = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(true)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
@@ -98,7 +98,7 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
     }
   }
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
       handleFileUpload(files[0])

@@ -1,12 +1,12 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { useUser } from "@stackframe/stack"
+import { useEffect, type ReactNode } from "react"
+import { useUser } from "@/lib/auth-client"
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
-  fallback?: React.ReactNode
+  children: ReactNode
+  fallback?: ReactNode
   redirectTo?: string
 }
 

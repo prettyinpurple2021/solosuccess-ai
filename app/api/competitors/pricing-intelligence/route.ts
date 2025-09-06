@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -188,8 +188,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

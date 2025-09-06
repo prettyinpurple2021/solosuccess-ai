@@ -1,3 +1,4 @@
+import '@/lib/server-polyfills'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { authenticateRequest } from '@/lib/auth-server'

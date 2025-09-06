@@ -9,14 +9,16 @@ const nextConfig = {
   },
   // Enable standalone output for Docker deployment
   output: 'standalone',
-
-  // Performance optimizations
+  
+  // Enable instrumentation for server polyfills
   experimental: {
+    instrumentationHook: true,
     // Enable modern React features
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
     // --- THIS IS THE NEW, CORRECT LOCATION FOR EXTERNAL PACKAGES ---
     serverComponentsExternalPackages: ['@sentry/nextjs'],
   },
+
 
   // --- WE ARE REMOVING THE OLD `serverExternalPackages` KEY ---
   // serverExternalPackages: ['@sentry/nextjs'], // This line is now removed

@@ -16,7 +16,7 @@ const paramsSchema = z.object({
 
 const querySchema = z.object({
   platform: z.enum(['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']).optional(),
-  days: z.string().transform(Number).default(30),
+  days: z.string().transform(Number).default('30'),
   analysis_type: z.enum(['engagement', 'frequency', 'audience', 'campaigns', 'all']).default('all')
 });
 
