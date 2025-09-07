@@ -17,7 +17,7 @@ async function run() {
     const worker = await Worker.create({
       connection,
       namespace: process.env.TEMPORAL_NAMESPACE || 'default',
-      taskQueue: 'soloboss-tasks',
+      taskQueue: 'subscriptions-task-queue',
       // Workflows are registered using a path as they run in a separate JS context.
       workflowsPath: require.resolve('../src/workflows'),
       activities,

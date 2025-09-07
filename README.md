@@ -327,21 +327,15 @@ Your SoloBoss AI platform is **production-ready** with advanced features:
 
 Ready to deploy to production:
 
-1. **Build your application**
+1. **Deploy to Vercel (Recommended)**
 
-   ```bash
-   npm run build
-   ```
+   - Connect your GitHub repository to Vercel
+   - Set up environment variables in Vercel dashboard
+   - Automatic deployments on every push
 
-2. **Deploy to Google Cloud Run**
+   See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed instructions.
 
-   ```bash
-   npm run build
-   ```
-
-   Follow the Google Cloud Run deployment guide in the repository.
-
-3. **Environment Variables**
+2. **Environment Variables**
    - Set all production URLs
    - Use production API keys
    - Review and update pricing as needed

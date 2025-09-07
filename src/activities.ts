@@ -87,17 +87,6 @@ export async function initializeAIAgents(userId: string): Promise<{ agentsInitia
   };
 }
 
-export async function sendWelcomeEmail(userId: string, userEmail: string, userName: string): Promise<{ sent: boolean; emailId: string }> {
-  console.log(`Sending welcome email to: ${userEmail}`);
-  
-  // Simulate email sending
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return {
-    sent: true,
-    emailId: `welcome_${Date.now()}`
-  };
-}
 
 export async function createOnboardingTasks(userId: string, goalIds: string[]): Promise<{ tasksCreated: number; taskIds: string[] }> {
   console.log(`Creating onboarding tasks for user: ${userId}`);

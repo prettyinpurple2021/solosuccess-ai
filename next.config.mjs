@@ -7,21 +7,16 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Enable standalone output for Docker deployment
-  output: 'standalone',
+  // Optimized for Vercel deployment
+  // output: 'standalone', // Removed for Vercel
   
-  // Enable instrumentation for server polyfills
+  // Enable modern React features
   experimental: {
-    instrumentationHook: true,
-    // Enable modern React features
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    // --- THIS IS THE NEW, CORRECT LOCATION FOR EXTERNAL PACKAGES ---
-    serverComponentsExternalPackages: ['@sentry/nextjs'],
   },
-
-
-  // --- WE ARE REMOVING THE OLD `serverExternalPackages` KEY ---
-  // serverExternalPackages: ['@sentry/nextjs'], // This line is now removed
+  
+  // External packages for server components
+  serverExternalPackages: ['@sentry/nextjs'],
 
   // Image optimization
   images: {

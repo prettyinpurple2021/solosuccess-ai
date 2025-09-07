@@ -1,9 +1,7 @@
-import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise'
-
 // reCAPTCHA configuration
 export const RECAPTCHA_CONFIG = {
-  siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6Lc6OK8rAAAAAPXfc8nHtTiKjk8rE9MhP10Kb8Pj',
-  projectId: process.env.NEXT_PUBLIC_RECAPTCHA_PROJECT_ID || 'soloboss-ai-v3',
+  siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+  secretKey: process.env.RECAPTCHA_SECRET_KEY || '',
   actions: {
     signup: 'signup',
     signin: 'signin',
@@ -14,7 +12,7 @@ export const RECAPTCHA_CONFIG = {
 }
 
 /**
- * Create an assessment to analyze the risk of a UI action.
+ * Verify reCAPTCHA token with Google's verification API
  * 
  * @param token - The generated token obtained from the client
  * @param action - Action name corresponding to the token
@@ -25,53 +23,35 @@ export async function createAssessment(
   action: string = 'submit'
 ): Promise<number | null> {
   try {
-    // Create the reCAPTCHA client with default credentials
-    const client = new RecaptchaEnterpriseServiceClient({
-      // Use default credentials from environment or metadata service
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-      projectId: RECAPTCHA_CONFIG.projectId,
-    })
-    
-    const projectPath = client.projectPath(RECAPTCHA_CONFIG.projectId)
+    if (!RECAPTCHA_CONFIG.secretKey) {
+      console.warn('reCAPTCHA secret key not configured, skipping validation')
+      return 0.9 // Return high score if not configured
+    }
 
-    // Build the assessment request
-    const request = {
-      assessment: {
-        event: {
-          token: token,
-          siteKey: RECAPTCHA_CONFIG.siteKey,
-        },
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      parent: projectPath,
-    }
+      body: new URLSearchParams({
+        secret: RECAPTCHA_CONFIG.secretKey,
+        response: token,
+      }),
+    })
 
-    const [response] = await client.createAssessment(request)
+    const data = await response.json()
 
-    // Check if the token is valid
-    if (!response.tokenProperties?.valid) {
-      console.error(`reCAPTCHA validation failed: ${response.tokenProperties?.invalidReason}`)
+    if (!data.success) {
+      console.error(`reCAPTCHA validation failed: ${data['error-codes']?.join(', ')}`)
       return null
     }
 
-    // Check if the expected action was executed
-    if (response.tokenProperties.action === action) {
-      const score = response.riskAnalysis?.score || 0
-      console.log(`reCAPTCHA score for action '${action}': ${score}`)
-      
-      // Log risk reasons if any
-      if (response.riskAnalysis?.reasons) {
-        response.riskAnalysis.reasons.forEach((reason) => {
-          console.log(`Risk reason: ${reason}`)
-        })
-      }
+    const score = data.score || 0
+    console.log(`reCAPTCHA score for action '${action}': ${score}`)
 
-      return score
-    } else {
-      console.error(`Action mismatch. Expected: ${action}, Got: ${response.tokenProperties.action}`)
-      return null
-    }
+    return score
   } catch (error) {
-    console.error('Error creating reCAPTCHA assessment:', error)
+    console.error('Error verifying reCAPTCHA token:', error)
     return null
   }
 }
@@ -102,7 +82,7 @@ export async function validateRecaptcha(
  * Get reCAPTCHA script URL for client-side loading
  */
 export function getRecaptchaScriptUrl(): string {
-  return `https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_CONFIG.siteKey}`
+  return `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_CONFIG.siteKey}`
 }
 
 /**
