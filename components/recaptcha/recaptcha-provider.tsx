@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import Script from 'next/script'
 import { useToast } from '@/hooks/use-toast'
 
-const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6Lc6OK8rAAAAAPXfc8nHtTiKjk8rE9MhP10Kb8Pj'
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
 
 interface RecaptchaContextType {
   isReady: boolean

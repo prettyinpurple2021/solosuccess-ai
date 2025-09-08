@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { RecaptchaSignupButton, RecaptchaSigninButton } from "@/components/ui/recaptcha-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -11,7 +10,7 @@ import { CalendarIcon, AlertCircle, CheckCircle, Lock, Crown } from "lucide-reac
 import { format, subYears } from "date-fns"
 import { motion } from "framer-motion"
 
-export function NeonAuth() {
+export function SimpleAuth() {
   const router = useRouter()
   const pathname = usePathname()
   const [email, setEmail] = useState("")
@@ -39,7 +38,7 @@ export function NeonAuth() {
   const isSignInPage = pathname === '/signin'
   const isSignUpPage = pathname === '/signup'
 
-  // Initialize Stack Auth on client side only
+  // Initialize on client side only
   useEffect(() => {
     setIsClient(true)
     
@@ -81,7 +80,7 @@ export function NeonAuth() {
     }
   }, [user, router, isClient])
 
-  const handleSignIn = async (_formData: any) => {
+  const handleSignIn = async () => {
     setLoading(true)
     setError(null)
     setSuccess(null)
@@ -202,7 +201,7 @@ export function NeonAuth() {
     return Object.keys(errors).length === 0
   }
 
-  const handleSignUp = async (_formData: any) => {
+  const handleSignUp = async () => {
     if (!validateSignUpForm()) {
       return { success: false, error: "Please fix the form errors" }
     }
@@ -345,20 +344,20 @@ export function NeonAuth() {
             {/* Sign In Form */}
             {isSignInPage && (
               <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                                 <div className="space-y-2">
-                   <Label htmlFor="email" className="text-sm font-medium">Email or Username</Label>
-                   <Input
-                     id="email"
-                     name="email"
-                     type="text"
-                     value={email}
-                     onChange={(e) => setEmail(e.target.value)}
-                     placeholder="Enter your email or username"
-                     className="glass"
-                     required
-                     autoComplete="username"
-                   />
-                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium">Email or Username</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="text"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email or username"
+                    className="glass"
+                    required
+                    autoComplete="username"
+                  />
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium">Password</Label>
