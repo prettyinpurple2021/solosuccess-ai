@@ -8,13 +8,13 @@ const envSchema = z.object({
   // Database - Required for core functionality
   DATABASE_URL: z.string().min(1, "Neon database URL is required"),
   
-  // Stack Auth - Required for authentication
-  NEXT_PUBLIC_STACK_PROJECT_ID: z.string().min(1, "Stack Auth project ID is required"),
-  NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: z.string().min(1, "Stack Auth publishable key is required"),
-  STACK_SECRET_SERVER_KEY: z.string().min(1, "Stack Auth secret key is required"),
+  // JWT Authentication - Required for authentication
+  JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters"),
   
-  // JWT for additional operations
-  JWT_SECRET: z.string().min(32, "JWT secret must be at least 32 characters").optional(),
+  // Stack Auth - Optional (for backward compatibility)
+  NEXT_PUBLIC_STACK_PROJECT_ID: z.string().min(1, "Stack Auth project ID is required").optional(),
+  NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: z.string().min(1, "Stack Auth publishable key is required").optional(),
+  STACK_SECRET_SERVER_KEY: z.string().min(1, "Stack Auth secret key is required").optional(),
 
   // Chargebee - Optional for billing
   CHARGEBEE_API_KEY: z.string().min(1, "Chargebee API key is required").optional(),
@@ -88,7 +88,7 @@ export function checkRequiredEnvVars(keys: string[]): boolean {
 export function getFeatureFlags() {
   return {
     hasDatabase: !!process.env.DATABASE_URL,
-    hasAuth: !!(process.env.NEXT_PUBLIC_STACK_PROJECT_ID && process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY),
+    hasAuth: !!(process.env.JWT_SECRET || (process.env.NEXT_PUBLIC_STACK_PROJECT_ID && process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY)),
     hasBilling: !!(process.env.CHARGEBEE_API_KEY && process.env.CHARGEBEE_SITE),
     hasAI: !!(process.env.OPENAI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY),
     hasEmail: !!process.env.RESEND_API_KEY,
