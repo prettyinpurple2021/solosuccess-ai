@@ -77,16 +77,16 @@ export async function POST(request: NextRequest) {
     )
     
     // Analyze if the message is competitive intelligence related
-    const isCompetitiveQuery = this.isCompetitiveIntelligenceQuery(message)
+    const isCompetitiveQuery = isCompetitiveIntelligenceQuery(message)
     
     // Get relevant competitive data based on message content
-    const relevantData = this.extractRelevantCompetitiveData(message, context)
+    const relevantData = extractRelevantCompetitiveData(message, context)
     
     return NextResponse.json({
       is_competitive_query: isCompetitiveQuery,
       formatted_context: formattedContext,
       relevant_data: relevantData,
-      context_summary: this.generateContextSummary(context)
+      context_summary: generateContextSummary(context)
     })
   } catch (error) {
     console.error('Error analyzing competitive intelligence context:', error)
