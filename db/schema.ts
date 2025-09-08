@@ -391,7 +391,7 @@ export const documents = pgTable('documents', {
   file_type: varchar('file_type', { length: 50 }).notNull(),
   mime_type: varchar('mime_type', { length: 100 }).notNull(),
   size: integer('size').notNull(),
-  file_data: bytea('file_data').notNull(), // Store file content directly in database
+  file_data: text('file_data').notNull(), // Store file content directly in database
   category: varchar('category', { length: 100 }).default('uncategorized'),
   description: text('description'),
   tags: jsonb('tags').default('[]'),
@@ -442,7 +442,7 @@ export const documentVersions = pgTable('document_versions', {
   name: varchar('name', { length: 255 }).notNull(),
   file_type: varchar('file_type', { length: 50 }).notNull(),
   size: integer('size').notNull(),
-  file_data: bytea('file_data').notNull(), // Store file content directly in database
+  file_data: text('file_data').notNull(), // Store file content directly in database
   change_summary: text('change_summary'),
   created_by: varchar('created_by', { length: 255 }).notNull().references(() => users.id),
   created_at: timestamp('created_at').defaultNow(),
