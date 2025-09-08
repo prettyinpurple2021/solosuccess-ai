@@ -78,6 +78,22 @@ describe('ScrapingScheduler', () => {
       expect(pricingJob?.priority).toBe('high')
       expect(jobsJob?.priority).toBe('low')
     })
+
+    it('should handle errors in scheduleJob', async () => {
+      // Mock the generateJobId method to throw an error
+      const originalGenerateJobId = (scheduler as any).generateJobId
+      ;(scheduler as any).generateJobId = jest.fn().mockImplementation(() => {
+        throw new Error('Test error')
+      })
+
+      await expect(scheduler.scheduleJob(
+        1, 'user123', 'website', 'https://example.com',
+        { type: 'interval', value: 720 }
+      )).rejects.toThrow('Test error')
+
+      // Restore original method
+      ;(scheduler as any).generateJobId = originalGenerateJobId
+    })
   })
 
   describe('scheduleCompetitorJobs', () => {

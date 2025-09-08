@@ -117,30 +117,35 @@ export class ScrapingScheduler {
     frequency: ScrapingFrequency,
     config: Partial<ScrapingJobConfig> = {}
   ): Promise<string> {
-    const jobId = this.generateJobId(competitorId, jobType, url)
-    
-    const job: ScrapingJob = {
-      id: jobId,
-      competitorId,
-      userId,
-      jobType,
-      url,
-      priority: this.calculateJobPriority(competitorId, jobType),
-      frequency,
-      nextRunAt: this.calculateNextRun(frequency),
-      retryCount: 0,
-      maxRetries: 3,
-      status: 'pending',
-      config: { ...DEFAULT_JOB_CONFIG, ...config },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
+    try {
+      const jobId = this.generateJobId(competitorId, jobType, url)
+      
+      const job: ScrapingJob = {
+        id: jobId,
+        competitorId,
+        userId,
+        jobType,
+        url,
+        priority: this.calculateJobPriority(competitorId, jobType),
+        frequency,
+        nextRunAt: this.calculateNextRun(frequency),
+        retryCount: 0,
+        maxRetries: 3,
+        status: 'pending',
+        config: { ...DEFAULT_JOB_CONFIG, ...config },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
 
-    this.jobQueue.set(jobId, job)
-    this.updateMetrics()
-    
-    console.log(`Scheduled scraping job: ${jobId} for ${url}`)
-    return jobId
+      this.jobQueue.set(jobId, job)
+      this.updateMetrics()
+      
+      console.log(`Scheduled scraping job: ${jobId} for ${url}`)
+      return jobId
+    } catch (error) {
+      console.error('Error in scheduleJob:', error)
+      throw error
+    }
   }
 
   /**
