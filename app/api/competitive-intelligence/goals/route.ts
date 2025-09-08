@@ -121,7 +121,11 @@ export async function POST(request: NextRequest) {
           goal_id,
           competitor_id,
           {
-            ...milestone,
+            title: milestone.title,
+            description: milestone.description,
+            targetMetric: milestone.target_metric,
+            competitorBenchmark: milestone.competitor_benchmark,
+            targetValue: milestone.target_value,
             dueDate: milestone.due_date ? new Date(milestone.due_date) : undefined
           },
           user.id

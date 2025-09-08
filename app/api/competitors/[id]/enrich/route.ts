@@ -87,11 +87,19 @@ export async function POST(
       threatLevel: existingCompetitor.threat_level as ThreatLevel,
       monitoringStatus: existingCompetitor.monitoring_status as MonitoringStatus,
       socialMediaHandles: existingCompetitor.social_media_handles || {},
-      keyPersonnel: existingCompetitor.key_personnel || [],
-      products: existingCompetitor.products || [],
+      keyPersonnel: Array.isArray(existingCompetitor.key_personnel) 
+        ? existingCompetitor.key_personnel 
+        : [],
+      products: Array.isArray(existingCompetitor.products) 
+        ? existingCompetitor.products 
+        : [],
       marketPosition: existingCompetitor.market_position || {},
-      competitiveAdvantages: existingCompetitor.competitive_advantages || [],
-      vulnerabilities: existingCompetitor.vulnerabilities || [],
+      competitiveAdvantages: Array.isArray(existingCompetitor.competitive_advantages) 
+        ? existingCompetitor.competitive_advantages 
+        : [],
+      vulnerabilities: Array.isArray(existingCompetitor.vulnerabilities) 
+        ? existingCompetitor.vulnerabilities 
+        : [],
       monitoringConfig: existingCompetitor.monitoring_config || {},
       lastAnalyzed: existingCompetitor.last_analyzed || undefined,
       createdAt: existingCompetitor.created_at!,
@@ -138,9 +146,11 @@ export async function POST(
     
     // Merge key personnel (avoid duplicates)
     if (enrichmentResult.data?.keyPersonnel) {
-      const existingPersonnel = existingCompetitor.key_personnel || []
+      const existingPersonnel = Array.isArray(existingCompetitor.key_personnel) 
+        ? existingCompetitor.key_personnel 
+        : []
       const newPersonnel = enrichmentResult.data.keyPersonnel.filter(newPerson => 
-        !existingPersonnel.some(existing => 
+        !existingPersonnel.some((existing: any) => 
           existing.name.toLowerCase() === newPerson.name.toLowerCase() &&
           existing.role.toLowerCase() === newPerson.role.toLowerCase()
         )
@@ -150,9 +160,11 @@ export async function POST(
     
     // Merge products (avoid duplicates)
     if (enrichmentResult.data?.products) {
-      const existingProducts = existingCompetitor.products || []
+      const existingProducts = Array.isArray(existingCompetitor.products) 
+        ? existingCompetitor.products 
+        : []
       const newProducts = enrichmentResult.data.products.filter(newProduct => 
-        !existingProducts.some(existing => 
+        !existingProducts.some((existing: any) => 
           existing.name.toLowerCase() === newProduct.name.toLowerCase()
         )
       )
@@ -161,7 +173,9 @@ export async function POST(
     
     // Merge competitive advantages (avoid duplicates)
     if (enrichmentResult.data?.competitiveAdvantages) {
-      const existingAdvantages = existingCompetitor.competitive_advantages || []
+      const existingAdvantages = Array.isArray(existingCompetitor.competitive_advantages) 
+        ? existingCompetitor.competitive_advantages 
+        : []
       const newAdvantages = enrichmentResult.data.competitiveAdvantages.filter(advantage => 
         !existingAdvantages.includes(advantage)
       )
@@ -170,7 +184,9 @@ export async function POST(
     
     // Merge vulnerabilities (avoid duplicates)
     if (enrichmentResult.data?.vulnerabilities) {
-      const existingVulnerabilities = existingCompetitor.vulnerabilities || []
+      const existingVulnerabilities = Array.isArray(existingCompetitor.vulnerabilities) 
+        ? existingCompetitor.vulnerabilities 
+        : []
       const newVulnerabilities = enrichmentResult.data.vulnerabilities.filter(vulnerability => 
         !existingVulnerabilities.includes(vulnerability)
       )
