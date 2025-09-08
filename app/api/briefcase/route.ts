@@ -45,43 +45,49 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Build query
+    // Build query with folder information (exclude file_data for performance)
     let query = `
-      SELECT id, name, file_type, size, category, description, tags, created_at, updated_at
-      FROM documents 
-      WHERE user_id = $1
+      SELECT 
+        d.id, d.name, d.original_name, d.file_type, d.mime_type, d.size, 
+        d.category, d.description, d.tags, d.metadata, d.ai_insights,
+        d.is_favorite, d.download_count, d.view_count, d.last_accessed,
+        d.created_at, d.updated_at, d.folder_id,
+        f.name as folder_name, f.color as folder_color
+      FROM documents d
+      LEFT JOIN document_folders f ON d.folder_id = f.id
+      WHERE d.user_id = $1
     `
     const params = [user.id]
     let paramIndex = 2
 
     if (category && category !== 'all') {
-      query += ` AND category = $${paramIndex}`
+      query += ` AND d.category = $${paramIndex}`
       params.push(category)
       paramIndex++
     }
 
     if (search) {
-      query += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex} OR tags ILIKE $${paramIndex})`
+      query += ` AND (d.name ILIKE $${paramIndex} OR d.description ILIKE $${paramIndex} OR d.tags::text ILIKE $${paramIndex})`
       params.push(`%${search}%`)
       paramIndex++
     }
 
-    query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
+    query += ` ORDER BY d.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
     params.push(limit.toString(), offset.toString())
 
     const { rows: files } = await client.query(query, params)
 
     // Get total count for pagination
-    let countQuery = `SELECT COUNT(*) as total FROM documents WHERE user_id = $1`
+    let countQuery = `SELECT COUNT(*) as total FROM documents d WHERE d.user_id = $1`
     const countParams = [user.id]
 
     if (category && category !== 'all') {
-      countQuery += ` AND category = $2`
+      countQuery += ` AND d.category = $2`
       countParams.push(category)
     }
 
     if (search) {
-      countQuery += ` AND (name ILIKE $${countParams.length + 1} OR description ILIKE $${countParams.length + 1} OR tags ILIKE $${countParams.length + 1})`
+      countQuery += ` AND (d.name ILIKE $${countParams.length + 1} OR d.description ILIKE $${countParams.length + 1} OR d.tags::text ILIKE $${countParams.length + 1})`
       countParams.push(`%${search}%`)
     }
 
@@ -89,10 +95,21 @@ export async function GET(request: NextRequest) {
 
     // Get category statistics
     const { rows: categoryStats } = await client.query(
-      `SELECT category, COUNT(*) as count, SUM(size) as total_size
-       FROM documents 
-       WHERE user_id = $1 
-       GROUP BY category`,
+      `SELECT d.category, COUNT(*) as count, SUM(d.size) as total_size
+       FROM documents d
+       WHERE d.user_id = $1 
+       GROUP BY d.category
+       ORDER BY count DESC`,
+      [user.id]
+    )
+
+    // Get file type statistics
+    const { rows: fileTypeStats } = await client.query(
+      `SELECT d.file_type, COUNT(*) as count, SUM(d.size) as total_size
+       FROM documents d
+       WHERE d.user_id = $1 
+       GROUP BY d.file_type
+       ORDER BY count DESC`,
       [user.id]
     )
 
@@ -100,13 +117,26 @@ export async function GET(request: NextRequest) {
       files: files.map(file => ({
         id: file.id,
         name: file.name,
+        originalName: file.original_name,
         type: file.file_type,
+        mimeType: file.mime_type,
         size: file.size,
         category: file.category,
         description: file.description,
-        tags: file.tags,
+        tags: file.tags ? JSON.parse(file.tags) : [],
+        metadata: file.metadata ? JSON.parse(file.metadata) : {},
+        aiInsights: file.ai_insights ? JSON.parse(file.ai_insights) : {},
+        isFavorite: file.is_favorite,
+        downloadCount: file.download_count,
+        viewCount: file.view_count,
+        lastAccessed: file.last_accessed,
+        folderId: file.folder_id,
+        folderName: file.folder_name,
+        folderColor: file.folder_color,
         createdAt: file.created_at,
-        updatedAt: file.updated_at
+        updatedAt: file.updated_at,
+        downloadUrl: `/api/briefcase/files/${file.id}/download`,
+        previewUrl: `/api/briefcase/files/${file.id}/preview`,
       })),
       pagination: {
         total: parseInt(total),
@@ -116,8 +146,14 @@ export async function GET(request: NextRequest) {
       },
       stats: {
         totalFiles: parseInt(total),
+        totalSize: files.reduce((sum, file) => sum + parseInt(file.size), 0),
         categories: categoryStats.map(stat => ({
           name: stat.category,
+          count: parseInt(stat.count),
+          totalSize: parseInt(stat.total_size || 0)
+        })),
+        fileTypes: fileTypeStats.map(stat => ({
+          type: stat.file_type,
           count: parseInt(stat.count),
           totalSize: parseInt(stat.total_size || 0)
         }))

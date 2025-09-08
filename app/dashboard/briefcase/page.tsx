@@ -34,6 +34,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 import FilePreviewModal from "@/components/file-preview-modal"
+import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
 
 interface BriefcaseFile {
   id: string
@@ -58,16 +59,22 @@ interface Folder {
 
 export default function BriefcasePage() {
   const [files, setFiles] = useState<BriefcaseFile[]>([])
-  const [_folders, setFolders] = useState<Folder[]>([])
+  const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [_selectedFolder, setSelectedFolder] = useState<string | null>(null)
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
   const [showUploadDialog, setShowUploadDialog] = useState(false)
-  const [_showFolderDialog, setShowFolderDialog] = useState(false)
+  const [showFolderDialog, setShowFolderDialog] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
+  const [stats, setStats] = useState({
+    totalFiles: 0,
+    totalSize: 0,
+    categories: [],
+    fileTypes: []
+  })
   
   // Preview modal state
   const [showPreviewModal, setShowPreviewModal] = useState(false)
@@ -114,6 +121,7 @@ export default function BriefcasePage() {
       setLoading(true)
       const params = new URLSearchParams()
       if (selectedCategory !== 'all') params.append('category', selectedCategory)
+      if (selectedFolder) params.append('folder', selectedFolder)
       if (searchTerm) params.append('search', searchTerm)
       
       const response = await fetch(`/api/briefcase?${params.toString()}`)
@@ -121,6 +129,7 @@ export default function BriefcasePage() {
       
       const data = await response.json()
       setFiles(data.files || [])
+      setStats(data.stats || { totalFiles: 0, totalSize: 0, categories: [], fileTypes: [] })
     } catch (error) {
       console.error('Error fetching files:', error)
       toast({
@@ -131,15 +140,29 @@ export default function BriefcasePage() {
     } finally {
       setLoading(false)
     }
-  }, [selectedCategory, searchTerm, toast])
+  }, [selectedCategory, selectedFolder, searchTerm, toast])
+
+  // Fetch folders
+  const fetchFolders = useCallback(async () => {
+    try {
+      const response = await fetch('/api/briefcase/folders')
+      if (response.ok) {
+        const data = await response.json()
+        setFolders(data.folders || [])
+      }
+    } catch (error) {
+      console.error('Error fetching folders:', error)
+    }
+  }, [])
 
   // Initial load
   useEffect(() => {
     fetchFiles()
-  }, [fetchFiles])
+    fetchFolders()
+  }, [fetchFiles, fetchFolders])
 
   // Handle file upload
-  const handleFileUpload = async (files: FileList | null) => {
+  const handleFileUpload = async (files: FileList | null, folderId?: string, category?: string) => {
     if (!files || files.length === 0) return
 
     setIsUploading(true)
@@ -150,31 +173,37 @@ export default function BriefcasePage() {
       for (let i = 0; i < files.length; i++) {
         formData.append('files', files[i])
       }
-      formData.append('category', selectedCategory)
+      
+      formData.append('category', category || selectedCategory)
+      if (folderId) formData.append('folderId', folderId)
       formData.append('description', '')
       formData.append('tags', '')
 
       const response = await fetch('/api/briefcase/upload', {
-        method: 'POST',
+        method: 'PUT', // Use PUT for bulk upload
         body: formData
       })
 
-      if (!response.ok) throw new Error('Upload failed')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Upload failed')
+      }
 
       const result = await response.json()
       
       toast({
         title: "Success!",
-        description: `Uploaded ${result.files.length} file(s) successfully.`
+        description: `Uploaded ${result.uploaded} file(s) successfully.`
       })
 
       setShowUploadDialog(false)
       fetchFiles() // Refresh the file list
+      fetchFolders() // Refresh folders to update counts
     } catch (error) {
       console.error('Upload error:', error)
       toast({
         title: "Upload Failed",
-        description: "Failed to upload files. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload files. Please try again.",
         variant: "destructive"
       })
     } finally {
@@ -188,6 +217,40 @@ export default function BriefcasePage() {
     setPreviewFile(file)
     setPreviewIndex(index)
     setShowPreviewModal(true)
+  }
+
+  // Handle folder creation
+  const handleCreateFolder = async (name: string, description?: string, color?: string) => {
+    try {
+      const response = await fetch('/api/briefcase/folders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          description,
+          color: color || '#8B5CF6',
+          parentId: selectedFolder
+        })
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Success!",
+          description: `Folder "${name}" created successfully.`
+        })
+        fetchFolders()
+        setShowFolderDialog(false)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create folder')
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create folder",
+        variant: "destructive"
+      })
+    }
   }
 
   // Handle file download
@@ -303,8 +366,28 @@ export default function BriefcasePage() {
               <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
                 Briefcase
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Your secure document vault and content library</p>
+              <p className="text-sm sm:text-base text-gray-600 hidden sm:block">
+                {stats.totalFiles} files • {formatFileSize(stats.totalSize)}
+              </p>
             </div>
+          </div>
+          
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <button 
+              onClick={() => setSelectedFolder(null)}
+              className="hover:text-purple-600 transition-colors"
+            >
+              All Files
+            </button>
+            {selectedFolder && (
+              <>
+                <span>/</span>
+                <span className="text-purple-600 font-medium">
+                  {folders.find(f => f.id.toString() === selectedFolder)?.name || 'Folder'}
+                </span>
+              </>
+            )}
           </div>
         </div>
         
@@ -327,49 +410,105 @@ export default function BriefcasePage() {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search files..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+      {/* Main Content Layout */}
+      <div className="flex gap-6">
+        {/* Folder Sidebar */}
+        <div className="hidden lg:block w-64 flex-shrink-0">
+          <div className="bg-white rounded-lg border p-4 space-y-3">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Folder className="w-4 h-4" />
+              Folders
+            </h3>
+            
+            <div className="space-y-1">
+              <button
+                onClick={() => setSelectedFolder(null)}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                  !selectedFolder 
+                    ? 'bg-purple-100 text-purple-700 font-medium' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Folder className="w-4 h-4" />
+                  All Files
+                  <span className="ml-auto text-xs text-gray-500">
+                    {stats.totalFiles}
+                  </span>
+                </div>
+              </button>
+              
+              {folders.map((folder) => (
+                <button
+                  key={folder.id}
+                  onClick={() => setSelectedFolder(folder.id.toString())}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                    selectedFolder === folder.id.toString()
+                      ? 'bg-purple-100 text-purple-700 font-medium' 
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: folder.color }}
+                    />
+                    {folder.name}
+                    <span className="ml-auto text-xs text-gray-500">
+                      {folder.file_count}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="All Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="document">Documents</SelectItem>
-            <SelectItem value="image">Images</SelectItem>
-            <SelectItem value="video">Videos</SelectItem>
-            <SelectItem value="audio">Audio</SelectItem>
-            <SelectItem value="archive">Archives</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('grid')}
-          >
-            <Grid3x3 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('list')}
-          >
-            <List className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+
+        {/* Main Content */}
+        <div className="flex-1 space-y-6">
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search files..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {stats.categories.map((cat: any) => (
+                  <SelectItem key={cat.name} value={cat.name}>
+                    {cat.name} ({cat.count})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid3x3 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
 
       {/* Files Grid/List */}
       {loading ? (
@@ -514,14 +653,24 @@ export default function BriefcasePage() {
         </DialogContent>
       </Dialog>
 
-      {/* File Preview Modal */}
-      <FilePreviewModal
-        isOpen={showPreviewModal}
-        onClose={() => setShowPreviewModal(false)}
-        files={filteredFiles}
-        currentIndex={previewIndex}
-        onIndexChange={setPreviewIndex}
-      />
+          {/* File Preview Modal */}
+          <FilePreviewModal
+            isOpen={showPreviewModal}
+            onClose={() => setShowPreviewModal(false)}
+            files={filteredFiles}
+            currentIndex={previewIndex}
+            onIndexChange={setPreviewIndex}
+          />
+
+          {/* Folder Creation Dialog */}
+          <FolderCreationDialog
+            isOpen={showFolderDialog}
+            onClose={() => setShowFolderDialog(false)}
+            onCreate={handleCreateFolder}
+            parentFolder={selectedFolder ? folders.find(f => f.id.toString() === selectedFolder)?.name : undefined}
+          />
+        </div>
+      </div>
     </div>
   )
 }

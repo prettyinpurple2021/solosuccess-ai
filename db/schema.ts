@@ -381,6 +381,134 @@ export const opportunityMetrics = pgTable('opportunity_metrics', {
   measurementDateIdx: index('opportunity_metrics_measurement_date_idx').on(table.measurement_date),
 }));
 
+// Documents table for Briefcase
+export const documents = pgTable('documents', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  folder_id: integer('folder_id').references(() => documentFolders.id, { onDelete: 'set null' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  original_name: varchar('original_name', { length: 255 }).notNull(),
+  file_type: varchar('file_type', { length: 50 }).notNull(),
+  mime_type: varchar('mime_type', { length: 100 }).notNull(),
+  size: integer('size').notNull(),
+  file_data: bytea('file_data').notNull(), // Store file content directly in database
+  category: varchar('category', { length: 100 }).default('uncategorized'),
+  description: text('description'),
+  tags: jsonb('tags').default('[]'),
+  metadata: jsonb('metadata').default('{}'),
+  ai_insights: jsonb('ai_insights').default('{}'),
+  is_favorite: boolean('is_favorite').default(false),
+  is_public: boolean('is_public').default(false),
+  download_count: integer('download_count').default(0),
+  view_count: integer('view_count').default(0),
+  last_accessed: timestamp('last_accessed'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('documents_user_id_idx').on(table.user_id),
+  folderIdIdx: index('documents_folder_id_idx').on(table.folder_id),
+  categoryIdx: index('documents_category_idx').on(table.category),
+  fileTypeIdx: index('documents_file_type_idx').on(table.file_type),
+  isFavoriteIdx: index('documents_is_favorite_idx').on(table.is_favorite),
+  createdAtIdx: index('documents_created_at_idx').on(table.created_at),
+  nameIdx: index('documents_name_idx').on(table.name),
+}));
+
+// Document Folders table
+export const documentFolders = pgTable('document_folders', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  parent_id: integer('parent_id').references(() => documentFolders.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+  color: varchar('color', { length: 7 }).default('#8B5CF6'),
+  icon: varchar('icon', { length: 50 }),
+  is_default: boolean('is_default').default(false),
+  file_count: integer('file_count').default(0),
+  total_size: integer('total_size').default(0),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('document_folders_user_id_idx').on(table.user_id),
+  parentIdIdx: index('document_folders_parent_id_idx').on(table.parent_id),
+  nameIdx: index('document_folders_name_idx').on(table.name),
+}));
+
+// Document Versions table
+export const documentVersions = pgTable('document_versions', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  version_number: integer('version_number').notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  file_type: varchar('file_type', { length: 50 }).notNull(),
+  size: integer('size').notNull(),
+  file_data: bytea('file_data').notNull(), // Store file content directly in database
+  change_summary: text('change_summary'),
+  created_by: varchar('created_by', { length: 255 }).notNull().references(() => users.id),
+  created_at: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  documentIdIdx: index('document_versions_document_id_idx').on(table.document_id),
+  versionNumberIdx: index('document_versions_version_number_idx').on(table.version_number),
+  createdByIdx: index('document_versions_created_by_idx').on(table.created_by),
+}));
+
+// Document Permissions table
+export const documentPermissions = pgTable('document_permissions', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'cascade' }),
+  email: varchar('email', { length: 255 }),
+  role: varchar('role', { length: 20 }).notNull().default('viewer'),
+  granted_by: varchar('granted_by', { length: 255 }).notNull().references(() => users.id),
+  granted_at: timestamp('granted_at').defaultNow(),
+  expires_at: timestamp('expires_at'),
+  is_active: boolean('is_active').default(true),
+}, (table) => ({
+  documentIdIdx: index('document_permissions_document_id_idx').on(table.document_id),
+  userIdIdx: index('document_permissions_user_id_idx').on(table.user_id),
+  emailIdx: index('document_permissions_email_idx').on(table.email),
+  roleIdx: index('document_permissions_role_idx').on(table.role),
+}));
+
+// Document Share Links table
+export const documentShareLinks = pgTable('document_share_links', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  created_by: varchar('created_by', { length: 255 }).notNull().references(() => users.id),
+  url: varchar('url', { length: 1000 }).notNull(),
+  password_hash: varchar('password_hash', { length: 255 }),
+  permissions: varchar('permissions', { length: 20 }).notNull().default('view'),
+  expires_at: timestamp('expires_at'),
+  max_access_count: integer('max_access_count'),
+  access_count: integer('access_count').default(0),
+  download_enabled: boolean('download_enabled').default(true),
+  require_auth: boolean('require_auth').default(false),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  documentIdIdx: index('document_share_links_document_id_idx').on(table.document_id),
+  createdByIdx: index('document_share_links_created_by_idx').on(table.created_by),
+  isActiveIdx: index('document_share_links_is_active_idx').on(table.is_active),
+  expiresAtIdx: index('document_share_links_expires_at_idx').on(table.expires_at),
+}));
+
+// Document Activity table
+export const documentActivity = pgTable('document_activity', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  action: varchar('action', { length: 50 }).notNull(),
+  details: jsonb('details').default('{}'),
+  ip_address: varchar('ip_address', { length: 45 }),
+  user_agent: text('user_agent'),
+  created_at: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  documentIdIdx: index('document_activity_document_id_idx').on(table.document_id),
+  userIdIdx: index('document_activity_user_id_idx').on(table.user_id),
+  actionIdx: index('document_activity_action_idx').on(table.action),
+  createdAtIdx: index('document_activity_created_at_idx').on(table.created_at),
+}));
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   briefcases: many(briefcases),
@@ -398,6 +526,12 @@ export const usersRelations = relations(users, ({ many }) => ({
   opportunityActions: many(opportunityActions),
   opportunityMetrics: many(opportunityMetrics),
   competitiveStats: many(userCompetitiveStats),
+  documents: many(documents),
+  documentFolders: many(documentFolders),
+  documentVersions: many(documentVersions),
+  documentPermissions: many(documentPermissions),
+  documentShareLinks: many(documentShareLinks),
+  documentActivity: many(documentActivity),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
@@ -580,6 +714,83 @@ export const opportunityMetricsRelations = relations(opportunityMetrics, ({ one 
   }),
   user: one(users, {
     fields: [opportunityMetrics.user_id],
+    references: [users.id],
+  }),
+}));
+
+// Document Relations
+export const documentsRelations = relations(documents, ({ one, many }) => ({
+  user: one(users, {
+    fields: [documents.user_id],
+    references: [users.id],
+  }),
+  folder: one(documentFolders, {
+    fields: [documents.folder_id],
+    references: [documentFolders.id],
+  }),
+  versions: many(documentVersions),
+  permissions: many(documentPermissions),
+  shareLinks: many(documentShareLinks),
+  activity: many(documentActivity),
+}));
+
+export const documentFoldersRelations = relations(documentFolders, ({ one, many }) => ({
+  user: one(users, {
+    fields: [documentFolders.user_id],
+    references: [users.id],
+  }),
+  parent: one(documentFolders, {
+    fields: [documentFolders.parent_id],
+    references: [documentFolders.id],
+  }),
+  children: many(documentFolders),
+  documents: many(documents),
+}));
+
+export const documentVersionsRelations = relations(documentVersions, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentVersions.document_id],
+    references: [documents.id],
+  }),
+  createdBy: one(users, {
+    fields: [documentVersions.created_by],
+    references: [users.id],
+  }),
+}));
+
+export const documentPermissionsRelations = relations(documentPermissions, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentPermissions.document_id],
+    references: [documents.id],
+  }),
+  user: one(users, {
+    fields: [documentPermissions.user_id],
+    references: [users.id],
+  }),
+  grantedBy: one(users, {
+    fields: [documentPermissions.granted_by],
+    references: [users.id],
+  }),
+}));
+
+export const documentShareLinksRelations = relations(documentShareLinks, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentShareLinks.document_id],
+    references: [documents.id],
+  }),
+  createdBy: one(users, {
+    fields: [documentShareLinks.created_by],
+    references: [users.id],
+  }),
+}));
+
+export const documentActivityRelations = relations(documentActivity, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentActivity.document_id],
+    references: [documents.id],
+  }),
+  user: one(users, {
+    fields: [documentActivity.user_id],
     references: [users.id],
   }),
 }));
