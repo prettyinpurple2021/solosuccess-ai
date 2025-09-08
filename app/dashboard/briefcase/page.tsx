@@ -35,17 +35,32 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 import FilePreviewModal from "@/components/file-preview-modal"
 import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
+import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advanced-search-panel"
+import AIInsightsPanel from "@/components/briefcase/ai-insights-panel"
 
 interface BriefcaseFile {
   id: string
   name: string
-  type: string
+  original_name: string
+  file_type: string
+  mime_type: string
   size: number
   category: string
   description?: string
-  tags?: string
-  createdAt: string
-  updatedAt: string
+  tags: string[]
+  metadata: any
+  ai_insights: any
+  is_favorite: boolean
+  download_count: number
+  view_count: number
+  last_accessed?: string
+  created_at: string
+  updated_at: string
+  folder_id?: number
+  folder_name?: string
+  folder_color?: string
+  downloadUrl: string
+  previewUrl: string
 }
 
 interface Folder {
@@ -87,31 +102,30 @@ export default function BriefcasePage() {
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Advanced search state
-  const [_showAdvancedSearch, setShowAdvancedSearch] = useState(false)
-  const [_sortBy, setSortBy] = useState<'name' | 'size' | 'date' | 'type' | 'modified'>('date')
-  const [_sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-  const [_searchFilters, setSearchFilters] = useState({
-    fileSize: { min: '', max: '' },
-    dateRange: { start: '', end: '' },
-    tags: [],
-    showFavorites: false,
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+    query: '',
+    semantic: false,
     fileTypes: [],
-    folders: []
+    categories: [],
+    tags: [],
+    dateRange: undefined,
+    sizeRange: [0, 1000],
+    authors: [],
+    favorites: false,
+    folders: [],
+    sortBy: 'relevance',
+    sortOrder: 'desc',
+    includeContent: true,
+    includeComments: false
   })
-  const [_savedSearches, setSavedSearches] = useState<Array<{
-    id: string
-    name: string
-    query: string
-    category: string
-    filters: typeof _searchFilters
-    sortBy: typeof _sortBy
-    sortOrder: typeof _sortOrder
-    createdAt: Date
-  }>>([])
-  
-  // Search suggestions and autocomplete
-  const [_showSuggestions, setShowSuggestions] = useState(false)
-  const [_searchHistory, setSearchHistory] = useState<string[]>([])
+  const [searchResults, setSearchResults] = useState<BriefcaseFile[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchStats, setSearchStats] = useState({
+    fileTypes: [],
+    categories: [],
+    tags: []
+  })
 
   const { toast } = useToast()
 
@@ -154,6 +168,38 @@ export default function BriefcasePage() {
       console.error('Error fetching folders:', error)
     }
   }, [])
+
+  // Advanced search function
+  const performAdvancedSearch = useCallback(async (filters: SearchFilters) => {
+    try {
+      setIsSearching(true)
+      const response = await fetch('/api/briefcase/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filters)
+      })
+      
+      if (!response.ok) throw new Error('Search failed')
+      
+      const data = await response.json()
+      setSearchResults(data.files || [])
+      setSearchStats(data.stats || { fileTypes: [], categories: [], tags: [] })
+      
+      toast({
+        title: "Search completed",
+        description: `Found ${data.files?.length || 0} files`,
+      })
+    } catch (error) {
+      console.error('Search error:', error)
+      toast({
+        title: "Search failed",
+        description: "Failed to perform search. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSearching(false)
+    }
+  }, [toast])
 
   // Initial load
   useEffect(() => {
@@ -331,8 +377,8 @@ export default function BriefcasePage() {
     return <FileType className="w-5 h-5" />
   }
 
-  // Filter files based on search and category
-  const filteredFiles = files.filter(file => {
+  // Use search results if available, otherwise filter regular files
+  const filteredFiles = searchResults.length > 0 ? searchResults : files.filter(file => {
     const matchesSearch = !searchTerm || 
       file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (file.description && file.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -466,32 +512,21 @@ export default function BriefcasePage() {
 
         {/* Main Content */}
         <div className="flex-1 space-y-6">
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search files..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {stats.categories.map((cat: any) => (
-                  <SelectItem key={cat.name} value={cat.name}>
-                    {cat.name} ({cat.count})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
+          {/* Advanced Search Panel */}
+          <AdvancedSearchPanel
+            filters={searchFilters}
+            onFiltersChange={setSearchFilters}
+            onSearch={performAdvancedSearch}
+            availableFileTypes={stats.fileTypes.map((ft: any) => ft.file_type)}
+            availableCategories={stats.categories.map((cat: any) => cat.name)}
+            availableTags={stats.categories.map((cat: any) => ({ name: cat.name, count: cat.count }))}
+            availableAuthors={[]} // TODO: Implement authors
+            availableFolders={folders.map(f => ({ name: f.name, id: f.id.toString(), count: f.file_count }))}
+            totalFiles={stats.totalFiles}
+          />
+
+          {/* View Mode Toggle */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'outline'}
@@ -508,25 +543,68 @@ export default function BriefcasePage() {
                 <List className="w-4 h-4" />
               </Button>
             </div>
+            
+            {/* Search Results Toggle */}
+            {searchResults.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={showAdvancedSearch ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  Search Results ({searchResults.length})
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSearchResults([])
+                    setSearchFilters({
+                      query: '',
+                      semantic: false,
+                      fileTypes: [],
+                      categories: [],
+                      tags: [],
+                      dateRange: undefined,
+                      sizeRange: [0, 1000],
+                      authors: [],
+                      favorites: false,
+                      folders: [],
+                      sortBy: 'relevance',
+                      sortOrder: 'desc',
+                      includeContent: true,
+                      includeComments: false
+                    })
+                  }}
+                >
+                  Clear Search
+                </Button>
+              </div>
+            )}
           </div>
 
       {/* Files Grid/List */}
-      {loading ? (
+      {loading || isSearching ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-          <span className="ml-2 text-gray-600">Loading files...</span>
+          <span className="ml-2 text-gray-600">
+            {isSearching ? 'Searching...' : 'Loading files...'}
+          </span>
         </div>
       ) : filteredFiles.length === 0 ? (
         <div className="text-center py-12">
           <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No files found</h3>
           <p className="text-gray-600 mb-4">
-            {searchTerm || selectedCategory !== 'all' 
-              ? 'Try adjusting your search or filters'
-              : 'Upload your first file to get started'
+            {searchResults.length > 0 
+              ? 'No files match your search criteria. Try adjusting your filters.'
+              : searchTerm || selectedCategory !== 'all' 
+                ? 'Try adjusting your search or filters'
+                : 'Upload your first file to get started'
             }
           </p>
-          {!searchTerm && selectedCategory === 'all' && (
+          {searchResults.length === 0 && !searchTerm && selectedCategory === 'all' && (
             <Button
               onClick={() => setShowUploadDialog(true)}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
