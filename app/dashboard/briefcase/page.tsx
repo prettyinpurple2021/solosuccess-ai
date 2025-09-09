@@ -32,7 +32,9 @@ import {
   Download,
   Brain,
   Share2,
-  History
+  History,
+  CheckSquare,
+  Square
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
@@ -43,6 +45,7 @@ import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advan
 import AIInsightsPanel from "@/components/briefcase/ai-insights-panel"
 import FileSharingModal from "@/components/briefcase/file-sharing-modal"
 import VersionHistoryModal from "@/components/briefcase/version-history-modal"
+import BulkOperationsPanel from "@/components/briefcase/bulk-operations-panel"
 
 interface BriefcaseFile {
   id: string
@@ -113,6 +116,11 @@ export default function BriefcasePage() {
   // Version history state
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [versionHistoryFile, setVersionHistoryFile] = useState<BriefcaseFile | null>(null)
+  
+  // Bulk operations state
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
+  const [showBulkOperations, setShowBulkOperations] = useState(false)
+  const [selectAll, setSelectAll] = useState(false)
   
   // Mobile optimization state
   const [_isRefreshing, setIsRefreshing] = useState(false)
@@ -418,6 +426,35 @@ export default function BriefcasePage() {
     }
   }
 
+  // Bulk operations handlers
+  const handleFileSelection = (fileId: string, selected: boolean) => {
+    setSelectedFiles(prev => {
+      const newSet = new Set(prev)
+      if (selected) {
+        newSet.add(fileId)
+      } else {
+        newSet.delete(fileId)
+      }
+      return newSet
+    })
+  }
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedFiles(new Set(filteredFiles.map(f => f.id)))
+    } else {
+      setSelectedFiles(new Set())
+    }
+    setSelectAll(selected)
+  }
+
+  const handleBulkOperationComplete = () => {
+    setSelectedFiles(new Set())
+    setSelectAll(false)
+    setShowBulkOperations(false)
+    fetchFiles() // Refresh the file list
+  }
+
   // Handle folder creation
   const handleCreateFolder = async (name: string, description?: string, color?: string) => {
     try {
@@ -697,6 +734,31 @@ export default function BriefcasePage() {
               </Button>
             </div>
             
+            {/* Bulk Operations */}
+            {selectedFiles.size > 0 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setShowBulkOperations(true)}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <CheckSquare className="w-4 h-4 mr-2" />
+                  Bulk Operations ({selectedFiles.size})
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedFiles(new Set())
+                    setSelectAll(false)
+                  }}
+                >
+                  Clear Selection
+                </Button>
+              </div>
+            )}
+
             {/* Search Results Toggle */}
             {searchResults.length > 0 && (
               <div className="flex items-center gap-2">
@@ -768,10 +830,43 @@ export default function BriefcasePage() {
           )}
         </div>
       ) : (
-        <div className={viewMode === 'grid' 
-          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-          : "space-y-2"
-        }>
+        <div className="space-y-4">
+          {/* Select All Header */}
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSelectAll(!selectAll)}
+                className="p-1"
+              >
+                {selectAll ? (
+                  <CheckSquare className="w-4 h-4 text-purple-600" />
+                ) : (
+                  <Square className="w-4 h-4 text-gray-400" />
+                )}
+              </Button>
+              <span className="text-sm font-medium">
+                {selectAll ? 'All selected' : 'Select all'} ({filteredFiles.length} files)
+              </span>
+            </div>
+            {selectedFiles.size > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowBulkOperations(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
+              >
+                <CheckSquare className="w-4 h-4 mr-2" />
+                Bulk Actions ({selectedFiles.size})
+              </Button>
+            )}
+          </div>
+
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            : "space-y-2"
+          }>
           {filteredFiles.map((file, index) => (
             <motion.div
               key={file.id}
@@ -779,17 +874,49 @@ export default function BriefcasePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               className={viewMode === 'grid' 
-                ? "group relative bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200 cursor-pointer"
-                : "group flex items-center space-x-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200 cursor-pointer p-4"
+                ? `group relative bg-white rounded-lg border transition-all duration-200 cursor-pointer ${
+                    selectedFiles.has(file.id) 
+                      ? 'border-purple-500 bg-purple-50' 
+                      : 'border-gray-200 hover:border-purple-300 hover:shadow-lg'
+                  }`
+                : `group flex items-center space-x-4 bg-white rounded-lg border transition-all duration-200 cursor-pointer p-4 ${
+                    selectedFiles.has(file.id) 
+                      ? 'border-purple-500 bg-purple-50' 
+                      : 'border-gray-200 hover:border-purple-300 hover:shadow-lg'
+                  }`
               }
-              onClick={() => handleFilePreview(file, index)}
+              onClick={(e) => {
+                // Don't trigger preview if clicking on checkbox
+                if ((e.target as HTMLElement).closest('[data-checkbox]')) {
+                  return
+                }
+                handleFilePreview(file, index)
+              }}
             >
               {viewMode === 'grid' ? (
                 <>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        {getFileIcon(file.file_type)}
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFileSelection(file.id, !selectedFiles.has(file.id))
+                          }}
+                          className="p-1"
+                          data-checkbox
+                        >
+                          {selectedFiles.has(file.id) ? (
+                            <CheckSquare className="w-4 h-4 text-purple-600" />
+                          ) : (
+                            <Square className="w-4 h-4 text-gray-400" />
+                          )}
+                        </Button>
+                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                          {getFileIcon(file.file_type)}
+                        </div>
                       </div>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                         <Button
@@ -847,6 +974,22 @@ export default function BriefcasePage() {
                 </>
               ) : (
                 <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleFileSelection(file.id, !selectedFiles.has(file.id))
+                    }}
+                    className="p-1"
+                    data-checkbox
+                  >
+                    {selectedFiles.has(file.id) ? (
+                      <CheckSquare className="w-4 h-4 text-purple-600" />
+                    ) : (
+                      <Square className="w-4 h-4 text-gray-400" />
+                    )}
+                  </Button>
                   <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                     {getFileIcon(file.file_type)}
                   </div>
@@ -1032,6 +1175,22 @@ export default function BriefcasePage() {
               file={versionHistoryFile}
               currentUserId="current-user-id" // TODO: Get from auth context
             />
+          )}
+
+          {/* Bulk Operations Modal */}
+          {showBulkOperations && selectedFiles.size > 0 && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <BulkOperationsPanel
+                    selectedFiles={filteredFiles.filter(f => selectedFiles.has(f.id))}
+                    availableFolders={folders}
+                    onClose={() => setShowBulkOperations(false)}
+                    onOperationComplete={handleBulkOperationComplete}
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
