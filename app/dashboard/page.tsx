@@ -228,7 +228,7 @@ export default function DashboardPage() {
     )
   }
 
-  const { user, todaysStats, todaysTasks, activeGoals, recentConversations, insights } = data
+  const { user, todaysStats, todaysTasks, activeGoals, recentConversations, recentBriefcases, insights } = data
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -569,6 +569,82 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-500 mt-2">
                       Complete more tasks to get AI insights
                     </p>
+                  </div>
+                )}
+              </div>
+            </BossCard>
+          </motion.div>
+
+          {/* Briefcase Section */}
+          <motion.div
+            variants={itemVariants}
+            className="col-span-1 lg:col-span-2"
+          >
+            <BossCard variant="default">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
+                  <Briefcase className="w-6 h-6" />
+                  <span>Recent Briefcases</span>
+                </h2>
+                <Link href="/dashboard/briefcase">
+                  <BossButton size="sm" variant="primary">
+                    View All
+                  </BossButton>
+                </Link>
+              </div>
+              
+              <div className="space-y-3">
+                {recentBriefcases && recentBriefcases.length > 0 ? (
+                  recentBriefcases.map((briefcase: any, index: number) => (
+                    <motion.div
+                      key={briefcase.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center space-x-3 p-3 glass rounded-lg hover-lift cursor-pointer"
+                    >
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <Briefcase className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{briefcase.title}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {briefcase.goal_count} goals • {briefcase.task_count} tasks
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Updated {new Date(briefcase.updated_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          briefcase.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : briefcase.status === 'completed'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {briefcase.status}
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">No briefcases yet</p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Create your first briefcase to organize your projects and goals
+                    </p>
+                    <Link href="/dashboard/briefcase">
+                      <BossButton 
+                        variant="primary" 
+                        size="sm"
+                        icon={<Plus className="w-4 h-4" />}
+                      >
+                        Create Briefcase
+                      </BossButton>
+                    </Link>
                   </div>
                 )}
               </div>

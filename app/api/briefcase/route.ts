@@ -1,41 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { createClient } from '@/lib/neon/server'
+import { neon } from '@neondatabase/serverless'
+import jwt from 'jsonwebtoken'
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
+
+// JWT authentication helper
+async function authenticateJWTRequest(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { user: null, error: 'No authorization header' }
+    }
+
+    const token = authHeader.substring(7)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    
+    return { 
+      user: {
+        id: decoded.userId,
+        email: decoded.email,
+        full_name: decoded.full_name || null,
+        avatar_url: null,
+        subscription_tier: 'free',
+        level: 1,
+        total_points: 0,
+        current_streak: 0,
+        wellness_score: 50,
+        focus_minutes: 0,
+        onboarding_completed: false
+      }, 
+      error: null 
+    }
+  } catch (error) {
+    console.error('JWT authentication error:', error)
+    return { user: null, error: 'Invalid token' }
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const { user, error } = await authenticateRequest()
+    const { user, error } = await authenticateJWTRequest(request)
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Ensure user exists in database
-    const client = await createClient()
-    let { rows: userData } = await client.query(
-      'SELECT id FROM users WHERE id = $1',
-      [user.id]
-    )
+    const sql = getSql()
+    let userData = await sql`
+      SELECT id FROM users WHERE id = ${user.id}
+    `
 
     if (userData.length === 0) {
       // Create user if they don't exist
-      await client.query(
-        `INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, level, total_points, current_streak, wellness_score, focus_minutes, onboarding_completed, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
-        [
-          user.id,
-          user.email,
-          user.full_name,
-          user.avatar_url,
-          'free',
-          1,
-          0,
-          0,
-          50,
-          0,
-          false
-        ]
-      )
+      await sql`
+        INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, subscription_status, is_verified, created_at, updated_at)
+        VALUES (${user.id}, ${user.email}, ${user.full_name}, ${user.avatar_url}, 'free', 'active', false, NOW(), NOW())
+      `
     }
 
     // Get query parameters
@@ -45,124 +72,189 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Build query with folder information (exclude file_data for performance)
-    let query = `
-      SELECT 
-        d.id, d.name, d.original_name, d.file_type, d.mime_type, d.size, 
-        d.category, d.description, d.tags, d.metadata, d.ai_insights,
-        d.is_favorite, d.download_count, d.view_count, d.last_accessed,
-        d.created_at, d.updated_at, d.folder_id,
-        f.name as folder_name, f.color as folder_color
-      FROM documents d
-      LEFT JOIN document_folders f ON d.folder_id = f.id
-      WHERE d.user_id = $1
-    `
-    const params = [user.id]
-    let paramIndex = 2
-
-    if (category && category !== 'all') {
-      query += ` AND d.category = $${paramIndex}`
-      params.push(category)
-      paramIndex++
-    }
-
+    // Get briefcases (projects) for the user
+    let briefcases
     if (search) {
-      query += ` AND (d.name ILIKE $${paramIndex} OR d.description ILIKE $${paramIndex} OR d.tags::text ILIKE $${paramIndex})`
-      params.push(`%${search}%`)
-      paramIndex++
+      briefcases = await sql`
+        SELECT 
+          b.id, b.title, b.description, b.status, b.metadata,
+          b.created_at, b.updated_at,
+          COUNT(DISTINCT g.id) as goal_count,
+          COUNT(DISTINCT t.id) as task_count
+        FROM briefcases b
+        LEFT JOIN goals g ON b.id = g.briefcase_id
+        LEFT JOIN tasks t ON b.id = t.briefcase_id
+        WHERE b.user_id = ${user.id} 
+          AND (b.title ILIKE ${`%${search}%`} OR b.description ILIKE ${`%${search}%`})
+        GROUP BY b.id, b.title, b.description, b.status, b.metadata, b.created_at, b.updated_at
+        ORDER BY b.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `
+    } else if (category && category !== 'all') {
+      briefcases = await sql`
+        SELECT 
+          b.id, b.title, b.description, b.status, b.metadata,
+          b.created_at, b.updated_at,
+          COUNT(DISTINCT g.id) as goal_count,
+          COUNT(DISTINCT t.id) as task_count
+        FROM briefcases b
+        LEFT JOIN goals g ON b.id = g.briefcase_id
+        LEFT JOIN tasks t ON b.id = t.briefcase_id
+        WHERE b.user_id = ${user.id} AND b.status = ${category}
+        GROUP BY b.id, b.title, b.description, b.status, b.metadata, b.created_at, b.updated_at
+        ORDER BY b.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `
+    } else {
+      briefcases = await sql`
+        SELECT 
+          b.id, b.title, b.description, b.status, b.metadata,
+          b.created_at, b.updated_at,
+          COUNT(DISTINCT g.id) as goal_count,
+          COUNT(DISTINCT t.id) as task_count
+        FROM briefcases b
+        LEFT JOIN goals g ON b.id = g.briefcase_id
+        LEFT JOIN tasks t ON b.id = t.briefcase_id
+        WHERE b.user_id = ${user.id}
+        GROUP BY b.id, b.title, b.description, b.status, b.metadata, b.created_at, b.updated_at
+        ORDER BY b.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `
     }
-
-    query += ` ORDER BY d.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
-    params.push(limit.toString(), offset.toString())
-
-    const { rows: files } = await client.query(query, params)
 
     // Get total count for pagination
-    let countQuery = `SELECT COUNT(*) as total FROM documents d WHERE d.user_id = $1`
-    const countParams = [user.id]
-
-    if (category && category !== 'all') {
-      countQuery += ` AND d.category = $2`
-      countParams.push(category)
-    }
-
+    let countResult
     if (search) {
-      countQuery += ` AND (d.name ILIKE $${countParams.length + 1} OR d.description ILIKE $${countParams.length + 1} OR d.tags::text ILIKE $${countParams.length + 1})`
-      countParams.push(`%${search}%`)
+      countResult = await sql`
+        SELECT COUNT(*) as total FROM briefcases 
+        WHERE user_id = ${user.id} 
+          AND (title ILIKE ${`%${search}%`} OR description ILIKE ${`%${search}%`})
+      `
+    } else if (category && category !== 'all') {
+      countResult = await sql`
+        SELECT COUNT(*) as total FROM briefcases 
+        WHERE user_id = ${user.id} AND status = ${category}
+      `
+    } else {
+      countResult = await sql`
+        SELECT COUNT(*) as total FROM briefcases 
+        WHERE user_id = ${user.id}
+      `
     }
 
-    const { rows: [{ total }] } = await client.query(countQuery, countParams)
+    const total = parseInt(countResult[0].total)
 
-    // Get category statistics
-    const { rows: categoryStats } = await client.query(
-      `SELECT d.category, COUNT(*) as count, SUM(d.size) as total_size
-       FROM documents d
-       WHERE d.user_id = $1 
-       GROUP BY d.category
-       ORDER BY count DESC`,
-      [user.id]
-    )
+    // Get stats
+    const statsResult = await sql`
+      SELECT 
+        COUNT(*) as total_briefcases,
+        COUNT(CASE WHEN status = 'active' THEN 1 END) as active_briefcases,
+        COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_briefcases,
+        COUNT(CASE WHEN status = 'archived' THEN 1 END) as archived_briefcases
+      FROM briefcases 
+      WHERE user_id = ${user.id}
+    `
 
-    // Get file type statistics
-    const { rows: fileTypeStats } = await client.query(
-      `SELECT d.file_type, COUNT(*) as count, SUM(d.size) as total_size
-       FROM documents d
-       WHERE d.user_id = $1 
-       GROUP BY d.file_type
-       ORDER BY count DESC`,
-      [user.id]
-    )
+    const stats = statsResult[0]
+
+    // Transform briefcases to match expected format
+    const files = briefcases.map((briefcase: any) => ({
+      id: briefcase.id.toString(),
+      name: briefcase.title,
+      original_name: briefcase.title,
+      file_type: 'briefcase',
+      mime_type: 'application/briefcase',
+      size: 0,
+      category: briefcase.status,
+      description: briefcase.description,
+      tags: [],
+      metadata: briefcase.metadata || {},
+      ai_insights: {},
+      is_favorite: false,
+      download_count: 0,
+      view_count: 0,
+      last_accessed: briefcase.updated_at,
+      created_at: briefcase.created_at,
+      updated_at: briefcase.updated_at,
+      folder_id: null,
+      folder_name: null,
+      folder_color: null,
+      downloadUrl: '',
+      previewUrl: '',
+      goal_count: parseInt(briefcase.goal_count),
+      task_count: parseInt(briefcase.task_count)
+    }))
 
     return NextResponse.json({
-      files: files.map(file => ({
-        id: file.id,
-        name: file.name,
-        originalName: file.original_name,
-        type: file.file_type,
-        mimeType: file.mime_type,
-        size: file.size,
-        category: file.category,
-        description: file.description,
-        tags: file.tags ? JSON.parse(file.tags) : [],
-        metadata: file.metadata ? JSON.parse(file.metadata) : {},
-        aiInsights: file.ai_insights ? JSON.parse(file.ai_insights) : {},
-        isFavorite: file.is_favorite,
-        downloadCount: file.download_count,
-        viewCount: file.view_count,
-        lastAccessed: file.last_accessed,
-        folderId: file.folder_id,
-        folderName: file.folder_name,
-        folderColor: file.folder_color,
-        createdAt: file.created_at,
-        updatedAt: file.updated_at,
-        downloadUrl: `/api/briefcase/files/${file.id}/download`,
-        previewUrl: `/api/briefcase/files/${file.id}/preview`,
-      })),
+      files,
+      stats: {
+        totalFiles: stats.total_briefcases,
+        totalSize: 0,
+        categories: [
+          { name: 'active', count: stats.active_briefcases },
+          { name: 'completed', count: stats.completed_briefcases },
+          { name: 'archived', count: stats.archived_briefcases }
+        ],
+        fileTypes: [{ file_type: 'briefcase', count: stats.total_briefcases }]
+      },
       pagination: {
-        total: parseInt(total),
+        total,
         limit,
         offset,
-        hasMore: offset + limit < parseInt(total)
-      },
-      stats: {
-        totalFiles: parseInt(total),
-        totalSize: files.reduce((sum, file) => sum + parseInt(file.size), 0),
-        categories: categoryStats.map(stat => ({
-          name: stat.category,
-          count: parseInt(stat.count),
-          totalSize: parseInt(stat.total_size || 0)
-        })),
-        fileTypes: fileTypeStats.map(stat => ({
-          type: stat.file_type,
-          count: parseInt(stat.count),
-          totalSize: parseInt(stat.total_size || 0)
-        }))
+        hasMore: offset + limit < total
       }
     })
 
-  } catch {
+  } catch (error) {
+    console.error('Briefcase API error:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    })
     return NextResponse.json(
-      { error: 'Failed to fetch files' },
+      { 
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : 'Unknown error') : undefined
+      },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { user, error } = await authenticateJWTRequest(request)
+    
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { title, description, status = 'active', metadata = {} } = body
+
+    if (!title) {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+    }
+
+    const sql = getSql()
+
+    // Create new briefcase
+    const newBriefcase = await sql`
+      INSERT INTO briefcases (user_id, title, description, status, metadata, created_at, updated_at)
+      VALUES (${user.id}, ${title}, ${description}, ${status}, ${JSON.stringify(metadata)}, NOW(), NOW())
+      RETURNING id, title, description, status, metadata, created_at, updated_at
+    `
+
+    return NextResponse.json({
+      success: true,
+      briefcase: newBriefcase[0]
+    })
+
+  } catch (error) {
+    console.error('Briefcase creation error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get basic data from existing tables (simplified for now)
-    let todaysStatsRes, todaysTasksRes, activeGoalsRes, conversationsRes, achievementsRes, weeklyFocusRes;
+    let todaysStatsRes, todaysTasksRes, activeGoalsRes, conversationsRes, achievementsRes, weeklyFocusRes, briefcasesRes;
     
     try {
       // Try to get tasks data if table exists
@@ -101,10 +101,27 @@ export async function GET(request: NextRequest) {
           ORDER BY COALESCE(due_date, NOW()) ASC
           LIMIT 10
       `;
+
+      // Get briefcases (projects) data
+      briefcasesRes = await sql`
+        SELECT 
+          b.id, b.title, b.description, b.status, b.metadata,
+          b.created_at, b.updated_at,
+          COUNT(DISTINCT g.id) as goal_count,
+          COUNT(DISTINCT t.id) as task_count
+        FROM briefcases b
+        LEFT JOIN goals g ON b.id = g.briefcase_id
+        LEFT JOIN tasks t ON b.id = t.briefcase_id
+        WHERE b.user_id = ${user.id}
+        GROUP BY b.id, b.title, b.description, b.status, b.metadata, b.created_at, b.updated_at
+        ORDER BY b.updated_at DESC
+        LIMIT 6
+      `;
     } catch (error) {
-      // If tasks table doesn't exist, use default data
+      // If tables don't exist, use default data
       todaysStatsRes = [{ tasks_completed: 0, total_tasks: 0, focus_minutes: 0, ai_interactions: 0, goals_achieved: 0, productivity_score: 0 }];
       todaysTasksRes = [];
+      briefcasesRes = [];
     }
     
     // Default empty data for other tables that might not exist
@@ -158,13 +175,25 @@ export async function GET(request: NextRequest) {
 
     const weeklyFocusRow = weeklyFocusRes[0] || { total_minutes: 0, sessions_count: 0, average_session: 0 }
 
+    // Transform briefcases data
+    const recentBriefcases = briefcasesRes.map((b: any) => ({
+      id: b.id,
+      title: b.title,
+      description: b.description,
+      status: b.status,
+      goal_count: parseInt(b.goal_count),
+      task_count: parseInt(b.task_count),
+      created_at: b.created_at,
+      updated_at: b.updated_at,
+    }))
+
     // Generate some sample insights for new users
-    const insights = todaysTasks.length === 0 ? [
+    const insights = todaysTasks.length === 0 && recentBriefcases.length === 0 ? [
       {
         type: 'welcome',
         title: 'Welcome to SoloBoss AI!',
-        description: 'Start by creating your first goal or task to get organized.',
-        action: 'Create Goal'
+        description: 'Start by creating your first briefcase (project) to get organized.',
+        action: 'Create Briefcase'
       }
     ] : []
 
@@ -187,6 +216,7 @@ export async function GET(request: NextRequest) {
       activeGoals,
       recentConversations,
       recentAchievements,
+      recentBriefcases,
       weeklyFocus: weeklyFocusRow,
       insights,
     }

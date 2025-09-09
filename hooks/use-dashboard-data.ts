@@ -66,6 +66,16 @@ export interface DashboardData {
       points: number
     }
   }>
+  recentBriefcases: Array<{
+    id: number
+    title: string
+    description: string
+    status: string
+    goal_count: number
+    task_count: number
+    created_at: string
+    updated_at: string
+  }>
   weeklyFocus: {
     total_minutes: number
     sessions_count: number
