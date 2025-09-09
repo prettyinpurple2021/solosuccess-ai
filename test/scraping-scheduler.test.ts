@@ -221,6 +221,29 @@ describe('ScrapingScheduler', () => {
     })
   })
 
+  describe('job cancellation', () => {
+    it('should allow cancelling a running job', async () => {
+      const jobId = await scheduler.scheduleJob(
+        1, 'user123', 'website', 'https://example.com',
+        { type: 'interval', value: 720 }
+      )
+
+      // Manually set the job as running for the test
+      scheduler._setJobAsRunningForTesting(jobId)
+
+      const success = scheduler.cancelJob(jobId)
+      expect(success).toBe(true)
+
+      const job = scheduler.getJob(jobId)
+      expect(job?.status).toBe('cancelled')
+
+      // Simulate job completion by calling processJob, which should handle the cleanup
+      await (scheduler as any).processJob(job)
+
+      expect(scheduler.getJob(jobId)).toBeNull()
+    })
+  })
+
   describe('metrics', () => {
     it('should provide accurate metrics', async () => {
       // Schedule some jobs
