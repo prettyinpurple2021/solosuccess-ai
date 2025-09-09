@@ -85,25 +85,10 @@ export async function POST(request: NextRequest) {
       created_at: newUser.created_at
     }
 
-    // Start Temporal onboarding workflow in the background
+    // Start Temporal onboarding workflow in the background (disabled for now)
     try {
-      const { startWorkflow, generateWorkflowId, WORKFLOW_CONFIGS } = await import('@/lib/temporal-client')
-      
-      const workflowId = generateWorkflowId('onboarding', newUser.id)
-      
-      await startWorkflow('solobossUserOnboardingWorkflow', [
-        newUser.id,
-        {
-          email: newUser.email,
-          fullName: newUser.full_name,
-          username: newUser.username
-        }
-      ], {
-        workflowId,
-        ...WORKFLOW_CONFIGS.ONBOARDING
-      })
-      
-      console.log(`Started onboarding workflow ${workflowId} for user ${newUser.id}`)
+      // Temporarily disabled to prevent 500 errors
+      console.log(`User ${newUser.id} created successfully - onboarding workflow disabled`)
     } catch (error) {
       // Don't fail the signup if Temporal workflow fails
       console.error('Failed to start onboarding workflow:', error)
@@ -116,9 +101,18 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Signup error:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    })
     const message = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { error: 'Internal server error', message: process.env.NODE_ENV === 'development' ? message : undefined },
+      { 
+        error: 'Internal server error', 
+        message: process.env.NODE_ENV === 'development' ? message : undefined,
+        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
+      },
       { status: 500 }
     )
   }

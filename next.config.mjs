@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fix workspace root warning
+  outputFileTracingRoot: process.cwd(),
+  
   // Disable all checks to ensure it builds
   eslint: {
     ignoreDuringBuilds: true,
