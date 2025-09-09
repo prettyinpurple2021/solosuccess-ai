@@ -37,6 +37,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 import FilePreviewModal from "@/components/file-preview-modal"
+import EnhancedFilePreviewModal from "@/components/briefcase/enhanced-file-preview-modal"
 import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
 import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advanced-search-panel"
 import AIInsightsPanel from "@/components/briefcase/ai-insights-panel"
@@ -298,6 +299,123 @@ export default function BriefcasePage() {
   const handleVersionHistory = (file: BriefcaseFile) => {
     setVersionHistoryFile(file)
     setShowVersionHistory(true)
+  }
+
+  // Handle file metadata operations
+  const handleToggleFavorite = async (file: BriefcaseFile) => {
+    try {
+      const response = await fetch(`/api/briefcase/files/${file.id}/favorite`, {
+        method: 'POST'
+      })
+
+      if (!response.ok) throw new Error('Failed to toggle favorite')
+
+      const result = await response.json()
+      
+      // Update the file in the local state
+      setFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, is_favorite: result.isFavorite } : f
+      ))
+
+      toast({
+        title: result.isFavorite ? "Added to favorites" : "Removed from favorites",
+        description: `"${file.name}" ${result.isFavorite ? 'added to' : 'removed from'} your favorites`,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update favorite status",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleAddTag = async (file: BriefcaseFile, tag: string) => {
+    try {
+      const response = await fetch(`/api/briefcase/files/${file.id}/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag })
+      })
+
+      if (!response.ok) throw new Error('Failed to add tag')
+
+      const result = await response.json()
+      
+      // Update the file in the local state
+      setFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, tags: result.tags } : f
+      ))
+
+      toast({
+        title: "Tag added",
+        description: `Added "${tag}" to "${file.name}"`,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add tag",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleRemoveTag = async (file: BriefcaseFile, tag: string) => {
+    try {
+      const response = await fetch(`/api/briefcase/files/${file.id}/tags?tag=${encodeURIComponent(tag)}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to remove tag')
+
+      const result = await response.json()
+      
+      // Update the file in the local state
+      setFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, tags: result.tags } : f
+      ))
+
+      toast({
+        title: "Tag removed",
+        description: `Removed "${tag}" from "${file.name}"`,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove tag",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleUpdateDescription = async (file: BriefcaseFile, description: string) => {
+    try {
+      const response = await fetch(`/api/briefcase/files/${file.id}/metadata`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description })
+      })
+
+      if (!response.ok) throw new Error('Failed to update description')
+
+      const result = await response.json()
+      
+      // Update the file in the local state
+      setFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, description: result.document.description } : f
+      ))
+
+      toast({
+        title: "Description updated",
+        description: `Updated description for "${file.name}"`,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update description",
+        variant: "destructive"
+      })
+    }
   }
 
   // Handle folder creation
@@ -835,13 +953,35 @@ export default function BriefcasePage() {
         </DialogContent>
       </Dialog>
 
-          {/* File Preview Modal */}
-          <FilePreviewModal
+          {/* Enhanced File Preview Modal */}
+          <EnhancedFilePreviewModal
             isOpen={showPreviewModal}
             onClose={() => setShowPreviewModal(false)}
+            file={filteredFiles[previewIndex] || null}
             files={filteredFiles}
             currentIndex={previewIndex}
-            onIndexChange={setPreviewIndex}
+            onNavigate={(direction) => {
+              if (direction === 'prev' && previewIndex > 0) {
+                setPreviewIndex(previewIndex - 1)
+              } else if (direction === 'next' && previewIndex < filteredFiles.length - 1) {
+                setPreviewIndex(previewIndex + 1)
+              }
+            }}
+            onEdit={(file) => {
+              // TODO: Implement file editing
+              console.log('Edit file:', file.name)
+            }}
+            onDelete={handleFileDelete}
+            onShare={handleFileSharing}
+            onDownload={handleFileDownload}
+            onToggleFavorite={handleToggleFavorite}
+            onAddTag={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+            onUpdateDescription={handleUpdateDescription}
+            onUpdateCategory={(file, category) => {
+              // TODO: Implement category update
+              console.log('Update category:', file.name, category)
+            }}
           />
 
           {/* Folder Creation Dialog */}
