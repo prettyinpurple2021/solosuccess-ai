@@ -39,19 +39,19 @@ export default function DashboardPage() {
 
   // Check if onboarding should be shown
   useEffect(() => {
-    if (data && !data.user.onboarding_completed) {
+    if (data && !dashboardUser.onboarding_completed) {
       // Show welcome dashboard first, then onboarding
       setShowWelcomeDashboard(true)
     }
-  }, [data])
+  }, [data, dashboardUser])
 
   // Track dashboard view
   useEffect(() => {
     if (data) {
       track('dashboard_viewed', {
-        userLevel: data.user.level,
-        totalPoints: data.user.total_points,
-        streak: data.user.current_streak
+        userLevel: dashboardUser.level,
+        totalPoints: dashboardUser.total_points,
+        streak: dashboardUser.current_streak
       })
     }
   }, [data, track])
@@ -228,7 +228,7 @@ export default function DashboardPage() {
     )
   }
 
-  const { user, todaysStats, todaysTasks, activeGoals, recentConversations, recentBriefcases, insights } = data
+  const { user: dashboardUser, todaysStats, todaysTasks, activeGoals, recentConversations, recentBriefcases, insights } = data
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -286,7 +286,7 @@ export default function DashboardPage() {
               </motion.div>
               <div>
                 <h1 className="text-4xl font-bold text-gradient">
-                  Welcome back, {user.full_name || user.email.split('@')[0]}! 👑
+                  Welcome back, {dashboardUser.full_name || dashboardUser.email.split('@')[0]}! 👑
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-400">
                   Here&apos;s what&apos;s happening with your empire today
@@ -299,13 +299,13 @@ export default function DashboardPage() {
               whileHover={{ scale: 1.05 }}
               className="crown-badge"
             >
-              Level {user.level}
+              Level {dashboardUser.level}
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="px-4 py-2 gradient-success rounded-full text-white font-bold"
             >
-              {user.total_points} pts
+              {dashboardUser.total_points} pts
             </motion.div>
           </div>
         </motion.div>
