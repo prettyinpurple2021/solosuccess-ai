@@ -15,7 +15,7 @@ export interface ScrapingJob {
   lastRunAt?: Date
   retryCount: number
   maxRetries: number
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused' | 'cancelled'
   config: ScrapingJobConfig
   createdAt: Date
   updatedAt: Date
@@ -266,7 +266,7 @@ export class ScrapingScheduler {
 
     if (this.runningJobs.has(jobId)) {
       // Mark for cancellation, will be removed when execution completes
-      job.status = 'paused'
+      job.status = 'cancelled'
     } else {
       this.jobQueue.delete(jobId)
     }
@@ -424,6 +424,22 @@ export class ScrapingScheduler {
     job.updatedAt = new Date()
 
     try {
+      // Check if job was cancelled before starting
+      if (job.status === 'cancelled') {
+        console.log(`Job ${job.id} was cancelled before execution.`)
+        this.jobQueue.delete(job.id)
+        this.updateMetrics()
+        return {
+          jobId: job.id,
+          success: false,
+          error: 'Job cancelled by user',
+          executionTime: 0,
+          changesDetected: false,
+          retryCount: job.retryCount,
+          completedAt: new Date(),
+        }
+      }
+
       console.log(`Processing scraping job: ${job.id} (${job.jobType}) for ${job.url}`)
 
       // Execute the scraping based on job type
@@ -524,6 +540,12 @@ export class ScrapingScheduler {
       return result
     } finally {
       this.runningJobs.delete(job.id)
+      // If job was cancelled during execution, remove it from the queue
+      if (job.status === 'cancelled') {
+        this.jobQueue.delete(job.id)
+        console.log(`Cleaned up cancelled job: ${job.id}`)
+        this.updateMetrics()
+      }
     }
   }
 
