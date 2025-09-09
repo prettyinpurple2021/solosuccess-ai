@@ -241,13 +241,14 @@ describe('ScrapingScheduler', () => {
       // Simulate job completion
       runningJobs.delete(jobId)
 
-      // Manually trigger cleanup that would happen in processJob's finally block
-      const finalJobCheck = scheduler.getJob(jobId)
-      if (finalJobCheck && finalJobCheck.status === 'cancelled') {
-        (scheduler as any).jobQueue.delete(jobId)
-      }
+      // If the scheduler exposes a public cleanup method, call it here.
+      // For example: scheduler.cleanupJob(jobId)
+      // Otherwise, rely on the scheduler's own logic to eventually remove the job.
+      // Remove manual deletion of jobQueue.
 
-      expect(scheduler.getJob(jobId)).toBeNull()
+      // The job should still exist but be marked as cancelled.
+      const jobAfterCancel = scheduler.getJob(jobId)
+      expect(jobAfterCancel?.status).toBe('cancelled')
     })
   })
 
