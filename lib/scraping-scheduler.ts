@@ -15,7 +15,7 @@ export interface ScrapingJob {
   lastRunAt?: Date
   retryCount: number
   maxRetries: number
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused' | 'cancelled'
   config: ScrapingJobConfig
   createdAt: Date
   updatedAt: Date
@@ -266,7 +266,7 @@ export class ScrapingScheduler {
 
     if (this.runningJobs.has(jobId)) {
       // Mark for cancellation, will be removed when execution completes
-      job.status = 'paused'
+      job.status = 'cancelled'
     } else {
       this.jobQueue.delete(jobId)
     }
@@ -415,6 +415,20 @@ export class ScrapingScheduler {
   }
 
   private async processJob(job: ScrapingJob): Promise<ScrapingJobResult> {
+    // Immediately handle jobs that were cancelled while pending in the queue
+    if (job.status === 'cancelled') {
+      this._cleanupCancelledJob(job.id)
+      return {
+        jobId: job.id,
+        success: false,
+        error: 'Job cancelled before execution',
+        executionTime: 0,
+        changesDetected: false,
+        retryCount: job.retryCount,
+        completedAt: new Date(),
+      }
+    }
+
     const startTime = Date.now()
     this.runningJobs.add(job.id)
     
@@ -466,7 +480,7 @@ export class ScrapingScheduler {
         job.retryCount = 0
         job.nextRunAt = this.calculateNextRun(job.frequency)
         this.metrics.completedJobs++
-      } else {
+      } else if (job.status !== 'cancelled') {
         // Job failed, check if we should retry
         job.retryCount++
         
@@ -524,7 +538,17 @@ export class ScrapingScheduler {
       return result
     } finally {
       this.runningJobs.delete(job.id)
+      // If job was cancelled during execution, remove it from the queue
+      if (job.status === 'cancelled') {
+        this._cleanupCancelledJob(job.id)
+      }
     }
+  }
+
+  private _cleanupCancelledJob(jobId: string): void {
+    this.jobQueue.delete(jobId)
+    console.log(`Cleaned up cancelled job: ${jobId}`)
+    this.updateMetrics()
   }
 
   private generateJobId(competitorId: number, jobType: string, url: string): string {
@@ -698,6 +722,17 @@ export class ScrapingScheduler {
     this.jobQueue.clear()
     this.runningJobs.clear()
     this.jobHistory.clear()
+  }
+
+  /**
+   * Test-only method to manually set a job's status to running
+   * @param jobId The ID of the job to set as running
+   */
+  _setJobAsRunningForTesting(jobId: string): void {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('This method is for testing purposes only.')
+    }
+    this.runningJobs.add(jobId)
   }
 }
 
