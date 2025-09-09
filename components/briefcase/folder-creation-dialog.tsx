@@ -11,9 +11,10 @@ import { Folder, Palette } from 'lucide-react'
 
 interface FolderCreationDialogProps {
   isOpen: boolean
-  onClose: () => void
-  onCreate: (name: string, description?: string, color?: string) => void
+  onCloseAction: () => void
+  onCreateFolderAction: (name: string, description?: string, color?: string, parentId?: string) => void
   parentFolder?: string
+  availableFolders?: Array<{ id: string; name: string; color: string }>
 }
 
 const FOLDER_COLORS = [
@@ -29,13 +30,15 @@ const FOLDER_COLORS = [
 
 export default function FolderCreationDialog({ 
   isOpen, 
-  onClose, 
-  onCreate, 
-  parentFolder 
+  onCloseAction, 
+  onCreateFolderAction, 
+  parentFolder,
+  availableFolders = []
 }: FolderCreationDialogProps) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [color, setColor] = useState('#8B5CF6')
+  const [selectedParentId, setSelectedParentId] = useState<string>('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,11 +47,12 @@ export default function FolderCreationDialog({
 
     setLoading(true)
     try {
-      await onCreate(name.trim(), description.trim() || undefined, color)
+      await onCreateFolderAction(name.trim(), description.trim() || undefined, color, selectedParentId || undefined)
       // Reset form
       setName('')
       setDescription('')
       setColor('#8B5CF6')
+      setSelectedParentId('')
     } finally {
       setLoading(false)
     }
@@ -59,7 +63,8 @@ export default function FolderCreationDialog({
       setName('')
       setDescription('')
       setColor('#8B5CF6')
-      onClose()
+      setSelectedParentId('')
+      onCloseAction()
     }
   }
 
@@ -105,6 +110,31 @@ export default function FolderCreationDialog({
               rows={3}
             />
           </div>
+
+          {availableFolders.length > 0 && (
+            <div>
+              <Label htmlFor="parent-folder">Parent Folder (Optional)</Label>
+              <Select value={selectedParentId} onValueChange={setSelectedParentId} disabled={loading}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select parent folder..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Root Level</SelectItem>
+                  {availableFolders.map((folder) => (
+                    <SelectItem key={folder.id} value={folder.id}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: folder.color }}
+                        />
+                        {folder.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label className="flex items-center gap-2">

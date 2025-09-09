@@ -29,7 +29,9 @@ import {
   FileType,
   FileCode,
   Loader2,
-  Download
+  Download,
+  Brain,
+  Share2
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
@@ -37,6 +39,7 @@ import FilePreviewModal from "@/components/file-preview-modal"
 import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
 import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advanced-search-panel"
 import AIInsightsPanel from "@/components/briefcase/ai-insights-panel"
+import FileSharingModal from "@/components/briefcase/file-sharing-modal"
 
 interface BriefcaseFile {
   id: string
@@ -95,6 +98,14 @@ export default function BriefcasePage() {
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [_previewFile, setPreviewFile] = useState<BriefcaseFile | null>(null)
   const [previewIndex, setPreviewIndex] = useState(0)
+  
+  // AI insights state
+  const [showAIInsights, setShowAIInsights] = useState(false)
+  const [aiInsightsFile, setAiInsightsFile] = useState<BriefcaseFile | null>(null)
+  
+  // File sharing state
+  const [showSharingModal, setShowSharingModal] = useState(false)
+  const [sharingFile, setSharingFile] = useState<BriefcaseFile | null>(null)
   
   // Mobile optimization state
   const [_isRefreshing, setIsRefreshing] = useState(false)
@@ -263,6 +274,18 @@ export default function BriefcasePage() {
     setPreviewFile(file)
     setPreviewIndex(index)
     setShowPreviewModal(true)
+  }
+
+  // Handle AI insights
+  const handleAIInsights = (file: BriefcaseFile) => {
+    setAiInsightsFile(file)
+    setShowAIInsights(true)
+  }
+
+  // Handle file sharing
+  const handleFileSharing = (file: BriefcaseFile) => {
+    setSharingFile(file)
+    setShowSharingModal(true)
   }
 
   // Handle folder creation
@@ -636,9 +659,31 @@ export default function BriefcasePage() {
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        {getFileIcon(file.type)}
+                        {getFileIcon(file.file_type)}
                       </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleAIInsights(file)
+                          }}
+                          title="AI Analysis"
+                        >
+                          <Brain className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFileSharing(file)
+                          }}
+                          title="Share"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"
@@ -646,6 +691,7 @@ export default function BriefcasePage() {
                             e.stopPropagation()
                             handleFileDownload(file)
                           }}
+                          title="Download"
                         >
                           <Download className="w-4 h-4" />
                         </Button>
@@ -654,14 +700,14 @@ export default function BriefcasePage() {
                     <h3 className="font-medium text-sm text-gray-900 truncate">{file.name}</h3>
                     <p className="text-xs text-gray-500 mt-1">{formatFileSize(file.size)}</p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {new Date(file.createdAt).toLocaleDateString()}
+                      {new Date(file.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    {getFileIcon(file.type)}
+                    {getFileIcon(file.file_type)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-sm text-gray-900 truncate">{file.name}</h3>
@@ -673,8 +719,20 @@ export default function BriefcasePage() {
                       variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation()
+                        handleAIInsights(file)
+                      }}
+                      title="AI Analysis"
+                    >
+                      <Brain className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation()
                         handleFileDownload(file)
                       }}
+                      title="Download"
                     >
                       <Download className="w-4 h-4" />
                     </Button>
@@ -685,6 +743,7 @@ export default function BriefcasePage() {
                         e.stopPropagation()
                         handleFileDelete(file.id)
                       }}
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -747,6 +806,21 @@ export default function BriefcasePage() {
             onCreate={handleCreateFolder}
             parentFolder={selectedFolder ? folders.find(f => f.id.toString() === selectedFolder)?.name : undefined}
           />
+
+          {/* AI Insights Panel */}
+          {showAIInsights && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <AIInsightsPanel
+                  file={aiInsightsFile}
+                  onClose={() => {
+                    setShowAIInsights(false)
+                    setAiInsightsFile(null)
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
