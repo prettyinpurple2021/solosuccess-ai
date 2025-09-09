@@ -438,6 +438,22 @@ export class ScrapingScheduler {
     job.updatedAt = new Date()
 
     try {
+      // Check if job was cancelled before starting
+      if (job.status === 'cancelled') {
+        console.log(`Job ${job.id} was cancelled before execution.`)
+        this.jobQueue.delete(job.id)
+        this.updateMetrics()
+        return {
+          jobId: job.id,
+          success: false,
+          error: 'Job cancelled by user',
+          executionTime: 0,
+          changesDetected: false,
+          retryCount: job.retryCount,
+          completedAt: new Date(),
+        }
+      }
+
       console.log(`Processing scraping job: ${job.id} (${job.jobType}) for ${job.url}`)
 
       // Execute the scraping based on job type
