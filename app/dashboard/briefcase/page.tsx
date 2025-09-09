@@ -31,7 +31,8 @@ import {
   Loader2,
   Download,
   Brain,
-  Share2
+  Share2,
+  History
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
@@ -40,6 +41,7 @@ import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
 import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advanced-search-panel"
 import AIInsightsPanel from "@/components/briefcase/ai-insights-panel"
 import FileSharingModal from "@/components/briefcase/file-sharing-modal"
+import VersionHistoryModal from "@/components/briefcase/version-history-modal"
 
 interface BriefcaseFile {
   id: string
@@ -106,6 +108,10 @@ export default function BriefcasePage() {
   // File sharing state
   const [showSharingModal, setShowSharingModal] = useState(false)
   const [sharingFile, setSharingFile] = useState<BriefcaseFile | null>(null)
+  
+  // Version history state
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
+  const [versionHistoryFile, setVersionHistoryFile] = useState<BriefcaseFile | null>(null)
   
   // Mobile optimization state
   const [_isRefreshing, setIsRefreshing] = useState(false)
@@ -286,6 +292,12 @@ export default function BriefcasePage() {
   const handleFileSharing = (file: BriefcaseFile) => {
     setSharingFile(file)
     setShowSharingModal(true)
+  }
+
+  // Handle version history
+  const handleVersionHistory = (file: BriefcaseFile) => {
+    setVersionHistoryFile(file)
+    setShowVersionHistory(true)
   }
 
   // Handle folder creation
@@ -689,6 +701,17 @@ export default function BriefcasePage() {
                           variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation()
+                            handleVersionHistory(file)
+                          }}
+                          title="Version History"
+                        >
+                          <History className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation()
                             handleFileDownload(file)
                           }}
                           title="Download"
@@ -724,6 +747,28 @@ export default function BriefcasePage() {
                       title="AI Analysis"
                     >
                       <Brain className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFileSharing(file)
+                      }}
+                      title="Share"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleVersionHistory(file)
+                      }}
+                      title="Version History"
+                    >
+                      <History className="w-4 h-4" />
                     </Button>
                     <Button
                       size="sm"
@@ -802,8 +847,8 @@ export default function BriefcasePage() {
           {/* Folder Creation Dialog */}
           <FolderCreationDialog
             isOpen={showFolderDialog}
-            onClose={() => setShowFolderDialog(false)}
-            onCreate={handleCreateFolder}
+            onCloseAction={() => setShowFolderDialog(false)}
+            onCreateFolderAction={handleCreateFolder}
             parentFolder={selectedFolder ? folders.find(f => f.id.toString() === selectedFolder)?.name : undefined}
           />
 
@@ -820,6 +865,33 @@ export default function BriefcasePage() {
                 />
               </div>
             </div>
+          )}
+
+          {/* File Sharing Modal */}
+          {showSharingModal && sharingFile && (
+            <FileSharingModal
+              isOpen={showSharingModal}
+              onClose={() => {
+                setShowSharingModal(false)
+                setSharingFile(null)
+              }}
+              file={sharingFile}
+              currentUserId="current-user-id" // TODO: Get from auth context
+              currentUserName="Current User" // TODO: Get from auth context
+            />
+          )}
+
+          {/* Version History Modal */}
+          {showVersionHistory && versionHistoryFile && (
+            <VersionHistoryModal
+              isOpen={showVersionHistory}
+              onClose={() => {
+                setShowVersionHistory(false)
+                setVersionHistoryFile(null)
+              }}
+              file={versionHistoryFile}
+              currentUserId="current-user-id" // TODO: Get from auth context
+            />
           )}
         </div>
       </div>
