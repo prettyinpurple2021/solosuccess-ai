@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
+import { useAuth } from "@/hooks/use-auth"
 import { useAnalytics, usePageTracking, usePerformanceTracking } from "@/hooks/use-analytics"
 import { EnhancedOnboarding } from "@/components/onboarding/enhanced-onboarding"
 import { WelcomeDashboard } from "@/components/onboarding/welcome-dashboard"
@@ -26,6 +27,7 @@ import {
 import Link from "next/link"
 
 export default function DashboardPage() {
+  const { user, loading: authLoading } = useAuth()
   const { data, loading, error } = useDashboardData()
   const { track } = useAnalytics()
   const [showOnboarding, setShowOnboarding] = useState(false)
@@ -113,7 +115,7 @@ export default function DashboardPage() {
     )
   }
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen gradient-background p-6">
         <EnhancedOnboarding 
