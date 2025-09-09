@@ -229,8 +229,7 @@ describe('ScrapingScheduler', () => {
       )
 
       // Manually set the job as running for the test
-      const runningJobs = (scheduler as any).runningJobs as Set<string>
-      runningJobs.add(jobId)
+      scheduler._setJobAsRunningForTesting(jobId)
 
       const success = scheduler.cancelJob(jobId)
       expect(success).toBe(true)
@@ -238,17 +237,10 @@ describe('ScrapingScheduler', () => {
       const job = scheduler.getJob(jobId)
       expect(job?.status).toBe('cancelled')
 
-      // Simulate job completion
-      runningJobs.delete(jobId)
+      // Simulate job completion by calling processJob, which should handle the cleanup
+      await (scheduler as any).processJob(job)
 
-      // If the scheduler exposes a public cleanup method, call it here.
-      // For example: scheduler.cleanupJob(jobId)
-      // Otherwise, rely on the scheduler's own logic to eventually remove the job.
-      // Remove manual deletion of jobQueue.
-
-      // The job should still exist but be marked as cancelled.
-      const jobAfterCancel = scheduler.getJob(jobId)
-      expect(jobAfterCancel?.status).toBe('cancelled')
+      expect(scheduler.getJob(jobId)).toBeNull()
     })
   })
 
