@@ -23,14 +23,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for existing token in localStorage
-    const token = localStorage.getItem('auth-token')
+    const token = localStorage.getItem('authToken')
     if (token) {
       const decoded = verifyToken(token)
       if (decoded) {
         // Fetch user data from database
         fetchUserData(decoded.userId, token)
       } else {
-        localStorage.removeItem('auth-token')
+        localStorage.removeItem('authToken')
         setLoading(false)
       }
     } else {
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData)
         setSession(sessionData)
       } else {
-        localStorage.removeItem('auth-token')
+        localStorage.removeItem('authToken')
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const { user, token } = data
-        localStorage.setItem('auth-token', token)
+        localStorage.setItem('authToken', token)
         
         const sessionData: Session = {
           user,
@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const { user, token } = data
-        localStorage.setItem('auth-token', token)
+        localStorage.setItem('authToken', token)
         
         const sessionData: Session = {
           user,
@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    localStorage.removeItem('auth-token')
+    localStorage.removeItem('authToken')
     setUser(null)
     setSession(null)
   }
