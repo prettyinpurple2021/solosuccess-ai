@@ -867,7 +867,7 @@ export default function BriefcasePage() {
             ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
             : "space-y-2"
           }>
-          {filteredFiles.map((file, index) => (
+            {filteredFiles.map((file, index) => (
             <motion.div
               key={file.id}
               initial={{ opacity: 0, y: 20 }}
@@ -1058,6 +1058,7 @@ export default function BriefcasePage() {
               )}
             </motion.div>
           ))}
+          </div>
         </div>
       )}
 
