@@ -2,7 +2,7 @@
 
 **Launch Date:** January 2025  
 **Status:** Ready for Launch  
-**Platform:** https://solobossai.fun
+**Platform:** https://v0-fork-of-solo-boss-ai-platform-bl207i61t.vercel.app
 
 ---
 

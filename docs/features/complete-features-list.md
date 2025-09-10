@@ -2,7 +2,7 @@
 
 **Generated:** January 2025  
 **Status:** Production Ready  
-**Platform:** https://solobossai.fun
+**Platform:** https://v0-fork-of-solo-boss-ai-platform-bl207i61t.vercel.app
 
 ---
 

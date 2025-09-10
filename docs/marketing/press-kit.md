@@ -2,7 +2,7 @@
 
 **For Immediate Release**  
 **Contact:** [Your Contact Information]  
-**Website:** https://solobossai.fun
+**Website:** https://v0-fork-of-solo-boss-ai-platform-bl207i61t.vercel.app
 
 ---
 
@@ -115,7 +115,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 - Mobile app functionality
 
 ### **Live Demo:**
-- Available at: https://solobossai.fun
+- Available at: https://v0-fork-of-solo-boss-ai-platform-bl207i61t.vercel.app
 - Free trial with no credit card required
 - Full access to Launch plan features
 
@@ -190,7 +190,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 - **Title:** Founder & CEO, SoloBoss AI Platform
 - **Email:** [Your Email]
 - **Phone:** [Your Phone]
-- **Website:** https://solobossai.fun
+- **Website:** https://v0-fork-of-solo-boss-ai-platform-bl207i61t.vercel.app
 
 ### **Social Media:**
 - **LinkedIn:** [Your LinkedIn]
@@ -226,7 +226,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 
 **Ready to revolutionize how solo founders build and scale their businesses!** 🚀💜
 
-*For more information, visit https://solobossai.fun*
+*For more information, visit https://v0-fork-of-solo-boss-ai-platform-bl207i61t.vercel.app*
 
 ---
 
