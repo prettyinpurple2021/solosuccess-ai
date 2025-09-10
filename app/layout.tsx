@@ -10,7 +10,6 @@ import { PerformanceMonitor } from "@/components/performance/performance-monitor
 import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
-import { PostHogProvider } from "@/components/posthog-provider"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -62,19 +61,17 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PostHogProvider>
-            <StackAuthProvider>
-              <AuthProvider>
-                <AccessibilityProvider>
-                  <ErrorBoundary>
-                    {children}
-                  </ErrorBoundary>
-                  <PerformanceMonitor />
-                  <ServiceWorkerRegister />
-                </AccessibilityProvider>
-              </AuthProvider>
-            </StackAuthProvider>
-          </PostHogProvider>
+          <StackAuthProvider>
+            <AuthProvider>
+              <AccessibilityProvider>
+                <ErrorBoundary>
+                  {children}
+                </ErrorBoundary>
+                <PerformanceMonitor />
+                <ServiceWorkerRegister />
+              </AccessibilityProvider>
+            </AuthProvider>
+          </StackAuthProvider>
         </ThemeProvider>
       </body>
     </html>
