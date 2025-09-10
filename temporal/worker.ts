@@ -23,7 +23,7 @@ async function run() {
       activities,
     });
 
-    // Step 3: Start accepting tasks on the `soloboss-tasks` queue
+    // Step 3: Start accepting tasks on the `SoloSuccess-tasks` queue
     console.log('Worker started, listening for tasks...');
     await worker.run();
   } finally {

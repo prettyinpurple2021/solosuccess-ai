@@ -70,7 +70,7 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {getStatusIcon()}
-          SoloBoss AI Platform Onboarding
+          SoloSuccess AI Platform Onboarding
         </CardTitle>
         <CardDescription>
           Your personalized AI team setup and platform initialization
@@ -81,7 +81,7 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
         {!currentWorkflowId ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground mb-4">
-              Start your SoloBoss AI Platform onboarding to set up your personalized AI team
+              Start your SoloSuccess AI Platform onboarding to set up your personalized AI team
             </p>
             <Button 
               onClick={handleStartOnboarding}

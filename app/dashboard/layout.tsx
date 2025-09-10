@@ -14,7 +14,7 @@ export default function DashboardLayout({
         <div className="w-64 bg-white border-r border-gray-200 min-h-screen p-4">
           <div className="flex items-center gap-2 mb-8">
             <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg"></div>
-            <span className="font-bold text-lg">SoloBoss AI</span>
+            <span className="font-bold text-lg">SoloSuccess AI</span>
           </div>
           
           <nav className="space-y-2">

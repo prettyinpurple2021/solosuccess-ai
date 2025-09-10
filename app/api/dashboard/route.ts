@@ -191,7 +191,7 @@ export async function GET(request: NextRequest) {
     const insights = todaysTasks.length === 0 && recentBriefcases.length === 0 ? [
       {
         type: 'welcome',
-        title: 'Welcome to SoloBoss AI!',
+        title: 'Welcome to SoloSuccess AI!',
         description: 'Start by creating your first briefcase (project) to get organized.',
         action: 'Create Briefcase'
       }

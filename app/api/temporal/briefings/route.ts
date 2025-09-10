@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Start the AI agent briefing workflow
     const handle = await client.workflow.start(aiAgentBriefingWorkflow, {
       args: [userId, agentIds, briefingType],
-      taskQueue: 'soloboss-tasks',
+      taskQueue: 'SoloSuccess-tasks',
       workflowId: `briefing-${userId}-${briefingType}-${Date.now()}`,
     })
 

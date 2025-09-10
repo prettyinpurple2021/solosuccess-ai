@@ -24,7 +24,7 @@ export function SectionHeader({
     <div
       className={cn(
         "mb-6",
-        variant === "gradient" && "rounded-xl p-[2px] soloboss-gradient animate-gradient",
+        variant === "gradient" && "rounded-xl p-[2px] SoloSuccess-gradient animate-gradient",
         variant === "empowered" && "rounded-xl p-[2px] empowerment-gradient animate-gradient",
         className
       )}

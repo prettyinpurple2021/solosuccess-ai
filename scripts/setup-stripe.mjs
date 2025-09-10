@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 
-console.log('🚀 SoloBoss AI Platform - Stripe Setup Helper\n')
+console.log('🚀 SoloSuccess AI Platform - Stripe Setup Helper\n')
 
 console.log('📋 Step-by-Step Stripe Setup Guide:')
 console.log('=====================================\n')
@@ -30,17 +30,17 @@ console.log('   • Create these 3 products:\n')
 
 const products = [
   {
-    name: 'SoloBoss AI - Launch Plan',
+    name: 'SoloSuccess AI - Launch Plan',
     description: 'Perfect for ambitious beginners ready to start their empire',
     price: '$0.00 (Free)'
   },
   {
-    name: 'SoloBoss AI - Accelerator Plan', 
+    name: 'SoloSuccess AI - Accelerator Plan', 
     description: 'For solo founders ready to scale their empire',
     price: '$19.00/month or $190.00/year'
   },
   {
-    name: 'SoloBoss AI - Dominator Plan',
+    name: 'SoloSuccess AI - Dominator Plan',
     description: 'For empire builders who demand the best', 
     price: '$29.00/month or $290.00/year'
   }
@@ -107,4 +107,4 @@ console.log('   • Stripe Documentation: https://stripe.com/docs')
 console.log('   • Test Cards: https://stripe.com/docs/testing\n')
 
 console.log('✅  Once you complete these steps, your Stripe integration will be ready!')
-console.log('🚀  Your SoloBoss AI Platform will be able to process payments and manage subscriptions!')
+console.log('🚀  Your SoloSuccess AI Platform will be able to process payments and manage subscriptions!')

@@ -161,7 +161,7 @@ export default function FeaturesPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -198,7 +198,7 @@ export default function FeaturesPage() {
             <span className="text-gray-600 text-3xl md:text-4xl">To Build Your Empire</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Discover all the powerful features that make SoloBoss AI the ultimate productivity platform 
+            Discover all the powerful features that make SoloSuccess AI the ultimate productivity platform 
             for solo entrepreneurs. From AI agents to automation tools, we've got you covered. 💪
           </p>
         </div>
@@ -297,7 +297,7 @@ export default function FeaturesPage() {
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold text-gray-800 mb-4">Powerful Integrations</h2>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Connect SoloBoss AI with your favorite tools and streamline your entire workflow
+                  Connect SoloSuccess AI with your favorite tools and streamline your entire workflow
                 </p>
               </div>
 
@@ -365,7 +365,7 @@ export default function FeaturesPage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Why Solo Entrepreneurs Choose SoloBoss</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Why Solo Entrepreneurs Choose SoloSuccess</h2>
             <p className="text-xl text-gray-600">Real benefits that make a difference in your business</p>
           </div>
 
@@ -406,9 +406,9 @@ export default function FeaturesPage() {
       {/* Video Demo Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">See SoloBoss AI in Action</h2>
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">See SoloSuccess AI in Action</h2>
           <p className="text-xl text-gray-600 mb-8">
-            Watch how real solo entrepreneurs use SoloBoss AI to build their empires
+            Watch how real solo entrepreneurs use SoloSuccess AI to build their empires
           </p>
           
           <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-8 rounded-2xl border border-purple-200">
@@ -421,7 +421,7 @@ export default function FeaturesPage() {
               "From Overwhelmed to Empire Builder in 30 Days"
             </h3>
             <p className="text-gray-600 mb-6">
-              Watch Sarah transform her struggling freelance business into a thriving empire using SoloBoss AI's complete toolkit.
+              Watch Sarah transform her struggling freelance business into a thriving empire using SoloSuccess AI's complete toolkit.
             </p>
             <Button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
               Watch Demo Video
@@ -435,7 +435,7 @@ export default function FeaturesPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Empire?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of solo entrepreneurs who've transformed their businesses with SoloBoss AI. 
+            Join thousands of solo entrepreneurs who've transformed their businesses with SoloSuccess AI. 
             Start your journey today and experience the power of having an AI squad! 🚀
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">

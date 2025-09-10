@@ -77,7 +77,7 @@ export default function FallbackSignIn() {
                   <Crown className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </motion.div>
               <p className="text-gray-600">Welcome back, boss!</p>

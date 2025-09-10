@@ -17,7 +17,7 @@ const SocialMediaStrategy = lazy(() => import('./social-media-strategy'))
 const CustomerJourneyMapper = lazy(() => import('./customer-journey-mapper'))
 const ProjectTimeline = lazy(() => import('./project-timeline'))
 
-// Existing SoloBoss Templates
+// Existing SoloSuccess Templates
 const VisionBoardGenerator = lazy(() => import('./vision-board-generator'))
 const QuarterlyBizReview = lazy(() => import('./quarterly-biz-review'))
 const DelegationListBuilder = lazy(() => import('./delegation-list-builder'))
@@ -48,7 +48,7 @@ export const templateRegistry: Record<string, TemplateComponent> = {
   'customer-journey-mapper': CustomerJourneyMapper,
   'project-timeline': ProjectTimeline,
   
-  // Existing SoloBoss Templates
+  // Existing SoloSuccess Templates
   'vision-board-generator': VisionBoardGenerator,
   'quarterly-biz-review': QuarterlyBizReview,
   'delegation-list-builder': DelegationListBuilder,

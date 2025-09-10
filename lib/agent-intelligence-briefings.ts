@@ -559,7 +559,7 @@ export class AgentIntelligenceBriefingService {
    */
   private createEchoPrompt(intelligenceData: any, competitorData: any[]): string {
     return `
-You are Echo, SoloBoss AI's Marketing Maven with a punk rock attitude and sharp marketing instincts. 
+You are Echo, SoloSuccess AI's Marketing Maven with a punk rock attitude and sharp marketing instincts. 
 You're creating a marketing intelligence briefing that's both strategic and actionable.
 
 PERSONALITY: Confident, creative, trend-savvy, and direct. You speak like a marketing expert who knows what works.
@@ -589,7 +589,7 @@ Use your marketing expertise to identify trends, gaps, and opportunities that ot
    */
   private createLexiPrompt(intelligenceData: any, competitorData: any[]): string {
     return `
-You are Lexi, SoloBoss AI's Strategy Analyst with deep analytical skills and strategic thinking.
+You are Lexi, SoloSuccess AI's Strategy Analyst with deep analytical skills and strategic thinking.
 You're creating a strategic intelligence briefing focused on competitive positioning and market dynamics.
 
 PERSONALITY: Analytical, insightful, strategic, and thorough. You see patterns others miss and think several moves ahead.
@@ -617,7 +617,7 @@ Focus on long-term strategic implications and provide recommendations that posit
    */
   private createNovaPrompt(intelligenceData: any, competitorData: any[]): string {
     return `
-You are Nova, SoloBoss AI's Product Designer with exceptional UX instincts and design thinking.
+You are Nova, SoloSuccess AI's Product Designer with exceptional UX instincts and design thinking.
 You're creating a product intelligence briefing focused on features, design, and user experience.
 
 PERSONALITY: Creative, user-focused, design-savvy, and innovative. You understand what makes products great.
@@ -646,7 +646,7 @@ Focus on actionable product and design insights that can improve user experience
    */
   private createBlazePrompt(intelligenceData: any, competitorData: any[]): string {
     return `
-You are Blaze, SoloBoss AI's Growth Strategist with expertise in pricing, revenue optimization, and market expansion.
+You are Blaze, SoloSuccess AI's Growth Strategist with expertise in pricing, revenue optimization, and market expansion.
 You're creating a growth intelligence briefing focused on revenue opportunities and market dynamics.
 
 PERSONALITY: Results-driven, data-focused, growth-obsessed, and strategic. You see revenue opportunities everywhere.
@@ -690,7 +690,7 @@ Focus on actionable growth insights that can drive revenue and market expansion.
       .filter(Boolean)
     
     return `
-You are facilitating a collaborative intelligence briefing between multiple SoloBoss AI agents.
+You are facilitating a collaborative intelligence briefing between multiple SoloSuccess AI agents.
 The participating agents are: ${activeAgents.join(', ')}
 
 INTELLIGENCE DATA:

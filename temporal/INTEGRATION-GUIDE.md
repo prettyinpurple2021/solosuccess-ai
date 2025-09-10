@@ -1,13 +1,13 @@
-# 🚀 SoloBoss AI Platform - Temporal Integration Guide
+# 🚀 SoloSuccess AI Platform - Temporal Integration Guide
 
 ## Overview
 
-This guide shows how Temporal.io workflows are integrated with your SoloBoss AI Platform features. The integration provides reliable, scalable background processing for complex user operations.
+This guide shows how Temporal.io workflows are integrated with your SoloSuccess AI Platform features. The integration provides reliable, scalable background processing for complex user operations.
 
 ## 🎯 Integrated Features
 
 ### 1. **User Onboarding Workflow**
-**File:** `src/workflows.ts` - `solobossUserOnboardingWorkflow`
+**File:** `src/workflows.ts` - `SoloSuccessUserOnboardingWorkflow`
 
 **What it does:**
 - Creates initial goals for new users
@@ -314,4 +314,4 @@ export async function processUserData(userId: string, data: any) {
 
 ---
 
-**Your SoloBoss AI Platform now has enterprise-grade workflow orchestration! 🚀**
+**Your SoloSuccess AI Platform now has enterprise-grade workflow orchestration! 🚀**

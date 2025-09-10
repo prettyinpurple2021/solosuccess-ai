@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Authentication Error - SoloBoss AI',
+  title: 'Authentication Error - SoloSuccess AI',
   description: 'An error occurred during authentication. Please try again.',
 }
 

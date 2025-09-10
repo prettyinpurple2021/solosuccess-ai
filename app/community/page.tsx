@@ -18,7 +18,7 @@ export default function CommunityComingSoonPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -331,7 +331,7 @@ export default function CommunityComingSoonPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Together?</h2>
           <p className="text-xl mb-8 opacity-90">
-            While we build Boss Community, start connecting with entrepreneurs today through SoloBoss AI!
+            While we build Boss Community, start connecting with entrepreneurs today through SoloSuccess AI!
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Link href="/">

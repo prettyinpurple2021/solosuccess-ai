@@ -1,5 +1,5 @@
 {
-  "name": "SoloBoss AI Platform",
+  "name": "SoloSuccess AI Platform",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   
   "features": {
@@ -43,7 +43,7 @@
   "forwardPorts": [3000, 5432],
   "portsAttributes": {
     "3000": {
-      "label": "SoloBoss AI Platform",
+      "label": "SoloSuccess AI Platform",
       "onAutoForward": "notify"
     }
   },
@@ -53,7 +53,7 @@
   "remoteUser": "node",
   
   "mounts": [
-    "source=${localWorkspaceFolder}/.env.local,target=/workspaces/v0-solo-boss-ai-platform/.env.local,type=bind,consistency=cached"
+    "source=${localWorkspaceFolder}/.env.local,target=/workspaces/v0-solo-success-ai-platform/.env.local,type=bind,consistency=cached"
   ],
 
   "containerEnv": {

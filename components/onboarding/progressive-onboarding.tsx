@@ -64,7 +64,7 @@ export function ProgressiveOnboarding({ open, onComplete, onSkip, userData }: Pr
     {
       id: "welcome",
       title: "Welcome to Your Empire! 👑",
-      description: "Let's take a quick tour of your SoloBoss AI dashboard and get you set up for success!",
+      description: "Let's take a quick tour of your SoloSuccess AI dashboard and get you set up for success!",
       target: ".dashboard-header",
       position: "bottom",
       estimatedTime: 30,

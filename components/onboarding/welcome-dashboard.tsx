@@ -89,7 +89,7 @@ export function WelcomeDashboard({ userData, onStartOnboarding, onSkipOnboarding
     {
       id: "first-login",
       title: "Welcome to the Empire!",
-      description: "You've successfully joined SoloBoss AI",
+      description: "You've successfully joined SoloSuccess AI",
       icon: Crown,
       unlocked: true,
       points: 100

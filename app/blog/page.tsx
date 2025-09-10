@@ -18,7 +18,7 @@ export default function BlogComingSoonPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -200,7 +200,7 @@ export default function BlogComingSoonPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Building?</h2>
           <p className="text-xl mb-8 opacity-90">
-            While you wait for the Boss Blog, start building your empire with SoloBoss AI today!
+            While you wait for the Boss Blog, start building your empire with SoloSuccess AI today!
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Link href="/">

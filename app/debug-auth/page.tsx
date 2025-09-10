@@ -83,7 +83,7 @@ export default function DebugAuthPage() {
             <Crown className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold boss-heading mb-2">Authentication Debug</h1>
-          <p className="text-muted-foreground">Debug your SoloBoss AI authentication system</p>
+          <p className="text-muted-foreground">Debug your SoloSuccess AI authentication system</p>
         </div>
 
         <EmpowermentCard>

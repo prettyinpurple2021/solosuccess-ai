@@ -70,7 +70,7 @@ const testimonials = [
   {
     name: "Sarah Chen",
     role: "Solo Founder, TechStart",
-    content: "SoloBoss AI is like having a full team of experts working for me 24/7. Roxy helps me make strategic decisions, Blaze tracks my competitors, and I've increased my productivity by 200% in just 2 months.",
+    content: "SoloSuccess AI is like having a full team of experts working for me 24/7. Roxy helps me make strategic decisions, Blaze tracks my competitors, and I've increased my productivity by 200% in just 2 months.",
     rating: 5,
     avatar: "/default-user.svg",
   },
@@ -168,8 +168,8 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <img 
-                src="/images/soloboss-logo.png" 
-                alt="SoloBoss AI" 
+                src="/images/SoloSuccess-logo.png" 
+                alt="SoloSuccess AI" 
                 width={40} 
                 height={40} 
                 className="rounded-lg"
@@ -182,7 +182,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 }}
               />
               <span className="text-responsive-xl lg:text-responsive-2xl font-bold bg-gradient-to-r from-purple-600 via-teal-500 to-pink-600 bg-clip-text text-transparent">
-                SoloBoss AI
+                SoloSuccess AI
               </span>
             </div>
 
@@ -338,7 +338,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
                 Become the Ultimate
                 <br />
-                <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-pink-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">SoloBoss</span>
+                <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-pink-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">SoloSuccess</span>
               </h1>
               <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 mb-8">
                 Transform your productivity with AI agents that work 24/7. Automate everything, achieve more, and dominate
@@ -370,13 +370,13 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="/images/soloboss-hero-silhouette.jpg"
-                  alt="SoloBoss - Confident entrepreneur working in her office"
+                  src="/images/SoloSuccess-hero-silhouette.jpg"
+                  alt="SoloSuccess - Confident entrepreneur working in her office"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = "/images/soloboss-hero-silhouette.png";
+                    e.currentTarget.src = "/images/SoloSuccess-hero-silhouette.png";
                   }}
                 />
                 {/* Gradient overlay to enhance the integration */}
@@ -405,7 +405,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
         </div>
       </section>
 
-      {/* SoloBoss Motto Banner */}
+      {/* SoloSuccess Motto Banner */}
       <section className="p-responsive-xl bg-gradient-to-r from-purple-50 via-teal-50 to-pink-50 dark:from-purple-900/20 dark:via-teal-900/20 dark:to-pink-900/20">
         <div className="container-responsive">
           <motion.div
@@ -416,13 +416,13 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             className="relative rounded-3xl overflow-hidden shadow-2xl"
           >
             <img
-              src="/images/soloboss-banner.jpg"
-              alt="Confident. Creative. In control. That's the SoloBoss way."
+              src="/images/SoloSuccess-banner.jpg"
+              alt="Confident. Creative. In control. That's the SoloSuccess way."
               width={1200}
               height={300}
               className="w-full h-auto object-cover"
               onError={(e) => {
-                e.currentTarget.src = "/images/soloboss-banner.png";
+                e.currentTarget.src = "/images/SoloSuccess-banner.png";
               }}
             />
             {/* Optional overlay for better text readability if needed */}
@@ -582,7 +582,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               Success Stories
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Join thousands of entrepreneurs who&apos;ve transformed their businesses with SoloBoss AI.
+              Join thousands of entrepreneurs who&apos;ve transformed their businesses with SoloSuccess AI.
             </p>
           </motion.div>
 
@@ -655,7 +655,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               Choose Your Power Level
             </h2>
             <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Start your journey to becoming a SoloBoss with our flexible pricing plans.
+              Start your journey to becoming a SoloSuccess with our flexible pricing plans.
             </p>
           </motion.div>
 
@@ -733,7 +733,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             viewport={{ once: true }}
           >
             <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-              Ready to Become a SoloBoss?
+              Ready to Become a SoloSuccess?
             </h2>
             <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
               Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of
@@ -769,14 +769,14 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <ResponsiveImage
-                  src="/images/soloboss-logo.png"
-                  alt="SoloBoss AI"
+                  src="/images/SoloSuccess-logo.png"
+                  alt="SoloSuccess AI"
                   width={32}
                   height={32}
                   className="rounded-lg"
                   fallbackSrc="/images/logo.png"
                 />
-                <span className="text-responsive-lg lg:text-responsive-xl font-bold">SoloBoss AI</span>
+                <span className="text-responsive-lg lg:text-responsive-xl font-bold">SoloSuccess AI</span>
               </div>
               <p className="text-gray-400">Empowering entrepreneurs with AI-powered productivity tools.</p>
             </div>
@@ -872,7 +872,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           </div>
           <Separator className="my-8 bg-gray-800" />
           <div className="flex-responsive justify-between items-center">
-            <p className="text-gray-400">© 2024 SoloBoss AI. All rights reserved.</p>
+            <p className="text-gray-400">© 2024 SoloSuccess AI. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Privacy

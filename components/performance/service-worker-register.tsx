@@ -85,7 +85,7 @@ export function ServiceWorkerRegister() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Download className="w-4 h-4 text-blue-600" />
-              Install SoloBoss AI
+              Install SoloSuccess AI
             </CardTitle>
             <CardDescription className="text-xs">
               Get the full app experience with offline access

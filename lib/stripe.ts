@@ -15,18 +15,18 @@ export function isStripeConfigured(): boolean {
 
 // Stripe Product IDs - From your Stripe dashboard
 export const STRIPE_PRODUCTS = {
-  LAUNCH: 'prod_T06VzLBN9hna1l', // SoloBoss AI - Launch Plan (Free)
-  ACCELERATOR: 'prod_T06ZE5uUl56Ez1', // SoloBoss AI - Accelerator Plan
-  DOMINATOR: 'prod_T06cdEqWcdrKgy', // SoloBoss AI - Dominator Plan
+  LAUNCH: 'prod_T06VzLBN9hna1l', // SoloSuccess AI - Launch Plan (Free)
+  ACCELERATOR: 'prod_T06ZE5uUl56Ez1', // SoloSuccess AI - Accelerator Plan
+  DOMINATOR: 'prod_T06cdEqWcdrKgy', // SoloSuccess AI - Dominator Plan
 } as const
 
 // Stripe Price IDs - From your Stripe dashboard
 export const STRIPE_PRICES = {
-  LAUNCH: 'price_1S46IjPpYfwm37m7EKFi7H4C', // SoloBoss AI - Launch Plan (Free)
-  ACCELERATOR_MONTHLY: 'price_1S46LyPpYfwm37m7M5nOAYW7', // SoloBoss AI - Accelerator Plan ($19/month)
-  ACCELERATOR_YEARLY: 'price_1S46LyPpYfwm37m7lyRhudBs', // SoloBoss AI - Accelerator Plan ($190/year)
-  DOMINATOR_MONTHLY: 'price_1S46P6PpYfwm37m76hqohlw0', // SoloBoss AI - Dominator Plan ($29/month)
-  DOMINATOR_YEARLY: 'price_1S46PXPpYfwm37m7yVhLS7j2', // SoloBoss AI - Dominator Plan ($290/year)
+  LAUNCH: 'price_1S46IjPpYfwm37m7EKFi7H4C', // SoloSuccess AI - Launch Plan (Free)
+  ACCELERATOR_MONTHLY: 'price_1S46LyPpYfwm37m7M5nOAYW7', // SoloSuccess AI - Accelerator Plan ($19/month)
+  ACCELERATOR_YEARLY: 'price_1S46LyPpYfwm37m7lyRhudBs', // SoloSuccess AI - Accelerator Plan ($190/year)
+  DOMINATOR_MONTHLY: 'price_1S46P6PpYfwm37m76hqohlw0', // SoloSuccess AI - Dominator Plan ($29/month)
+  DOMINATOR_YEARLY: 'price_1S46PXPpYfwm37m7yVhLS7j2', // SoloSuccess AI - Dominator Plan ($290/year)
 } as const
 
 // Subscription tiers configuration
@@ -181,7 +181,7 @@ export async function createStripeCustomer(
     email,
     name,
     metadata: {
-      platform: 'soloboss-ai',
+      platform: 'SoloSuccess-ai',
       ...metadata
     }
   })
@@ -212,12 +212,12 @@ export async function createCheckoutSession(
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata: {
-      platform: 'soloboss-ai',
+      platform: 'SoloSuccess-ai',
       ...metadata
     },
     subscription_data: {
       metadata: {
-        platform: 'soloboss-ai',
+        platform: 'SoloSuccess-ai',
         ...metadata
       }
     }

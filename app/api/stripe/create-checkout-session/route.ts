@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         name: user.full_name,
         metadata: {
           user_id: user.id,
-          platform: 'soloboss-ai'
+          platform: 'SoloSuccess-ai'
         }
       })
       customerId = customer.id

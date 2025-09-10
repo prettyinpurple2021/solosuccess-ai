@@ -1,7 +1,7 @@
 # ✅ Stripe Setup Checklist
 
 **Status:** 90% Complete - Almost Ready! 🚀  
-**Platform:** SoloBoss AI Platform
+**Platform:** SoloSuccess AI Platform
 
 ---
 
@@ -29,7 +29,7 @@
 
 ### **Phase 4: Webhooks (10 minutes)** ✅ **COMPLETED**
 - [x] Create webhook endpoint in Stripe Dashboard
-- [x] Set endpoint URL to: `https://solobossai.fun/api/stripe/webhook`
+- [x] Set endpoint URL to: `https://SoloSuccessai.fun/api/stripe/webhook`
 - [x] Select required events (see list below)
 - [x] Copy webhook signing secret
 - [x] Add `STRIPE_WEBHOOK_SECRET` to `.env.local` - `whsec_HNIRg0ZlAr5a3kP1lAEy51Czqx57Agav` ✅

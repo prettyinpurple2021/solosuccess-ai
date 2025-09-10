@@ -137,22 +137,22 @@ export function generateWorkflowId(prefix: string, userId: string, suffix?: stri
 // Common workflow configurations
 export const WORKFLOW_CONFIGS = {
   ONBOARDING: {
-    taskQueue: 'soloboss-tasks',
+    taskQueue: 'SoloSuccess-tasks',
     executionTimeout: '30m',
     runTimeout: '15m',
   },
   INTELLIGENCE: {
-    taskQueue: 'soloboss-tasks',
+    taskQueue: 'SoloSuccess-tasks',
     executionTimeout: '1h',
     runTimeout: '30m',
   },
   BRIEFING: {
-    taskQueue: 'soloboss-tasks',
+    taskQueue: 'SoloSuccess-tasks',
     executionTimeout: '20m',
     runTimeout: '10m',
   },
   GOAL_TRACKING: {
-    taskQueue: 'soloboss-tasks',
+    taskQueue: 'SoloSuccess-tasks',
     executionTimeout: '15m',
     runTimeout: '5m',
   },

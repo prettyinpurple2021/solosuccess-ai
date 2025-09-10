@@ -73,7 +73,7 @@ export default function TestAuthPage() {
             <Crown className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold boss-heading mb-2">Authentication Test</h1>
-          <p className="text-muted-foreground">Testing your SoloBoss AI authentication system</p>
+          <p className="text-muted-foreground">Testing your SoloSuccess AI authentication system</p>
         </div>
 
         {authStatus === 'authenticated' ? (

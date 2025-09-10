@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Competitor Stalker feature transforms SoloBoss AI into a comprehensive business intelligence platform that monitors competitors in real-time, providing users with actionable insights to maintain competitive advantage. This feature turns competitive analysis from a tedious research task into an engaging spy thriller experience, where AI agents act as intelligence operatives gathering and analyzing competitor data.
+The Competitor Stalker feature transforms SoloSuccess AI into a comprehensive business intelligence platform that monitors competitors in real-time, providing users with actionable insights to maintain competitive advantage. This feature turns competitive analysis from a tedious research task into an engaging spy thriller experience, where AI agents act as intelligence operatives gathering and analyzing competitor data.
 
 Unlike generic business intelligence tools, Competitor Stalker focuses on solo founders and entrepreneurs who need to stay ahead of larger competitors through superior intelligence and agility. The system provides automated monitoring, intelligent analysis, and actionable recommendations delivered through the existing AI agent personalities.
 
@@ -118,9 +118,9 @@ Unlike generic business intelligence tools, Competitor Stalker focuses on solo f
 6. WHEN competitor data is sensitive THEN the system SHALL implement appropriate security measures
 7. WHEN intelligence activities could be problematic THEN the system SHALL provide legal risk assessments
 
-### Requirement 9: Integration with Existing SoloBoss Features
+### Requirement 9: Integration with Existing SoloSuccess Features
 
-**User Story:** As a SoloBoss user, I want competitive intelligence to integrate seamlessly with my existing goals, tasks, and AI agent conversations so that intelligence informs my overall business strategy.
+**User Story:** As a SoloSuccess user, I want competitive intelligence to integrate seamlessly with my existing goals, tasks, and AI agent conversations so that intelligence informs my overall business strategy.
 
 #### Requirement nine Acceptance Criteria
 

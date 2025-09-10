@@ -167,7 +167,7 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
         <div>
           <h2 className="text-3xl font-bold boss-heading mb-2">Welcome to Your Empire! 👑</h2>
           <p className="text-lg text-muted-foreground mb-6">
-                          You&apos;ve completed the onboarding and tutorials. Your SoloBoss AI platform is ready to help you dominate your industry!
+                          You&apos;ve completed the onboarding and tutorials. Your SoloSuccess AI platform is ready to help you dominate your industry!
           </p>
         </div>
 

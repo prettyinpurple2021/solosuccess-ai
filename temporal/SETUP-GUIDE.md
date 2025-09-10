@@ -1,4 +1,4 @@
-# Temporal.io Setup Guide for SoloBoss AI Platform
+# Temporal.io Setup Guide for SoloSuccess AI Platform
 
 ## 🎉 Setup Complete!
 
@@ -9,7 +9,7 @@ Your Temporal.io development environment is now configured! Here's what we've se
 1. **Dependencies Installed**: `@temporalio/client` and `@temporalio/worker` are already in your package.json
 2. **Worker Configuration**: Created `temporal/worker.ts` with proper configuration
 3. **Client Examples**: Created `temporal/client.ts` with example workflows
-4. **Enhanced Activities**: Updated `src/activities.ts` with SoloBoss-specific examples
+4. **Enhanced Activities**: Updated `src/activities.ts` with SoloSuccess-specific examples
 5. **Enhanced Workflows**: Updated `src/workflows.ts` with complex workflow examples
 6. **NPM Scripts**: Added convenient scripts for running Temporal components
 
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
 
   const handle = await client.workflow.start(userOnboardingWorkflow, {
     args: [userId, userData],
-    taskQueue: 'soloboss-tasks',
+    taskQueue: 'SoloSuccess-tasks',
     workflowId: `onboarding-${userId}-${Date.now()}`,
   });
 
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
 
 1. **Get Temporal Server Running**: Choose one of the methods above
 2. **Test the Setup**: Run the example workflows
-3. **Create Custom Workflows**: Add workflows specific to your SoloBoss AI Platform features
+3. **Create Custom Workflows**: Add workflows specific to your SoloSuccess AI Platform features
 4. **Add Error Handling**: Implement retry policies and error handling
 5. **Production Setup**: Consider Temporal Cloud for production
 
@@ -168,4 +168,4 @@ export async function POST(request: Request) {
 
 **Ready to start building with Temporal! 🚀**
 
-Your SoloBoss AI Platform now has a robust workflow orchestration system that can handle complex, long-running processes reliably.
+Your SoloSuccess AI Platform now has a robust workflow orchestration system that can handle complex, long-running processes reliably.

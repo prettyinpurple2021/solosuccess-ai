@@ -400,7 +400,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
               Welcome to Your Empire! 👑
             </h2>
             <p className="text-lg text-muted-foreground mb-6">
-              Your SoloBoss AI platform is ready to help you dominate your industry!
+              Your SoloSuccess AI platform is ready to help you dominate your industry!
             </p>
           </motion.div>
 

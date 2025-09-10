@@ -40,7 +40,7 @@ export default function HelpPage() {
   const faqData: FAQItem[] = [
     {
       id: "getting-started-1",
-      question: "How do I get started with SoloBoss AI?",
+      question: "How do I get started with SoloSuccess AI?",
       answer: "Getting started is simple! Sign up for a free account, complete the onboarding wizard to tell us about your business, and start exploring your AI squad. Begin with simple tasks like goal setting or asking your AI agents for business advice.",
       category: "Getting Started"
     },
@@ -83,7 +83,7 @@ export default function HelpPage() {
     {
       id: "billing-2",
       question: "Do you offer refunds?",
-      answer: "We offer a 30-day money-back guarantee on all paid plans. If you're not completely satisfied with SoloBoss AI, we'll refund your payment, no questions asked. We're confident you'll love the platform!",
+      answer: "We offer a 30-day money-back guarantee on all paid plans. If you're not completely satisfied with SoloSuccess AI, we'll refund your payment, no questions asked. We're confident you'll love the platform!",
       category: "Billing"
     },
     {
@@ -94,7 +94,7 @@ export default function HelpPage() {
     },
     {
       id: "technical-2",
-      question: "Can I integrate SoloBoss AI with other tools?",
+      question: "Can I integrate SoloSuccess AI with other tools?",
       answer: "Yes! We support integrations with popular tools like Google Calendar, Slack, Clerk Billing, and many more. Check out our integrations page to see the full list and set up connections to streamline your workflow.",
       category: "Technical"
     }
@@ -104,7 +104,7 @@ export default function HelpPage() {
     {
       id: "setup-guide",
       title: "Complete Setup Guide",
-      description: "Get your SoloBoss AI account set up perfectly in 15 minutes",
+      description: "Get your SoloSuccess AI account set up perfectly in 15 minutes",
       icon: Settings,
       href: "#setup",
       difficulty: "beginner"
@@ -162,7 +162,7 @@ export default function HelpPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -197,7 +197,7 @@ export default function HelpPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Find answers, learn new strategies, and get the most out of your SoloBoss AI experience. 
+            Find answers, learn new strategies, and get the most out of your SoloSuccess AI experience. 
             Your success is our mission! 💪
           </p>
           
@@ -262,7 +262,7 @@ export default function HelpPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Getting Started Guides</h2>
-            <p className="text-xl text-gray-600">Master SoloBoss AI with our comprehensive guides</p>
+            <p className="text-xl text-gray-600">Master SoloSuccess AI with our comprehensive guides</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {guides.map((guide) => (

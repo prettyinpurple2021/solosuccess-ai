@@ -9,13 +9,13 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export const sendWelcomeEmail = async (email: string, name: string) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.FROM_EMAIL || "SoloBoss AI <noreply@soloboss.ai>",
+      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@SoloSuccess.ai>",
       to: [email],
-      subject: "Welcome to SoloBoss AI - Your Empire Awaits! 👑",
+      subject: "Welcome to SoloSuccess AI - Your Empire Awaits! 👑",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #8B5CF6; font-size: 28px; margin-bottom: 10px;">Welcome to SoloBoss AI! 👑</h1>
+            <h1 style="color: #8B5CF6; font-size: 28px; margin-bottom: 10px;">Welcome to SoloSuccess AI! 👑</h1>
             <p style="color: #6B7280; font-size: 16px;">Your AI-powered empire building journey starts now</p>
           </div>
           
@@ -66,7 +66,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
 export const sendSubscriptionConfirmation = async (email: string, name: string, planName: string, amount: number) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.FROM_EMAIL || "SoloBoss AI <noreply@soloboss.ai>",
+      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@SoloSuccess.ai>",
       to: [email],
       subject: `Welcome to ${planName} - Your Empire Just Leveled Up! 🚀`,
       html: `

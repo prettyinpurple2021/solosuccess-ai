@@ -71,7 +71,7 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="rounded-xl p-[2px] soloboss-gradient animate-gradient mb-6">
+      <div className="rounded-xl p-[2px] SoloSuccess-gradient animate-gradient mb-6">
         <div className="rounded-xl bg-background/70 backdrop-blur-md border-2 border-purple-200 px-6 py-4">
           <h1 className="text-4xl font-bold boss-text-gradient">{template.title}</h1>
           <p className="text-lg text-muted-foreground mt-2">{template.description}</p>

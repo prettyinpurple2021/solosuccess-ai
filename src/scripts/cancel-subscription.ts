@@ -1,8 +1,8 @@
 import { Connection, Client } from "@temporalio/client";
 import { subscriptionManagementWorkflow, cancelSubscription } from "../workflows";
-import { TASK_QUEUE_NAME, SoloBossCustomer, SubscriptionWorkflowData } from "../shared";
+import { TASK_QUEUE_NAME, SoloSuccessCustomer, SubscriptionWorkflowData } from "../shared";
 
-const customer: SoloBossCustomer = {
+const customer: SoloSuccessCustomer = {
   id: "user-cancel-test",
   email: "cancel-test@example.com",
   fullName: "Cancel Test User",

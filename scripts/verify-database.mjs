@@ -22,7 +22,7 @@ async function verifyDatabase() {
   const client = await pool.connect()
   
   try {
-    console.log('🔍 Verifying SoloBoss AI database setup...\n')
+    console.log('🔍 Verifying SoloSuccess AI database setup...\n')
     
     // Check required tables
     const requiredTables = [
@@ -119,7 +119,7 @@ async function verifyDatabase() {
     console.log('✅ All required tables exist')
     console.log('✅ AI agents are seeded')
     console.log('✅ Environment variables are configured')
-    console.log('\n🚀 Your SoloBoss AI platform is ready for production!')
+    console.log('\n🚀 Your SoloSuccess AI platform is ready for production!')
     
   } catch (error) {
     console.error('❌ Database verification failed:', error.message)

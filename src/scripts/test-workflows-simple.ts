@@ -1,11 +1,11 @@
 import { Connection, Client } from "@temporalio/client";
 import { userOnboardingWorkflow } from "../workflows";
-import { TASK_QUEUE_NAME, SoloBossCustomer } from "../shared";
+import { TASK_QUEUE_NAME, SoloSuccessCustomer } from "../shared";
 
 // Simple test customer
-const testCustomer: SoloBossCustomer = {
+const testCustomer: SoloSuccessCustomer = {
   id: "test-user-1",
-  email: "test@solobossai.fun",
+  email: "test@SoloSuccessai.fun",
   fullName: "Test User",
   username: "testuser",
   subscriptionTier: "launch",
@@ -15,7 +15,7 @@ const testCustomer: SoloBossCustomer = {
 };
 
 async function run() {
-  console.log("🧪 Testing SoloBoss AI Platform Temporal Workflows (Simple Test)...\n");
+  console.log("🧪 Testing SoloSuccess AI Platform Temporal Workflows (Simple Test)...\n");
 
   try {
     // First, check if Temporal server is running
@@ -58,7 +58,7 @@ async function run() {
     console.log(`🎯 Final Tier: ${result.tier}`);
 
     if (result.success) {
-      console.log("\n🎉 Test passed! SoloBoss AI Platform workflows are working correctly.");
+      console.log("\n🎉 Test passed! SoloSuccess AI Platform workflows are working correctly.");
     } else {
       console.log("\n❌ Test failed. Check the error message above.");
     }

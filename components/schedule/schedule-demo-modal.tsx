@@ -41,7 +41,7 @@ export function ScheduleDemoModal({ isOpen, onClose }: ScheduleDemoModalProps) {
             Request a Personalized Demo
           </h3>
           <p className="text-sm text-gray-600 mb-6">
-            Get a tailored demonstration of SoloBoss AI and see how it can transform your business.
+            Get a tailored demonstration of SoloSuccess AI and see how it can transform your business.
           </p>
           
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,6 +1,6 @@
-# Temporal.io Setup for SoloBoss AI Platform
+# Temporal.io Setup for SoloSuccess AI Platform
 
-This directory contains the Temporal.io configuration and examples for the SoloBoss AI Platform.
+This directory contains the Temporal.io configuration and examples for the SoloSuccess AI Platform.
 
 ## Prerequisites
 
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
   const handle = await client.workflow.start(userOnboardingWorkflow, {
     args: [userId, userData],
-    taskQueue: 'soloboss-tasks',
+    taskQueue: 'SoloSuccess-tasks',
     workflowId: `onboarding-${userId}-${Date.now()}`,
   });
 
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
 ## Next Steps
 
-1. Create more specific workflows for your SoloBoss AI Platform features
+1. Create more specific workflows for your SoloSuccess AI Platform features
 2. Add error handling and retry policies
 3. Set up production Temporal Cloud or self-hosted server
 4. Integrate with your existing database and services

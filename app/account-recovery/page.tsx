@@ -89,7 +89,7 @@ export default function AccountRecoveryPage() {
 
             <Button 
               type="submit" 
-              className="w-full boss-button bg-gradient-soloboss hover:bg-gradient-soloboss-light text-white font-bold"
+              className="w-full boss-button bg-gradient-SoloSuccess hover:bg-gradient-SoloSuccess-light text-white font-bold"
               disabled={loading}
             >
               {loading ? "Sending..." : "🚀 Send Reset Link"}

@@ -17,13 +17,13 @@ const fontSans = FontSans({
 })
 
 export const metadata = {
-  title: 'SoloBoss AI',
-  description: 'SoloBoss AI Platform',
+  title: 'SoloSuccess AI',
+  description: 'SoloSuccess AI Platform',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'SoloBoss AI',
+    title: 'SoloSuccess AI',
   },
   other: {
     'mobile-web-app-capable': 'yes',

@@ -11,7 +11,7 @@ const pool = new Pool({
 })
 
 async function fetchHtml(url: string): Promise<string> {
-  const res = await fetch(url, { headers: { 'User-Agent': 'SoloBoss-GuardianAI/1.0' } })
+  const res = await fetch(url, { headers: { 'User-Agent': 'SoloSuccess-GuardianAI/1.0' } })
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`)
   return await res.text()
 }

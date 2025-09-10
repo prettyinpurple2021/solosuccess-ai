@@ -2,7 +2,7 @@ export async function greet(name: string): Promise<string> {
   return `Hello, ${name}!`;
 }
 
-// Example activities for SoloBoss AI Platform
+// Example activities for SoloSuccess AI Platform
 export async function processUserData(userId: string, data: any): Promise<{ success: boolean; processedAt: string }> {
   // Simulate processing user data
   console.log(`Processing data for user: ${userId}`);
@@ -42,7 +42,7 @@ export async function updateUserProfile(userId: string, updates: any): Promise<{
   };
 }
 
-// SoloBoss AI Platform specific activities
+// SoloSuccess AI Platform specific activities
 export async function createInitialGoals(userId: string, userData: any): Promise<{ goalsCreated: number; goalIds: string[] }> {
   console.log(`Creating initial goals for user: ${userId}`);
   
@@ -118,12 +118,12 @@ export async function scheduleIntelligenceBriefing(userId: string): Promise<{ sc
   };
 }
 
-// SoloBoss AI Platform subscription activities
+// SoloSuccess AI Platform subscription activities
 import { log } from "@temporalio/activity";
-import { SoloBossCustomer, SubscriptionTier, SubscriptionWorkflowData } from "./shared";
+import { SoloSuccessCustomer, SubscriptionTier, SubscriptionWorkflowData } from "./shared";
 
 // Welcome and onboarding activities
-export async function sendWelcomeEmail(customer: SoloBossCustomer) {
+export async function sendWelcomeEmail(customer: SoloSuccessCustomer) {
   log.info(`Sending welcome email to ${customer.email} for ${customer.subscriptionTier} tier`);
   
   // Simulate email sending with a short delay
@@ -132,7 +132,7 @@ export async function sendWelcomeEmail(customer: SoloBossCustomer) {
   // In a real implementation, you would integrate with your email service (Resend, SendGrid, etc.)
   // await sendEmail({
   //   to: customer.email,
-  //   subject: `Welcome to SoloBoss AI Platform!`,
+  //   subject: `Welcome to SoloSuccess AI Platform!`,
   //   template: 'welcome',
   //   data: { customer, tier: customer.subscriptionTier }
   // });
@@ -140,7 +140,7 @@ export async function sendWelcomeEmail(customer: SoloBossCustomer) {
   log.info(`Welcome email sent successfully to ${customer.email}`);
 }
 
-export async function setupFreeTierAccess(customer: SoloBossCustomer) {
+export async function setupFreeTierAccess(customer: SoloSuccessCustomer) {
   log.info(`Setting up free tier access for ${customer.email}`);
   
   // Simulate setup with a short delay
@@ -157,7 +157,7 @@ export async function setupFreeTierAccess(customer: SoloBossCustomer) {
   log.info(`Free tier access set up successfully for ${customer.email}`);
 }
 
-export async function setupPaidTierAccess(customer: SoloBossCustomer, tier: SubscriptionTier) {
+export async function setupPaidTierAccess(customer: SoloSuccessCustomer, tier: SubscriptionTier) {
   log.info(`Setting up ${tier} tier access for ${customer.email}`);
   
   if (tier === 'accelerator') {
@@ -180,7 +180,7 @@ export async function setupPaidTierAccess(customer: SoloBossCustomer, tier: Subs
 }
 
 // Subscription management activities
-export async function createStripeSubscription(customer: SoloBossCustomer, priceId: string) {
+export async function createStripeSubscription(customer: SoloSuccessCustomer, priceId: string) {
   log.info(`Creating Stripe subscription for ${customer.email} with price ${priceId}`);
   
   // In a real implementation, you would call Stripe API
@@ -197,7 +197,7 @@ export async function createStripeSubscription(customer: SoloBossCustomer, price
   return `sub_mock_${Date.now()}`;
 }
 
-export async function cancelStripeSubscription(customer: SoloBossCustomer) {
+export async function cancelStripeSubscription(customer: SoloSuccessCustomer) {
   log.info(`Canceling Stripe subscription for ${customer.email}`);
   
   if (!customer.stripeSubscriptionId) {
@@ -213,7 +213,7 @@ export async function cancelStripeSubscription(customer: SoloBossCustomer) {
   log.info(`Stripe subscription ${customer.stripeSubscriptionId} marked for cancellation`);
 }
 
-export async function updateStripeSubscription(customer: SoloBossCustomer, newPriceId: string) {
+export async function updateStripeSubscription(customer: SoloSuccessCustomer, newPriceId: string) {
   log.info(`Updating Stripe subscription for ${customer.email} to price ${newPriceId}`);
   
   if (!customer.stripeSubscriptionId) {
@@ -234,58 +234,58 @@ export async function updateStripeSubscription(customer: SoloBossCustomer, newPr
 }
 
 // Email notification activities
-export async function sendSubscriptionUpgradeEmail(customer: SoloBossCustomer, newTier: SubscriptionTier) {
+export async function sendSubscriptionUpgradeEmail(customer: SoloSuccessCustomer, newTier: SubscriptionTier) {
   log.info(`Sending subscription upgrade email to ${customer.email} for ${newTier} tier`);
   // await sendEmail({
   //   to: customer.email,
-  //   subject: `Welcome to SoloBoss AI ${newTier.charAt(0).toUpperCase() + newTier.slice(1)}!`,
+  //   subject: `Welcome to SoloSuccess AI ${newTier.charAt(0).toUpperCase() + newTier.slice(1)}!`,
   //   template: 'subscription-upgrade',
   //   data: { customer, newTier }
   // });
 }
 
-export async function sendSubscriptionDowngradeEmail(customer: SoloBossCustomer, newTier: SubscriptionTier) {
+export async function sendSubscriptionDowngradeEmail(customer: SoloSuccessCustomer, newTier: SubscriptionTier) {
   log.info(`Sending subscription downgrade email to ${customer.email} for ${newTier} tier`);
   // await sendEmail({
   //   to: customer.email,
-  //   subject: `Your SoloBoss AI subscription has been updated`,
+  //   subject: `Your SoloSuccess AI subscription has been updated`,
   //   template: 'subscription-downgrade',
   //   data: { customer, newTier }
   // });
 }
 
-export async function sendSubscriptionCancellationEmail(customer: SoloBossCustomer) {
+export async function sendSubscriptionCancellationEmail(customer: SoloSuccessCustomer) {
   log.info(`Sending subscription cancellation email to ${customer.email}`);
   // await sendEmail({
   //   to: customer.email,
-  //   subject: `Your SoloBoss AI subscription has been canceled`,
+  //   subject: `Your SoloSuccess AI subscription has been canceled`,
   //   template: 'subscription-cancellation',
   //   data: { customer }
   // });
 }
 
-export async function sendPaymentFailedEmail(customer: SoloBossCustomer, retryCount: number) {
+export async function sendPaymentFailedEmail(customer: SoloSuccessCustomer, retryCount: number) {
   log.info(`Sending payment failed email to ${customer.email} (retry ${retryCount})`);
   // await sendEmail({
   //   to: customer.email,
-  //   subject: `Payment failed for your SoloBoss AI subscription`,
+  //   subject: `Payment failed for your SoloSuccess AI subscription`,
   //   template: 'payment-failed',
   //   data: { customer, retryCount }
   // });
 }
 
-export async function sendPaymentSucceededEmail(customer: SoloBossCustomer, amount: number) {
+export async function sendPaymentSucceededEmail(customer: SoloSuccessCustomer, amount: number) {
   log.info(`Sending payment succeeded email to ${customer.email} for $${amount / 100}`);
   // await sendEmail({
   //   to: customer.email,
-  //   subject: `Payment successful for your SoloBoss AI subscription`,
+  //   subject: `Payment successful for your SoloSuccess AI subscription`,
   //   template: 'payment-succeeded',
   //   data: { customer, amount }
   // });
 }
 
 // Database update activities
-export async function updateUserSubscriptionInDatabase(customer: SoloBossCustomer) {
+export async function updateUserSubscriptionInDatabase(customer: SoloSuccessCustomer) {
   log.info(`Updating user subscription in database for ${customer.email}`);
   
   // Simulate database update with a short delay
@@ -308,7 +308,7 @@ export async function updateUserSubscriptionInDatabase(customer: SoloBossCustome
   log.info(`User subscription updated successfully for ${customer.email}`);
 }
 
-export async function downgradeToFreeTier(customer: SoloBossCustomer) {
+export async function downgradeToFreeTier(customer: SoloSuccessCustomer) {
   log.info(`Downgrading ${customer.email} to free tier`);
   
   // Update customer to free tier

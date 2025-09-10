@@ -122,7 +122,7 @@ export default function PricingPage() {
     if (tierId === 'launch') {
       toast({
         title: 'Free Plan',
-        description: 'You can start using SoloBoss AI right now with our free Launch plan!',
+        description: 'You can start using SoloSuccess AI right now with our free Launch plan!',
       })
       return
     }
@@ -439,7 +439,7 @@ export default function PricingPage() {
               Ready to Dominate Your Industry?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Join thousands of girlbosses who are already using SoloBoss AI to scale their empires.
+              Join thousands of girlbosses who are already using SoloSuccess AI to scale their empires.
             </p>
             <Button 
               size="lg" 

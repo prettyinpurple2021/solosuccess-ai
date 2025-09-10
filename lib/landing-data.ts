@@ -240,7 +240,7 @@ export const testimonials: Testimonial[] = [
     name: "Sarah Chen",
     role: "Startup Founder",
     company: "TechVenture Inc.",
-    content: "SoloBoss AI transformed how I manage my startup. The AI team feels like having a full executive staff at my fingertips.",
+    content: "SoloSuccess AI transformed how I manage my startup. The AI team feels like having a full executive staff at my fingertips.",
     avatar: "/default-user.svg",
     rating: 5,
   },
@@ -270,15 +270,15 @@ export interface FAQ {
 
 export const faqs: FAQ[] = [
   {
-    question: "How does SoloBoss AI differ from other productivity tools?",
-    answer: "SoloBoss AI combines multiple AI specialists into one platform, offering personalized strategies across all aspects of your work - from focus sessions to strategic planning. It's not just a tool, it's your AI-powered team.",
+    question: "How does SoloSuccess AI differ from other productivity tools?",
+    answer: "SoloSuccess AI combines multiple AI specialists into one platform, offering personalized strategies across all aspects of your work - from focus sessions to strategic planning. It's not just a tool, it's your AI-powered team.",
   },
   {
     question: "Can I customize the AI agents to my specific needs?",
     answer: "Absolutely! Each AI agent learns from your preferences, work style, and goals to provide increasingly personalized recommendations and support tailored to your unique situation.",
   },
   {
-    question: "Is my data secure with SoloBoss AI?",
+    question: "Is my data secure with SoloSuccess AI?",
     answer: "Yes, we implement enterprise-grade security with end-to-end encryption. Your data is never shared with third parties and remains completely private to you.",
   },
   {
@@ -286,11 +286,11 @@ export const faqs: FAQ[] = [
     answer: "Most users report increased productivity within the first week. The AI agents continuously learn and adapt, so the value compounds over time as they better understand your work patterns.",
   },
   {
-    question: "Do I need technical expertise to use SoloBoss AI?",
-    answer: "Not at all! SoloBoss AI is designed for ease of use. The interface is intuitive, and the AI agents guide you through everything step by step.",
+    question: "Do I need technical expertise to use SoloSuccess AI?",
+    answer: "Not at all! SoloSuccess AI is designed for ease of use. The interface is intuitive, and the AI agents guide you through everything step by step.",
   },
   {
-    question: "Can I integrate SoloBoss AI with my existing tools?",
+    question: "Can I integrate SoloSuccess AI with my existing tools?",
     answer: "Yes, we offer integrations with popular productivity tools, calendars, and project management platforms to seamlessly fit into your existing workflow.",
   },
 ]

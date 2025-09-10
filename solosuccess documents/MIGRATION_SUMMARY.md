@@ -12,7 +12,7 @@ Your Solo Boss AI Platform has been successfully migrated from Google Cloud to V
 - ❌ `clouddeploy.yaml` - Google Cloud Deploy configuration
 - ❌ `deploy-gcp.sh` & `deploy-gcp.ps1` - Google Cloud deployment scripts
 - ❌ `deploy-gcloud.sh` & `deploy-gcloud.ps1` - Google Cloud deployment scripts
-- ❌ `soloboss-deployer-key.json` - Google Cloud service account key
+- ❌ `SoloSuccess-deployer-key.json` - Google Cloud service account key
 - ❌ `app/api/integrations/google/` - Google Calendar integration
 - ❌ `lib/google-auth.ts` - Google OAuth2 client
 - ❌ `@google-cloud/recaptcha-enterprise` - Google Cloud reCAPTCHA

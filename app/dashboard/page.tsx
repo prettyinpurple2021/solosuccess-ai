@@ -197,7 +197,7 @@ export default function DashboardPage() {
                 <Crown className="w-10 h-10 text-white" />
               </motion.div>
               <div>
-                <h2 className="text-2xl font-bold text-gradient mb-2">Welcome to SoloBoss AI</h2>
+                <h2 className="text-2xl font-bold text-gradient mb-2">Welcome to SoloSuccess AI</h2>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">Get started by creating your first goal or task.</p>
                 <div className="space-y-3">
                   <Link href="/dashboard/slaylist">

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * SoloBoss AI Platform - UX Testing Script
+ * SoloSuccess AI Platform - UX Testing Script
  * 
  * This script tests all user experience improvements including:
  * - Enhanced onboarding flow
@@ -27,7 +27,7 @@ class UXTesting {
   }
 
   async runAllTests() {
-    console.log('🚀 Starting SoloBoss AI Platform UX Testing...\n');
+    console.log('🚀 Starting SoloSuccess AI Platform UX Testing...\n');
     
     await this.testOnboardingEnhancements();
     await this.testInteractiveTutorials();

@@ -279,7 +279,7 @@ export function SubscriptionManager() {
             Current Subscription
           </CardTitle>
           <CardDescription>
-            Manage your SoloBoss AI subscription and billing
+            Manage your SoloSuccess AI subscription and billing
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

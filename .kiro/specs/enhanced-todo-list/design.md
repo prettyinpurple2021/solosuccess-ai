@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Enhanced To-Do List feature will extend the existing task management system in SoloBoss AI with advanced AI-powered capabilities, smart organization, and comprehensive analytics. The design leverages the existing database schema while adding new tables and enhancing the current task management workflow.
+The Enhanced To-Do List feature will extend the existing task management system in SoloSuccess AI with advanced AI-powered capabilities, smart organization, and comprehensive analytics. The design leverages the existing database schema while adding new tables and enhancing the current task management workflow.
 
 ## Architecture
 

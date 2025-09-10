@@ -196,7 +196,7 @@ export default function ResetPasswordPage() {
 
             <Button 
               type="submit" 
-              className="w-full boss-button bg-gradient-soloboss hover:bg-gradient-soloboss-light text-white font-bold"
+              className="w-full boss-button bg-gradient-SoloSuccess hover:bg-gradient-SoloSuccess-light text-white font-bold"
               disabled={loading || !!message}
             >
               {loading ? "Resetting..." : "🔒 Set New Password"}

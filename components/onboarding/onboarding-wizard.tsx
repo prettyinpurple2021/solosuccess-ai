@@ -171,7 +171,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               </div>
               <h2 className="text-3xl font-bold boss-heading">Welcome to Your Empire! 👑</h2>
               <p className="text-lg text-muted-foreground">
-                Let&apos;s set up your SoloBoss AI platform to match your unique boss energy!
+                Let&apos;s set up your SoloSuccess AI platform to match your unique boss energy!
               </p>
             </div>
 
@@ -522,7 +522,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="boss-heading text-xl">SoloBoss AI Setup</DialogTitle>
+              <DialogTitle className="boss-heading text-xl">SoloSuccess AI Setup</DialogTitle>
               <DialogDescription>
                 Step {currentStep + 1} of {totalSteps} - Let&apos;s build your empire!
               </DialogDescription>

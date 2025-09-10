@@ -1,10 +1,10 @@
 # User Flows
 
-## SoloBoss AI User Journey Mapping
+## SoloSuccess AI User Journey Mapping
 
 ## 📋 Overview
 
-This document illustrates the step-by-step paths that users will take to accomplish key tasks within the SoloBoss AI application. These flows are derived from the user personas and their stories, providing a clear guide for UI/UX design and development.
+This document illustrates the step-by-step paths that users will take to accomplish key tasks within the SoloSuccess AI application. These flows are derived from the user personas and their stories, providing a clear guide for UI/UX design and development.
 
 ---
 
@@ -12,7 +12,7 @@ This document illustrates the step-by-step paths that users will take to accompl
 
 ### Flow 1 Trigger
 
-New user (Sam, the Overwhelmed Freelancer) discovers SoloBoss AI and wants to create their first project.
+New user (Sam, the Overwhelmed Freelancer) discovers SoloSuccess AI and wants to create their first project.
 
 ### Flow 1 User Goal
 
@@ -21,7 +21,7 @@ Sign up, create a goal for a new client project, and add the first task to get s
 ### Flow 1 Steps
 
 1. **Landing Page Visit**
-   - **User Action:** Sam arrives at the SoloBoss AI landing page and clicks "Sign Up"
+   - **User Action:** Sam arrives at the SoloSuccess AI landing page and clicks "Sign Up"
    - **System Response:** Navigation to registration form
 
 2. **Account Registration**
@@ -229,7 +229,7 @@ Upgrade from the free plan to the "Accelerator" tier to access all AI agents.
    - **System Response:** Stripe processes payment securely
 
 7. **Confirmation and Access**
-   - **User Action:** Alex is redirected back to SoloBoss AI
+   - **User Action:** Alex is redirected back to SoloSuccess AI
    - **System Response:** Lands on billing settings page showing active "Accelerator" subscription with success notification
 
 8. **Feature Access Verification**

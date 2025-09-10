@@ -22,7 +22,7 @@ const pool = new Pool({
 })
 
 async function runCompleteSchema() {
-  console.log('🚀 Setting up complete SoloBoss AI database schema...\n')
+  console.log('🚀 Setting up complete SoloSuccess AI database schema...\n')
 
   try {
     // Read the schema file

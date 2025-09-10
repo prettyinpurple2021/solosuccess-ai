@@ -207,7 +207,7 @@ export default function SecurityPage() {
               <Link href="/contact">Contact Security Team</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="mailto:security@soloboss.ai">security@soloboss.ai</Link>
+              <Link href="mailto:security@SoloSuccess.ai">security@SoloSuccess.ai</Link>
             </Button>
           </div>
         </div>

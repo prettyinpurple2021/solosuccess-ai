@@ -239,7 +239,7 @@ export function NeonAuth() {
       // Auto-login after successful signup
       localStorage.setItem('authToken', data.token)
       setUser(data.user)
-      setSuccess("Account created successfully! Welcome to SoloBoss AI!")
+      setSuccess("Account created successfully! Welcome to SoloSuccess AI!")
       
       // Redirect to dashboard immediately
       router.push("/dashboard")
@@ -320,7 +320,7 @@ export function NeonAuth() {
                 <div className="w-12 h-12 gradient-empowerment rounded-full flex items-center justify-center">
                   <Crown className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-gradient font-boss">SoloBoss AI</span>
+                <span className="text-2xl font-bold text-gradient font-boss">SoloSuccess AI</span>
               </motion.div>
               <p className="text-gray-600 dark:text-gray-400">
                 {isSignInPage ? "Welcome back, boss!" : "Join the empire of bad ass girl bosses"}

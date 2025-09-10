@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * SoloBoss AI Neon Database Setup Script
+ * SoloSuccess AI Neon Database Setup Script
  * 
  * This script initializes the Neon database with:
  * - Complete schema migration
@@ -36,7 +36,7 @@ const pool = new Pool({
 })
 
 async function setupDatabase() {
-  console.log('🚀 Setting up SoloBoss AI Neon database...\n')
+  console.log('🚀 Setting up SoloSuccess AI Neon database...\n')
 
   const client = await pool.connect()
 

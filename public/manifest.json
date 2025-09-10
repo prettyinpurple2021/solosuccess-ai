@@ -1,6 +1,6 @@
 {
-  "name": "SoloBoss AI - Your AI-Powered Business Platform",
-  "short_name": "SoloBoss AI",
+  "name": "SoloSuccess AI - Your AI-Powered Business Platform",
+  "short_name": "SoloSuccess AI",
   "description": "The ultimate AI-powered platform for solo entrepreneurs and business owners. Manage goals, tasks, and grow your business with your AI squad.",
   "start_url": "/dashboard",
   "display": "standalone",
@@ -18,7 +18,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/images/soloboss-logo.png",
+      "src": "/images/SoloSuccess-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -106,11 +106,11 @@
   ],
   "screenshots": [
     {
-      "src": "/images/soloboss-banner.png",
+      "src": "/images/SoloSuccess-banner.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "SoloBoss AI Dashboard"
+      "label": "SoloSuccess AI Dashboard"
     }
   ],
   "related_applications": [],
@@ -124,7 +124,7 @@
   "handle_links": "preferred",
   "protocol_handlers": [
     {
-      "protocol": "web+soloboss",
+      "protocol": "web+SoloSuccess",
       "url": "/dashboard?action=%s"
     }
   ]

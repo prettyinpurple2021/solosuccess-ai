@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -55,7 +55,7 @@ export default function TermsOfServicePage() {
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Building empires requires clear foundations. Here are the terms that govern your journey with SoloBoss AI.
+            Building empires requires clear foundations. Here are the terms that govern your journey with SoloSuccess AI.
           </p>
           <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
             <FileText className="w-4 h-4" />
@@ -71,7 +71,7 @@ export default function TermsOfServicePage() {
             <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <Crown className="w-6 h-6 text-purple-600" />
-                SoloBoss AI Terms of Service
+                SoloSuccess AI Terms of Service
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
@@ -83,10 +83,10 @@ export default function TermsOfServicePage() {
                     Introduction and Acceptance of Terms
                   </h2>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    Welcome to SoloBoss AI! SoloBoss AI is an innovative web application designed to be an AI-driven productivity platform for solo entrepreneurs, freelancers, and small business owners. Our purpose is to provide a highly valuable, feature-rich, and production-ready platform that simulates a "virtual team experience," enabling independent professionals to streamline operations, enhance productivity, and scale their businesses without the need for traditional hiring.
+                    Welcome to SoloSuccess AI! SoloSuccess AI is an innovative web application designed to be an AI-driven productivity platform for solo entrepreneurs, freelancers, and small business owners. Our purpose is to provide a highly valuable, feature-rich, and production-ready platform that simulates a "virtual team experience," enabling independent professionals to streamline operations, enhance productivity, and scale their businesses without the need for traditional hiring.
                   </p>
                   <p className="text-gray-600 leading-relaxed">
-                    By accessing or using the SoloBoss AI web application and its services (collectively, the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, you may not access or use the Service.
+                    By accessing or using the SoloSuccess AI web application and its services (collectively, the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, you may not access or use the Service.
                   </p>
                 </div>
 
@@ -96,15 +96,15 @@ export default function TermsOfServicePage() {
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">2</span>
-                    Your SoloBoss AI Account
+                    Your SoloSuccess AI Account
                   </h2>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    To access most features of SoloBoss AI, you must register for an account.
+                    To access most features of SoloSuccess AI, you must register for an account.
                   </p>
                   <div className="bg-purple-50 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-800 mb-2">Account Creation:</h3>
                     <p className="text-gray-600 text-sm">
-                      The system allows new users to register for a SoloBoss AI account using our custom authentication system, which handles secure password hashing and creates a user record.
+                      The system allows new users to register for a SoloSuccess AI account using our custom authentication system, which handles secure password hashing and creates a user record.
                     </p>
                   </div>
                   <div className="bg-pink-50 p-4 rounded-lg mb-4">
@@ -130,7 +130,7 @@ export default function TermsOfServicePage() {
                     Subscription Plans and Payments
                   </h2>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    SoloBoss AI offers a tiered subscription model to cater to different user needs.
+                    SoloSuccess AI offers a tiered subscription model to cater to different user needs.
                   </p>
                   
                   <h3 className="text-xl font-semibold text-gray-800 mb-3">Product Tiers:</h3>
@@ -185,13 +185,13 @@ export default function TermsOfServicePage() {
                     Intellectual Property Rights
                   </h2>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    All rights reserved. This project is proprietary software developed for SoloBoss AI Platform.
+                    All rights reserved. This project is proprietary software developed for SoloSuccess AI Platform.
                   </p>
                   
                   <div className="bg-yellow-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-400">
                     <h3 className="font-semibold text-gray-800 mb-2">Ownership:</h3>
                     <p className="text-gray-600 text-sm">
-                      SoloBoss AI and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof), are owned by SoloBoss AI, its licensors, or other providers of such material. This includes the distinct brand identity, brand name "SoloBoss", tagline "Be the Boss. Build Solo. Rule Your Empire.", brand voice (e.g., Confident, Empowering, Rebellious with purpose), brand personality (e.g., Punk Rock meets Girlboss CEO, Energetic, creative, driven), brand aesthetic (e.g., Vibrant Purple, Teal, Hot Pink, paint splatter, shimmer/glitter overlays, cute skulls with bows), and the distinct personalities and roles of the 8 AI Agents (Roxy, Blaze, Echo, Lumi, Vex, Lexi, Nova, Glitch).
+                      SoloSuccess AI and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof), are owned by SoloSuccess AI, its licensors, or other providers of such material. This includes the distinct brand identity, brand name "SoloSuccess", tagline "Be the Boss. Build Solo. Rule Your Empire.", brand voice (e.g., Confident, Empowering, Rebellious with purpose), brand personality (e.g., Punk Rock meets Girlboss CEO, Energetic, creative, driven), brand aesthetic (e.g., Vibrant Purple, Teal, Hot Pink, paint splatter, shimmer/glitter overlays, cute skulls with bows), and the distinct personalities and roles of the 8 AI Agents (Roxy, Blaze, Echo, Lumi, Vex, Lexi, Nova, Glitch).
                     </p>
                   </div>
 
@@ -234,9 +234,9 @@ export default function TermsOfServicePage() {
                   </div>
 
                   <div className="bg-purple-50 p-4 rounded-lg mb-4">
-                    <h3 className="font-semibold text-gray-800 mb-2">License to SoloBoss AI:</h3>
+                    <h3 className="font-semibold text-gray-800 mb-2">License to SoloSuccess AI:</h3>
                     <p className="text-gray-600 text-sm">
-                      By submitting, posting, or displaying User-Generated Content on or through the Service, you grant SoloBoss AI a worldwide, non-exclusive, royalty-free license (with the right to sublicense) to use, copy, reproduce, process, adapt, modify, publish, transmit, display, and distribute such content in any and all media or distribution methods (now known or later developed) for the sole purpose of providing and improving the Service to you. This includes, for example, AI agents accessing your Brand Profile to generate on-brand content or Lexi analyzing SlayList data to provide insights.
+                      By submitting, posting, or displaying User-Generated Content on or through the Service, you grant SoloSuccess AI a worldwide, non-exclusive, royalty-free license (with the right to sublicense) to use, copy, reproduce, process, adapt, modify, publish, transmit, display, and distribute such content in any and all media or distribution methods (now known or later developed) for the sole purpose of providing and improving the Service to you. This includes, for example, AI agents accessing your Brand Profile to generate on-brand content or Lexi analyzing SlayList data to provide insights.
                     </p>
                   </div>
 
@@ -269,7 +269,7 @@ export default function TermsOfServicePage() {
                     <p className="text-gray-600 text-sm mb-2">You agree not to:</p>
                     <ul className="text-gray-600 text-sm list-disc list-inside space-y-1">
                       <li>Use the Service in any way that violates any applicable federal, state, local, or international law or regulation.</li>
-                      <li>Engage in any conduct that restricts or inhibits anyone's use or enjoyment of the Service, or which, as determined by us, may harm SoloBoss AI or users of the Service or expose them to liability.</li>
+                      <li>Engage in any conduct that restricts or inhibits anyone's use or enjoyment of the Service, or which, as determined by us, may harm SoloSuccess AI or users of the Service or expose them to liability.</li>
                       <li>Introduce any viruses, Trojan horses, worms, logic bombs, or other material that is malicious or technologically harmful.</li>
                       <li>Attempt to gain unauthorized access to, interfere with, damage, or disrupt any parts of the Service, the server on which the Service is stored, or any server, computer, or database connected to the Service.</li>
                     </ul>
@@ -278,7 +278,7 @@ export default function TermsOfServicePage() {
                   <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
                     <h3 className="font-semibold text-gray-800 mb-2">AI Agent Outputs Disclaimer:</h3>
                     <p className="text-gray-600 text-sm">
-                      While AI Agents like Lumi (Legal & Docs Agent) can assist with legal requirements and document generation, their outputs come "with appropriate disclaimers". The information provided by SoloBoss AI agents is for informational purposes only and does not constitute professional advice (e.g., legal, financial, or technical). You should consult with a qualified professional for advice tailored to your specific situation.
+                      While AI Agents like Lumi (Legal & Docs Agent) can assist with legal requirements and document generation, their outputs come "with appropriate disclaimers". The information provided by SoloSuccess AI agents is for informational purposes only and does not constitute professional advice (e.g., legal, financial, or technical). You should consult with a qualified professional for advice tailored to your specific situation.
                     </p>
                   </div>
                 </div>
@@ -295,21 +295,21 @@ export default function TermsOfServicePage() {
                   <div className="bg-gray-50 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-800 mb-2">"As Is" Basis:</h3>
                     <p className="text-gray-600 text-sm">
-                      Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE" basis, without any warranties of any kind, either express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement. SoloBoss AI aims for a scalable, resilient, and maintainable architecture, robust data security, and reliable integrations.
+                      Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE" basis, without any warranties of any kind, either express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement. SoloSuccess AI aims for a scalable, resilient, and maintainable architecture, robust data security, and reliable integrations.
                     </p>
                   </div>
 
                   <div className="bg-blue-50 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-800 mb-2">AI Outputs:</h3>
                     <p className="text-gray-600 text-sm">
-                      SoloBoss AI does not guarantee the accuracy, completeness, or usefulness of any information generated by the AI Agents or other AI-powered features. The effectiveness of any Large Language Model (LLM) is fundamentally constrained by the quality and structure of the context it is given.
+                      SoloSuccess AI does not guarantee the accuracy, completeness, or usefulness of any information generated by the AI Agents or other AI-powered features. The effectiveness of any Large Language Model (LLM) is fundamentally constrained by the quality and structure of the context it is given.
                     </p>
                   </div>
 
                   <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
                     <h3 className="font-semibold text-gray-800 mb-2">Limitation of Liability:</h3>
                     <p className="text-gray-600 text-sm">
-                      In no event will SoloBoss AI, its affiliates, or their licensors, service providers, employees, agents, officers, or directors be liable for damages of any kind, under any legal theory, arising out of or in connection with your use, or inability to use, the Service, including any direct, indirect, special, incidental, consequential, or punitive damages, including but not limited to, personal injury, pain and suffering, emotional distress, loss of revenue, loss of profits, loss of business or anticipated savings, loss of use, loss of goodwill, loss of data, whether caused by tort (including negligence), breach of contract, or otherwise, even if foreseeable.
+                      In no event will SoloSuccess AI, its affiliates, or their licensors, service providers, employees, agents, officers, or directors be liable for damages of any kind, under any legal theory, arising out of or in connection with your use, or inability to use, the Service, including any direct, indirect, special, incidental, consequential, or punitive damages, including but not limited to, personal injury, pain and suffering, emotional distress, loss of revenue, loss of profits, loss of business or anticipated savings, loss of use, loss of goodwill, loss of data, whether caused by tort (including negligence), breach of contract, or otherwise, even if foreseeable.
                     </p>
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function TermsOfServicePage() {
                       Termination
                     </h2>
                     <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                      <h3 className="font-semibold text-gray-800 mb-2">By SoloBoss AI:</h3>
+                      <h3 className="font-semibold text-gray-800 mb-2">By SoloSuccess AI:</h3>
                       <p className="text-gray-600 text-sm">
                         We may terminate or suspend your access to all or part of the Service immediately, without prior notice or liability, if you breach these Terms of Service. This includes processing events related to subscription deletion, which may revert your account to the free tier.
                       </p>
@@ -383,7 +383,7 @@ export default function TermsOfServicePage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Empire?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Now that you know the terms, it's time to start your boss journey. Join thousands of entrepreneurs already scaling with SoloBoss AI.
+            Now that you know the terms, it's time to start your boss journey. Join thousands of entrepreneurs already scaling with SoloSuccess AI.
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Button

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'soloboss-ai-v1'
-const STATIC_CACHE = 'soloboss-static-v1'
-const DYNAMIC_CACHE = 'soloboss-dynamic-v1'
+const CACHE_NAME = 'SoloSuccess-ai-v1'
+const STATIC_CACHE = 'SoloSuccess-static-v1'
+const DYNAMIC_CACHE = 'SoloSuccess-dynamic-v1'
 
 // Files to cache immediately
 const STATIC_FILES = [
@@ -10,7 +10,7 @@ const STATIC_FILES = [
   '/manifest.json',
   '/favicon.ico',
   '/images/logo.png',
-  '/images/soloboss-logo.png',
+  '/images/SoloSuccess-logo.png',
 ]
 
 // API routes to cache
@@ -185,7 +185,7 @@ async function doBackgroundSync() {
 // Push notifications
 self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'New notification from SoloBoss AI',
+    body: event.data ? event.data.text() : 'New notification from SoloSuccess AI',
     icon: '/images/logo.png',
     badge: '/images/logo.png',
     vibrate: [100, 50, 100],
@@ -208,7 +208,7 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification('SoloBoss AI', options)
+    self.registration.showNotification('SoloSuccess AI', options)
   )
 })
 

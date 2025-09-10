@@ -89,7 +89,7 @@ export default function AboutPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -304,13 +304,13 @@ export default function AboutPage() {
                 <div className="w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
                   <Crown className="w-12 h-12 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">The Boss Behind SoloBoss</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">The Boss Behind SoloSuccess</h3>
                 <p className="text-purple-600 font-semibold">Founder & Chief Boss Officer</p>
               </div>
               <blockquote className="text-xl text-gray-600 leading-relaxed text-center italic">
                 "I was that solo entrepreneur juggling 15 different tools, working 80-hour weeks, 
                 and still feeling like I was barely keeping my head above water. I knew there had to be a better way. 
-                SoloBoss AI is the solution I wish I'd had when I started my entrepreneurial journey - 
+                SoloSuccess AI is the solution I wish I'd had when I started my entrepreneurial journey - 
                 and it's the solution thousands of other solo entrepreneurs needed too."
               </blockquote>
             </CardContent>

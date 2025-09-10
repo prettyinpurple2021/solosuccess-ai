@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Start the competitive intelligence processing workflow
     const handle = await client.workflow.start(competitiveIntelligenceProcessingWorkflow, {
       args: [userId, competitorData],
-      taskQueue: 'soloboss-tasks',
+      taskQueue: 'SoloSuccess-tasks',
       workflowId: `intelligence-${userId}-${Date.now()}`,
     })
 

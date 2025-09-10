@@ -13,7 +13,7 @@ export default function SimpleLandingPage() {
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
             Become the Ultimate
             <br />
-            <span className="text-5xl md:text-7xl">SoloBoss</span>
+            <span className="text-5xl md:text-7xl">SoloSuccess</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Transform your productivity with AI agents that work 24/7. Automate everything, achieve more, and dominate
@@ -110,7 +110,7 @@ export default function SimpleLandingPage() {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Ready to Become a SoloBoss?
+            Ready to Become a SoloSuccess?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of
@@ -145,7 +145,7 @@ export default function SimpleLandingPage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg"></div>
-                <span className="text-xl font-bold">SoloBoss AI</span>
+                <span className="text-xl font-bold">SoloSuccess AI</span>
               </div>
               <p className="text-gray-400">Empowering entrepreneurs with AI-powered productivity tools.</p>
             </div>
@@ -222,7 +222,7 @@ export default function SimpleLandingPage() {
           </div>
           <div className="h-px bg-gray-800 my-8"></div>
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">© 2024 SoloBoss AI. All rights reserved.</p>
+            <p className="text-gray-400">© 2024 SoloSuccess AI. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Privacy

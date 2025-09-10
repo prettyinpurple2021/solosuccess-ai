@@ -134,7 +134,7 @@ export function AchievementCelebration({ achievement, onClose, onShare }: Achiev
             <CardContent className="p-6 text-center space-y-3">
               <h3 className="text-xl font-bold empowering-text">{achievement.title}</h3>
               <p className="text-muted-foreground font-medium">{achievement.description}</p>
-              <div className="flex items-center justify-center gap-2 text-lg font-bold soloboss-text-gradient">
+              <div className="flex items-center justify-center gap-2 text-lg font-bold SoloSuccess-text-gradient">
                 <Sparkles className="h-5 w-5" />+{achievement.points} Boss Points
                 <Sparkles className="h-5 w-5" />
               </div>
@@ -293,7 +293,7 @@ export function StreakCelebration({ streakCount, onClose }: StreakCelebrationPro
 
           <div className="space-y-2">
             <DialogTitle className="text-2xl font-bold boss-heading">{getStreakMessage(streakCount)}</DialogTitle>
-            <div className="text-4xl font-bold soloboss-text-gradient">
+            <div className="text-4xl font-bold SoloSuccess-text-gradient">
               {streakCount} Day Streak! {getStreakEmoji(streakCount)}
             </div>
           </div>

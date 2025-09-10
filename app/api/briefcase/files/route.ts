@@ -12,7 +12,7 @@ export const MOCK_FILES = [
     last_modified: '2024-01-15T10:00:00Z',
     category: 'document',
     tags: ['business', 'planning', '2024', 'strategy'],
-    description: 'Annual business plan and strategy document for SoloBoss AI Platform',
+    description: 'Annual business plan and strategy document for SoloSuccess AI Platform',
     is_favorite: true,
     folder_id: null,
     storage_path: require('path').join(process.cwd(), 'uploads', 'business-plan-2024.txt')

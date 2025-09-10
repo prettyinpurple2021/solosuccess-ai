@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 /**
- * Environment variable validation schema for the SoloBoss AI Platform
+ * Environment variable validation schema for the SoloSuccess AI Platform
  * Validates all required configuration values for production deployment
  */
 const envSchema = z.object({

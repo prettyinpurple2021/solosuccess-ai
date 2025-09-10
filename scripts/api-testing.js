@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * SoloBoss AI Platform - API Testing Script
+ * SoloSuccess AI Platform - API Testing Script
  * 
  * This script tests all API endpoints to ensure they are functioning correctly.
  */
@@ -152,7 +152,7 @@ class APITesting {
    * Run all API tests
    */
   async runAllTests() {
-    console.log('🚀 Starting SoloBoss AI Platform API Testing...\n');
+    console.log('🚀 Starting SoloSuccess AI Platform API Testing...\n');
     console.log(`🌐 Base URL: ${this.baseUrl}\n`);
 
     const totalTests = APITesting.ENDPOINTS.length;

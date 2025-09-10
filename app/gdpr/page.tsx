@@ -19,7 +19,7 @@ export default function GDPRPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -84,7 +84,7 @@ export default function GDPRPage() {
                   </p>
                   <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
                     <p className="text-gray-600 text-sm">
-                      <strong>At SoloBoss AI:</strong> We fully comply with GDPR requirements and are committed to protecting your personal data with the highest standards of privacy and security.
+                      <strong>At SoloSuccess AI:</strong> We fully comply with GDPR requirements and are committed to protecting your personal data with the highest standards of privacy and security.
                     </p>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export default function GDPRPage() {
                         Data Protection by Design
                       </h3>
                       <p className="text-gray-600 text-sm">
-                        We build privacy protection into every aspect of SoloBoss AI from the ground up. 
+                        We build privacy protection into every aspect of SoloSuccess AI from the ground up. 
                         Data protection isn't an afterthought - it's fundamental to how we operate.
                       </p>
                     </div>
@@ -308,7 +308,7 @@ export default function GDPRPage() {
                   
                   <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-400">
                     <p className="text-gray-600 text-sm mb-4">
-                      SoloBoss AI uses cloud infrastructure that may involve transferring your data outside the European Economic Area (EEA). 
+                      SoloSuccess AI uses cloud infrastructure that may involve transferring your data outside the European Economic Area (EEA). 
                       When we do this, we ensure adequate protection through:
                     </p>
                     <ul className="text-gray-600 text-sm list-disc list-inside space-y-1">

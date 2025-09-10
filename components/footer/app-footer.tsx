@@ -16,7 +16,7 @@ const footerLinks = {
     { name: "System Status", href: "/status" },
   ],
   company: [
-    { name: "About SoloBoss", href: "/about" },
+    { name: "About SoloSuccess", href: "/about" },
     { name: "Boss Blog", href: "/blog" },
     { name: "Contact Us", href: "/contact" },
   ],
@@ -34,10 +34,10 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { name: "Twitter", href: "https://twitter.com/solobossai", icon: Twitter },
-  { name: "Instagram", href: "https://instagram.com/solobossai", icon: Instagram },
-  { name: "LinkedIn", href: "https://linkedin.com/company/solobossai", icon: Linkedin },
-  { name: "GitHub", href: "https://github.com/solobossai", icon: Github },
+  { name: "Twitter", href: "https://twitter.com/SoloSuccessai", icon: Twitter },
+  { name: "Instagram", href: "https://instagram.com/SoloSuccessai", icon: Instagram },
+  { name: "LinkedIn", href: "https://linkedin.com/company/SoloSuccessai", icon: Linkedin },
+  { name: "GitHub", href: "https://github.com/SoloSuccessai", icon: Github },
 ]
 
 export function AppFooter() {
@@ -145,7 +145,7 @@ export function AppFooter() {
               <div className="relative">
                 <Image
                   src="/images/logo.png"
-                  alt="SoloBoss AI"
+                  alt="SoloSuccess AI"
                   width={48}
                   height={48}
                   className="rounded-xl object-contain punk-shadow"
@@ -154,7 +154,7 @@ export function AppFooter() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold boss-heading bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </h2>
                 <p className="text-sm text-gray-600 font-medium">Solo Entrepreneur Empire</p>
               </div>
@@ -254,7 +254,7 @@ export function AppFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 text-gray-600">
-            <span>© 2025 SoloBoss AI. Made with</span>
+            <span>© 2025 SoloSuccess AI. Made with</span>
             <Heart className="h-4 w-4 text-red-500 fill-current" />
             <span>for boss babes everywhere.</span>
           </div>

@@ -78,7 +78,7 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
       
       toast({
         title: `✅ Connected to ${provider === 'google' ? 'Google' : 'Outlook'} Calendar!`,
-        description: "Your calendar is now synced with SoloBoss AI",
+        description: "Your calendar is now synced with SoloSuccess AI",
       })
       
       loadCalendarEvents()

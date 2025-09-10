@@ -132,7 +132,7 @@ npm run test:ux      # UX testing
 
 ### Tailwind Config
 
-- Custom color palette with SoloBoss branding
+- Custom color palette with SoloSuccess branding
 - Agent-specific color schemes
 - Custom animations and keyframes
 - Responsive design utilities

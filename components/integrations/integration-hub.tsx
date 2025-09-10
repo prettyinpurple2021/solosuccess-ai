@@ -44,7 +44,7 @@ const ALL_INTEGRATIONS: Integration[] = [
     category: "communication",
     isPremium: false,
     features: ["Task completion notifications", "Daily progress summaries", "AI agent updates", "Team collaboration alerts"],
-    setupSteps: ["Install SoloBoss Slack app", "Authorize workspace access", "Choose notification channels", "Configure message preferences"],
+    setupSteps: ["Install SoloSuccess Slack app", "Authorize workspace access", "Choose notification channels", "Configure message preferences"],
   },
   // Add other integrations here...
 ];
@@ -145,7 +145,7 @@ export function IntegrationHub() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="boss-card soloboss-gradient text-white">
+      <Card className="boss-card SoloSuccess-gradient text-white">
         <CardContent className="p-6 text-center space-y-3">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-3"><Link className="h-8 w-8" />Integration Hub<Zap className="h-8 w-8" /></h1>
           <p className="text-lg opacity-90">Connect your favorite tools and supercharge your empire! 🔗✨</p>

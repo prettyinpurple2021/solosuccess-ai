@@ -86,7 +86,7 @@ async function sendNotification(
     try {
       // In production, integrate with Twilio or similar service
       console.log(`Sending SMS to user ${user.id}:`, {
-        message: `SoloBoss Alert: ${alerts.length} new competitor alert${alerts.length > 1 ? 's' : ''}. Check your dashboard.`,
+        message: `SoloSuccess Alert: ${alerts.length} new competitor alert${alerts.length > 1 ? 's' : ''}. Check your dashboard.`,
         priority,
       })
       deliveredChannels.push('sms')

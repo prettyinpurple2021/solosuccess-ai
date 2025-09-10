@@ -60,8 +60,8 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // SoloBoss Brand Colors
-        soloboss: {
+        // SoloSuccess Brand Colors
+        SoloSuccess: {
           purple: '#8B5CF6',
           pink: '#EC4899',
           'purple-light': '#A855F7',
@@ -149,9 +149,9 @@ const config: Config = {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        // SoloBoss Gradients
-        'gradient-soloboss': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
-        'gradient-soloboss-light': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
+        // SoloSuccess Gradients
+        'gradient-SoloSuccess': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
+        'gradient-SoloSuccess-light': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
         'gradient-empowerment': 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #F59E0B 100%)',
         'gradient-boss': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
         'gradient-boss-secondary': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',

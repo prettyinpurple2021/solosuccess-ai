@@ -82,7 +82,7 @@ export default function ContactPage() {
             <div className="w-8 h-8 gradient-empowerment rounded-full flex items-center justify-center">
               <Crown className="w-4 h-4 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gradient font-boss">SoloBoss AI</span>
+            <span className="text-2xl font-bold text-gradient font-boss">SoloSuccess AI</span>
           </Link>
           <EmpowermentButton 
             onClick={() => window.location.href = '/signup'}

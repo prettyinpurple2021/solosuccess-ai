@@ -2,7 +2,7 @@
 import { Pool } from 'pg'
 import bcrypt from 'bcryptjs'
 
-const { DATABASE_URL, E2E_EMAIL = 'test@solobossai.fun', E2E_PASSWORD = 'testpassword123' } = process.env
+const { DATABASE_URL, E2E_EMAIL = 'test@SoloSuccessai.fun', E2E_PASSWORD = 'testpassword123' } = process.env
 
 if (!DATABASE_URL) {
   console.error('DATABASE_URL is required')

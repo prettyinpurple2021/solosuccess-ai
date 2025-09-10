@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -65,7 +65,7 @@ export default function PrivacyPolicyPage() {
             <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <Crown className="w-6 h-6 text-purple-600" />
-                SoloBoss AI Privacy Policy
+                SoloSuccess AI Privacy Policy
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
                 {/* Introduction */}
                 <div className="mb-8">
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    This Privacy Policy describes how SoloBoss AI ("we," "us," or "our") collects, uses, and discloses your information when you use our web application (the "Service"). We are committed to protecting your privacy and handling your data in a transparent and secure manner.
+                    This Privacy Policy describes how SoloSuccess AI ("we," "us," or "our") collects, uses, and discloses your information when you use our web application (the "Service"). We are committed to protecting your privacy and handling your data in a transparent and secure manner.
                   </p>
                 </div>
 
@@ -142,7 +142,7 @@ export default function PrivacyPolicyPage() {
                     <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
                       <h3 className="font-semibold text-gray-800 mb-2">User Activity/Burnout Data:</h3>
                       <p className="text-gray-600 text-sm">
-                        SoloBoss AI includes a "Burnout Shield & Focus Mode" feature. To provide personalized suggestions and assess burnout risk, we may collect specific user activity metrics. This data, including activity_data_id, user_id, type_of_activity (e.g., 'slaylist_completion', 'focus_mode_duration'), timestamp, and relevant_metrics (JSONB), may be stored.
+                        SoloSuccess AI includes a "Burnout Shield & Focus Mode" feature. To provide personalized suggestions and assess burnout risk, we may collect specific user activity metrics. This data, including activity_data_id, user_id, type_of_activity (e.g., 'slaylist_completion', 'focus_mode_duration'), timestamp, and relevant_metrics (JSONB), may be stored.
                       </p>
                     </div>
 
@@ -333,7 +333,7 @@ export default function PrivacyPolicyPage() {
                   </h2>
                   
                   <p className="text-gray-600 leading-relaxed mb-6">
-                    SoloBoss AI aims to adhere to relevant privacy regulations like GDPR and CCPA. While a conceptual "Guardian AI" platform is envisioned to help SoloBoss AI's users with their own data privacy compliance (including handling user requests for data access, correction, or deletion for their clients), we also provide mechanisms for our own users to exercise similar rights regarding their data stored within SoloBoss AI.
+                    SoloSuccess AI aims to adhere to relevant privacy regulations like GDPR and CCPA. While a conceptual "Guardian AI" platform is envisioned to help SoloSuccess AI's users with their own data privacy compliance (including handling user requests for data access, correction, or deletion for their clients), we also provide mechanisms for our own users to exercise similar rights regarding their data stored within SoloSuccess AI.
                   </p>
 
                   <p className="text-gray-600 leading-relaxed mb-4">
@@ -393,7 +393,7 @@ export default function PrivacyPolicyPage() {
                     </h2>
                     <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
                       <p className="text-gray-600 text-sm mb-2">
-                        Please note that while our Lumi (Legal & Docs Agent) assists with document generation, its output explicitly includes "appropriate disclaimers." This emphasizes that the AI's output is not a substitute for professional legal advice. SoloBoss AI provides assistance, but users are ultimately responsible for seeking professional advice where necessary.
+                        Please note that while our Lumi (Legal & Docs Agent) assists with document generation, its output explicitly includes "appropriate disclaimers." This emphasizes that the AI's output is not a substitute for professional legal advice. SoloSuccess AI provides assistance, but users are ultimately responsible for seeking professional advice where necessary.
                       </p>
                       <p className="text-gray-600 text-sm">
                         We acknowledge ethical considerations such as algorithmic bias, transparency, explainability, and accountability related to AI systems. We are committed to addressing these considerations as our Service evolves.
@@ -430,7 +430,7 @@ export default function PrivacyPolicyPage() {
                         <div className="bg-white p-4 rounded-lg border border-purple-200">
                           <h4 className="font-semibold text-gray-800 mb-2">Home Office:</h4>
                           <div className="text-gray-600 space-y-1">
-                            <p className="font-semibold">SoloBoss AI</p>
+                            <p className="font-semibold">SoloSuccess AI</p>
                             <p>Virtual</p>
                             <p>Albany, GA</p>
                             <p>United States</p>
@@ -451,7 +451,7 @@ export default function PrivacyPolicyPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Your Privacy, Our Priority</h2>
           <p className="text-xl mb-8 opacity-90">
-            Ready to build your empire with confidence? Your data is safe with us as you scale your business with SoloBoss AI.
+            Ready to build your empire with confidence? Your data is safe with us as you scale your business with SoloSuccess AI.
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Link href="/">

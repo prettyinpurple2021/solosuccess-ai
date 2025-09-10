@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     const agentPersonality = agentPersonalities[agentId as keyof typeof agentPersonalities] || 
-      'You are a helpful AI assistant for SoloBoss AI platform.'
+      'You are a helpful AI assistant for SoloSuccess AI platform.'
     
     // Format competitive intelligence context for the agent
     const competitiveContextString = CompetitiveIntelligenceContextService.formatContextForAgent(
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Stream AI response with competitive intelligence context
-    const systemPrompt = `${agentPersonality} You are helping a SoloBoss AI user. Be helpful, professional, and use frameworks when appropriate.${competitiveContextString}`
+    const systemPrompt = `${agentPersonality} You are helping a SoloSuccess AI user. Be helpful, professional, and use frameworks when appropriate.${competitiveContextString}`
     
     const result = await streamText({
       model: openai('gpt-4o'),

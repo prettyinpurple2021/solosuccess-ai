@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * SoloBoss AI Platform - Analytics Setup Script
+ * SoloSuccess AI Platform - Analytics Setup Script
  * 
  * This script sets up comprehensive analytics tracking for the platform launch.
  */
@@ -351,7 +351,7 @@ export const useAnalytics = () => {
    * Setup all analytics files
    */
   async setupAnalytics() {
-    console.log('🚀 Setting up SoloBoss AI Platform Analytics...\n');
+    console.log('🚀 Setting up SoloSuccess AI Platform Analytics...\n');
 
     try {
       // Create analytics directory
@@ -416,10 +416,10 @@ ERROR_TRACKING_ENABLED=true
    * Generate analytics documentation
    */
   generateDocumentation() {
-    const docs = `# 📊 SoloBoss AI Platform - Analytics Documentation
+    const docs = `# 📊 SoloSuccess AI Platform - Analytics Documentation
 
 ## Overview
-This document describes the analytics setup for the SoloBoss AI Platform launch.
+This document describes the analytics setup for the SoloSuccess AI Platform launch.
 
 ## Tracking Events
 

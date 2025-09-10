@@ -86,7 +86,7 @@ export function InteractiveTutorial({
       {
         id: "welcome",
         title: "Welcome to Your Empire! 👑",
-        description: "Let's take a quick tour of your SoloBoss AI dashboard",
+        description: "Let's take a quick tour of your SoloSuccess AI dashboard",
         target: ".dashboard-header",
         position: "bottom",
         estimatedTime: 30,
@@ -455,7 +455,7 @@ export function InteractiveTutorial({
       {
         id: "completion",
         title: "You're All Set! 🚀",
-        description: "Your SoloBoss AI platform is ready to help you succeed",
+        description: "Your SoloSuccess AI platform is ready to help you succeed",
         target: "body",
         position: "bottom",
         content: (

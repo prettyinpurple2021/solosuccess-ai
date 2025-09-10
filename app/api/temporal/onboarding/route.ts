@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Connection, Client } from '@temporalio/client'
-import { solobossUserOnboardingWorkflow } from '@/src/workflows'
+import { SoloSuccessUserOnboardingWorkflow } from '@/src/workflows'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
     })
 
     // Start the onboarding workflow
-    const handle = await client.workflow.start(solobossUserOnboardingWorkflow, {
+    const handle = await client.workflow.start(SoloSuccessUserOnboardingWorkflow, {
       args: [userId, userData],
-      taskQueue: 'soloboss-tasks',
+      taskQueue: 'SoloSuccess-tasks',
       workflowId: `onboarding-${userId}-${Date.now()}`,
     })
 

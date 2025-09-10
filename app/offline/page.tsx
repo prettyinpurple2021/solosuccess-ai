@@ -21,7 +21,7 @@ export default function OfflinePage() {
             You're Offline! 😱
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Don't worry, boss! We can't connect to the internet right now, but your SoloBoss AI platform is still here for you.
+            Don't worry, boss! We can't connect to the internet right now, but your SoloSuccess AI platform is still here for you.
           </CardDescription>
         </CardHeader>
         

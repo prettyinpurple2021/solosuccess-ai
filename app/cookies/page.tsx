@@ -19,7 +19,7 @@ export default function CookiePolicyPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -65,7 +65,7 @@ export default function CookiePolicyPage() {
             <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <Crown className="w-6 h-6 text-purple-600" />
-                SoloBoss AI Cookie Policy
+                SoloSuccess AI Cookie Policy
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
@@ -234,7 +234,7 @@ export default function CookiePolicyPage() {
                     <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-400">
                       <h3 className="font-semibold text-gray-800 mb-2">⚠️ Important Note</h3>
                       <p className="text-gray-600 text-sm">
-                        Disabling certain cookies may affect the functionality of SoloBoss AI. Essential cookies cannot be disabled as they're required for the service to work properly.
+                        Disabling certain cookies may affect the functionality of SoloSuccess AI. Essential cookies cannot be disabled as they're required for the service to work properly.
                       </p>
                     </div>
                   </div>
@@ -324,7 +324,7 @@ export default function CookiePolicyPage() {
                 <CardContent className="p-6 text-center">
                   <FileText className="w-12 h-12 text-purple-600 mx-auto mb-4" />
                   <h4 className="text-lg font-semibold text-gray-800 mb-2">Terms of Service</h4>
-                  <p className="text-gray-600 text-sm">Read the terms that govern your use of SoloBoss AI</p>
+                  <p className="text-gray-600 text-sm">Read the terms that govern your use of SoloSuccess AI</p>
                 </CardContent>
               </Card>
             </Link>
@@ -337,7 +337,7 @@ export default function CookiePolicyPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Empire?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Now that you understand our cookie usage, start your journey with SoloBoss AI and experience the power of AI-driven productivity.
+            Now that you understand our cookie usage, start your journey with SoloSuccess AI and experience the power of AI-driven productivity.
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Link href="/">

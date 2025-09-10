@@ -27,7 +27,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } fr
 const data = {
   teams: [
     {
-      name: "SoloBoss AI",
+      name: "SoloSuccess AI",
       logo: GalleryVerticalEnd,
       plan: "Empire Builder",
     },
@@ -95,8 +95,8 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Create user data with fallbacks for missing information
   const userData = {
-    name: "SoloBoss User",
-    email: "user@soloboss.ai",
+    name: "SoloSuccess User",
+    email: "user@SoloSuccess.ai",
     avatar: "/default-user.svg",
   }
 

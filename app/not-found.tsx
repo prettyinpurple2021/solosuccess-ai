@@ -9,7 +9,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-pink-50">
       <div className="w-full max-w-md text-center">
-        {/* SoloBoss Crown Logo */}
+        {/* SoloSuccess Crown Logo */}
         <div className="flex justify-center mb-6">
           <div className="p-4 bg-purple-100 rounded-full">
             <Crown className="h-12 w-12 text-purple-600" />

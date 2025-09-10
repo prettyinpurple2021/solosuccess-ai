@@ -2,7 +2,7 @@ import { IntegrationHub } from '@/components/integrations/integration-hub';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Integrations Hub | SoloBoss AI',
+  title: 'Integrations Hub | SoloSuccess AI',
   description: 'Connect your favorite tools and supercharge your empire!',
 };
 

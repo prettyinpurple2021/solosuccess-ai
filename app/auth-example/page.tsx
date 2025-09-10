@@ -27,7 +27,7 @@ export default function AuthExamplePage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="boss-text-gradient text-4xl font-bold mb-4">
-            SoloBoss AI Authentication
+            SoloSuccess AI Authentication
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Experience the new authentication system with our custom design system. 
@@ -97,7 +97,7 @@ export default function AuthExamplePage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Beautiful authentication components that match your SoloBoss 
+                Beautiful authentication components that match your SoloSuccess 
                 brand identity and design system.
               </p>
             </CardContent>
@@ -160,8 +160,8 @@ export default function AuthExamplePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex space-x-2">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-soloboss"></div>
-                  <div className="w-12 h-12 rounded-lg bg-gradient-soloboss-light"></div>
+                  <div className="w-12 h-12 rounded-lg bg-gradient-SoloSuccess"></div>
+                  <div className="w-12 h-12 rounded-lg bg-gradient-SoloSuccess-light"></div>
                   <div className="w-12 h-12 rounded-lg bg-gradient-empowerment"></div>
                 </div>
                 <div className="text-sm text-gray-600">
@@ -190,7 +190,7 @@ export default function AuthExamplePage() {
         {/* Footer */}
         <div className="mt-16 text-center">
           <p className="text-gray-500">
-            Ready to build your empire? Sign up now and start dominating with SoloBoss AI! 🚀
+            Ready to build your empire? Sign up now and start dominating with SoloSuccess AI! 🚀
           </p>
         </div>
       </div>

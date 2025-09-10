@@ -25,4 +25,4 @@ Allow: /features
 Allow: /docs
 
 # If you have a sitemap, uncomment and update the URL below
-# Sitemap: https://solobossai.fun/sitemap.xml
+# Sitemap: https://SoloSuccessai.fun/sitemap.xml

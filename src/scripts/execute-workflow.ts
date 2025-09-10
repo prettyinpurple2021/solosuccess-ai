@@ -1,9 +1,9 @@
 import { Connection, Client } from "@temporalio/client";
 import { userOnboardingWorkflow, subscriptionManagementWorkflow } from "../workflows";
-import { SoloBossCustomer, SubscriptionWorkflowData, TASK_QUEUE_NAME } from "../shared";
+import { SoloSuccessCustomer, SubscriptionWorkflowData, TASK_QUEUE_NAME } from "../shared";
 
-// Sample SoloBoss customers for testing
-const customers: SoloBossCustomer[] = [
+// Sample SoloSuccess customers for testing
+const customers: SoloSuccessCustomer[] = [
   {
     id: "user-1",
     email: "john@example.com",
@@ -52,7 +52,7 @@ async function run() {
     connection,
   });
 
-  console.log("🚀 Starting SoloBoss AI Platform subscription workflows...\n");
+  console.log("🚀 Starting SoloSuccess AI Platform subscription workflows...\n");
 
   // Run onboarding workflows for all customers
   const onboardingResults = await Promise.all(
@@ -125,7 +125,7 @@ async function run() {
     });
   }
 
-  console.log("\n🎉 All SoloBoss AI Platform workflows completed!");
+  console.log("\n🎉 All SoloSuccess AI Platform workflows completed!");
 }
 
 run().catch((err) => {

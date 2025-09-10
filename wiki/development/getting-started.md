@@ -2,7 +2,7 @@
 
 ## 🚀 Quick Start
 
-This guide will help you set up the SoloBoss AI Platform development environment and get you coding in minutes.
+This guide will help you set up the SoloSuccess AI Platform development environment and get you coding in minutes.
 
 ## 📋 Prerequisites
 
@@ -42,10 +42,10 @@ This guide will help you set up the SoloBoss AI Platform development environment
 
 ```bash
 # Clone the repository
-git clone https://github.com/prettyinpurple2021/v0-solo-boss-ai-platform.git
+git clone https://github.com/prettyinpurple2021/v0-solo-success-ai-platform.git
 
 # Navigate to the project directory
-cd v0-solo-boss-ai-platform
+cd v0-solo-success-ai-platform
 ```
 
 ### 2. Install Dependencies
@@ -159,7 +159,7 @@ testAI()
 ### Root Directory
 
 ```
-v0-solo-boss-ai-platform/
+v0-solo-success-ai-platform/
 ├── app/                    # Next.js App Router
 ├── components/             # React components
 ├── lib/                    # Utilities and configurations
@@ -416,4 +416,4 @@ If you run into issues:
 
 ---
 
-Happy coding! 🎉 Welcome to the SoloBoss AI Platform development team!
+Happy coding! 🎉 Welcome to the SoloSuccess AI Platform development team!

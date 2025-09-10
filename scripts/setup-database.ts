@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 /**
- * SoloBoss AI Database Setup Script
+ * SoloSuccess AI Database Setup Script
  * 
  * This script initializes the database with:
  * - AI Agents with their personalities
@@ -32,7 +32,7 @@ const pool = new Pool({
 })
 
 async function setupDatabase() {
-  console.log('🚀 Setting up SoloBoss AI database...\n')
+  console.log('🚀 Setting up SoloSuccess AI database...\n')
 
   try {
     // 1. Check if AI agents already exist

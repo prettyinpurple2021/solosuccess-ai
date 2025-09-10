@@ -1,4 +1,4 @@
--- Complete SoloBoss AI Database Schema
+-- Complete SoloSuccess AI Database Schema
 -- This file creates all necessary tables for the platform
 
 -- =============================================

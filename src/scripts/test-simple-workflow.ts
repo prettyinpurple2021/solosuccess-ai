@@ -23,7 +23,7 @@ async function run() {
 
     // Start a simple workflow
     const execution = await client.workflow.start(simpleTestWorkflow, {
-      args: ["SoloBoss AI"],
+      args: ["SoloSuccess AI"],
       taskQueue: TASK_QUEUE_NAME,
       workflowId: `simple-test-${Date.now()}`,
       workflowRunTimeout: "30s",

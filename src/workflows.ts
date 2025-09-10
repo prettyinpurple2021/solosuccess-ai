@@ -10,13 +10,13 @@ import {
 } from '@temporalio/workflow';
 // Only import the activity types
 import type * as activities from './activities';
-import { SoloBossCustomer, SubscriptionTier, SubscriptionWorkflowData } from './shared';
+import { SoloSuccessCustomer, SubscriptionTier, SubscriptionWorkflowData } from './shared';
 
 const { greet, processUserData, sendNotification, updateUserProfile } = proxyActivities<typeof activities>({
   startToCloseTimeout: '1 minute',
 });
 
-// SoloBoss subscription workflow activities
+// SoloSuccess subscription workflow activities
 const {
   sendWelcomeEmail,
   setupFreeTierAccess,
@@ -61,7 +61,7 @@ export async function legacyUserOnboardingWorkflow(userId: string, userData: any
     }
     
     // Step 3: Send welcome notification
-    const notificationResult = await sendNotification(userId, 'Welcome to SoloBoss AI Platform!');
+    const notificationResult = await sendNotification(userId, 'Welcome to SoloSuccess AI Platform!');
     if (notificationResult.sent) {
       steps.push('Welcome notification sent');
     }
@@ -103,7 +103,7 @@ export async function scheduledDataProcessingWorkflow(): Promise<{ processed: nu
   return { processed, errors };
 }
 
-// SoloBoss AI Platform specific workflows (legacy)
+// SoloSuccess AI Platform specific workflows (legacy)
 const { 
   createInitialGoals, 
   setupCompetitiveIntelligence, 
@@ -114,8 +114,8 @@ const {
   startToCloseTimeout: '2 minutes',
 });
 
-/** Complete SoloBoss AI Platform user onboarding workflow (legacy) */
-export async function solobossUserOnboardingWorkflow(
+/** Complete SoloSuccess AI Platform user onboarding workflow (legacy) */
+export async function SoloSuccessUserOnboardingWorkflow(
   userId: string, 
   userData: { email: string; fullName: string; username?: string }
 ): Promise<{ 
@@ -183,7 +183,7 @@ export async function solobossUserOnboardingWorkflow(
     };
     
   } catch (error) {
-    console.error('SoloBoss onboarding failed:', error);
+    console.error('SoloSuccess onboarding failed:', error);
     return {
       success: false,
       steps: [...steps, 'Onboarding failed'],
@@ -348,7 +348,7 @@ export async function goalAchievementTrackingWorkflow(
   }
 }
 
-// SoloBoss AI Platform subscription workflow definitions
+// SoloSuccess AI Platform subscription workflow definitions
 export const customerTierQuery = defineQuery<SubscriptionTier>("customerTier");
 export const customerStatusQuery = defineQuery<string>("customerStatus");
 export const subscriptionAmountQuery = defineQuery<number>("subscriptionAmount");
@@ -358,11 +358,11 @@ export const upgradeSubscription = defineSignal<[SubscriptionTier, string]>("upg
 export const downgradeSubscription = defineSignal<[SubscriptionTier]>("downgradeSubscription");
 
 /**
- * SoloBoss AI Platform User Onboarding Workflow
+ * SoloSuccess AI Platform User Onboarding Workflow
  * Handles new user signup and initial subscription setup
  */
 export async function userOnboardingWorkflow(
-  customer: SoloBossCustomer
+  customer: SoloSuccessCustomer
 ): Promise<{ success: boolean; message: string; tier: SubscriptionTier }> {
   try {
     log.info(`Starting onboarding workflow for ${customer.email}`);
@@ -384,7 +384,7 @@ export async function userOnboardingWorkflow(
     
     return {
       success: true,
-      message: `Welcome to SoloBoss AI Platform! You're now on the ${customer.subscriptionTier} tier.`,
+      message: `Welcome to SoloSuccess AI Platform! You're now on the ${customer.subscriptionTier} tier.`,
       tier: customer.subscriptionTier
     };
 
@@ -399,7 +399,7 @@ export async function userOnboardingWorkflow(
 }
 
 /**
- * SoloBoss AI Platform Subscription Management Workflow
+ * SoloSuccess AI Platform Subscription Management Workflow
  * Handles ongoing subscription management, upgrades, downgrades, and cancellations
  */
 export async function subscriptionManagementWorkflow(
@@ -571,11 +571,11 @@ export async function subscriptionManagementWorkflow(
 }
 
 /**
- * SoloBoss AI Platform Payment Processing Workflow
+ * SoloSuccess AI Platform Payment Processing Workflow
  * Handles payment success/failure scenarios
  */
 export async function paymentProcessingWorkflow(
-  customer: SoloBossCustomer,
+  customer: SoloSuccessCustomer,
   paymentEvent: 'succeeded' | 'failed',
   amount?: number,
   retryCount?: number

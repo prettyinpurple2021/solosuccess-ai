@@ -124,7 +124,7 @@ export function BossCommunity() {
         verified: true,
       },
       content:
-        "Built my first AI agent today using SoloBoss! 🤖 It's handling customer support while I focus on product development. The future is here and it's FEMALE! Who's ready to scale with AI?",
+        "Built my first AI agent today using SoloSuccess! 🤖 It's handling customer support while I focus on product development. The future is here and it's FEMALE! Who's ready to scale with AI?",
       image: "/default-post.svg",
       timestamp: "6 hours ago",
       likes: 156,
@@ -266,7 +266,7 @@ export function BossCommunity() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="boss-card soloboss-gradient text-white">
+      <Card className="boss-card SoloSuccess-gradient text-white">
         <CardContent className="p-6">
           <div className="text-center space-y-3">
             <h1 className="text-3xl font-bold flex items-center justify-center gap-3">

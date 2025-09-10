@@ -1,10 +1,10 @@
-# SoloBoss AI Design System & Theme Guide
+# SoloSuccess AI Design System & Theme Guide
 
 ## Punk Rock Meets Professional Aesthetic 💜✨
 
 ## 📋 Overview
 
-This document defines the complete design system for SoloBoss AI - a visual identity that screams "I'm a boss" while whispering "I'm approachable." Based on our custom theme created on [tweakcn.com](https://tweakcn.com/themes/cmdp1bpnl000204jt0acm4hc8), this system embodies our core values: ambition with authenticity, creativity with strategy, empowerment with edge.
+This document defines the complete design system for SoloSuccess AI - a visual identity that screams "I'm a boss" while whispering "I'm approachable." Based on our custom theme created on [tweakcn.com](https://tweakcn.com/themes/cmdp1bpnl000204jt0acm4hc8), this system embodies our core values: ambition with authenticity, creativity with strategy, empowerment with edge.
 
 *Because every punk rock girlboss deserves a brand that matches her energy.* 🔥
 
@@ -426,7 +426,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        soloboss: {
+        SoloSuccess: {
           purple: '#8B5CF6',
           pink: '#EC4899',
           'purple-light': '#A855F7',
@@ -439,7 +439,7 @@ module.exports = {
         foreground: "hsl(var(--foreground))",
       },
       backgroundImage: {
-        'gradient-soloboss': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
+        'gradient-SoloSuccess': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
         'gradient-boss-secondary': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
         'gradient-empowerment': 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #F59E0B 100%)',
       },
@@ -484,8 +484,8 @@ module.exports = {
         foreground: "hsl(var(--foreground))",
       },
       backgroundImage: {
-        'gradient-soloboss': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
-        'gradient-soloboss-light': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
+        'gradient-SoloSuccess': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
+        'gradient-SoloSuccess-light': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -551,10 +551,10 @@ function DashboardExample() {
   return (
     <Card className="card-dashboard">
       <CardHeader>
-        <CardTitle className="text-soloboss-purple">SoloBoss AI</CardTitle>
+        <CardTitle className="text-SoloSuccess-purple">SoloSuccess AI</CardTitle>
       </CardHeader>
       <CardContent>
-        <Button className="bg-gradient-soloboss text-white">
+        <Button className="bg-gradient-SoloSuccess text-white">
           Get Started
         </Button>
       </CardContent>
@@ -565,7 +565,7 @@ function DashboardExample() {
 
 ---
 
-**This design system provides a complete foundation for building SoloBoss AI with consistent, beautiful, and user-friendly interfaces that match your brand identity.**
+**This design system provides a complete foundation for building SoloSuccess AI with consistent, beautiful, and user-friendly interfaces that match your brand identity.**
 
 *Theme documentation based on: <https://tweakcn.com/themes/cmdp1bpnl000204jt0acm4hc8>*  
 *Last updated: January 2025*

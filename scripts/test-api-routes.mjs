@@ -25,11 +25,11 @@ async function testAPIRoutes() {
   const client = await pool.connect()
   
   try {
-    console.log('🧪 Testing SoloBoss AI API Routes...\n')
+    console.log('🧪 Testing SoloSuccess AI API Routes...\n')
     
     // Create a test user
     console.log('👤 Creating test user...')
-    const testEmail = 'test@solobossai.fun'
+    const testEmail = 'test@SoloSuccessai.fun'
     const testPassword = 'testpassword123'
     const hashedPassword = await bcrypt.hash(testPassword, 10)
     
@@ -199,7 +199,7 @@ async function testAPIRoutes() {
     console.log('✅ All API routes are working correctly')
     console.log('✅ Database operations are successful')
     console.log('✅ Authentication system is functional')
-    console.log('\n🚀 Your SoloBoss AI platform is ready for production!')
+    console.log('\n🚀 Your SoloSuccess AI platform is ready for production!')
     
   } catch (error) {
     console.error('❌ API testing failed:', error.message)

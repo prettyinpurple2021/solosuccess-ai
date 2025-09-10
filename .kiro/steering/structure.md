@@ -2,7 +2,7 @@
 
 ## Root Directory Structure
 
-soloboss-ai-platform/
+SoloSuccess-ai-platform/
 ├── app/                    # Next.js App Router pages and layouts
 ├── components/             # Reusable React components
 ├── lib/                    # Utility functions and configurations

@@ -2,7 +2,7 @@
 
 ## 🏗️ System Architecture
 
-SoloBoss AI Platform is built as a modern, scalable web application using a sophisticated architecture designed for performance, maintainability, and extensibility.
+SoloSuccess AI Platform is built as a modern, scalable web application using a sophisticated architecture designed for performance, maintainability, and extensibility.
 
 ## 📊 High-Level Architecture
 

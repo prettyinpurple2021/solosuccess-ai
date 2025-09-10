@@ -29,7 +29,7 @@ interface Incident {
 export default function StatusPage() {
   const [services, setServices] = useState<ServiceStatus[]>([
     {
-      name: "SoloBoss AI Platform",
+      name: "SoloSuccess AI Platform",
       status: "operational",
       lastCheck: new Date().toLocaleTimeString(),
       uptime: "99.98%",
@@ -160,7 +160,7 @@ export default function StatusPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
                 <div className="text-2xl">👑</div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloBoss AI
+                  SoloSuccess AI
                 </span>
               </Link>
             </div>
@@ -186,11 +186,11 @@ export default function StatusPage() {
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              SoloBoss Status
+              SoloSuccess Status
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Real-time status and uptime monitoring for all SoloBoss AI services. 
+            Real-time status and uptime monitoring for all SoloSuccess AI services. 
             Stay informed about any service disruptions or maintenance windows.
           </p>
           
@@ -214,7 +214,7 @@ export default function StatusPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Service Status</h2>
-            <p className="text-xl text-gray-600">Current status of all SoloBoss AI services</p>
+            <p className="text-xl text-gray-600">Current status of all SoloSuccess AI services</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
