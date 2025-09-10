@@ -1,0 +1,110 @@
+/* Brand Demo Component Styles */
+
+.color-circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.color-preview {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.brand-preview-bg {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.logo-placeholder {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  margin: 0 auto 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.generated-logo {
+  width: 100%;
+  height: 5rem;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.selected-logo {
+  width: 5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.font-preview {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+}
+
+.font-preview-heading {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.font-preview-body {
+  font-size: 0.875rem;
+}
+
+.color-picker-input {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+}
+
+/* Dynamic styles for color circles */
+.color-circle[data-color] {
+  background-color: var(--color-value);
+}
+
+/* Dynamic styles for color previews */
+.color-preview[data-color] {
+  background-color: var(--color-value);
+}
+
+/* Dynamic styles for brand preview background */
+.brand-preview-bg[data-bg-color] {
+  background-color: var(--bg-color);
+}
+
+/* Dynamic styles for logo placeholder */
+.logo-placeholder[data-bg-color] {
+  background-color: var(--bg-color);
+}
+
+/* Dynamic styles for brand name color */
+.brand-name[data-color] {
+  color: var(--color-value);
+}
+
+/* Dynamic styles for brand tagline font */
+.brand-tagline[data-font] {
+  font-family: var(--font-family);
+}
+
+/* Dynamic styles for font previews */
+.font-preview-heading[data-font] {
+  font-family: var(--font-family);
+}
+
+.font-preview-body[data-font] {
+  font-family: var(--font-family);
+}

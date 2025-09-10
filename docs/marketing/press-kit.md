@@ -2,7 +2,7 @@
 
 **For Immediate Release**  
 **Contact:** [Your Contact Information]  
-**Website:** https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+**Website:** https://solobossai.fun
 
 ---
 
@@ -115,7 +115,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 - Mobile app functionality
 
 ### **Live Demo:**
-- Available at: https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+- Available at: https://solobossai.fun
 - Free trial with no credit card required
 - Full access to Launch plan features
 
@@ -190,7 +190,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 - **Title:** Founder & CEO, SoloBoss AI Platform
 - **Email:** [Your Email]
 - **Phone:** [Your Phone]
-- **Website:** https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+- **Website:** https://solobossai.fun
 
 ### **Social Media:**
 - **LinkedIn:** [Your LinkedIn]
@@ -226,7 +226,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 
 **Ready to revolutionize how solo founders build and scale their businesses!** 🚀💜
 
-*For more information, visit https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app*
+*For more information, visit https://solobossai.fun*
 
 ---
 

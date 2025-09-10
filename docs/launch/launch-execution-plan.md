@@ -2,7 +2,7 @@
 
 **Launch Date:** January 2025  
 **Status:** Ready for Launch  
-**Platform:** https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+**Platform:** https://solobossai.fun
 
 ---
 
@@ -232,7 +232,7 @@ Key features:
 
 Built for ambitious entrepreneurs who refuse to settle for mediocre tools. Your AI team is ready to help you dominate your industry! 💜
 
-Try it free: https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+Try it free: https://solobossai.fun
 
 #AI #Entrepreneurship #Productivity #Business #Innovation
 ```
@@ -245,7 +245,7 @@ SoloBoss AI Platform is live! 8 AI agents working 24/7 to help you dominate your
 
 Built by a girlboss, for girlbosses 💜
 
-Try it free: https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+Try it free: https://solobossai.fun
 
 #AI #Entrepreneurship #Productivity #Launch
 ```
@@ -280,7 +280,7 @@ Key features:
 
 I'd love your support on launch day! Here's how you can help:
 
-1. Try the platform: https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+1. Try the platform: https://solobossai.fun
 2. Share on social media if you love it
 3. Leave a review or testimonial
 4. Refer other entrepreneurs who might benefit

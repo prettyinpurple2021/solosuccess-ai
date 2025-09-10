@@ -2,7 +2,7 @@
 
 **Launch Date:** January 2025  
 **Status:** Ready for Launch  
-**Platform:** https://soloboss-ai-platform-pjdya2xlfq-uc.a.run.app
+**Platform:** https://solobossai.fun
 
 ---
 

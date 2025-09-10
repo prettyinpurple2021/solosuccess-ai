@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
+import "./brand-demo.css"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,7 +24,7 @@ const ColorPicker = ({ label, value, onChange }: { label: string; value: string;
         type="color"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-10 h-10 rounded border border-gray-300 cursor-pointer"
+        className="color-picker-input"
         aria-label={`Color picker for ${label}`}
         title={`Select ${label.toLowerCase()}`}
       />
@@ -143,6 +145,16 @@ export default function BrandStylerStudioDemo() {
   const [brandTagline, setBrandTagline] = useState("")
   const [brandDescription, setBrandDescription] = useState("")
   const [industry, setIndustry] = useState("")
+
+  // Helper function to set CSS custom properties
+  const setCSSProperty = (element: HTMLElement, property: string, value: string) => {
+    element.style.setProperty(property, value)
+  }
+
+  // Helper function for ref callbacks
+  const setRefCSSProperty = (property: string, value: string) => (el: HTMLElement | null): void => {
+    if (el) setCSSProperty(el, property, value)
+  }
   
   // Custom font selection states
   const [customHeadingFont, setCustomHeadingFont] = useState("Inter")
@@ -572,8 +584,9 @@ export default function BrandStylerStudioDemo() {
                                   {palette.colors.map((color, colorIndex) => (
                                     <div
                                       key={colorIndex}
-                                      className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
-                                      style={{ backgroundColor: color }}
+                                      className="color-circle"
+                                      data-color={color}
+                                      ref={setRefCSSProperty('--color-value', color)}
                                     />
                                   ))}
                                 </div>
@@ -594,7 +607,7 @@ export default function BrandStylerStudioDemo() {
                         <Type className="w-5 h-5 text-purple-600" />
                         <span>Typography That Commands</span>
                       </CardTitle>
-                      <CardDescription>Choose fonts that convey your brand's personality and authority</CardDescription>
+                      <CardDescription>Choose fonts that convey your brand&apos;s personality and authority</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Toggle for custom fonts */}
@@ -625,10 +638,11 @@ export default function BrandStylerStudioDemo() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <div className="p-3 border rounded-lg">
+                              <div className="font-preview">
                                 <div 
-                                  className="text-2xl font-bold"
-                                  style={{ fontFamily: customHeadingFont }}
+                                  className="font-preview-heading"
+                                  data-font={customHeadingFont}
+                                  ref={setRefCSSProperty('--font-family', customHeadingFont)}
                                 >
                                   Sample Heading
                                 </div>
@@ -648,10 +662,11 @@ export default function BrandStylerStudioDemo() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <div className="p-3 border rounded-lg">
+                              <div className="font-preview">
                                 <div 
-                                  className="text-sm"
-                                  style={{ fontFamily: customBodyFont }}
+                                  className="font-preview-body"
+                                  data-font={customBodyFont}
+                                  ref={setRefCSSProperty('--font-family', customBodyFont)}
                                 >
                                   This is sample body text to preview how your content will look with the selected font.
                                 </div>
@@ -682,10 +697,18 @@ export default function BrandStylerStudioDemo() {
                                   )}
                                 </div>
                                 <div className="space-y-2">
-                                  <div className="text-xl font-bold" style={{ fontFamily: typography.heading }}>
+                                  <div 
+                                    className="text-xl font-bold" 
+                                    data-font={typography.heading}
+                                    ref={setRefCSSProperty('--font-family', typography.heading)}
+                                  >
                                     Heading Font
                                   </div>
-                                  <div className="text-sm" style={{ fontFamily: typography.body }}>
+                                  <div 
+                                    className="text-sm" 
+                                    data-font={typography.body}
+                                    ref={setRefCSSProperty('--font-family', typography.body)}
+                                  >
                                     Body text font for readability
                                   </div>
                                   <p className="text-xs text-gray-500">{typography.style}</p>
@@ -751,10 +774,12 @@ export default function BrandStylerStudioDemo() {
                                 onClick={() => setSelectedGeneratedLogo(logo)}
                               >
                                 <CardContent className="p-4 text-center">
-                                  <img 
+                                  <Image 
                                     src={logo} 
                                     alt={`Generated logo ${index + 1}`}
-                                    className="w-full h-20 object-contain mb-2"
+                                    className="generated-logo"
+                                    width={200}
+                                    height={80}
                                   />
                                   {selectedGeneratedLogo === logo && (
                                     <Badge className="bg-purple-100 text-purple-700 border-purple-200 text-xs">
@@ -811,30 +836,42 @@ export default function BrandStylerStudioDemo() {
                   <CardTitle className="text-lg">Brand Preview</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="text-center p-6 rounded-lg" style={{ backgroundColor: getActiveColors().secondary }}>
+                  <div 
+                    className="brand-preview-bg" 
+                    data-bg-color={getActiveColors().secondary}
+                    ref={setRefCSSProperty('--bg-color', getActiveColors().secondary)}
+                  >
                     {selectedGeneratedLogo ? (
                       <div className="mb-3">
-                        <img 
+                        <Image 
                           src={selectedGeneratedLogo} 
                           alt="Generated logo"
-                          className="w-20 h-10 object-contain mx-auto"
+                          className="selected-logo"
+                          width={80}
+                          height={40}
                         />
                       </div>
                     ) : (
                       <div
-                        className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"
-                        style={{ backgroundColor: getActiveColors().primary }}
+                        className="logo-placeholder"
+                        data-bg-color={getActiveColors().primary}
+                        ref={setRefCSSProperty('--bg-color', getActiveColors().primary)}
                       >
                         👑
                       </div>
                     )}
                     <h3
-                      className="font-bold text-lg"
-                      style={{ color: getActiveColors().primary, fontFamily: getActiveTypography().heading }}
+                      className="brand-name font-bold text-lg"
+                      data-color={getActiveColors().primary}
+                      ref={setRefCSSProperty('--color-value', getActiveColors().primary)}
                     >
                       {brandName || "Your Brand"}
                     </h3>
-                    <p className="text-sm mt-1" style={{ fontFamily: getActiveTypography().body }}>
+                    <p 
+                      className="brand-tagline text-sm mt-1" 
+                      data-font={getActiveTypography().body}
+                      ref={setRefCSSProperty('--font-family', getActiveTypography().body)}
+                    >
                       {brandTagline || "Your powerful tagline"}
                     </p>
                   </div>
@@ -843,18 +880,21 @@ export default function BrandStylerStudioDemo() {
                     <h4 className="font-semibold text-sm text-gray-700">Color Palette</h4>
                     <div className="flex space-x-2">
                       <div
-                        className="w-6 h-6 rounded border shadow-sm"
-                        style={{ backgroundColor: getActiveColors().primary }}
+                        className="color-preview"
+                        data-color={getActiveColors().primary}
+                        ref={setRefCSSProperty('--color-value', getActiveColors().primary)}
                         title={getActiveColors().primary}
                       />
                       <div
-                        className="w-6 h-6 rounded border shadow-sm"
-                        style={{ backgroundColor: getActiveColors().secondary }}
+                        className="color-preview"
+                        data-color={getActiveColors().secondary}
+                        ref={setRefCSSProperty('--color-value', getActiveColors().secondary)}
                         title={getActiveColors().secondary}
                       />
                       <div
-                        className="w-6 h-6 rounded border shadow-sm"
-                        style={{ backgroundColor: getActiveColors().accent }}
+                        className="color-preview"
+                        data-color={getActiveColors().accent}
+                        ref={setRefCSSProperty('--color-value', getActiveColors().accent)}
                         title={getActiveColors().accent}
                       />
                     </div>
