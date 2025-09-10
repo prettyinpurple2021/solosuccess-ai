@@ -16,10 +16,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: z.string().min(1, "Stack Auth publishable key is required").optional(),
   STACK_SECRET_SERVER_KEY: z.string().min(1, "Stack Auth secret key is required").optional(),
 
-  // Chargebee - Optional for billing
-  CHARGEBEE_API_KEY: z.string().min(1, "Chargebee API key is required").optional(),
-  CHARGEBEE_SITE: z.string().min(1, "Chargebee site subdomain is required").optional(),
-  CHARGEBEE_WEBHOOK_SIGNING_KEY: z.string().optional(),
+
 
   // AI Services - Optional for AI functionality
   OPENAI_API_KEY: z.string().min(1, "OpenAI API key is required").optional(),
@@ -89,7 +86,7 @@ export function getFeatureFlags() {
   return {
     hasDatabase: !!process.env.DATABASE_URL,
     hasAuth: !!(process.env.JWT_SECRET || (process.env.NEXT_PUBLIC_STACK_PROJECT_ID && process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY)),
-    hasBilling: !!(process.env.CHARGEBEE_API_KEY && process.env.CHARGEBEE_SITE),
+    hasBilling: false, // Chargebee removed
     hasAI: !!(process.env.OPENAI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY),
     hasEmail: !!process.env.RESEND_API_KEY,
   }
