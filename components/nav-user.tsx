@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useUser } from "@/lib/auth-client"
+import { useStackApp } from "@stackframe/stack"
 
 export function NavUser({
   user: userProp,
@@ -26,7 +27,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const user = useUser()
-  const _stackApp = useStackApp()
+  const stackApp = useStackApp()
   
   const signOut = async () => {
     if (user) {
@@ -93,17 +94,23 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem asChild>
+                <a href="/dashboard/settings">
+                  <BadgeCheck />
+                  Account Settings
+                </a>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
+              <DropdownMenuItem asChild>
+                <a href="/dashboard/billing">
+                  <CreditCard />
+                  Billing
+                </a>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+              <DropdownMenuItem asChild>
+                <a href="/dashboard/notifications">
+                  <Bell />
+                  Notifications
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
