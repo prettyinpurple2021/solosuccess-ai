@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
-import { analytics, AnalyticsEvent } from '@/lib/analytics'
+import { analytics } from '@/lib/analytics'
 import { z } from 'zod'
 
 // Force dynamic rendering

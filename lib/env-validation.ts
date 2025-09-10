@@ -33,13 +33,6 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url("Invalid app URL"),
   NEXTAUTH_URL: z.string().url("Invalid NextAuth URL").optional(),
   
-  // Analytics - Optional (PostHog)
-  NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1).optional(),
-  NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
-  POSTHOG_SERVER_KEY: z.string().min(1).optional(),
-  POSTHOG_API_KEY: z.string().min(1).optional(),
-  POSTHOG_HOST: z.string().url().optional(),
-  
   // Environment
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 })
