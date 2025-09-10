@@ -29,7 +29,6 @@
 
 - **Stack Auth** - Authentication provider
 - **Resend** - Transactional email delivery
-- **Chargebee** - Subscription management (optional)
 
 ### Development Tools
 
@@ -118,7 +117,6 @@ npm run test:ux      # UX testing
 
 - `OPENAI_API_KEY` - For AI functionality
 - `RESEND_API_KEY` - For email notifications
-- `CHARGEBEE_API_KEY` - For billing
 
 ## Build Configuration
 
