@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { getPostHogServer } from './posthog-server'
 
 // Analytics event types
 export type AnalyticsEvent = 
@@ -112,8 +113,33 @@ class AnalyticsService {
       console.log('📊 Analytics Event:', event, properties)
     }
 
-    // In production, you would send this to your analytics service
-    // await this.sendToAnalyticsService(eventData)
+    // Forward to PostHog (server-side) when available
+    const ph = getPostHogServer()
+    if (ph) {
+      const distinctId = properties.userId || properties.sessionId || 'anonymous'
+      try {
+        ph.capture({
+          distinctId,
+          event,
+          properties: {
+            ...properties,
+            $ip: eventData.metadata?.ip,
+            $current_url: eventData.metadata?.url,
+            $referrer: eventData.metadata?.referrer,
+            userAgent: eventData.metadata?.userAgent,
+          },
+        })
+        if (properties.userId) {
+          ph.identify({
+            distinctId: properties.userId,
+          })
+        }
+      } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('PostHog capture failed:', err)
+        }
+      }
+    }
   }
 
   /**
