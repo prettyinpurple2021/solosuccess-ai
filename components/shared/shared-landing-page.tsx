@@ -335,7 +335,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               <Badge className="mb-6 bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 text-white">
                 ✨ AI-Powered Productivity Revolution
               </Badge>
-              <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
+              <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
                 Become the Ultimate
                 <br />
                 <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-pink-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">SoloSuccess</span>
