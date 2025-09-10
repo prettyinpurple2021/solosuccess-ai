@@ -102,36 +102,36 @@ export default function HelpPage() {
 
   const guides: GuideItem[] = [
     {
-      id: "setup-guide",
-      title: "Complete Setup Guide",
-      description: "Get your SoloSuccess AI account set up perfectly in 15 minutes",
+      id: "getting-started-guide",
+      title: "Getting Started Guide",
+      description: "Your complete guide to dominating your industry with SoloSuccess AI",
       icon: Settings,
-      href: "#setup",
+      href: "/docs/user-guides/GETTING-STARTED.md",
       difficulty: "beginner"
+    },
+    {
+      id: "advanced-features-guide",
+      title: "Advanced Features Guide",
+      description: "Master the powerful features that will help you dominate your industry",
+      icon: Users,
+      href: "/docs/user-guides/ADVANCED-FEATURES.md",
+      difficulty: "advanced"
     },
     {
       id: "ai-agents-guide",
-      title: "Working with AI Agents",
-      description: "Learn how to get the most out of your AI squad",
-      icon: Users,
-      href: "#ai-agents",
+      title: "AI Agents Overview",
+      description: "Meet your 8 specialized AI team members and learn how to work with them",
+      icon: Zap,
+      href: "/docs/user-research/user-personas.md",
       difficulty: "beginner"
     },
     {
-      id: "productivity-guide",
-      title: "Productivity Mastery",
-      description: "Advanced strategies for solo entrepreneur productivity",
-      icon: Zap,
-      href: "#productivity",
-      difficulty: "intermediate"
-    },
-    {
-      id: "automation-guide",
-      title: "Automation Workflows",
-      description: "Automate your business processes like a boss",
+      id: "features-roadmap",
+      title: "Features Roadmap",
+      description: "See all current and planned features for SoloSuccess AI",
       icon: Lightbulb,
-      href: "#automation",
-      difficulty: "advanced"
+      href: "/docs/features/MASTER-FEATURES-ROADMAP.md",
+      difficulty: "intermediate"
     }
   ]
 
@@ -266,28 +266,30 @@ export default function HelpPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {guides.map((guide) => (
-              <Card key={guide.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
-                <CardContent className="p-8">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                      <guide.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-xl font-bold text-gray-800">{guide.title}</h3>
-                        <Badge className={`text-xs ${getDifficultyColor(guide.difficulty)}`}>
-                          {guide.difficulty}
-                        </Badge>
+              <Link key={guide.id} href={guide.href} target="_blank" rel="noopener noreferrer">
+                <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+                  <CardContent className="p-8">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                        <guide.icon className="w-6 h-6 text-white" />
                       </div>
-                      <p className="text-gray-600 mb-4">{guide.description}</p>
-                      <div className="flex items-center gap-2 text-purple-600 font-medium">
-                        <span>Read Guide</span>
-                        <ExternalLink className="w-4 h-4" />
+                      <div className="flex-grow">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-xl font-bold text-gray-800">{guide.title}</h3>
+                          <Badge className={`text-xs ${getDifficultyColor(guide.difficulty)}`}>
+                            {guide.difficulty}
+                          </Badge>
+                        </div>
+                        <p className="text-gray-600 mb-4">{guide.description}</p>
+                        <div className="flex items-center gap-2 text-purple-600 font-medium">
+                          <span>Read Guide</span>
+                          <ExternalLink className="w-4 h-4" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
