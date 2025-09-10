@@ -444,9 +444,7 @@
 - [x] Unit tests for Zod schemas and API handler happy/edge paths
 - [x] Playwright E2E covering auth → templates → profile
 
-14 Webhook glow-up — Chargebee, but make it safe
-
-- [x] Verify Chargebee webhook signatures using signing secret
+- [x] Removed Chargebee webhook implementation (no longer needed)
 - [x] Store and enforce idempotency for events
 - [ ] Reconcile subscription states with feature gates used in UI
 
