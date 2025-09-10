@@ -148,8 +148,8 @@
     scroll-behavior: smooth;
     @apply bg-background text-foreground;
     background: linear-gradient(135deg, #fdf2f8 0%, #e0f2fe 25%, #f3e8ff 50%, #e0e7ff 75%, #fef3c7 100%);
-    background-size: 400% 400%;
-    animation: gradient-shift 15s ease infinite;
+    background-size: 200% 200%;
+    animation: gradient-shift 30s ease infinite;
     font-family: 'Inter', system-ui, sans-serif;
   }
   
@@ -177,32 +177,32 @@
 @layer utilities {
   .gradient-primary {
     background: var(--gradient-primary);
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
+    background-size: 150% 150%;
+    animation: gradient-shift 6s ease infinite;
   }
 
   .gradient-secondary {
     background: var(--gradient-secondary);
-    background-size: 200% 200%;
-    animation: gradient-shift 4s ease infinite;
+    background-size: 150% 150%;
+    animation: gradient-shift 8s ease infinite;
   }
 
   .gradient-accent {
     background: var(--gradient-accent);
-    background-size: 200% 200%;
-    animation: gradient-shift 5s ease infinite;
+    background-size: 150% 150%;
+    animation: gradient-shift 10s ease infinite;
   }
 
   .gradient-empowerment {
     background: var(--gradient-empowerment);
-    background-size: 300% 300%;
-    animation: gradient-shift 8s ease infinite;
+    background-size: 200% 200%;
+    animation: gradient-shift 12s ease infinite;
   }
 
   .gradient-boss {
     background: var(--gradient-boss);
-    background-size: 400% 400%;
-    animation: gradient-shift 10s ease infinite;
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
   }
 
   .gradient-skull {
@@ -259,11 +259,11 @@
 
   .text-gradient {
     background: var(--gradient-empowerment);
-    background-size: 200% 200%;
+    background-size: 150% 150%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradient-shift 4s ease infinite;
+    animation: gradient-shift 8s ease infinite;
   }
 
   /* Hover Effects */
@@ -322,7 +322,7 @@
   /* Boss Button Styles */
   .btn-boss {
     background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 25%, #06B6D4 50%, #F59E0B 75%, #10B981 100%);
-    background-size: 200% 200%;
+    background-size: 150% 150%;
     color: white;
     font-weight: 700;
     padding: 12px 24px;
@@ -332,7 +332,7 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    animation: gradient-shift 4s ease infinite;
+    animation: gradient-shift 8s ease infinite;
   }
 
   .btn-boss:hover {
