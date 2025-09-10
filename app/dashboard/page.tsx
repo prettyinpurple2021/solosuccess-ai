@@ -22,7 +22,8 @@ import {
   Flame,
   ArrowRight,
   BarChart3,
-  Plus
+  Plus,
+  Briefcase
 } from "lucide-react"
 import Link from "next/link"
 
@@ -39,19 +40,19 @@ export default function DashboardPage() {
 
   // Check if onboarding should be shown
   useEffect(() => {
-    if (data && !dashboardUser.onboarding_completed) {
+    if (data && !data.user.onboarding_completed) {
       // Show welcome dashboard first, then onboarding
       setShowWelcomeDashboard(true)
     }
-  }, [data, dashboardUser])
+  }, [data])
 
   // Track dashboard view
   useEffect(() => {
     if (data) {
       track('dashboard_viewed', {
-        userLevel: dashboardUser.level,
-        totalPoints: dashboardUser.total_points,
-        streak: dashboardUser.current_streak
+        userLevel: data.user.level,
+        totalPoints: data.user.total_points,
+        streak: data.user.current_streak
       })
     }
   }, [data, track])
@@ -286,7 +287,7 @@ export default function DashboardPage() {
               </motion.div>
               <div>
                 <h1 className="text-4xl font-bold text-gradient">
-                  Welcome back, {dashboardUser.full_name || dashboardUser.email.split('@')[0]}! 👑
+                  Welcome back, {data.user.full_name || data.user.email.split('@')[0]}! 👑
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-400">
                   Here&apos;s what&apos;s happening with your empire today
@@ -299,13 +300,13 @@ export default function DashboardPage() {
               whileHover={{ scale: 1.05 }}
               className="crown-badge"
             >
-              Level {dashboardUser.level}
+              Level {data.user.level}
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="px-4 py-2 gradient-success rounded-full text-white font-bold"
             >
-              {dashboardUser.total_points} pts
+              {data.user.total_points} pts
             </motion.div>
           </div>
         </motion.div>
