@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
-console.log('🔍 SoloSuccess → SoloSuccess Rebranding Checklist');
+console.log('🔍 SoloBoss → SoloSuccess Rebranding Checklist');
 console.log('==============================================');
 console.log('');
 
@@ -17,8 +17,8 @@ function checkFileForOldBranding(filePath) {
   try {
     const content = readFileSync(filePath, 'utf8');
     const oldBrandingPatterns = [
-      'SoloSuccess AI', 'SoloSuccess', 'SoloSuccess-ai', 'SoloSuccess_ai', 
-      'SoloSuccess', 'solo-success', 'solo_success', 'SoloSuccess.ai'
+      'SoloBoss AI', 'SoloBoss', 'soloboss-ai', 'soloboss_ai', 
+      'soloboss', 'solo-boss', 'solo_boss', 'soloboss.ai'
     ];
     
     const foundPatterns = [];
@@ -122,7 +122,7 @@ function checkDocumentationFiles() {
   console.log('📚 DOCUMENTATION FILES CHECK:');
   console.log('=============================');
   
-  const docDirs = ['docs', 'wiki', 'SoloSuccess documents'];
+  const docDirs = ['docs', 'wiki', 'solosuccess documents'];
   let totalDocFiles = 0;
   let docFilesWithIssues = 0;
   

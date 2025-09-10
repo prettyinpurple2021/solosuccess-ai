@@ -1,6 +1,6 @@
 # Vercel Deployment Guide
 
-This guide will help you deploy your Solo Boss AI Platform to Vercel, taking advantage of their free tier and excellent Next.js integration.
+This guide will help you deploy your SoloSuccess AI Platform to Vercel, taking advantage of their free tier and excellent Next.js integration.
 
 ## Prerequisites
 

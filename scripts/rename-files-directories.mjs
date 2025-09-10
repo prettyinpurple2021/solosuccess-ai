@@ -11,7 +11,7 @@ const projectRoot = join(__dirname, '..');
 // File and directory renaming mappings
 const renameMappings = {
   // Directory renames
-  'SoloSuccess documents': 'solosuccess documents',
+  'soloboss documents': 'solosuccess documents',
   
   // File renames (if any specific files need renaming)
   // Add specific file renames here as needed
