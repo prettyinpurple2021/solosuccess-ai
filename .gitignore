@@ -30,8 +30,10 @@ next-env.d.ts
 *~
 .env*.local
 
-# migration and template features (exclude from build)
-/Templates feature/
+# templates should be tracked (do not ignore)
+!app/templates/**
+!components/templates/**
+!data/templates.json
 
 
 
