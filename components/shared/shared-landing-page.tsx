@@ -168,7 +168,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <img 
-                src="/images/SoloSuccess-logo.png" 
+                src="/images/soloboss-logo.png" 
                 alt="SoloSuccess AI" 
                 width={40} 
                 height={40} 
@@ -370,13 +370,13 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="/images/SoloSuccess-hero-silhouette.jpg"
+                  src="/images/soloboss-hero-silhouette.jpg"
                   alt="SoloSuccess - Confident entrepreneur working in her office"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = "/images/SoloSuccess-hero-silhouette.png";
+                    e.currentTarget.src = "/images/soloboss-hero-silhouette.png";
                   }}
                 />
                 {/* Gradient overlay to enhance the integration */}
@@ -416,13 +416,13 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             className="relative rounded-3xl overflow-hidden shadow-2xl"
           >
             <img
-              src="/images/SoloSuccess-banner.jpg"
+              src="/images/soloboss-banner.jpg"
               alt="Confident. Creative. In control. That's the SoloSuccess way."
               width={1200}
               height={300}
               className="w-full h-auto object-cover"
               onError={(e) => {
-                e.currentTarget.src = "/images/SoloSuccess-banner.png";
+                e.currentTarget.src = "/images/soloboss-banner.png";
               }}
             />
             {/* Optional overlay for better text readability if needed */}
@@ -769,7 +769,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <ResponsiveImage
-                  src="/images/SoloSuccess-logo.png"
+                  src="/images/soloboss-logo.png"
                   alt="SoloSuccess AI"
                   width={32}
                   height={32}

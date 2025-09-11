@@ -16,7 +16,6 @@ const nextConfig = {
   // Enable modern React features
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    instrumentationHook: true,
   },
   
   // External packages for server components

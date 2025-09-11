@@ -10,7 +10,7 @@ const STATIC_FILES = [
   '/manifest.json',
   '/favicon.ico',
   '/images/logo.png',
-  '/images/SoloSuccess-logo.png',
+  '/images/soloboss-logo.png',
 ]
 
 // API routes to cache
