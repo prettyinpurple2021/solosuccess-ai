@@ -1,12 +1,17 @@
 "use client"
 
 import type { ReactNode } from 'react'
+import Link from 'next/link'
+import { Briefcase, Settings, LogOut } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function DashboardLayout({
   children,
 }: {
   children: ReactNode
 }) {
+  const { signOut } = useAuth()
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
@@ -18,24 +23,39 @@ export default function DashboardLayout({
           </div>
           
           <nav className="space-y-2">
-            <a href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+            <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
               <span>Dashboard</span>
-            </a>
-            <a href="/dashboard/slaylist" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+            </Link>
+            <Link href="/dashboard/slaylist" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
               <span>SlayList</span>
-            </a>
-            <a href="/dashboard/agents" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+            </Link>
+            <Link href="/dashboard/agents" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
               <span>AI Squad</span>
-            </a>
-            <a href="/dashboard/brand" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+            </Link>
+            <Link href="/dashboard/brand" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
               <span>Brand Studio</span>
-            </a>
-            <a href="/dashboard/focus" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+            </Link>
+            <Link href="/dashboard/focus" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
               <span>Focus Mode</span>
-            </a>
-            <a href="/dashboard/burnout" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+            </Link>
+            <Link href="/dashboard/burnout" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
               <span>Burnout Shield</span>
-            </a>
+            </Link>
+            {/* Briefcase */}
+            <Link href="/dashboard/briefcase" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+              <Briefcase className="h-4 w-4" />
+              <span>Briefcase</span>
+            </Link>
+            {/* Settings */}
+            <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100">
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
+            </Link>
+            {/* Logout */}
+            <button onClick={() => signOut()} className="w-full flex items-center gap-2 px-3 py-2 text-left text-gray-700 rounded-lg hover:bg-gray-100">
+              <LogOut className="h-4 w-4" />
+              <span>Log out</span>
+            </button>
           </nav>
         </div>
         
