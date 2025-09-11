@@ -107,12 +107,24 @@ export function SimpleAuth() {
         }),
       })
       
+      const contentType = response.headers.get('content-type') || ''
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Sign in failed')
+        let message = 'Sign in failed'
+        try {
+          if (contentType.includes('application/json')) {
+            const errorData = await response.json()
+            message = errorData.error || message
+          } else {
+            const text = await response.text()
+            message = text?.slice(0, 140) || message
+          }
+        } catch (_) {}
+        throw new Error(message)
       }
-      
-      const data = await response.json()
+
+      const data = contentType.includes('application/json')
+        ? await response.json()
+        : { token: undefined, user: undefined }
       
       // Store the token (you might want to use a more secure method)
       localStorage.setItem('authToken', data.token)

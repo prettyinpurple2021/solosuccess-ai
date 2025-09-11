@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { RecaptchaSignupButton, RecaptchaSigninButton } from "@/components/ui/recaptcha-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -10,6 +9,7 @@ import { EmpowermentCard } from "@/components/ui/boss-card"
 import { CalendarIcon, AlertCircle, CheckCircle, Lock, Crown } from "lucide-react"
 import { format, subYears } from "date-fns"
 import { motion } from "framer-motion"
+import type { User as AppUser } from "@/lib/neon/types"
 
 export function NeonAuth() {
   const router = useRouter()
@@ -20,7 +20,7 @@ export function NeonAuth() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<AppUser | null>(null)
   
   // Enhanced sign-up form state
   const [signUpData, setSignUpData] = useState({
@@ -39,20 +39,8 @@ export function NeonAuth() {
   const isSignInPage = pathname === '/signin'
   const isSignUpPage = pathname === '/signup'
 
-  // Initialize Stack Auth on client side only
-  useEffect(() => {
-    setIsClient(true)
-    
-    // Check if user is already logged in
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      // Verify token and set user
-      verifyToken(token)
-    }
-  }, [])
-
   // Verify JWT token and set user
-  const verifyToken = async (token: string) => {
+  const verifyToken = useCallback(async (token: string) => {
     try {
       const response = await fetch('/api/auth/user', {
         headers: {
@@ -62,7 +50,7 @@ export function NeonAuth() {
       
       if (response.ok) {
         const userData = await response.json()
-        setUser(userData.user)
+        setUser(userData.user as AppUser)
         router.push("/dashboard")
       } else {
         // Token is invalid, remove it
@@ -72,7 +60,19 @@ export function NeonAuth() {
       console.error('Token verification failed:', error)
       localStorage.removeItem('authToken')
     }
-  }
+  }, [router])
+
+  // Initialize auth on client side only
+  useEffect(() => {
+    setIsClient(true)
+    
+    // Check if user is already logged in
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      // Verify token and set user
+      verifyToken(token)
+    }
+  }, [verifyToken])
 
   // Redirect to dashboard when user is authenticated
   useEffect(() => {
@@ -81,7 +81,7 @@ export function NeonAuth() {
     }
   }, [user, router, isClient])
 
-  const handleSignIn = async (_formData: any) => {
+  const handleSignIn = async (_formData?: unknown) => {
     setLoading(true)
     setError(null)
     setSuccess(null)
@@ -108,12 +108,28 @@ export function NeonAuth() {
         }),
       })
       
+      const contentType = response.headers.get('content-type') || ''
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Sign in failed')
+        // Attempt to parse JSON, but fall back to text/HTML safely
+        let message = 'Sign in failed'
+        try {
+          if (contentType.includes('application/json')) {
+            const errorData = await response.json()
+            message = errorData.error || message
+          } else {
+            const text = await response.text()
+            // Extract a short snippet from potential HTML
+            message = text?.slice(0, 140) || message
+          }
+        } catch (_) {
+          // ignore parsing errors
+        }
+        throw new Error(message)
       }
-      
-      const data = await response.json()
+
+      const data = contentType.includes('application/json')
+        ? await response.json()
+        : { token: undefined, user: undefined }
       
       // Store the token (you might want to use a more secure method)
       localStorage.setItem('authToken', data.token)
@@ -124,8 +140,9 @@ export function NeonAuth() {
       setUser(data.user)
       router.push("/dashboard")
       
-    } catch (err: any) {
-      setError(err.message || 'Sign in failed')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Sign in failed'
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -202,7 +219,7 @@ export function NeonAuth() {
     return Object.keys(errors).length === 0
   }
 
-  const handleSignUp = async (_formData: any) => {
+  const handleSignUp = async (_formData?: unknown): Promise<{ success: boolean; error?: string }> => {
     if (!validateSignUpForm()) {
       return { success: false, error: "Please fix the form errors" }
     }
@@ -246,8 +263,8 @@ export function NeonAuth() {
       
       return { success: true }
 
-    } catch (err: any) {
-      const errorMsg = err.message || "An unexpected error occurred. Please try again."
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred. Please try again."
       setError(errorMsg)
       return { success: false, error: errorMsg }
     } finally {
@@ -408,7 +425,7 @@ export function NeonAuth() {
 
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <button
                       type="button"
                       onClick={() => router.push('/signup')}
