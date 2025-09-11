@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useUser } from "@/lib/auth-client"
-import { useStackApp } from "@stackframe/stack"
+import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,14 +13,13 @@ import { User, Mail, Lock, Trash2, LogOut, Save, AlertTriangle } from "lucide-re
 import { motion } from "framer-motion"
 
 export default function SettingsPage() {
-  const user = useUser()
-  const stackApp = useStackApp()
+  const { user, signOut } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
-    displayName: user?.displayName || "",
-    email: user?.primaryEmail || "",
+    displayName: user?.name || "",
+    email: user?.email || "",
   })
 
   const handleUpdateProfile = async () => {
@@ -30,10 +28,21 @@ export default function SettingsPage() {
     setIsLoading(true)
     try {
       // Update display name if changed
-      if (formData.displayName !== user.displayName) {
-        await user.update({
-          displayName: formData.displayName,
+      if (formData.displayName !== user.name) {
+        const response = await fetch('/api/auth/update-profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            name: formData.displayName
+          })
         })
+
+        if (!response.ok) {
+          throw new Error('Failed to update profile')
+        }
       }
 
       toast({
@@ -53,7 +62,7 @@ export default function SettingsPage() {
 
   const handleSignOut = async () => {
     try {
-      await user?.signOut()
+      await signOut()
       toast({
         title: "Signed Out",
         description: "You have been successfully signed out.",
@@ -73,7 +82,16 @@ export default function SettingsPage() {
     setIsDeleting(true)
     try {
       // Delete the user account
-      await user.delete()
+      const response = await fetch('/api/auth/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete account')
+      }
       
       toast({
         title: "Account Deleted",
@@ -240,15 +258,15 @@ export default function SettingsPage() {
                   <div>
                     <h4 className="font-medium">Account Created</h4>
                     <p className="text-sm text-muted-foreground">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown"}
+                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : "Unknown"}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
-                    <h4 className="font-medium">Last Sign In</h4>
+                    <h4 className="font-medium">Last Updated</h4>
                     <p className="text-sm text-muted-foreground">
-                      {user.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString() : "Unknown"}
+                      {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : "Unknown"}
                     </p>
                   </div>
                 </div>

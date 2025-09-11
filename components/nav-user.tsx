@@ -13,8 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
-import { useUser } from "@/lib/auth-client"
-import { useStackApp } from "@stackframe/stack"
+import { useAuth } from "@/hooks/use-auth"
 
 export function NavUser({
   user: userProp,
@@ -26,14 +25,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const user = useUser()
-  const stackApp = useStackApp()
-  
-  const signOut = async () => {
-    if (user) {
-      await user.signOut()
-    }
-  }
+  const { user, signOut } = useAuth()
 
   const handleSignOut = async () => {
     await signOut()

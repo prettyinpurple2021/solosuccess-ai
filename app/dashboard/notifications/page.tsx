@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useUser } from "@/lib/auth-client"
+import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -12,7 +12,7 @@ import { Bell, Mail, Smartphone, Settings, Save } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function NotificationsPage() {
-  const user = useUser()
+  const { user } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [notifications, setNotifications] = useState({
