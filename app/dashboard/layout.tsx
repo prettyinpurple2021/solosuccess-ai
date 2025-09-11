@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Briefcase, Settings, LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 
+export const dynamic = 'force-dynamic'
+
 export default function DashboardLayout({
   children,
 }: {

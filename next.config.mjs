@@ -3,12 +3,12 @@ const nextConfig = {
   // Fix workspace root warning
   outputFileTracingRoot: process.cwd(),
   
-  // Disable all checks to ensure it builds
+  // Enable checks for production readiness
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   // Optimized for Vercel deployment
   // output: 'standalone', // Removed for Vercel
