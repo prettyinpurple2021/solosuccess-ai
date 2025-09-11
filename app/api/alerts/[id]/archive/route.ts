@@ -17,9 +17,12 @@ const ArchiveRequestSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
+    const { id } = params
+    
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('alerts:archive', ip, 60_000, 50)
     if (!allowed) {
@@ -32,7 +35,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const alertId = parseInt(params.id)
+    const alertId = parseInt(id)
     if (isNaN(alertId)) {
       return NextResponse.json({ error: 'Invalid alert ID' }, { status: 400 })
     }
