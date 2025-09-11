@@ -25,7 +25,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const { user, signOut } = useAuth()
+  const { signOut } = useAuth()
 
   const handleSignOut = async () => {
     await signOut()
