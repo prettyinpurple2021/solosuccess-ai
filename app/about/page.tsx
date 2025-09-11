@@ -1,3 +1,4 @@
+/// <reference types="react" />
 "use client"
 
 import * as React from "react"
