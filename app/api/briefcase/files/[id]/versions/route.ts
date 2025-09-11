@@ -12,6 +12,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const documentId = id
     const client = await createClient()
 
@@ -77,6 +79,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const documentId = id
     const { changelog } = await request.json()
     const client = await createClient()
