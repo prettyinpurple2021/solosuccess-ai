@@ -7,11 +7,13 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const documentId = id
     const { tag } = await request.json()
 
@@ -82,11 +84,13 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const documentId = id
     const { searchParams } = new URL(request.url)
     const tag = searchParams.get('tag')

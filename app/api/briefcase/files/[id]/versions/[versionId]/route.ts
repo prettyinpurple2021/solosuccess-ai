@@ -7,8 +7,8 @@ export async function GET(
   context: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -67,8 +67,8 @@ export async function POST(
   context: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -168,8 +168,8 @@ export async function DELETE(
   context: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

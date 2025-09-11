@@ -4,7 +4,7 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { eq, and, sql } from 'drizzle-orm'
-import { savedIntelligenceSearches } from '../route'
+import { savedIntelligenceSearches } from '@/lib/schemas/saved-intelligence-searches'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -47,6 +47,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const searchId = parseInt(id)
     if (isNaN(searchId)) {
       return NextResponse.json({ error: 'Invalid search ID' }, { status: 400 })
@@ -124,6 +126,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const searchId = parseInt(id)
     if (isNaN(searchId)) {
       return NextResponse.json({ error: 'Invalid search ID' }, { status: 400 })
@@ -239,6 +243,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const searchId = parseInt(id)
     if (isNaN(searchId)) {
       return NextResponse.json({ error: 'Invalid search ID' }, { status: 400 })

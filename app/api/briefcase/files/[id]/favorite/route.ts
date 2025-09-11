@@ -10,8 +10,8 @@ export async function POST(
     const params = await context.params
     const { id } = params
     
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

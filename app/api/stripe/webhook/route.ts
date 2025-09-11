@@ -91,7 +91,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     
     // Get user by Stripe customer ID
     // const user = await getUserByStripeCustomerId(customerId)
-    // if (!user) {
+    // if (error || !user) {
     //   console.error('User not found for customer:', customerId)
     //   return
     // }

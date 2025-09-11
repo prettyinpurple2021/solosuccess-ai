@@ -7,11 +7,13 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const documentId = id
     const client = await createClient()
 
@@ -73,11 +75,13 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
+    const { id } = params
     const documentId = id
     const { email, role, message } = await request.json()
 
@@ -136,7 +140,7 @@ export async function POST(
       granted: newPermission.granted_at,
       status: 'pending',
       accessCount: 0,
-      invitedBy: user.name || user.email
+      invitedBy: user.full_name || user.email
     })
 
   } catch (error) {

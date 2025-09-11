@@ -8,14 +8,15 @@ export const metadata: Metadata = {
 }
 
 interface AuthErrorPageProps {
-  searchParams: {
+  searchParams: Promise<{
     error?: string
     error_description?: string
-  }
+  }>
 }
 
-export default function AuthCodeErrorPage({ searchParams }: AuthErrorPageProps) {
-  const { error, error_description } = searchParams
+export default async function AuthCodeErrorPage({ searchParams }: AuthErrorPageProps) {
+  const params = await searchParams
+  const { error, error_description } = params
 
   const getErrorMessage = (errorCode?: string) => {
     switch (errorCode) {

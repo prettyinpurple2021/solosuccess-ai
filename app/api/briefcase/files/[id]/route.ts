@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const params = await context.params
     const { id } = params
     const body = await request.json()
     
@@ -28,6 +29,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
 export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const params = await context.params
     const { id } = params
     
     // Placeholder for demo - in production this would delete the file from database and storage
@@ -47,6 +49,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const params = await context.params
     const { id } = params
     
     // Placeholder for demo - in production this would fetch the specific file
