@@ -26,7 +26,7 @@ const updateFrequencySchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -47,7 +47,7 @@ export async function GET(
       )
     }
 
-    const competitorId = parseInt(params.id, 10)
+    const competitorId = parseInt(id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
@@ -77,7 +77,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -98,7 +98,7 @@ export async function POST(
       )
     }
 
-    const competitorId = parseInt(params.id, 10)
+    const competitorId = parseInt(id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
@@ -151,7 +151,7 @@ export async function POST(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -172,7 +172,7 @@ export async function PUT(
       )
     }
 
-    const competitorId = parseInt(params.id, 10)
+    const competitorId = parseInt(id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
@@ -223,7 +223,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -244,7 +244,7 @@ export async function DELETE(
       )
     }
 
-    const competitorId = parseInt(params.id, 10)
+    const competitorId = parseInt(id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },

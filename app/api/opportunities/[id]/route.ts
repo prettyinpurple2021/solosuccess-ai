@@ -22,7 +22,7 @@ const updateOpportunitySchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -43,7 +43,7 @@ export async function GET(
       )
     }
 
-    const opportunityId = params.id
+    const opportunityId = id
 
     // Get opportunity details
     const opportunity = await db
@@ -92,7 +92,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -113,7 +113,7 @@ export async function PUT(
       )
     }
 
-    const opportunityId = params.id
+    const opportunityId = id
 
     // Parse and validate request body
     const body = await request.json()
@@ -201,7 +201,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -222,7 +222,7 @@ export async function DELETE(
       )
     }
 
-    const opportunityId = params.id
+    const opportunityId = id
 
     // Check if opportunity exists and belongs to user
     const existingOpportunity = await db

@@ -4,7 +4,7 @@ import { createClient } from '@/lib/neon/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await authenticateRequest(request)
@@ -12,7 +12,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const documentId = id
     const client = await createClient()
 
     // Verify document ownership
@@ -69,7 +69,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await authenticateRequest(request)
@@ -77,7 +77,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const documentId = id
     const { changelog } = await request.json()
     const client = await createClient()
 

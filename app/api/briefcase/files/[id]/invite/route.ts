@@ -4,7 +4,7 @@ import { createClient } from '@/lib/neon/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await authenticateRequest(request)
@@ -12,7 +12,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const documentId = id
     const { email, role, message, invitedBy } = await request.json()
 
     if (!email || !role) {

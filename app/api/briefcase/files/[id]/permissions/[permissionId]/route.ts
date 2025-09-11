@@ -4,15 +4,17 @@ import { createClient } from '@/lib/neon/server'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; permissionId: string } }
+  context: { params: Promise<{ id: string; permissionId: string }> }
 ) {
   try {
+    const params = await context.params
+    const { id: documentId, permissionId } = params
+    
     const user = await authenticateRequest(request)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id: documentId, permissionId } = params
     const { role } = await request.json()
 
     if (!role) {
@@ -72,15 +74,17 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; permissionId: string } }
+  context: { params: Promise<{ id: string; permissionId: string }> }
 ) {
   try {
+    const params = await context.params
+    const { id: documentId, permissionId } = params
+    
     const user = await authenticateRequest(request)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id: documentId, permissionId } = params
     const client = await createClient()
 
     // Verify document ownership

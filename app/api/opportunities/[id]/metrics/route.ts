@@ -27,7 +27,7 @@ const createMetricSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -48,7 +48,7 @@ export async function GET(
       )
     }
 
-    const opportunityId = params.id
+    const opportunityId = id
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db
@@ -89,7 +89,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -110,7 +110,7 @@ export async function POST(
       )
     }
 
-    const opportunityId = params.id
+    const opportunityId = id
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db
@@ -172,7 +172,7 @@ export async function POST(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -193,7 +193,7 @@ export async function PUT(
       )
     }
 
-    const opportunityId = params.id
+    const opportunityId = id
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db

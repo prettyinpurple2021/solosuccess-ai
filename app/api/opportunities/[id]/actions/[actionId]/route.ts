@@ -25,7 +25,7 @@ const updateActionSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; actionId: string } }
+  context: { params: Promise<{ id: string; actionId: string }> }
 ) {
   try {
     // Rate limiting
@@ -101,7 +101,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; actionId: string } }
+  context: { params: Promise<{ id: string; actionId: string }> }
 ) {
   try {
     // Rate limiting
@@ -220,7 +220,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; actionId: string } }
+  context: { params: Promise<{ id: string; actionId: string }> }
 ) {
   try {
     // Rate limiting
