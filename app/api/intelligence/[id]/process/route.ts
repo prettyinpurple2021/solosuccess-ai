@@ -68,7 +68,7 @@ const ProcessingRequestSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
@@ -83,7 +83,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const intelligenceId = parseInt(params.id)
+    const intelligenceId = parseInt(id)
     if (isNaN(intelligenceId)) {
       return NextResponse.json({ error: 'Invalid intelligence ID' }, { status: 400 })
     }

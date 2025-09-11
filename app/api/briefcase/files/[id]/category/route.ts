@@ -4,16 +4,19 @@ import { createClient } from '@/lib/neon/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
+    const { id } = params
+    
     const user = await authenticateRequest(request)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { category } = await request.json()
-    const documentId = params.id
+    const documentId = id
 
     if (!category || typeof category !== 'string') {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 })
@@ -67,15 +70,18 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
+    const { id } = params
+    
     const user = await authenticateRequest(request)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const documentId = id
     const client = await createClient()
 
     // Get document category
