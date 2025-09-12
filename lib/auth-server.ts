@@ -2,49 +2,76 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import type { AuthenticatedUser, AuthResult } from "./auth-utils"
-import { getStackServerApp } from "@/stack"
+import { headers } from "next/headers"
+import jwt from 'jsonwebtoken'
+import { neon } from '@neondatabase/serverless'
 
-// Define Stack Auth user interface
-interface StackUser {
-  id: string
-  primaryEmail?: string
-  email?: string
-  displayName?: string
-  avatarUrl?: string
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
 }
 
-async function getStackAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   try {
-    const app = getStackServerApp()
-    if (!app) return null
-    const stackUser = await app.getUser() as StackUser | null
-    if (!stackUser) return null
+    const headersList = await headers()
+    const authHeader = headersList.get('authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null
+    }
 
-    // Map Stack user to our AuthenticatedUser shape
+    const token = authHeader.substring(7)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    
+    if (!decoded || !decoded.userId) {
+      return null
+    }
+
+    // Get user from database
+    const sql = getSql()
+    const users = await sql`
+      SELECT id, email, full_name, username, date_of_birth, created_at, updated_at
+      FROM users 
+      WHERE id = ${decoded.userId}
+    `
+
+    if (users.length === 0) {
+      return null
+    }
+
+    const user = users[0]
+
+    // Map database user to our AuthenticatedUser shape
     return {
-      id: stackUser.id,
-      email: stackUser.primaryEmail || stackUser.email || "",
-      full_name: stackUser.displayName,
-      avatar_url: stackUser.avatarUrl,
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      name: user.full_name,
+      username: user.username,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
       subscription_tier: undefined,
       subscription_status: undefined,
     }
   } catch (err) {
-    console.error('Stack authentication error:', err)
+    console.error('JWT authentication error:', err)
     return null
   }
 }
 
 /**
  * Server-side authentication utility for API routes.
- * This now exclusively uses Stack Auth.
+ * Uses JWT-based authentication.
  */
 export async function authenticateRequest(): Promise<AuthResult> {
   try {
-    const stackUser = await getStackAuthenticatedUser()
+    const jwtUser = await getJWTAuthenticatedUser()
 
-    if (stackUser) {
-      return { user: stackUser, error: null }
+    if (jwtUser) {
+      return { user: jwtUser, error: null }
     } else {
       return { user: null, error: "No authenticated user session found" }
     }

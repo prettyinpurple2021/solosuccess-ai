@@ -4,7 +4,11 @@ export interface AuthenticatedUser {
   id: string
   email: string
   full_name?: string
+  name?: string
+  username?: string
   avatar_url?: string
+  created_at?: string
+  updated_at?: string
   subscription_tier?: string
   subscription_status?: string
 }
