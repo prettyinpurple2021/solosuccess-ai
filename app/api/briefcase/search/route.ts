@@ -241,7 +241,7 @@ async function performSemanticSearch(query: string, userId: string, client: any)
 
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
     
-    const context = documents.map(doc => ({
+    const context = documents.map((doc: any) => ({
       id: doc.id,
       name: doc.name,
       description: doc.description,

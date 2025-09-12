@@ -473,7 +473,7 @@ export class SocialMediaMonitor {
     return posts;
   }
 
-  private async analyzeSinglePostSentiment(content: string): Promise<SentimentScore> {
+  private async analyzeSinglePostSentiment(_content: string): Promise<SentimentScore> {
     // Placeholder implementation
     // In reality, would use OpenAI, Google Cloud Natural Language, or similar
     const score = (Math.random() - 0.5) * 2; // Random score between -1 and 1

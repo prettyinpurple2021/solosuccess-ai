@@ -35,6 +35,7 @@ export async function GET(
       );
     }
 
+    const { id } = await context.params;
     const competitorId = parseInt(id);
     if (isNaN(competitorId)) {
       return NextResponse.json(
