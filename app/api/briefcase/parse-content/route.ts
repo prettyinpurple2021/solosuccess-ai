@@ -1,23 +1,48 @@
 import '@/lib/server-polyfills'
 import { NextRequest, NextResponse } from 'next/server';
 import { DocumentParser } from '@/lib/documentParser';
-import fs from 'fs';
-import path from 'path';
+import { authenticateRequest } from '@/lib/auth-server'
+import { createClient } from '@/lib/neon/server'
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const fileId = formData.get('fileId') as string;
-    const filePath = formData.get('filePath') as string;
-    const mimeType = formData.get('mimeType') as string;
-    const fileName = formData.get('fileName') as string;
+    // Optional legacy fields (ignored for security):
+    const providedMimeType = formData.get('mimeType') as string | null;
+    const providedFileName = formData.get('fileName') as string | null;
     
-    if (!fileId || !filePath || !mimeType || !fileName) {
+    if (!fileId) {
       return NextResponse.json(
-        { error: 'Missing required parameters' },
+        { error: 'Missing required parameter: fileId' },
         { status: 400 }
       );
     }
+
+    // Authenticate user and verify ownership
+    const { user, error: authError } = await authenticateRequest()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Load file securely from DB (Neon) instead of filesystem
+    const client = await createClient()
+    const { rows: [document] } = await client.query(
+      `SELECT id, user_id, mime_type, original_name, name, file_data
+       FROM documents
+       WHERE id = $1 AND user_id = $2`,
+      [fileId, user.id]
+    )
+
+    if (!document) {
+      return NextResponse.json(
+        { error: 'Document not found' },
+        { status: 404 }
+      )
+    }
+
+    const mimeType: string = document.mime_type || providedMimeType || 'application/octet-stream'
+    const fileName: string = document.original_name || document.name || providedFileName || 'file'
 
     // Check if the file type is supported
     if (!DocumentParser.isSupportedMimeType(mimeType)) {
@@ -29,23 +54,25 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Validate file path to prevent path traversal
-    if (filePath.includes('..') || filePath.startsWith('/')) {
-      return NextResponse.json(
-        { error: 'Invalid file path' },
-        { status: 400 }
-      );
+    // Convert stored file data to Buffer (supports base64 string or binary)
+    const rawData = document.file_data as unknown
+    let fileBuffer: Buffer
+    if (typeof rawData === 'string') {
+      fileBuffer = Buffer.from(rawData, 'base64')
+    } else if (Buffer.isBuffer(rawData)) {
+      fileBuffer = rawData
+    } else if (rawData instanceof Uint8Array) {
+      fileBuffer = Buffer.from(rawData)
+    } else if (rawData instanceof ArrayBuffer) {
+      fileBuffer = Buffer.from(new Uint8Array(rawData))
+    } else {
+      return NextResponse.json({
+        success: false,
+        error: 'Unsupported file data format',
+        content: '',
+        metadata: null
+      }, { status: 400 })
     }
-    const absoluteFilePath = path.resolve(filePath);
-    
-    if (!fs.existsSync(absoluteFilePath)) {
-      return NextResponse.json(
-        { error: 'File not found' },
-        { status: 404 }
-      );
-    }
-
-    const fileBuffer = fs.readFileSync(absoluteFilePath);
     
     // Get estimated processing time
     const estimatedTime = DocumentParser.getEstimatedProcessingTime(fileBuffer.length, mimeType);
