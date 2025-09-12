@@ -18,7 +18,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/images/SoloSuccess-logo.png",
+      "src": "/images/soloboss-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -106,7 +106,7 @@
   ],
   "screenshots": [
     {
-      "src": "/images/SoloSuccess-banner.png",
+      "src": "/images/soloboss-banner.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",

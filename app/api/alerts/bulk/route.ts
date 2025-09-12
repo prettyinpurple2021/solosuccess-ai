@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let updateData: any = { updated_at: new Date() }
+    const updateData: any = { updated_at: new Date() }
     let resultMessage = ''
 
     // Determine update based on operation

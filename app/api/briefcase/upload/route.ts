@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       JSON.stringify({
         originalSize: file.size,
         uploadedAt: new Date().toISOString(),
-        userAgent: headers().get('user-agent'),
+        userAgent: (await headers()).get('user-agent'),
       })
     ])
 

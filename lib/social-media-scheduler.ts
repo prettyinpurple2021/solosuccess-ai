@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { competitorProfiles, scrapingJobs, scrapingJobResults } from '@/db/schema';
-import { eq, and, lte, isNull, or } from 'drizzle-orm';
+import { eq, and, lte } from 'drizzle-orm';
 import { socialMediaMonitor } from './social-media-monitor';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -423,7 +423,7 @@ export class SocialMediaScheduler {
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
     try {
-      const result = await db
+      await db
         .delete(scrapingJobResults)
         .where(lte(scrapingJobResults.completed_at, cutoffDate));
 
