@@ -29,7 +29,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Read the file from storage
+    // Validate file path to prevent path traversal
+    if (filePath.includes('..') || filePath.startsWith('/')) {
+      return NextResponse.json(
+        { error: 'Invalid file path' },
+        { status: 400 }
+      );
+    }
     const absoluteFilePath = path.resolve(filePath);
     
     if (!fs.existsSync(absoluteFilePath)) {
