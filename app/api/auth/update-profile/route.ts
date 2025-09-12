@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     await db
       .update(users)
       .set({ 
-        name: name.trim(),
+        full_name: name.trim(),
         updated_at: new Date()
       })
       .where(eq(users.id, decoded.userId))

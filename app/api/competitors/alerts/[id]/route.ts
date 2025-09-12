@@ -10,7 +10,7 @@ const updateAlertSchema = z.object({
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -31,7 +31,7 @@ export async function PATCH(
       );
     }
 
-    const alertId = parseInt(params.id);
+    const alertId = parseInt(id);
     if (isNaN(alertId)) {
       return NextResponse.json(
         { error: 'Invalid alert ID' },
@@ -69,7 +69,7 @@ export async function PATCH(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -90,7 +90,7 @@ export async function GET(
       );
     }
 
-    const alertId = parseInt(params.id);
+    const alertId = parseInt(id);
     if (isNaN(alertId)) {
       return NextResponse.json(
         { error: 'Invalid alert ID' },

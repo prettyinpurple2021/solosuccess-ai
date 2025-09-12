@@ -13,7 +13,7 @@ const getCompetitorAlertsSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Rate limiting
@@ -35,7 +35,7 @@ export async function GET(
       );
     }
 
-    const competitorId = parseInt(params.id);
+    const competitorId = parseInt(id);
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },

@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { shareId: string } }
+  context: { params: Promise<{ shareId: string }> }
 ) {
   try {
     const { shareId } = params
@@ -91,7 +91,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { shareId: string } }
+  context: { params: Promise<{ shareId: string }> }
 ) {
   try {
     const { shareId } = params

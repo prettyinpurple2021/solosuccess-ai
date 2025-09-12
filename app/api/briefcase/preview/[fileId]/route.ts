@@ -2,7 +2,7 @@ import '@/lib/server-polyfills'
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
-import { MOCK_FILES } from '../../files/route'
+import { MOCK_FILES } from '../../files/mock-files'
 
 // MIME type mappings for file extensions
 const MIME_TYPES: { [key: string]: string } = {
@@ -256,9 +256,10 @@ This content is generated for preview purposes and demonstrates how the file pre
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  context: { params: Promise<{ fileId: string }> }
 ) {
   try {
+    const params = await context.params
     const { fileId } = params
     const searchParams = request.nextUrl.searchParams
     const thumbnail = searchParams.get('thumbnail') === 'true'
@@ -338,9 +339,10 @@ export async function GET(
 // Handle file preview metadata requests
 export async function HEAD(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  context: { params: Promise<{ fileId: string }> }
 ) {
   try {
+    const params = await context.params
     const { fileId } = params
     
     const file = MOCK_FILES.find(f => f.id === fileId)

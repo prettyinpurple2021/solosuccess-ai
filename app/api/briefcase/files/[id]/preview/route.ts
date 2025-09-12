@@ -25,7 +25,7 @@ const PREVIEWABLE_TYPES = [
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, error } = await authenticateRequest()
@@ -34,7 +34,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const params = await context.params
+    const { id } = params
+    const documentId = id
     const client = await createClient()
 
     // Get document info with file data
