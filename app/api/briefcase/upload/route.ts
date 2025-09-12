@@ -42,71 +42,46 @@ function isFileTypeAllowed(mimeType: string): boolean {
   return false
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const { user, error } = await authenticateRequest()
-    
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+async function saveFile(params: {
+  userId: string,
+  file: File,
+  folderId?: string | null,
+  category?: string,
+  description?: string | null,
+  tags?: string,
+}) {
+  const { userId, file, folderId, category = 'uncategorized', description = null, tags } = params
 
-    // Get form data
-    const formData = await request.formData()
-    const file = formData.get('file') as File
-    const folderId = formData.get('folderId') as string
-    const category = formData.get('category') as string || 'uncategorized'
-    const description = formData.get('description') as string
-    const tags = formData.get('tags') as string
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(`File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`)
+  }
+  if (!isFileTypeAllowed(file.type)) {
+    throw new Error('File type not allowed')
+  }
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
-    }
+  const fileId = uuidv4()
+  const fileBuffer = await file.arrayBuffer()
+  const fileData = Buffer.from(fileBuffer)
+  const client = await createClient()
+  const parsedTags = tags ? JSON.parse(tags) : []
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ 
-        error: `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB` 
-      }, { status: 400 })
-    }
-
-    // Validate file type
-    if (!isFileTypeAllowed(file.type)) {
-      return NextResponse.json({ 
-        error: 'File type not allowed' 
-      }, { status: 400 })
-    }
-
-    // Generate unique file ID
-    const fileId = uuidv4()
-    
-    // Get file buffer
-    const fileBuffer = await file.arrayBuffer()
-    const fileData = Buffer.from(fileBuffer)
-
-    // Save document metadata to database
-    const client = await createClient()
-    
-    // Parse tags
-    const parsedTags = tags ? JSON.parse(tags) : []
-    
-    // Insert document record with file data
-    const { rows: [document] } = await client.query(`
+  const { rows: [document] } = await client.query(`
       INSERT INTO documents (
-        id, user_id, folder_id, name, original_name, file_type, mime_type, 
-        size, file_data, category, description, tags, 
+        id, user_id, folder_id, name, original_name, file_type, mime_type,
+        size, file_data, category, description, tags,
         metadata, created_at, updated_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
       RETURNING *
     `, [
       fileId,
-      user.id,
+      userId,
       folderId || null,
       file.name,
       file.name,
       getFileTypeFromMime(file.type),
       file.type,
       file.size,
-      fileData, // Store file data directly in database
+      fileData,
       category,
       description || null,
       JSON.stringify(parsedTags),
@@ -117,57 +92,73 @@ export async function POST(request: NextRequest) {
       })
     ])
 
-    // Update folder file count if folder specified
-    if (folderId) {
-      await client.query(`
-        UPDATE document_folders 
-        SET file_count = file_count + 1, 
+  if (folderId) {
+    await client.query(`
+        UPDATE document_folders
+        SET file_count = file_count + 1,
             total_size = total_size + $1,
             updated_at = NOW()
         WHERE id = $2 AND user_id = $3
-      `, [file.size, folderId, user.id])
-    }
+      `, [file.size, folderId, userId])
+  }
 
-    // Log activity
-    await client.query(`
+  await client.query(`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
       VALUES ($1, $2, 'uploaded', $3, NOW())
     `, [
-      fileId,
-      user.id,
-      JSON.stringify({
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        category,
-        folderId: folderId || null,
-      })
-    ])
-
-    // Return success response
-    return NextResponse.json({
-      success: true,
-      document: {
-        id: document.id,
-        name: document.name,
-        type: document.file_type,
-        size: document.size,
-        category: document.category,
-        description: document.description,
-        tags: parsedTags,
-        createdAt: document.created_at,
-        updatedAt: document.updated_at,
-        downloadUrl: `/api/briefcase/files/${fileId}/download`,
-        previewUrl: `/api/briefcase/files/${fileId}/preview`,
-      }
+    fileId,
+    userId,
+    JSON.stringify({
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      category,
+      folderId: folderId || null,
     })
+  ])
 
+  return {
+    id: document.id,
+    name: document.name,
+    type: document.file_type,
+    size: document.size,
+    category: document.category,
+    description: document.description,
+    tags: parsedTags,
+    createdAt: document.created_at,
+    updatedAt: document.updated_at,
+    downloadUrl: `/api/briefcase/files/${fileId}/download`,
+    previewUrl: `/api/briefcase/files/${fileId}/preview`,
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const formData = await request.formData()
+    // Accept either 'file' or 'files'
+    const directFile = formData.get('file') as File | null
+    const filesList = formData.getAll('files') as File[]
+    const file = directFile || (filesList && filesList.length > 0 ? filesList[0] : null)
+    const folderId = (formData.get('folderId') as string) || null
+    const category = (formData.get('category') as string) || 'uncategorized'
+    const description = (formData.get('description') as string) || null
+    const tags = (formData.get('tags') as string) || ''
+
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    }
+
+    const saved = await saveFile({ userId: user.id, file, folderId, category, description, tags })
+    return NextResponse.json({ success: true, document: saved })
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json(
-      { error: 'Failed to upload file' },
-      { status: 500 }
-    )
+    const message = error instanceof Error ? error.message : 'Failed to upload file'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -175,60 +166,37 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
-    
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const formData = await request.formData()
-    const files = formData.getAll('files') as File[]
-    const folderId = formData.get('folderId') as string
-    const category = formData.get('category') as string || 'uncategorized'
+    const files = (formData.getAll('files') as File[]).filter(Boolean)
+    const folderId = (formData.get('folderId') as string) || null
+    const category = (formData.get('category') as string) || 'uncategorized'
+    const description = (formData.get('description') as string) || null
+    const tags = (formData.get('tags') as string) || ''
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })
     }
 
-    const uploadPromises = files.map(async (file) => {
-      // Create individual form data for each file
-      const individualFormData = new FormData()
-      individualFormData.append('file', file)
-      individualFormData.append('folderId', folderId || '')
-      individualFormData.append('category', category)
+    const results = await Promise.allSettled(
+      files.map((file) => saveFile({ userId: user.id, file, folderId, category, description, tags }))
+    )
 
-      // Create a new request for each file
-      const individualRequest = new NextRequest(request.url, {
-        method: 'POST',
-        body: individualFormData,
-        headers: request.headers,
-      })
-
-      return POST(individualRequest)
-    })
-
-    const results = await Promise.allSettled(uploadPromises)
-    
-    const successful = results
-      .filter((result): result is PromiseFulfilledResult<NextResponse<any>> => result.status === 'fulfilled')
-      .map(result => result.value)
-
-    const failed = results
-      .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
-      .map(result => result.reason)
+    const successes = results.filter(r => r.status === 'fulfilled') as PromiseFulfilledResult<any>[]
+    const failures = results.filter(r => r.status === 'rejected') as PromiseRejectedResult[]
 
     return NextResponse.json({
-      success: true,
-      uploaded: successful.length,
-      failed: failed.length,
-      results: successful.map(response => response.json()),
-      errors: failed.map(error => error.message),
+      success: failures.length === 0,
+      uploaded: successes.length,
+      failed: failures.length,
+      results: successes.map(r => r.value),
+      errors: failures.map(f => (f.reason instanceof Error ? f.reason.message : String(f.reason))),
     })
-
   } catch (error) {
     console.error('Bulk upload error:', error)
-    return NextResponse.json(
-      { error: 'Failed to upload files' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to upload files' }, { status: 500 })
   }
 }
