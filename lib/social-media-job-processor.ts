@@ -1,4 +1,5 @@
 import { socialMediaScheduler } from './social-media-scheduler';
+// import { socialMediaMonitor } from './social-media-monitor';
 import { socialMediaAnalysisEngine } from './social-media-analysis-engine';
 import { db } from '@/db';
 import { competitorProfiles, competitorAlerts } from '@/db/schema';

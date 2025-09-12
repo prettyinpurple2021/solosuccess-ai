@@ -37,6 +37,11 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
+    /* Sidebar Layout Variables */
+    --sidebar-width: 16rem;
+    --sidebar-width-mobile: 18rem;
+    --sidebar-width-icon: 3rem;
+
     /* Epic Gradient Variables */
     --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 50%, #EC4899 100%);
     --gradient-secondary: linear-gradient(135deg, #A855F7 0%, #0891B2 50%, #F472B6 100%);
@@ -82,6 +87,11 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Sidebar Layout Variables - Same for dark mode */
+    --sidebar-width: 16rem;
+    --sidebar-width-mobile: 18rem;
+    --sidebar-width-icon: 3rem;
 
     /* Dark Mode Epic Gradients */
     --gradient-primary: linear-gradient(135deg, #6366F1 0%, #0891B2 50%, #EC4899 100%);
@@ -390,6 +400,37 @@
 
   .dark .card-boss:hover {
     border-color: rgba(236, 72, 153, 0.5);
+  }
+
+  /* Sidebar Layout Utilities */
+  .sidebar-provider {
+    --sidebar-width: 16rem;
+    --sidebar-width-mobile: 18rem;
+    --sidebar-width-icon: 3rem;
+  }
+
+  /* Ensure proper layout offset for sidebar content */
+  .sidebar-inset {
+    margin-left: 0;
+    transition: margin-left 200ms ease-linear;
+  }
+
+  /* Desktop sidebar layout - add margin when sidebar is expanded */
+  @media (min-width: 768px) {
+    .sidebar-provider:has([data-state="expanded"]) .sidebar-inset {
+      margin-left: var(--sidebar-width);
+    }
+    
+    .sidebar-provider:has([data-state="collapsed"]) .sidebar-inset {
+      margin-left: var(--sidebar-width-icon);
+    }
+  }
+
+  /* Mobile - no margin needed as sidebar is overlay */
+  @media (max-width: 767px) {
+    .sidebar-inset {
+      margin-left: 0 !important;
+    }
   }
 }
 
