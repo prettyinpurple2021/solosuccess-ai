@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useUser } from '@stackframe/stack'
+import { useAuth } from '@/hooks/use-auth'
 
 interface Project {
   id: string
@@ -23,7 +23,7 @@ interface UseProjectsResult {
 }
 
 export function useProjects(): UseProjectsResult {
-  const user = useUser()
+  const { user } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -38,7 +38,12 @@ export function useProjects(): UseProjectsResult {
 
     try {
       setError(null)
-      const response = await fetch("/api/projects")
+      const token = localStorage.getItem('authToken')
+      const response = await fetch("/api/projects", {
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      })
       const data = await response.json()
 
       if (response.ok) {

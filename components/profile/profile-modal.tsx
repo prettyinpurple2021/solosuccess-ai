@@ -19,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useUser, useStackApp } from "@stackframe/stack"
+import { useAuth } from "@/hooks/use-auth"
 import { Loader2, User, Camera, Trash2, AlertTriangle } from "lucide-react"
 
 interface ProfileModalProps {
@@ -28,12 +28,12 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
-  const user = useUser()
-  const _stackApp = useStackApp()
+  const { user, signOut: authSignOut } = useAuth()
+  // Stack app functionality has been removed
   
   const signOut = async () => {
     if (user) {
-      await user.signOut()
+      await authSignOut()
     }
   }
   const [loading, setLoading] = useState(false)

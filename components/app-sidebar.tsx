@@ -22,6 +22,7 @@ import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
+import { useAuth } from "@/hooks/use-auth"
 
 // This is sample data.
 const data = {
@@ -93,11 +94,13 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth()
+  
   // Create user data with fallbacks for missing information
   const userData = {
-    name: "SoloSuccess User",
-    email: "user@SoloSuccess.ai",
-    avatar: "/default-user.svg",
+    name: user?.name || user?.full_name || user?.email?.split('@')[0] || "SoloSuccess User",
+    email: user?.email || "user@SoloSuccess.ai",
+    avatar: user?.avatar_url || "/default-user.svg",
   }
 
   return (
