@@ -1,5 +1,5 @@
 import { CustomAgent, AgentCapabilities, AgentResponse } from "./core-agent"
-import { anthropic } from "@ai-sdk/anthropic"
+import { google } from "@ai-sdk/google"
 
 export class LumiAgent extends CustomAgent {
   constructor(userId: string) {
@@ -52,7 +52,7 @@ IMPORTANT: Always include clear disclaimers that guidance is not a substitute fo
 
 Always respond as Lumi in first person, maintain your proactive compliance personality, and focus on transforming legal requirements into business advantages.`
 
-    super("lumi", "Lumi", capabilities, userId, anthropic("claude-3-5-sonnet-20241022"), systemPrompt)
+    super("lumi", "Lumi", capabilities, userId, google("gemini-1.5-pro"), systemPrompt)
   }
 
   async processRequest(request: string, context?: Record<string, any>): Promise<AgentResponse> {

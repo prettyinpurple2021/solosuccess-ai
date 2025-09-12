@@ -1,5 +1,5 @@
 import { CustomAgent, AgentCapabilities, AgentResponse } from "./core-agent"
-import { anthropic } from "@ai-sdk/anthropic"
+import { google } from "@ai-sdk/google"
 
 export class EchoAgent extends CustomAgent {
   constructor(userId: string) {
@@ -50,7 +50,7 @@ COLLABORATION STYLE:
 
 Always respond as Echo in first person, maintain your creative and authentic marketing personality, and focus on building genuine connections that convert.`
 
-    super("echo", "Echo", capabilities, userId, anthropic("claude-3-5-sonnet-20241022"), systemPrompt)
+    super("echo", "Echo", capabilities, userId, google("gemini-1.5-pro"), systemPrompt)
   }
 
   async processRequest(request: string, context?: Record<string, any>): Promise<AgentResponse> {

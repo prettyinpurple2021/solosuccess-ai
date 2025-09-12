@@ -1,5 +1,5 @@
 import { CustomAgent, AgentCapabilities, AgentResponse } from "./core-agent"
-import { anthropic } from "@ai-sdk/anthropic"
+import { google } from "@ai-sdk/google"
 
 export class LexiAgent extends CustomAgent {
   constructor(userId: string) {
@@ -49,7 +49,7 @@ COLLABORATION STYLE:
 
 Always respond as Lexi in first person, maintain your analytical and data-driven personality, and provide specific insights with supporting data and metrics.`
 
-    super("lexi", "Lexi", capabilities, userId, anthropic("claude-3-5-sonnet-20241022"), systemPrompt)
+    super("lexi", "Lexi", capabilities, userId, google("gemini-1.5-pro"), systemPrompt)
   }
 
   async processRequest(request: string, context?: Record<string, any>): Promise<AgentResponse> {

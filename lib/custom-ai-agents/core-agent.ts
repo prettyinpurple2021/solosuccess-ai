@@ -1,4 +1,4 @@
-import { generateText, generateObject } from "ai"
+import { generateText, streamText } from "ai"
 import { openai } from "@ai-sdk/openai"
 import { anthropic } from "@ai-sdk/anthropic"
 import { google } from "@ai-sdk/google"
@@ -204,11 +204,14 @@ Be specific, actionable, and maintain your ${this.name} personality.`
       }
     } catch (error) {
       console.error(`Error generating response for ${this.name}:`, error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const errorStack = error instanceof Error ? error.stack : 'No stack trace'
+      
       return {
-        content: `I apologize, but I encountered an error processing your request. Let me try a different approach.`,
+        content: `I apologize, but I encountered an error processing your request: ${errorMessage}`,
         confidence: 0.1,
-        reasoning: "Error occurred during response generation",
-        suggestedActions: ["Retry the request", "Contact technical support"],
+        reasoning: `Error occurred during response generation: ${errorMessage}. Stack: ${errorStack}`,
+        suggestedActions: ["Try rephrasing your request", "Check if the service is available"],
         collaborationRequests: [],
         followUpTasks: []
       }
