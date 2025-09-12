@@ -1,22 +1,36 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
 
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { BossButton } from '@/components/ui/boss-button';
-import { BossCard } from '@/components/ui/boss-card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert } from '@/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus, TrendingUp, TrendingDown, Brain, Target, AlertTriangle, CheckCircle, Lightbulb, Scale, Crown, BarChart3 } from 'lucide-react';
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
+import { Button } from "@/components/ui/button"
+import { BossButton } from "@/components/ui/boss-button"
+import { BossCard } from "@/components/ui/boss-card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { motion, AnimatePresence } from "framer-motion"
+import { 
+  Plus, 
+  Minus, 
+  TrendingUp, 
+  TrendingDown, 
+  Brain,
+  Target,
+  AlertTriangle,
+  CheckCircle,
+  Lightbulb,
+  Scale,
+  Crown,
+  BarChart3
+} from "lucide-react"
+
 interface DecisionOption {
   id: string
   title: string
@@ -47,7 +61,7 @@ interface DecisionDashboardProps {
   onExport?: (format: 'json' | 'pdf' | 'csv') => void
 }
 
-export default function DecisionDashboard(_{ template,  _onSave: _onSave,  _onExport: _onExport }: DecisionDashboardProps) {
+export default function DecisionDashboard({ template, onSave: _onSave, onExport: _onExport }: DecisionDashboardProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [_data, setData] = useState<DecisionDashboardData>({
     decisionTitle: "",

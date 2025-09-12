@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, TrendingUp, AlertTriangle } from 'lucide-react';
+
 export function BigLeapPlanner() {
   const [leapDescription, setLeapDescription] = useState('');
   const [currentSituation, setCurrentSituation] = useState('');
@@ -22,7 +23,7 @@ export function BigLeapPlanner() {
   const [riskLevel, setRiskLevel] = useState([5]);
   const [title, setTitle] = useState('');
   
-  const { _saveTemplate,  _isSaving  } = useTemplateSave();
+  const { saveTemplate, isSaving } = useTemplateSave();
 
   const handleSave = async () => {
     const templateData = {

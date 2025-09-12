@@ -4,6 +4,7 @@ import React, { ErrorInfo } from 'react';
 import { Button } from './button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card';
 import { AlertCircle, Home, RefreshCw } from 'lucide-react';
+
 interface ErrorBoundaryProps {
   children: React.ReactNode;
 }

@@ -1,12 +1,25 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useState, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { Achievement, LevelInfo } from "@/lib/gamification-system"
-import { Trophy, Star, Crown, Sparkles, Target, Users, Flame, CheckCircle, Gift, PartyPopper, ArrowRight,  } from 'lucide-react';
+import {
+  Trophy,
+  Star,
+  Crown,
+  Sparkles,
+  Target,
+  Users,
+  Flame,
+  CheckCircle,
+  Gift,
+  PartyPopper,
+  ArrowRight,
+} from "lucide-react"
+
 interface AchievementCelebrationProps {
   achievement: Achievement | null
   onClose: () => void
@@ -24,7 +37,7 @@ interface StreakCelebrationProps {
   onClose: () => void
 }
 
-export function AchievementCelebration(_{ achievement,  _onClose,  _onShare }: AchievementCelebrationProps) {
+export function AchievementCelebration({ achievement, onClose, onShare }: AchievementCelebrationProps) {
   const [showConfetti, setShowConfetti] = useState(false)
 
   useEffect(() => {
@@ -165,7 +178,7 @@ export function AchievementCelebration(_{ achievement,  _onClose,  _onShare }: A
   )
 }
 
-export function LevelUpCelebration(_{ newLevel,  _oldLevel,  _onClose }: LevelUpCelebrationProps) {
+export function LevelUpCelebration({ newLevel, oldLevel, onClose }: LevelUpCelebrationProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose()
@@ -244,7 +257,7 @@ export function LevelUpCelebration(_{ newLevel,  _oldLevel,  _onClose }: LevelUp
   )
 }
 
-export function StreakCelebration(_{ streakCount,  _onClose }: StreakCelebrationProps) {
+export function StreakCelebration({ streakCount, onClose }: StreakCelebrationProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose()

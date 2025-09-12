@@ -1,12 +1,13 @@
 "use client"
 
-import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import { BossButton, BossButtonProps } from './boss-button';
-import { useRecaptcha } from '@/hooks/use-recaptcha';
-import { RECAPTCHA_ACTIONS, type RecaptchaAction } from '@/lib/recaptcha-client';
-import { Shield, AlertCircle, CheckCircle } from 'lucide-react';
-import { RECAPTCHA_CONFIG } from '@/lib/recaptcha-client';
+import { ReactNode } from "react"
+import { motion } from "framer-motion"
+import { BossButton, BossButtonProps } from "./boss-button"
+import { useRecaptcha } from "@/hooks/use-recaptcha"
+import { RECAPTCHA_ACTIONS, type RecaptchaAction } from "@/lib/recaptcha-client"
+import { Shield, AlertCircle, CheckCircle } from "lucide-react"
+import { RECAPTCHA_CONFIG } from "@/lib/recaptcha-client"
+
 interface RecaptchaButtonProps extends Omit<BossButtonProps, 'onClick'> {
   children: ReactNode
   action?: RecaptchaAction
@@ -20,15 +21,15 @@ interface RecaptchaButtonProps extends Omit<BossButtonProps, 'onClick'> {
 }
 
 export function RecaptchaButton({
-  children, 
-  action: _action = RECAPTCHA_ACTIONS.SUBMIT, 
-  minScore: _minScore = 0.5, 
-  onSuccess: _onSuccess, 
-  onError: _onError, 
-  onSubmit: _onSubmit, 
-  formData: _formData, 
-  showShield: _showShield = true, 
-  className: _className = "", 
+  children,
+  action = RECAPTCHA_ACTIONS.SUBMIT,
+  minScore = 0.5,
+  onSuccess,
+  onError,
+  onSubmit,
+  formData,
+  showShield = true,
+  className = "",
   ...buttonProps
 }: RecaptchaButtonProps) {
   const {
@@ -210,8 +211,10 @@ export function RecaptchaDemoButton({ children, ...props }: Omit<RecaptchaButton
 }
 
 // Form wrapper component
-export function RecaptchaForm({ children, 
-  action: _action = RECAPTCHA_ACTIONS.SUBMIT, onSubmit, 
+export function RecaptchaForm({
+  children,
+  action = RECAPTCHA_ACTIONS.SUBMIT,
+  onSubmit,
   ...props
 }: {
   children: ReactNode

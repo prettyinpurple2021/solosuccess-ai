@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, Sparkles, Plus, Trash2, Target, Heart, DollarSign, MapPin } from 'lucide-react';
+
 interface VisionElement {
   id: string;
   category: 'business' | 'personal' | 'financial' | 'lifestyle';
@@ -24,7 +25,7 @@ export function VisionBoardGenerator() {
   const [elements, setElements] = useState<VisionElement[]>([]);
   const [title, setTitle] = useState('');
   
-  const { _saveTemplate,  _isSaving  } = useTemplateSave();
+  const { saveTemplate, isSaving } = useTemplateSave();
 
   const categories = [
     { value: 'business', label: 'Business Goals', icon: Target, color: 'text-blue-600' },

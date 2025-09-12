@@ -1,12 +1,23 @@
 "use client"
 
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { BossButton } from '@/components/ui/boss-button';
-import { BossCard } from '@/components/ui/boss-card';
-import { Progress } from '@/components/ui/progress';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Share2, Bookmark, ArrowLeft, Sparkles, Crown, Save, RefreshCw } from 'lucide-react';
+import { useState } from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { BossButton } from "@/components/ui/boss-button"
+import { BossCard } from "@/components/ui/boss-card"
+import { Progress } from "@/components/ui/progress"
+
+import { motion, AnimatePresence } from "framer-motion"
+import { 
+  Download, 
+  Share2, 
+  Bookmark, 
+  ArrowLeft, 
+  Sparkles,
+  Crown,
+  Save,
+  RefreshCw
+} from "lucide-react"
 import Link from "next/link"
 
 export interface TemplateData {
@@ -30,16 +41,16 @@ export interface BaseTemplateProps {
   className?: string
 }
 
-export default function BaseTemplate(_{
-  template, 
-  _children, 
-  _currentStep = 1, 
-  _totalSteps = 1, 
-  _onSave, 
-  _onExport, 
-  _onReset: _onReset, 
-  _showProgress = false, 
-  _className = ""
+export default function BaseTemplate({
+  template,
+  children,
+  currentStep = 1,
+  totalSteps = 1,
+  onSave,
+  onExport,
+  onReset: _onReset,
+  showProgress = false,
+  className = ""
 }: BaseTemplateProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)

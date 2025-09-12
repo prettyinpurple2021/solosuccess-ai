@@ -1,13 +1,14 @@
 "use client"
 
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import Script from 'next/script'
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast'
+
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
 
 interface RecaptchaContextType {
   isReady: boolean
-  executeRecaptcha: (_action: string) => Promise<string | null>
+  executeRecaptcha: (action: string) => Promise<string | null>
   resetRecaptcha: () => void
 }
 
@@ -22,14 +23,14 @@ declare global {
     grecaptcha: {
       enterprise: {
         ready: (_callback: () => void) => void
-        execute: (_siteKey: string,  _options: { action: string }) => Promise<string>
+        execute: (_siteKey: string, _options: { action: string }) => Promise<string>
         reset: (_widgetId?: string) => void
       }
     }
   }
 }
 
-export function RecaptchaProvider(_{ children }: RecaptchaProviderProps) {
+export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   const [isReady, setIsReady] = useState(false)
   const [_isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -46,8 +47,8 @@ export function RecaptchaProvider(_{ children }: RecaptchaProviderProps) {
     }
 
     try {
-      return new Promise(_(resolve) => {
-        window.grecaptcha.enterprise.ready(_async () => {
+      return new Promise((resolve) => {
+        window.grecaptcha.enterprise.ready(async () => {
           try {
             const token = await window.grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {
               action: action
@@ -89,7 +90,7 @@ export function RecaptchaProvider(_{ children }: RecaptchaProviderProps) {
     setIsLoading(false)
     
     if (window.grecaptcha?.enterprise) {
-      window.grecaptcha.enterprise.ready_(() => {
+      window.grecaptcha.enterprise.ready(() => {
         setIsReady(true)
         console.log('reCAPTCHA is ready')
       })
@@ -114,7 +115,7 @@ export function RecaptchaProvider(_{ children }: RecaptchaProviderProps) {
     })
   }
 
-  _(() => {
+  useEffect(() => {
     setIsLoading(true)
   }, [])
 

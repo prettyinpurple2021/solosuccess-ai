@@ -1,5 +1,6 @@
-import { lazy } from 'react';
-import { TemplateData } from './base-template';
+import { lazy } from 'react'
+import { TemplateData } from './base-template'
+
 // Template component type
 export type TemplateComponent = React.ComponentType<{
   template: TemplateData
@@ -70,12 +71,12 @@ export const templateRegistry: Record<string, TemplateComponent> = {
 }
 
 // Helper function to get template component
-export function getTemplateComponent(_slug: string): TemplateComponent | null {
+export function getTemplateComponent(slug: string): TemplateComponent | null {
   return templateRegistry[slug] || null
 }
 
 // Helper function to check if template exists
-export function templateExists(_slug: string): boolean {
+export function templateExists(slug: string): boolean {
   return slug in templateRegistry
 }
 

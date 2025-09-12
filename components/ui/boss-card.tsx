@@ -1,9 +1,10 @@
 "use client"
 
-import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { Sparkles } from 'lucide-react';
+import { motion } from "framer-motion"
+import { ReactNode } from "react"
+import { cn } from "@/lib/utils"
+import { Crown, Sparkles } from "lucide-react"
+
 interface BossCardProps {
   children: ReactNode
   variant?: "default" | "empowerment" | "success" | "warning" | "danger" | "premium"
@@ -20,15 +21,19 @@ interface BossCardProps {
 }
 
 export function BossCard({
-  children,  
-  variant: _variant = "default",  
-  size: _size = "md",  
-  shimmer: _shimmer = true,  
-  glow: _glow = true,  
-  crown: _crown = false,  
-  _className = "", onClick,  
-  _interactive = false,  
-  _fullWidth = false, header, footer }: BossCardProps) {
+  children,
+  variant = "default",
+  size = "md",
+  shimmer = true,
+  glow = true,
+  crown = false,
+  className = "",
+  onClick,
+  interactive = false,
+  fullWidth = false,
+  header,
+  footer
+}: BossCardProps) {
   const baseClasses = "relative overflow-hidden rounded-2xl transition-all duration-300"
   
   const sizeClasses = {
@@ -137,14 +142,14 @@ export function BossCard({
         />
       )}
       
-      {/* indicator */}
+      {/* Crown indicator */}
       {crown && (
         <motion.div
           variants={crownVariants}
           animate="animate"
           className="absolute top-4 right-4 z-10"
         >
-          <div className="w-6 h-6 text-yellow-500" />
+          <Crown className="w-6 h-6 text-yellow-500" />
         </motion.div>
       )}
       
@@ -276,8 +281,11 @@ export function InteractiveBossCard({ children, ...props }: BossCardProps) {
 }
 
 // Stats card
-export function StatsCard({ title, value,   
-  icon: _icon, trend,   
+export function StatsCard({ 
+  title, 
+  value, 
+  icon, 
+  trend, 
   ...props 
 }: Omit<BossCardProps, 'children'> & {
   title: string

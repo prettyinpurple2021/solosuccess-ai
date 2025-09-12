@@ -1,5 +1,6 @@
-import { generateText } from 'ai';
-import { getTeamMemberConfig } from './ai-config';
+import { generateText } from "ai"
+import { getTeamMemberConfig } from "./ai-config"
+
 export interface UserContext {
   id: string
   name: string

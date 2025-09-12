@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Download, RefreshCw, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Download, RefreshCw, CheckCircle } from 'lucide-react'
+
 export function ServiceWorkerRegister() {
   const [isSupported, setIsSupported] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)

@@ -2,24 +2,32 @@
 
 import type React from "react"
 
-import { useState, } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useUser, useStackApp } from "@stackframe/stack"
+import { Loader2, User, Camera, Trash2, AlertTriangle } from "lucide-react"
 
-
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogFooter, } from '@/components/ui/dialog';
-
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useUser, useStackApp } from '@stackframe/stack';
-import { Loader2, User, } from 'lucide-react';
 interface ProfileModalProps {
   open: boolean
-  onOpenChange: (_open: boolean) => void
+  onOpenChange: (open: boolean) => void
 }
 
-export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
+export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
   const user = useUser()
   const _stackApp = useStackApp()
   
@@ -45,7 +53,7 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
     timezone: "",
   })
 
-  _(() => {
+  useEffect(() => {
     if (user) {
       setFormData({
         full_name: user.displayName || "",
@@ -60,7 +68,7 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
     }
   }, [user])
 
-  const handleUpdateProfile = async (_e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -139,20 +147,21 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-        <>
-          <className="flex items-center gap-2">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Profile </>
-          <>Manage your account information and preferences</>
-        </>
+            Profile Settings
+          </DialogTitle>
+          <DialogDescription>Manage your account information and preferences</DialogDescription>
+        </DialogHeader>
 
-        <defaultValue="profile" className="w-full">
-          <className="grid w-full grid-cols-2">
-            <value="profile">Profile</>
-            <value="account">Account</>
-          </>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="account">Account</TabsTrigger>
+          </TabsList>
 
-          <value="profile" className="space-y-4">
+          <TabsContent value="profile" className="space-y-4">
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               {/* Avatar Section */}
               <div className="flex items-center gap-4">
@@ -164,7 +173,7 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
                 </Avatar>
                 <div>
                   <Button type="button" variant="outline" size="sm">
-                    <className="mr-2 h-4 w-4" />
+                    <Camera className="mr-2 h-4 w-4" />
                     Change Photo
                   </Button>
                   <p className="text-xs text-muted-foreground mt-1">JPG, PNG or GIF. Max size 2MB.</p>
@@ -174,16 +183,16 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
               {/* Basic Information */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <htmlFor="full_name">Full Name</>
+                  <Label htmlFor="full_name">Full Name</Label>
                   <Input
                     id="full_name"
                     value={formData.full_name}
-                    onChange={(_e) => setFormData({ ...formData, full_name: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                     placeholder="Your full name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <htmlFor="email">Email</>
+                  <Label htmlFor="email">Email</Label>
                   <Input id="email" value={user?.primaryEmail || ""} disabled className="bg-muted" />
                 </div>
               </div>
@@ -191,25 +200,25 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
               {/* Business Information */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <htmlFor="company_name">Company Name</>
+                  <Label htmlFor="company_name">Company Name</Label>
                   <Input
                     id="company_name"
                     value={formData.company_name}
-                    onChange={(_e) => setFormData({ ...formData, company_name: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                     placeholder="Your company name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <htmlFor="industry">Industry</>
+                  <Label htmlFor="industry">Industry</Label>
                   <Select
                     value={formData.industry}
-                    onValueChange={(_value) => setFormData({ ...formData, industry: value })}
+                    onValueChange={(value) => setFormData({ ...formData, industry: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select industry" />
                     </SelectTrigger>
                     <SelectContent>
-                      {industries.map(_(industry) => (
+                      {industries.map((industry) => (
                         <SelectItem key={industry} value={industry}>
                           {industry}
                         </SelectItem>
@@ -221,16 +230,16 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <htmlFor="business_type">Business Type</>
+                  <Label htmlFor="business_type">Business Type</Label>
                   <Select
                     value={formData.business_type}
-                    onValueChange={(_value) => setFormData({ ...formData, business_type: value })}
+                    onValueChange={(value) => setFormData({ ...formData, business_type: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select business type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {businessTypes.map(_(type) => (
+                      {businessTypes.map((type) => (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
@@ -239,16 +248,16 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <htmlFor="timezone">Timezone</>
+                  <Label htmlFor="timezone">Timezone</Label>
                   <Select
                     value={formData.timezone}
-                    onValueChange={(_value) => setFormData({ ...formData, timezone: value })}
+                    onValueChange={(value) => setFormData({ ...formData, timezone: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select timezone" />
                     </SelectTrigger>
                     <SelectContent>
-                      {timezones.map(_(tz) => (
+                      {timezones.map((tz) => (
                         <SelectItem key={tz} value={tz}>
                           {tz.replace("_", " ")}
                         </SelectItem>
@@ -261,20 +270,20 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
               {/* Contact Information */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <htmlFor="phone">Phone</>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(_e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="Your phone number"
                   />
                 </div>
                 <div className="space-y-2">
-                  <htmlFor="website">Website</>
+                  <Label htmlFor="website">Website</Label>
                   <Input
                     id="website"
                     value={formData.website}
-                    onChange={(_e) => setFormData({ ...formData, website: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                     placeholder="https://yourwebsite.com"
                   />
                 </div>
@@ -282,10 +291,11 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
 
               {/* Bio */}
               <div className="space-y-2">
-                <htmlFor="bio">Bio</>
-                <id="bio"
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
                   value={formData.bio}
-                  onChange={(_e) => setFormData({ ...formData, bio: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   placeholder="Tell us about yourself and your business..."
                   rows={3}
                 />
@@ -302,9 +312,9 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
                 )}
               </Button>
             </form>
-          </>
+          </TabsContent>
 
-          <value="account" className="space-y-4">
+          <TabsContent value="account" className="space-y-4">
             <div className="space-y-6">
               {/* Account Information */}
               <div className="space-y-4">
@@ -359,42 +369,42 @@ export function ProfileModal(_{ open,   _onOpenChange }: ProfileModalProps) {
                       </p>
                     </div>
                     <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} className="ml-4">
-                      <className="mr-2 h-4 w-4" />
+                      <Trash2 className="mr-2 h-4 w-4" />
                       Delete Account
                     </Button>
                   </div>
                 </div>
               </div>
             </div>
-          </>
-        </>
+          </TabsContent>
+        </Tabs>
 
         {error && (
-          <className="border-red-200 bg-red-50">
-            <className="h-4 w-4" />
-            <className="text-red-800">{error}</>
-          </>
+          <Alert className="border-red-200 bg-red-50">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription className="text-red-800">{error}</AlertDescription>
+          </Alert>
         )}
 
         {success && (
-          <className="border-green-200 bg-green-50">
-            <className="text-green-800">{success}</>
-          </>
+          <Alert className="border-green-200 bg-green-50">
+            <AlertDescription className="text-green-800">{success}</AlertDescription>
+          </Alert>
         )}
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
           <DialogContent>
-            <>
-              <className="flex items-center gap-2 text-red-600">
-                <className="h-5 w-5" />
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
                 Delete Account
-              </>
-              <>
+              </DialogTitle>
+              <DialogDescription>
                 Are you absolutely sure you want to delete your account? This action cannot be undone and will
                 permanently delete:
-              </>
-            </>
+              </DialogDescription>
+            </DialogHeader>
             <div className="space-y-2 text-sm">
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                 <li>Your profile and personal information</li>

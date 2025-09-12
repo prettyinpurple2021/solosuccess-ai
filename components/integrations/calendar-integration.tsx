@@ -1,12 +1,22 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Calendar, Clock, CheckCircle, XCircle, Settings, RefreshCw, Plus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useCallback } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
+import { 
+  Calendar, 
+  Clock, 
+  CheckCircle,
+  XCircle,
+  ExternalLink,
+  Settings,
+  RefreshCw,
+  Plus
+} from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+
 interface CalendarEvent {
   id: string
   title: string
@@ -23,7 +33,7 @@ interface CalendarIntegrationProps {
   className?: string
 }
 
-export function CalendarIntegration(_{ className = "" }: CalendarIntegrationProps) {
+export function CalendarIntegration({ className = "" }: CalendarIntegrationProps) {
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [connectedCalendars, setConnectedCalendars] = useState<string[]>([])

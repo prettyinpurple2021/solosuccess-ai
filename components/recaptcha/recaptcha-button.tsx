@@ -1,9 +1,10 @@
 "use client"
 
 import React from 'react'
-import { Button } from '@/components/ui/button';
-import { useRecaptchaValidation } from '@/hooks/use-recaptcha-validation';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button'
+import { useRecaptchaValidation } from '@/hooks/use-recaptcha-validation'
+import { Shield, Loader2 } from 'lucide-react'
+
 interface RecaptchaButtonProps {
   children: React.ReactNode
   action: string
@@ -16,16 +17,16 @@ interface RecaptchaButtonProps {
   showSecurityBadge?: boolean
 }
 
-export function RecaptchaButton(_{
-  children,  
-  _action,  
-  _minScore,  
-  _onClick,  
-  _disabled = false,  
-  _variant = "default",  
-  _size = "default",  
-  _className = "",  
-  _showSecurityBadge = false
+export function RecaptchaButton({
+  children,
+  action,
+  minScore,
+  onClick,
+  disabled = false,
+  variant = "default",
+  size = "default",
+  className = "",
+  showSecurityBadge = false
 }: RecaptchaButtonProps) {
   const { validateWithRecaptcha, isValidating } = useRecaptchaValidation()
 
@@ -57,7 +58,7 @@ export function RecaptchaButton(_{
       
       {showSecurityBadge && (
         <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-          <className="w-3 h-3 text-green-600" />
+          <Shield className="w-3 h-3 text-green-600" />
           <span>Protected by reCAPTCHA</span>
         </div>
       )}
@@ -71,18 +72,18 @@ interface WithRecaptchaProps {
   minScore?: number
   onSuccess: () => Promise<void> | void
   onError?: (_error: string) => void
-  children: (_props: {
+  children: (props: {
     onClick: () => Promise<void>
     isValidating: boolean
   }) => React.ReactNode
 }
 
-export function WithRecaptcha(_{
-  action: _action,  
-  _minScore,  
-  _onSuccess,  
-  _onError,  
-  _children
+export function WithRecaptcha({
+  action: _action,
+  minScore,
+  onSuccess,
+  onError,
+  children
 }: WithRecaptchaProps) {
   const { validateWithRecaptcha, isValidating } = useRecaptchaValidation()
 
@@ -108,7 +109,7 @@ export function WithRecaptcha(_{
 
 // Example usage components:
 
-export function SecureLoginButton(_{ onClick,    _disabled,    _className }: {
+export function SecureLoginButton({ onClick, disabled, className }: {
   onClick: () => Promise<void> | void
   disabled?: boolean
   className?: string
@@ -127,7 +128,7 @@ export function SecureLoginButton(_{ onClick,    _disabled,    _className }: {
   )
 }
 
-export function SecureSignupButton(_{ onClick,    _disabled,    _className }: {
+export function SecureSignupButton({ onClick, disabled, className }: {
   onClick: () => Promise<void> | void
   disabled?: boolean
   className?: string
@@ -146,7 +147,7 @@ export function SecureSignupButton(_{ onClick,    _disabled,    _className }: {
   )
 }
 
-export function SecureDemoButton(_{ onClick,    _disabled,    _className }: {
+export function SecureDemoButton({ onClick, disabled, className }: {
   onClick: () => Promise<void> | void
   disabled?: boolean
   className?: string

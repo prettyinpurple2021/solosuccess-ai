@@ -2,10 +2,23 @@
 
 import type React from "react"
 
-import { useState, useRef, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Smartphone, ShuffleIcon as Swipe, Sparkles, TouchpadOff, Heart, Star, Zap, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { useState, useRef, useCallback } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+  Smartphone,
+  ShuffleIcon as Swipe,
+  Sparkles,
+  TouchpadOff,
+  Heart,
+  Star,
+  Zap,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight
+} from "lucide-react"
+
 interface SwipeGesture {
   direction: "up" | "down" | "left" | "right"
   distance: number
@@ -22,14 +35,14 @@ interface TouchGestureProps {
   className?: string
 }
 
-export function TouchGestureWrapper(_{
-  onSwipe, 
-  _onDoubleTap, 
-  _onLongPress, 
-  _onPinch: _onPinch, 
-  _children, 
-  _className = "", 
-_}: TouchGestureProps) {
+export function TouchGestureWrapper({
+  onSwipe,
+  onDoubleTap,
+  onLongPress,
+  onPinch: _onPinch,
+  children,
+  className = "",
+}: TouchGestureProps) {
   const [touchStart, setTouchStart] = useState<{ x: number; y: number; time: number } | null>(null)
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number; time: number } | null>(null)
   const [lastTap, setLastTap] = useState<number>(0)

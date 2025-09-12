@@ -2,20 +2,29 @@
 
 import { useState } from 'react';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import from 'next/link';
+import Link from 'next/link';
 
 import { useTemplates } from '@/hooks/use-templates-swr';
 import { SavedTemplate } from '@/lib/types';
-import { Download, } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger,  } from '@/components/ui/dialog';
+import { FileText, Download, Trash2, Eye } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+
 // Uses SavedTemplate from hook to avoid duplicate/conflicting types
 
 export function SavedTemplatesList() {
   const [_selectedTemplate, setSelectedTemplate] = useState<SavedTemplate | null>(null);
-  const { _templates: savedTemplates,   _isLoading,   _deleteTemplate,   _exportTemplate   } = useTemplates();
+  const { templates: savedTemplates, isLoading, deleteTemplate, exportTemplate } = useTemplates();
 
-  const getTemplateIcon = (_slug: string) => {
+  const getTemplateIcon = (slug: string) => {
     switch (slug) {
       case 'decision-dashboard':
         return '🎯';
@@ -30,19 +39,19 @@ export function SavedTemplatesList() {
     }
   };
 
-  const formatDate = (_dateString: string) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const handleViewTemplate = (_template: SavedTemplate) => {
+  const handleViewTemplate = (template: SavedTemplate) => {
     setSelectedTemplate(template);
   };
 
-  const handleDeleteTemplate = (_templateId: number) => {
+  const handleDeleteTemplate = (templateId: number) => {
     deleteTemplate(templateId);
   };
 
-  const handleExportTemplate = (_template: SavedTemplate) => {
+  const handleExportTemplate = (template: SavedTemplate) => {
     exportTemplate(template);
   }
 
@@ -62,24 +71,24 @@ export function SavedTemplatesList() {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Saved Templates</h3>
-        <>
-          <className="p-8 text-center">
-            <className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <Card>
+          <CardContent className="p-8 text-center">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h4 className="text-lg font-medium mb-2">No saved templates yet</h4>
             <p className="text-muted-foreground mb-4">
               Save your work from the templates to see them here.
             </p>
             <Button asChild>
-              <href="/templates">Go to Templates</>
+              <Link href="/templates">Go to Templates</Link>
             </Button>
-          </>
-        </>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    _<div className="space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold boss-text-gradient">Saved Templates</h3>
         <span className="text-sm text-muted-foreground">{savedTemplates.length} templates</span>
@@ -87,21 +96,21 @@ export function SavedTemplatesList() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {savedTemplates.map((template) => (
-          <key={template.id} className="boss-card">
-            <className="pb-3">
+          <Card key={template.id} className="boss-card">
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{getTemplateIcon(template.template_slug)}</span>
                   <div>
-                    <className="text-base gradient-text-secondary">{template.title}</>
+                    <CardTitle className="text-base gradient-text-secondary">{template.title}</CardTitle>
                     <p className="text-sm text-muted-foreground">
                       {formatDate(template.created_at)}
                     </p>
                   </div>
                 </div>
               </div>
-            </>
-            <className="pt-0">
+            </CardHeader>
+            <CardContent className="pt-0">
               {template.description && (
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                   {template.description}
@@ -116,17 +125,17 @@ export function SavedTemplatesList() {
                       size="sm"
                       onClick={() => handleViewTemplate(template)}
                     >
-                      <className="w-4 h-4 mr-1" />
+                      <Eye className="w-4 h-4 mr-1" />
                       View
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                    <>
-                      <className="boss-text-gradient">{template.title}</>
-                      <>
+                    <DialogHeader>
+                      <DialogTitle className="boss-text-gradient">{template.title}</DialogTitle>
+                      <DialogDescription>
                         Template data from {formatDate(template.created_at)}
-                      </>
-                    </>
+                      </DialogDescription>
+                    </DialogHeader>
                     <div className="space-y-4">
                       <pre className="bg-muted p-4 rounded text-sm overflow-x-auto">
                         {JSON.stringify(template.template_data, null, 2)}
@@ -152,11 +161,11 @@ export function SavedTemplatesList() {
                   onClick={() => handleDeleteTemplate(template.id)}
                   className="text-destructive hover:text-destructive/80"
                 >
-                  <className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            </>
-          </>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
