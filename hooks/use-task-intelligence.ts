@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useUser } from '@stackframe/stack'
+import { useAuth } from '@/hooks/use-auth'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult, TaskSuggestion } from '@/lib/ai-task-intelligence'
 
 export interface UseTaskIntelligenceOptions {
@@ -9,7 +9,7 @@ export interface UseTaskIntelligenceOptions {
 }
 
 export function useTaskIntelligence(options: UseTaskIntelligenceOptions = {}) {
-  const user = useUser()
+  const { user } = useAuth()
   const [engine] = useState(() => new TaskIntelligenceEngine())
   const [optimizationResult, setOptimizationResult] = useState<TaskOptimizationResult | null>(null)
   const [loading, setLoading] = useState(false)

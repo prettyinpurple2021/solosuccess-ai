@@ -1,21 +1,19 @@
 "use client"
 
-import { useUser, useStackApp } from "@stackframe/stack"
+import { useAuth } from '@/hooks/use-auth'
 
 export function useSafeUser() {
   try {
-    return useUser()
+    const { user } = useAuth()
+    return user
   } catch (error) {
-    console.warn('Stack Auth not available:', error)
+    console.warn('Auth not available:', error)
     return null
   }
 }
 
 export function useSafeStackApp() {
-  try {
-    return useStackApp()
-  } catch (error) {
-    console.warn('Stack Auth not available:', error)
-    return null
-  }
+  // Stack Auth has been removed, return null
+  console.warn('Stack Auth has been removed from this application')
+  return null
 }
