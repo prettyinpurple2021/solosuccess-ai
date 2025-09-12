@@ -316,7 +316,7 @@ async function getSearchStats(client: any, userId: string, whereConditions: stri
     const { rows: fileTypeStats } = await client.query(`
       SELECT file_type, COUNT(*) as count, SUM(size) as total_size
       FROM documents d
-      WHERE ${whereConditions.join(' AND ')}
+      WHERE ${whereConditions.map((_, i) => `$${i + 1}`).join(' AND ')}
       GROUP BY file_type
       ORDER BY count DESC
     `, params)
@@ -325,7 +325,7 @@ async function getSearchStats(client: any, userId: string, whereConditions: stri
     const { rows: categoryStats } = await client.query(`
       SELECT category, COUNT(*) as count
       FROM documents d
-      WHERE ${whereConditions.join(' AND ')}
+      WHERE ${whereConditions.map((_, i) => `$${i + 1}`).join(' AND ')}
       GROUP BY category
       ORDER BY count DESC
     `, params)
@@ -334,7 +334,7 @@ async function getSearchStats(client: any, userId: string, whereConditions: stri
     const { rows: tagStats } = await client.query(`
       SELECT jsonb_array_elements_text(tags) as tag, COUNT(*) as count
       FROM documents d
-      WHERE ${whereConditions.join(' AND ')} AND tags IS NOT NULL
+      WHERE ${whereConditions.map((_, i) => `$${i + 1}`).join(' AND ')} AND tags IS NOT NULL
       GROUP BY tag
       ORDER BY count DESC
       LIMIT 20
