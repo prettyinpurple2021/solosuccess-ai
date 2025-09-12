@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    const absoluteFilePath = path.resolve(filePath);
+    const absoluteFilePath = path.join(process.cwd(), filePath);
     
     if (!fs.existsSync(absoluteFilePath)) {
       return NextResponse.json(
