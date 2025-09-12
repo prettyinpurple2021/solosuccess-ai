@@ -49,8 +49,8 @@ export function NeonAuth() {
       })
       
       if (response.ok) {
-        const userData = await response.json()
-        setUser(userData.user as AppUser)
+        const data = await response.json()
+        setUser((data.user ?? data) as AppUser)
         router.push("/dashboard")
       } else {
         // Token is invalid, remove it

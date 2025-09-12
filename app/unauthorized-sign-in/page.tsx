@@ -11,7 +11,7 @@ export default function UnauthorizedSignInPage() {
 
   const handleUnauthorizedSignIn = () => {
     // Redirect to sign-in page
-    window.location.href = "/sign-in"
+    window.location.href = "/signin"
   }
 
   return (
@@ -38,7 +38,7 @@ export default function UnauthorizedSignInPage() {
           
           <div className="text-center text-sm text-gray-600">
             Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="text-pink-600 hover:text-pink-700 font-medium">
+            <Link href="/signup" className="text-pink-600 hover:text-pink-700 font-medium">
               Sign up here
             </Link>
           </div>

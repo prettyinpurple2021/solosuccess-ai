@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useAuth } from "@/hooks/use-auth"
+import { Loading } from "@/components/ui/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,7 @@ import { User, Mail, Lock, Trash2, LogOut, Save, AlertTriangle } from "lucide-re
 import { motion } from "framer-motion"
 
 export default function SettingsPage() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -111,13 +112,21 @@ export default function SettingsPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-background p-6 flex items-center justify-center">
+        <Loading variant="boss" size="lg" text="Checking your access..." />
+      </div>
+    )
+  }
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please sign in to access settings</h1>
           <Button asChild>
-            <a href="/sign-in">Sign In</a>
+            <a href="/signin">Sign In</a>
           </Button>
         </div>
       </div>

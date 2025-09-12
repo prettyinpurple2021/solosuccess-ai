@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useAuth } from "@/hooks/use-auth"
+import { Loading } from "@/components/ui/loading"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,7 +11,7 @@ import { CreditCard, Crown, Zap, Check, X } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function BillingPage() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -99,13 +100,21 @@ export default function BillingPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-background p-6 flex items-center justify-center">
+        <Loading variant="boss" size="lg" text="Checking your access..." />
+      </div>
+    )
+  }
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please sign in to access billing</h1>
           <Button asChild>
-            <a href="/sign-in">Sign In</a>
+            <a href="/signin">Sign In</a>
           </Button>
         </div>
       </div>

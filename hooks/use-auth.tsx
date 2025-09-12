@@ -3,7 +3,6 @@
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import type { User, Session } from "@/lib/neon/types"
-import { verifyToken } from "@/lib/auth-utils"
 
 interface AuthContextType {
   user: User | null
@@ -25,20 +24,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check for existing token in localStorage
     const token = localStorage.getItem('authToken')
     if (token) {
-      const decoded = verifyToken(token)
-      if (decoded) {
-        // Fetch user data from database
-        fetchUserData(decoded.userId, token)
-      } else {
-        localStorage.removeItem('authToken')
-        setLoading(false)
-      }
+      // Always let the server verify the token; do not verify on client
+      fetchUserData(token)
     } else {
       setLoading(false)
     }
   }, [])
 
-  const fetchUserData = async (userId: string, token: string) => {
+  const fetchUserData = async (token: string) => {
     try {
       const response = await fetch('/api/auth/user', {
         headers: {
@@ -47,7 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       
       if (response.ok) {
-        const userData = await response.json()
+        const data = await response.json()
+        const userData = (data && (data.user ?? data)) as User
         const sessionData: Session = {
           user: userData,
           access_token: token,
@@ -74,7 +68,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          identifier: email.includes('@') ? email : email.toLowerCase(),
+          password,
+          isEmail: email.includes('@')
+        }),
       })
 
       const data = await response.json()

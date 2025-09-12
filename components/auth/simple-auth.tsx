@@ -60,8 +60,8 @@ export function SimpleAuth() {
       })
       
       if (response.ok) {
-        const userData = await response.json()
-        setUser(userData.user)
+        const data = await response.json()
+        setUser(data.user ?? data)
         router.push("/dashboard")
       } else {
         // Token is invalid, remove it

@@ -36,7 +36,7 @@ export default function UserProfilePage() {
           
           <div className="text-center text-sm text-gray-600">
             Need to sign in first?{" "}
-            <Link href="/sign-in" className="text-pink-600 hover:text-pink-700 font-medium">
+            <Link href="/signin" className="text-pink-600 hover:text-pink-700 font-medium">
               Sign in here
             </Link>
           </div>
