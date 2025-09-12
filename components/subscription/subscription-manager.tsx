@@ -256,16 +256,16 @@ export function SubscriptionManager() {
   return (
     <div className="space-y-6">
       {/* Current Subscription */}
-      <>
-        <>
+      <div>
+        <div>
           <div className="flex items-center gap-2">
             <div className="h-5 w-5" />
             Current Subscription
           </div>
-          <>
+          <div>
             Manage your SoloSuccess AI subscription and billing
-          </>
-        </>
+          </div>
+        </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -308,21 +308,21 @@ export function SubscriptionManager() {
               Manage Billing
             </Button>
           </div>
-        </>
-      </>
+        </div>
+      </div>
 
       {/* Usage Overview */}
-      <>
-        <>
-          <className="flex items-center gap-2">
-            <className="h-5 w-5" />
+      <div>
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="h-5 w-5" />
             Usage Overview
-          </>
-          <>
+          </div>
+          <div>
             Your current usage across all features
-          </>
-        </>
-        <className="space-y-4">
+          </div>
+        </div>
+        <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -335,7 +335,8 @@ export function SubscriptionManager() {
                 </span>
               </div>
               {getCurrentTier().limits.dailyConversations !== -1 && (
-                <value={getUsagePercentage(usage.aiConversations, getCurrentTier().limits.dailyConversations)} 
+                <div 
+                  value={getUsagePercentage(usage.aiConversations, getCurrentTier().limits.dailyConversations)} 
                   className="h-2" 
                 />
               )}
@@ -344,14 +345,15 @@ export function SubscriptionManager() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <className="h-4 w-4" />
+                  <div className="h-4 w-4" />
                   File Storage
                 </span>
                 <span>
                   {formatStorage(usage.fileStorage)} / {getCurrentTier().limits.fileStorage}
                 </span>
               </div>
-              <value={getUsagePercentage(usage.fileStorage, getCurrentTier().limits.fileStorage)} 
+              <div 
+                value={getUsagePercentage(usage.fileStorage, getCurrentTier().limits.fileStorage)} 
                 className="h-2" 
               />
             </div>
@@ -359,7 +361,7 @@ export function SubscriptionManager() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <className="h-4 w-4" />
+                  <div className="h-4 w-4" />
                   Goals
                 </span>
                 <span>
@@ -376,7 +378,7 @@ export function SubscriptionManager() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <className="h-4 w-4" />
+                  <div className="h-4 w-4" />
                   Tasks
                 </span>
                 <span>
@@ -397,25 +399,25 @@ export function SubscriptionManager() {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Available Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {tiers.map(_(tier) => (
-            <key={tier.id} className={`relative ${tier.popular ? 'ring-2 ring-purple-500' : ''}`}>
+          {tiers.map(tier => (
+            <div key={tier.id} className={`relative ${tier.popular ? 'ring-2 ring-purple-500' : ''}`}>
               {tier.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-purple-500 text-white">
-                    <className="h-3 w-3 mr-1" />
+                    <div className="h-3 w-3 mr-1" />
                     Most Popular
                   </Badge>
                 </div>
               )}
               
-              <>
-                <className="flex items-center gap-2">
-                  {tier.id === 'launch' && <className="h-5 w-5" />}
-                  {tier.id === 'accelerator' && <className="h-5 w-5" />}
-                  {tier.id === 'dominator' && <className="h-5 w-5" />}
+              <div>
+                <div className="flex items-center gap-2">
+                  {tier.id === 'launch' && <div className="h-5 w-5" />}
+                  {tier.id === 'accelerator' && <div className="h-5 w-5" />}
+                  {tier.id === 'dominator' && <div className="h-5 w-5" />}
                   {tier.name}
-                </>
-                <>{tier.description}</>
+                </div>
+                <div>{tier.description}</div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-bold">
                     ${tier.price}
@@ -427,13 +429,13 @@ export function SubscriptionManager() {
                     or ${tier.yearlyPrice}/{tier.yearlyPeriod} (save 17%)
                   </div>
                 )}
-              </>
+              </div>
               
-              <className="space-y-4">
+              <div className="space-y-4">
                 <ul className="space-y-2">
-                  {tier.features.map(_(feature,  _index) => (
+                  {tier.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
-                      <className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <div className="h-4 w-4 text-green-500 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
@@ -452,8 +454,7 @@ export function SubscriptionManager() {
                     {tier.id !== subscription?.tier && <ArrowRight className="h-4 w-4 ml-2" />}
                   </Button>
                   
-                  {tier.yearlyPrice && tier.id !== subscription?.tier && (
-                    _<Button 
+                  {tier.yearlyPrice && tier.id !== subscription?.tier && ( <Button 
                       className="w-full"
                       variant="outline"
                       disabled={loading}

@@ -150,10 +150,10 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
     updateData("goals", { primaryGoals: newGoals })
   }
 
-  const toggleAgent = (_agentId: string) => {
+  const toggleAgent = (agentId: string) => {
     const currentAgents = _data.aiTeam.selectedAgents
     const newAgents = currentAgents.includes(agentId)
-      ? currentAgents.filter(_(a) => a !== agentId)
+      ? currentAgents.filter(a => a !== agentId)
       : [...currentAgents, agentId]
     updateData("aiTeam", { selectedAgents: newAgents })
   }
@@ -162,10 +162,10 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
     switch (currentStep) {
       case 0:
         return (
-          _<div className="space-y-6">
+          <div className="space-y-6">
             <div className="text-center space-y-3">
               <div className="w-20 h-20 mx-auto bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <className="h-10 w-10 text-white" />
+                <div className="h-10 w-10 text-white" />
               </div>
               <h2 className="text-3xl font-bold boss-heading">Welcome to Your Empire! 👑</h2>
               <p className="text-lg text-muted-foreground">
@@ -175,9 +175,9 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <htmlFor="name" className="font-semibold">
-                  What should we call you,  _boss?
-                </>
+                <label htmlFor="name" className="font-semibold">
+                  What should we call you, boss?
+                </label>
                 <Input
                   id="name"
                   placeholder="Your name or business name"
@@ -188,16 +188,16 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
               </div>
 
               <div className="space-y-2">
-                <className="font-semibold">What type of boss are you?</>
+                <div className="font-semibold">What type of boss are you?</div>
                 <Select
                   value={data.personalInfo.businessType}
-                  onValueChange={(_value) => updateData("personalInfo", { businessType: value })}
+                  onValueChange={(value) => updateData("personalInfo", { businessType: value })}
                 >
                   <SelectTrigger className="border-2 border-purple-200 focus:border-purple-400">
                     <SelectValue placeholder="Select your business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {businessTypes.map(_(type) => (
+                    {businessTypes.map(type => (
                       <SelectItem key={type} value={type}>
                         {type}
                       </SelectItem>
@@ -207,16 +207,16 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
               </div>
 
               <div className="space-y-2">
-                <className="font-semibold">What industry do you dominate?</>
+                <div className="font-semibold">What industry do you dominate?</div>
                 <Select
                   value={data.personalInfo.industry}
-                  onValueChange={(_value) => updateData("personalInfo", { industry: value })}
+                  onValueChange={(value) => updateData("personalInfo", { industry: value })}
                 >
                   <SelectTrigger className="border-2 border-purple-200 focus:border-purple-400">
                     <SelectValue placeholder="Select your industry" />
                   </SelectTrigger>
                   <SelectContent>
-                    {industries.map(_(industry) => (
+                    {industries.map(industry => (
                       <SelectItem key={industry} value={industry}>
                         {industry}
                       </SelectItem>
@@ -230,10 +230,10 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
 
       case 1:
         return (
-          _<div className="space-y-6">
+          <div className="space-y-6">
             <div className="text-center space-y-3">
               <div className="w-16 h-16 mx-auto bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
-                <className="h-8 w-8 text-white" />
+                <div className="h-8 w-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold boss-heading">What are your empire goals? 🎯</h2>
                               <p className="text-muted-foreground">Select all that apply - we&apos;ll customize your experience!</p>
@@ -241,7 +241,7 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
 
             <div className="grid gap-3 md:grid-cols-2">
               {goalOptions.map((goal) => (
-                <key={goal.id}
+                <div key={goal.id}
                   className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                     data.goals.primaryGoals.includes(goal.id)
                       ? "ring-2 ring-purple-500 bg-gradient-to-r from-purple-50 to-pink-50"
@@ -249,14 +249,14 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                   }`}
                   onClick={() => toggleGoal(goal.id)}
                 >
-                  <className="p-4">
+                  <div className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="text-2xl">{goal.emoji}</div>
                       <div className="flex-1">
                         <h3 className="font-semibold">{goal.label}</h3>
                         <p className="text-sm text-muted-foreground">{goal.description}</p>
                       </div>
-                      {data.goals.primaryGoals.includes(goal.id) && <className="h-5 w-5 text-purple-600" />}
+                      {data.goals.primaryGoals.includes(goal.id) && <div className="h-5 w-5 text-purple-600" />}
                     </div>
                   </>
                 </>
@@ -265,7 +265,7 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <className="font-semibold">What&apos;s your biggest challenge right now?</>
+                <div className="font-semibold">What&apos;s your biggest challenge right now?</>
                 <placeholder="Tell us what&apos;s keeping you from reaching your full boss potential..."
                   value={data.goals.biggestChallenge}
                   onChange={(_e) => updateData("goals", { biggestChallenge: e.target.value })}
@@ -277,11 +277,10 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
         )
 
       case 2:
-        return (
-          _<div className="space-y-6">
+        return ( <div className="space-y-6">
             <div className="text-center space-y-3">
               <div className="w-16 h-16 mx-auto bg-gradient-to-r from-teal-500 to-purple-500 rounded-full flex items-center justify-center">
-                <className="h-8 w-8 text-white" />
+                <div className="h-8 w-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold boss-heading">How do you work best? 🧠</h2>
                               <p className="text-muted-foreground">Let&apos;s optimize your AI team for your work style!</p>
@@ -289,14 +288,13 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
 
             <div className="space-y-6">
               <div className="space-y-3">
-                <className="font-semibold">Your work style:</>
+                <div className="font-semibold">Your work style:</>
                 <div className="grid gap-2">
                   {[
                     { value: "focused",  _label: "Deep Focus",  _desc: "Long,  _uninterrupted work sessions" }, 
                     _{ value: "collaborative",  _label: "Collaborative",  _desc: "Frequent check-ins and teamwork" }, 
                     _{ value: "flexible",  _label: "Flexible",  _desc: "Mix of focus and collaboration" }, 
-                  _].map((style) => (
-                    _<key={style.value}
+                  _].map((style) => ( <key={style.value}
                       className={`cursor-pointer transition-all ${
                         data.preferences.workStyle === style.value
                           ? "ring-2 ring-purple-500 bg-purple-50"
@@ -304,14 +302,14 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                       }`}
                       onClick={() => updateData("preferences", { workStyle: style.value })}
                     >
-                      <className="p-3">
+                      <div className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium">{style.label}</h4>
                             <p className="text-sm text-muted-foreground">{style.desc}</p>
                           </div>
                           {data.preferences.workStyle === style.value && (
-                            <className="h-5 w-5 text-purple-600" />
+                            <div className="h-5 w-5 text-purple-600" />
                           )}
                         </div>
                       </>
@@ -321,14 +319,13 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
               </div>
 
               <div className="space-y-3">
-                <className="font-semibold">Communication style:</>
+                <div className="font-semibold">Communication style:</>
                 <div className="grid gap-2">
                   {[
                     { value: "direct", label: "Direct & Efficient", desc: "Get straight to the point" },
                     { value: "encouraging", label: "Encouraging & Motivational", desc: "Positive reinforcement" },
                     { value: "detailed", label: "Detailed & Thorough", desc: "Comprehensive explanations" },
-                  ].map(_(style) => (
-                    _<key={style.value}
+                  ].map(style) => ( <key={style.value}
                       className={`cursor-pointer transition-all ${
                         data.preferences.communicationStyle === style.value
                           ? "ring-2 ring-purple-500 bg-purple-50"
@@ -336,14 +333,14 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                       }`}
                       onClick={() => updateData("preferences", { communicationStyle: style.value })}
                     >
-                      <className="p-3">
+                      <div className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium">{style.label}</h4>
                             <p className="text-sm text-muted-foreground">{style.desc}</p>
                           </div>
                           {data.preferences.communicationStyle === style.value && (
-                            <className="h-5 w-5 text-purple-600" />
+                            <div className="h-5 w-5 text-purple-600" />
                           )}
                         </div>
                       </>
@@ -360,14 +357,14 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
           <div className="space-y-6">
             <div className="text-center space-y-3">
               <div className="w-16 h-16 mx-auto bg-gradient-to-r from-pink-500 to-teal-500 rounded-full flex items-center justify-center">
-                <className="h-8 w-8 text-white" />
+                <div className="h-8 w-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold boss-heading">Meet Your AI Squad! 👯‍♀️</h2>
               <p className="text-muted-foreground">Choose your starting team (you can add more later!)</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              {agentOptions.map(_(agent) => (
+              {agentOptions.map(agent) => (
                 <key={agent.id}
                   className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                     data.aiTeam.selectedAgents.includes(agent.id)
@@ -376,7 +373,7 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                   }`}
                   onClick={() => toggleAgent(agent.id)}
                 >
-                  <className="p-4">
+                  <div className="p-4">
                     <div className="flex items-start gap-3">
                       <img src={agent.avatar || "/default-user.svg"}
                         alt={agent.name}
@@ -386,13 +383,13 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                         <div className="flex items-center justify-between mb-1">
                           <h3 className="font-semibold">{agent.name}</h3>
                           {data.aiTeam.selectedAgents.includes(agent.id) && (
-                            <className="h-5 w-5 text-purple-600" />
+                            <div className="h-5 w-5 text-purple-600" />
                           )}
                         </div>
                         <p className="text-sm font-medium text-purple-600 mb-1">{agent.role}</p>
                         <p className="text-sm text-muted-foreground mb-2">{agent.description}</p>
                         <div className="flex flex-wrap gap-1">
-                          {agent.specialties.map(_(specialty) => (
+                          {agent.specialties.map(specialty) => (
                             <Badge key={specialty} variant="outline" className="text-xs">
                               {specialty}
                             </Badge>
@@ -419,14 +416,14 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
             </div>
 
             <div className="space-y-4">
-              <className="boss-card">
+              <div className="boss-card">
                 <>
-                  <className="flex items-center gap-2">
-                    <className="h-5 w-5 text-purple-600" />
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-5 text-purple-600" />
                     Your Boss Profile
                   </>
                 </>
-                <className="space-y-2">
+                <div className="space-y-2">
                   <p>
                     <strong>Name:</strong> {data.personalInfo.name || "Boss Babe"}
                   </p>
@@ -442,16 +439,16 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                 </>
               </>
 
-              <className="boss-card">
+              <div className="boss-card">
                 <>
-                  <className="flex items-center gap-2">
-                    <className="h-5 w-5 text-pink-600" />
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-5 text-pink-600" />
                     Your Goals ({data.goals.primaryGoals.length})
                   </>
                 </>
                 <>
                   <div className="flex flex-wrap gap-2">
-                    {data.goals.primaryGoals.map(_(goalId) => {
+                    {data.goals.primaryGoals.map(goalId) => {
                       const goal = goalOptions.find(_(g) => g.id === goalId)
                       return (
                         <Badge key={goalId} className="girlboss-badge">
@@ -463,16 +460,16 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
                 </>
               </>
 
-              <className="boss-card">
+              <div className="boss-card">
                 <>
-                  <className="flex items-center gap-2">
-                    <className="h-5 w-5 text-teal-600" />
+                  <div className="flex items-center gap-2">
+                    <div className="h-5 w-5 text-teal-600" />
                     Your AI Squad ({data.aiTeam.selectedAgents.length})
                   </>
                 </>
                 <>
                   <div className="flex flex-wrap gap-3">
-                    {data.aiTeam.selectedAgents.map(_(agentId) => {
+                    {data.aiTeam.selectedAgents.map(agentId) => {
                       const agent = agentOptions.find(_(a) => a.id === agentId)
                       return (
                         <div key={agentId} className="flex items-center gap-2">
@@ -507,13 +504,12 @@ export function OnboardingWizard({ open, onComplete: _onComplete, onSkip: _onSki
     }
   }
 
-  return (
-    _<Dialog open={open} onOpenChange={() => {}}>
+  return ( <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto boss-card border-2 border-purple-200">
         <>
           <div className="flex items-center justify-between">
             <div>
-              <className="boss-heading text-xl">SoloSuccess AI Setup</>
+              <div className="boss-heading text-xl">SoloSuccess AI Setup</>
               <>
                 Step {currentStep + 1} of {totalSteps} - Let&apos;s build your empire!
               </>

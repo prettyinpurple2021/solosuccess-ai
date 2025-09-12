@@ -26,13 +26,9 @@ export function BossCard({
   shimmer: _shimmer = true,  
   glow: _glow = true,  
   crown: _crown = false,  
-  _className = "",  
-  _onClick,  
+  _className = "", onClick,  
   _interactive = false,  
-  _fullWidth = false,  
-  _header,  
-  _footer
-}: BossCardProps) {
+  _fullWidth = false, header, footer }: BossCardProps) {
   const baseClasses = "relative overflow-hidden rounded-2xl transition-all duration-300"
   
   const sizeClasses = {
@@ -238,7 +234,7 @@ export function EmpowermentCard({ children, ...props }: Omit<BossCardProps, "var
   )
 }
 
-export function SuccessCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
+export function SuccessCard({ children, ...props }: Omit<BossCardProps, "variant">) {
   return (
     <BossCard variant="success" shimmer glow {...props}>
       {children}
@@ -246,7 +242,7 @@ export function SuccessCard(_{ children,   _...props }: Omit<BossCardProps,   _"
   )
 }
 
-export function WarningCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
+export function WarningCard({ children, ...props }: Omit<BossCardProps, "variant">) {
   return (
     <BossCard variant="warning" shimmer glow {...props}>
       {children}
@@ -254,7 +250,7 @@ export function WarningCard(_{ children,   _...props }: Omit<BossCardProps,   _"
   )
 }
 
-export function DangerCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
+export function DangerCard({ children, ...props }: Omit<BossCardProps, "variant">) {
   return (
     <BossCard variant="danger" shimmer glow {...props}>
       {children}
@@ -262,7 +258,7 @@ export function DangerCard(_{ children,   _...props }: Omit<BossCardProps,   _"v
   )
 }
 
-export function PremiumCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
+export function PremiumCard({ children, ...props }: Omit<BossCardProps, "variant">) {
   return (
     <BossCard variant="premium" crown shimmer glow {...props}>
       {children}
@@ -271,7 +267,7 @@ export function PremiumCard(_{ children,   _...props }: Omit<BossCardProps,   _"
 }
 
 // Interactive card wrapper
-export function InteractiveBossCard(_{ children,   _...props }: BossCardProps) {
+export function InteractiveBossCard({ children, ...props }: BossCardProps) {
   return (
     <BossCard interactive shimmer glow {...props}>
       {children}
@@ -280,13 +276,10 @@ export function InteractiveBossCard(_{ children,   _...props }: BossCardProps) {
 }
 
 // Stats card
-export function StatsCard(_{ 
-  title,   
-  _value,   
-  _icon,   
-  _trend,   
-  _...props 
-}: Omit<BossCardProps,   _'children'> & {
+export function StatsCard({ title, value,   
+  icon: _icon, trend,   
+  ...props 
+}: Omit<BossCardProps, 'children'> & {
   title: string
   value: string | number
   icon?: ReactNode

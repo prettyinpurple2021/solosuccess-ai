@@ -173,7 +173,7 @@ export function RecaptchaSignupButton({ children, ...props }: Omit<RecaptchaButt
   )
 }
 
-export function RecaptchaSigninButton(_{ children,  _...props }: Omit<RecaptchaButtonProps,  _'action'>) {
+export function RecaptchaSigninButton({ children, ...props }: Omit<RecaptchaButtonProps, 'action'>) {
   return (
     <RecaptchaButton 
       action={RECAPTCHA_ACTIONS.SIGNIN}
@@ -185,7 +185,7 @@ export function RecaptchaSigninButton(_{ children,  _...props }: Omit<RecaptchaB
   )
 }
 
-export function RecaptchaContactButton(_{ children,  _...props }: Omit<RecaptchaButtonProps,  _'action'>) {
+export function RecaptchaContactButton({ children, ...props }: Omit<RecaptchaButtonProps, 'action'>) {
   return (
     <RecaptchaButton 
       action={RECAPTCHA_ACTIONS.CONTACT}
@@ -197,7 +197,7 @@ export function RecaptchaContactButton(_{ children,  _...props }: Omit<Recaptcha
   )
 }
 
-export function RecaptchaDemoButton(_{ children,  _...props }: Omit<RecaptchaButtonProps,  _'action'>) {
+export function RecaptchaDemoButton({ children, ...props }: Omit<RecaptchaButtonProps, 'action'>) {
   return (
     <RecaptchaButton 
       action={RECAPTCHA_ACTIONS.DEMO}
@@ -210,11 +210,9 @@ export function RecaptchaDemoButton(_{ children,  _...props }: Omit<RecaptchaBut
 }
 
 // Form wrapper component
-export function RecaptchaForm(_{
-  children, 
-  _action = RECAPTCHA_ACTIONS.SUBMIT, 
-  _onSubmit, 
-  _...props
+export function RecaptchaForm({ children, 
+  action: _action = RECAPTCHA_ACTIONS.SUBMIT, onSubmit, 
+  ...props
 }: {
   children: ReactNode
   action?: RecaptchaAction
