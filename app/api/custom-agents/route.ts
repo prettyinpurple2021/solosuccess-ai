@@ -1,19 +1,36 @@
 import { NextRequest, NextResponse } from "next/server"
 import { AgentCollaborationSystem } from "@/lib/custom-ai-agents/agent-collaboration-system"
+import { SecurityMiddleware } from "@/lib/custom-ai-agents/security/security-middleware"
 
 // Store collaboration systems per user (in production, use Redis or database)
 const userCollaborationSystems = new Map<string, AgentCollaborationSystem>()
+const securityMiddleware = new SecurityMiddleware()
 
 export async function POST(request: NextRequest) {
   try {
-    // For now, use a default user ID. In production, implement proper authentication
-    const userId = "default-user"
-
     const { message, agentId, context, stream = false } = await request.json()
 
     if (!message) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
+
+    // Process security checks
+    const securityResult = await securityMiddleware.processRequest(
+      request,
+      agentId || "roxy",
+      "processRequest",
+      "agent_chat"
+    )
+
+    if (!securityResult.success) {
+      return securityResult.response || NextResponse.json(
+        { error: securityResult.error },
+        { status: 500 }
+      )
+    }
+
+    const securityContext = securityResult.context!
+    const userId = securityContext.userId
 
     // Get or create collaboration system for user
     let collaborationSystem = userCollaborationSystems.get(userId)
@@ -25,7 +42,7 @@ export async function POST(request: NextRequest) {
     // Process request with custom agents
     const result = await collaborationSystem.processRequest(
       message,
-      context,
+      { ...context, securityContext },
       agentId
     )
 
