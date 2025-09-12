@@ -42,6 +42,7 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+    const { id } = await context.params;
     const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
@@ -64,7 +65,7 @@ export async function GET(
 
     // Get recent intelligence data for analysis
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    const intelligence = await db.select()
+    const rawIntelligence = await db.select()
       .from(intelligenceData)
       .where(
         and(
@@ -75,6 +76,32 @@ export async function GET(
       )
       .orderBy(desc(intelligenceData.collected_at))
       .limit(100)
+
+    // Transform database results to match interface
+    const intelligence = rawIntelligence.map(item => ({
+      id: item.id,
+      competitorId: item.competitor_id,
+      userId: item.user_id,
+      sourceType: item.source_type as any,
+      sourceUrl: item.source_url || undefined,
+      dataType: item.data_type,
+      rawContent: item.raw_content,
+      extractedData: item.extracted_data ? item.extracted_data as any : {
+        metadata: {},
+        entities: [],
+        topics: [],
+        keyInsights: []
+      },
+      analysisResults: (item.analysis_results as any[]) || [],
+      confidence: item.confidence ? parseFloat(item.confidence) : 0,
+      importance: item.importance as any,
+      tags: (item.tags as string[]) || [],
+      collectedAt: item.collected_at!,
+      processedAt: item.processed_at || undefined,
+      expiresAt: item.expires_at || undefined,
+      createdAt: item.created_at!,
+      updatedAt: item.updated_at!,
+    }))
 
     // Parse query parameters
     const { searchParams } = new URL(request.url)
@@ -160,6 +187,7 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+    const { id } = await context.params;
     const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })

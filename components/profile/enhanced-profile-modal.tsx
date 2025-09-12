@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useUser } from "@stackframe/stack"
+import { useAuth } from "@/hooks/use-auth"
 import { useProfile } from "@/hooks/use-profile-swr"
 import { User, Camera, Upload, Crown, Sparkles, Bell, Settings, Shield, X, Save, Trash2 } from "lucide-react"
 

@@ -155,6 +155,20 @@ export default function BriefcasePage() {
 
   const { toast } = useToast()
 
+  // Helper function for authenticated requests
+  const authenticatedFetch = (url: string, options: RequestInit = {}) => {
+    const token = localStorage.getItem('authToken')
+    const headers = {
+      ...options.headers,
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    }
+    
+    return fetch(url, {
+      ...options,
+      headers
+    })
+  }
+
   // Fetch files from API
   const fetchFiles = useCallback(async () => {
     try {
@@ -164,7 +178,7 @@ export default function BriefcasePage() {
       if (selectedFolder) params.append('folder', selectedFolder)
       if (searchTerm) params.append('search', searchTerm)
       
-      const response = await fetch(`/api/briefcase?${params.toString()}`)
+      const response = await authenticatedFetch(`/api/briefcase?${params.toString()}`)
       if (!response.ok) throw new Error('Failed to fetch files')
       
       const data = await response.json()
@@ -185,7 +199,7 @@ export default function BriefcasePage() {
   // Fetch folders
   const fetchFolders = useCallback(async () => {
     try {
-      const response = await fetch('/api/briefcase/folders')
+      const response = await authenticatedFetch('/api/briefcase/folders')
       if (response.ok) {
         const data = await response.json()
         setFolders(data.folders || [])
@@ -199,7 +213,7 @@ export default function BriefcasePage() {
   const performAdvancedSearch = useCallback(async (filters: SearchFilters) => {
     try {
       setIsSearching(true)
-      const response = await fetch('/api/briefcase/search', {
+      const response = await authenticatedFetch('/api/briefcase/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(filters)
@@ -251,7 +265,7 @@ export default function BriefcasePage() {
       formData.append('description', '')
       formData.append('tags', '')
 
-      const response = await fetch('/api/briefcase/upload', {
+      const response = await authenticatedFetch('/api/briefcase/upload', {
         method: 'PUT', // Use PUT for bulk upload
         body: formData
       })
@@ -312,7 +326,7 @@ export default function BriefcasePage() {
   // Handle file metadata operations
   const handleToggleFavorite = async (file: BriefcaseFile) => {
     try {
-      const response = await fetch(`/api/briefcase/files/${file.id}/favorite`, {
+      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/favorite`, {
         method: 'POST'
       })
 
@@ -340,7 +354,7 @@ export default function BriefcasePage() {
 
   const handleAddTag = async (file: BriefcaseFile, tag: string) => {
     try {
-      const response = await fetch(`/api/briefcase/files/${file.id}/tags`, {
+      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/tags`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tag })
@@ -370,7 +384,7 @@ export default function BriefcasePage() {
 
   const handleRemoveTag = async (file: BriefcaseFile, tag: string) => {
     try {
-      const response = await fetch(`/api/briefcase/files/${file.id}/tags?tag=${encodeURIComponent(tag)}`, {
+      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/tags?tag=${encodeURIComponent(tag)}`, {
         method: 'DELETE'
       })
 
@@ -398,7 +412,7 @@ export default function BriefcasePage() {
 
   const handleUpdateDescription = async (file: BriefcaseFile, description: string) => {
     try {
-      const response = await fetch(`/api/briefcase/files/${file.id}/metadata`, {
+      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/metadata`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description })
@@ -458,7 +472,7 @@ export default function BriefcasePage() {
   // Handle folder creation
   const handleCreateFolder = async (name: string, description?: string, color?: string) => {
     try {
-      const response = await fetch('/api/briefcase/folders', {
+      const response = await authenticatedFetch('/api/briefcase/folders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -492,7 +506,7 @@ export default function BriefcasePage() {
   // Handle file download
   const handleFileDownload = async (file: BriefcaseFile) => {
     try {
-      const response = await fetch(`/api/briefcase/${file.id}/download`)
+      const response = await authenticatedFetch(`/api/briefcase/${file.id}/download`)
       if (!response.ok) throw new Error('Download failed')
       
       const blob = await response.blob()
@@ -524,7 +538,7 @@ export default function BriefcasePage() {
     if (!confirm('Are you sure you want to delete this file?')) return
 
     try {
-      const response = await fetch(`/api/briefcase/${fileId}`, {
+      const response = await authenticatedFetch(`/api/briefcase/${fileId}`, {
         method: 'DELETE'
       })
 
