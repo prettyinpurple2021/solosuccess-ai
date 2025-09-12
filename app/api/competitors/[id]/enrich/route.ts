@@ -37,6 +37,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await context.params;
     const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
@@ -93,14 +94,41 @@ export async function POST(
       products: Array.isArray(existingCompetitor.products) 
         ? existingCompetitor.products 
         : [],
-      marketPosition: existingCompetitor.market_position || {},
+      marketPosition: existingCompetitor.market_position 
+        ? {
+            ...existingCompetitor.market_position,
+            targetMarkets: (existingCompetitor.market_position as any)?.targetMarkets || [],
+            competitiveAdvantages: (existingCompetitor.market_position as any)?.competitiveAdvantages || [],
+            marketSegments: (existingCompetitor.market_position as any)?.marketSegments || []
+          }
+        : {
+            targetMarkets: [],
+            competitiveAdvantages: [],
+            marketSegments: []
+          },
       competitiveAdvantages: Array.isArray(existingCompetitor.competitive_advantages) 
         ? existingCompetitor.competitive_advantages 
         : [],
       vulnerabilities: Array.isArray(existingCompetitor.vulnerabilities) 
         ? existingCompetitor.vulnerabilities 
         : [],
-      monitoringConfig: existingCompetitor.monitoring_config || {},
+      monitoringConfig: existingCompetitor.monitoring_config 
+        ? existingCompetitor.monitoring_config as any
+        : {
+            websiteMonitoring: false,
+            socialMediaMonitoring: false,
+            newsMonitoring: false,
+            jobPostingMonitoring: false,
+            appStoreMonitoring: false,
+            monitoringFrequency: 'daily' as const,
+            alertThresholds: {
+              pricing: false,
+              productLaunches: false,
+              hiring: false,
+              funding: false,
+              partnerships: false,
+            }
+          },
       lastAnalyzed: existingCompetitor.last_analyzed || undefined,
       createdAt: existingCompetitor.created_at!,
       updatedAt: existingCompetitor.updated_at!,
@@ -266,6 +294,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await context.params;
     const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })

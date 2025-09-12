@@ -39,6 +39,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await context.params
     const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })

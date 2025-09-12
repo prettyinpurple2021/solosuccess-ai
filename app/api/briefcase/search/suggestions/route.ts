@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       LIMIT 10
     `, [user.id])
 
-    const suggestions = []
+    const suggestions: any[] = []
 
     // Basic suggestions based on existing data
     if (!semantic) {
