@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/hooks/use-toast'
-import { _motion, _AnimatePresence } from 'framer-motion'
+import { motion as _motion, AnimatePresence as _AnimatePresence } from 'framer-motion'
 import { 
   Brain, 
   FileText, 
