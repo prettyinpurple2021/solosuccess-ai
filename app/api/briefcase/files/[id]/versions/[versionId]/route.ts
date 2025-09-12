@@ -4,14 +4,15 @@ import { createClient } from '@/lib/neon/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } }
+  context: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
     const { id: documentId, versionId } = params
     const client = await createClient()
 
@@ -64,14 +65,15 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } }
+  context: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
     const { id: documentId, versionId } = params
     const { action } = await request.json()
     const client = await createClient()
@@ -165,14 +167,15 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } }
+  context: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
     const { id: documentId, versionId } = params
     const client = await createClient()
 

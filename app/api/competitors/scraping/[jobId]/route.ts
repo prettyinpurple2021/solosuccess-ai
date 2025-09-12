@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  context: { params: Promise<{ jobId: string }> }
 ) {
   try {
     // Rate limiting
@@ -35,7 +35,7 @@ export async function GET(
       )
     }
 
-    const jobId = params.jobId
+    const jobId = jobId
 
     // Get job details
     const job = await db
@@ -86,7 +86,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  context: { params: Promise<{ jobId: string }> }
 ) {
   try {
     // Rate limiting
@@ -107,7 +107,7 @@ export async function PATCH(
       )
     }
 
-    const jobId = params.jobId
+    const jobId = jobId
     const body = await request.json()
     const { action } = body
 
@@ -166,7 +166,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  context: { params: Promise<{ jobId: string }> }
 ) {
   try {
     // Rate limiting
@@ -187,7 +187,7 @@ export async function DELETE(
       )
     }
 
-    const jobId = params.jobId
+    const jobId = jobId
 
     // Verify job ownership
     const job = await db

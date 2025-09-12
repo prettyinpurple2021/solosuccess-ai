@@ -8,8 +8,8 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Build base query
     let whereConditions = ['d.user_id = $1']
-    let params = [user.id]
+    let params: any[] = [user.id]
     let paramIndex = 2
 
     // Text search
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Tags filter
     if (tags.length > 0) {
-      const tagConditions = tags.map(() => {
+      const tagConditions = tags.map((tag: string) => {
         const condition = `$${paramIndex++} = ANY(d.tags)`
         params.push(tag)
         return condition

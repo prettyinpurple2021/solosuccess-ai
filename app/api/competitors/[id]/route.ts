@@ -66,7 +66,7 @@ const CompetitorUpdateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, error } = await authenticateRequest()
@@ -75,7 +75,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const competitorId = parseInt(params.id)
+    const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
@@ -135,7 +135,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
@@ -150,7 +150,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const competitorId = parseInt(params.id)
+    const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
@@ -292,7 +292,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
@@ -307,7 +307,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const competitorId = parseInt(params.id)
+    const competitorId = parseInt(id)
     if (isNaN(competitorId)) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }

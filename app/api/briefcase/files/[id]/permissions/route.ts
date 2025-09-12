@@ -4,15 +4,17 @@ import { createClient } from '@/lib/neon/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const params = await context.params
+    const { id } = params
+    const documentId = id
     const client = await createClient()
 
     // Verify document ownership
@@ -70,15 +72,17 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const params = await context.params
+    const { id } = params
+    const documentId = id
     const { email, role, message } = await request.json()
 
     if (!email || !role) {
@@ -136,7 +140,7 @@ export async function POST(
       granted: newPermission.granted_at,
       status: 'pending',
       accessCount: 0,
-      invitedBy: user.name || user.email
+      invitedBy: user.full_name || user.email
     })
 
   } catch (error) {

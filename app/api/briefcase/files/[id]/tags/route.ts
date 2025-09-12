@@ -4,15 +4,17 @@ import { createClient } from '@/lib/neon/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const params = await context.params
+    const { id } = params
+    const documentId = id
     const { tag } = await request.json()
 
     if (!tag || typeof tag !== 'string' || !tag.trim()) {
@@ -79,15 +81,17 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await authenticateRequest(request)
-    if (!user) {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = params.id
+    const params = await context.params
+    const { id } = params
+    const documentId = id
     const { searchParams } = new URL(request.url)
     const tag = searchParams.get('tag')
 

@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 
-import { analyze } from '../app/api/compliance/scan/route'
+import { analyze } from '../lib/compliance-analyzer'
 
 
 describe('Compliance Scanner - analyze', () => {

@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, error } = await authenticateRequest()
@@ -36,7 +36,7 @@ export async function PUT(
     // First verify the task belongs to the user
     const { rows: existingTask } = await client.query(
       'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
-      [params.id, user.id]
+      [id, user.id]
     )
 
     if (existingTask.length === 0) {
@@ -61,7 +61,7 @@ export async function PUT(
     }
 
     updateFields.push('updated_at = NOW()')
-    updateValues.push(params.id, user.id)
+    updateValues.push(id, user.id)
 
     const { rows } = await client.query(
       `UPDATE tasks SET ${updateFields.join(', ')} WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`,
@@ -80,7 +80,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, error } = await authenticateRequest()
@@ -94,7 +94,7 @@ export async function DELETE(
     // Verify the task belongs to the user and delete it in one step
     const { rowCount } = await client.query(
       'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
-      [params.id, user.id]
+      [id, user.id]
     )
 
     if (rowCount === 0) {
