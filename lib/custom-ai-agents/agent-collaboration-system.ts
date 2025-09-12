@@ -80,7 +80,12 @@ export class AgentCollaborationSystem {
     }
 
     // Process the primary request
+    const startTime = Date.now()
     const primaryResponse = await primaryAgent.processRequest(request, context)
+    const responseTime = Date.now() - startTime
+
+    // Record training data
+    await primaryAgent.recordTrainingData(request, primaryResponse, context || {}, responseTime, true)
     
     // Check if collaboration is needed
     const collaborationResponses: AgentResponse[] = []

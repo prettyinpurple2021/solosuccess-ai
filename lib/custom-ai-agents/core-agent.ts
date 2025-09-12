@@ -2,6 +2,7 @@ import { generateText, streamText } from "ai"
 import { openai } from "@ai-sdk/openai"
 import { anthropic } from "@ai-sdk/anthropic"
 import { google } from "@ai-sdk/google"
+import { SimpleTrainingCollector } from "./training/simple-training-collector"
 
 export interface AgentCapabilities {
   frameworks: string[]
@@ -60,6 +61,7 @@ export abstract class CustomAgent {
   protected memory: AgentMemory
   protected model: any
   protected systemPrompt: string
+  protected trainingCollector: SimpleTrainingCollector
 
   constructor(
     id: string,
@@ -74,6 +76,7 @@ export abstract class CustomAgent {
     this.capabilities = capabilities
     this.model = model
     this.systemPrompt = systemPrompt
+    this.trainingCollector = SimpleTrainingCollector.getInstance()
     this.memory = {
       userId,
       context: {},
@@ -230,6 +233,40 @@ Be specific, actionable, and maintain your ${this.name} personality.`
     // Keep only last 100 interactions to manage memory
     if (this.memory.history.length > 100) {
       this.memory.history = this.memory.history.slice(-100)
+    }
+  }
+
+  // Record training data for analytics and fine-tuning
+  async recordTrainingData(
+    userMessage: string,
+    agentResponse: AgentResponse,
+    context: Record<string, any>,
+    responseTime: number,
+    success: boolean = true
+  ): Promise<void> {
+    try {
+      await this.trainingCollector.recordInteraction({
+        userId: this.memory.userId,
+        agentId: this.id,
+        userMessage,
+        agentResponse: agentResponse.content,
+        context,
+        success,
+        responseTime,
+        confidence: agentResponse.confidence,
+        collaborationRequests: agentResponse.collaborationRequests.map(req => req.request),
+        followUpTasks: agentResponse.followUpTasks.map(task => task.expectedOutcome),
+        metadata: {
+          model: this.model?.modelId || 'unknown',
+          temperature: 0.7,
+          maxTokens: 1000,
+          framework: this.capabilities.frameworks[0] || 'general',
+          specialization: this.capabilities.specializations[0] || 'general'
+        }
+      })
+    } catch (error) {
+      console.error(`Error recording training data for ${this.name}:`, error)
+      // Don't throw - training data recording shouldn't break the main flow
     }
   }
 
