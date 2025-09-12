@@ -83,6 +83,7 @@ export function TrainingDashboard() {
   const [fineTuningJobs, setFineTuningJobs] = useState<FineTuningJob[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedAgent, setSelectedAgent] = useState<string>('roxy')
+  const [trainingInProgress, setTrainingInProgress] = useState(false)
 
   useEffect(() => {
     loadTrainingData()
@@ -123,6 +124,93 @@ export function TrainingDashboard() {
       console.error('Error loading training data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const startTraining = async () => {
+    try {
+      setTrainingInProgress(true)
+      
+      // Check if we have enough training data first
+      if (!metrics || metrics.totalInteractions < 5) {
+        alert('Insufficient training data. Please interact with your agents more to collect training data before starting fine-tuning.')
+        return
+      }
+      
+      const response = await fetch('/api/custom-agents/training', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create-fine-tuning-job',
+          agentId: selectedAgent,
+          parameters: {
+            model: 'gpt-4o',
+            epochs: 3,
+            learningRate: 0.001,
+            batchSize: 32,
+            temperature: 0.7,
+            maxTokens: 1000,
+            customPrompts: [],
+            dataFilters: {
+              minRating: 3,
+              minConfidence: 0.7,
+              successOnly: true
+            }
+          }
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        // Reload training data to show the new job
+        await loadTrainingData()
+        alert('Training job started successfully!')
+      } else {
+        alert(`Failed to start training: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error starting training:', error)
+      alert('Failed to start training. Please try again.')
+    } finally {
+      setTrainingInProgress(false)
+    }
+  }
+
+  const exportData = async () => {
+    try {
+      const response = await fetch('/api/custom-agents/training', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'export-data',
+          format: 'json'
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        // Create and download the file
+        const blob = new Blob([data.data], { type: 'application/json' })
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `training-data-${new Date().toISOString().split('T')[0]}.json`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      } else {
+        alert(`Failed to export data: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      alert('Failed to export data. Please try again.')
     }
   }
 
@@ -411,27 +499,96 @@ export function TrainingDashboard() {
         </TabsContent>
 
         <TabsContent value="training" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Fine-tuning Pipeline</CardTitle>
-              <CardDescription>Train and optimize your agents with custom data</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Fine-tuning Coming Soon</h3>
-                  <p className="text-gray-600 mb-4">
-                    Advanced fine-tuning capabilities will be available soon to customize your agents
-                  </p>
-                  <Button disabled>
-                    <Settings className="h-4 w-4 mr-2" />
-                    Configure Training
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Training Configuration */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Start Fine-tuning</CardTitle>
+                <CardDescription>Configure and start training for your selected agent</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Select Agent:</label>
+                    <select 
+                      value={selectedAgent} 
+                      onChange={(e) => setSelectedAgent(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md mt-1"
+                      aria-label="Select agent for training"
+                    >
+                      {Object.keys(agentPerformance).map(agentId => (
+                        <option key={agentId} value={agentId} className="capitalize">
+                          {agentId}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Training Parameters:</label>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>Epochs: 3</div>
+                      <div>Learning Rate: 0.001</div>
+                      <div>Batch Size: 32</div>
+                      <div>Data Size: 100 samples</div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={startTraining}
+                    disabled={trainingInProgress || !metrics || metrics.totalInteractions < 5}
+                    className="w-full"
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    {trainingInProgress ? 'Starting Training...' : 
+                     (!metrics || metrics.totalInteractions < 5) ? 'Need More Data' : 'Start Training'}
                   </Button>
+                  
+                  {(!metrics || metrics.totalInteractions < 5) && (
+                    <p className="text-sm text-gray-500 text-center">
+                      Need at least 5 interactions to start training. 
+                      <br />
+                      Current: {metrics?.totalInteractions || 0} interactions
+                    </p>
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Recent Training Jobs */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Training Jobs</CardTitle>
+                <CardDescription>Track your fine-tuning progress</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {fineTuningJobs.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Brain className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                      <p className="text-gray-500 text-sm">No training jobs yet</p>
+                      <p className="text-gray-400 text-xs">Start your first training job to see progress here</p>
+                    </div>
+                  ) : (
+                    fineTuningJobs.map((job) => (
+                      <div key={job.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <p className="font-medium capitalize">{job.agentId}</p>
+                          <p className="text-sm text-gray-600">
+                            {job.trainingDataSize} samples • {new Date(job.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 rounded-full ${getStatusColor(job.status)}`} />
+                          <span className="text-sm capitalize">{job.status}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="insights" className="space-y-4">
@@ -463,13 +620,17 @@ export function TrainingDashboard() {
                 </Alert>
 
                 <div className="flex space-x-2">
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={exportData}>
                     <Download className="h-4 w-4 mr-2" />
                     Export Data
                   </Button>
-                  <Button variant="outline">
+                  <Button 
+                    variant="outline" 
+                    onClick={startTraining}
+                    disabled={trainingInProgress}
+                  >
                     <Play className="h-4 w-4 mr-2" />
-                    Start Training
+                    {trainingInProgress ? 'Starting Training...' : 'Start Training'}
                   </Button>
                 </div>
               </div>

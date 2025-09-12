@@ -80,31 +80,36 @@ export class FineTuningPipeline {
   ): Promise<FineTuningJob> {
     const jobId = crypto.randomUUID()
     
-    // Get training data
-    const trainingData = await this.prepareTrainingData(agentId, userId, parameters.dataFilters)
-    
-    if (trainingData.length < 50) {
-      throw new Error('Insufficient training data. Need at least 50 interactions.')
+    try {
+      // Get training data
+      const trainingData = await this.prepareTrainingData(agentId, userId, parameters.dataFilters)
+      
+      if (trainingData.length < 5) {
+        throw new Error('Insufficient training data. Need at least 5 interactions.')
+      }
+
+      const job: FineTuningJob = {
+        id: jobId,
+        agentId,
+        userId,
+        status: 'pending',
+        createdAt: new Date(),
+        trainingDataSize: trainingData.length,
+        validationDataSize: Math.floor(trainingData.length * 0.2),
+        parameters
+      }
+
+      // Store job in database (simplified - in real implementation, use proper DB)
+      await this.storeFineTuningJob(job)
+
+      // Start training process
+      this.startFineTuningProcess(job, trainingData)
+
+      return job
+    } catch (error) {
+      console.error('Error creating fine-tuning job:', error)
+      throw error
     }
-
-    const job: FineTuningJob = {
-      id: jobId,
-      agentId,
-      userId,
-      status: 'pending',
-      createdAt: new Date(),
-      trainingDataSize: trainingData.length,
-      validationDataSize: Math.floor(trainingData.length * 0.2),
-      parameters
-    }
-
-    // Store job in database (simplified - in real implementation, use proper DB)
-    await this.storeFineTuningJob(job)
-
-    // Start training process
-    this.startFineTuningProcess(job, trainingData)
-
-    return job
   }
 
   private async prepareTrainingData(
@@ -113,6 +118,8 @@ export class FineTuningPipeline {
     filters: FineTuningParameters['dataFilters']
   ): Promise<TrainingInteraction[]> {
     let data = await this.dataCollector.getTrainingDataForAgent(agentId, userId, 5000)
+
+    console.log(`Found ${data.length} training interactions for agent ${agentId}`)
 
     // Apply filters
     if (filters.minRating) {
@@ -126,6 +133,8 @@ export class FineTuningPipeline {
     if (filters.successOnly) {
       data = data.filter(d => d.success)
     }
+
+    console.log(`After filtering: ${data.length} training interactions`)
 
     if (filters.timeRange) {
       data = data.filter(d => 
