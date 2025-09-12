@@ -3,7 +3,15 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { createClient } from '@/lib/neon/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// Initialize Google AI
+// Suggestion type definition
+type Suggestion = {
+  type: string
+  query?: string
+  label?: string
+  count?: number
+  text?: string
+}
+
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
 
 export async function POST(request: NextRequest) {
@@ -45,7 +53,8 @@ export async function POST(request: NextRequest) {
       LIMIT 10
     `, [user.id])
 
-    const suggestions: Array<{ type: string; text: string; count?: number; query?: string; label?: string }> = []
+    // Use explicit type for suggestions array
+    const suggestions: Suggestion[] = []
 
     // Basic suggestions based on existing data
     if (!semantic) {
@@ -138,7 +147,7 @@ Focus on practical, specific suggestions that will help them find their document
 
       // Try to parse AI response
       try {
-        const aiSuggestions = JSON.parse(text)
+        const aiSuggestions: Suggestion[] = JSON.parse(text)
         if (Array.isArray(aiSuggestions)) {
           suggestions.push(...aiSuggestions)
         }

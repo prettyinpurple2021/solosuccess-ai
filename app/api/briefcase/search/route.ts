@@ -3,6 +3,17 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { createClient } from '@/lib/neon/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
+// Type for document search results from database
+interface DocumentSearchResult {
+  id: string
+  name: string
+  description: string
+  tags: string[]
+  category: string
+  file_type: string
+  ai_insights: any
+}
+
 // Initialize Google AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
 
@@ -227,7 +238,7 @@ export async function POST(request: NextRequest) {
 async function performSemanticSearch(query: string, userId: string, client: any) {
   try {
     // Get user's documents for semantic analysis
-    const { rows: documents } = await client.query(`
+    const { rows: documents }: { rows: DocumentSearchResult[] } = await client.query(`
       SELECT id, name, description, tags, category, file_type, ai_insights
       FROM documents 
       WHERE user_id = $1
@@ -241,7 +252,7 @@ async function performSemanticSearch(query: string, userId: string, client: any)
 
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
     
-    const context = documents.map((doc: any) => ({
+    const context = documents.map((doc: DocumentSearchResult) => ({
       id: doc.id,
       name: doc.name,
       description: doc.description,

@@ -209,7 +209,7 @@ export async function PUT(request: NextRequest) {
     const results = await Promise.allSettled(uploadPromises)
     
     const successful = results
-      .filter((result): result is PromiseFulfilledResult<Response> => result.status === 'fulfilled')
+      .filter((result): result is PromiseFulfilledResult<NextResponse<any>> => result.status === 'fulfilled')
       .map(result => result.value)
 
     const failed = results
