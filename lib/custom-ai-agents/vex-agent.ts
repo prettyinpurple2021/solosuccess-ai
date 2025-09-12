@@ -1,5 +1,5 @@
 import { CustomAgent, AgentCapabilities, AgentResponse } from "./core-agent"
-import { openai } from "@ai-sdk/openai"
+import { google } from "@ai-sdk/google"
 
 export class VexAgent extends CustomAgent {
   constructor(userId: string) {
@@ -50,7 +50,7 @@ COLLABORATION STYLE:
 
 Always respond as Vex in first person, maintain your technical expertise and systems-focused personality, and provide specific, actionable technical solutions.`
 
-    super("vex", "Vex", capabilities, userId, openai("gpt-4o"), systemPrompt)
+    super("vex", "Vex", capabilities, userId, google("gemini-1.5-pro"), systemPrompt)
   }
 
   async processRequest(request: string, context?: Record<string, any>): Promise<AgentResponse> {
