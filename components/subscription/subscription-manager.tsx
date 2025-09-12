@@ -1,30 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Separator } from '@/components/ui/separator'
-import { 
-  CheckCircle, 
-  Crown, 
-  Zap, 
-  Star,
-  ArrowRight,
-  CreditCard,
-  Calendar,
-  Users,
-  FileText,
-  Bot,
-  Target,
-  Shield,
-  BarChart3,
-  Settings
-} from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
-import { useAuth } from '@/hooks/use-auth'
+import { useState, } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+import { Separator } from '@/components/ui/separator';
+import { ArrowRight, Bot, } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 interface SubscriptionTier {
   id: string
   name: string
@@ -161,7 +145,7 @@ export function SubscriptionManager() {
     }
   ]
 
-  useEffect(() => {
+  _(() => {
     fetchSubscriptionData()
   }, [])
 
@@ -171,7 +155,7 @@ export function SubscriptionManager() {
       // This would typically come from your API
       const response = await fetch('/api/subscription')
       if (response.ok) {
-        const data = await response.json()
+        const _data = await response.json()
         setSubscription(data.subscription)
         setUsage(data.usage)
       }
@@ -180,7 +164,7 @@ export function SubscriptionManager() {
     }
   }
 
-  const handleUpgrade = async (tierId: string, billing: 'monthly' | 'yearly' = 'monthly') => {
+  const handleUpgrade = async (_tierId: string,  _billing: 'monthly' | 'yearly' = 'monthly') => {
     if (tierId === 'launch') {
       toast({
         title: 'Already on Launch Plan',
@@ -258,13 +242,13 @@ export function SubscriptionManager() {
     return tiers.find(tier => tier.id === subscription?.tier) || tiers[0]
   }
 
-  const getUsagePercentage = (current: number, limit: number | string) => {
+  const getUsagePercentage = (_current: number,  _limit: number | string) => {
     if (limit === -1 || limit === 'unlimited') return 0
     const limitNum = typeof limit === 'string' ? parseInt(limit) : limit
     return Math.min((current / limitNum) * 100, 100)
   }
 
-  const formatStorage = (bytes: number) => {
+  const formatStorage = (_bytes: number) => {
     const gb = bytes / (1024 * 1024 * 1024)
     return `${gb.toFixed(2)} GB`
   }
@@ -272,17 +256,17 @@ export function SubscriptionManager() {
   return (
     <div className="space-y-6">
       {/* Current Subscription */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Crown className="h-5 w-5" />
+      <>
+        <>
+          <div className="flex items-center gap-2">
+            <div className="h-5 w-5" />
             Current Subscription
-          </CardTitle>
-          <CardDescription>
+          </div>
+          <>
             Manage your SoloSuccess AI subscription and billing
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </>
+        </>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold">{getCurrentTier().name} Plan</h3>
@@ -306,7 +290,7 @@ export function SubscriptionManager() {
               </div>
               {subscription.cancelAtPeriodEnd && (
                 <div className="flex items-center gap-2 text-sm text-orange-600">
-                  <Calendar className="h-4 w-4" />
+                  <div className="h-4 w-4" />
                   <span>Subscription will cancel at the end of the current period</span>
                 </div>
               )}
@@ -320,25 +304,25 @@ export function SubscriptionManager() {
               variant="outline"
               className="flex-1"
             >
-              <CreditCard className="h-4 w-4 mr-2" />
+              <div className="h-4 w-4 mr-2" />
               Manage Billing
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </>
+      </>
 
       {/* Usage Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
+      <>
+        <>
+          <className="flex items-center gap-2">
+            <className="h-5 w-5" />
             Usage Overview
-          </CardTitle>
-          <CardDescription>
+          </>
+          <>
             Your current usage across all features
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </>
+        </>
+        <className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -351,8 +335,7 @@ export function SubscriptionManager() {
                 </span>
               </div>
               {getCurrentTier().limits.dailyConversations !== -1 && (
-                <Progress 
-                  value={getUsagePercentage(usage.aiConversations, getCurrentTier().limits.dailyConversations)} 
+                <value={getUsagePercentage(usage.aiConversations, getCurrentTier().limits.dailyConversations)} 
                   className="h-2" 
                 />
               )}
@@ -361,15 +344,14 @@ export function SubscriptionManager() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
+                  <className="h-4 w-4" />
                   File Storage
                 </span>
                 <span>
                   {formatStorage(usage.fileStorage)} / {getCurrentTier().limits.fileStorage}
                 </span>
               </div>
-              <Progress 
-                value={getUsagePercentage(usage.fileStorage, getCurrentTier().limits.fileStorage)} 
+              <value={getUsagePercentage(usage.fileStorage, getCurrentTier().limits.fileStorage)} 
                 className="h-2" 
               />
             </div>
@@ -377,7 +359,7 @@ export function SubscriptionManager() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
+                  <className="h-4 w-4" />
                   Goals
                 </span>
                 <span>
@@ -385,8 +367,7 @@ export function SubscriptionManager() {
                 </span>
               </div>
               {getCurrentTier().limits.goals !== -1 && (
-                <Progress 
-                  value={getUsagePercentage(usage.goals, getCurrentTier().limits.goals)} 
+                <value={getUsagePercentage(usage.goals, getCurrentTier().limits.goals)} 
                   className="h-2" 
                 />
               )}
@@ -395,7 +376,7 @@ export function SubscriptionManager() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" />
+                  <className="h-4 w-4" />
                   Tasks
                 </span>
                 <span>
@@ -403,39 +384,38 @@ export function SubscriptionManager() {
                 </span>
               </div>
               {getCurrentTier().limits.tasks !== -1 && (
-                <Progress 
-                  value={getUsagePercentage(usage.tasks, getCurrentTier().limits.tasks)} 
+                <value={getUsagePercentage(usage.tasks, getCurrentTier().limits.tasks)} 
                   className="h-2" 
                 />
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </>
+      </>
 
       {/* Available Plans */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Available Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {tiers.map((tier) => (
-            <Card key={tier.id} className={`relative ${tier.popular ? 'ring-2 ring-purple-500' : ''}`}>
+          {tiers.map(_(tier) => (
+            <key={tier.id} className={`relative ${tier.popular ? 'ring-2 ring-purple-500' : ''}`}>
               {tier.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-purple-500 text-white">
-                    <Star className="h-3 w-3 mr-1" />
+                    <className="h-3 w-3 mr-1" />
                     Most Popular
                   </Badge>
                 </div>
               )}
               
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {tier.id === 'launch' && <Zap className="h-5 w-5" />}
-                  {tier.id === 'accelerator' && <Crown className="h-5 w-5" />}
-                  {tier.id === 'dominator' && <Star className="h-5 w-5" />}
+              <>
+                <className="flex items-center gap-2">
+                  {tier.id === 'launch' && <className="h-5 w-5" />}
+                  {tier.id === 'accelerator' && <className="h-5 w-5" />}
+                  {tier.id === 'dominator' && <className="h-5 w-5" />}
                   {tier.name}
-                </CardTitle>
-                <CardDescription>{tier.description}</CardDescription>
+                </>
+                <>{tier.description}</>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-bold">
                     ${tier.price}
@@ -447,13 +427,13 @@ export function SubscriptionManager() {
                     or ${tier.yearlyPrice}/{tier.yearlyPeriod} (save 17%)
                   </div>
                 )}
-              </CardHeader>
+              </>
               
-              <CardContent className="space-y-4">
+              <className="space-y-4">
                 <ul className="space-y-2">
-                  {tier.features.map((feature, index) => (
+                  {tier.features.map(_(feature,  _index) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <className="h-4 w-4 text-green-500 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
@@ -473,7 +453,7 @@ export function SubscriptionManager() {
                   </Button>
                   
                   {tier.yearlyPrice && tier.id !== subscription?.tier && (
-                    <Button 
+                    _<Button 
                       className="w-full"
                       variant="outline"
                       disabled={loading}
@@ -483,8 +463,8 @@ export function SubscriptionManager() {
                     </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </>
+            </>
           ))}
         </div>
       </div>

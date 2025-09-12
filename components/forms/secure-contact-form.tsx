@@ -1,16 +1,15 @@
 "use client"
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToast } from '@/hooks/use-toast'
-import { useRecaptchaValidation } from '@/hooks/use-recaptcha-validation'
-import { RECAPTCHA_ACTIONS } from '@/components/recaptcha/recaptcha-provider'
-import { Loader2, Shield, Send } from 'lucide-react'
-
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { useRecaptchaValidation } from '@/hooks/use-recaptcha-validation';
+import { RECAPTCHA_ACTIONS } from '@/components/recaptcha/recaptcha-provider';
+import { Loader2, Shield, Send } from 'lucide-react';
 interface ContactFormData {
   name: string
   email: string
@@ -23,7 +22,7 @@ interface SecureContactFormProps {
   className?: string
 }
 
-export function SecureContactForm({ onSubmit, className = "" }: SecureContactFormProps) {
+export function SecureContactForm(_{ onSubmit,  _className = "" }: SecureContactFormProps) {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',

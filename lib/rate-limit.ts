@@ -5,7 +5,7 @@ declare global {
   var __rateLimits: Map<string, Map<string, RateLimitEntry>> | undefined
 }
 
-function getBucket(bucketName: string) {
+function getBucket(_bucketName: string) {
   if (!globalThis.__rateLimits) {
     globalThis.__rateLimits = new Map()
   }
@@ -17,7 +17,7 @@ function getBucket(bucketName: string) {
   return bucket
 }
 
-function getClientIP(request: Request): string {
+function getClientIP(_request: Request): string {
   // Try to get IP from various headers
   const forwarded = request.headers.get('x-forwarded-for')
   if (forwarded) {
@@ -39,10 +39,10 @@ function getClientIP(request: Request): string {
 }
 
 function handleOriginalPattern(
-  bucketName: string,
-  ip: string,
-  windowMs: number,
-  max: number
+  _bucketName: string, 
+  _ip: string, 
+  _windowMs: number, 
+  _max: number
 ): { allowed: boolean; remaining: number } {
   const bucket = getBucket(bucketName)
   const now = Date.now()
@@ -58,8 +58,8 @@ function handleOriginalPattern(
 }
 
 async function handleRequestPattern(
-  request: Request,
-  options: { requests: number; window: number }
+  _request: Request, 
+  _options: { requests: number; window: number }
 ): Promise<{ allowed: boolean; remaining: number; success?: boolean }> {
   // Extract IP from request
   const ip = getClientIP(request)
@@ -78,24 +78,24 @@ async function handleRequestPattern(
 
 // Overload for the common API pattern: rateLimitByIp(request, options)
 export function rateLimitByIp(
-  request: Request,
-  options: { requests: number; window: number }
+  _request: Request, 
+  _options: { requests: number; window: number }
 ): Promise<{ allowed: boolean; remaining: number; success?: boolean }>
 
 // Original function signature
 export function rateLimitByIp(
-  bucketName: string,
-  ip: string,
-  windowMs: number,
-  max: number
+  _bucketName: string, 
+  _ip: string, 
+  _windowMs: number, 
+  _max: number
 ): { allowed: boolean; remaining: number }
 
 // Implementation that handles both patterns
 export function rateLimitByIp(
-  requestOrBucket: Request | string,
-  optionsOrIp: { requests: number; window: number } | string,
-  windowMs?: number,
-  max?: number
+  _requestOrBucket: Request | string, 
+  _optionsOrIp: { requests: number; window: number } | string, 
+  _windowMs?: number, 
+  _max?: number
 ): Promise<{ allowed: boolean; remaining: number; success?: boolean }> | { allowed: boolean; remaining: number } {
   // New pattern: rateLimitByIp(request, options)
   if (requestOrBucket instanceof Request && typeof optionsOrIp === 'object') {

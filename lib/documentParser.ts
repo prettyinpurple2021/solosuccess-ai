@@ -3,7 +3,6 @@ import mammoth from 'mammoth';
 import * as ExcelJS from 'exceljs';
 import * as cheerio from 'cheerio';
 import { parse } from 'node-html-parser';
-
 export interface ParseResult {
   content: string;
   metadata?: {
@@ -112,7 +111,7 @@ export class DocumentParser {
 
   private static async parsePDF(buffer: Buffer): Promise<ParseResult> {
     try {
-      const data = await pdf(buffer);
+      const _data = await pdf(buffer);
       
       const content = data.text.substring(0, this.MAX_CONTENT_LENGTH);
       const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
@@ -168,12 +167,12 @@ export class DocumentParser {
       let allText = '';
       
       // Extract text from all worksheets
-      workbook.eachSheet((worksheet, sheetId) => {
+      workbook.eachSheet(_(worksheet,  _sheetId) => {
         allText += `Sheet: ${worksheet.name}\n`;
         
-        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+        worksheet.eachRow(_{ includeEmpty: false },  _(row,  _rowNumber) => {
           const rowValues: string[] = [];
-          row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+          row.eachCell(_{ includeEmpty: false },  _(cell,  _colNumber) => {
             // Get cell value as string, handling different types
             let cellValue = '';
             if (cell.value !== null && cell.value !== undefined) {
@@ -197,7 +196,7 @@ export class DocumentParser {
       });
       
       const content = allText.substring(0, this.MAX_CONTENT_LENGTH);
-      const wordCount = content.split(/\s+/).filter((word: string) => word.length > 0).length;
+      const wordCount = content.split(/\s+/).filter(_(word: string) => word.length > 0).length;
       
       return {
         content,

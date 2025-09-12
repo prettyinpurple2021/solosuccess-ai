@@ -3,12 +3,11 @@
 import Link from "next/link"
 import Image from "next/image"
 
-import { useState, type FormEvent } from "react"
-import { Crown, Heart, Sparkles, Twitter, Instagram, Linkedin, Github, Mail, CheckCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-
+import { useState, type FormEvent } from 'react';
+import { Crown, Heart, Sparkles, Twitter, Instagram, Linkedin, Github, Mail, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 const footerLinks = {
   product: [
     { name: "Features", href: "/features" },

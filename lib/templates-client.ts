@@ -11,7 +11,7 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
     }
 
     const client = await createClient();
-    const { rows, error } = await client.query(`
+    const { _rows,  _error  } = await client.query(`
       SELECT 
         tc.id,
         tc.category,
@@ -59,7 +59,7 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
   }
 }
 
-export async function getTemplateBySlug(slug: string): Promise<Template | null> {
+export async function getTemplateBySlug(_slug: string): Promise<Template | null> {
   try {
     // Only try to connect to database if environment variables are available
     if (!process.env.DATABASE_URL) {
@@ -68,7 +68,7 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
     }
 
     const client = await createClient();
-    const { rows, error } = await client.query(
+    const { _rows,  _error  } = await client.query(
       'SELECT * FROM templates WHERE slug = $1',
       [slug]
     );
@@ -88,7 +88,7 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
   }
 }
 
-function findTemplateInJson(slug: string): Template | null {
+function findTemplateInJson(_slug: string): Template | null {
   for (const category of templateData) {
     const template = category.templates.find(t => t.slug === slug);
     if (template) {

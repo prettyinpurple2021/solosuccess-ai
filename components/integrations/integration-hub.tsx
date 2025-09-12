@@ -1,17 +1,16 @@
 "use client"
 
 import React, { useState, useEffect, useMemo } from "react"
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Calendar, MessageSquare, Link, Zap, CheckCircle, Globe, Sparkles, Settings, AlertCircle } from "lucide-react"
-import { toast } from "sonner"
-import { Skeleton } from "@/components/ui/skeleton"
-
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Calendar, MessageSquare, Link, Zap, CheckCircle, Globe, Sparkles, Settings, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 // Define the shape of a single integration
 interface Integration {
   id: string

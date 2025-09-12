@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, Zap, ArrowRight, Mail, Gift } from 'lucide-react';
-
 interface FunnelStep {
   type: 'lead-magnet' | 'email' | 'product-teaser';
   title: string;
@@ -28,7 +27,7 @@ export function FreebieFunnelBuilder() {
   const [funnel, setFunnel] = useState<FunnelStep[]>([]);
   const [title, setTitle] = useState('');
   
-  const { saveTemplate, isSaving } = useTemplateSave();
+  const { _saveTemplate,  _isSaving  } = useTemplateSave();
 
   const handleBuildFunnel = () => {
     const generatedFunnel: FunnelStep[] = [

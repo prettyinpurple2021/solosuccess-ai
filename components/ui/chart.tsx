@@ -3,8 +3,7 @@
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 
-import { cn } from "@/lib/utils"
-
+import { cn } from '@/lib/utils';
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
@@ -141,7 +140,7 @@ const ChartTooltipContent = React.forwardRef<
     },
     ref
   ) => {
-    const { config } = useChart()
+    const { _config  } = useChart()
 
     const tooltipLabel = React.useMemo(() => {
       if (hideLabel || !payload?.length) {
@@ -328,9 +327,9 @@ ChartLegendContent.displayName = "ChartLegend"
 
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(
-  config: ChartConfig,
-  payload: unknown,
-  key: string
+  _config: ChartConfig, 
+  _payload: unknown, 
+  _key: string
 ) {
   if (typeof payload !== "object" || payload === null) {
     return undefined

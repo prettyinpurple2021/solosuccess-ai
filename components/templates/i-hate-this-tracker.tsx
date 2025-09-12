@@ -5,13 +5,12 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, Trash2, AlertTriangle } from 'lucide-react';
-
 export function IHateThisTracker() {
   const [items, setItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState('');
   const [title, setTitle] = useState('');
   
-  const { saveTemplate, isSaving } = useTemplateSave();
+  const { _saveTemplate,  _isSaving  } = useTemplateSave();
 
   const addItem = () => {
     if (newItem.trim()) {

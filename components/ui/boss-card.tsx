@@ -1,10 +1,9 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { ReactNode } from "react"
-import { cn } from "@/lib/utils"
-import { Crown, Sparkles } from "lucide-react"
-
+import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import { Sparkles } from 'lucide-react';
 interface BossCardProps {
   children: ReactNode
   variant?: "default" | "empowerment" | "success" | "warning" | "danger" | "premium"
@@ -21,18 +20,18 @@ interface BossCardProps {
 }
 
 export function BossCard({
-  children,
-  variant = "default",
-  size = "md",
-  shimmer = true,
-  glow = true,
-  crown = false,
-  className = "",
-  onClick,
-  interactive = false,
-  fullWidth = false,
-  header,
-  footer
+  children,  
+  variant: _variant = "default",  
+  size: _size = "md",  
+  shimmer: _shimmer = true,  
+  glow: _glow = true,  
+  crown: _crown = false,  
+  _className = "",  
+  _onClick,  
+  _interactive = false,  
+  _fullWidth = false,  
+  _header,  
+  _footer
 }: BossCardProps) {
   const baseClasses = "relative overflow-hidden rounded-2xl transition-all duration-300"
   
@@ -142,14 +141,14 @@ export function BossCard({
         />
       )}
       
-      {/* Crown indicator */}
+      {/* indicator */}
       {crown && (
         <motion.div
           variants={crownVariants}
           animate="animate"
           className="absolute top-4 right-4 z-10"
         >
-          <Crown className="w-6 h-6 text-yellow-500" />
+          <div className="w-6 h-6 text-yellow-500" />
         </motion.div>
       )}
       
@@ -239,7 +238,7 @@ export function EmpowermentCard({ children, ...props }: Omit<BossCardProps, "var
   )
 }
 
-export function SuccessCard({ children, ...props }: Omit<BossCardProps, "variant">) {
+export function SuccessCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
   return (
     <BossCard variant="success" shimmer glow {...props}>
       {children}
@@ -247,7 +246,7 @@ export function SuccessCard({ children, ...props }: Omit<BossCardProps, "variant
   )
 }
 
-export function WarningCard({ children, ...props }: Omit<BossCardProps, "variant">) {
+export function WarningCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
   return (
     <BossCard variant="warning" shimmer glow {...props}>
       {children}
@@ -255,7 +254,7 @@ export function WarningCard({ children, ...props }: Omit<BossCardProps, "variant
   )
 }
 
-export function DangerCard({ children, ...props }: Omit<BossCardProps, "variant">) {
+export function DangerCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
   return (
     <BossCard variant="danger" shimmer glow {...props}>
       {children}
@@ -263,7 +262,7 @@ export function DangerCard({ children, ...props }: Omit<BossCardProps, "variant"
   )
 }
 
-export function PremiumCard({ children, ...props }: Omit<BossCardProps, "variant">) {
+export function PremiumCard(_{ children,   _...props }: Omit<BossCardProps,   _"variant">) {
   return (
     <BossCard variant="premium" crown shimmer glow {...props}>
       {children}
@@ -272,7 +271,7 @@ export function PremiumCard({ children, ...props }: Omit<BossCardProps, "variant
 }
 
 // Interactive card wrapper
-export function InteractiveBossCard({ children, ...props }: BossCardProps) {
+export function InteractiveBossCard(_{ children,   _...props }: BossCardProps) {
   return (
     <BossCard interactive shimmer glow {...props}>
       {children}
@@ -281,13 +280,13 @@ export function InteractiveBossCard({ children, ...props }: BossCardProps) {
 }
 
 // Stats card
-export function StatsCard({ 
-  title, 
-  value, 
-  icon, 
-  trend, 
-  ...props 
-}: Omit<BossCardProps, 'children'> & {
+export function StatsCard(_{ 
+  title,   
+  _value,   
+  _icon,   
+  _trend,   
+  _...props 
+}: Omit<BossCardProps,   _'children'> & {
   title: string
   value: string | number
   icon?: ReactNode

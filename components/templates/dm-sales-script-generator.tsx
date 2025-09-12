@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, MessageSquare, Copy } from 'lucide-react';
-
 export function DmSalesScriptGenerator() {
   const [persona, setPersona] = useState('');
   const [offerDetails, setOfferDetails] = useState('');
@@ -17,7 +16,7 @@ export function DmSalesScriptGenerator() {
   const [scripts, setScripts] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   
-  const { saveTemplate, isSaving } = useTemplateSave();
+  const { _saveTemplate,  _isSaving  } = useTemplateSave();
 
   const handleGenerate = () => {
     const generatedScripts = [

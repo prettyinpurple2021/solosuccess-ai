@@ -5,13 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, Rocket, Calendar, CheckCircle } from 'lucide-react';
-
 interface LaunchTask {
   day: number;
   task: string;
@@ -35,7 +33,7 @@ export function LiveLaunchTracker() {
   ]);
   const [title, setTitle] = useState('');
   
-  const { saveTemplate, isSaving } = useTemplateSave();
+  const { _saveTemplate,  _isSaving  } = useTemplateSave();
 
   const toggleTask = (index: number) => {
     const newTasks = [...tasks];

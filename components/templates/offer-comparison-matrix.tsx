@@ -2,14 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, Grid3X3, Plus, Trash2, Check, X } from 'lucide-react';
-
 interface Offer {
   name: string;
   price: string;
@@ -34,7 +32,7 @@ export function OfferComparisonMatrix() {
   ]);
   const [title, setTitle] = useState('');
   
-  const { saveTemplate, isSaving } = useTemplateSave();
+  const { _saveTemplate,  _isSaving  } = useTemplateSave();
 
   const addOffer = () => {
     const newOffer: Offer = {

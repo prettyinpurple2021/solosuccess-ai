@@ -3,8 +3,8 @@ type SqlClient = {
 }
 
 export async function reserveIdempotencyKey(
-  client: SqlClient,
-  key: string
+  _client: SqlClient, 
+  _key: string
 ): Promise<boolean> {
   // Ensure table exists (safe to run repeatedly)
   await client.query(
@@ -23,7 +23,7 @@ export async function reserveIdempotencyKey(
   return result.rowCount === 1
 }
 
-export function getIdempotencyKeyFromRequest(req: Request): string | null {
+export function getIdempotencyKeyFromRequest(_req: Request): string | null {
   const header = req.headers.get('Idempotency-Key') || req.headers.get('idempotency-key')
   return header && header.trim().length > 0 ? header.trim() : null
 }

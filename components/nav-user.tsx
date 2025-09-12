@@ -1,23 +1,13 @@
 "use client"
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react"
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
-import { useAuth } from "@/hooks/use-auth"
-
-export function NavUser({
-  user: userProp,
-}: {
+import { BadgeCheck, Bell, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,  } from '@/components/ui/dropdown-menu';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/use-auth';
+export function NavUser(_{
+  user: userProp,  
+_}: {
   user: {
     name: string
     email: string
@@ -34,7 +24,7 @@ export function NavUser({
   // Generate initials from name for fallback
   const initials = userProp.name
     .split(" ")
-    .map((n) => n[0])
+    .map(_(n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2)
@@ -89,12 +79,11 @@ export function NavUser({
               <DropdownMenuItem asChild>
                 <a href="/dashboard/settings">
                   <BadgeCheck />
-                  Account Settings
-                </a>
+                  Account </a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <a href="/dashboard/billing">
-                  <CreditCard />
+                  </>
                   Billing
                 </a>
               </DropdownMenuItem>

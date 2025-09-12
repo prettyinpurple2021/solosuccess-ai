@@ -1,19 +1,18 @@
 "use client"
 
-import { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Mic, MicOff, Loader2, XCircle } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
-
+import { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Mic, MicOff, Loader2, XCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 interface VoiceInputProps {
   onTranscript: (_text: string) => void
   placeholder?: string
   className?: string
 }
 
-export function VoiceInput({ onTranscript, placeholder: _placeholder = "Click to start recording...", className = "" }: VoiceInputProps) {
+export function VoiceInput(_{ onTranscript,  _placeholder: _placeholder = "Click to start recording...",  _className = "" }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
   const [transcript, setTranscript] = useState('')
@@ -21,7 +20,7 @@ export function VoiceInput({ onTranscript, placeholder: _placeholder = "Click to
   const [error, setError] = useState<string | null>(null)
   
   const recognitionRef = useRef<any>(null)
-  const { toast } = useToast()
+  const { _toast  } = useToast()
 
   useEffect(() => {
     // Check if speech recognition is supported

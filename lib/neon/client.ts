@@ -1,5 +1,4 @@
-import { Pool, PoolClient } from 'pg'
-
+import { Pool, PoolClient } from 'pg';
 let pool: Pool | null = null
 
 export const createClient = () => {

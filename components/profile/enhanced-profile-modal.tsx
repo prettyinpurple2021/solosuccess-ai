@@ -2,27 +2,26 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useUser } from "@stackframe/stack"
-import { useProfile } from "@/hooks/use-profile-swr"
-import { User, Camera, Upload, Crown, Sparkles, Bell, Settings, Shield, X, Save, Trash2 } from "lucide-react"
-
+import { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useUser } from '@stackframe/stack';
+import { useProfile } from '@/hooks/use-profile-swr';
+import { User, Camera, Upload, Crown, Sparkles, Bell, Settings, Shield, X, Save, Trash2 } from 'lucide-react';
 interface EnhancedProfileModalProps {
   _open: boolean
   onOpenChangeAction: (_open: boolean) => void
 }
 
-export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProfileModalProps) {
+export function EnhancedProfileModal(_{ _open,  _onOpenChangeAction }: EnhancedProfileModalProps) {
   const user = useUser()
   const { profile, updateProfile, uploadAvatar, removeAvatar } = useProfile()
   const fileInputRef = useRef<HTMLInputElement>(null)

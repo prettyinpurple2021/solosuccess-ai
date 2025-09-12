@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, TrendingUp, Plus, ArrowRight, DollarSign } from 'lucide-react';
-
 interface UpsellStep {
   type: 'initial-offer' | 'upsell' | 'downsell' | 'loyalty';
   title: string;
@@ -34,7 +33,7 @@ export function UpsellFlowBuilder() {
   ]);
   const [title, setTitle] = useState('');
   
-  const { saveTemplate, isSaving } = useTemplateSave();
+  const { _saveTemplate,  _isSaving  } = useTemplateSave();
 
   const addUpsellStep = (type: UpsellStep['type']) => {
     const stepTitles: Record<UpsellStep['type'], string> = {

@@ -1,20 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Mic, MicOff, Volume2, Loader2, Sparkles, Headphones, Radio } from "lucide-react"
-
+import { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,  } from '@/components/ui/dialog';
+import { Mic, MicOff, Volume2, Loader2, Sparkles, Headphones, Radio } from 'lucide-react';
 interface VoiceChatProps {
   agentId: string
   agentName: string
@@ -27,7 +19,7 @@ interface VoiceChatProps {
  * VoiceChat component provides voice interaction with AI agents
  * Supports speech recognition and text-to-speech synthesis
  */
-export function VoiceChat({ agentId, agentName, agentAvatar, onTranscript, onResponse }: VoiceChatProps) {
+export function VoiceChat(_{ agentId,  _agentName,  _agentAvatar,  _onTranscript,  _onResponse }: VoiceChatProps) {
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
