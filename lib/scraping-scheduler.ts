@@ -143,7 +143,10 @@ export class ScrapingScheduler {
       console.log(`Scheduled scraping job: ${jobId} for ${url}`)
       return jobId
     } catch (error) {
-      console.error('Error in scheduleJob:', error)
+      // Only log errors in non-test environments to reduce test noise
+      if (process.env.NODE_ENV !== 'test') {
+        console.error('Error in scheduleJob:', error)
+      }
       throw error
     }
   }
