@@ -56,8 +56,10 @@ export async function POST(request: NextRequest) {
         // For semantic search, we'll use AI to find relevant documents
         const semanticResults = await performSemanticSearch(query, user.id, client)
         if (semanticResults.length > 0) {
-          const documentIds = semanticResults.map(r => `'${r.id}'`).join(',')
-          whereConditions.push(`d.id IN (${documentIds})`)
+          // Use parameterized queries to prevent SQL injection
+          const placeholders = semanticResults.map(() => `$${paramIndex++}`).join(',')
+          whereConditions.push(`d.id IN (${placeholders})`)
+          params.push(...semanticResults.map(r => r.id))
         } else {
           // Fallback to regular text search if semantic search fails
           whereConditions.push(`(

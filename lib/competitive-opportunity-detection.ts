@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import { competitors, intelligenceData, competitorAlerts } from '@/db/schema'
-import { eq, and, desc, gte, lte, sql } from 'drizzle-orm'
+import { eq, and, desc, gte, lte, sql, inArray } from 'drizzle-orm'
 
 // Types for opportunity detection
 export interface OpportunityDetectionResult {
@@ -167,8 +167,8 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            sql`${intelligenceData.competitorId} IN (${competitorIds.map(id => `'${id}'`).join(',')})`,
-            sql`${intelligenceData.dataType} IN ('product', 'service', 'website', 'pricing')`
+            inArray(intelligenceData.competitorId, competitorIds),
+            inArray(intelligenceData.dataType, ['product', 'service', 'website', 'pricing'])
           )
         )
 
