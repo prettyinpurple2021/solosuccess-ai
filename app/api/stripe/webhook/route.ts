@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe, STRIPE_WEBHOOK_EVENTS } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import Stripe from 'stripe'
+import { 
+  getUserByStripeCustomerId, 
+  updateUserSubscription, 
+  getSubscriptionTierFromPriceId 
+} from '@/lib/stripe-db-utils'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -90,32 +95,31 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     const priceId = subscription.items.data[0].price.id
     
     // Get user by Stripe customer ID
-    // const user = await getUserByStripeCustomerId(customerId)
-    // if (error || !user) {
-    //   console.error('User not found for customer:', customerId)
-    //   return
-    // }
-
-    // Determine subscription tier based on price ID
-    let tier = 'launch' // default
-    if (priceId.includes('accelerator')) {
-      tier = 'accelerator'
-    } else if (priceId.includes('dominator')) {
-      tier = 'dominator'
+    const user = await getUserByStripeCustomerId(customerId)
+    if (!user) {
+      console.error('User not found for customer:', customerId)
+      return
     }
 
-    // Update user subscription in database
-    // await updateUserSubscription(user.id, {
-    //   stripe_subscription_id: subscription.id,
-    //   stripe_customer_id: customerId,
-    //   subscription_tier: tier,
-    //   subscription_status: subscription.status,
-    //   current_period_start: new Date(subscription.current_period_start * 1000),
-    //   current_period_end: new Date(subscription.current_period_end * 1000),
-    //   cancel_at_period_end: subscription.cancel_at_period_end
-    // })
+    // Determine subscription tier based on price ID
+    const tier = getSubscriptionTierFromPriceId(priceId)
 
-    console.log(`Subscription created for customer ${customerId}: ${tier}`)
+    // Update user subscription in database
+    const result = await updateUserSubscription(user.id, {
+      stripe_subscription_id: subscription.id,
+      stripe_customer_id: customerId,
+      subscription_tier: tier,
+      subscription_status: subscription.status,
+      current_period_start: new Date(subscription.current_period_start * 1000),
+      current_period_end: new Date(subscription.current_period_end * 1000),
+      cancel_at_period_end: subscription.cancel_at_period_end
+    })
+
+    if (result.success) {
+      console.log(`Subscription created for user ${user.id} (customer ${customerId}): ${tier}`)
+    } else {
+      console.error('Failed to update user subscription:', result.error)
+    }
   } catch (error) {
     console.error('Error handling subscription created:', error)
   }
@@ -127,24 +131,30 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     const customerId = subscription.customer as string
     const priceId = subscription.items.data[0].price.id
     
-    // Determine subscription tier based on price ID
-    let tier = 'launch' // default
-    if (priceId.includes('accelerator')) {
-      tier = 'accelerator'
-    } else if (priceId.includes('dominator')) {
-      tier = 'dominator'
+    // Get user by Stripe customer ID
+    const user = await getUserByStripeCustomerId(customerId)
+    if (!user) {
+      console.error('User not found for customer:', customerId)
+      return
     }
 
-    // Update user subscription in database
-    // await updateUserSubscription(user.id, {
-    //   subscription_tier: tier,
-    //   subscription_status: subscription.status,
-    //   current_period_start: new Date(subscription.current_period_start * 1000),
-    //   current_period_end: new Date(subscription.current_period_end * 1000),
-    //   cancel_at_period_end: subscription.cancel_at_period_end
-    // })
+    // Determine subscription tier based on price ID
+    const tier = getSubscriptionTierFromPriceId(priceId)
 
-    console.log(`Subscription updated for customer ${customerId}: ${tier}`)
+    // Update user subscription in database
+    const result = await updateUserSubscription(user.id, {
+      subscription_tier: tier,
+      subscription_status: subscription.status,
+      current_period_start: new Date(subscription.current_period_start * 1000),
+      current_period_end: new Date(subscription.current_period_end * 1000),
+      cancel_at_period_end: subscription.cancel_at_period_end
+    })
+
+    if (result.success) {
+      console.log(`Subscription updated for user ${user.id} (customer ${customerId}): ${tier}`)
+    } else {
+      console.error('Failed to update user subscription:', result.error)
+    }
   } catch (error) {
     console.error('Error handling subscription updated:', error)
   }
@@ -155,15 +165,26 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   try {
     const customerId = subscription.customer as string
 
-    // Update user subscription in database
-    // await updateUserSubscription(user.id, {
-    //   subscription_tier: 'launch',
-    //   subscription_status: 'canceled',
-    //   stripe_subscription_id: null,
-    //   cancel_at_period_end: false
-    // })
+    // Get user by Stripe customer ID
+    const user = await getUserByStripeCustomerId(customerId)
+    if (!user) {
+      console.error('User not found for customer:', customerId)
+      return
+    }
 
-    console.log(`Subscription deleted for customer ${customerId}`)
+    // Update user subscription in database - downgrade to launch tier
+    const result = await updateUserSubscription(user.id, {
+      subscription_tier: 'launch',
+      subscription_status: 'canceled',
+      stripe_subscription_id: null,
+      cancel_at_period_end: false
+    })
+
+    if (result.success) {
+      console.log(`Subscription deleted for user ${user.id} (customer ${customerId}) - downgraded to launch`)
+    } else {
+      console.error('Failed to update user subscription:', result.error)
+    }
   } catch (error) {
     console.error('Error handling subscription deleted:', error)
   }
