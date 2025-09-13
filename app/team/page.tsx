@@ -23,6 +23,7 @@ import { PolicyGenerator } from "@/components/guardian-ai/policy-generator"
 import { CostBenefitMatrix } from "@/components/decision-frameworks/cost-benefit-matrix"
 import { SpadeFramework } from "@/components/decision-frameworks/spade-framework"
 import { FiveWhysAnalysis } from "@/components/decision-frameworks/five-whys-analysis"
+import { SubscriptionGuard } from "@/components/subscription/subscription-guard"
 
 export default function TeamPage() {
   const [selectedAgent, setSelectedAgent] = useState(aiAgents[0])
@@ -87,7 +88,11 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <SubscriptionGuard 
+      requiredTier="accelerator" 
+      feature="AI Team Collaboration"
+    >
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -906,6 +911,7 @@ export default function TeamPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </SubscriptionGuard>
   )
 }

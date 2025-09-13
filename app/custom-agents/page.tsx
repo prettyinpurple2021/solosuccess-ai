@@ -4,6 +4,7 @@ import React from "react"
 import { CustomAgentChat } from "@/components/custom-agents/custom-agent-chat"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { SubscriptionGuard } from "@/components/subscription/subscription-guard"
 import { 
   Brain, 
   Users, 
@@ -95,7 +96,11 @@ const AGENT_INFO = [
 
 export default function CustomAgentsPage() {
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <SubscriptionGuard 
+      requiredTier="accelerator" 
+      feature="Custom AI Agents"
+    >
+      <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center space-x-2">
@@ -209,6 +214,7 @@ export default function CustomAgentsPage() {
           <CustomAgentChat className="h-full" />
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </SubscriptionGuard>
   )
 }

@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast"
 import { User, Mail, Lock, Trash2, LogOut, Save, AlertTriangle } from "lucide-react"
 import { motion } from "framer-motion"
+import { SubscriptionManager } from "@/components/subscription/subscription-manager"
 
 export default function SettingsPage() {
   const { user, signOut, loading } = useAuth()
@@ -148,6 +149,9 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid gap-6">
+          {/* Subscription Management */}
+          <SubscriptionManager />
+
           {/* Profile Information */}
           <Card>
             <CardHeader>
