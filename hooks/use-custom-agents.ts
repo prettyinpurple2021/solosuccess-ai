@@ -115,6 +115,7 @@ export function useCustomAgents(options: UseCustomAgentsOptions = {}): UseCustom
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-user-id": "default-user", // Add user ID header for security middleware
         },
         body: JSON.stringify({
           message,
@@ -187,6 +188,7 @@ export function useCustomAgents(options: UseCustomAgentsOptions = {}): UseCustom
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-user-id": "default-user",
         },
         body: JSON.stringify({
           action: "execute",
@@ -235,6 +237,7 @@ export function useCustomAgents(options: UseCustomAgentsOptions = {}): UseCustom
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-user-id": "default-user",
         },
         body: JSON.stringify({
           action: "create",
@@ -272,7 +275,11 @@ export function useCustomAgents(options: UseCustomAgentsOptions = {}): UseCustom
   // Get agents
   const getAgents = useCallback(async () => {
     try {
-      const response = await fetch("/api/custom-agents?action=agents")
+      const response = await fetch("/api/custom-agents?action=agents", {
+        headers: {
+          "x-user-id": "default-user",
+        }
+      })
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -293,7 +300,11 @@ export function useCustomAgents(options: UseCustomAgentsOptions = {}): UseCustom
   // Get workflows
   const getWorkflows = useCallback(async () => {
     try {
-      const response = await fetch("/api/custom-agents/workflow")
+      const response = await fetch("/api/custom-agents/workflow", {
+        headers: {
+          "x-user-id": "default-user",
+        }
+      })
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -314,7 +325,11 @@ export function useCustomAgents(options: UseCustomAgentsOptions = {}): UseCustom
   // Get insights
   const getInsights = useCallback(async () => {
     try {
-      const response = await fetch("/api/custom-agents?action=insights")
+      const response = await fetch("/api/custom-agents?action=insights", {
+        headers: {
+          "x-user-id": "default-user",
+        }
+      })
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

@@ -67,10 +67,19 @@ export interface TrainingDataset {
 export class FineTuningPipeline {
   private dataCollector: SimpleTrainingCollector
   private analytics: PerformanceAnalytics
+  private jobs: Map<string, FineTuningJob> = new Map()
 
   constructor() {
     this.dataCollector = new SimpleTrainingCollector()
     this.analytics = new PerformanceAnalytics()
+  }
+
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0
+      const v = c === 'x' ? r : (r & 0x3 | 0x8)
+      return v.toString(16)
+    })
   }
 
   async createFineTuningJob(
@@ -78,7 +87,7 @@ export class FineTuningPipeline {
     userId: string,
     parameters: FineTuningParameters
   ): Promise<FineTuningJob> {
-    const jobId = crypto.randomUUID()
+    const jobId = this.generateUUID()
     
     try {
       // Get training data
@@ -102,8 +111,10 @@ export class FineTuningPipeline {
       // Store job in database (simplified - in real implementation, use proper DB)
       await this.storeFineTuningJob(job)
 
-      // Start training process
-      this.startFineTuningProcess(job, trainingData)
+      // Start training process (run asynchronously)
+      this.startFineTuningProcess(job, trainingData).catch(error => {
+        console.error('Error in fine-tuning process:', error)
+      })
 
       return job
     } catch (error) {
@@ -159,7 +170,8 @@ export class FineTuningPipeline {
   }
 
   private async storeFineTuningJob(job: FineTuningJob): Promise<void> {
-    // In a real implementation, store in database
+    // Store in memory (in a real implementation, store in database)
+    this.jobs.set(job.id, job)
     console.log('Storing fine-tuning job:', job.id)
   }
 
@@ -202,7 +214,7 @@ export class FineTuningPipeline {
 
   private async createTrainingDataset(job: FineTuningJob, data: TrainingInteraction[]): Promise<TrainingDataset> {
     const dataset: TrainingDataset = {
-      id: crypto.randomUUID(),
+      id: this.generateUUID(),
       agentId: job.agentId,
       name: `Fine-tuning dataset for ${job.agentId}`,
       description: `Training dataset created for fine-tuning job ${job.id}`,
@@ -318,20 +330,21 @@ export class FineTuningPipeline {
   }
 
   private async updateJobStatus(job: FineTuningJob): Promise<void> {
-    // In real implementation, update in database
+    // Update in memory (in real implementation, update in database)
+    this.jobs.set(job.id, job)
     console.log(`Job ${job.id} status updated to: ${job.status}`)
   }
 
   async getFineTuningJob(jobId: string): Promise<FineTuningJob | null> {
-    // In real implementation, fetch from database
+    // Fetch from memory (in real implementation, fetch from database)
     console.log(`Fetching fine-tuning job: ${jobId}`)
-    return null
+    return this.jobs.get(jobId) || null
   }
 
   async listFineTuningJobs(userId: string): Promise<FineTuningJob[]> {
-    // In real implementation, fetch from database
+    // Fetch from memory (in real implementation, fetch from database)
     console.log(`Listing fine-tuning jobs for user: ${userId}`)
-    return []
+    return Array.from(this.jobs.values()).filter(job => job.userId === userId)
   }
 
   async generateFineTuningRecommendations(
@@ -413,8 +426,8 @@ export class FineTuningPipeline {
       filteredData = data.filter(d => d.userRating && d.userRating >= 3)
     }
 
-    return this.createTrainingDataset({
-      id: crypto.randomUUID(),
+    const mockJob: FineTuningJob = {
+      id: this.generateUUID(),
       agentId: recommendation.agentId,
       userId,
       status: 'pending',
@@ -431,6 +444,8 @@ export class FineTuningPipeline {
         customPrompts: [],
         dataFilters: {}
       }
-    }, filteredData)
+    }
+    
+    return this.createTrainingDataset(mockJob, filteredData)
   }
 }
