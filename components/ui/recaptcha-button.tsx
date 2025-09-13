@@ -51,6 +51,20 @@ export function RecaptchaButton({
   const handleClick = async () => {
     resetError()
     
+    if (!RECAPTCHA_CONFIG.siteKey) {
+      console.warn('reCAPTCHA site key not configured, proceeding without validation')
+      if (onSubmit) {
+        try {
+          const result = await onSubmit(formData)
+          return result
+        } catch (err) {
+          const errorMsg = err instanceof Error ? err.message : 'Submission failed'
+          onError?.(errorMsg)
+        }
+      }
+      return
+    }
+    
     if (!isReady) {
       const errorMsg = 'reCAPTCHA not ready. Please wait a moment and try again.'
       console.error('reCAPTCHA not ready. Site key:', RECAPTCHA_CONFIG.siteKey)

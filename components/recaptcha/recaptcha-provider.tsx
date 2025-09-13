@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import Script from 'next/script'
 import { useToast } from '@/hooks/use-toast'
 
-const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''
 
 interface RecaptchaContextType {
   isReady: boolean
@@ -36,6 +36,11 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   const { toast } = useToast()
 
   const executeRecaptcha = async (action: _action): Promise<string | null> => {
+    if (!RECAPTCHA_SITE_KEY) {
+      console.warn('reCAPTCHA site key not configured, skipping validation')
+      return null
+    }
+    
     if (!isReady || !window.grecaptcha?.enterprise) {
       console.error('reCAPTCHA is not ready')
       toast({
@@ -127,12 +132,14 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
 
   return (
     <>
-      <Script
-        src={`https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`}
-        onLoad={handleScriptLoad}
-        onError={handleScriptError}
-        strategy="lazyOnload"
-      />
+      {RECAPTCHA_SITE_KEY && (
+        <Script
+          src={`https://www.google.com/recaptcha/enterprise.js?render=${RECAPTCHA_SITE_KEY}`}
+          onLoad={handleScriptLoad}
+          onError={handleScriptError}
+          strategy="lazyOnload"
+        />
+      )}
       <RecaptchaContext.Provider value={contextValue}>
         {children}
       </RecaptchaContext.Provider>
