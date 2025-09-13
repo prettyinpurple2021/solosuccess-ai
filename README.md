@@ -1,407 +1,133 @@
-# 🚀 SoloSuccess AI Platform
+# 👑 SoloSuccess AI
 
-**Transform your productivity with AI agents that work 24/7. Automate everything, achieve more, and dominate your industry like never before.**
-
-*Built by a punk rock girlboss turned businesswoman who became her own best friend* 💜✨
-
-## ✨ What We've Built
-
-SoloSuccess AI is a **comprehensive AI-powered productivity platform** designed for solo founders and entrepreneurs. We've created a virtual AI team that handles everything from strategic decision-making to compliance management.
-
-### 🤖 **8 Specialized AI Agents**
-
-Meet your virtual squad - each with their own punk rock personality and specialized capabilities:
-
-- **Roxy** - Strategic Decision Architect (SPADE Framework expert, Type 1 decision specialist)
-- **Blaze** - Growth Strategist (Cost-Benefit-Mitigation Matrix, strategic analysis)
-- **Echo** - Marketing Maven (content creator, brand rebel)
-- **Lumi** - Guardian AI & Compliance Co-Pilot (GDPR/CCPA compliance, policy generation)
-- **Vex** - Technical Architect (systems rebel, automation architect)
-- **Lexi** - Strategy Analyst (data queen, insights insurgent)
-- **Nova** - Product Designer (UX revolutionary, prototype punk)
-- **Glitch** - Problem-Solving Architect (Five Whys analysis, root cause investigation)
-
-### 🎯 Core Features Implemented
-
-#### ✅ **BossRoom Dashboard**
-
-Your command center for world domination:
-
-- Real-time user statistics with punk rock gamification
-- Today's mission-critical tasks with priority sorting
-- Active empire goals with progress tracking
-- Recent AI conversations with your squad
-- Achievement system with boss points and levels
-- Wellness and productivity insights (because self-care is punk rock)
-- Streak tracking and motivation boosts
-
-#### ✅ **SlayList (Goal & Task Management)**
-
-- Create and manage goals with AI suggestions
-- Task creation linked to goals
-- Automatic progress calculation
-- Priority-based task organization
-- Due date tracking and overdue alerts
-- Real-time stats and analytics
-
-#### ✅ **AI Agent Conversations**
-
-- Persistent chat history for each agent
-- Streaming responses with real-time typing
-- Agent-specific personalities and capabilities
-- Context-aware conversations
-- Multi-model support (GPT-4, Claude, Gemini)
-- Usage tracking and analytics
-
-#### ✅ **Guardian AI - Compliance & Ethics Co-Pilot**
-
-- **GDPR/CCPA Violation Detection** - Real-time compliance scanning
-- **Automated Policy Generation** - Privacy policies, terms of service, cookie policies
-- **Consent Management Hub** - Centralized dashboard for compliance
-- **Trust Score System** - Compliance certification badges
-- **Website Scanning** - Sophisticated pattern detection and realistic scoring
-- **Policy Templates** - AI-powered legal document generation
-
-#### ✅ **Strategic Decision Frameworks**
-
-- **Cost-Benefit-Mitigation Matrix** (Blaze) - Strategic decision analysis
-- **SPADE Framework** (Roxy) - Type 1 decision methodology (Setting, People, Alternatives, Decide, Explain)
-- **Five Whys Analysis** (Glitch) - Root cause investigation and problem-solving
-- **Guided Decision Workflows** - AI prompts and structured templates
-- **Decision Rationale Logging** - Track decision history and reasoning
-
-#### ✅ **Authentication & User Management**
-
-- Secure authentication integration
-- User profiles with gamification data
-- Subscription tier management
-- Secure API endpoints
-
-#### ✅ **Gamification System**
-
-- User levels and points
-- Achievement tracking
-- Streak counters
-- Daily statistics
-- Progress celebrations
-
-### 🛠️ Technical Stack
-
-#### **Frontend Revolution**
-
-- **Next.js 15.2.4** - App Router, Server Components, API Routes
-- **React 19** - Concurrent Features, Server Components
-- **TypeScript 5+** - Full type safety
-- **Tailwind CSS 3.4+** - Utility-first styling with custom punk rock design system
-- **Radix UI** - Accessible, unstyled component primitives
-- **Framer Motion 12+** - Smooth animations and transitions
-
-#### **Backend & Database Power**
-
-- **PostgreSQL** - Robust and scalable relational database
-- **Comprehensive Schema** - 15+ tables with relationships including compliance tables
-- **Database Functions** - Analytics and gamification automation
-
-#### **AI & Machine Learning Squad**
-
-- **AI SDK** - Provider-agnostic AI integration
-- **OpenAI GPT-4** - Primary conversational AI
-- **Anthropic Claude** - Alternative AI model
-- **Google Gemini** - Additional AI capabilities
-- **Streaming Responses** - Real-time AI conversations
-
-#### **Additional Services & Integrations**
-
-- **Subscription Tiers** - Feature access and plan management
-- **Resend** - Transactional email delivery
-- **Environment Validation** - Zod-based config validation
-
-### 📊 Database Schema
-
-Complete database with 15+ tables including compliance schema:
-
-- `profiles` - User accounts with gamification
-- `goals` - User goals with progress tracking
-- `tasks` - Task management linked to goals
-- `ai_agents` - Agent configurations and personalities
-- `ai_conversations` - Persistent chat history
-- `ai_messages` - Individual chat messages
-- `documents` - File management
-- `brand_profiles` - Branding system
-- `focus_sessions` - Focus tracking
-- `achievements` - Gamification achievements
-- `daily_stats` - Analytics and progress tracking
-- `compliance_scans` - GDPR/CCPA compliance data
-- `compliance_issues` - Compliance violation tracking
-- `compliance_policies` - Generated policy documents
-- `trust_scores` - Compliance certification data
-
-### 🔌 API Endpoints
-
-Comprehensive REST API:
-
-- `/api/chat` - AI agent conversations (GET, POST)
-- `/api/goals` - Goal management (GET, POST, PUT, DELETE)
-- `/api/tasks` - Task management (GET, POST, PUT, DELETE)
-- `/api/ai-agents` - Agent information (GET)
-- `/api/dashboard` - Real-time dashboard data (GET)
-- `/api/compliance/scan` - GDPR/CCPA compliance scanning
-- `/api/compliance/policies` - Policy generation
-- `/api/compliance/history` - Compliance audit trail
-
-### 🎨 Design System
-
-Our punk rock meets professional aesthetic:
-
-- Purple-to-pink gradient brand identity
-- Agent-specific color schemes
-- Responsive design patterns
-- Accessible UI components
-- Dark/light mode support
-- Custom animations and transitions
-
-## 🚀 Getting Started
-
-### 1. **Clone & Install**
-
-```bash
-git clone <your-repo>
-cd SoloSuccess-ai-platform
-npm install
-```
-
-### 2. **Environment Setup**
-
-```bash
-cp .env.example .env.local
-# Fill in your API keys and database credentials
-```
-
-### 3. **Database Setup**
-
-Run the database migrations to set up your database schema.
-
-### 4. **Start Development**
-
-```bash
-npm run dev
-```
-
-Visit [http://localhost:3000](http://localhost:3000) to see your SoloSuccess AI platform in action! 🔥
-
-## 📋 Setup Requirements
-
-### **Required Services**
-
-1. **PostgreSQL Database** - for data storage and management.
-2. **OpenAI** - AI conversations
-   - Get API key at [platform.openai.com](https://platform.openai.com)
-
-3. **Subscription Management** - Three pricing tiers available
-   - Launch: $0/month or $0/year (free tier)
-   - Accelerator: $19/month or $190/year
-   - Dominator: $29/month or $290/year
-   - Configure subscription plans
-
-4. **Resend** (Optional) - Emails
-   - Create account at [resend.com](https://resend.com)
-
-## 🎯 What Works Right Now
-
-### ✅ **Fully Functional Features**
-
-- User registration and authentication
-- AI agent conversations with all 8 specialized personalities
-- Goal creation and management
-- Task creation and completion
-- Real-time dashboard with live data
-- Gamification system (points, levels, achievements)
-- Responsive design across all devices
-- Database persistence for all user data
-
-### ✅ **Advanced AI Capabilities**
-
-- **Guardian AI Compliance System** - Full GDPR/CCPA compliance automation
-- **Strategic Decision Frameworks** - SPADE, Cost-Benefit-Mitigation, Five Whys
-- **Policy Generation** - AI-powered legal document creation
-- **Compliance Scanning** - Real-time website compliance analysis
-- **Trust Score System** - Compliance certification and monitoring
-
-### ✅ **Live Features That Slay**
-
-- Chat with Roxy using SPADE framework for strategic decisions
-- Chat with Blaze using Cost-Benefit-Mitigation Matrix for growth analysis
-- Chat with Glitch using Five Whys for problem-solving
-- Use Lumi's Guardian AI for compliance and policy generation
-- Create goals and track progress automatically
-- Complete tasks and watch your streak grow
-- View real-time statistics and insights
-- Earn achievements and level up
-
-## 🔮 Ready for Enhancement
-
-The platform is architected for easy expansion:
-
-### 📁 **Briefcase (Document Management)**
-
-- Database schema ready
-- File upload endpoints prepared
-- AI document processing hooks available
-
-### 🎨 **BrandStyler (Brand Management)**
-
-- Brand profiles and assets tables ready
-- AI brand generation endpoints prepared
-- Style guide management system ready
-
-### 🧘 **Burnout Shield (Wellness Tracking)**
-
-- Focus sessions and wellness entries tables ready
-- Pomodoro timer integration prepared
-- Wellness scoring algorithms implemented
-
-### 💳 **Subscription System**
-
-- Pricing page with tier comparison available
-- Tier-based access control ready
-- Usage tracking implemented
-
-### 👥 **First Hire & Scaling Playbook**
-
-- Role architect with self-analysis workflow
-- Compensation & equity modeler
-- 30-60-90 day onboarding plan generator
-- Job description and interview scorecard templates
-
-## 🌟 Key Highlights
-
-### **🎮 Gamification That Actually Motivates**
-
-- User levels and experience points
-- Achievement system with 10+ punk rock achievements
-- Daily streak tracking
-- Progress celebrations
-
-### **🔒 Security Like a Fortress**
-
-- Secure API endpoints with authentication
-- Input validation with Zod schemas
-- Environment variable validation
-
-### **📈 Analytics That Actually Help**
-
-- Real-time user statistics
-- Daily activity tracking
-- AI usage analytics
-- Goal completion metrics
-
-### **⚡ Performance That Impresses**
-
-- Server-side rendering
-- Streaming AI responses
-- Optimized database queries
-
-### **🛡️ Compliance That Protects**
-
-- Automated GDPR/CCPA compliance
-- Real-time policy generation
-- Trust score certification
-- Comprehensive audit trails
-
-## 🎉 Success Metrics
-
-Your SoloSuccess AI platform is **production-ready** with advanced features:
-
-- ✅ **Complete Authentication System**
-- ✅ **8 Working AI Agents** with specialized frameworks
-- ✅ **Full Goal & Task Management** with real-time updates
-- ✅ **Comprehensive Dashboard** with live data
-- ✅ **Gamification System** with points and achievements
-- ✅ **Guardian AI Compliance System** with policy generation
-- ✅ **Strategic Decision Frameworks** for complex analysis
-- ✅ **Responsive Design** that works on all devices
-- ✅ **Production-Ready Codebase** with proper error handling
-- ✅ **Scalable Architecture** ready for thousands of users
-
-## 🚀 Deployment
-
-Ready to deploy to production:
-
-1. **Deploy to Vercel (Recommended)**
-
-   - Connect your GitHub repository to Vercel
-   - Set up environment variables in Vercel dashboard
-   - Automatic deployments on every push
-
-   See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed instructions.
-
-2. **Environment Variables**
-   - Set all production URLs
-   - Use production API keys
-   - Review and update pricing as needed
-
-4. **Database**
-   - Run all migrations on your production database
-   - Set up proper backup schedules
-
-## 📞 What's Next?
-
-Your SoloSuccess AI platform is now a **comprehensive productivity suite** that users can immediately start using to:
-
-- 🤖 Chat with specialized AI agents using proven frameworks
-- 🎯 Create and track goals with strategic insights
-- ✅ Manage daily tasks with intelligent prioritization
-- 📊 Monitor productivity metrics and compliance
-- 🏆 Earn achievements and level up
-- 🛡️ Ensure GDPR/CCPA compliance automatically
-- 🧠 Make better decisions with structured frameworks
-
-**Ready to launch and start changing lives like the boss you are!** 🚀💜
+Your all‑in‑one, AI‑powered command center for solo founders. Build your empire with a squad of specialized AI agents, a focused dashboard, a goal→task SlayList, smart document Briefcase, and interactive business templates — all wrapped in a bold, girlboss vibe that respects your time.
 
 ---
 
-> Built with ❤️, rebellion, and the power of AI by a girlboss who refused to settle for mediocre tools
+## ✨ What you can do
+
+- **Chat with your AI squad**: 8 specialized agents for strategy, growth, marketing, compliance, product, tech, analytics, and problem‑solving.
+- **Run your day from the BossRoom**: daily stats, priorities, insights, streaks, and wins.
+- **Turn goals into action with SlayList**: create goals, break into tasks, track progress.
+- **Store and use documents in Briefcase**: upload files, tag, preview, favorite, and reuse outputs.
+- **Use interactive templates**: guided frameworks that produce real deliverables.
+- **Earn and learn**: levels, points, achievements, and insights that actually help.
 
 ---
 
-## Punk Rock Development Philosophy
+## 🚀 Quick start (for users)
 
-- **Move Fast, Break Things, Fix Them Faster** - Iterate with confidence
-- **User Experience > Everything** - If it's not intuitive, it's not punk rock
-- **Accessibility is Rebellion** - Everyone deserves to feel like a boss
-- **Performance is Respect** - Fast apps show you respect your users' time
-- **Code Quality is Self-Love** - Write code your future self will thank you for
+1. **Create your account**
 
-## Girlboss Code Standards
+- Go to the app, sign up, and log in.
 
-- **Clean Code is Confident Code** - No spaghetti allowed
-- **Comments Explain the Why, Not the What** - Smart documentation
-- **Error Handling is Caring** - Fail gracefully, always
-- **Testing is Trust** - Trust but verify everything
-- **Security is Self-Care** - Protect your users like you protect yourself
+1. **Complete the Onboarding**
 
-## Recent Updates (January 2025)
+- The Welcome screen launches a guided flow. Click “Start Guide” or visit `/dashboard?onboarding=1` to open it anytime.
+- We’ll personalize your setup and unlock the right workflows.
 
-### ✅ **Completed Major Features**
+1. **Meet the BossRoom (dashboard)**
 
-- **Guardian AI Integration** - Complete GDPR/CCPA compliance system
-- **Strategic Decision Frameworks** - SPADE, Cost-Benefit-Mitigation, Five Whys
-- **Database Schema Expansion** - Added compliance and project tables
-- **API Route Implementation** - Core functionality endpoints
-- **Statsig Removal** - Cleaned up feature flag dependencies
+- See Today’s Tasks, AI interactions, productivity score, and recent items.
+- Use the call‑to‑action buttons to jump into chat, SlayList, or Briefcase.
 
-### 🔄 **In Progress**
+1. **Start chatting with your AI team**
 
-- **API Route Completion** - Finalizing remaining endpoints
-- **Database Optimization** - Performance improvements
-- **Code Quality** - Linting and TypeScript fixes
+- Open Agents from the dashboard. Each agent has a specialty and tone.
+- Ask for plans, drafts, analyses, or step‑by‑step guidance.
 
-### 📋 **Next Priorities**
+1. **Plan with SlayList**
 
-- **First Hire Playbook** - Scaling and team building tools
-- **File Upload System** - Document management
-- **Advanced Analytics** - Enhanced reporting and insights
+- Create a goal → break it into tasks → set priorities → knock them out.
+
+1. **Upload to Briefcase**
+
+- Click Upload, choose files, set description/tags/category, then Save/Start Upload.
+- Preview files, mark favorites, and use tags to find things instantly.
+
+1. **Use interactive Templates**
+
+- Browse `/templates`. Open any template to follow a guided workflow and export results.
+
+Need the full tour? See the User Handbook below.
 
 ---
 
-Last updated: January 2025 - Guardian AI & Decision Frameworks Complete*
+## 🤖 Your AI squad
+
+- **Roxy**: Strategic decisions (SPADE, Type‑1 decisions)
+- **Blaze**: Growth and Cost‑Benefit‑Mitigation analysis
+- **Echo**: Marketing campaigns and content
+- **Lumi**: Guardian AI — policies, compliance, privacy
+- **Vex**: Technical planning and systems
+- **Lexi**: Analytics and strategy insights
+- **Nova**: Product design and UX thinking
+- **Glitch**: Five Whys and problem‑solving
+
+---
+
+## 💼 Briefcase (documents)
+
+- Upload multiple files with description, tags, and category.
+- Preview (with auth), download, favorite, tag, and update metadata.
+- Save outputs from chats and templates directly to Briefcase.
+
+---
+
+## 🧩 Templates (interactive)
+
+- A growing library of structured, guided tools (e.g., Decision Dashboard, Delegation List Builder, Offer Comparison Matrix, Launch Trackers).
+- Each template outputs usable artifacts you can save to Briefcase.
+
+---
+
+## 💳 Plans & billing
+
+- Pricing tiers are shown on the Pricing page in‑app.
+- Manage your subscription from your profile. Payments are powered by Stripe.
+
+---
+
+## 🔒 Privacy & security
+
+- Account‑protected features, server‑side validation, and secure API routes.
+- File storage and data live in our database stack (Neon/PostgreSQL). We do not use MongoDB.
+- GDPR/CCPA support via Guardian AI for policies and scanning.
+
+---
+
+## 🆘 Help & support
+
+- Open the in‑app Help page for quick answers.
+- Check the User Handbook for step‑by‑step guides.
+- If you need assistance, reach out via the in‑app support link.
+
+---
+
+## 📚 User Handbook (Wiki)
+
+For exhaustive, step‑by‑step guides to every feature, visit the wiki:
+
+- Onboarding
+- Dashboard (BossRoom)
+- AI Agents
+- SlayList (Goals & Tasks)
+- Briefcase (Documents)
+- Templates (Interactive Tools)
+- Billing & Subscriptions
+- Privacy & Security
+- Troubleshooting
+
+See `wiki/user-guides/` for the full manual.
+
+---
+
+## What’s new
+
+- Briefcase now uses database‑backed APIs (upload, tags, metadata, favorites, preview).
+- Agent chat uploads use authenticated requests and can save to Briefcase.
+- Templates landing page and interactive renderer are live.
+- Onboarding is reliable and can be launched with `/dashboard?onboarding=1`.
+- MongoDB removed; the stack uses Neon/PostgreSQL and integrated storage.
+
+Own your workflow. Build your empire. Stay legendary. 💜

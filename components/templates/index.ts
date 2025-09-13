@@ -1,4 +1,4 @@
-export { DecisionDashboard } from './decision-dashboard';
+export { default as DecisionDashboard } from './decision-dashboard';
 export { DelegationListBuilder } from './delegation-list-builder';
 export { DmSalesScriptGenerator } from './dm-sales-script-generator';
 export { FreebieFunnelBuilder } from './freebie-funnel-builder';
@@ -22,7 +22,7 @@ export { AiCollabPlanner } from './ai-collab-planner';
 export { PrPitchTemplate } from './pr-pitch-template';
 
 // Import components for slug-based mapping
-import { DecisionDashboard } from './decision-dashboard';
+import DecisionDashboard from './decision-dashboard';
 import { DelegationListBuilder } from './delegation-list-builder';
 import { DmSalesScriptGenerator } from './dm-sales-script-generator';
 import { FreebieFunnelBuilder } from './freebie-funnel-builder';

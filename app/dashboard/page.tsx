@@ -26,6 +26,7 @@ import {
   Briefcase
 } from "lucide-react"
 import Link from "next/link"
+import { useSearchParams, useRouter } from "next/navigation"
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -33,6 +34,8 @@ export default function DashboardPage() {
   const { track } = useAnalytics()
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showWelcomeDashboard, setShowWelcomeDashboard] = useState(false)
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   // Track page views and performance
   usePageTracking()
@@ -45,6 +48,19 @@ export default function DashboardPage() {
       setShowWelcomeDashboard(true)
     }
   }, [data])
+
+  // Support query param trigger (?onboarding=1) for reliability
+  useEffect(() => {
+    const onboardingFlag = searchParams?.get('onboarding')
+    if (onboardingFlag === '1') {
+      setShowWelcomeDashboard(false)
+      setShowOnboarding(true)
+      // Clean the param from URL without full reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('onboarding')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   // Track dashboard view
   useEffect(() => {
