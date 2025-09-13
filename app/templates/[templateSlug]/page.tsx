@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TemplateRenderer } from '@/components/templates/template-renderer'
 import templateData from '@/data/templates.json';
 
 // Helper function to find template in JSON data
@@ -84,25 +85,7 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
         </div>
       </div>
 
-      <Card className="boss-card">
-        <CardContent className="p-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-2 gradient-text-secondary">Template Preview</h3>
-            <p className="text-muted-foreground">
-              This template is currently in development. The interactive component will be available soon.
-            </p>
-            <div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-              <h4 className="font-medium mb-2">Template Details:</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li><strong>Title:</strong> {template.title}</li>
-                <li><strong>Category:</strong> {template.category}</li>
-                <li><strong>Required Role:</strong> {template.requiredRole}</li>
-                <li><strong>Interactive:</strong> {template.isInteractive ? 'Yes' : 'No'}</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <TemplateRenderer slug={template.slug} />
     </div>
   );
 }

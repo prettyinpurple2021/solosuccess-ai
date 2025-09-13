@@ -128,8 +128,12 @@ export default function EnhancedFilePreviewModal({
 
     try {
       // Check if the file supports preview
+      const token = localStorage.getItem('authToken')
       const headResponse = await fetch(`/api/briefcase/files/${fileToPreview.id}/preview`, {
-        method: 'HEAD'
+        method: 'HEAD',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
       })
 
       if (!headResponse.ok) {
@@ -144,7 +148,11 @@ export default function EnhancedFilePreviewModal({
       }
 
       // Load the actual preview content
-      const previewResponse = await fetch(`/api/briefcase/files/${fileToPreview.id}/preview`)
+      const previewResponse = await fetch(`/api/briefcase/files/${fileToPreview.id}/preview`, {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      })
       
       if (!previewResponse.ok) {
         throw new Error('Failed to load preview')

@@ -152,6 +152,11 @@ export default function BriefcasePage() {
     categories: [],
     tags: []
   })
+  // Upload dialog state
+  const [uploadSelectedFiles, setUploadSelectedFiles] = useState<FileList | null>(null)
+  const [uploadDescription, setUploadDescription] = useState("")
+  const [uploadTags, setUploadTags] = useState("")
+  const [uploadCategory, setUploadCategory] = useState("document")
 
   const { toast } = useToast()
 
@@ -178,7 +183,7 @@ export default function BriefcasePage() {
       if (selectedFolder) params.append('folder', selectedFolder)
       if (searchTerm) params.append('search', searchTerm)
       
-      const response = await authenticatedFetch(`/api/briefcase?${params.toString()}`)
+      const response = await authenticatedFetch(`/api/briefcase/files?${params.toString()}`)
       if (!response.ok) throw new Error('Failed to fetch files')
       
       const data = await response.json()
@@ -248,7 +253,13 @@ export default function BriefcasePage() {
   }, [fetchFiles, fetchFolders])
 
   // Handle file upload
-  const handleFileUpload = async (files: FileList | null, folderId?: string, category?: string) => {
+  const handleFileUpload = async (
+    files: FileList | null,
+    folderId?: string,
+    category?: string,
+    description?: string,
+    tags?: string
+  ) => {
     if (!files || files.length === 0) return
 
     setIsUploading(true)
@@ -262,8 +273,8 @@ export default function BriefcasePage() {
       
       formData.append('category', category || selectedCategory)
       if (folderId) formData.append('folderId', folderId)
-      formData.append('description', '')
-      formData.append('tags', '')
+      formData.append('description', description || '')
+      formData.append('tags', tags || '')
 
       const response = await authenticatedFetch('/api/briefcase/upload', {
         method: 'PUT', // Use PUT for bulk upload
@@ -283,6 +294,9 @@ export default function BriefcasePage() {
       })
 
       setShowUploadDialog(false)
+      setUploadSelectedFiles(null)
+      setUploadDescription("")
+      setUploadTags("")
       fetchFiles() // Refresh the file list
       fetchFolders() // Refresh folders to update counts
     } catch (error) {
@@ -506,7 +520,7 @@ export default function BriefcasePage() {
   // Handle file download
   const handleFileDownload = async (file: BriefcaseFile) => {
     try {
-      const response = await authenticatedFetch(`/api/briefcase/${file.id}/download`)
+      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/download`)
       if (!response.ok) throw new Error('Download failed')
       
       const blob = await response.blob()
@@ -538,7 +552,7 @@ export default function BriefcasePage() {
     if (!confirm('Are you sure you want to delete this file?')) return
 
     try {
-      const response = await authenticatedFetch(`/api/briefcase/${fileId}`, {
+      const response = await authenticatedFetch(`/api/briefcase/files/${fileId}`, {
         method: 'DELETE'
       })
 
@@ -1093,7 +1107,60 @@ export default function BriefcasePage() {
                 id="files"
                 type="file"
                 multiple
-                onChange={(e) => handleFileUpload(e.target.files)}
+                onChange={(e) => setUploadSelectedFiles(e.target.files)}
+                disabled={isUploading}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label>Category</Label>
+                <Select value={uploadCategory} onValueChange={setUploadCategory}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="document">Document</SelectItem>
+                    <SelectItem value="image">Image</SelectItem>
+                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="audio">Audio</SelectItem>
+                    <SelectItem value="template">Template</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Folder</Label>
+                <Select value={selectedFolder || ''} onValueChange={(v) => setSelectedFolder(v || null)}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select folder (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Root</SelectItem>
+                    {folders.map((f) => (
+                      <SelectItem key={f.id} value={f.id.toString()}>
+                        {f.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="upload-description">Description (optional)</Label>
+              <Input
+                id="upload-description"
+                value={uploadDescription}
+                onChange={(e) => setUploadDescription(e.target.value)}
+                placeholder="Describe these files..."
+                disabled={isUploading}
+              />
+            </div>
+            <div>
+              <Label htmlFor="upload-tags">Tags (comma separated, optional)</Label>
+              <Input
+                id="upload-tags"
+                value={uploadTags}
+                onChange={(e) => setUploadTags(e.target.value)}
+                placeholder="tag1, tag2"
                 disabled={isUploading}
               />
             </div>
@@ -1107,6 +1174,17 @@ export default function BriefcasePage() {
                 <Progress value={uploadProgress} />
               </div>
             )}
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowUploadDialog(false)} disabled={isUploading}>Cancel</Button>
+              <Button
+                onClick={() => handleFileUpload(uploadSelectedFiles, selectedFolder || undefined, uploadCategory, uploadDescription, uploadTags)}
+                disabled={!uploadSelectedFiles || uploadSelectedFiles.length === 0 || isUploading}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              >
+                Start Upload
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -1126,8 +1204,7 @@ export default function BriefcasePage() {
               }
             }}
             onEdit={(file) => {
-              // TODO: Implement file editing
-              console.log('Edit file:', file.name)
+              // Open description edit via metadata panel; handled inside modal callbacks
             }}
             onDelete={handleFileDelete}
             onShare={handleFileSharing}
@@ -1137,8 +1214,18 @@ export default function BriefcasePage() {
             onRemoveTag={handleRemoveTag}
             onUpdateDescription={handleUpdateDescription}
             onUpdateCategory={(file, category) => {
-              // TODO: Implement category update
-              console.log('Update category:', file.name, category)
+              fetch(`/api/briefcase/files/${file.id}/category`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
+                body: JSON.stringify({ category })
+              }).then(async (res) => {
+                if (!res.ok) throw new Error('Failed to update category')
+                const result = await res.json()
+                setFiles(prev => prev.map(f => f.id === file.id ? { ...f, category: result.category } : f))
+                toast({ title: 'Category updated', description: `Moved to ${category}` })
+              }).catch(() => {
+                toast({ title: 'Update failed', description: 'Could not update category', variant: 'destructive' })
+              })
             }}
           />
 

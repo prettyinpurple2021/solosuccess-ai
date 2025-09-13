@@ -179,10 +179,12 @@ export default function AgentsPage() {
     setIsLoading(true)
 
     try {
+      const token = localStorage.getItem('authToken')
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           message: input,
@@ -354,8 +356,12 @@ export default function AgentsPage() {
       formData.append('description', saveForm.description)
       formData.append('tags', saveForm.tags)
       
+      const token = localStorage.getItem('authToken')
       const response = await fetch('/api/briefcase/upload', {
         method: 'POST',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
         body: formData
       })
       

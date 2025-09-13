@@ -147,7 +147,20 @@ export async function POST(request: NextRequest) {
     const folderId = (formData.get('folderId') as string) || null
     const category = (formData.get('category') as string) || 'uncategorized'
     const description = (formData.get('description') as string) || null
-    const tags = (formData.get('tags') as string) || ''
+    const rawTags = (formData.get('tags') as string) || ''
+    // Accept either JSON array string or comma separated string
+    let tags = '[]'
+    try {
+      if (rawTags.trim().startsWith('[')) {
+        const parsed = JSON.parse(rawTags)
+        tags = JSON.stringify(Array.isArray(parsed) ? parsed.map((t: any) => String(t).trim().toLowerCase()).filter(Boolean) : [])
+      } else if (rawTags.trim().length > 0) {
+        const arr = rawTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+        tags = JSON.stringify(arr)
+      }
+    } catch {
+      tags = '[]'
+    }
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -175,7 +188,19 @@ export async function PUT(request: NextRequest) {
     const folderId = (formData.get('folderId') as string) || null
     const category = (formData.get('category') as string) || 'uncategorized'
     const description = (formData.get('description') as string) || null
-    const tags = (formData.get('tags') as string) || ''
+    const rawTags = (formData.get('tags') as string) || ''
+    let tags = '[]'
+    try {
+      if (rawTags.trim().startsWith('[')) {
+        const parsed = JSON.parse(rawTags)
+        tags = JSON.stringify(Array.isArray(parsed) ? parsed.map((t: any) => String(t).trim().toLowerCase()).filter(Boolean) : [])
+      } else if (rawTags.trim().length > 0) {
+        const arr = rawTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+        tags = JSON.stringify(arr)
+      }
+    } catch {
+      tags = '[]'
+    }
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })

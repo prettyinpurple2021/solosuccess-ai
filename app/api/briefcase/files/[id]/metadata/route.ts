@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { createClient } from '@/lib/neon/server'
 
+// Consolidated PATCH handler for updating document metadata
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -15,12 +16,7 @@ export async function PATCH(
     const params = await context.params
     const { id } = params
     const documentId = id
-    const { 
-      description, 
-      tags, 
-      category, 
-      isFavorite 
-    } = await request.json()
+    const { description, tags, category, isFavorite, metadata } = await request.json()
 
     const client = await createClient()
 
@@ -47,7 +43,12 @@ export async function PATCH(
 
     if (tags !== undefined) {
       updates.push(`tags = $${paramCount}`)
-      values.push(JSON.stringify(tags))
+      values.push(JSON.stringify(Array.isArray(tags) ? tags : []))
+      paramCount++
+    }
+    if (metadata !== undefined) {
+      updates.push(`metadata = $${paramCount}`)
+      values.push(metadata)
       paramCount++
     }
 
@@ -104,6 +105,7 @@ export async function PATCH(
         tags: updatedDocument.tags ? JSON.parse(updatedDocument.tags) : [],
         category: updatedDocument.category,
         isFavorite: updatedDocument.is_favorite,
+        metadata: updatedDocument.metadata,
         updatedAt: updatedDocument.updated_at
       }
     })

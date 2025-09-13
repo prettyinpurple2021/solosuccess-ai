@@ -5,17 +5,25 @@ import { useState } from 'react'
 import { SavedTemplate } from '@/lib/types'
 import { toast } from 'sonner'
 
-const fetcher = (url: string) => fetch(url).then(res => {
+const authFetch = async (url: string, init?: RequestInit) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+  const headers: HeadersInit = {
+    ...(init?.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+  const res = await fetch(url, { ...init, headers })
   if (!res.ok) throw new Error('Failed to fetch templates')
-  return res.json()
-})
+  return res
+}
+
+const fetcher = (url: string) => authFetch(url).then(res => res.json())
 
 export function useTemplates() {
   const { data, error, isLoading, mutate } = useSWR<{ templates: SavedTemplate[] }>('/api/templates', fetcher)
 
   const deleteTemplate = async (templateId: number) => {
     try {
-      const res = await fetch(`/api/templates/${templateId}`, { method: 'DELETE' })
+      const res = await authFetch(`/api/templates/${templateId}`, { method: 'DELETE' })
       
       if (!res.ok) {
         throw new Error('Failed to delete template')
@@ -55,14 +63,20 @@ export function useTemplates() {
       
       const a = document.createElement('a')
       a.href = url
-      a.download = `${template.name.toLowerCase().replace(/\s+/g, '-')}-${template.id}.json`
+      const safeName = (template.name || (template as any).title || template.template_slug || 'template')
+        .toString()
+        .toLowerCase()
+        .replace(/[^a-z0-9-_]+/g, '-')
+        .replace(/-{2,}/g, '-')
+        .replace(/^-+|-+$/g, '')
+      a.download = `${safeName}-${template.id}.json`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       
       toast.success("Template exported!", { 
-        description: `"${template.name}" downloaded as JSON.` 
+        description: `"${template.name || (template as any).title || template.template_slug}" downloaded as JSON.` 
       })
       
       return true
@@ -94,7 +108,7 @@ export function useTemplateSave() {
     setIsSaving(true)
     
     try {
-      const res = await fetch('/api/templates', {
+      const res = await authFetch('/api/templates', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

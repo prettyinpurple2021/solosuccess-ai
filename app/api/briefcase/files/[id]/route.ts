@@ -1,83 +1,121 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { createClient } from '@/lib/neon/server'
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const params = await context.params
     const { id } = params
     const body = await request.json()
-    
-    // Placeholder for demo - in production this would update the file in database
-    const updatedFile = {
-      id,
-      ...body,
-      last_modified: new Date().toISOString()
-    }
 
-    return NextResponse.json({
-      success: true,
-      file: updatedFile,
-      message: 'File updated successfully'
-    })
+    const client = await createClient()
+    // Ensure ownership
+    const { rows: [doc] } = await client.query(`SELECT id FROM documents WHERE id = $1 AND user_id = $2`, [id, user.id])
+    if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    const { name, description, category, folder_id } = body
+    const { rows: [updated] } = await client.query(`
+      UPDATE documents
+      SET name = COALESCE($1, name),
+          description = COALESCE($2, description),
+          category = COALESCE($3, category),
+          folder_id = COALESCE($4, folder_id),
+          updated_at = NOW()
+      WHERE id = $5
+      RETURNING *
+    `, [name, description, category, folder_id, id])
+
+    return NextResponse.json({ success: true, document: updated })
   } catch (error) {
     console.error('Error updating file:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to update file'
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update file' }, { status: 500 })
   }
 }
 
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     const params = await context.params
     const { id } = params
-    
-    // Placeholder for demo - in production this would delete the file from database and storage
-    
-    return NextResponse.json({
-      success: true,
-      message: 'File deleted successfully'
-    })
-  } catch (error) {
-    console.error('Error deleting file:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to delete file'
-    }, { status: 500 })
-  }
-}
 
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  try {
-    const params = await context.params
-    const { id } = params
-    
-    // Placeholder for demo - in production this would fetch the specific file
-    const mockFile = {
-      id,
-      name: 'Sample Document.pdf',
-      file_type: 'pdf',
-      mime_type: 'application/pdf',
-      size: 1024000,
-      upload_date: '2024-01-15T10:00:00Z',
-      last_modified: '2024-01-15T10:00:00Z',
-      category: 'document',
-      tags: ['sample', 'demo'],
-      description: 'Sample document for demonstration',
-      is_favorite: false,
-      folder_id: null,
-      storage_path: `/files/sample-document-${id}.pdf`
+    const client = await createClient()
+    // Ensure ownership
+    const { rows: [doc] } = await client.query(`SELECT id, size, folder_id FROM documents WHERE id = $1 AND user_id = $2`, [id, user.id])
+    if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    await client.query(`DELETE FROM documents WHERE id = $1`, [id])
+
+    // Update folder counters if applicable
+    if (doc.folder_id) {
+      await client.query(`
+        UPDATE document_folders
+        SET file_count = GREATEST(file_count - 1, 0),
+            total_size = GREATEST(total_size - $1, 0),
+            updated_at = NOW()
+        WHERE id = $2 AND user_id = $3
+      `, [doc.size || 0, doc.folder_id, user.id])
     }
 
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting file:', error)
+    return NextResponse.json({ error: 'Failed to delete file' }, { status: 500 })
+  }
+}
+
+export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const params = await context.params
+    const { id } = params
+
+    const client = await createClient()
+    const { rows: [r] } = await client.query(`
+      SELECT d.*, f.name AS folder_name, f.color AS folder_color
+      FROM documents d
+      LEFT JOIN document_folders f ON f.id = d.folder_id
+      WHERE d.id = $1 AND d.user_id = $2
+    `, [id, user.id])
+    if (!r) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    let tags: string[] = []
+    try { tags = Array.isArray(r.tags) ? r.tags : JSON.parse(r.tags || '[]') } catch { tags = [] }
+
     return NextResponse.json({
       success: true,
-      file: mockFile
+      file: {
+        id: r.id,
+        name: r.name,
+        original_name: r.original_name || r.name,
+        file_type: r.file_type,
+        mime_type: r.mime_type,
+        size: Number(r.size || 0),
+        category: r.category || 'uncategorized',
+        description: r.description || '',
+        tags,
+        is_favorite: !!r.is_favorite,
+        folder_id: r.folder_id,
+        folder_name: r.folder_name,
+        folder_color: r.folder_color,
+        created_at: r.created_at,
+        updated_at: r.updated_at,
+        downloadUrl: `/api/briefcase/files/${r.id}/download`,
+        previewUrl: `/api/briefcase/files/${r.id}/preview`,
+      }
     })
   } catch (error) {
     console.error('Error fetching file:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch file'
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch file' }, { status: 500 })
   }
 }
