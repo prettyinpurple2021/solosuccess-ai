@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
     // Create user in database
     const _userId = randomUUID()
     const newUsers = await sql`
-      INSERT INTO users (id, email, password_hash, full_name, username, date_of_birth, created_at, updated_at)
-      VALUES (${_userId}, ${email.toLowerCase()}, ${passwordHash}, ${fullName}, ${usernameValue}, ${dateOfBirth}, NOW(), NOW())
-      RETURNING id, email, full_name, username, date_of_birth, created_at
+      INSERT INTO users (id, email, password_hash, full_name, username, date_of_birth, subscription_tier, subscription_status, cancel_at_period_end, created_at, updated_at)
+      VALUES (${_userId}, ${email.toLowerCase()}, ${passwordHash}, ${fullName}, ${usernameValue}, ${dateOfBirth}, 'launch', 'active', false, NOW(), NOW())
+      RETURNING id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
     `
 
     if (newUsers.length === 0) {
@@ -82,6 +82,13 @@ export async function POST(request: NextRequest) {
       full_name: newUser.full_name,
       username: newUser.username,
       date_of_birth: newUser.date_of_birth,
+      subscription_tier: newUser.subscription_tier || 'launch',
+      subscription_status: newUser.subscription_status || 'active',
+      stripe_customer_id: newUser.stripe_customer_id,
+      stripe_subscription_id: newUser.stripe_subscription_id,
+      current_period_start: newUser.current_period_start,
+      current_period_end: newUser.current_period_end,
+      cancel_at_period_end: newUser.cancel_at_period_end || false,
       created_at: newUser.created_at
     }
 

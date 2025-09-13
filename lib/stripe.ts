@@ -25,7 +25,7 @@ export const STRIPE_PRICES = {
   LAUNCH: 'price_1S46IjPpYfwm37m7EKFi7H4C', // SoloSuccess AI - Launch Plan (Free)
   ACCELERATOR_MONTHLY: 'price_1S46LyPpYfwm37m7M5nOAYW7', // SoloSuccess AI - Accelerator Plan ($19/month)
   ACCELERATOR_YEARLY: 'price_1S46LyPpYfwm37m7lyRhudBs', // SoloSuccess AI - Accelerator Plan ($190/year)
-  DOMINATOR_MONTHLY: 'price_1S46P6PpYfwm37m76hqohlw0', // SoloSuccess AI - Dominator Plan ($29/month)
+  DOMINATOR_MONTHLY: 'price_1S46P6PpYfwm37m76hqohIw0', // SoloSuccess AI - Dominator Plan ($29/month)
   DOMINATOR_YEARLY: 'price_1S46PXPpYfwm37m7yVhLS7j2', // SoloSuccess AI - Dominator Plan ($290/year)
 } as const
 

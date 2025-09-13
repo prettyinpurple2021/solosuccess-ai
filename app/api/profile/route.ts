@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     const client = await createClient()
     const { rows } = await client.query(
       `SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status,
+              stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end,
               level, total_points, current_streak, wellness_score, focus_minutes, onboarding_completed, preferred_ai_agent
          FROM users WHERE id = $1`,
       [user.id]

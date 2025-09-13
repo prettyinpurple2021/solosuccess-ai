@@ -28,14 +28,14 @@ export async function POST(request: NextRequest) {
     if (isEmail) {
       // Search by email
       users = await sql`
-        SELECT id, email, password_hash, full_name, username, date_of_birth, created_at
+        SELECT id, email, password_hash, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
         FROM users 
         WHERE email = ${identifier.toLowerCase()}
       `
     } else {
       // Search by username
       users = await sql`
-        SELECT id, email, password_hash, full_name, username, date_of_birth, created_at
+        SELECT id, email, password_hash, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
         FROM users 
         WHERE username = ${identifier.toLowerCase()}
       `
@@ -85,6 +85,13 @@ export async function POST(request: NextRequest) {
       full_name: user.full_name,
       username: user.username,
       date_of_birth: user.date_of_birth,
+      subscription_tier: user.subscription_tier || 'launch',
+      subscription_status: user.subscription_status || 'active',
+      stripe_customer_id: user.stripe_customer_id,
+      stripe_subscription_id: user.stripe_subscription_id,
+      current_period_start: user.current_period_start,
+      current_period_end: user.current_period_end,
+      cancel_at_period_end: user.cancel_at_period_end || false,
       created_at: user.created_at
     }
 

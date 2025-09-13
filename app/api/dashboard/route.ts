@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     
     // First, try to get existing user data
     let userData = await sql`
-      SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status, is_verified, created_at, updated_at
+      SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
       FROM users 
       WHERE id = ${user.id}
     `
@@ -70,9 +70,9 @@ export async function GET(request: NextRequest) {
     // If user doesn't exist in database, create them
     if (!dbUser) {
       const newUser = await sql`
-        INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, subscription_status, is_verified, created_at, updated_at)
-        VALUES (${user.id}, ${user.email}, ${user.full_name}, ${user.avatar_url}, 'free', 'active', false, NOW(), NOW())
-        RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, is_verified, created_at, updated_at
+        INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, subscription_status, cancel_at_period_end, is_verified, created_at, updated_at)
+        VALUES (${user.id}, ${user.email}, ${user.full_name}, ${user.avatar_url}, 'launch', 'active', false, false, NOW(), NOW())
+        RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
       `
       dbUser = newUser[0]
     }
