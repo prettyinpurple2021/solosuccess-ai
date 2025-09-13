@@ -7,7 +7,7 @@ import {
   intelligenceData,
   users
 } from '@/db/schema'
-import { eq, and, desc, gte, sql, asc, lte, isNull, not } from 'drizzle-orm'
+import { eq, and, desc, gte, sql, asc, lte, isNull, not, inArray } from 'drizzle-orm'
 import { competitiveOpportunityDetector, type OpportunityDetectionResult } from './competitive-opportunity-detection'
 
 // Types for opportunity recommendation system
@@ -407,15 +407,15 @@ export class OpportunityRecommendationSystem {
       const conditions = [eq(competitiveOpportunities.user_id, userId)]
 
       if (filters.status?.length) {
-        conditions.push(sql`${competitiveOpportunities.status} IN (${filters.status.map(s => `'${s}'`).join(',')})`)
+        conditions.push(inArray(competitiveOpportunities.status, filters.status))
       }
 
       if (filters.opportunityType?.length) {
-        conditions.push(sql`${competitiveOpportunities.opportunity_type} IN (${filters.opportunityType.map(t => `'${t}'`).join(',')})`)
+        conditions.push(inArray(competitiveOpportunities.opportunity_type, filters.opportunityType))
       }
 
       if (filters.impact?.length) {
-        conditions.push(sql`${competitiveOpportunities.impact} IN (${filters.impact.map(i => `'${i}'`).join(',')})`)
+        conditions.push(inArray(competitiveOpportunities.impact, filters.impact))
       }
 
       if (filters.competitorId) {
