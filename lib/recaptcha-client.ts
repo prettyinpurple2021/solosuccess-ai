@@ -3,8 +3,8 @@
 // reCAPTCHA configuration
 // Set NEXT_PUBLIC_RECAPTCHA_SITE_KEY and NEXT_PUBLIC_RECAPTCHA_PROJECT_ID in your environment variables
 export const RECAPTCHA_CONFIG = {
-  siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-  projectId: process.env.NEXT_PUBLIC_RECAPTCHA_PROJECT_ID || 'SoloSuccess-ai-v3',
+  siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+  projectId: process.env.NEXT_PUBLIC_RECAPTCHA_PROJECT_ID || '',
   actions: {
     signup: 'signup',
     signin: 'signin',
