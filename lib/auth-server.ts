@@ -19,6 +19,21 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
     const headersList = await headers()
     const authHeader = headersList.get('authorization')
     
+    // Development mode fallback - create a mock user if no auth header
+    if (process.env.NODE_ENV === 'development' && !authHeader) {
+      return {
+        id: 'dev-user-1',
+        email: 'dev@example.com',
+        full_name: 'Development User',
+        name: 'Development User',
+        username: 'devuser',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        subscription_tier: 'launch',
+        subscription_status: 'active',
+      }
+    }
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return null
     }

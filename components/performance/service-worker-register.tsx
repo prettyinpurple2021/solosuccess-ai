@@ -56,8 +56,10 @@ export function ServiceWorkerRegister() {
 
   const handleInstall = async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
+      // Cast to the proper type to access prompt method
+      const installPrompt = deferredPrompt as any
+      installPrompt.prompt()
+      const { outcome } = await installPrompt.userChoice
       
       if (outcome === 'accepted') {
         console.log('PWA installed successfully')
