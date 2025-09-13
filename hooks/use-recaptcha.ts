@@ -52,6 +52,11 @@ export function useRecaptcha(options: UseRecaptchaOptions = {}) {
 
   // Execute reCAPTCHA
   const execute = useCallback(async (): Promise<string | null> => {
+    if (!RECAPTCHA_CONFIG.siteKey) {
+      console.warn('reCAPTCHA site key not configured, skipping validation')
+      return null
+    }
+
     if (!isReady) {
       const errorMsg = 'reCAPTCHA not ready'
       console.error('reCAPTCHA not ready. Site key:', RECAPTCHA_CONFIG.siteKey)
