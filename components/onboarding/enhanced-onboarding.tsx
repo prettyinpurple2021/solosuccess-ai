@@ -307,6 +307,8 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
           onCompleteAction={handleTutorialComplete}
           onSkipAction={handleTutorialSkip}
           tutorialType={tutorialType}
+          onCompleteAction={handleTutorialComplete}
+          onSkipAction={handleTutorialSkip}
         />
       )}
 
