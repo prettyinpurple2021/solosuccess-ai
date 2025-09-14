@@ -20,7 +20,7 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
   const [currentWorkflowId, setCurrentWorkflowId] = useState(workflowId)
   
   const { status, loading, error, isCompleted, isRunning, isFailed } = useOnboardingWorkflow(
-    currentWorkflowId,
+    currentWorkflowId ?? null,
     {
       onComplete: (result) => {
         console.log('Onboarding completed:', result)

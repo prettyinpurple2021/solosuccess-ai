@@ -1,11 +1,33 @@
 "use client"
 
 import React from 'react'
+import templateData from '@/data/templates.json'
 import { Card, CardContent } from '@/components/ui/card'
 import { templateComponents } from './index'
 
 export function TemplateRenderer({ slug }: { slug: string }) {
   const Component = templateComponents[slug]
+
+  const findTemplateInJson = (s: string) => {
+    for (const category of templateData as any[]) {
+      const template = category.templates.find((t: any) => t.slug === s)
+      if (template) {
+        return {
+          ...template,
+          category: category.category,
+          icon: category.icon,
+          description: category.description,
+          slug: template.slug,
+          isInteractive: template.isInteractive,
+          requiredRole: template.requiredRole,
+          title: template.title,
+        }
+      }
+    }
+    return null
+  }
+
+  const template = findTemplateInJson(slug)
 
   if (!Component) {
     return (
@@ -21,7 +43,7 @@ export function TemplateRenderer({ slug }: { slug: string }) {
 
   return (
     <div className="mt-6">
-      <Component />
+      {template ? <Component template={template} /> : <Component />}
     </div>
   )
 }

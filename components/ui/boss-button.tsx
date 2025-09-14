@@ -5,9 +5,9 @@ import { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { Crown, Sparkles, Zap } from "lucide-react"
 
-interface BossButtonProps {
+export interface BossButtonProps {
   children: ReactNode
-  variant?: "primary" | "secondary" | "accent" | "empowerment" | "danger" | "success"
+  variant?: "primary" | "secondary" | "accent" | "empowerment" | "danger" | "success" | "outline"
   size?: "sm" | "md" | "lg"
   icon?: ReactNode
   iconPosition?: "left" | "right"
@@ -50,7 +50,8 @@ export function BossButton({
     accent: "gradient-accent text-white focus:ring-cyan-500",
     empowerment: "gradient-empowerment text-white focus:ring-purple-500",
     danger: "gradient-danger text-white focus:ring-red-500",
-    success: "gradient-success text-white focus:ring-green-500"
+    success: "gradient-success text-white focus:ring-green-500",
+    outline: "border-2 border-purple-200 bg-white text-purple-700 hover:bg-purple-50 focus:ring-purple-400"
   }
 
   const widthClass = fullWidth ? "w-full" : ""
@@ -73,8 +74,7 @@ export function BossButton({
       x: "100%",
       transition: {
         duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
+        repeat: Infinity
       }
     }
   }
@@ -133,7 +133,7 @@ export function BossButton({
           <>
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 1, repeat: Infinity }}
               className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
             />
             <span>Loading...</span>
@@ -148,8 +148,7 @@ export function BossButton({
                 }}
                 transition={{
                   duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
+                  repeat: Infinity
                 }}
               >
                 <Crown className="w-4 h-4 text-yellow-300" />
@@ -184,8 +183,7 @@ export function BossButton({
               }}
               transition={{
                 duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
+                repeat: Infinity
               }}
               className="absolute -top-1 -right-1"
             >

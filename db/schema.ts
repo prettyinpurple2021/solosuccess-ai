@@ -1,4 +1,4 @@
-import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid } from 'drizzle-orm/pg-core';
+import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid, foreignKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Users table
@@ -55,7 +55,7 @@ export const tasks = pgTable('tasks', {
   user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   goal_id: integer('goal_id').references(() => goals.id, { onDelete: 'cascade' }),
   briefcase_id: integer('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
-  parent_task_id: integer('parent_task_id').references(() => tasks.id, { onDelete: 'cascade' }),
+  parent_task_id: integer('parent_task_id'),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   status: varchar('status', { length: 50 }).default('pending'),
@@ -72,7 +72,12 @@ export const tasks = pgTable('tasks', {
   completed_at: timestamp('completed_at'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
-});
+}, (table) => ({
+  parentTaskFk: foreignKey({
+    columns: [table.parent_task_id],
+    foreignColumns: [table.id],
+  }).onDelete('cascade'),
+}));
 
 // Templates table
 export const templates = pgTable('templates', {
@@ -423,7 +428,7 @@ export const documents = pgTable('documents', {
 export const documentFolders = pgTable('document_folders', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
-  parent_id: integer('parent_id').references(() => documentFolders.id, { onDelete: 'cascade' }),
+  parent_id: integer('parent_id'),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   color: varchar('color', { length: 7 }).default('#8B5CF6'),
@@ -437,6 +442,10 @@ export const documentFolders = pgTable('document_folders', {
   userIdIdx: index('document_folders_user_id_idx').on(table.user_id),
   parentIdIdx: index('document_folders_parent_id_idx').on(table.parent_id),
   nameIdx: index('document_folders_name_idx').on(table.name),
+  parentFolderFk: foreignKey({
+    columns: [table.parent_id],
+    foreignColumns: [table.id],
+  }).onDelete('cascade'),
 }));
 
 // Document Versions table

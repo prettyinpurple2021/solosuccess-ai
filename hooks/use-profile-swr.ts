@@ -8,7 +8,7 @@ export interface UserProfile {
   id: string
   email: string
   full_name?: string
-  avatar_url?: string
+  avatar_url?: string | null
   subscription_tier?: string
   subscription_status?: string
   level?: number
@@ -17,7 +17,7 @@ export interface UserProfile {
 
 interface ProfileUpdateData {
   full_name?: string
-  avatar_url?: string
+  avatar_url?: string | null
 }
 
 const fetcher = (url: string) => fetch(url).then(res => {
@@ -48,12 +48,16 @@ export function useProfile() {
       const updatedData = await res.json()
       
       // Optimistically update the local data
-      mutate(
-        prev => ({
-          user: { ...prev?.user, ...profileData }
-        }),
-        { revalidate: false }
-      )
+      mutate((prev) => {
+        if (!prev) return prev
+        const nextUser: UserProfile = {
+          ...prev.user,
+          ...profileData,
+          id: prev.user.id,
+          email: prev.user.email,
+        }
+        return { user: nextUser }
+      }, { revalidate: false })
       
       toast.success("Profile updated!", { 
         description: "Your profile information has been saved." 

@@ -44,7 +44,7 @@ import { AiCollabPlanner } from './ai-collab-planner';
 import { PrPitchTemplate } from './pr-pitch-template';
 
 // Slug-based mapping for dynamic component loading
-export const templateComponents: Record<string, React.ComponentType> = {
+export const templateComponents: Record<string, React.ComponentType<any>> = {
   'decision-dashboard': DecisionDashboard,
   'delegation-list-builder': DelegationListBuilder,
   'dm-sales-script-generator': DmSalesScriptGenerator,

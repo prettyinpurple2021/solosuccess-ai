@@ -40,8 +40,12 @@ export function VoiceInput({ onTranscript, placeholder: _placeholder = "Click to
   }, [])
 
   const initializeSpeechRecognition = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    recognitionRef.current = new SpeechRecognition()
+    const SpeechRecognitionCtor: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognitionCtor) {
+      setError('Speech recognition constructor not available')
+      return
+    }
+    recognitionRef.current = new SpeechRecognitionCtor()
     
     recognitionRef.current.continuous = true
     recognitionRef.current.interimResults = true

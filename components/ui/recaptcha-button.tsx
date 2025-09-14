@@ -2,8 +2,8 @@
 
 import { ReactNode } from "react"
 import { motion } from "framer-motion"
-import { BossButton, BossButtonProps } from "./boss-button"
-import { useRecaptcha } from "@/hooks/use-recaptcha"
+import { BossButton, type BossButtonProps } from "./boss-button"
+import { useRecaptcha, useRecaptchaForm } from "@/hooks/use-recaptcha"
 import { RECAPTCHA_ACTIONS, type RecaptchaAction } from "@/lib/recaptcha-client"
 import { Shield, AlertCircle, CheckCircle } from "lucide-react"
 import { RECAPTCHA_CONFIG } from "@/lib/recaptcha-client"
@@ -97,7 +97,7 @@ export function RecaptchaButton({
         <div className="flex items-center space-x-2">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity }}
           >
             <Shield className="w-4 h-4" />
           </motion.div>
@@ -125,8 +125,7 @@ export function RecaptchaButton({
             }}
             transition={{
               duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
+              repeat: Infinity
             }}
           >
             <Shield className="w-4 h-4" />

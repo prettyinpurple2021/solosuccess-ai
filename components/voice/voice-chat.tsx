@@ -263,8 +263,7 @@ export function VoiceChat({ agentId, agentName, agentAvatar, onTranscript, onRes
                           key={i}
                           className={`w-1 h-8 bg-gradient-to-t from-purple-500 to-pink-500 rounded-full transition-all duration-150 ${
                             audioLevel > (i * 50) ? "opacity-100" : "opacity-30"
-                          }`}
-                          className={`audio-bar ${audioLevel > i * 50 ? "audio-bar-active" : ""}`}
+                          } audio-bar ${audioLevel > i * 50 ? "audio-bar-active" : ""}`}
                         />
                       ))}
                     </div>

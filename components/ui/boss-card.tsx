@@ -65,16 +65,14 @@ export function BossCard({
       y: 0,
       scale: 1,
       transition: {
-        duration: 0.5,
-        ease: "easeOut"
+        duration: 0.5
       }
     },
     hover: interactive ? {
       y: -8,
       scale: 1.02,
       transition: {
-        duration: 0.3,
-        ease: "easeOut"
+        duration: 0.3
       }
     } : {}
   }
@@ -85,8 +83,7 @@ export function BossCard({
       x: "100%",
       transition: {
         duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut"
+        repeat: Infinity
       }
     }
   }
@@ -97,8 +94,7 @@ export function BossCard({
       scale: [1, 1.1, 1],
       transition: {
         duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
+        repeat: Infinity
       }
     }
   }
@@ -162,8 +158,7 @@ export function BossCard({
           }}
           transition={{
             duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
+            repeat: Infinity
           }}
           className="absolute top-4 left-4 z-10"
         >

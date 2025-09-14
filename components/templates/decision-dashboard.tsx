@@ -358,7 +358,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                           <Badge className="mt-1">High Score</Badge>
                         )}
                       </div>
-                      {data.options.length > 1 && (
+                      {_data.options.length > 1 && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -528,7 +528,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
             </BossButton>
             <BossButton 
               onClick={() => setCurrentStep(3)}
-              disabled={data.options.some(opt => !opt.title)}
+              disabled={_data.options.some(opt => !opt.title)}
               crown
             >
               Next: Analysis
@@ -560,7 +560,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                 </BossButton>
               </div>
 
-              {aiInsights.length > 0 && (
+              {_aiInsights.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -570,7 +570,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                     <Lightbulb className="w-5 h-5 text-yellow-500" />
                     AI Insights
                   </h4>
-                  {aiInsights.map((insight, index) => (
+                  {_aiInsights.map((insight, index) => (
                     <Alert key={index}>
                       <AlertTriangle className="h-4 w-4" />
                       <AlertDescription>{insight}</AlertDescription>
@@ -669,7 +669,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                 <Textarea
                   id="final-decision"
                   placeholder="Document your final decision and the reasoning behind it..."
-                  value={data.finalDecision || ""}
+                  value={_data.finalDecision || ""}
                   onChange={(e) => setData(prev => ({ ...prev, finalDecision: e.target.value }))}
                   className="mt-2"
                   rows={3}
@@ -681,7 +681,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                 <Textarea
                   id="reasoning"
                   placeholder="Explain why you chose this option over others..."
-                  value={data.reasoning || ""}
+                  value={_data.reasoning || ""}
                   onChange={(e) => setData(prev => ({ ...prev, reasoning: e.target.value }))}
                   className="mt-2"
                   rows={4}
@@ -691,23 +691,23 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
               <div>
                 <Label>Next Steps</Label>
                 <div className="space-y-2 mt-2">
-                  {(data.nextSteps || [""]).map((step, index) => (
+                  {(_data.nextSteps || [""]).map((step, index) => (
                     <div key={index} className="flex gap-2">
                       <Input
                         value={step}
                         onChange={(e) => {
-                          const newSteps = [...(data.nextSteps || [])]
+                          const newSteps = [...(_data.nextSteps || [])]
                           newSteps[index] = e.target.value
                           setData(prev => ({ ...prev, nextSteps: newSteps }))
                         }}
                         placeholder={`Step ${index + 1}...`}
                       />
-                      {(data.nextSteps || []).length > 1 && (
+                      {(_data.nextSteps || []).length > 1 && (
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            const newSteps = (data.nextSteps || []).filter((_, i) => i !== index)
+                            const newSteps = (_data.nextSteps || []).filter((_, i) => i !== index)
                             setData(prev => ({ ...prev, nextSteps: newSteps }))
                           }}
                         >

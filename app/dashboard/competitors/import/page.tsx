@@ -7,21 +7,15 @@ import {
   ArrowLeft, 
   Upload, 
   Download, 
-  FileText, 
   CheckCircle, 
   AlertTriangle,
   X,
-  Eye,
-  Zap,
-  Plus,
   Trash2
 } from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
+import { EmpowermentCard } from "@/components/ui/boss-card"
 import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
@@ -546,6 +540,7 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
                                 type="checkbox"
                                 checked={selectedRows.has(competitor.id)}
                                 onChange={() => toggleRowSelection(competitor.id)}
+                                aria-label={`Select ${competitor.name} for import`}
                                 className="rounded border-gray-300"
                               />
                             )}

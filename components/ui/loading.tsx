@@ -34,8 +34,7 @@ export function Loading({
       scale: [1, 1.1, 1],
       transition: {
         duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
+        repeat: Infinity
       }
     }
   }
@@ -46,8 +45,7 @@ export function Loading({
       scale: [1, 1.05, 1],
       transition: {
         duration: 1.5,
-        repeat: Infinity,
-        ease: "easeInOut"
+        repeat: Infinity
       }
     }
   }
@@ -58,8 +56,7 @@ export function Loading({
       scale: [1, 1.15, 1],
       transition: {
         duration: 2.5,
-        repeat: Infinity,
-        ease: "easeInOut"
+        repeat: Infinity
       }
     }
   }
@@ -101,8 +98,7 @@ export function Loading({
               }}
               transition={{
                 duration: 3,
-                repeat: Infinity,
-                ease: "linear"
+                repeat: Infinity
               }}
               className="absolute inset-0 flex items-center justify-center"
             >
@@ -126,8 +122,7 @@ export function Loading({
           }}
           transition={{
             duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
+            repeat: Infinity
           }}
           className="absolute inset-0 rounded-full gradient-empowerment opacity-20"
         />
@@ -156,8 +151,7 @@ export function Loading({
         }}
         transition={{
           duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
+          repeat: Infinity
         }}
         className="w-32 h-1 gradient-primary rounded-full"
       />
@@ -187,8 +181,7 @@ export function LoadingOverlay({
           }}
           transition={{
             duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
+            repeat: Infinity
           }}
           className="text-sm text-gray-600 dark:text-gray-400"
         >
@@ -212,8 +205,7 @@ export function LoadingSpinner({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
       animate={{ rotate: 360 }}
       transition={{
         duration: 1,
-        repeat: Infinity,
-        ease: "linear"
+        repeat: Infinity
       }}
       className={`${sizeClasses[size]} border-2 border-purple-200 border-t-purple-600 rounded-full`}
     />

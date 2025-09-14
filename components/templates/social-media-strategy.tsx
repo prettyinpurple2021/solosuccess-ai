@@ -841,7 +841,7 @@ export default function SocialMediaStrategy({ template, onSave, onExport }: Soci
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(1)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
