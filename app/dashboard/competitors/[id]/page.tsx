@@ -1,16 +1,14 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import {
   ArrowLeft,
   Globe,
   Building,
   Users,
   DollarSign,
-  Shield,
-  Eye,
   Zap,
   AlertTriangle,
   TrendingUp,
@@ -21,9 +19,7 @@ import {
   Target,
   Lightbulb,
   Activity,
-  BarChart3,
   MessageSquare,
-  Star,
   ThumbsUp,
   ThumbsDown,
   Clock,
@@ -38,28 +34,19 @@ import {
   XCircle,
   AlertCircle,
   Info,
-  Filter,
-  Search,
   Download,
-  Share,
-  Bookmark,
-  Flag,
-  Gauge,
   Crosshair,
-  Layers,
-  Network,
   Sparkles,
-  Flame,
-  Zap as ZapIcon
+  Flame
 } from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
+import { EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
 import { BossButton, ZapButton } from "@/components/ui/boss-button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Loading } from "@/components/ui/loading"
 
 interface CompetitorProfile {
@@ -107,7 +94,7 @@ interface ActivityItem {
   source: string
   importance: 'low' | 'medium' | 'high' | 'critical'
   timestamp: string
-  metadata?: any
+  metadata?: Record<string, unknown>
 }
 
 interface Alert {
@@ -131,7 +118,7 @@ interface Insight {
   actionItems: string[]
   generatedBy: string
   timestamp: string
-  supportingData?: any[]
+  supportingData?: Record<string, unknown>[]
   tags?: string[]
 }
 
@@ -165,7 +152,6 @@ interface ActionRecommendation {
 
 export default function CompetitorProfilePage() {
   const params = useParams()
-  const router = useRouter()
   const competitorId = params.id as string
 
   const [competitor, setCompetitor] = useState<CompetitorProfile | null>(null)
@@ -180,11 +166,7 @@ export default function CompetitorProfilePage() {
   const [activityFilter, setActivityFilter] = useState<string>('all')
   const [insightFilter, setInsightFilter] = useState<string>('all')
 
-  useEffect(() => {
-    fetchCompetitorData()
-  }, [competitorId])
-
-  const fetchCompetitorData = async () => {
+  const fetchCompetitorData = useCallback(async () => {
     try {
       setLoading(true)
 
@@ -526,7 +508,11 @@ export default function CompetitorProfilePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [competitorId])
+
+  useEffect(() => {
+    fetchCompetitorData()
+  }, [fetchCompetitorData])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -670,7 +656,7 @@ export default function CompetitorProfilePage() {
               <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto" />
               <h2 className="text-2xl font-bold text-gradient">Competitor Not Found</h2>
               <p className="text-gray-600 dark:text-gray-400">
-                The competitor profile you're looking for doesn't exist or has been removed.
+                The competitor profile you&apos;re looking for doesn&apos;t exist or has been removed.
               </p>
               <Link href="/dashboard/competitors">
                 <BossButton variant="primary">
@@ -892,6 +878,7 @@ export default function CompetitorProfilePage() {
                             href={person.linkedinProfile}
                             target="_blank"
                             rel="noopener noreferrer"
+                            title={`View ${person.name}'s LinkedIn profile`}
                             className="text-blue-600 hover:text-blue-800"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -950,6 +937,7 @@ export default function CompetitorProfilePage() {
                   <select
                     value={activityFilter}
                     onChange={(e) => setActivityFilter(e.target.value)}
+                    aria-label="Filter activities by type"
                     className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:border-gray-600"
                   >
                     <option value="all">All Activities</option>
@@ -970,7 +958,7 @@ export default function CompetitorProfilePage() {
                 <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500"></div>
 
                 <div className="space-y-6">
-                  {filteredActivities.map((activity, index) => (
+                  {filteredActivities.map((activity) => (
                     <div key={activity.id} className="relative flex items-start space-x-6">
                       {/* Timeline dot */}
                       <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-gray-900 ${activity.importance === 'critical' ? 'bg-red-500' :
@@ -1030,6 +1018,7 @@ export default function CompetitorProfilePage() {
                   <select
                     value={insightFilter}
                     onChange={(e) => setInsightFilter(e.target.value)}
+                    aria-label="Filter insights by type"
                     className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:border-gray-600"
                   >
                     <option value="all">All Insights</option>

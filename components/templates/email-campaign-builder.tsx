@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { BossButton } from "@/components/ui/boss-button"
 import { BossCard } from "@/components/ui/boss-card"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -158,6 +158,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
     const baseBlock = {
       id: crypto.randomUUID(),
       type,
+      content: {},
       style: {
         padding: '20px',
         backgroundColor: 'transparent',
@@ -973,23 +974,19 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                 <h4 className="font-semibold mb-4">Common Personalization Examples</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="p-3 bg-gray-50 rounded">
-                    <strong>{{firstName}}</strong> - Recipient&apos;s first name
+                    <strong>{'{{firstName}}'}</strong> - Recipient&apos;s first name
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
-                    <strong>{{firstName}}</strong> - Recipient&apos;s first name
-                    <strong>{{firstName}}</strong> - Recipient&apos;s first name
+                    <strong>{'{{lastName}}'}</strong> - Recipient&apos;s last name
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
-                    <strong>{{companyName}}</strong> - Company name
-                    <strong>{{companyName}}</strong> - Company name
+                    <strong>{'{{companyName}}'}</strong> - Company name
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
-                    <strong>{{location}}</strong> - City or region
-                    <strong>{{location}}</strong> - City or region
+                    <strong>{'{{location}}'}</strong> - City or region
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
-                    <strong>{{recentPurchase}}</strong> - Last item bought
-                    <strong>{{recentPurchase}}</strong> - Last item bought
+                    <strong>{'{{recentPurchase}}'}</strong> - Last item bought
                   </div>
                 </div>
               </div>
