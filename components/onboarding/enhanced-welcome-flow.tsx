@@ -20,10 +20,12 @@ import {
   Heart,
   CheckCircle,
   ArrowRight,
+  ArrowLeft,
   Play,
   Pause,
   Volume2,
-  VolumeX
+  VolumeX,
+  Settings
 } from "lucide-react"
 
 interface WelcomeFlowProps {
