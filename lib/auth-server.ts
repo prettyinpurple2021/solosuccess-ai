@@ -54,8 +54,8 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
       username: user.username,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      subscription_tier: undefined,
-      subscription_status: undefined,
+      subscription_tier: user.subscription_tier ?? 'free',
+      subscription_status: user.subscription_status ?? 'active',
     }
   } catch (err) {
     console.error('JWT authentication error:', err)

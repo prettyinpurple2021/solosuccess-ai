@@ -63,7 +63,8 @@ export function useTemplates() {
       
       const a = document.createElement('a')
       a.href = url
-      const safeName = (template.name || (template as any).title || template.template_slug || 'template')
+      const base = template.title || template.template_slug || 'template'
+      const safeName = base
         .toString()
         .toLowerCase()
         .replace(/[^a-z0-9-_]+/g, '-')
@@ -76,7 +77,7 @@ export function useTemplates() {
       URL.revokeObjectURL(url)
       
       toast.success("Template exported!", { 
-        description: `"${template.name || (template as any).title || template.template_slug}" downloaded as JSON.` 
+        description: `"${base}" downloaded as JSON.` 
       })
       
       return true

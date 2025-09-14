@@ -280,15 +280,15 @@ export class BlazeGrowthIntelligence {
         
         Competitor Context:
         - Industry: ${competitorProfile.industry}
-        - Company Size: ${competitorProfile.employeeCount} employees
-        - Funding Stage: ${competitorProfile.fundingStage}
-        - Threat Level: ${competitorProfile.threatLevel}
+        - Company Size: ${competitorProfile.employee_count} employees
+        - Funding Stage: ${competitorProfile.funding_stage}
+        - Threat Level: ${competitorProfile.threat_level}
         
         Pricing Intelligence Data:
         ${pricingData.map(data => `
-        - Source: ${data.sourceType} (${data.sourceUrl})
-        - Content: ${JSON.stringify(data.extractedData.content)}
-        - Key Insights: ${data.extractedData.keyInsights.join(', ')}
+        - Source: ${(data as any).sourceType || (data as any).source_type} (${(data as any).sourceUrl || (data as any).source_url})
+        - Content: ${JSON.stringify(((data as any).extractedData || (data as any).extracted_data)?.content)}
+        - Key Insights: ${(((data as any).extractedData || (data as any).extracted_data)?.keyInsights || []).join(', ')}
         `).join('\n')}
         
         Provide a comprehensive pricing strategy analysis including:
@@ -303,7 +303,7 @@ export class BlazeGrowthIntelligence {
       `
 
       const response = await generateText({
-        model: this.blazeConfig.model,
+        model: this.blazeConfig.model as any,
         messages: [
           {
             role: 'system',
@@ -354,9 +354,9 @@ export class BlazeGrowthIntelligence {
         Proposed Action: ${proposedAction}
         
         Competitor Context:
-        - Threat Level: ${competitorProfile.threatLevel}
-        - Market Position: ${JSON.stringify(competitorProfile.marketPosition)}
-        - Competitive Advantages: ${competitorProfile.competitiveAdvantages.join(', ')}
+        - Threat Level: ${competitorProfile.threat_level}
+        - Market Position: ${JSON.stringify(competitorProfile.market_position)}
+        - Competitive Advantages: ${(competitorProfile as any).competitive_advantages?.join(', ')}
         
         Market Data:
         ${JSON.stringify(marketData)}
@@ -373,7 +373,7 @@ export class BlazeGrowthIntelligence {
       `
 
       const response = await generateText({
-        model: this.blazeConfig.model,
+        model: this.blazeConfig.model as any,
         messages: [
           {
             role: 'system',
@@ -429,9 +429,9 @@ export class BlazeGrowthIntelligence {
         
         Competitor Profile:
         - Industry: ${competitorProfile.industry}
-        - Employee Count: ${competitorProfile.employeeCount}
-        - Funding: $${competitorProfile.fundingAmount} (${competitorProfile.fundingStage})
-        - Current Markets: ${competitorProfile.marketPosition.targetMarkets.join(', ')}
+        - Employee Count: ${competitorProfile.employee_count}
+        - Funding: $${competitorProfile.funding_amount} (${competitorProfile.funding_stage})
+        - Current Markets: ${(competitorProfile.market_position as any)?.target_markets?.join(', ')}
         
         Growth Intelligence:
         ${growthData.map(data => `
@@ -452,7 +452,7 @@ export class BlazeGrowthIntelligence {
       `
 
       const response = await generateText({
-        model: this.blazeConfig.model,
+        model: this.blazeConfig.model as any,
         messages: [
           {
             role: 'system',
@@ -492,8 +492,8 @@ export class BlazeGrowthIntelligence {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitorId, competitorIds[0]),
-            gte(intelligenceData.collectedAt, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // Last 30 days
+            eq(intelligenceData.competitor_id, competitorIds[0]),
+            gte(intelligenceData.collected_at, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // Last 30 days
           )
         )
         .orderBy(desc(intelligenceData.collectedAt))
@@ -508,16 +508,16 @@ export class BlazeGrowthIntelligence {
         Competitive Intelligence:
         ${competitors.map(comp => `
         Competitor: ${comp.name}
-        - Threat Level: ${comp.threatLevel}
-        - Market Position: ${JSON.stringify(comp.marketPosition)}
-        - Advantages: ${comp.competitiveAdvantages.join(', ')}
-        - Vulnerabilities: ${comp.vulnerabilities.join(', ')}
+        - Threat Level: ${(comp as any).threat_level}
+        - Market Position: ${JSON.stringify((comp as any).market_position)}
+        - Advantages: ${((comp as any).competitive_advantages || []).join(', ')}
+        - Vulnerabilities: ${((comp as any).vulnerabilities || []).join(', ')}
         `).join('\n')}
         
         Recent Market Activity:
         ${recentIntelligence.map(intel => `
-        - ${intel.sourceType}: ${intel.extractedData.title}
-        - Insights: ${intel.extractedData.keyInsights.join(', ')}
+        - ${(intel as any).sourceType || (intel as any).source_type}: ${((intel as any).extractedData || (intel as any).extracted_data)?.title}
+        - Insights: ${(((intel as any).extractedData || (intel as any).extracted_data)?.keyInsights || []).join(', ')}
         `).join('\n')}
         
         Provide strategic recommendations for:
@@ -531,7 +531,7 @@ export class BlazeGrowthIntelligence {
       `
 
       const response = await generateText({
-        model: this.blazeConfig.model,
+        model: this.blazeConfig.model as any,
         messages: [
           {
             role: 'system',
@@ -589,7 +589,7 @@ export class BlazeGrowthIntelligence {
       `
 
       const response = await generateText({
-        model: this.blazeConfig.model,
+        model: this.blazeConfig.model as any,
         messages: [
           {
             role: 'system',

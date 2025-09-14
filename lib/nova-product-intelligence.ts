@@ -313,7 +313,7 @@ export class NovaProductIntelligence {
     )
 
     const { text } = await generateText({
-      model: this.novaConfig.model,
+      model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2500,
@@ -336,7 +336,7 @@ export class NovaProductIntelligence {
     const analysisPrompt = this.buildUXTrendAnalysisPrompt(competitor, websiteData, appStoreData)
 
     const { text } = await generateText({
-      model: this.novaConfig.model,
+      model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2000,
@@ -367,7 +367,7 @@ export class NovaProductIntelligence {
     )
 
     const { text } = await generateText({
-      model: this.novaConfig.model,
+      model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.8,
       maxTokens: 2000,
@@ -398,7 +398,7 @@ export class NovaProductIntelligence {
     const analysisPrompt = this.buildDesignPatternAnalysisPrompt(competitors, designData)
 
     const { text } = await generateText({
-      model: this.novaConfig.model,
+      model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 1800,
@@ -431,7 +431,7 @@ export class NovaProductIntelligence {
     )
 
     const { text } = await generateText({
-      model: this.novaConfig.model,
+      model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2200,
@@ -464,7 +464,7 @@ export class NovaProductIntelligence {
     const briefingPrompt = this.buildProductBriefingPrompt(briefingData, timeframe)
 
     const { text } = await generateText({
-      model: this.novaConfig.model,
+      model: this.novaConfig.model as any,
       prompt: briefingPrompt,
       temperature: 0.7,
       maxTokens: 2800,

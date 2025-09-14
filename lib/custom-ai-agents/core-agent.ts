@@ -187,7 +187,7 @@ Be specific, actionable, and maintain your ${this.name} personality.`
 
     try {
       const { text } = await generateText({
-        model: this.model,
+        model: this.model as any,
         prompt: fullPrompt,
         temperature: 0.7,
         maxTokens: 1000

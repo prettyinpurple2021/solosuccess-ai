@@ -126,7 +126,7 @@ export class TaskIntelligenceEngine {
       const prompt = this.buildTaskAnalysisPrompt(task, allTasks)
       
       const result = await generateText({
-        model: openai('gpt-4-turbo'),
+        model: openai('gpt-4-turbo') as any,
         prompt,
         temperature: 0.3,
         maxTokens: 500,
@@ -346,7 +346,7 @@ Overdue Tasks: ${workloadAnalysis.overdueTasks}
 Provide specific, actionable tips that would help improve productivity and task management. Keep each tip under 100 characters.`
 
       const result = await generateText({
-        model: openai('gpt-4-turbo'),
+        model: openai('gpt-4-turbo') as any,
         prompt,
         temperature: 0.7,
         maxTokens: 300,

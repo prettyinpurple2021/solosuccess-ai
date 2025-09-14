@@ -9,13 +9,13 @@ export interface AuthenticatedUser {
   avatar_url?: string
   created_at?: string
   updated_at?: string
-  subscription_tier: string
-  subscription_status: string
+  subscription_tier?: string
+  subscription_status?: string
   stripe_customer_id?: string
   stripe_subscription_id?: string
   current_period_start?: Date
   current_period_end?: Date
-  cancel_at_period_end: boolean
+  cancel_at_period_end?: boolean
 }
 
 export interface AuthResult {

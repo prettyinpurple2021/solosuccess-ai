@@ -173,7 +173,7 @@ export class EchoMarketingIntelligence {
 
     // Get Echo's analysis
     const { text } = await generateText({
-      model: this.echoConfig.model,
+      model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2000,
@@ -198,7 +198,7 @@ export class EchoMarketingIntelligence {
     const analysisPrompt = this.buildBrandPositioningPrompt(competitor, allIntelligenceData)
 
     const { text } = await generateText({
-      model: this.echoConfig.model,
+      model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.6,
       maxTokens: 1500,
@@ -221,7 +221,7 @@ export class EchoMarketingIntelligence {
     const analysisPrompt = this.buildCampaignEffectivenessPrompt(competitor, socialMediaData, newsData)
 
     const { text } = await generateText({
-      model: this.echoConfig.model,
+      model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2000,
@@ -248,7 +248,7 @@ export class EchoMarketingIntelligence {
     const analysisPrompt = this.buildContentGapAnalysisPrompt(competitors, competitorIntelligence, userCompanyData)
 
     const { text } = await generateText({
-      model: this.echoConfig.model,
+      model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.8,
       maxTokens: 1500,
@@ -274,7 +274,7 @@ export class EchoMarketingIntelligence {
     const briefingPrompt = this.buildMarketingBriefingPrompt(briefingData, timeframe)
 
     const { text } = await generateText({
-      model: this.echoConfig.model,
+      model: this.echoConfig.model as any,
       prompt: briefingPrompt,
       temperature: 0.7,
       maxTokens: 2500,
