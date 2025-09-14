@@ -352,5 +352,7 @@ export function useWebSocketNotifications(userId: string | null) {
 // Note: This would need React import in a real implementation
 // For now, we'll assume React is available globally
 declare global {
-  const React: any;
+  namespace React {
+    // React types would go here if needed
+  }
 }

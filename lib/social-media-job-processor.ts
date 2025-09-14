@@ -172,12 +172,12 @@ export class SocialMediaJobProcessor {
    */
   private generateInsights(analyses: any): any {
     const insights = {
-      engagement_trends: [],
-      content_opportunities: [],
-      timing_insights: [],
-      audience_changes: [],
-      competitive_advantages: [],
-      risk_factors: []
+      engagement_trends: [] as any[],
+      content_opportunities: [] as any[],
+      timing_insights: [] as any[],
+      audience_changes: [] as any[],
+      competitive_advantages: [] as any[],
+      risk_factors: [] as any[]
     };
 
     // Process engagement analysis
@@ -267,7 +267,7 @@ export class SocialMediaJobProcessor {
    * Identify events that should trigger alerts
    */
   private identifyAlertableEvents(competitor: any, analyses: any, insights: any): any[] {
-    const alerts = [];
+    const alerts: any[] = [];
 
     // High-impact insights become alerts
     insights.competitive_advantages.forEach((advantage: any) => {

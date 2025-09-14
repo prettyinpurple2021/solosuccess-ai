@@ -40,68 +40,58 @@ export async function updateUserSubscription(
   try {
     const sql = getSql()
     
-    // Build dynamic update query
-    const updateFields = []
-    const values = []
-    let paramIndex = 1
-
+    // Build the update object dynamically
+    const updateData: any = {
+      updated_at: new Date()
+    }
+    
     if (subscriptionData.stripe_subscription_id !== undefined) {
-      updateFields.push(`stripe_subscription_id = $${paramIndex}`)
-      values.push(subscriptionData.stripe_subscription_id)
-      paramIndex++
+      updateData.stripe_subscription_id = subscriptionData.stripe_subscription_id
     }
     
     if (subscriptionData.stripe_customer_id !== undefined) {
-      updateFields.push(`stripe_customer_id = $${paramIndex}`)
-      values.push(subscriptionData.stripe_customer_id)
-      paramIndex++
+      updateData.stripe_customer_id = subscriptionData.stripe_customer_id
     }
     
     if (subscriptionData.subscription_tier !== undefined) {
-      updateFields.push(`subscription_tier = $${paramIndex}`)
-      values.push(subscriptionData.subscription_tier)
-      paramIndex++
+      updateData.subscription_tier = subscriptionData.subscription_tier
     }
     
     if (subscriptionData.subscription_status !== undefined) {
-      updateFields.push(`subscription_status = $${paramIndex}`)
-      values.push(subscriptionData.subscription_status)
-      paramIndex++
+      updateData.subscription_status = subscriptionData.subscription_status
     }
     
     if (subscriptionData.current_period_start !== undefined) {
-      updateFields.push(`current_period_start = $${paramIndex}`)
-      values.push(subscriptionData.current_period_start)
-      paramIndex++
+      updateData.current_period_start = subscriptionData.current_period_start
     }
     
     if (subscriptionData.current_period_end !== undefined) {
-      updateFields.push(`current_period_end = $${paramIndex}`)
-      values.push(subscriptionData.current_period_end)
-      paramIndex++
+      updateData.current_period_end = subscriptionData.current_period_end
     }
     
     if (subscriptionData.cancel_at_period_end !== undefined) {
-      updateFields.push(`cancel_at_period_end = $${paramIndex}`)
-      values.push(subscriptionData.cancel_at_period_end)
-      paramIndex++
+      updateData.cancel_at_period_end = subscriptionData.cancel_at_period_end
     }
 
-    if (updateFields.length === 0) {
+    if (Object.keys(updateData).length === 1) { // Only updated_at
       return { success: false, error: 'No fields to update' }
     }
 
-    updateFields.push(`updated_at = NOW()`)
-    values.push(userId)
-
-    const query = `
+    // Use template literal for the update query
+    const result = await sql`
       UPDATE users 
-      SET ${updateFields.join(', ')}
-      WHERE id = $${paramIndex}
+      SET 
+        stripe_subscription_id = ${updateData.stripe_subscription_id || null},
+        stripe_customer_id = ${updateData.stripe_customer_id || null},
+        subscription_tier = ${updateData.subscription_tier || null},
+        subscription_status = ${updateData.subscription_status || null},
+        current_period_start = ${updateData.current_period_start || null},
+        current_period_end = ${updateData.current_period_end || null},
+        cancel_at_period_end = ${updateData.cancel_at_period_end || null},
+        updated_at = NOW()
+      WHERE id = ${userId}
       RETURNING id, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id
     `
-
-    const result = await sql.unsafe(query, values)
     
     if (result.length === 0) {
       return { success: false, error: 'User not found' }

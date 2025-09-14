@@ -165,7 +165,7 @@ export class ScrapingQueueProcessor {
     const stats = await this.scheduler.getJobStats()
     
     return {
-      total: Object.values(stats).reduce((sum, count) => sum + count, 0),
+      total: Object.values(stats).reduce((sum, count) => (sum as number) + (count as number), 0) as number,
       pending: stats.pending || 0,
       running: stats.running || 0,
       completed: stats.completed || 0,

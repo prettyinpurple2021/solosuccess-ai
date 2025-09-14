@@ -435,7 +435,7 @@ export class WebScrapingService {
       // Cache the robots.txt for future use
       this.robotsCache.set(domain, robots)
       
-      return robots.isAllowed(url, this.config.userAgent)
+      return robots.isAllowed(url, this.config.userAgent) ?? true
     } catch (error) {
       // If robots.txt is not accessible, allow scraping but log warning
       console.warn(`Could not fetch robots.txt for ${url}:`, error)
