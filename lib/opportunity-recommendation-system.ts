@@ -394,16 +394,7 @@ export class OpportunityRecommendationSystem {
     } = { field: 'priority_score', direction: 'desc' }
   ) {
     try {
-      let query = db
-        .select({
-          opportunity: competitiveOpportunities,
-          competitor: competitorProfiles
-        })
-        .from(competitiveOpportunities)
-        .leftJoin(competitorProfiles, eq(competitiveOpportunities.competitor_id, competitorProfiles.id))
-        .where(eq(competitiveOpportunities.user_id, userId))
-
-      // Apply filters
+      // Build all conditions first
       const conditions = [eq(competitiveOpportunities.user_id, userId)]
 
       if (filters.status?.length) {
@@ -430,15 +421,22 @@ export class OpportunityRecommendationSystem {
         conditions.push(eq(competitiveOpportunities.is_archived, filters.isArchived))
       }
 
-      if (conditions.length > 1) {
-        query = query.where(and(...conditions))
-      }
-
       // Apply sorting
       const sortField = competitiveOpportunities[sorting.field]
-      query = sorting.direction === 'desc' 
-        ? query.orderBy(desc(sortField))
-        : query.orderBy(asc(sortField))
+      const orderByClause = sorting.direction === 'desc' 
+        ? desc(sortField)
+        : asc(sortField)
+
+      // Build the complete query with all conditions and sorting
+      const query = db
+        .select({
+          opportunity: competitiveOpportunities,
+          competitor: competitorProfiles
+        })
+        .from(competitiveOpportunities)
+        .leftJoin(competitorProfiles, eq(competitiveOpportunities.competitor_id, competitorProfiles.id))
+        .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+        .orderBy(orderByClause)
 
       return await query
     } catch (error) {
@@ -924,7 +922,7 @@ export class OpportunityRecommendationSystem {
   }
 
   private generateTags(opportunity: OpportunityDetectionResult): string[] {
-    const tags = [opportunity.opportunityType, opportunity.impact, opportunity.timing]
+    const tags: string[] = [opportunity.opportunityType, opportunity.impact, opportunity.timing]
     
     // Add specific tags based on evidence
     if (opportunity.evidence.some(e => e.type === 'social_media')) {

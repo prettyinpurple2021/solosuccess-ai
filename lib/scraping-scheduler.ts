@@ -433,31 +433,15 @@ export class ScrapingScheduler {
     }
 
     const startTime = Date.now()
-    this.runningJobs.add(job.id)
     
-    // Update job status
-    job.status = 'running'
-    job.lastRunAt = new Date()
-    job.updatedAt = new Date()
-
     try {
-      // Check if job was cancelled before starting
-      if (job.status === 'cancelled') {
-        console.log(`Job ${job.id} was cancelled before execution.`)
-        this.jobQueue.delete(job.id)
-        this.updateMetrics()
-        return {
-          jobId: job.id,
-          success: false,
-          error: 'Job cancelled by user',
-          executionTime: 0,
-          changesDetected: false,
-          retryCount: job.retryCount,
-          completedAt: new Date(),
-        }
-      }
-
       console.log(`Processing scraping job: ${job.id} (${job.jobType}) for ${job.url}`)
+      
+      // Now update job status to running since it wasn't cancelled
+      this.runningJobs.add(job.id)
+      job.status = 'running'
+      job.lastRunAt = new Date()
+      job.updatedAt = new Date()
 
       // Execute the scraping based on job type
       let scrapingResult: ScrapingResult
@@ -499,7 +483,7 @@ export class ScrapingScheduler {
         job.retryCount = 0
         job.nextRunAt = this.calculateNextRun(job.frequency)
         this.metrics.completedJobs++
-      } else if (job.status !== 'cancelled') {
+      } else if ((job.status as any) !== 'cancelled') {
         // Job failed, check if we should retry
         job.retryCount++
         
@@ -558,7 +542,7 @@ export class ScrapingScheduler {
     } finally {
       this.runningJobs.delete(job.id)
       // If job was cancelled during execution, remove it from the queue
-      if (job.status === 'cancelled') {
+      if ((job.status as any) === 'cancelled') {
         this._cleanupCancelledJob(job.id)
       }
     }
@@ -757,6 +741,3 @@ export class ScrapingScheduler {
 
 // Export singleton instance
 export const scrapingScheduler = new ScrapingScheduler(true)
-
-// Export types for external use
-export type { ScrapingJob, ScrapingJobConfig, ScrapingFrequency, QueueMetrics, ScrapingJobResult, ValidationResult }

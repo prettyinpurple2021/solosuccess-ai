@@ -387,7 +387,7 @@ export class SocialMediaMonitor {
           sentiment: analysis.sentiment
         },
         analysis_results: [],
-        confidence: analysis.sentiment.overall.confidence,
+        confidence: analysis.sentiment.overall.confidence.toString(),
         importance: this.calculateImportance(analysis),
         tags: [analysis.platform, 'social_media', 'engagement'],
         collected_at: new Date(),

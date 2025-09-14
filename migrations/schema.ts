@@ -1,5 +1,12 @@
-import { pgTable, unique, uuid, text, jsonb, boolean, timestamp, index, foreignKey, check, integer, date, bigint } from "drizzle-orm/pg-core"
+import { pgTable, unique, uuid, text, jsonb, boolean, timestamp, index, foreignKey, check, integer, date, bigint, customType } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
+
+// Define custom type for bytea
+const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
+  dataType() {
+    return 'bytea'
+  },
+})
 
 
 
@@ -101,8 +108,8 @@ export const documents = pgTable("documents", {
 	originalFilename: text("original_filename").notNull(),
 	fileSize: integer("file_size").notNull(),
 	mimeType: text("mime_type").notNull(),
-	// TODO: failed to parse database type 'bytea'
-	fileData: unknown("file_data").notNull(),
+	// File data stored as bytea
+	fileData: bytea("file_data").notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
