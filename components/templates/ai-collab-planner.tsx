@@ -204,8 +204,9 @@ export function AiCollabPlanner() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Collaboration Type</Label>
+                  <Label htmlFor={`collab-type-${index}`}>Collaboration Type</Label>
                   <select
+                    id={`collab-type-${index}`}
                     className="w-full p-2 border rounded-md"
                     value={idea.type}
                     onChange={(e) => updateCollabIdea(index, 'type', e.target.value)}

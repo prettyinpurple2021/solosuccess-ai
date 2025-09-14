@@ -150,8 +150,9 @@ export function BragBankTemplate() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label>Type</Label>
+                  <Label htmlFor={`entry-type-${index}`}>Type</Label>
                   <select
+                    id={`entry-type-${index}`}
                     className="w-full p-2 border rounded-md"
                     value={entry.type}
                     onChange={(e) => updateEntry(index, 'type', e.target.value)}

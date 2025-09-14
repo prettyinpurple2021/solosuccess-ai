@@ -310,7 +310,7 @@ export class LexiStrategicAnalysis {
     const analysisPrompt = this.buildPositioningAnalysisPrompt(competitor, allIntelligence, marketData)
 
     const { text } = await generateText({
-      model: this.lexiConfig.model,
+      model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.6,
       maxTokens: 2500,
@@ -339,7 +339,7 @@ export class LexiStrategicAnalysis {
     const analysisPrompt = this.buildMarketTrendAnalysisPrompt(competitors, competitorIntelligence, industryData)
 
     const { text } = await generateText({
-      model: this.lexiConfig.model,
+      model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2500,
@@ -372,7 +372,7 @@ export class LexiStrategicAnalysis {
     )
 
     const { text } = await generateText({
-      model: this.lexiConfig.model,
+      model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
       maxTokens: 2000,
@@ -395,7 +395,7 @@ export class LexiStrategicAnalysis {
     const analysisPrompt = this.buildThreatAssessmentPrompt(competitor, recentIntelligence, competitorProfile)
 
     const { text } = await generateText({
-      model: this.lexiConfig.model,
+      model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.6,
       maxTokens: 2000,
@@ -422,7 +422,7 @@ export class LexiStrategicAnalysis {
     const analysisPrompt = this.buildOpportunityAnalysisPrompt(competitors, competitorIntelligence)
 
     const { text } = await generateText({
-      model: this.lexiConfig.model,
+      model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.8,
       maxTokens: 2000,
@@ -451,7 +451,7 @@ export class LexiStrategicAnalysis {
       competitorIds.map(async (id) => {
         const competitor = await this.getCompetitorProfile(id)
         const recentIntelligence = await this.getAllIntelligenceData(id, days)
-        const threatLevel = competitor.threat_level
+        const threatLevel = (competitor as any).threatLevel ?? (competitor as any).threat_level
         return { competitor, intelligence: recentIntelligence, threatLevel }
       })
     )
@@ -459,7 +459,7 @@ export class LexiStrategicAnalysis {
     const briefingPrompt = this.buildStrategicBriefingPrompt(briefingData, timeframe)
 
     const { text } = await generateText({
-      model: this.lexiConfig.model,
+      model: this.lexiConfig.model as any,
       prompt: briefingPrompt,
       temperature: 0.7,
       maxTokens: 3000,
@@ -481,14 +481,14 @@ export class LexiStrategicAnalysis {
       throw new Error(`Competitor profile not found: ${competitorId}`)
     }
 
-    return result[0] as CompetitorProfile
+    return (result[0] as unknown) as CompetitorProfile
   }
 
   private async getAllIntelligenceData(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -498,6 +498,7 @@ export class LexiStrategicAnalysis {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getMarketIntelligence(industry: string, days: number): Promise<IntelligenceData[]> {
@@ -514,7 +515,7 @@ export class LexiStrategicAnalysis {
 
     if (competitorIds.length === 0) return []
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -524,13 +525,14 @@ export class LexiStrategicAnalysis {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getHiringIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -541,13 +543,14 @@ export class LexiStrategicAnalysis {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getInvestmentIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -558,13 +561,14 @@ export class LexiStrategicAnalysis {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getPartnershipIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -575,6 +579,7 @@ export class LexiStrategicAnalysis {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   // Prompt building methods
@@ -593,15 +598,15 @@ Analyze the competitive positioning for: ${competitor.name}
 COMPETITOR PROFILE:
 - Company: ${competitor.name}
 - Industry: ${competitor.industry}
-- Threat Level: ${competitor.threat_level}
-- Market Position: ${JSON.stringify(competitor.market_position)}
-- Competitive Advantages: ${competitor.competitive_advantages?.join(', ')}
+- Threat Level: ${(competitor as any).threatLevel}
+- Market Position: ${JSON.stringify((competitor as any).marketPosition)}
+- Competitive Advantages: ${(competitor as any).competitiveAdvantages?.join(', ')}
 - Vulnerabilities: ${competitor.vulnerabilities?.join(', ')}
 - Products: ${competitor.products?.map(p => `${p.name}: ${p.description}`).join('; ')}
 
 COMPETITOR INTELLIGENCE DATA:
 ${intelligence.slice(0, 10).map(data => `
-Source: ${data.sourceType} - ${data.data_type}
+Source: ${data.sourceType} - ${data.dataType}
 Content: ${JSON.stringify(data.extractedData).substring(0, 400)}
 Date: ${data.collectedAt}
 `).join('\n')}
@@ -642,7 +647,7 @@ Analyze market trends based on competitor activities and industry data.
 COMPETITORS ANALYZED:
 ${competitors.map((comp, index) => `
 ${index + 1}. ${comp.name} (${comp.industry})
-   - Threat Level: ${comp.threat_level}
+   - Threat Level: ${(comp as any).threatLevel}
    - Recent Activities: ${competitorIntelligence[index]?.length || 0} data points
    - Key Intelligence: ${JSON.stringify(competitorIntelligence[index]?.slice(0, 2)).substring(0, 300)}
 `).join('\n')}
@@ -724,10 +729,10 @@ COMPETITIVE THREAT ASSESSMENT REQUEST:
 Assess competitive threats from: ${competitor.name}
 
 COMPETITOR PROFILE:
-- Threat Level: ${competitor.threat_level}
-- Competitive Advantages: ${competitor.competitive_advantages?.join(', ')}
-- Market Position: ${JSON.stringify(competitor.market_position)}
-- Recent Funding: $${competitor.funding_amount} (${competitor.funding_stage})
+- Threat Level: ${(competitor as any).threatLevel}
+- Competitive Advantages: ${(competitor as any).competitiveAdvantages?.join(', ')}
+- Market Position: ${JSON.stringify((competitor as any).marketPosition)}
+- Recent Funding: $${(competitor as any).fundingAmount} (${(competitor as any).fundingStage})
 
 RECENT INTELLIGENCE:
 ${intelligence.slice(0, 15).map(data => `
@@ -763,9 +768,9 @@ Identify market opportunities based on competitor gap analysis.
 COMPETITOR LANDSCAPE:
 ${competitors.map((comp, index) => `
 ${comp.name}:
-- Market Position: ${JSON.stringify(comp.market_position)}
+- Market Position: ${JSON.stringify((comp as any).marketPosition)}
 - Products: ${comp.products?.map(p => p.name).join(', ')}
-- Vulnerabilities: ${comp.vulnerabilities?.join(', ')}
+- Vulnerabilities: ${(comp as any).vulnerabilities?.join(', ')}
 - Recent Intelligence: ${JSON.stringify(competitorIntelligence[index]?.slice(0, 2)).substring(0, 400)}
 `).join('\n\n')}
 
@@ -921,8 +926,8 @@ STRATEGIC INTELLIGENCE BRIEFING:`
         topics: [analysisType, 'strategic', 'competitive_intelligence'],
         keyInsights: []
       },
-      analysis_results: [analysisResult],
-      confidence: 0.85,
+      analysis_results: [analysisResult] as any,
+      confidence: '0.85',
       importance: 'high',
       tags: ['lexi', 'strategic', analysisType],
       collected_at: new Date(),

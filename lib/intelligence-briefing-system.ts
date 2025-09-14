@@ -106,7 +106,8 @@ const briefingSchema = z.object({
       title: z.string(),
       description: z.string(),
       impact: z.enum(['low', 'medium', 'high', 'critical']),
-      source: z.string()
+      source: z.string(),
+      date: z.date()
     }))
   })),
   trendAnalysis: z.array(z.object({
@@ -481,7 +482,16 @@ Generate a structured intelligence briefing that helps the user make informed st
       competitorUpdates: competitors.map((c: any) => ({
         competitorId: c.id,
         competitorName: c.name,
-        updates: []
+        updates: [
+          {
+            type: 'news' as const,
+            title: 'No significant updates',
+            description: 'No critical events recorded during the period.',
+            impact: 'low' as const,
+            date: new Date(),
+            source: 'system'
+          }
+        ]
       })),
       trendAnalysis: [],
       actionItems: [],

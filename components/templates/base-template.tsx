@@ -201,8 +201,7 @@ export default function BaseTemplate({
                   }}
                   transition={{ 
                     duration: 4, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
+                    repeat: Infinity 
                   }}
                   className="ml-4"
                 >

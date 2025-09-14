@@ -64,7 +64,7 @@ export class ScrapingScheduler {
    */
   async createJob(params: CreateJobParams): Promise<string> {
     const jobId = uuidv4()
-    const nextRunAt = this.calculateNextRun(params.frequencyType || 'interval', params.frequencyValue, params.frequencyTimezone)
+    const nextRunAt = this.calculateNextRun(params.frequencyType || 'interval', params.frequencyValue, params.frequencyTimezone ?? undefined)
 
     await db.insert(scrapingJobs).values({
       id: jobId,
@@ -160,7 +160,7 @@ export class ScrapingScheduler {
       const nextRun = this.calculateNextRun(
         currentJob.frequency_type as FrequencyType,
         currentJob.frequency_value,
-        currentJob.frequency_timezone
+        currentJob.frequency_timezone ?? undefined
       )
 
       await db
@@ -482,7 +482,7 @@ export class ScrapingScheduler {
     const nextRun = this.calculateNextRun(
       jobData.frequency_type as FrequencyType,
       jobData.frequency_value,
-      jobData.frequency_timezone
+      jobData.frequency_timezone ?? undefined
     )
 
     await db

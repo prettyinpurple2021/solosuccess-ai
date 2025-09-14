@@ -251,7 +251,9 @@ export function VisionBoardGenerator() {
                       />
                       
                       <div className="flex gap-2">
+                        <Label htmlFor={`timeline-${element.id}`} className="sr-only">Timeline</Label>
                         <select
+                          id={`timeline-${element.id}`}
                           value={element.timeline}
                           onChange={(e) => updateElement(element.id, 'timeline', e.target.value)}
                           className="flex-1 px-3 py-2 border rounded-md text-sm"
@@ -264,7 +266,9 @@ export function VisionBoardGenerator() {
                           <option value="5 years">5 years</option>
                         </select>
                         
+                        <Label htmlFor={`priority-${element.id}`} className="sr-only">Priority</Label>
                         <select
+                          id={`priority-${element.id}`}
                           value={element.priority}
                           onChange={(e) => updateElement(element.id, 'priority', e.target.value as VisionElement['priority'])}
                           className="px-3 py-2 border rounded-md text-sm"

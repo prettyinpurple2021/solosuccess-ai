@@ -164,7 +164,10 @@ export class DocumentParser {
   private static async parseExcel(buffer: Buffer, fileName: string): Promise<ParseResult> {
     try {
       const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(buffer);
+      const arrayBuffer = buffer instanceof Uint8Array
+        ? buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
+        : (buffer as unknown as Uint8Array).buffer;
+      await workbook.xlsx.load(arrayBuffer as ArrayBuffer);
       let allText = '';
       
       // Extract text from all worksheets
@@ -179,10 +182,10 @@ export class DocumentParser {
             if (cell.value !== null && cell.value !== undefined) {
               if (typeof cell.value === 'object' && 'text' in cell.value) {
                 // Rich text object
-                cellValue = cell.value.text || '';
+                cellValue = (cell.value as any).text || '';
               } else if (typeof cell.value === 'object' && 'result' in cell.value) {
                 // Formula result
-                cellValue = String(cell.value.result || '');
+                cellValue = String((cell.value as any).result || '');
               } else {
                 // Simple value
                 cellValue = String(cell.value);

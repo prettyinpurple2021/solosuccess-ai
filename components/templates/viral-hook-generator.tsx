@@ -159,8 +159,9 @@ export function ViralHookGenerator() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label>Platform</Label>
+            <Label htmlFor="platform-select">Platform</Label>
             <select
+              id="platform-select"
               className="w-full p-2 border rounded-md"
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
@@ -171,8 +172,9 @@ export function ViralHookGenerator() {
             </select>
           </div>
           <div>
-            <Label>Content Type</Label>
+            <Label htmlFor="content-type-select">Content Type</Label>
             <select
+              id="content-type-select"
               className="w-full p-2 border rounded-md"
               value={contentType}
               onChange={(e) => setContentType(e.target.value)}
@@ -183,8 +185,9 @@ export function ViralHookGenerator() {
             </select>
           </div>
           <div>
-            <Label>Desired Vibe</Label>
+            <Label htmlFor="vibe-select">Desired Vibe</Label>
             <select
+              id="vibe-select"
               className="w-full p-2 border rounded-md"
               value={desiredVibe}
               onChange={(e) => setDesiredVibe(e.target.value)}
@@ -253,8 +256,9 @@ export function ViralHookGenerator() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>Platform</Label>
+                      <Label htmlFor={`hook-platform-${index}`}>Platform</Label>
                       <select
+                        id={`hook-platform-${index}`}
                         className="w-full p-2 border rounded-md"
                         value={hookOption.platform}
                         onChange={(e) => updateHook(index, 'platform', e.target.value)}
@@ -265,8 +269,9 @@ export function ViralHookGenerator() {
                       </select>
                     </div>
                     <div>
-                      <Label>Content Type</Label>
+                      <Label htmlFor={`hook-content-type-${index}`}>Content Type</Label>
                       <select
+                        id={`hook-content-type-${index}`}
                         className="w-full p-2 border rounded-md"
                         value={hookOption.contentType}
                         onChange={(e) => updateHook(index, 'contentType', e.target.value)}

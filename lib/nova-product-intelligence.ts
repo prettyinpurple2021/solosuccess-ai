@@ -289,6 +289,13 @@ export interface TimelineEstimate {
   riskFactors: string[]
 }
 
+export interface UserFeedbackSummary {
+  averageRating: number
+  commonPros: string[]
+  commonCons: string[]
+  themes: string[]
+}
+
 /**
  * Nova Product Intelligence Service
  * Provides AI-powered product and design analysis for competitor intelligence
@@ -328,7 +335,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze UX/UI trends from competitor websites and apps
    */
-  async analyzeUXTrends(competitorId: number, days: number = 90): Promise<UXAnalysis> {
+  async analyzeUXTrends(competitorId: number, userId: string, days: number = 90): Promise<UXAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const websiteData = await this.getWebsiteIntelligence(competitorId, days)
     const appStoreData = await this.getAppStoreIntelligence(competitorId, days)
@@ -343,7 +350,7 @@ export class NovaProductIntelligence {
     })
 
     const analysis = this.parseUXAnalysis(text, competitorId)
-    await this.storeProductIntelligence(competitorId, 'ux_trends', analysis)
+    await this.storeProductIntelligence(competitorId, 'ux_trends', analysis, userId)
 
     return analysis
   }
@@ -351,7 +358,7 @@ export class NovaProductIntelligence {
   /**
    * Identify product gaps and missing features/markets
    */
-  async analyzeProductGaps(competitorIds: number[], userProductData?: any): Promise<ProductGap[]> {
+  async analyzeProductGaps(competitorIds: number[], userProductData?: any, userId?: string): Promise<ProductGap[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -377,7 +384,7 @@ export class NovaProductIntelligence {
 
     // Store gap analysis for each competitor
     for (const competitorId of competitorIds) {
-      await this.storeProductIntelligence(competitorId, 'product_gaps', gaps)
+      await this.storeProductIntelligence(competitorId, 'product_gaps', gaps, userId || '')
     }
 
     return gaps
@@ -386,7 +393,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze design patterns for competitive advantage identification
    */
-  async analyzeDesignPatterns(competitorIds: number[]): Promise<DesignPattern[]> {
+  async analyzeDesignPatterns(competitorIds: number[], userId?: string): Promise<DesignPattern[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -408,7 +415,7 @@ export class NovaProductIntelligence {
 
     // Store design pattern analysis
     for (const competitorId of competitorIds) {
-      await this.storeProductIntelligence(competitorId, 'design_patterns', patterns)
+      await this.storeProductIntelligence(competitorId, 'design_patterns', patterns, userId || '')
     }
 
     return patterns
@@ -417,7 +424,7 @@ export class NovaProductIntelligence {
   /**
    * Predict product roadmap based on competitor development patterns
    */
-  async predictProductRoadmap(competitorId: number): Promise<ProductRoadmapPrediction> {
+  async predictProductRoadmap(competitorId: number, userId?: string): Promise<ProductRoadmapPrediction> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const hiringData = await this.getHiringIntelligence(competitorId, 180)
     const productData = await this.getWebsiteIntelligence(competitorId, 180)
@@ -438,7 +445,7 @@ export class NovaProductIntelligence {
     })
 
     const prediction = this.parseRoadmapPrediction(text, competitorId)
-    await this.storeProductIntelligence(competitorId, 'roadmap_prediction', prediction)
+    await this.storeProductIntelligence(competitorId, 'roadmap_prediction', prediction, userId || '')
 
     return prediction
   }
@@ -486,14 +493,14 @@ export class NovaProductIntelligence {
       throw new Error(`Competitor profile not found: ${competitorId}`)
     }
 
-    return result[0] as CompetitorProfile
+    return (result[0] as unknown) as CompetitorProfile
   }
 
   private async getWebsiteIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -504,13 +511,14 @@ export class NovaProductIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getAppStoreIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -521,13 +529,14 @@ export class NovaProductIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getSocialMediaIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -538,13 +547,14 @@ export class NovaProductIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getHiringIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -555,6 +565,7 @@ export class NovaProductIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   // Prompt building methods
@@ -667,7 +678,7 @@ COMPETITOR PRODUCTS:
 ${competitors.map((comp, index) => `
 ${comp.name}:
 - Products: ${comp.products?.map(p => `${p.name}: ${p.description}`).join('; ')}
-- Market Position: ${JSON.stringify(comp.market_position)}
+- Market Position: ${JSON.stringify(comp.marketPosition)}
 - Recent Product Data: ${JSON.stringify(competitorProductData[index]?.slice(0, 2)).substring(0, 400)}
 `).join('\n\n')}
 
@@ -931,7 +942,7 @@ PRODUCT INTELLIGENCE BRIEFING:`
         keyInsights: []
       },
       analysis_results: [analysisResult],
-      confidence: 0.8,
+      confidence: '0.80',
       importance: 'high',
       tags: ['nova', 'product', 'design', analysisType],
       collected_at: new Date(),

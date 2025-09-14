@@ -296,14 +296,14 @@ export class EchoMarketingIntelligence {
       throw new Error(`Competitor profile not found: ${competitorId}`)
     }
 
-    return result[0] as CompetitorProfile
+    return (result[0] as unknown) as CompetitorProfile
   }
 
   private async getSocialMediaIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -314,13 +314,14 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getWebsiteIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -331,13 +332,14 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getNewsIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -348,13 +350,14 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private async getAllIntelligenceData(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
-    return await db
+    const rows = await db
       .select()
       .from(intelligenceData)
       .where(
@@ -364,6 +367,7 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
+    return rows as unknown as IntelligenceData[]
   }
 
   private buildContentStrategyPrompt(
@@ -386,16 +390,16 @@ COMPETITOR PROFILE:
 
 SOCIAL MEDIA DATA (Last 30 days):
 ${socialMediaData.map(data => `
-Platform: ${data.data_type}
-Content: ${JSON.stringify(data.raw_content).substring(0, 500)}
-Collected: ${data.collected_at}
+Platform: ${data.dataType}
+Content: ${JSON.stringify(data.rawContent).substring(0, 500)}
+Collected: ${data.collectedAt}
 `).join('\n')}
 
 WEBSITE DATA (Last 30 days):
 ${websiteData.map(data => `
-Source: ${data.source_url}
-Content: ${JSON.stringify(data.raw_content).substring(0, 300)}
-Collected: ${data.collected_at}
+Source: ${data.sourceUrl}
+Content: ${JSON.stringify(data.rawContent).substring(0, 300)}
+Collected: ${data.collectedAt}
 `).join('\n')}
 
 ANALYSIS REQUIREMENTS:
@@ -423,16 +427,16 @@ Analyze the brand positioning and market messaging for: ${competitor.name}
 COMPETITOR PROFILE:
 - Company: ${competitor.name}
 - Industry: ${competitor.industry}
-- Market Position: ${JSON.stringify(competitor.market_position)}
-- Competitive Advantages: ${competitor.competitive_advantages?.join(', ')}
+- Market Position: ${JSON.stringify(competitor.marketPosition)}
+- Competitive Advantages: ${competitor.competitiveAdvantages?.join(', ')}
 - Products: ${competitor.products?.map(p => p.name).join(', ')}
 
 ALL INTELLIGENCE DATA:
 ${allData.map(data => `
-Source: ${data.source_type} - ${data.data_type}
-URL: ${data.source_url}
-Content: ${JSON.stringify(data.raw_content).substring(0, 400)}
-Date: ${data.collected_at}
+Source: ${data.sourceType} - ${data.dataType}
+URL: ${data.sourceUrl}
+Content: ${JSON.stringify(data.rawContent).substring(0, 400)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 POSITIONING ANALYSIS REQUIREMENTS:
@@ -464,17 +468,17 @@ Analyze marketing campaign effectiveness for: ${competitor.name}
 
 SOCIAL MEDIA CAMPAIGNS:
 ${socialMediaData.map(data => `
-Platform: ${data.data_type}
-Campaign Data: ${JSON.stringify(data.raw_content).substring(0, 600)}
-Performance: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Platform: ${data.dataType}
+Campaign Data: ${JSON.stringify(data.rawContent).substring(0, 600)}
+Performance: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 NEWS AND PR DATA:
 ${newsData.map(data => `
-Source: ${data.source_url}
-News Content: ${JSON.stringify(data.raw_content).substring(0, 400)}
-Date: ${data.collected_at}
+Source: ${data.sourceUrl}
+News Content: ${JSON.stringify(data.rawContent).substring(0, 400)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 CAMPAIGN ANALYSIS REQUIREMENTS:
@@ -544,8 +548,8 @@ ${briefingData.map(({ competitor, intelligence }) => `
 COMPETITOR: ${competitor.name}
 Recent Activities (${intelligence.length} items):
 ${intelligence.map(data => `
-- ${data.source_type}: ${JSON.stringify(data.extracted_data).substring(0, 200)}
-  Date: ${data.collected_at}
+-- ${data.sourceType}: ${JSON.stringify(data.extractedData).substring(0, 200)}
+  Date: ${data.collectedAt}
 `).join('\n')}
 `).join('\n\n')}
 
@@ -631,6 +635,14 @@ MARKETING INTELLIGENCE BRIEFING:`
     analysisType: string, 
     analysis: any
   ): Promise<void> {
+    // Derive user_id from competitor profile to avoid placeholders
+    const compRows = await db
+      .select({ user_id: competitorProfiles.user_id })
+      .from(competitorProfiles)
+      .where(eq(competitorProfiles.id, competitorId))
+      .limit(1)
+    const owningUserId = compRows[0]?.user_id as string
+
     const analysisResult: AnalysisResult = {
       agentId: 'echo',
       analysisType,
@@ -642,8 +654,8 @@ MARKETING INTELLIGENCE BRIEFING:`
 
     // Store in intelligence data table
     await db.insert(intelligenceData).values({
-      competitor_id: competitorId,
-      user_id: '', // This should be passed from the calling context
+      competitor_id: Number(competitorId),
+      user_id: owningUserId,
       source_type: 'manual',
       data_type: `echo_${analysisType}`,
       raw_content: analysis,
@@ -655,8 +667,8 @@ MARKETING INTELLIGENCE BRIEFING:`
         topics: [analysisType, 'marketing', 'competitive_intelligence'],
         keyInsights: []
       },
-      analysis_results: [analysisResult],
-      confidence: 0.8,
+      analysis_results: [analysisResult] as any,
+      confidence: '0.80',
       importance: 'high',
       tags: ['echo', 'marketing', analysisType],
       collected_at: new Date(),

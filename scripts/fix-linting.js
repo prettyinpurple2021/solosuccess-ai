@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-
+/* eslint-disable @typescript-eslint/no-var-requires, import/no-commonjs */
 const fs = require('fs');
-const path = require('path');
+
 
 // Function to fix unused imports
 function fixUnusedImports(content) {
