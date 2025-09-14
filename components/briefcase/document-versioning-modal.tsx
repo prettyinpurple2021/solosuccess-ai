@@ -94,13 +94,6 @@ export default function DocumentVersioningModal({
   
   const { toast } = useToast()
 
-  // Load version history when modal opens
-  useEffect(() => {
-    if (isOpen && file) {
-      loadVersionHistory()
-    }
-  }, [isOpen, file, loadVersionHistory])
-
   const loadVersionHistory = useCallback(async () => {
     if (!file) return
     
@@ -127,6 +120,13 @@ export default function DocumentVersioningModal({
       setLoading(false)
     }
   }, [file, toast])
+
+  // Load version history when modal opens
+  useEffect(() => {
+    if (isOpen && file) {
+      loadVersionHistory()
+    }
+  }, [isOpen, file, loadVersionHistory])
 
   // Load version comparison data
   const loadVersionCompare = useCallback(async () => {
@@ -352,7 +352,7 @@ export default function DocumentVersioningModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value: 'history' | 'compare') => setActiveTab(value)} className="flex-1">
+        <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)} className="flex-1">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="history" className="flex items-center gap-1">
               <History className="w-3 h-3" />

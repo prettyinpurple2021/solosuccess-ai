@@ -37,6 +37,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Reactivate subscription in Stripe
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Stripe not configured' },
+        { status: 500 }
+      )
+    }
+    
     const stripeSubscription = await stripe.subscriptions.update(
       subscription.stripe_subscription_id,
       {
@@ -61,7 +68,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Subscription reactivated successfully',
       cancel_at_period_end: stripeSubscription.cancel_at_period_end,
-      current_period_end: new Date(stripeSubscription.current_period_end * 1000)
+      current_period_end: new Date((stripeSubscription as any).current_period_end * 1000)
     })
 
   } catch (error) {

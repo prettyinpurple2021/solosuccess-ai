@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     // Get the appropriate price ID
     let priceId: string
     if (billing === 'yearly') {
-      priceId = subscriptionTier.stripeYearlyPriceId || subscriptionTier.stripePriceId
+      priceId = (subscriptionTier as any).stripeYearlyPriceId || subscriptionTier.stripePriceId
     } else {
       priceId = subscriptionTier.stripePriceId
     }
@@ -65,6 +65,13 @@ export async function POST(request: NextRequest) {
     if (user.stripe_customer_id) {
       customerId = user.stripe_customer_id
     } else {
+      if (!stripe) {
+        return NextResponse.json(
+          { error: 'Stripe not configured' },
+          { status: 500 }
+        )
+      }
+      
       const customer = await stripe.customers.create({
         email: user.email,
         name: user.full_name,

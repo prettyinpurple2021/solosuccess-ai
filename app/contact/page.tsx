@@ -65,7 +65,7 @@ export default function ContactPage() {
         ease: "easeOut"
       }
     }
-  }
+  } as any
 
   return (
     <div className="min-h-screen gradient-background">
@@ -288,7 +288,7 @@ export default function ContactPage() {
             {/* Contact Information */}
             <motion.div variants={itemVariants} className="space-y-8">
               {/* Direct Contact */}
-              <BossCard variant="accent">
+              <BossCard variant="default">
                 <div className="flex items-center space-x-2 mb-4">
                   <Mail className="w-5 h-5 text-blue-600" />
                   <h3 className="text-xl font-bold text-gradient">Direct Contact</h3>

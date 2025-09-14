@@ -20,7 +20,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
-    displayName: user?.name || "",
+    displayName: (user as any)?.name || "",
     email: user?.email || "",
   })
 
@@ -30,7 +30,7 @@ export default function SettingsPage() {
     setIsLoading(true)
     try {
       // Update display name if changed
-      if (formData.displayName !== user.name) {
+      if (formData.displayName !== (user as any).name) {
         const response = await fetch('/api/auth/update-profile', {
           method: 'POST',
           headers: {

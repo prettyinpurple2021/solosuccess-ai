@@ -50,7 +50,7 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
     setCurrentPhase("wizard")
   }
 
-  const handleWizardComplete = (data: Record<string, unknown>) => {
+  const handleWizardComplete = (data: any) => {
     setOnboardingData(data)
     setCurrentPhase("discovery")
   }
@@ -102,7 +102,7 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
   }
 
   const renderTutorialProgress = () => {
-    if (currentPhase !== "tutorial") return null
+    if (currentPhase !== "progressive") return null
 
     return (
       <div className="fixed top-4 right-4 z-50">
@@ -301,11 +301,9 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
         />
       )}
 
-      {currentPhase === "tutorial" && (
+      {currentPhase === "progressive" && (
         <InteractiveTutorial
           open={showTutorial}
-          onComplete={handleTutorialComplete}
-          onSkip={handleTutorialSkip}
           tutorialType={tutorialType}
         />
       )}

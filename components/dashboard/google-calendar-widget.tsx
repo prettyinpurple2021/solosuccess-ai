@@ -72,7 +72,7 @@ export function GoogleCalendarWidget() {
         setEvents(todaysEvents);
 
       } catch (e: unknown) {
-        setError(e.message || 'An unknown error occurred.');
+        setError((e as any)?.message || 'An unknown error occurred.');
       } finally {
         setIsLoading(false);
       }

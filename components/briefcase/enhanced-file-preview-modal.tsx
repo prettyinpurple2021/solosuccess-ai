@@ -271,7 +271,7 @@ export default function EnhancedFilePreviewModal({
   }, [isOpen, onClose, onNavigate, currentIndex, files.length, previewState.previewType])
 
   const getFileIcon = (filename: string, previewType: string | null) => {
-    if (previewType === 'image') return <Image className="w-4 h-4" alt="Image file" />
+    if (previewType === 'image') return <Image className="w-4 h-4" />
     if (previewType === 'text') return <FileCode className="w-4 h-4" />
     if (previewType === 'audio') return <Music className="w-4 h-4" />
     if (previewType === 'video') return <Video className="w-4 h-4" />
@@ -517,7 +517,7 @@ export default function EnhancedFilePreviewModal({
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={(value: 'preview' | 'metadata') => setActiveTab(value)} className="h-full flex flex-col">
+          <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)} className="h-full flex flex-col">
             <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
               <TabsTrigger value="preview" className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />

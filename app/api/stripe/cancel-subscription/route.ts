@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Subscription will be canceled at the end of the current period',
       cancel_at_period_end: stripeSubscription.cancel_at_period_end,
-      current_period_end: new Date(stripeSubscription.current_period_end * 1000)
+      current_period_end: new Date((stripeSubscription as any).current_period_end * 1000)
     })
 
   } catch (error) {

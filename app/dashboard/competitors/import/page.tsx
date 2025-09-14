@@ -354,7 +354,6 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
             <ZapButton
               onClick={handleImport}
               loading={importing}
-              icon={<Plus className="w-4 h-4" />}
             >
               Import {selectedRows.size} Competitor{selectedRows.size > 1 ? 's' : ''}
             </ZapButton>
@@ -456,8 +455,6 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
                         <BossButton
                           variant="primary"
                           size="sm"
-                          as="span"
-                          icon={<FileText className="w-4 h-4" />}
                         >
                           Select CSV File
                         </BossButton>
@@ -615,7 +612,6 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
                     <ZapButton
                       onClick={handleImport}
                       loading={importing}
-                      icon={<Plus className="w-4 h-4" />}
                     >
                       {importing ? 'Importing...' : `Import ${selectedRows.size} Competitor${selectedRows.size > 1 ? 's' : ''}`}
                     </ZapButton>

@@ -133,13 +133,6 @@ export default function FileSharingModal({
   
   const { toast } = useToast()
 
-  // Load sharing data when modal opens
-  useEffect(() => {
-    if (isOpen && file) {
-      loadSharingData()
-    }
-  }, [isOpen, file, loadSharingData])
-
   const loadSharingData = useCallback(async () => {
     if (!file) return
     
@@ -177,6 +170,13 @@ export default function FileSharingModal({
       setLoading(false)
     }
   }, [file, toast])
+
+  // Load sharing data when modal opens
+  useEffect(() => {
+    if (isOpen && file) {
+      loadSharingData()
+    }
+  }, [isOpen, file, loadSharingData])
 
   // Send email invitation
   const sendInvitation = useCallback(async () => {
@@ -422,7 +422,7 @@ export default function FileSharingModal({
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value: 'share' | 'permissions' | 'links' | 'activity') => setActiveTab(value)} className="flex-1">
+        <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)} className="flex-1">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="share" className="flex items-center gap-1">
               <Share2 className="w-3 h-3" />

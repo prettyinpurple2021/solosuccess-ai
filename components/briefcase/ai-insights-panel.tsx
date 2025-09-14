@@ -104,13 +104,6 @@ export default function AIInsightsPanel({ file, onClose, className = "" }: AIIns
   
   const { toast } = useToast()
 
-  // Load AI insights when file changes
-  useEffect(() => {
-    if (file) {
-      generateInsights()
-    }
-  }, [file, generateInsights])
-
   const generateInsights = useCallback(async () => {
     if (!file) return
     
@@ -191,6 +184,13 @@ export default function AIInsightsPanel({ file, onClose, className = "" }: AIIns
       setLoading(false)
     }
   }, [file, toast])
+
+  // Load AI insights when file changes
+  useEffect(() => {
+    if (file) {
+      generateInsights()
+    }
+  }, [file, generateInsights])
 
   // Apply suggested tag
   const applySuggestedTag = useCallback(async (tagName: string) => {
@@ -355,7 +355,7 @@ export default function AIInsightsPanel({ file, onClose, className = "" }: AIIns
           )}
 
           {!loading && insights.length > 0 && (
-            <Tabs value={activeInsight} onValueChange={(value: 'summary' | 'sentiment' | 'topics' | 'entities' | 'tags' | 'recommendations') => setActiveInsight(value)}>
+            <Tabs value={activeInsight} onValueChange={(value: string) => setActiveInsight(value as any)}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="sentiment">Sentiment</TabsTrigger>

@@ -98,7 +98,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   
   // Create user data with fallbacks for missing information
   const userData = {
-    name: user?.name || user?.full_name || user?.email?.split('@')[0] || "SoloSuccess User",
+    name: (user as any)?.name || (user as any)?.full_name || user?.email?.split('@')[0] || "SoloSuccess User",
     email: user?.email || "user@SoloSuccess.ai",
     avatar: user?.avatar_url || "/default-user.svg",
   }

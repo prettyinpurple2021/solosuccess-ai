@@ -1193,8 +1193,22 @@ export default function BriefcasePage() {
           <EnhancedFilePreviewModal
             isOpen={showPreviewModal}
             onClose={() => setShowPreviewModal(false)}
-            file={filteredFiles[previewIndex] || null}
-            files={filteredFiles}
+            file={filteredFiles[previewIndex] ? {
+              ...filteredFiles[previewIndex],
+              folderId: filteredFiles[previewIndex].folder_id?.toString(),
+              type: filteredFiles[previewIndex].file_type,
+              createdAt: new Date(filteredFiles[previewIndex].created_at),
+              modifiedAt: new Date(filteredFiles[previewIndex].updated_at),
+              favorite: filteredFiles[previewIndex].is_favorite
+            } as any : null}
+            files={filteredFiles.map(file => ({
+              ...file,
+              folderId: file.folder_id?.toString(),
+              type: file.file_type,
+              createdAt: new Date(file.created_at),
+              modifiedAt: new Date(file.updated_at),
+              favorite: file.is_favorite
+            })) as any}
             currentIndex={previewIndex}
             onNavigate={(direction) => {
               if (direction === 'prev' && previewIndex > 0) {
@@ -1206,13 +1220,13 @@ export default function BriefcasePage() {
             onEdit={(file) => {
               // Open description edit via metadata panel; handled inside modal callbacks
             }}
-            onDelete={handleFileDelete}
-            onShare={handleFileSharing}
-            onDownload={handleFileDownload}
-            onToggleFavorite={handleToggleFavorite}
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
-            onUpdateDescription={handleUpdateDescription}
+            onDelete={(file: any) => { handleFileDelete(file.id) }}
+            onShare={handleFileSharing as any}
+            onDownload={(file: any) => { handleFileDownload(file) }}
+            onToggleFavorite={(file: any) => { handleToggleFavorite(file) }}
+            onAddTag={(file: any, tag: string) => { handleAddTag(file, tag) }}
+            onRemoveTag={(file: any, tag: string) => { handleRemoveTag(file, tag) }}
+            onUpdateDescription={(file: any, description: string) => { handleUpdateDescription(file, description) }}
             onUpdateCategory={(file, category) => {
               fetch(`/api/briefcase/files/${file.id}/category`, {
                 method: 'POST',
@@ -1242,7 +1256,7 @@ export default function BriefcasePage() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <AIInsightsPanel
-                  file={aiInsightsFile}
+                  file={aiInsightsFile as any}
                   onClose={() => {
                     setShowAIInsights(false)
                     setAiInsightsFile(null)
@@ -1260,7 +1274,7 @@ export default function BriefcasePage() {
                 setShowSharingModal(false)
                 setSharingFile(null)
               }}
-              file={sharingFile}
+              file={sharingFile as any}
               currentUserId="current-user-id" // TODO: Get from auth context
               currentUserName="Current User" // TODO: Get from auth context
             />
@@ -1274,7 +1288,7 @@ export default function BriefcasePage() {
                 setShowVersionHistory(false)
                 setVersionHistoryFile(null)
               }}
-              file={versionHistoryFile}
+              file={versionHistoryFile as any}
               currentUserId="current-user-id" // TODO: Get from auth context
             />
           )}
@@ -1285,8 +1299,8 @@ export default function BriefcasePage() {
               <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                   <BulkOperationsPanel
-                    selectedFiles={filteredFiles.filter(f => selectedFiles.has(f.id))}
-                    availableFolders={folders}
+                    selectedFiles={filteredFiles.filter(f => selectedFiles.has(f.id)) as any}
+                    availableFolders={folders as any}
                     onClose={() => setShowBulkOperations(false)}
                     onOperationComplete={handleBulkOperationComplete}
                   />

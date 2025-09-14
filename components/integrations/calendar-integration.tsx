@@ -43,11 +43,6 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
   const [_selectedCalendar, _setSelectedCalendar] = useState<string>('primary')
   const { toast } = useToast()
 
-  useEffect(() => {
-    // Check if user has connected calendars
-    checkCalendarConnection()
-  }, [checkCalendarConnection])
-
   const checkCalendarConnection = useCallback(async () => {
     try {
       // Simulate checking calendar connection
@@ -65,6 +60,11 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
       console.error('Failed to check calendar connection')
     }
   }, [])
+
+  useEffect(() => {
+    // Check if user has connected calendars
+    checkCalendarConnection()
+  }, [checkCalendarConnection])
 
   const connectCalendar = async (provider: 'google' | 'outlook') => {
     setIsLoading(true)

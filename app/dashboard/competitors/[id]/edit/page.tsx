@@ -525,7 +525,6 @@ export default function EditCompetitorPage() {
               onClick={handleSave}
               loading={saving}
               disabled={!hasChanges}
-              icon={<Save className="w-4 h-4" />}
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </ZapButton>
@@ -1083,7 +1082,6 @@ export default function EditCompetitorPage() {
               <ZapButton
                 onClick={handleSave}
                 loading={saving}
-                icon={<Save className="w-4 h-4" />}
               >
                 Save Now
               </ZapButton>

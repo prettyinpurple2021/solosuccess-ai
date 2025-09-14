@@ -110,10 +110,16 @@ export function SpadeFramework() {
 
   const addAlternative = () => {
     const newOption = `Option ${spadeData.alternatives.options.length + 1}`
-    updateSpadeData("alternatives", "options", [...spadeData.alternatives.options, newOption])
-    updateSpadeData("alternatives", "pros", { ...spadeData.alternatives.pros, [newOption]: [] })
-    updateSpadeData("alternatives", "cons", { ...spadeData.alternatives.cons, [newOption]: [] })
-    updateSpadeData("alternatives", "feasibility", { ...spadeData.alternatives.feasibility, [newOption]: "medium" })
+    setSpadeData(prev => ({
+      ...prev,
+      alternatives: {
+        ...prev.alternatives,
+        options: [...prev.alternatives.options, newOption],
+        pros: { ...prev.alternatives.pros, [newOption]: [] },
+        cons: { ...prev.alternatives.cons, [newOption]: [] },
+        feasibility: { ...prev.alternatives.feasibility, [newOption]: "medium" }
+      }
+    }))
   }
 
 
@@ -392,9 +398,16 @@ export function SpadeFramework() {
                         className="w-full p-2 border rounded"
                         value={spadeData.alternatives.feasibility[option] || "medium"}
                         onChange={(e) => {
-                          const newFeasibility = { ...spadeData.alternatives.feasibility }
-                          newFeasibility[option] = e.target.value as "high" | "medium" | "low"
-                          updateSpadeData("alternatives", "feasibility", newFeasibility)
+                          setSpadeData(prev => ({
+                            ...prev,
+                            alternatives: {
+                              ...prev.alternatives,
+                              feasibility: {
+                                ...prev.alternatives.feasibility,
+                                [option]: e.target.value as "high" | "medium" | "low"
+                              }
+                            }
+                          }))
                         }}
                         aria-label={`Feasibility for ${option}`}
                       >
@@ -413,10 +426,18 @@ export function SpadeFramework() {
                               <Input
                                 value={pro}
                                 onChange={(e) => {
-                                  const newPros = { ...spadeData.alternatives.pros }
-                                  newPros[option] = [...(newPros[option] || [])]
-                                  newPros[option][proIndex] = e.target.value
-                                  updateSpadeData("alternatives", "pros", newPros)
+                                  setSpadeData(prev => ({
+                                    ...prev,
+                                    alternatives: {
+                                      ...prev.alternatives,
+                                      pros: {
+                                        ...prev.alternatives.pros,
+                                        [option]: (prev.alternatives.pros[option] || []).map((pro, i) => 
+                                          i === proIndex ? e.target.value : pro
+                                        )
+                                      }
+                                    }
+                                  }))
                                 }}
                                 placeholder="Enter pro..."
                               />
@@ -424,9 +445,16 @@ export function SpadeFramework() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  const newPros = { ...spadeData.alternatives.pros }
-                                  newPros[option] = (newPros[option] || []).filter((_, i) => i !== proIndex)
-                                  updateSpadeData("alternatives", "pros", newPros)
+                                  setSpadeData(prev => ({
+                                    ...prev,
+                                    alternatives: {
+                                      ...prev.alternatives,
+                                      pros: {
+                                        ...prev.alternatives.pros,
+                                        [option]: (prev.alternatives.pros[option] || []).filter((_, i) => i !== proIndex)
+                                      }
+                                    }
+                                  }))
                                 }}
                               >
                                 Remove
@@ -437,9 +465,16 @@ export function SpadeFramework() {
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              const newPros = { ...spadeData.alternatives.pros }
-                              newPros[option] = [...(newPros[option] || []), ""]
-                              updateSpadeData("alternatives", "pros", newPros)
+                              setSpadeData(prev => ({
+                                ...prev,
+                                alternatives: {
+                                  ...prev.alternatives,
+                                  pros: {
+                                    ...prev.alternatives.pros,
+                                    [option]: [...(prev.alternatives.pros[option] || []), ""]
+                                  }
+                                }
+                              }))
                             }}
                           >
                             Add Pro
@@ -455,10 +490,18 @@ export function SpadeFramework() {
                               <Input
                                 value={con}
                                 onChange={(e) => {
-                                  const newCons = { ...spadeData.alternatives.cons }
-                                  newCons[option] = [...(newCons[option] || [])]
-                                  newCons[option][conIndex] = e.target.value
-                                  updateSpadeData("alternatives", "cons", newCons)
+                                  setSpadeData(prev => ({
+                                    ...prev,
+                                    alternatives: {
+                                      ...prev.alternatives,
+                                      cons: {
+                                        ...prev.alternatives.cons,
+                                        [option]: (prev.alternatives.cons[option] || []).map((con, i) => 
+                                          i === conIndex ? e.target.value : con
+                                        )
+                                      }
+                                    }
+                                  }))
                                 }}
                                 placeholder="Enter con..."
                               />
@@ -466,9 +509,16 @@ export function SpadeFramework() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  const newCons = { ...spadeData.alternatives.cons }
-                                  newCons[option] = (newCons[option] || []).filter((_, i) => i !== conIndex)
-                                  updateSpadeData("alternatives", "cons", newCons)
+                                  setSpadeData(prev => ({
+                                    ...prev,
+                                    alternatives: {
+                                      ...prev.alternatives,
+                                      cons: {
+                                        ...prev.alternatives.cons,
+                                        [option]: (prev.alternatives.cons[option] || []).filter((_, i) => i !== conIndex)
+                                      }
+                                    }
+                                  }))
                                 }}
                               >
                                 Remove
@@ -479,9 +529,16 @@ export function SpadeFramework() {
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              const newCons = { ...spadeData.alternatives.cons }
-                              newCons[option] = [...(newCons[option] || []), ""]
-                              updateSpadeData("alternatives", "cons", newCons)
+                              setSpadeData(prev => ({
+                                ...prev,
+                                alternatives: {
+                                  ...prev.alternatives,
+                                  cons: {
+                                    ...prev.alternatives.cons,
+                                    [option]: [...(prev.alternatives.cons[option] || []), ""]
+                                  }
+                                }
+                              }))
                             }}
                           >
                             Add Con

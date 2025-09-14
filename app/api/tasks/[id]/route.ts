@@ -34,6 +34,8 @@ export async function PUT(
     const client = await createClient()
     
     // First verify the task belongs to the user
+    const params = await context.params
+    const { id } = params
     const { rows: existingTask } = await client.query(
       'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
       [id, user.id]
@@ -92,6 +94,8 @@ export async function DELETE(
     const client = await createClient()
     
     // Verify the task belongs to the user and delete it in one step
+    const params = await context.params
+    const { id } = params
     const { rowCount } = await client.query(
       'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
       [id, user.id]

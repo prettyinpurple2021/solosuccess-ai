@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import NextImage from 'next/image'
 
 import { 
   X, 
@@ -238,7 +239,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
 
   // Get file icon
   const getFileIcon = (filename: string, previewType: string | null) => {
-    if (previewType === 'image') return <Image className="w-4 h-4" alt="Image file" />
+    if (previewType === 'image') return <Image className="w-4 h-4" />
     if (previewType === 'text') return <FileCode className="w-4 h-4" />
     if (previewType === 'audio') return <Music className="w-4 h-4" />
     if (previewType === 'video') return <Video className="w-4 h-4" />
@@ -375,7 +376,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
           >
             <div className="relative touch-pan-x touch-pan-y">
               {previewState.previewUrl && (
-                <Image
+                <NextImage
                   src={previewState.previewUrl}
                   alt={file?.name || "File preview"}
                   width={800}

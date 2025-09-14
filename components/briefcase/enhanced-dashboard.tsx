@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
-import { _motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { 
   BarChart3,
   PieChart,
@@ -118,11 +118,6 @@ export default function EnhancedDashboard({ className = "" }: EnhancedDashboardP
 
   const { toast } = useToast()
 
-  // Load dashboard data
-  useEffect(() => {
-    loadDashboardData()
-  }, [timeRange, loadDashboardData])
-
   const loadDashboardData = useCallback(async () => {
     setLoading(true)
     try {
@@ -164,6 +159,11 @@ export default function EnhancedDashboard({ className = "" }: EnhancedDashboardP
       setLoading(false)
     }
   }, [timeRange, toast])
+
+  // Load dashboard data
+  useEffect(() => {
+    loadDashboardData()
+  }, [timeRange, loadDashboardData])
 
   // Format file size
   const formatFileSize = (bytes: number) => {
@@ -336,7 +336,7 @@ export default function EnhancedDashboard({ className = "" }: EnhancedDashboardP
       )}
 
       {/* Main Dashboard Tabs */}
-      <Tabs value={activeTab} onValueChange={(value: 'overview' | 'analytics' | 'ai-insights' | 'collaboration') => setActiveTab(value)}>
+      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>

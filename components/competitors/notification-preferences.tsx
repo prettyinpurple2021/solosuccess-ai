@@ -24,7 +24,7 @@ import {
   Plus,
   Trash2
 } from 'lucide-react';
-import { NotificationChannel, NotificationPreferences } from '@/lib/notification-delivery-system';
+import { NotificationChannel, type NotificationPreferences } from '@/lib/notification-delivery-system';
 import { AlertSeverity, AlertType } from '@/lib/competitor-alert-system';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';

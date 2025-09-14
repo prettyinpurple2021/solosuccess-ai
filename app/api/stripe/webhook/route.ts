@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text()
-    const signature = headers().get('stripe-signature')
+    const signature = (await headers()).get('stripe-signature')
 
     if (!signature) {
       return NextResponse.json(
@@ -28,6 +28,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify webhook signature
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Stripe not configured' },
+        { status: 500 }
+      )
+    }
+    
     let event: Stripe.Event
     try {
       event = stripe.webhooks.constructEvent(
@@ -110,8 +117,8 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
       stripe_customer_id: customerId,
       subscription_tier: tier,
       subscription_status: subscription.status,
-      current_period_start: new Date(subscription.current_period_start * 1000),
-      current_period_end: new Date(subscription.current_period_end * 1000),
+      current_period_start: new Date((subscription as any).current_period_start * 1000),
+      current_period_end: new Date((subscription as any).current_period_end * 1000),
       cancel_at_period_end: subscription.cancel_at_period_end
     })
 
@@ -145,8 +152,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     const result = await updateUserSubscription(user.id, {
       subscription_tier: tier,
       subscription_status: subscription.status,
-      current_period_start: new Date(subscription.current_period_start * 1000),
-      current_period_end: new Date(subscription.current_period_end * 1000),
+      current_period_start: new Date((subscription as any).current_period_start * 1000),
+      current_period_end: new Date((subscription as any).current_period_end * 1000),
       cancel_at_period_end: subscription.cancel_at_period_end
     })
 
@@ -176,7 +183,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     const result = await updateUserSubscription(user.id, {
       subscription_tier: 'launch',
       subscription_status: 'canceled',
-      stripe_subscription_id: null,
+      stripe_subscription_id: undefined,
       cancel_at_period_end: false
     })
 
@@ -194,7 +201,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   try {
     const customerId = invoice.customer as string
-    const subscriptionId = invoice.subscription as string
+    const subscriptionId = (invoice as any).subscription as string
 
     // Update user payment status in database
     // await updateUserPaymentStatus(user.id, {
@@ -213,7 +220,7 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
   try {
     const customerId = invoice.customer as string
-    const subscriptionId = invoice.subscription as string
+    const subscriptionId = (invoice as any).subscription as string
 
     // Update user payment status in database
     // await updateUserPaymentStatus(user.id, {

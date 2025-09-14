@@ -595,7 +595,6 @@ export default function AddCompetitorPage() {
               <ZapButton
                 onClick={() => setStep(step + 1)}
                 disabled={!isStepValid(step)}
-                icon={<ArrowLeft className="w-4 h-4 rotate-180" />}
               >
                 Next Step
               </ZapButton>
@@ -603,7 +602,6 @@ export default function AddCompetitorPage() {
               <ZapButton
                 onClick={handleSubmit}
                 loading={loading}
-                icon={<Shield className="w-4 h-4" />}
               >
                 {loading ? 'Creating Competitor...' : 'Start Monitoring'}
               </ZapButton>

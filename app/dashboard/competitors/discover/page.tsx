@@ -345,7 +345,6 @@ export default function CompetitorDiscoveryPage() {
             <ZapButton
               onClick={handleAddSelected}
               loading={loading}
-              icon={<Plus className="w-4 h-4" />}
             >
               Add {selectedCompetitors.size} Competitor{selectedCompetitors.size > 1 ? 's' : ''}
             </ZapButton>
@@ -405,7 +404,6 @@ export default function CompetitorDiscoveryPage() {
                 onClick={handleSearch}
                 loading={searching}
                 disabled={!businessDescription.trim()}
-                icon={<Sparkles className="w-4 h-4" />}
               >
                 {searching ? 'Discovering Competitors...' : 'Discover Competitors'}
               </ZapButton>
@@ -598,8 +596,7 @@ export default function CompetitorDiscoveryPage() {
                             <BossButton 
                               variant="primary" 
                               size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation()
+                              onClick={() => {
                                 toggleCompetitorSelection(suggestion.id)
                               }}
                             >

@@ -137,7 +137,6 @@ export default function ForgotPasswordPage() {
               </div>
               
               <EmpowermentButton
-                type="submit"
                 fullWidth
                 size="lg"
                 disabled={!email.trim() || loading}

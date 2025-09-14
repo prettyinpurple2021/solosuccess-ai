@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // If user has a Stripe subscription, get additional details from Stripe
     let stripeSubscription = null
-    if (subscription.stripe_subscription_id) {
+    if (subscription.stripe_subscription_id && stripe) {
       try {
         stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id)
       } catch (error) {

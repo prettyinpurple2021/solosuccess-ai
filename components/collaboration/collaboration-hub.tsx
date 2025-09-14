@@ -202,7 +202,7 @@ export function CollaborationHub() {
                     <strong>Recommendation:</strong> {suggestion.reasoning}
                     {suggestion.recommended && suggestion.workflow && (
                       <div className="mt-2">
-                        <Button size="sm" onClick={() => handleCreateTask(suggestion.workflow, newTaskInput)}>
+                        <Button size="sm" onClick={() => handleCreateTask(suggestion.workflow!, newTaskInput)}>
                           Start {workflows[suggestion.workflow]?.title}
                         </Button>
                       </div>
