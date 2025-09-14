@@ -56,7 +56,7 @@ export default function BaseTemplate({
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isBookmarked, setIsBookmarked] = useState(false)
 
-  const handleSave = async (_data: any) => {
+  const handleSave = async (data: any) => {
     if (!onSave) return
     
     setIsSaving(true)
@@ -87,7 +87,7 @@ export default function BaseTemplate({
             {/* Back & Title */}
             <div className="flex items-center gap-4">
               <Link href="/templates">
-                <BossButton variant="outline" size="sm" icon={<ArrowLeft className="w-4 h-4" />}>
+                <BossButton variant="secondary" size="sm" icon={<ArrowLeft className="w-4 h-4" />}>
                   Templates
                 </BossButton>
               </Link>
@@ -101,12 +101,12 @@ export default function BaseTemplate({
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="hidden sm:flex">
+              <Badge variant="default" className="hidden sm:flex">
                 {template.requiredRole.replace('_', ' ')}
               </Badge>
               
               <BossButton
-                variant="ghost"
+                variant="secondary"
                 size="sm"
                 onClick={() => setIsBookmarked(!isBookmarked)}
                 className={isBookmarked ? "text-yellow-500" : ""}
@@ -116,7 +116,7 @@ export default function BaseTemplate({
 
               {onSave && (
                 <BossButton
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => handleSave({})}
                   loading={isSaving}
@@ -226,17 +226,17 @@ export default function BaseTemplate({
           </AnimatePresence>
 
           {/* Quick Actions */}
-          {(onReset || onExport) && (
+          {(_onReset || onExport) && (
             <motion.div 
               className="mt-8 flex justify-center gap-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              {onReset && (
+              {_onReset && (
                 <BossButton
-                  variant="outline"
-                  onClick={onReset}
+                  variant="secondary"
+                  onClick={_onReset}
                   icon={<RefreshCw className="w-4 h-4" />}
                 >
                   Reset Template

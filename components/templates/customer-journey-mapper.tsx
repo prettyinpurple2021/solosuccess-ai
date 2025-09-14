@@ -365,14 +365,14 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
   }
 
   const handleSave = async () => {
-    if (onSave) {
-      await onSave(data)
+    if (_onSave) {
+      await _onSave(data)
     }
   }
 
   const handleExport = (format: 'json' | 'pdf' | 'csv') => {
-    if (onExport) {
-      onExport(format)
+    if (_onExport) {
+      _onExport(format)
     }
   }
 
@@ -869,7 +869,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(1)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -900,7 +900,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
                   <h4 className="font-semibold">Customer Journey Stages</h4>
                   <p className="text-sm text-gray-600">Break down the journey into distinct phases</p>
                 </div>
-                <BossButton onClick={addStage} variant="outline" size="sm">
+                <BossButton onClick={addStage} variant="secondary" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Stage
                 </BossButton>
@@ -1105,7 +1105,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(2)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1136,7 +1136,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
                   <h4 className="font-semibold">Touchpoints</h4>
                   <p className="text-sm text-gray-600">Define every interaction point in the journey</p>
                 </div>
-                <BossButton onClick={addTouchpoint} variant="outline" size="sm">
+                <BossButton onClick={addTouchpoint} variant="secondary" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Touchpoint
                 </BossButton>
@@ -1372,7 +1372,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
 
                       <div className="flex items-center justify-between pt-3 border-t">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline">{touchpoint.type.replace('-', ' ')}</Badge>
+                          <Badge variant="default">{touchpoint.type.replace('-', ' ')}</Badge>
                           <div className={`flex items-center gap-1 ${getEmotionColor(touchpoint.emotionScore)}`}>
                             {getEmotionIcon(touchpoint.emotionScore)}
                             <span className="text-sm">Emotion: {touchpoint.emotionScore}/10</span>
@@ -1400,7 +1400,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(3)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1485,7 +1485,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
                           <div key={touchpoint.id} className="flex items-center justify-between text-sm">
                             <span>{touchpoint.name}</span>
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-red-600 border-red-200">
+                              <Badge variant="default" className="text-red-600 border-red-200">
                                 {touchpoint.emotionScore}/10
                               </Badge>
                               <div className="text-red-600">
@@ -1619,7 +1619,7 @@ export default function CustomerJourneyMapper({ template, onSave: _onSave, onExp
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(4)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>

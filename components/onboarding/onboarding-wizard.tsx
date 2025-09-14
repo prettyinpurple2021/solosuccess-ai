@@ -45,7 +45,7 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [_data, setData] = useState<OnboardingData>({
+  const [data, setData] = useState<OnboardingData>({
     personalInfo: { name: "", businessType: "", industry: "", experience: "" },
     goals: { primaryGoals: [], timeframe: "", biggestChallenge: "" },
     preferences: { workStyle: "", communicationStyle: "", focusTime: "", notifications: [] },
@@ -134,7 +134,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      onComplete(_data)
+      onComplete(data)
     }
   }
 
@@ -145,7 +145,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   const toggleGoal = (goalId: string) => {
-    const currentGoals = _data.goals.primaryGoals
+    const currentGoals = data.goals.primaryGoals
     const newGoals = currentGoals.includes(goalId)
       ? currentGoals.filter((g) => g !== goalId)
       : [...currentGoals, goalId]
@@ -153,7 +153,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   const toggleAgent = (agentId: string) => {
-    const currentAgents = _data.aiTeam.selectedAgents
+    const currentAgents = data.aiTeam.selectedAgents
     const newAgents = currentAgents.includes(agentId)
       ? currentAgents.filter((a) => a !== agentId)
       : [...currentAgents, agentId]

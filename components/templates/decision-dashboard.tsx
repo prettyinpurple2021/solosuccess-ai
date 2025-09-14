@@ -117,17 +117,19 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
 
   // Add pro/con
   const addProCon = (optionId: string, type: 'pros' | 'cons') => {
+    const found = (_data as any).options.find((o: any) => o.id === optionId)
+    const currentList: string[] = found ? (found as any)[type] || [] : []
     updateOption(optionId, {
-      [type]: [...(data.options.find(o => o.id === optionId)?.[type] || []), ""]
+      [type]: [...currentList, ""]
     })
   }
 
   // Update pro/con
   const updateProCon = (optionId: string, type: 'pros' | 'cons', index: number, value: string) => {
-    const option = data.options.find(o => o.id === optionId)
+    const option = (_data as any).options.find((o: any) => o.id === optionId)
     if (!option) return
     
-    const newList = [...option[type]]
+    const newList = [...(option[type] as string[])]
     newList[index] = value
     
     updateOption(optionId, { [type]: newList })
@@ -135,10 +137,10 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
 
   // Remove pro/con
   const removeProCon = (optionId: string, type: 'pros' | 'cons', index: number) => {
-    const option = data.options.find(o => o.id === optionId)
+    const option = (_data as any).options.find((o: any) => o.id === optionId)
     if (!option) return
     
-    const newList = option[type].filter((_, i) => i !== index)
+    const newList = (option[type] as string[]).filter((_: string, i: number) => i !== index)
     updateOption(optionId, { [type]: newList })
   }
 
@@ -149,15 +151,15 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
       // Simulate AI analysis - in production, call your AI API
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      const insights = [
-        `Based on your options, Option 1 shows the highest impact potential (${data.options[0]?.impactScore || 50}/100)`,
-        `Consider the time constraints: your deadline is ${data.context.includes('urgent') ? 'tight' : 'reasonable'}`,
+      const insights: string[] = [
+        `Based on your options, Option 1 shows the highest impact potential (${(_data as any).options[0]?.impactScore || 50}/100)`,
+        `Consider the time constraints: your deadline is ${(_data as any).context?.includes('urgent') ? 'tight' : 'reasonable'}`,
         `Resource allocation is a key factor - ensure you have bandwidth for implementation`,
         `Risk mitigation strategies should be developed for high-risk options`,
         `Stakeholder buy-in will be crucial for success`
       ]
       
-      setAiInsights(insights.slice(0, Math.min(3, data.options.length + 1)))
+      setAiInsights(insights.slice(0, Math.min(3, (_data as any).options.length + 1)))
     } catch (error) {
       console.error('Failed to get AI insights:', error)
     } finally {
@@ -183,22 +185,22 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
 
   // Get top recommendation
   const getTopRecommendation = () => {
-    if (data.options.length === 0) return null
+    if ((_data as any).options.length === 0) return null
     
-    return data.options.reduce((best, current) => 
+    return (_data as any).options.reduce((best: any, current: any) => 
       getDecisionScore(current) > getDecisionScore(best) ? current : best
     )
   }
 
   const handleSave = async () => {
-    if (onSave) {
-      await onSave(data)
+    if (_onSave) {
+      await _onSave(_data)
     }
   }
 
   const handleExport = (format: 'json' | 'pdf' | 'csv') => {
-    if (onExport) {
-      onExport(format)
+    if (_onExport) {
+      _onExport(format)
     }
   }
 
@@ -269,7 +271,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                 <Input
                   id="decision-title"
                   placeholder="e.g., Should we pivot our product strategy?"
-                  value={data.decisionTitle}
+                  value={_data.decisionTitle}
                   onChange={(e) => setData(prev => ({ ...prev, decisionTitle: e.target.value }))}
                   className="mt-2"
                 />
@@ -280,7 +282,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                 <Textarea
                   id="context"
                   placeholder="Provide background information about this decision..."
-                  value={data.context}
+                  value={_data.context}
                   onChange={(e) => setData(prev => ({ ...prev, context: e.target.value }))}
                   className="mt-2"
                   rows={4}
@@ -293,7 +295,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                   <Input
                     id="deadline"
                     type="date"
-                    value={data.deadline}
+                    value={_data.deadline}
                     onChange={(e) => setData(prev => ({ ...prev, deadline: e.target.value }))}
                     className="mt-2"
                   />
@@ -304,7 +306,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                   <Input
                     id="stakeholders"
                     placeholder="Separate with commas"
-                    value={data.stakeholders.join(", ")}
+                    value={_data.stakeholders.join(", ")}
                     onChange={(e) => setData(prev => ({ 
                       ...prev, 
                       stakeholders: e.target.value.split(",").map(s => s.trim()).filter(Boolean)
@@ -319,7 +321,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
           <div className="flex justify-end">
             <BossButton 
               onClick={() => setCurrentStep(2)}
-              disabled={!data.decisionTitle}
+              disabled={!_data.decisionTitle}
               crown
             >
               Next: Add Options
@@ -334,14 +336,14 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
               <h3 className="text-lg font-semibold">Decision Options</h3>
               <p className="text-sm text-gray-600">Add and configure your available options</p>
             </div>
-            <BossButton onClick={addOption} variant="outline" icon={<Plus className="w-4 h-4" />}>
+            <BossButton onClick={addOption} variant="secondary" icon={<Plus className="w-4 h-4" />}> 
               Add Option
             </BossButton>
           </div>
 
           <div className="grid gap-6">
             <AnimatePresence>
-              {data.options.map((option, index) => (
+              {_data.options.map((option, index) => (
                 <motion.div
                   key={option.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -520,7 +522,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(1)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -584,9 +586,9 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
                   Option Comparison
                 </h4>
                 <div className="space-y-4">
-                  {data.options
-                    .sort((a, b) => getDecisionScore(b) - getDecisionScore(a))
-                    .map((option, index) => (
+                  {_data.options
+                    .sort((a: any, b: any) => getDecisionScore(b) - getDecisionScore(a))
+                    .map((option: any, index: number) => (
                       <div key={option.id} className="flex items-center gap-4 p-4 border rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
@@ -636,7 +638,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(2)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -735,7 +737,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(3)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>

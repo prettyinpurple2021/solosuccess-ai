@@ -16,6 +16,7 @@ import {
   Crown,
   CheckCircle,
   ArrowRight,
+  ArrowLeft,
   Lightbulb,
   Star,
   Gift,

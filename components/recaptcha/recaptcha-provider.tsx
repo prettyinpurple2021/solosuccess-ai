@@ -35,7 +35,7 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   const [_isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  const executeRecaptcha = async (action: _action): Promise<string | null> => {
+  const executeRecaptcha = async (action: string): Promise<string | null> => {
     if (!RECAPTCHA_SITE_KEY) {
       console.warn('reCAPTCHA site key not configured, skipping validation')
       return null

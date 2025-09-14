@@ -262,14 +262,14 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
 
   // Duplicate block
   const duplicateBlock = (id: string) => {
-    const blockToDuplicate = data.blocks.find(block => block.id === id)
+    const blockToDuplicate = _data.blocks.find(block => block.id === id)
     if (blockToDuplicate) {
       const duplicatedBlock = {
         ...blockToDuplicate,
         id: crypto.randomUUID()
       }
-      const blockIndex = data.blocks.findIndex(block => block.id === id)
-      const newBlocks = [...data.blocks]
+      const blockIndex = _data.blocks.findIndex(block => block.id === id)
+      const newBlocks = [..._data.blocks]
       newBlocks.splice(blockIndex + 1, 0, duplicatedBlock)
       
       setData(prev => ({
@@ -281,13 +281,13 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
 
   // Move block up/down
   const _moveBlock = (id: string, direction: 'up' | 'down') => {
-    const currentIndex = data.blocks.findIndex(block => block.id === id)
+    const currentIndex = _data.blocks.findIndex(block => block.id === id)
     if (currentIndex === -1) return
 
     const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
-    if (newIndex < 0 || newIndex >= data.blocks.length) return
+    if (newIndex < 0 || newIndex >= _data.blocks.length) return
 
-    const newBlocks = [...data.blocks]
+    const newBlocks = [..._data.blocks]
     const [movedBlock] = newBlocks.splice(currentIndex, 1)
     newBlocks.splice(newIndex, 0, movedBlock)
 
@@ -312,7 +312,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
 
   // Update personalization
   const updatePersonalization = (index: number, updates: Partial<Personalization>) => {
-    const newPersonalizations = [...data.personalizations]
+    const newPersonalizations = [..._data.personalizations]
     newPersonalizations[index] = { ...newPersonalizations[index], ...updates }
     setData(prev => ({ ...prev, personalizations: newPersonalizations }))
   }
@@ -329,10 +329,10 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
   const createABTestVariant = () => {
     const newVariant: ABTestVariant = {
       id: crypto.randomUUID(),
-      name: `Variant ${data.variants.length + 1}`,
-      subject: data.subject,
-      preheader: data.preheader,
-      blocks: [...data.blocks],
+      name: `Variant ${_data.variants.length + 1}`,
+      subject: _data.subject,
+      preheader: _data.preheader,
+      blocks: [..._data.blocks],
       trafficPercentage: 50
     }
     setData(prev => ({
@@ -423,14 +423,14 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
   }
 
   const handleSave = async () => {
-    if (onSave) {
-      await onSave(data)
+    if (_onSave) {
+      await _onSave(_data)
     }
   }
 
   const handleExport = (format: 'json' | 'pdf' | 'csv') => {
-    if (onExport) {
-      onExport(format)
+    if (_onExport) {
+      _onExport(format)
     }
   }
 
@@ -527,14 +527,14 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Input
                     id="campaign-name"
                     placeholder="e.g., Weekly Newsletter - March 2024"
-                    value={data.campaignName}
+                    value={_data.campaignName}
                     onChange={(e) => setData(prev => ({ ...prev, campaignName: e.target.value }))}
                     className="mt-2"
                   />
                 </div>
                 <div>
                   <Label>Campaign Type</Label>
-                  <Select onValueChange={(value: any) => setData(prev => ({ ...prev, campaignType: value }))}>
+                  <Select onValueChange={(value: any) => setData(prev => ({ ...prev, campaignType: value as 'newsletter' | 'promotional' | 'transactional' | 'welcome' | 'abandoned-cart' | 're-engagement' }))}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
@@ -556,7 +556,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Input
                     id="from-name"
                     placeholder="Your Company"
-                    value={data.fromName}
+                    value={_data.fromName}
                     onChange={(e) => setData(prev => ({ ...prev, fromName: e.target.value }))}
                     className="mt-2"
                   />
@@ -567,7 +567,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                     id="from-email"
                     type="email"
                     placeholder="hello@company.com"
-                    value={data.fromEmail}
+                    value={_data.fromEmail}
                     onChange={(e) => setData(prev => ({ ...prev, fromEmail: e.target.value }))}
                     className="mt-2"
                   />
@@ -578,7 +578,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                     id="reply-to"
                     type="email"
                     placeholder="support@company.com"
-                    value={data.replyTo}
+                    value={_data.replyTo}
                     onChange={(e) => setData(prev => ({ ...prev, replyTo: e.target.value }))}
                     className="mt-2"
                   />
@@ -591,12 +591,12 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Input
                     id="subject"
                     placeholder="Your compelling subject line"
-                    value={data.subject}
+                    value={_data.subject}
                     onChange={(e) => setData(prev => ({ ...prev, subject: e.target.value }))}
                     className="mt-2"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    Length: {data.subject.length}/50 characters
+                    Length: {_data.subject.length}/50 characters
                   </p>
                 </div>
                 <div>
@@ -604,12 +604,12 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Input
                     id="preheader"
                     placeholder="Preview text that appears after subject"
-                    value={data.preheader}
+                    value={_data.preheader}
                     onChange={(e) => setData(prev => ({ ...prev, preheader: e.target.value }))}
                     className="mt-2"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    Length: {data.preheader.length}/90 characters
+                    Length: {_data.preheader.length}/90 characters
                   </p>
                 </div>
               </div>
@@ -625,7 +625,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                     <label key={segment} className="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
                       <input
                         type="checkbox"
-                        checked={data.audience.includes(segment)}
+                        checked={_data.audience.includes(segment)}
                         onChange={(e) => {
                           if (e.target.checked) {
                             setData(prev => ({ ...prev, audience: [...prev.audience, segment] }))
@@ -647,7 +647,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Input
                     id="send-date"
                     type="datetime-local"
-                    value={data.sendDate}
+                    value={_data.sendDate}
                     onChange={(e) => setData(prev => ({ ...prev, sendDate: e.target.value }))}
                     className="mt-2"
                   />
@@ -674,7 +674,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
           <div className="flex justify-end">
             <BossButton 
               onClick={() => setCurrentStep(2)}
-              disabled={!data.campaignName || !data.fromName || !data.fromEmail || !data.subject}
+              disabled={!_data.campaignName || !_data.fromName || !_data.fromEmail || !_data.subject}
               crown
             >
               Next: Design Email
@@ -829,16 +829,16 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <div className={`border rounded-lg overflow-hidden ${previewMode === 'mobile' ? 'max-w-sm mx-auto' : ''}`}>
                     {/* Email Header */}
                     <div className="bg-gray-50 p-4 text-sm border-b">
-                      <div className="font-medium">From: {data.fromName} &lt;{data.fromEmail}&gt;</div>
-                      <div className="font-bold mt-1">{data.subject || 'Subject line...'}</div>
-                      {data.preheader && (
-                        <div className="text-gray-600 text-xs mt-1">{data.preheader}</div>
+                      <div className="font-medium">From: {_data.fromName} &lt;{_data.fromEmail}&gt;</div>
+                      <div className="font-bold mt-1">{_data.subject || 'Subject line...'}</div>
+                      {_data.preheader && (
+                        <div className="text-gray-600 text-xs mt-1">{_data.preheader}</div>
                       )}
                     </div>
 
                     {/* Email Body */}
                     <div className="bg-white min-h-[400px]">
-                      {data.blocks.length === 0 ? (
+                      {_data.blocks.length === 0 ? (
                         <div className="p-8 text-center text-gray-500">
                           <Mail className="w-16 h-16 mx-auto mb-4 opacity-50" />
                           <p>Start building your email by adding elements</p>
@@ -846,7 +846,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       ) : (
                         <div 
                           className="email-content"
-                          dangerouslySetInnerHTML={{ __html: getEmailPreviewHTML(data.blocks) }}
+                          dangerouslySetInnerHTML={{ __html: getEmailPreviewHTML(_data.blocks) }}
                         />
                       )}
                     </div>
@@ -859,7 +859,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(1)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -889,7 +889,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={data.dynamicContent}
+                    checked={_data.dynamicContent}
                     onChange={(e) => setData(prev => ({ ...prev, dynamicContent: e.target.checked }))}
                     className="rounded"
                   />
@@ -903,14 +903,14 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                     <h4 className="font-semibold">Personalization Tokens</h4>
                     <p className="text-sm text-gray-600">Define merge tags for dynamic content</p>
                   </div>
-                  <BossButton onClick={addPersonalization} variant="outline" size="sm">
+                  <BossButton onClick={addPersonalization} variant="secondary" size="sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Token
                   </BossButton>
                 </div>
 
                 <div className="space-y-4">
-                  {data.personalizations.map((personalization, index) => (
+                  {_data.personalizations.map((personalization, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, y: 20 }}
@@ -960,7 +960,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   ))}
                 </div>
 
-                {data.personalizations.length === 0 && (
+                {_data.personalizations.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <Type className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No personalization tokens yet</p>
@@ -976,12 +976,19 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                     <strong>{{firstName}}</strong> - Recipient&apos;s first name
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
+                    <strong>{{firstName}}</strong> - Recipient&apos;s first name
+                    <strong>{{firstName}}</strong> - Recipient&apos;s first name
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded">
+                    <strong>{{companyName}}</strong> - Company name
                     <strong>{{companyName}}</strong> - Company name
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
                     <strong>{{location}}</strong> - City or region
+                    <strong>{{location}}</strong> - City or region
                   </div>
                   <div className="p-3 bg-gray-50 rounded">
+                    <strong>{{recentPurchase}}</strong> - Last item bought
                     <strong>{{recentPurchase}}</strong> - Last item bought
                   </div>
                 </div>
@@ -992,7 +999,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(2)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1022,7 +1029,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={data.enableABTest}
+                    checked={_data.enableABTest}
                     onChange={(e) => setData(prev => ({ ...prev, enableABTest: e.target.checked }))}
                     className="rounded"
                   />
@@ -1030,7 +1037,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                 </label>
               </div>
 
-              {data.enableABTest && (
+              {_data.enableABTest && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -1051,7 +1058,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                     <div>
                       <Label>Test Duration (hours)</Label>
                       <Slider
-                        value={[data.testDuration]}
+                        value={[_data.testDuration]}
                         onValueChange={([value]) => setData(prev => ({ ...prev, testDuration: value }))}
                         max={168}
                         min={1}
@@ -1059,7 +1066,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                         className="mt-4"
                       />
                       <p className="text-sm text-gray-500 mt-1">
-                        {data.testDuration} hours
+                        {_data.testDuration} hours
                       </p>
                     </div>
 
@@ -1084,14 +1091,14 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                         <h4 className="font-semibold">Test Variants</h4>
                         <p className="text-sm text-gray-600">Create different versions to test</p>
                       </div>
-                      <BossButton onClick={createABTestVariant} variant="outline" size="sm">
+                      <BossButton onClick={createABTestVariant} variant="secondary" size="sm">
                         <Plus className="w-4 h-4 mr-2" />
                         Add Variant
                       </BossButton>
                     </div>
 
                     <div className="space-y-4">
-                      {data.variants.map((variant) => (
+                      {_data.variants.map((variant) => (
                         <motion.div
                           key={variant.id}
                           initial={{ opacity: 0, y: 20 }}
@@ -1117,7 +1124,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                             </div>
                           </div>
                           
-                          {data.testElement === 'subject' && (
+                          {_data.testElement === 'subject' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
                                 <Label className="text-sm">Subject Line</Label>
@@ -1152,7 +1159,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       ))}
                     </div>
 
-                    {data.variants.length === 0 && (
+                    {_data.variants.length === 0 && (
                       <div className="text-center py-8 text-gray-500">
                         <Split className="w-12 h-12 mx-auto mb-4 opacity-50" />
                         <p>No test variants created yet</p>
@@ -1168,7 +1175,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(3)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1202,7 +1209,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <input
                         type="radio"
                         name="sendOption"
-                        checked={data.sendImmediately}
+                        checked={_data.sendImmediately}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           sendImmediately: e.target.checked,
@@ -1217,7 +1224,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <input
                         type="radio"
                         name="sendOption"
-                        checked={data.scheduledSend}
+                        checked={_data.scheduledSend}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           sendImmediately: false,
@@ -1232,7 +1239,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <input
                         type="radio"
                         name="sendOption"
-                        checked={data.autoSend}
+                        checked={_data.autoSend}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           sendImmediately: false,
@@ -1250,7 +1257,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Label htmlFor="throttling">Send Rate Throttling</Label>
                   <div className="mt-2">
                     <Slider
-                      value={[data.throttling]}
+                      value={[_data.throttling]}
                       onValueChange={([value]) => setData(prev => ({ ...prev, throttling: value }))}
                       max={100}
                       min={10}
@@ -1258,7 +1265,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       className="mt-2"
                     />
                     <p className="text-sm text-gray-500 mt-1">
-                      {data.throttling}% of normal send rate
+                      {_data.throttling}% of normal send rate
                     </p>
                   </div>
                 </div>
@@ -1280,7 +1287,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      checked={data.trackingEnabled}
+                      checked={_data.trackingEnabled}
                       onChange={(e) => setData(prev => ({ ...prev, trackingEnabled: e.target.checked }))}
                       className="rounded"
                     />
@@ -1293,7 +1300,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                   <Input
                     id="primary-goal"
                     placeholder="e.g., Increase product awareness, Drive website traffic"
-                    value={data.primaryGoal}
+                    value={_data.primaryGoal}
                     onChange={(e) => setData(prev => ({ ...prev, primaryGoal: e.target.value }))}
                     className="mt-2"
                   />
@@ -1306,7 +1313,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <Label className="text-sm">Source</Label>
                       <Input
                         placeholder="email"
-                        value={data.utmParameters.source}
+                        value={_data.utmParameters.source}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           utmParameters: { ...prev.utmParameters, source: e.target.value }
@@ -1318,7 +1325,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <Label className="text-sm">Medium</Label>
                       <Input
                         placeholder="newsletter"
-                        value={data.utmParameters.medium}
+                        value={_data.utmParameters.medium}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           utmParameters: { ...prev.utmParameters, medium: e.target.value }
@@ -1330,7 +1337,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <Label className="text-sm">Campaign</Label>
                       <Input
                         placeholder="march-2024"
-                        value={data.utmParameters.campaign}
+                        value={_data.utmParameters.campaign}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           utmParameters: { ...prev.utmParameters, campaign: e.target.value }
@@ -1342,7 +1349,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <Label className="text-sm">Content</Label>
                       <Input
                         placeholder="header-cta"
-                        value={data.utmParameters.content}
+                        value={_data.utmParameters.content}
                         onChange={(e) => setData(prev => ({ 
                           ...prev, 
                           utmParameters: { ...prev.utmParameters, content: e.target.value }
@@ -1368,7 +1375,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                       <div className="text-sm text-purple-700">Click Rate</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-purple-900">{data.audience.length * 1250}</div>
+                      <div className="text-2xl font-bold text-purple-900">{_data.audience.length * 1250}</div>
                       <div className="text-sm text-purple-700">Recipients</div>
                     </div>
                   </div>
@@ -1380,7 +1387,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
           <div className="flex justify-between">
             <BossButton 
               onClick={() => setCurrentStep(4)}
-              variant="outline"
+              variant="secondary"
             >
               Previous
             </BossButton>
@@ -1399,8 +1406,7 @@ export default function EmailCampaignBuilder({ template, onSave: _onSave, onExpo
                 Export
               </BossButton>
               <BossButton 
-                variant="success"
-                className="bg-green-600 hover:bg-green-700"
+                variant="secondary"
               >
                 <Send className="w-4 h-4 mr-2" />
                 Send Campaign

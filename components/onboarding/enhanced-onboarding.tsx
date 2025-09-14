@@ -304,6 +304,8 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
       {currentPhase === "progressive" && (
         <InteractiveTutorial
           open={showTutorial}
+          onCompleteAction={handleTutorialComplete}
+          onSkipAction={handleTutorialSkip}
           tutorialType={tutorialType}
         />
       )}

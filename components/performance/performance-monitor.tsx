@@ -30,12 +30,13 @@ export function PerformanceMonitor() {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (entry.entryType === 'largest-contentful-paint') {
-            setMetrics(prev => ({ ...prev, lcp: entry.startTime }))
+            setMetrics(prev => ({ ...(prev || { fcp: 0, lcp: 0, fid: 0, cls: 0, ttfb: 0, loadTime: 0 }), lcp: entry.startTime }))
           } else if (entry.entryType === 'first-input') {
-            setMetrics(prev => ({ ...prev, fid: entry.processingStart - entry.startTime }))
+            const fiEntry = entry as PerformanceEventTiming
+            setMetrics(prev => ({ ...(prev || { fcp: 0, lcp: 0, fid: 0, cls: 0, ttfb: 0, loadTime: 0 }), fid: (fiEntry.processingStart || fiEntry.startTime) - fiEntry.startTime }))
           } else if (entry.entryType === 'layout-shift') {
             const clsEntry = entry as PerformanceEntry & { value: number }
-            setMetrics(prev => ({ ...prev, cls: (prev?.cls || 0) + clsEntry.value }))
+            setMetrics(prev => ({ ...(prev || { fcp: 0, lcp: 0, fid: 0, cls: 0, ttfb: 0, loadTime: 0 }), cls: (prev?.cls || 0) + clsEntry.value }))
           }
         }
       })
@@ -59,7 +60,7 @@ export function PerformanceMonitor() {
       const fcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries()
         const fcpEntry = entries[entries.length - 1]
-        setMetrics(prev => ({ ...prev, fcp: fcpEntry.startTime }))
+        setMetrics(prev => ({ ...(prev || { fcp: 0, lcp: 0, fid: 0, cls: 0, ttfb: 0, loadTime: 0 }), fcp: fcpEntry.startTime }))
       })
       fcpObserver.observe({ entryTypes: ['paint'] })
 

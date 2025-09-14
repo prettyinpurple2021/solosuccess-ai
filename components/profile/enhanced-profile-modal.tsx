@@ -23,12 +23,12 @@ interface EnhancedProfileModalProps {
 }
 
 export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProfileModalProps) {
-  const user = useUser()
+  const { user } = useAuth()
   const { profile, updateProfile, uploadAvatar, removeAvatar } = useProfile()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState({
-    full_name: user?.displayName || profile?.full_name || "",
+    full_name: (user as any)?.displayName || profile?.full_name || "",
     company_name: "",
     industry: "",
     business_type: "",
@@ -188,7 +188,7 @@ export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProf
                 <Avatar className="h-32 w-32 border-4 border-gradient-to-r from-purple-400 to-pink-400">
                   <AvatarImage src={formData.avatar_url || "/default-user.svg"} className="object-cover" />
                   <AvatarFallback className="text-4xl bg-gradient-to-r from-purple-400 to-pink-400 text-white">
-                    {formData.full_name?.charAt(0) || user?.primaryEmail?.charAt(0) || "B"}
+                    {formData.full_name?.charAt(0) || (user as any)?.primaryEmail?.charAt(0) || (user as any)?.email?.charAt(0) || "B"}
                   </AvatarFallback>
                 </Avatar>
                 {formData.avatar_url && (
@@ -528,7 +528,7 @@ export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProf
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Email:</span>
-                    <span className="text-gray-600">{user?.primaryEmail}</span>
+                    <span className="text-gray-600">{(user as any)?.primaryEmail || user?.email}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Account Created:</span>

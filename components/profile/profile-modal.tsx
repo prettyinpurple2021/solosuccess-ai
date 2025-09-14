@@ -56,7 +56,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
   useEffect(() => {
     if (user) {
       setFormData({
-        full_name: user.displayName || "",
+        full_name: (user as any).displayName || "",
         company_name: "",
         industry: "",
         business_type: "",
@@ -168,7 +168,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
                 <Avatar className="h-20 w-20">
                   <AvatarImage src="/default-user.svg" />
                   <AvatarFallback className="text-lg">
-                    {user?.displayName?.charAt(0) || user?.primaryEmail?.charAt(0) || "U"}
+                    {(user as any)?.displayName?.charAt(0) || (user as any)?.primaryEmail?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -193,7 +193,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" value={user?.primaryEmail || ""} disabled className="bg-muted" />
+                  <Input id="email" value={(user as any)?.primaryEmail || user?.email || ""} disabled className="bg-muted" />
                 </div>
               </div>
 
@@ -323,7 +323,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
                   <div className="flex justify-between items-center p-3 border rounded-lg">
                     <div>
                       <p className="font-medium">Email Address</p>
-                      <p className="text-sm text-muted-foreground">{user?.primaryEmail}</p>
+                      <p className="text-sm text-muted-foreground">{(user as any)?.primaryEmail || user?.email}</p>
                     </div>
                     <Button variant="outline" size="sm">
                       Change Email

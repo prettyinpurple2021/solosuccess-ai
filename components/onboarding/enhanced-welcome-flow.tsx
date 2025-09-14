@@ -23,7 +23,9 @@ import {
   Play,
   Pause,
   Volume2,
-  VolumeX
+  VolumeX,
+  Settings,
+  ArrowLeft
 } from "lucide-react"
 
 interface WelcomeFlowProps {
@@ -340,7 +342,10 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
                 className="flex items-center justify-between p-4 border-2 border-transparent hover:border-indigo-200 rounded-xl cursor-pointer transition-all duration-200"
-                onClick={() => setUserPreferences(prev => ({ ...prev, [pref.id]: !prev[pref.id] }))}
+                onClick={() => setUserPreferences(prev => ({
+                  ...prev,
+                  [pref.id]: !(prev as any)[pref.id as keyof typeof prev]
+                }))}
               >
                 <div className="flex items-center space-x-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
