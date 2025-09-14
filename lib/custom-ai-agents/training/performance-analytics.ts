@@ -41,7 +41,7 @@ export class PerformanceAnalytics {
   private dataCollector: SimpleTrainingCollector
 
   constructor() {
-    this.dataCollector = new SimpleTrainingCollector()
+    this.dataCollector = SimpleTrainingCollector.getInstance()
   }
 
   async analyzeAgentPerformance(agentId: string, userId: string): Promise<AgentPerformanceProfile> {

@@ -152,7 +152,7 @@ export class CompetitiveIntelligenceContextService {
       
       // Enhance competitors with recent activities
       const enhancedCompetitors = await Promise.all(
-        competitors.map(async (competitor) => {
+        competitors.map(async (competitor: { id: number; name: string; threat_level: string; market_position: any }) => {
           const { rows: activities } = await client.query(
             `SELECT data_type, importance, collected_at
              FROM intelligence_data
@@ -165,7 +165,7 @@ export class CompetitiveIntelligenceContextService {
           
           return {
             ...competitor,
-            recent_activities: activities.map(a => `${a.data_type} (${a.importance})`),
+            recent_activities: activities.map((a: { data_type: string; importance: string }) => `${a.data_type} (${a.importance})`),
             key_metrics: competitor.market_position || {}
           }
         })
@@ -173,7 +173,7 @@ export class CompetitiveIntelligenceContextService {
       
       return {
         competitors: enhancedCompetitors,
-        recent_alerts: recent_alerts.map(alert => ({
+        recent_alerts: recent_alerts.map((alert: { id: number; title: string; severity: string; alert_type: string; competitor_name: string; created_at: Date }) => ({
           ...alert,
           created_at: alert.created_at.toISOString()
         })),

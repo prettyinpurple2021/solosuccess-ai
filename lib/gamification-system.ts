@@ -201,8 +201,8 @@ export const levels: LevelInfo[] = [
 ]
 
 export class GamificationEngine {
-  private userStats: UserStats
-  private unlockedAchievements: Set<string>
+  protected userStats: UserStats
+  protected unlockedAchievements: Set<string>
 
   constructor(userStats: UserStats, unlockedAchievements: string[] = []) {
     this.userStats = userStats

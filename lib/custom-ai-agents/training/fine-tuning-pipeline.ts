@@ -70,7 +70,7 @@ export class FineTuningPipeline {
   private jobs: Map<string, FineTuningJob> = new Map()
 
   constructor() {
-    this.dataCollector = new SimpleTrainingCollector()
+    this.dataCollector = SimpleTrainingCollector.getInstance()
     this.analytics = new PerformanceAnalytics()
   }
 

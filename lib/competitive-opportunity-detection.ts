@@ -99,19 +99,19 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitorId, competitorId),
-            gte(intelligenceData.collectedAt, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // Last 30 days
+            eq(intelligenceData.competitor_id, Number(competitorId)),
+            gte(intelligenceData.collected_at, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // Last 30 days
           )
         )
-        .orderBy(desc(intelligenceData.collectedAt))
+        .orderBy(desc(intelligenceData.collected_at))
 
       const weaknesses: CompetitorWeakness[] = []
 
       // Analyze customer complaints and reviews
-      const reviewData = recentData.filter(d => 
-        d.dataType === 'review' || 
-        d.dataType === 'social_media' || 
-        d.dataType === 'customer_feedback'
+      const reviewData = recentData.filter((d: any) => 
+        d.data_type === 'review' || 
+        d.data_type === 'social_media' || 
+        d.data_type === 'customer_feedback'
       )
 
       // Group complaints by category
@@ -143,7 +143,7 @@ export class CompetitiveOpportunityDetector {
       }
 
       // Analyze product/service gaps from social media mentions
-      const socialMentions = recentData.filter(d => d.dataType === 'social_media')
+      const socialMentions = recentData.filter((d: any) => d.data_type === 'social_media')
       const productGaps = this.detectProductGapsFromSocial(socialMentions, competitorId)
       weaknesses.push(...productGaps)
 
@@ -167,8 +167,8 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            inArray(intelligenceData.competitorId, competitorIds),
-            inArray(intelligenceData.dataType, ['product', 'service', 'website', 'pricing'])
+            inArray(intelligenceData.competitor_id, competitorIds.map((id) => Number(id))),
+            inArray(intelligenceData.data_type, ['product', 'service', 'website', 'pricing'])
           )
         )
 
@@ -217,13 +217,13 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.dataType, 'pricing'),
-            gte(intelligenceData.collectedAt, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) // Last 7 days
+            eq(intelligenceData.data_type, 'pricing'),
+            gte(intelligenceData.collected_at, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) // Last 7 days
           )
         )
 
-      const competitorPricing = pricingData.filter(d => d.competitorId === competitorId)
-      const marketPricing = pricingData.filter(d => d.competitorId !== competitorId)
+      const competitorPricing = pricingData.filter((d: any) => d.competitor_id === Number(competitorId))
+      const marketPricing = pricingData.filter((d: any) => d.competitor_id !== Number(competitorId))
 
       for (const pricing of competitorPricing) {
         const analysis = this.analyzePricingPosition(pricing, marketPricing)
@@ -262,9 +262,9 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitorId, competitorId),
-            eq(intelligenceData.dataType, 'job_posting'),
-            gte(intelligenceData.collectedAt, new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)) // Last 60 days
+            eq(intelligenceData.competitor_id, Number(competitorId)),
+            eq(intelligenceData.data_type, 'job_posting'),
+            gte(intelligenceData.collected_at, new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)) // Last 60 days
           )
         )
 
@@ -287,9 +287,9 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitorId, competitorId),
-            sql`${intelligenceData.dataType} IN ('social_media', 'news')`,
-            gte(intelligenceData.collectedAt, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+            eq(intelligenceData.competitor_id, Number(competitorId)),
+            sql`${intelligenceData.data_type} IN ('social_media', 'news')`,
+            gte(intelligenceData.collected_at, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
           )
         )
 
@@ -320,9 +320,9 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitorId, competitorId),
-            sql`${intelligenceData.dataType} IN ('news', 'social_media', 'press_release')`,
-            gte(intelligenceData.collectedAt, new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)) // Last 90 days
+            eq(intelligenceData.competitor_id, Number(competitorId)),
+            sql`${intelligenceData.data_type} IN ('news', 'social_media', 'press_release')`,
+            gte(intelligenceData.collected_at, new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)) // Last 90 days
           )
         )
 

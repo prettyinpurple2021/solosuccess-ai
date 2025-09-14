@@ -1,5 +1,5 @@
 import { Achievement, UserStats, GamificationEngine } from './gamification-system'
-import { createClient } from '@/lib/db'
+import { createClient } from '@/lib/neon/client'
 
 export interface CompetitiveIntelligenceStats {
   competitors_monitored: number

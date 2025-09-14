@@ -300,7 +300,7 @@ export class CompetitorEnrichmentService {
       }
 
       if (foundHandles > 0) {
-        result.data = { socialMediaHandles }
+        result.data = { socialMediaHandles: socialHandles }
         result.confidence = Math.min(0.8, foundHandles * 0.2) // Higher confidence with more handles
         result.success = true
       } else {

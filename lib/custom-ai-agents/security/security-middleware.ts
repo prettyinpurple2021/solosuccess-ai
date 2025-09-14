@@ -165,7 +165,7 @@ export class SecurityMiddleware {
     error?: string
   }> {
     try {
-      const ipAddress = request.ip || 
+      const ipAddress = 
                        request.headers.get('x-forwarded-for') || 
                        request.headers.get('x-real-ip') || 
                        'unknown'

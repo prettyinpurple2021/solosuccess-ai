@@ -496,7 +496,7 @@ export class BlazeGrowthIntelligence {
             gte(intelligenceData.collected_at, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // Last 30 days
           )
         )
-        .orderBy(desc(intelligenceData.collectedAt))
+        .orderBy(desc(intelligenceData.collected_at))
         .limit(50)
 
       const analysisPrompt = `
