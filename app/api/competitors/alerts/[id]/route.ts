@@ -31,7 +31,8 @@ export async function PATCH(
       );
     }
 
-    const alertId = parseInt(id);
+    const params = await context.params;
+    const alertId = parseInt(params.id);
     if (isNaN(alertId)) {
       return NextResponse.json(
         { error: 'Invalid alert ID' },
@@ -90,7 +91,8 @@ export async function GET(
       );
     }
 
-    const alertId = parseInt(id);
+    const params = await context.params;
+    const alertId = parseInt(params.id);
     if (isNaN(alertId)) {
       return NextResponse.json(
         { error: 'Invalid alert ID' },

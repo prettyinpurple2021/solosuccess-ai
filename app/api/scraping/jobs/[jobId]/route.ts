@@ -50,7 +50,8 @@ export async function GET(
       )
     }
 
-    const { jobId } = params
+    const contextParams = await context.params
+    const { jobId } = contextParams
 
     // Get job details
     const job = scrapingScheduler.getJob(jobId)
@@ -124,7 +125,8 @@ export async function PUT(
       )
     }
 
-    const { jobId } = params
+    const contextParams = await context.params
+    const { jobId } = contextParams
 
     // Get job details
     const job = scrapingScheduler.getJob(jobId)
@@ -257,7 +259,8 @@ export async function DELETE(
       )
     }
 
-    const { jobId } = params
+    const contextParams = await context.params
+    const { jobId } = contextParams
 
     // Get job details
     const job = scrapingScheduler.getJob(jobId)

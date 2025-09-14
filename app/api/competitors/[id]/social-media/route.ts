@@ -48,6 +48,7 @@ export async function GET(
     }
 
     // Validate params
+    const params = await context.params;
     const { id: competitorId } = paramsSchema.parse(params);
     
     // Validate query parameters
@@ -178,6 +179,7 @@ export async function POST(
     }
 
     // Validate params
+    const params = await context.params;
     const { id: competitorId } = paramsSchema.parse(params);
 
     // Parse request body

@@ -90,52 +90,80 @@ export async function GET(request: NextRequest) {
     const queryParams = Object.fromEntries(url.searchParams.entries())
     
     // Parse arrays from query string
-    if (queryParams.threatLevel) {
-      queryParams.threatLevel = queryParams.threatLevel.split(',')
+    const parsedParams: any = { ...queryParams };
+    if (parsedParams.threatLevel && typeof parsedParams.threatLevel === 'string') {
+      parsedParams.threatLevel = parsedParams.threatLevel.split(',')
     }
-    if (queryParams.monitoringStatus) {
-      queryParams.monitoringStatus = queryParams.monitoringStatus.split(',')
+    if (parsedParams.monitoringStatus && typeof parsedParams.monitoringStatus === 'string') {
+      parsedParams.monitoringStatus = parsedParams.monitoringStatus.split(',')
     }
-    if (queryParams.industry) {
-      queryParams.industry = queryParams.industry.split(',')
+    if (parsedParams.industry && typeof parsedParams.industry === 'string') {
+      parsedParams.industry = parsedParams.industry.split(',')
     }
-    if (queryParams.fundingStage) {
-      queryParams.fundingStage = queryParams.fundingStage.split(',')
+    if (parsedParams.fundingStage && typeof parsedParams.fundingStage === 'string') {
+      parsedParams.fundingStage = parsedParams.fundingStage.split(',')
     }
     
     // Convert string numbers to numbers
-    if (queryParams.page) queryParams.page = parseInt(queryParams.page)
-    if (queryParams.limit) queryParams.limit = parseInt(queryParams.limit)
+    if (parsedParams.page && typeof parsedParams.page === 'string') {
+      parsedParams.page = parseInt(parsedParams.page)
+    }
+    if (parsedParams.limit && typeof parsedParams.limit === 'string') {
+      parsedParams.limit = parseInt(parsedParams.limit)
+    }
 
-    const filters = CompetitorFiltersSchema.parse(queryParams)
+    const filters = CompetitorFiltersSchema.parse(parsedParams)
 
     // Build query conditions
     const conditions = [eq(competitorProfiles.user_id, user.id)]
 
     if (filters.threatLevel && filters.threatLevel.length > 0) {
-      conditions.push(or(...filters.threatLevel.map(level => eq(competitorProfiles.threat_level, level))))
+      const threatLevelConditions = filters.threatLevel
+        .filter(level => level !== undefined && level !== null)
+        .map(level => eq(competitorProfiles.threat_level, level as string))
+      if (threatLevelConditions.length > 0) {
+        conditions.push(or(...threatLevelConditions) as any)
+      }
     }
 
     if (filters.monitoringStatus && filters.monitoringStatus.length > 0) {
-      conditions.push(or(...filters.monitoringStatus.map(status => eq(competitorProfiles.monitoring_status, status))))
+      const monitoringStatusConditions = filters.monitoringStatus
+        .filter(status => status !== undefined && status !== null)
+        .map(status => eq(competitorProfiles.monitoring_status, status as string))
+      if (monitoringStatusConditions.length > 0) {
+        conditions.push(or(...monitoringStatusConditions) as any)
+      }
     }
 
     if (filters.industry && filters.industry.length > 0) {
-      conditions.push(or(...filters.industry.map(industry => eq(competitorProfiles.industry, industry))))
+      const industryConditions = filters.industry
+        .filter(industry => industry !== undefined && industry !== null)
+        .map(industry => eq(competitorProfiles.industry, industry as string))
+      if (industryConditions.length > 0) {
+        conditions.push(or(...industryConditions) as any)
+      }
     }
 
     if (filters.fundingStage && filters.fundingStage.length > 0) {
-      conditions.push(or(...filters.fundingStage.map(stage => eq(competitorProfiles.funding_stage, stage))))
+      const fundingStageConditions = filters.fundingStage
+        .filter(stage => stage !== undefined && stage !== null)
+        .map(stage => eq(competitorProfiles.funding_stage, stage as string))
+      if (fundingStageConditions.length > 0) {
+        conditions.push(or(...fundingStageConditions) as any)
+      }
     }
 
-    if (filters.search) {
-      conditions.push(
-        or(
-          ilike(competitorProfiles.name, `%${filters.search}%`),
-          ilike(competitorProfiles.domain, `%${filters.search}%`),
-          ilike(competitorProfiles.description, `%${filters.search}%`)
-        )
-      )
+    if (filters.search && filters.search.trim().length > 0) {
+      const searchTerm = filters.search.trim()
+      const searchConditions = [
+        ilike(competitorProfiles.name, `%${searchTerm}%`),
+        ilike(competitorProfiles.domain, `%${searchTerm}%`),
+        ilike(competitorProfiles.description, `%${searchTerm}%`)
+      ]
+      
+      if (searchConditions.length > 0) {
+        conditions.push(or(...searchConditions) as any)
+      }
     }
 
     // Build sort order
@@ -248,10 +276,10 @@ export async function POST(request: NextRequest) {
       .where(
         and(
           eq(competitorProfiles.user_id, user.id),
-          or(
-            eq(competitorProfiles.name, data.name),
-            data.domain ? eq(competitorProfiles.domain, data.domain) : undefined
-          ).filter(Boolean)
+        or(
+          eq(competitorProfiles.name, data.name),
+          ...(data.domain ? [eq(competitorProfiles.domain, data.domain)] : [])
+        )
         )
       )
       .limit(1)
@@ -320,18 +348,26 @@ export async function POST(request: NextRequest) {
             threatLevel: newCompetitor.threat_level as any,
             monitoringStatus: newCompetitor.monitoring_status as any,
             socialMediaHandles: newCompetitor.social_media_handles || {},
-            keyPersonnel: newCompetitor.key_personnel || [],
-            products: newCompetitor.products || [],
-            marketPosition: newCompetitor.market_position || {},
-            competitiveAdvantages: newCompetitor.competitive_advantages || [],
-            vulnerabilities: newCompetitor.vulnerabilities || [],
+            keyPersonnel: Array.isArray(newCompetitor.key_personnel) ? newCompetitor.key_personnel : [],
+            products: Array.isArray(newCompetitor.products) ? newCompetitor.products : [],
+            marketPosition: newCompetitor.market_position && typeof newCompetitor.market_position === 'object' && !Array.isArray(newCompetitor.market_position) ? newCompetitor.market_position : {
+              targetMarkets: [],
+              competitiveAdvantages: [],
+              marketSegments: [],
+              marketShare: 0,
+              positioningStrength: 0,
+              differentiationLevel: 0,
+              marketFit: 0
+            },
+            competitiveAdvantages: Array.isArray(newCompetitor.competitive_advantages) ? newCompetitor.competitive_advantages : [],
+            vulnerabilities: Array.isArray(newCompetitor.vulnerabilities) ? newCompetitor.vulnerabilities : [],
             monitoringConfig: newCompetitor.monitoring_config || {},
             lastAnalyzed: newCompetitor.last_analyzed || undefined,
             createdAt: newCompetitor.created_at!,
             updatedAt: newCompetitor.updated_at!,
           }
 
-          const enrichmentResult = await competitorEnrichmentService.enrichCompetitorProfile(competitorData)
+          const enrichmentResult = await competitorEnrichmentService.enrichCompetitorProfile(competitorData as any)
           
           if (enrichmentResult.success && enrichmentResult.data) {
             // Update competitor with enriched data
@@ -366,24 +402,24 @@ export async function POST(request: NextRequest) {
             }
             
             // Add key personnel if none exist
-            if (enrichmentResult.data.keyPersonnel && (newCompetitor.key_personnel || []).length === 0) {
+            if (enrichmentResult.data.keyPersonnel && (Array.isArray(newCompetitor.key_personnel) ? newCompetitor.key_personnel : []).length === 0) {
               updateData.key_personnel = enrichmentResult.data.keyPersonnel
             }
             
             // Add products if none exist
-            if (enrichmentResult.data.products && (newCompetitor.products || []).length === 0) {
+            if (enrichmentResult.data.products && (Array.isArray(newCompetitor.products) ? newCompetitor.products : []).length === 0) {
               updateData.products = enrichmentResult.data.products
             }
             
             // Add competitive advantages
             if (enrichmentResult.data.competitiveAdvantages) {
-              const existingAdvantages = newCompetitor.competitive_advantages || []
+              const existingAdvantages = Array.isArray(newCompetitor.competitive_advantages) ? newCompetitor.competitive_advantages : []
               updateData.competitive_advantages = [...existingAdvantages, ...enrichmentResult.data.competitiveAdvantages]
             }
             
             // Add vulnerabilities
             if (enrichmentResult.data.vulnerabilities) {
-              const existingVulnerabilities = newCompetitor.vulnerabilities || []
+              const existingVulnerabilities = Array.isArray(newCompetitor.vulnerabilities) ? newCompetitor.vulnerabilities : []
               updateData.vulnerabilities = [...existingVulnerabilities, ...enrichmentResult.data.vulnerabilities]
             }
 

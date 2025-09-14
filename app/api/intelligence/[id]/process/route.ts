@@ -83,7 +83,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const intelligenceId = parseInt(id)
+    const params = await context.params
+    const intelligenceId = parseInt(params.id)
     if (isNaN(intelligenceId)) {
       return NextResponse.json({ error: 'Invalid intelligence ID' }, { status: 400 })
     }

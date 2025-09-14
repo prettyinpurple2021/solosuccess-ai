@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest } from '@/lib/auth-server';
 import { rateLimitByIp } from '@/lib/rate-limit';
 import { notificationDelivery, NotificationPreferences } from '@/lib/notification-delivery-system';
+import { AlertType } from '@/lib/competitor-alert-system';
 import { z } from 'zod';
 
 const notificationChannelSchema = z.object({
@@ -11,7 +12,7 @@ const notificationChannelSchema = z.object({
   enabled: z.boolean(),
   config: z.record(z.any()),
   severityFilter: z.array(z.enum(['info', 'warning', 'urgent', 'critical'])),
-  typeFilter: z.array(z.string()),
+  typeFilter: z.array(z.enum(['pricing_change', 'product_launch', 'funding_announcement', 'key_hire', 'negative_news', 'website_change', 'social_activity', 'job_posting', 'partnership'])),
 });
 
 const notificationPreferencesSchema = z.object({

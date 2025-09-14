@@ -2,6 +2,7 @@ import '@/lib/server-polyfills'
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
+import { MOCK_FILES } from '../../files/mock-files'
 // Deprecated mock route: prefer /api/briefcase/files/[id]/preview which serves real file data
 
 // MIME type mappings for file extensions
@@ -265,7 +266,7 @@ export async function GET(
     const thumbnail = searchParams.get('thumbnail') === 'true'
     
     // Find file in mock data
-    const file = MOCK_FILES.find(f => f.id === fileId)
+    const file = MOCK_FILES.find((f: any) => f.id === fileId)
     if (!file) {
       return NextResponse.json(
         { error: 'File not found' }, 
@@ -345,7 +346,7 @@ export async function HEAD(
     const params = await context.params
     const { fileId } = params
     
-    const file = MOCK_FILES.find(f => f.id === fileId)
+    const file = MOCK_FILES.find((f: any) => f.id === fileId)
     if (!file) {
       return new NextResponse(null, { status: 404 })
     }

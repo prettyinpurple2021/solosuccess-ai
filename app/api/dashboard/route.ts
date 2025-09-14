@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get basic data from existing tables (simplified for now)
-    let todaysStatsRes, todaysTasksRes, activeGoalsRes, conversationsRes, achievementsRes, weeklyFocusRes, briefcasesRes;
+    let todaysStatsRes: any, todaysTasksRes: any, activeGoalsRes: any, conversationsRes: any, achievementsRes: any, weeklyFocusRes: any, briefcasesRes: any;
     
     try {
       // Try to get tasks data if table exists
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
       productivity_score: 0,
     }
 
-    const todaysTasks = todaysTasksRes.map((r) => ({
+    const todaysTasks = todaysTasksRes.map((r: any) => ({
       id: r.id,
       title: r.title,
       description: r.description,
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
       goal: null, // Simplified for now
     }))
 
-    const activeGoals = activeGoalsRes.map((r) => ({
+    const activeGoals = activeGoalsRes.map((r: any) => ({
       id: r.id,
       title: r.title,
       description: r.description,
@@ -160,14 +160,14 @@ export async function GET(request: NextRequest) {
       tasks_completed: r.tasks_completed,
     }))
 
-    const recentConversations = conversationsRes.map((r) => ({
+    const recentConversations = conversationsRes.map((r: any) => ({
       id: r.id,
       title: null,
       last_message_at: r.last_message_at,
       agent: { name: r.name, display_name: r.display_name, accent_color: r.accent_color },
     }))
 
-    const recentAchievements = achievementsRes.map((r) => ({
+    const recentAchievements = achievementsRes.map((r: any) => ({
       id: r.id,
       earned_at: r.earned_at,
       achievement: { name: r.name, title: r.title, description: r.description, icon: r.icon, points: r.points },

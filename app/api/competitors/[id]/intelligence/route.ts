@@ -69,34 +69,39 @@ export async function GET(
     const queryParams = Object.fromEntries(url.searchParams.entries())
     
     // Parse arrays from query string
-    if (queryParams.sourceTypes) {
-      queryParams.sourceTypes = queryParams.sourceTypes.split(',')
+    const parsedParams: any = { ...queryParams };
+    if (parsedParams.sourceTypes && typeof parsedParams.sourceTypes === 'string') {
+      parsedParams.sourceTypes = parsedParams.sourceTypes.split(',')
     }
-    if (queryParams.dataTypes) {
-      queryParams.dataTypes = queryParams.dataTypes.split(',')
+    if (parsedParams.dataTypes && typeof parsedParams.dataTypes === 'string') {
+      parsedParams.dataTypes = parsedParams.dataTypes.split(',')
     }
-    if (queryParams.importance) {
-      queryParams.importance = queryParams.importance.split(',')
+    if (parsedParams.importance && typeof parsedParams.importance === 'string') {
+      parsedParams.importance = parsedParams.importance.split(',')
     }
-    if (queryParams.tags) {
-      queryParams.tags = queryParams.tags.split(',')
+    if (parsedParams.tags && typeof parsedParams.tags === 'string') {
+      parsedParams.tags = parsedParams.tags.split(',')
     }
     
     // Parse date range
-    if (queryParams.startDate && queryParams.endDate) {
-      queryParams.dateRange = {
-        start: queryParams.startDate,
-        end: queryParams.endDate,
+    if (parsedParams.startDate && parsedParams.endDate) {
+      parsedParams.dateRange = {
+        start: parsedParams.startDate,
+        end: parsedParams.endDate,
       }
-      delete queryParams.startDate
-      delete queryParams.endDate
+      delete parsedParams.startDate
+      delete parsedParams.endDate
     }
     
     // Convert string numbers to numbers
-    if (queryParams.page) queryParams.page = parseInt(queryParams.page as string)
-    if (queryParams.limit) queryParams.limit = parseInt(queryParams.limit as string)
+    if (parsedParams.page && typeof parsedParams.page === 'string') {
+      parsedParams.page = parseInt(parsedParams.page)
+    }
+    if (parsedParams.limit && typeof parsedParams.limit === 'string') {
+      parsedParams.limit = parseInt(parsedParams.limit)
+    }
 
-    const filters = IntelligenceQuerySchema.parse(queryParams)
+    const filters = IntelligenceQuerySchema.parse(parsedParams)
 
     // Build query conditions
     const conditions = [

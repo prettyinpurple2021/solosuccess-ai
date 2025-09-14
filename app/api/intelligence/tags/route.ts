@@ -32,9 +32,10 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url)
     const queryParams = Object.fromEntries(url.searchParams.entries())
     
-    if (queryParams.limit) queryParams.limit = parseInt(queryParams.limit as string)
+    const parsedParams: any = { ...queryParams }
+    if (queryParams.limit) parsedParams.limit = parseInt(queryParams.limit as string)
 
-    const filters = TagSuggestionsSchema.parse(queryParams)
+    const filters = TagSuggestionsSchema.parse(parsedParams)
 
     // Get all unique tags from user's intelligence data
     const tagsQuery = sql`

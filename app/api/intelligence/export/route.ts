@@ -153,13 +153,15 @@ export async function POST(request: NextRequest) {
     const intelligence = await db
       .select({
         intelligence: intelligenceData,
-        competitor: filters.includeCompetitorInfo ? {
-          id: competitorProfiles.id,
-          name: competitorProfiles.name,
-          domain: competitorProfiles.domain,
-          industry: competitorProfiles.industry,
-          threatLevel: competitorProfiles.threat_level,
-        } : undefined
+        ...(filters.includeCompetitorInfo && {
+          competitor: {
+            id: competitorProfiles.id,
+            name: competitorProfiles.name,
+            domain: competitorProfiles.domain,
+            industry: competitorProfiles.industry,
+            threatLevel: competitorProfiles.threat_level,
+          }
+        })
       })
       .from(intelligenceData)
       .leftJoin(competitorProfiles, eq(intelligenceData.competitor_id, competitorProfiles.id))
@@ -168,19 +170,20 @@ export async function POST(request: NextRequest) {
 
     // Transform data for export
     const exportData = intelligence.map(item => {
+      const intel = item.intelligence as any
       const baseData = {
-        id: item.intelligence.id,
-        competitorId: item.intelligence.competitor_id,
-        sourceType: item.intelligence.source_type,
-        sourceUrl: item.intelligence.source_url,
-        dataType: item.intelligence.data_type,
-        title: (item.intelligence.extracted_data as ExtractedData)?.title || '',
-        content: (item.intelligence.extracted_data as ExtractedData)?.content || '',
-        confidence: item.intelligence.confidence ? parseFloat(item.intelligence.confidence) : 0,
-        importance: item.intelligence.importance,
-        tags: (item.intelligence.tags as string[]) || [],
-        collectedAt: item.intelligence.collected_at,
-        processedAt: item.intelligence.processed_at,
+        id: intel.id,
+        competitorId: intel.competitor_id,
+        sourceType: intel.source_type,
+        sourceUrl: intel.source_url,
+        dataType: intel.data_type,
+        title: (intel.extracted_data as ExtractedData)?.title || '',
+        content: (intel.extracted_data as ExtractedData)?.content || '',
+        confidence: intel.confidence ? parseFloat(intel.confidence) : 0,
+        importance: intel.importance,
+        tags: (intel.tags as string[]) || [],
+        collectedAt: intel.collected_at,
+        processedAt: intel.processed_at,
       }
 
       // Add competitor info if requested

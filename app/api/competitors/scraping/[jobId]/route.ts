@@ -35,7 +35,8 @@ export async function GET(
       )
     }
 
-    const jobId = jobId
+    const params = await context.params;
+    const jobId = params.jobId
 
     // Get job details
     const job = await db
@@ -107,7 +108,8 @@ export async function PATCH(
       )
     }
 
-    const jobId = jobId
+    const params = await context.params;
+    const jobId = params.jobId
     const body = await request.json()
     const { action } = body
 
@@ -187,7 +189,8 @@ export async function DELETE(
       )
     }
 
-    const jobId = jobId
+    const params = await context.params;
+    const jobId = params.jobId
 
     // Verify job ownership
     const job = await db

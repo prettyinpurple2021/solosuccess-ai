@@ -302,7 +302,7 @@ export class LexiStrategicAnalysis {
   /**
    * Perform comprehensive competitive positioning analysis
    */
-  async analyzeCompetitivePositioning(competitorId: number): Promise<CompetitivePositioningAnalysis> {
+  async analyzeCompetitivePositioning(competitorId: number, userId: string): Promise<CompetitivePositioningAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const allIntelligence = await this.getAllIntelligenceData(competitorId, 90)
     const marketData = await this.getMarketIntelligence(competitor.industry || '', 60)
@@ -317,7 +317,7 @@ export class LexiStrategicAnalysis {
     })
 
     const analysis = this.parsePositioningAnalysis(text, competitorId)
-    await this.storeStrategicAnalysis(competitorId, 'competitive_positioning', analysis)
+    await this.storeStrategicAnalysis(competitorId, 'competitive_positioning', analysis, userId)
 
     return analysis
   }
@@ -325,7 +325,7 @@ export class LexiStrategicAnalysis {
   /**
    * Analyze market trends based on competitor activities
    */
-  async analyzeMarketTrends(competitorIds: number[], industry?: string): Promise<MarketTrendAnalysis> {
+  async analyzeMarketTrends(competitorIds: number[], userId: string, industry?: string): Promise<MarketTrendAnalysis> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -349,7 +349,7 @@ export class LexiStrategicAnalysis {
     
     // Store analysis for each competitor
     for (const competitorId of competitorIds) {
-      await this.storeStrategicAnalysis(competitorId, 'market_trends', analysis)
+      await this.storeStrategicAnalysis(competitorId, 'market_trends', analysis, userId)
     }
 
     return analysis
@@ -358,7 +358,7 @@ export class LexiStrategicAnalysis {
   /**
    * Predict strategic moves based on competitor hiring and investments
    */
-  async analyzeStrategicMoves(competitorId: number): Promise<StrategicMoveAnalysis> {
+  async analyzeStrategicMoves(competitorId: number, userId: string): Promise<StrategicMoveAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const hiringData = await this.getHiringIntelligence(competitorId, 180)
     const investmentData = await this.getInvestmentIntelligence(competitorId, 365)
@@ -379,7 +379,7 @@ export class LexiStrategicAnalysis {
     })
 
     const analysis = this.parseStrategicMoveAnalysis(text, competitorId)
-    await this.storeStrategicAnalysis(competitorId, 'strategic_moves', analysis)
+    await this.storeStrategicAnalysis(competitorId, 'strategic_moves', analysis, userId)
 
     return analysis
   }
@@ -387,7 +387,7 @@ export class LexiStrategicAnalysis {
   /**
    * Build competitive threat assessment with actionable recommendations
    */
-  async assessCompetitiveThreats(competitorId: number): Promise<ThreatAssessment> {
+  async assessCompetitiveThreats(competitorId: number, userId: string): Promise<ThreatAssessment> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const recentIntelligence = await this.getAllIntelligenceData(competitorId, 60)
     const competitorProfile = await this.getCompetitorProfile(competitorId)
@@ -402,7 +402,7 @@ export class LexiStrategicAnalysis {
     })
 
     const assessment = this.parseThreatAssessment(text, competitorId)
-    await this.storeStrategicAnalysis(competitorId, 'threat_assessment', assessment)
+    await this.storeStrategicAnalysis(competitorId, 'threat_assessment', assessment, userId)
 
     return assessment
   }
@@ -410,7 +410,7 @@ export class LexiStrategicAnalysis {
   /**
    * Identify market opportunities based on competitor gaps
    */
-  async identifyMarketOpportunities(competitorIds: number[]): Promise<EmergingOpportunity[]> {
+  async identifyMarketOpportunities(competitorIds: number[], userId: string): Promise<EmergingOpportunity[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -432,7 +432,7 @@ export class LexiStrategicAnalysis {
 
     // Store opportunities for each competitor
     for (const competitorId of competitorIds) {
-      await this.storeStrategicAnalysis(competitorId, 'opportunity_identification', opportunities)
+      await this.storeStrategicAnalysis(competitorId, 'opportunity_identification', opportunities, userId)
     }
 
     return opportunities
@@ -601,16 +601,16 @@ COMPETITOR PROFILE:
 
 COMPETITOR INTELLIGENCE DATA:
 ${intelligence.slice(0, 10).map(data => `
-Source: ${data.source_type} - ${data.data_type}
-Content: ${JSON.stringify(data.extracted_data).substring(0, 400)}
-Date: ${data.collected_at}
+Source: ${data.sourceType} - ${data.data_type}
+Content: ${JSON.stringify(data.extractedData).substring(0, 400)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 MARKET INTELLIGENCE DATA:
 ${marketData.slice(0, 5).map(data => `
-Source: ${data.source_type}
-Market Data: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Source: ${data.sourceType}
+Market Data: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 POSITIONING ANALYSIS REQUIREMENTS:
@@ -649,9 +649,9 @@ ${index + 1}. ${comp.name} (${comp.industry})
 
 INDUSTRY DATA:
 ${industryData.slice(0, 10).map(data => `
-Source: ${data.source_type}
-Industry Intelligence: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Source: ${data.sourceType}
+Industry Intelligence: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 TREND ANALYSIS REQUIREMENTS:
@@ -683,20 +683,20 @@ Predict strategic moves for: ${competitor.name}
 
 HIRING INTELLIGENCE:
 ${hiringData.map(data => `
-Job Posting: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Job Posting: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 INVESTMENT INTELLIGENCE:
 ${investmentData.map(data => `
-Investment News: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Investment News: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 PARTNERSHIP INTELLIGENCE:
 ${partnershipData.map(data => `
-Partnership News: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Partnership News: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 STRATEGIC MOVE ANALYSIS REQUIREMENTS:
@@ -731,9 +731,9 @@ COMPETITOR PROFILE:
 
 RECENT INTELLIGENCE:
 ${intelligence.slice(0, 15).map(data => `
-Source: ${data.source_type}
-Threat Intelligence: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Source: ${data.sourceType}
+Threat Intelligence: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 THREAT ASSESSMENT REQUIREMENTS:
@@ -798,9 +798,9 @@ ${briefingData.map(({ competitor, intelligence, threatLevel }) => `
 COMPETITOR: ${competitor.name} (Threat: ${threatLevel})
 Recent Strategic Activities (${intelligence.length} items):
 ${intelligence.map(data => `
-- ${data.source_type}: ${JSON.stringify(data.extracted_data).substring(0, 200)}
+- ${data.sourceType}: ${JSON.stringify(data.extractedData).substring(0, 200)}
   Strategic Significance: ${data.importance}
-  Date: ${data.collected_at}
+  Date: ${data.collectedAt}
 `).join('\n')}
 `).join('\n\n')}
 
@@ -895,7 +895,8 @@ STRATEGIC INTELLIGENCE BRIEFING:`
   private async storeStrategicAnalysis(
     competitorId: number, 
     analysisType: string, 
-    analysis: any
+    analysis: any,
+    userId: string
   ): Promise<void> {
     const analysisResult: AnalysisResult = {
       agentId: 'lexi',
@@ -908,7 +909,7 @@ STRATEGIC INTELLIGENCE BRIEFING:`
 
     await db.insert(intelligenceData).values({
       competitor_id: competitorId,
-      user_id: '', // This should be passed from the calling context
+      user_id: userId,
       source_type: 'manual',
       data_type: `lexi_${analysisType}`,
       raw_content: analysis,

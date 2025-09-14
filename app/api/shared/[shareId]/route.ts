@@ -7,7 +7,8 @@ export async function GET(
   context: { params: Promise<{ shareId: string }> }
 ) {
   try {
-    const { shareId } = params
+    const contextParams = await context.params
+    const { shareId } = contextParams
     const client = await createClient()
 
     // Get share link details
@@ -94,7 +95,8 @@ export async function POST(
   context: { params: Promise<{ shareId: string }> }
 ) {
   try {
-    const { shareId } = params
+    const contextParams = await context.params
+    const { shareId } = contextParams
     const { password, action } = await request.json()
     const client = await createClient()
 

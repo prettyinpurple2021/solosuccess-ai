@@ -57,7 +57,8 @@ export async function GET(
       )
     }
 
-    const opportunityId = id
+    const contextParams = await context.params
+    const opportunityId = contextParams.id
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db
@@ -119,7 +120,8 @@ export async function POST(
       )
     }
 
-    const opportunityId = id
+    const contextParams = await context.params
+    const opportunityId = contextParams.id
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db

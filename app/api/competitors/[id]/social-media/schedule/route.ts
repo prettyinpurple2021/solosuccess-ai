@@ -49,6 +49,7 @@ export async function GET(
     }
 
     // Validate params
+    const params = await context.params;
     const { id: competitorId } = paramsSchema.parse(params);
 
     // Verify competitor exists and belongs to user
@@ -134,6 +135,7 @@ export async function POST(
     }
 
     // Validate params
+    const params = await context.params;
     const { id: competitorId } = paramsSchema.parse(params);
 
     // Parse and validate request body
@@ -264,6 +266,7 @@ export async function PUT(
     }
 
     // Validate params
+    const params = await context.params;
     const { id: competitorId } = paramsSchema.parse(params);
 
     // Parse and validate request body
@@ -375,6 +378,7 @@ export async function DELETE(
     }
 
     // Validate params
+    const params = await context.params;
     const { id: competitorId } = paramsSchema.parse(params);
 
     // Verify competitor exists and belongs to user

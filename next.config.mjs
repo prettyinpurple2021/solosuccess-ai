@@ -3,12 +3,12 @@ const nextConfig = {
   // Fix workspace root warning
   outputFileTracingRoot: process.cwd(),
   
-  // Don't fail production builds on ESLint issues; we'll fix them iteratively
+  // Production builds should catch errors
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   // Optimized for Vercel deployment
   // output: 'standalone', // Removed for Vercel
@@ -29,7 +29,7 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: true, // Disable optimization to fix image loading issues
+    unoptimized: false, // Enable optimization for production
   },
 
   // Bundle optimization (No changes here)

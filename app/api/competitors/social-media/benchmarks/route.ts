@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate custom benchmarks based on type
-    let benchmarkResults;
+    let benchmarkResults: any;
     
     switch (benchmark_type) {
       case 'performance':
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
 
     // Include industry averages if requested
     if (include_industry_averages) {
-      benchmarkResults.industry_averages = await getIndustryAverages(competitors[0].industry, platform);
+      benchmarkResults.industry_averages = await getIndustryAverages(competitors[0].industry || '', platform);
     }
 
     return NextResponse.json({

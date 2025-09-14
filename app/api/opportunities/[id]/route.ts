@@ -45,7 +45,7 @@ export async function GET(
 
     const params = await context.params
     const { id } = params
-    const opportunityId = parseInt(id)
+    const opportunityId = id
 
     // Get opportunity details
     const opportunity = await db
@@ -117,7 +117,7 @@ export async function PUT(
 
     const params = await context.params
     const { id } = params
-    const opportunityId = parseInt(id)
+    const opportunityId = id
 
     // Parse and validate request body
     const body = await request.json()
@@ -226,10 +226,9 @@ export async function DELETE(
       )
     }
 
-    const opportunityId = parseInt(id)
-
     const params = await context.params
     const { id } = params
+    const opportunityId = id
     // Check if opportunity exists and belongs to user
     const existingOpportunity = await db
       .select()

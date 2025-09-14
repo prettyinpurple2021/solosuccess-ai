@@ -27,7 +27,7 @@ const MOCK_COMPETITOR_SUGGESTIONS = [
     description: 'Leading provider of enterprise software solutions',
     industry: 'Technology',
     estimatedSize: 'medium',
-    threatLevel: 'high' as const,
+    threatLevel: 'high' as 'low' | 'medium' | 'high' | 'critical',
     reasoning: 'Direct competitor in enterprise software with similar target market',
     confidence: 0.85,
     keyIndicators: [
@@ -43,7 +43,7 @@ const MOCK_COMPETITOR_SUGGESTIONS = [
     description: 'Innovative startup disrupting traditional business processes',
     industry: 'Technology',
     estimatedSize: 'startup',
-    threatLevel: 'medium' as const,
+    threatLevel: 'medium' as 'low' | 'medium' | 'high' | 'critical',
     reasoning: 'Emerging competitor with innovative approach to similar problems',
     confidence: 0.72,
     keyIndicators: [
@@ -59,7 +59,7 @@ const MOCK_COMPETITOR_SUGGESTIONS = [
     description: 'Established player in business automation and workflow management',
     industry: 'Business Services',
     estimatedSize: 'large',
-    threatLevel: 'critical' as const,
+    threatLevel: 'critical' as 'low' | 'medium' | 'high' | 'critical',
     reasoning: 'Market leader with significant resources and established customer base',
     confidence: 0.91,
     keyIndicators: [
@@ -75,7 +75,7 @@ const MOCK_COMPETITOR_SUGGESTIONS = [
     description: 'Fast-growing startup with focus on SMB market',
     industry: 'Technology',
     estimatedSize: 'startup',
-    threatLevel: 'medium' as const,
+    threatLevel: 'medium' as 'low' | 'medium' | 'high' | 'critical',
     reasoning: 'Targeting similar SMB market with competitive pricing',
     confidence: 0.68,
     keyIndicators: [
@@ -91,7 +91,7 @@ const MOCK_COMPETITOR_SUGGESTIONS = [
     description: 'Enterprise-focused solutions with strong industry partnerships',
     industry: 'Technology',
     estimatedSize: 'large',
-    threatLevel: 'high' as const,
+    threatLevel: 'high' as 'low' | 'medium' | 'high' | 'critical',
     reasoning: 'Strong enterprise presence with strategic partnerships',
     confidence: 0.79,
     keyIndicators: [

@@ -46,7 +46,8 @@ export async function GET(
       )
     }
 
-    const { id: opportunityId, actionId } = params
+    const contextParams = await context.params
+    const { id: opportunityId, actionId } = contextParams
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db
@@ -122,7 +123,8 @@ export async function PUT(
       )
     }
 
-    const { id: opportunityId, actionId } = params
+    const contextParams = await context.params
+    const { id: opportunityId, actionId } = contextParams
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db
@@ -241,7 +243,8 @@ export async function DELETE(
       )
     }
 
-    const { id: opportunityId, actionId } = params
+    const contextParams = await context.params
+    const { id: opportunityId, actionId } = contextParams
 
     // Verify opportunity exists and belongs to user
     const opportunity = await db

@@ -103,37 +103,38 @@ export async function GET(request: NextRequest) {
     const queryParams = Object.fromEntries(url.searchParams.entries())
     
     // Parse arrays from query string
+    const parsedParams: any = { ...queryParams }
     if (queryParams.competitorIds) {
-      queryParams.competitorIds = queryParams.competitorIds.split(',').map(id => parseInt(id))
+      parsedParams.competitorIds = queryParams.competitorIds.split(',').map(id => parseInt(id))
     }
     if (queryParams.sourceTypes) {
-      queryParams.sourceTypes = queryParams.sourceTypes.split(',')
+      parsedParams.sourceTypes = queryParams.sourceTypes.split(',')
     }
     if (queryParams.dataTypes) {
-      queryParams.dataTypes = queryParams.dataTypes.split(',')
+      parsedParams.dataTypes = queryParams.dataTypes.split(',')
     }
     if (queryParams.importance) {
-      queryParams.importance = queryParams.importance.split(',')
+      parsedParams.importance = queryParams.importance.split(',')
     }
     if (queryParams.tags) {
-      queryParams.tags = queryParams.tags.split(',')
+      parsedParams.tags = queryParams.tags.split(',')
     }
     
     // Parse date range
     if (queryParams.startDate && queryParams.endDate) {
-      queryParams.dateRange = {
+      parsedParams.dateRange = {
         start: queryParams.startDate,
         end: queryParams.endDate,
       }
-      delete queryParams.startDate
-      delete queryParams.endDate
+      delete parsedParams.startDate
+      delete parsedParams.endDate
     }
     
     // Convert string numbers to numbers
-    if (queryParams.page) queryParams.page = parseInt(queryParams.page as string)
-    if (queryParams.limit) queryParams.limit = parseInt(queryParams.limit as string)
+    if (parsedParams.page) parsedParams.page = parseInt(parsedParams.page as string)
+    if (parsedParams.limit) parsedParams.limit = parseInt(parsedParams.limit as string)
 
-    const filters = IntelligenceFiltersSchema.parse(queryParams)
+    const filters = IntelligenceFiltersSchema.parse(parsedParams)
 
     // Build query conditions
     const conditions = [eq(intelligenceData.user_id, user.id)]

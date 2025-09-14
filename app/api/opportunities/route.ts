@@ -76,17 +76,18 @@ export async function GET(request: NextRequest) {
     const queryParams = Object.fromEntries(url.searchParams.entries())
     
     // Parse arrays from query string
+    const parsedParams: any = { ...queryParams }
     if (queryParams.status) {
-      queryParams.status = queryParams.status.split(',')
+      parsedParams.status = queryParams.status.split(',')
     }
     if (queryParams.opportunityType) {
-      queryParams.opportunityType = queryParams.opportunityType.split(',')
+      parsedParams.opportunityType = queryParams.opportunityType.split(',')
     }
     if (queryParams.impact) {
-      queryParams.impact = queryParams.impact.split(',')
+      parsedParams.impact = queryParams.impact.split(',')
     }
 
-    const validatedParams = getOpportunitiesSchema.parse(queryParams)
+    const validatedParams = getOpportunitiesSchema.parse(parsedParams)
 
     // Build filters
     const filters = {
@@ -179,15 +180,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate recommendations
-    const recommendations = await opportunityRecommendationSystem.generateRecommendations(opportunityResult)
+    const recommendations = await opportunityRecommendationSystem.generateRecommendations(opportunityResult as any)
 
     // Calculate prioritization
-    const prioritization = await opportunityRecommendationSystem.calculatePriorityScore(opportunityResult)
+    const prioritization = await opportunityRecommendationSystem.calculatePriorityScore(opportunityResult as any)
 
     // Store opportunity
     const opportunityId = await opportunityRecommendationSystem.storeOpportunity(
       user.id,
-      opportunityResult,
+      opportunityResult as any,
       recommendations,
       prioritization
     )

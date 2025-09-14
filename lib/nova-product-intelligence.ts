@@ -299,7 +299,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze competitor product features and updates
    */
-  async analyzeProductFeatures(competitorId: number, days: number = 60): Promise<ProductFeatureAnalysis> {
+  async analyzeProductFeatures(competitorId: number, userId: string, days: number = 60): Promise<ProductFeatureAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const websiteData = await this.getWebsiteIntelligence(competitorId, days)
     const appStoreData = await this.getAppStoreIntelligence(competitorId, days)
@@ -320,7 +320,7 @@ export class NovaProductIntelligence {
     })
 
     const analysis = this.parseProductFeatureAnalysis(text, competitorId)
-    await this.storeProductIntelligence(competitorId, 'product_features', analysis)
+    await this.storeProductIntelligence(competitorId, 'product_features', analysis, userId)
 
     return analysis
   }
@@ -575,26 +575,26 @@ COMPETITOR PROFILE:
 - Company: ${competitor.name}
 - Industry: ${competitor.industry}
 - Products: ${competitor.products?.map(p => `${p.name}: ${p.description}`).join('; ')}
-- Market Position: ${JSON.stringify(competitor.market_position)}
+- Market Position: ${JSON.stringify(competitor.marketPosition)}
 
 WEBSITE INTELLIGENCE:
 ${websiteData.map(data => `
-URL: ${data.source_url}
-Product Data: ${JSON.stringify(data.extracted_data).substring(0, 400)}
-Date: ${data.collected_at}
+URL: ${data.sourceUrl}
+Product Data: ${JSON.stringify(data.extractedData).substring(0, 400)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 APP STORE INTELLIGENCE:
 ${appStoreData.map(data => `
-App Data: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+App Data: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 SOCIAL MEDIA PRODUCT UPDATES:
 ${socialMediaData.map(data => `
-Platform: ${data.data_type}
-Product Updates: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Platform: ${data.dataType}
+Product Updates: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 PRODUCT ANALYSIS REQUIREMENTS:
@@ -625,15 +625,15 @@ Analyze UX/UI trends and design patterns for: ${competitor.name}
 
 WEBSITE UX DATA:
 ${websiteData.map(data => `
-URL: ${data.source_url}
-UX Data: ${JSON.stringify(data.extracted_data).substring(0, 400)}
-Date: ${data.collected_at}
+URL: ${data.sourceUrl}
+UX Data: ${JSON.stringify(data.extractedData).substring(0, 400)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 APP UX DATA:
 ${appStoreData.map(data => `
-App UX: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+App UX: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 UX ANALYSIS REQUIREMENTS:
@@ -733,21 +733,21 @@ Predict product roadmap and development patterns for: ${competitor.name}
 
 HIRING INTELLIGENCE:
 ${hiringData.map(data => `
-Job Posting: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Job Posting: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 PRODUCT DEVELOPMENT DATA:
 ${productData.map(data => `
-Product Updates: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Product Updates: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 SOCIAL MEDIA PRODUCT HINTS:
 ${socialMediaData.map(data => `
-Platform: ${data.data_type}
-Product Hints: ${JSON.stringify(data.extracted_data).substring(0, 300)}
-Date: ${data.collected_at}
+Platform: ${data.dataType}
+Product Hints: ${JSON.stringify(data.extractedData).substring(0, 300)}
+Date: ${data.collectedAt}
 `).join('\n')}
 
 ROADMAP PREDICTION REQUIREMENTS:
@@ -783,14 +783,14 @@ ${briefingData.map(({ competitor, productIntelligence, appIntelligence }) => `
 COMPETITOR: ${competitor.name}
 Product Updates (${productIntelligence.length} items):
 ${productIntelligence.map(data => `
-- Product Change: ${JSON.stringify(data.extracted_data).substring(0, 200)}
-  Date: ${data.collected_at}
+- Product Change: ${JSON.stringify(data.extractedData).substring(0, 200)}
+  Date: ${data.collectedAt}
 `).join('\n')}
 
 App Updates (${appIntelligence.length} items):
 ${appIntelligence.map(data => `
-- App Update: ${JSON.stringify(data.extracted_data).substring(0, 200)}
-  Date: ${data.collected_at}
+- App Update: ${JSON.stringify(data.extractedData).substring(0, 200)}
+  Date: ${data.collectedAt}
 `).join('\n')}
 `).join('\n\n')}
 
@@ -904,7 +904,8 @@ PRODUCT INTELLIGENCE BRIEFING:`
   private async storeProductIntelligence(
     competitorId: number,
     analysisType: string,
-    analysis: any
+    analysis: any,
+    userId: string
   ): Promise<void> {
     const analysisResult: AnalysisResult = {
       agentId: 'nova',
@@ -917,7 +918,7 @@ PRODUCT INTELLIGENCE BRIEFING:`
 
     await db.insert(intelligenceData).values({
       competitor_id: competitorId,
-      user_id: '', // This should be passed from the calling context
+      user_id: userId,
       source_type: 'manual',
       data_type: `nova_${analysisType}`,
       raw_content: analysis,

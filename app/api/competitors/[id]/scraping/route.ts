@@ -47,7 +47,8 @@ export async function GET(
       )
     }
 
-    const competitorId = parseInt(id, 10)
+    const params = await context.params;
+    const competitorId = parseInt(params.id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
@@ -98,7 +99,8 @@ export async function POST(
       )
     }
 
-    const competitorId = parseInt(id, 10)
+    const params = await context.params;
+    const competitorId = parseInt(params.id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
@@ -172,7 +174,8 @@ export async function PUT(
       )
     }
 
-    const competitorId = parseInt(id, 10)
+    const params = await context.params;
+    const competitorId = parseInt(params.id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
@@ -244,7 +247,8 @@ export async function DELETE(
       )
     }
 
-    const competitorId = parseInt(id, 10)
+    const params = await context.params;
+    const competitorId = parseInt(params.id, 10)
     if (isNaN(competitorId)) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },

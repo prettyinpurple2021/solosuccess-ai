@@ -6,6 +6,7 @@ import { competitorProfiles, intelligenceData } from '@/db/schema'
 import { eq, and, gte, desc } from 'drizzle-orm'
 import { blazeGrowthIntelligence } from '@/lib/blaze-growth-intelligence'
 import { z } from 'zod'
+import type { SourceType, ImportanceLevel, ExtractedData, AnalysisResult } from '@/lib/competitor-intelligence-types'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -100,7 +101,7 @@ export async function GET(
       processedAt: item.processed_at || undefined,
       expiresAt: item.expires_at || undefined,
       createdAt: item.created_at!,
-      updatedAt: item.updated_at!,
+      updatedAt: item.updated_at || new Date()!,
     }))
 
     // Parse query parameters
@@ -216,7 +217,7 @@ export async function POST(
     }
 
     // Get comprehensive intelligence data
-    const intelligence = await db.select()
+    const intelligenceRaw = await db.select()
       .from(intelligenceData)
       .where(
         and(
@@ -226,6 +227,26 @@ export async function POST(
       )
       .orderBy(desc(intelligenceData.collected_at))
       .limit(200)
+
+    // Transform database results to match IntelligenceData interface
+    const intelligence = intelligenceRaw.map(item => ({
+      id: item.id,
+      competitorId: item.competitor_id,
+      userId: item.user_id,
+      sourceType: item.source_type as SourceType,
+      sourceUrl: item.source_url || undefined,
+      dataType: item.data_type,
+      rawContent: item.raw_content,
+      extractedData: item.extracted_data as ExtractedData,
+      analysisResults: item.analysis_results as AnalysisResult[],
+      confidence: item.confidence ? parseFloat(item.confidence) : 0,
+      importance: item.importance as ImportanceLevel,
+      tags: Array.isArray(item.tags) ? item.tags : [],
+      collectedAt: item.collected_at || new Date(),
+      processedAt: item.processed_at || undefined,
+      createdAt: item.created_at || new Date(),
+      updatedAt: item.updated_at || new Date()
+    }))
 
     const results: any = {}
 
