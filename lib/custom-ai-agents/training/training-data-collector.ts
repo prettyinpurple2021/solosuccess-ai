@@ -18,7 +18,7 @@ export interface TrainingInteraction {
   metadata: {
     model: string
     temperature: number
-    maxTokens: number
+    maxOutputTokens: number
     framework: string
     specialization: string
   }

@@ -150,9 +150,7 @@ export function TrainingDashboard() {
             epochs: 3,
             learningRate: 0.001,
             batchSize: 32,
-            temperature: 0.7,
-            maxTokens: 1000,
-            customPrompts: [],
+            temperature: 0.7,customPrompts: [],
             dataFilters: {
               minRating: 3,
               minConfidence: 0.7,

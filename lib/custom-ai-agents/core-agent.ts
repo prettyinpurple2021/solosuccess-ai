@@ -189,8 +189,9 @@ Be specific, actionable, and maintain your ${this.name} personality.`
       const { text } = await generateText({
         model: this.model as any,
         prompt: fullPrompt,
+        temperature: 0.7,})
         temperature: 0.7,
-        maxTokens: 1000
+        maxOutputTokens: 1000
       })
 
       // Parse the response (in a real implementation, you'd want more robust parsing)
@@ -259,7 +260,7 @@ Be specific, actionable, and maintain your ${this.name} personality.`
         metadata: {
           model: this.model?.modelId || 'unknown',
           temperature: 0.7,
-          maxTokens: 1000,
+          maxOutputTokens: 1000,
           framework: this.capabilities.frameworks[0] || 'general',
           specialization: this.capabilities.specializations[0] || 'general'
         }

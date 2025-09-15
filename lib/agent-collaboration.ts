@@ -156,8 +156,9 @@ Provide your analysis and recommendations for this phase of the project.
       // Cast to any to support both LanguageModelV1 and V2 at runtime
       model: agentConfig.model as any,
       prompt: collaborationPrompt,
+      temperature: 0.7,})
       temperature: 0.7,
-      maxTokens: 800,
+      maxOutputTokens: 800,
     })
 
     // Generate handoff if there's a next phase
@@ -222,8 +223,9 @@ Keep it concise but comprehensive. Format as a professional handoff note.
     const { text } = await generateText({
       model: fromConfig.model as any,
       prompt: handoffPrompt,
+      temperature: 0.6,})
       temperature: 0.6,
-      maxTokens: 300,
+      maxOutputTokens: 300,
     })
 
     return {
@@ -265,8 +267,9 @@ Format as JSON: {"recommended": boolean, "workflow": string|null, "agents": stri
     const { text } = await generateText({
       model: getTeamMemberConfig("lexi").model as any,
       prompt: analysisPrompt,
+      temperature: 0.3,})
       temperature: 0.3,
-      maxTokens: 200,
+      maxOutputTokens: 200,
     })
 
     try {

@@ -179,8 +179,9 @@ Respond as ${agentId} with full personality and context awareness:
     const { text } = await generateText({
       model: agentConfig.model as any,
       prompt: contextualPrompt,
+      temperature: 0.8,})
       temperature: 0.8,
-      maxTokens: 300,
+      maxOutputTokens: 300,
     })
 
     return text

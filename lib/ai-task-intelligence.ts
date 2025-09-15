@@ -128,8 +128,9 @@ export class TaskIntelligenceEngine {
       const result = await generateText({
         model: openai('gpt-4-turbo') as any,
         prompt,
+        temperature: 0.3,})
         temperature: 0.3,
-        maxTokens: 500,
+        maxOutputTokens: 500,
       })
 
       return this.parseTaskSuggestion(result.text, task.id)
@@ -348,8 +349,9 @@ Provide specific, actionable tips that would help improve productivity and task 
       const result = await generateText({
         model: openai('gpt-4-turbo') as any,
         prompt,
+        temperature: 0.7,})
         temperature: 0.7,
-        maxTokens: 300,
+        maxOutputTokens: 300,
       })
 
       return result.text.split('\n').filter(line => line.trim().length > 0).slice(0, 5)
