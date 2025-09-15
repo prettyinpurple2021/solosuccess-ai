@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type') || undefined
+    const search = searchParams.get('search') || undefined
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
@@ -49,7 +50,8 @@ export async function GET(request: NextRequest) {
       userId, 
       type as string | undefined, 
       limit, 
-      offset
+      offset,
+      search
     )
 
     return NextResponse.json({

@@ -387,7 +387,8 @@ export class UnifiedBriefcaseManager {
     userId: string, 
     type?: string, 
     limit: number = 50, 
-    offset: number = 0
+    offset: number = 0,
+    search?: string
   ): Promise<{ items: BriefcaseItem[], total: number }> {
     let whereClause = 'user_id = $1'
     const params: any[] = [userId]
@@ -397,6 +398,17 @@ export class UnifiedBriefcaseManager {
       whereClause += ` AND type = $${paramIndex}`
       params.push(type)
       paramIndex++
+    }
+
+    if (search) {
+      whereClause += ` AND (
+        title ILIKE $${paramIndex} OR 
+        description ILIKE $${paramIndex + 1} OR 
+        $${paramIndex + 2} = ANY(tags)
+      )`
+      const searchPattern = `%${search}%`
+      params.push(searchPattern, searchPattern, search)
+      paramIndex += 3
     }
 
     // Get total count

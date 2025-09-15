@@ -10,14 +10,17 @@ import { Label} from "@/components/ui/label"
 import { Separator} from "@/components/ui/separator"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from "@/components/ui/alert-dialog"
 import { useToast} from "@/hooks/use-toast"
-import { User, Mail, Lock, Trash2, LogOut, Save, AlertTriangle} from "lucide-react"
+import { User, Mail, Lock, Trash2, LogOut, Save, AlertTriangle, Crown, Heart, Sparkles} from "lucide-react"
 import { motion} from "framer-motion"
 import { SubscriptionManager} from "@/components/subscription/subscription-manager"
 import NotificationSettings from "@/components/notifications/notification-settings"
+import AvatarUpload from "@/components/AvatarUpload"
+import { useAvatar } from "@/hooks/useAvatar"
 
 export default function SettingsPage() {
   const { user, signOut, loading } = useAuth()
   const { toast } = useToast()
+  const { avatar, updateAvatar } = useAvatar()
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
@@ -142,14 +145,50 @@ export default function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Account Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account information and preferences
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Crown className="text-purple-600" size={32} />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-teal-600 bg-clip-text text-transparent">
+              Account Settings
+            </h1>
+            <Sparkles className="text-teal-600 animate-pulse" size={32} />
+          </div>
+          <p className="text-purple-700/80 font-medium flex items-center justify-center gap-2">
+            <Heart size={16} className="text-pink-500" />
+            Manage your account information and preferences, queen!
+            <Heart size={16} className="text-pink-500" />
           </p>
         </div>
 
         <div className="grid gap-6">
+          {/* Avatar Upload Section */}
+          <Card className="bg-white/90 backdrop-blur-sm border-purple-200 shadow-lg shadow-purple-100/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-purple-900">
+                <Crown className="h-6 w-6 text-purple-600" />
+                Your Avatar
+                <Sparkles className="h-4 w-4 text-teal-500" />
+              </CardTitle>
+              <CardDescription className="text-purple-700/80 font-medium">
+                Upload your profile picture to personalize your account
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <AvatarUpload 
+                currentAvatar={avatar}
+                onAvatarChange={(newAvatar) => {
+                  updateAvatar(newAvatar)
+                  if (newAvatar) {
+                    toast({
+                      title: "Avatar Updated! 👑",
+                      description: "Your profile picture has been updated successfully."
+                    })
+                  }
+                }}
+              />
+            </CardContent>
+          </Card>
+
           {/* Subscription Management */}
           <SubscriptionManager />
 
