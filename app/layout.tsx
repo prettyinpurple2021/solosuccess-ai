@@ -6,10 +6,11 @@ import { ThemeProvider} from "@/components/theme-provider"
 import { StackAuthProvider} from "@/components/auth/stack-provider"
 import { AuthProvider} from "@/hooks/use-auth"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
-import { PerformanceMonitor} from "@/components/performance/performance-monitor"
-import { ServiceWorkerRegister} from "@/components/performance/service-worker-register"
-import { AccessibilityProvider} from "@/components/ui/accessibility"
-import { ErrorBoundary} from "@/components/ui/error-handler"
+import { PerformanceMonitor } from "@/components/performance/performance-monitor"
+import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"
+import { AccessibilityProvider } from "@/components/ui/accessibility"
+import { ErrorBoundary } from "@/components/ui/error-handler"
+import { ChatProvider } from "@/components/providers/chat-provider"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -64,9 +65,11 @@ export default function RootLayout({
           <StackAuthProvider>
             <AuthProvider>
               <AccessibilityProvider>
-                <ErrorBoundary>
-                  {children}
-                </ErrorBoundary>
+                <ChatProvider>
+                  <ErrorBoundary>
+                    {children}
+                  </ErrorBoundary>
+                </ChatProvider>
                 <PerformanceMonitor />
                 <ServiceWorkerRegister />
               </AccessibilityProvider>
