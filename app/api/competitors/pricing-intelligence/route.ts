@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
       competitor_ids, 
       analysis_scope,
       market_context,
-      include_recommendations 
+      _include_recommendations 
     } = pricingAnalysisSchema.parse(body)
 
     // Verify all competitors exist and belong to user

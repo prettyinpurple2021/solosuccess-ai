@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     
     // Get agent-specific prompts with competitive intelligence integration
     const agentPrompts = CompetitiveIntelligenceContextService.getAgentCompetitivePrompts()
-    const agentId_typed = agentId as keyof typeof agentPrompts
+    const _agentId_typed = agentId as keyof typeof agentPrompts
     
     // Get agent personality based on agentId
     const agentPersonalities = {

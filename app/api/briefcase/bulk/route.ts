@@ -356,7 +356,7 @@ async function handleBulkDownload(client: any, fileIds: string[], userId: string
   return result
 }
 
-async function handleBulkShare(client: any, fileIds: string[], permissions: any, userId: string) {
+async function handleBulkShare(client: any, fileIds: string[], permissions: any, _userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[], shareLinks: [] as string[] }
 
   for (const fileId of fileIds) {

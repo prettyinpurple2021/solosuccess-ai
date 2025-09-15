@@ -189,7 +189,7 @@ export async function POST(
       force_refresh: z.boolean().default(false)
     });
 
-    const { platforms, force_refresh } = requestSchema.parse(body);
+    const { platforms, _force_refresh } = requestSchema.parse(body);
 
     // Verify competitor exists and belongs to user
     const [competitor] = await db

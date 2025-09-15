@@ -6,7 +6,7 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceGamificationTriggers } from '@/lib/competitive-intelligence-gamification-triggers'
 import { z } from 'zod'
 import { eq, and, or, ilike, desc, asc } from 'drizzle-orm'
-import type { CompetitorProfile, CompetitorFilters, ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
+import type { _CompetitorProfile, _CompetitorFilters, ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

@@ -3,7 +3,7 @@ import { db } from '@/db'
 import { competitorProfiles } from '@/db/schema'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
-import { competitorEnrichmentService } from '@/lib/competitor-enrichment-service'
+import { _competitorEnrichmentService } from '@/lib/competitor-enrichment-service'
 import { z } from 'zod'
 import { eq, and, inArray } from 'drizzle-orm'
 import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
@@ -278,7 +278,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
     

@@ -46,7 +46,7 @@ export async function POST(
     const updatedTags = [...existingTags, newTag]
 
     // Update document
-    const { rows: [updatedDocument] } = await client.query(`
+    const { rows: [_updatedDocument] } = await client.query(`
       UPDATE documents 
       SET tags = $1, updated_at = NOW()
       WHERE id = $2
@@ -124,7 +124,7 @@ export async function DELETE(
     const updatedTags = existingTags.filter((t: string) => t !== tagToRemove)
 
     // Update document
-    const { rows: [updatedDocument] } = await client.query(`
+    const { rows: [_updatedDocument] } = await client.query(`
       UPDATE documents 
       SET tags = $1, updated_at = NOW()
       WHERE id = $2

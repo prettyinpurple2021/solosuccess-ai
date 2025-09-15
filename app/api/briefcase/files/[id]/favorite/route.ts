@@ -32,7 +32,7 @@ export async function POST(
     const newFavoriteStatus = !document.is_favorite
 
     // Update document
-    const { rows: [updatedDocument] } = await client.query(`
+    const { rows: [_updatedDocument] } = await client.query(`
       UPDATE documents 
       SET is_favorite = $1, updated_at = NOW()
       WHERE id = $2

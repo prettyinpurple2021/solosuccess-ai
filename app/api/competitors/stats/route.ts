@@ -4,7 +4,7 @@ import { competitorProfiles, competitorAlerts, intelligenceData } from '@/db/sch
 import { authenticateRequest } from '@/lib/auth-server'
 import { eq, and, count, gte } from 'drizzle-orm'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
     

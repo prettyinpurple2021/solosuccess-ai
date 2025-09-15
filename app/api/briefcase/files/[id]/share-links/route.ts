@@ -81,7 +81,7 @@ export async function POST(
       downloadEnabled, 
       maxAccess, 
       requireAuth, 
-      trackAccess 
+      _trackAccess 
     } = await request.json()
 
     if (!permissions) {
