@@ -3,7 +3,7 @@ import { AgentSecurityManager } from '@/lib/custom-ai-agents/security/agent-secu
 import { SecurityMiddleware } from '@/lib/custom-ai-agents/security/security-middleware'
 
 const securityManager = AgentSecurityManager.getInstance()
-const securityMiddleware = new SecurityMiddleware()
+const _securityMiddleware = new SecurityMiddleware()
 
 export async function GET(request: NextRequest) {
   try {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 async function getSecurityMetrics(request: NextRequest) {
   try {
     // Basic authentication check
-    const userId = request.headers.get('x-user-id') || 'default-user'
+    const _userId = request.headers.get('x-user-id') || 'default-user'
     
     const metrics = await securityManager.getSecurityMetrics()
     
@@ -85,7 +85,7 @@ async function getSecurityMetrics(request: NextRequest) {
 
 async function getUserPermissions(request: NextRequest) {
   try {
-    const userId = request.headers.get('x-user-id') || 'default-user'
+    const _userId = request.headers.get('x-user-id') || 'default-user'
     const agentId = request.nextUrl.searchParams.get('agentId')
 
     if (!agentId) {
@@ -149,7 +149,7 @@ async function getUserPermissions(request: NextRequest) {
   }
 }
 
-async function getSecurityConfig(request: NextRequest) {
+async function getSecurityConfig(_request: NextRequest) {
   try {
     const config = await securityManager.getSecurityConfig()
     

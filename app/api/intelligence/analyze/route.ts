@@ -4,9 +4,9 @@ import { intelligenceData, competitorProfiles } from '@/db/schema'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
-import { eq, and, inArray, gte, desc } from 'drizzle-orm'
+import { eq, and, inArray, _gte, _desc } from 'drizzle-orm'
 import type { 
-  IntelligenceData,
+  _IntelligenceData,
   AnalysisResult,
   ExtractedData,
   SourceType,
@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
     // Update intelligence entries with new analysis results
     const updatePromises = intelligence.map(async (item) => {
       const existingAnalysisResults = (item.intelligence.analysis_results as AnalysisResult[]) || []
-      const newAnalysisResults = analysisResults.filter(result => 
+      const newAnalysisResults = analysisResults.filter(_result => 
         // Add analysis results to all entries for now - in production you'd be more selective
         true
       )

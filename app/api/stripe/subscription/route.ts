@@ -7,7 +7,7 @@ import { stripe } from '@/lib/stripe'
 export const dynamic = 'force-dynamic'
 
 // GET - Get user's subscription details
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Authentication
     const { user, error } = await authenticateRequest()
