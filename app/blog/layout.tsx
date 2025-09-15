@@ -50,7 +50,7 @@ export default function BlogLayout({ children }: { children: ReactNode }) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const h = headers()
+  const h = await headers()
   const acceptLang = h.get('accept-language') || 'en'
   const locale = acceptLang.split(',')[0]?.toLowerCase() || 'en'
   const localizedTitle = locale.startsWith('en')
