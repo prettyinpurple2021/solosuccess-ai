@@ -9,16 +9,34 @@ import webpush from 'web-push'
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// Configure web-push with VAPID keys
-const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa40HvcCXvbdliMKvaV4MV8A3wfUFHVN1oNPROl56W4gNqVIwOqhH7nJ1EIIvg'
-const privateVapidKey = process.env.VAPID_PRIVATE_KEY || 'your-private-key-here'
+// VAPID configuration - deferred to runtime
+let vapidConfigured = false
 
-if (publicVapidKey && privateVapidKey) {
-  webpush.setVapidDetails(
-    'mailto:prettyinpurple2021@gmail.com',
-    publicVapidKey,
-    privateVapidKey
-  )
+// Function to configure VAPID keys at runtime
+function ensureVapidConfigured(): boolean {
+  if (vapidConfigured) return true
+  
+  const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+  const privateVapidKey = process.env.VAPID_PRIVATE_KEY
+  
+  if (publicVapidKey && privateVapidKey && privateVapidKey !== 'your-private-key-here' && privateVapidKey.length > 20) {
+    try {
+      webpush.setVapidDetails(
+        'mailto:prettyinpurple2021@gmail.com',
+        publicVapidKey,
+        privateVapidKey
+      )
+      vapidConfigured = true
+      console.log('✅ VAPID keys configured successfully')
+      return true
+    } catch (error) {
+      console.warn('⚠️ VAPID configuration failed:', error.message)
+      return false
+    }
+  } else {
+    console.warn('⚠️ VAPID keys not configured - push notifications disabled')
+    return false
+  }
 }
 
 const notificationSchema = z.object({
@@ -208,6 +226,14 @@ export async function POST(request: NextRequest) {
       requireInteraction: notification.requireInteraction,
       silent: notification.silent,
       vibrate: notification.vibrate || [200, 100, 200]
+    }
+
+    // Ensure VAPID is configured before sending
+    if (!ensureVapidConfigured()) {
+      return NextResponse.json(
+        { error: 'Push notifications not configured - invalid VAPID keys' },
+        { status: 503 }
+      )
     }
 
     // Send notifications
