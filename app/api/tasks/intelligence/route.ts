@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { authenticateRequest } from '@/lib/auth-server'
+import { createClient } from '@/lib/neon/server'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 // Input validation schema
 const TaskIntelligenceRequestSchema = z.object({
@@ -42,17 +38,10 @@ const TaskIntelligenceRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Get user from session
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader) {
+    // Authenticate user via JWT
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
-    }
-
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     // Parse and validate request body
@@ -67,16 +56,12 @@ export async function POST(request: NextRequest) {
       validatedData.tasks as TaskIntelligenceData[]
     )
 
-    // Log usage for analytics
-    await supabase
-      .from('ai_usage_logs')
-      .insert({
-        user_id: user.id,
-        feature: 'task_intelligence',
-        request_type: 'optimize_tasks',
-        task_count: validatedData.tasks.length,
-        created_at: new Date().toISOString()
-      })
+    // Log usage for analytics in Postgres (Neon)
+    const client = await createClient()
+    await client.query(
+      'INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at) VALUES ($1, $2, $3, $4, $5)',
+      [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date().toISOString()]
+    )
 
     return NextResponse.json({
       success: true,
@@ -113,31 +98,18 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user from session
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader) {
+    // Authenticate user via JWT
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
       return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
     }
 
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-
-    // Get user's recent AI usage stats
-    const { data: usageStats, error: statsError } = await supabase
-      .from('ai_usage_logs')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('feature', 'task_intelligence')
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    if (statsError) {
-      console.error('Error fetching usage stats:', statsError)
-    }
+    // Get user's recent AI usage stats from Postgres (Neon)
+    const client = await createClient()
+    const { rows: usageStats } = await client.query(
+      'SELECT * FROM ai_usage_logs WHERE user_id = $1 AND feature = $2 ORDER BY created_at DESC LIMIT 10',
+      [user.id, 'task_intelligence']
+    )
 
     return NextResponse.json({
       success: true,
