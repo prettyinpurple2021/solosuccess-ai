@@ -225,7 +225,7 @@ export class NovaProductIntelligence {
   /**
    * Predict product roadmap based on competitor development patterns
    */
-  async predictProductRoadmap(competitorId: number, userId?: string): Promise<ProductRoadmapPrediction> {
+  async predictProductRoadmap(competitorId: number, userId?: string): Promise<RoadmapPrediction> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const hiringData = await this.getHiringIntelligence(competitorId, 180)
     const productData = await this.getWebsiteIntelligence(competitorId, 180)
