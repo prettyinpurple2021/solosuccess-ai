@@ -1,15 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useState, useEffect} from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import { 
   Target, 
   CheckSquare, 
@@ -21,6 +21,7 @@ import {
   Brain
 } from "lucide-react"
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
+import VoiceTaskCreator from "@/components/tasks/voice-task-creator"
 import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
 
 interface Goal {
@@ -53,6 +54,7 @@ export default function SlaylistPage() {
   const [loading, setLoading] = useState(true)
   const [showGoalDialog, setShowGoalDialog] = useState(false)
   const [showTaskDialog, setShowTaskDialog] = useState(false)
+  const [showVoiceTaskDialog, setShowVoiceTaskDialog] = useState(false)
   const [_selectedGoal, _setSelectedGoal] = useState<Goal | null>(null)
   
   // Form states
@@ -150,6 +152,32 @@ export default function SlaylistPage() {
       }
     } catch (error) {
       console.error('Error creating task:', error)
+    }
+  }
+
+  const createVoiceTask = async (taskData: {
+    title: string
+    description: string
+    priority: string
+    due_date: string
+    goal_id: string
+    estimated_minutes: number
+  }) => {
+    try {
+      const response = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(taskData)
+      })
+      
+      if (response.ok) {
+        await fetchTasks()
+      } else {
+        throw new Error('Failed to create task')
+      }
+    } catch (error) {
+      console.error('Error creating voice task:', error)
+      throw error
     }
   }
 
@@ -255,6 +283,14 @@ export default function SlaylistPage() {
           <p className="text-gray-600">Manage your goals and tasks to dominate your empire</p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            onClick={() => setShowVoiceTaskDialog(true)}
+            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+          >
+            <Mic className="w-4 h-4 mr-2" />
+            Voice Task
+          </Button>
+          
           <Dialog open={showGoalDialog} onOpenChange={setShowGoalDialog}>
             <DialogTrigger asChild>
               <Button className="bg-purple-600 hover:bg-purple-700">
@@ -616,6 +652,18 @@ export default function SlaylistPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Voice Task Creator Dialog */}
+      <VoiceTaskCreator
+        open={showVoiceTaskDialog}
+        onOpenChange={setShowVoiceTaskDialog}
+        onCreateTask={createVoiceTask}
+        goals={goals.map(goal => ({
+          id: goal.id,
+          title: goal.title,
+          category: goal.category || 'general'
+        }))}
+      />
     </div>
   )
 }

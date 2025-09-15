@@ -1,24 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState, useEffect} from "react"
+import { Card, CardContent} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import type { Achievement, LevelInfo } from "@/lib/gamification-system"
 import {
-  Trophy,
-  Star,
-  Crown,
-  Sparkles,
-  Target,
-  Users,
-  Flame,
-  CheckCircle,
-  Gift,
-  PartyPopper,
-  ArrowRight,
-} from "lucide-react"
+  Trophy, Star, Crown, Sparkles, Target, Users, Flame, CheckCircle, Gift, PartyPopper, ArrowRight, } from "lucide-react"
 
 interface AchievementCelebrationProps {
   achievement: Achievement | null

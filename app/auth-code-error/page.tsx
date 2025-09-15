@@ -1,6 +1,6 @@
-import { Metadata } from 'next'
+import { Metadata} from 'next'
 import Link from 'next/link'
-import { AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, RefreshCw} from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Authentication Error - SoloSuccess AI',

@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, Lock, Zap, Crown } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect} from 'react'
+import { useAuth} from '@/hooks/use-auth'
+import { Button} from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Badge} from '@/components/ui/badge'
+import { Loader2, Lock, Zap, Crown} from 'lucide-react'
+import { useRouter} from 'next/navigation'
 
 interface SubscriptionGuardProps {
   children: React.ReactNode

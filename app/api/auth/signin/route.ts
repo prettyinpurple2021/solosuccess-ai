@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse} from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { neon } from '@neondatabase/serverless'
+import { neon} from '@neondatabase/serverless'
 
 function getSql() {
   const url = process.env.DATABASE_URL

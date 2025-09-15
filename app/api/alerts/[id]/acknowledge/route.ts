@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/db'
-import { competitorAlerts } from '@/db/schema'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { eq, and } from 'drizzle-orm'
+import { NextRequest, NextResponse} from 'next/server'
+import { db} from '@/db'
+import { competitorAlerts} from '@/db/schema'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { eq, and} from 'drizzle-orm'
 import type { AlertSeverity, ActionItem, Recommendation } from '@/lib/competitor-intelligence-types'
 
 // Force dynamic rendering

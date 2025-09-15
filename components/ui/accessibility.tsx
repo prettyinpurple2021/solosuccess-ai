@@ -1,23 +1,12 @@
 "use client"
 
-import { useState, useEffect, createContext, useContext } from "react"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect, createContext, useContext} from "react"
+import { Button} from "@/components/ui/button"
+import { Switch} from "@/components/ui/switch"
+import { Label} from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import { 
-  Eye, 
-  EyeOff, 
-  Volume2, 
-  VolumeX, 
-  Keyboard, 
-  MousePointer,
-  Accessibility,
-  Settings,
-  Sun,
-  Moon,
-  Contrast
-} from "lucide-react"
+  Eye, EyeOff, Volume2, VolumeX, Keyboard, MousePointer, Accessibility, Settings, Sun, Moon, Contrast} from "lucide-react"
 
 interface AccessibilityContextType {
   highContrast: boolean

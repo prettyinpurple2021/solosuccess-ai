@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Users, TrendingUp, Calculator, FileText, Brain, Target } from "lucide-react"
-import { FirstHireArchitect } from "./first-hire-architect"
-import { CompensationModeler } from "./compensation-modeler"
+import { useState} from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { Users, TrendingUp, Calculator, FileText, Brain, Target} from "lucide-react"
+import { FirstHireArchitect} from "./first-hire-architect"
+import { CompensationModeler} from "./compensation-modeler"
 
 interface ScalingMetrics {
   currentTeamSize: number

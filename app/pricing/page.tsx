@@ -1,8 +1,8 @@
 'use client'
 
-import { PricingCards } from '@/components/subscription/pricing-cards'
-import { Button } from '@/components/ui/button'
-import { Sparkles } from 'lucide-react'
+import { PricingCards} from '@/components/subscription/pricing-cards'
+import { Button} from '@/components/ui/button'
+import { Sparkles} from 'lucide-react'
 
 export default function PricingPage() {
   return (

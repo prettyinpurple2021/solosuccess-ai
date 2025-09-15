@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
-import { ArrowLeft, Crown, CheckCircle, AlertTriangle, XCircle, Clock, Zap, Shield, Database, Globe, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect} from "react"
+import { ArrowLeft, Crown, CheckCircle, AlertTriangle, XCircle, Clock, Zap, Shield, Database, Globe, Mail} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
 
 interface ServiceStatus {
   name: string

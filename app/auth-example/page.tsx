@@ -1,8 +1,8 @@
 'use client'
 
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { useEffect, useState} from "react"
 
 export default function AuthExamplePage() {
   const [mounted, setMounted] = useState(false)

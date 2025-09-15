@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button} from '@/components/ui/button';
+import { Input} from '@/components/ui/input';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
-import { useTemplateSave } from '@/hooks/use-template-save';
-import { Save, Grid3X3, Plus, Trash2, Check, X } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import { Badge} from '@/components/ui/badge';
+import { useState} from 'react';
+import { useTemplateSave} from '@/hooks/use-template-save';
+import { Save, Grid3X3, Plus, Trash2, Check, X} from 'lucide-react';
 
 interface Offer {
   name: string;

@@ -1,40 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect} from "react"
+import { motion} from "framer-motion"
 import { 
-  Clock, 
-  Activity, 
-  Globe, 
-  Users, 
-  TrendingUp,
-  AlertTriangle,
-  Zap,
-  Eye,
-  Calendar,
-  Filter,
-  Search,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink
-} from "lucide-react"
+  Clock, Activity, Globe, Users, TrendingUp, AlertTriangle, Zap, Eye, Calendar, Filter, Search, ChevronDown, ChevronUp, ExternalLink} from "lucide-react"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Badge} from "@/components/ui/badge"
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+  Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible"
 
 interface TimelineEvent {
   id: string

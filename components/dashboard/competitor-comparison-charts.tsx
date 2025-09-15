@@ -1,33 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect} from "react"
+import { motion} from "framer-motion"
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  DollarSign,
-  Globe,
-  Calendar,
-  Target,
-  Zap,
-  ArrowUp,
-  ArrowDown,
-  Minus,
-  Filter
-} from "lucide-react"
+  BarChart3, TrendingUp, Users, DollarSign, Globe, Calendar, Target, Zap, ArrowUp, ArrowDown, Minus, Filter} from "lucide-react"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton } from "@/components/ui/boss-button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton} from "@/components/ui/boss-button"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
 interface CompetitorMetrics {
   id: number

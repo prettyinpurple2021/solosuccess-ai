@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { ArrowLeft, Search, MessageCircle, Video, Mail, ExternalLink, ChevronDown, ChevronRight, HelpCircle, Lightbulb, Zap, Users, Settings } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useState} from "react"
+import { ArrowLeft, Search, MessageCircle, Video, Mail, ExternalLink, ChevronDown, ChevronRight, HelpCircle, Lightbulb, Zap, Users, Settings} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
+import { Input} from "@/components/ui/input"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible"
 
 interface FAQItem {
   id: string

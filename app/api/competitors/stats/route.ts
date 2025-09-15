@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/db'
-import { competitorProfiles, competitorAlerts, intelligenceData } from '@/db/schema'
-import { authenticateRequest } from '@/lib/auth-server'
-import { eq, and, count, gte } from 'drizzle-orm'
+import { NextRequest, NextResponse} from 'next/server'
+import { db} from '@/db'
+import { competitorProfiles, competitorAlerts, intelligenceData} from '@/db/schema'
+import { authenticateRequest} from '@/lib/auth-server'
+import { eq, and, count, gte} from 'drizzle-orm'
 
 export async function GET(_request: NextRequest) {
   try {

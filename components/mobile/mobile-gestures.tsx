@@ -2,22 +2,11 @@
 
 import type React from "react"
 
-import { useState, useRef, useCallback } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState, useRef, useCallback} from "react"
+import { Card, CardContent} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
 import {
-  Smartphone,
-  ShuffleIcon as Swipe,
-  Sparkles,
-  TouchpadOff,
-  Heart,
-  Star,
-  Zap,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight
-} from "lucide-react"
+  Smartphone, ShuffleIcon as Swipe, Sparkles, TouchpadOff, Heart, Star, Zap, ArrowUp, ArrowDown, ArrowLeft, ArrowRight} from "lucide-react"
 
 interface SwipeGesture {
   direction: "up" | "down" | "left" | "right"

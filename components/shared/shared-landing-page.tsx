@@ -1,31 +1,19 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { ResponsiveImage } from "@/components/ui/responsive-image"
+import { useState} from "react"
+import { motion, AnimatePresence} from "framer-motion"
+import { useRouter} from "next/navigation"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
+import { Separator} from "@/components/ui/separator"
+import { ThemeToggle} from "@/components/theme-toggle"
+import { ResponsiveImage} from "@/components/ui/responsive-image"
 import {
-  ArrowRight,
-  Sparkles,
-  Zap,
-  Target,
-  Users,
-  TrendingUp,
-  Shield,
-  Star,
-  CheckCircle,
-  X,
-  Menu,
-  Play
-} from "lucide-react"
+  ArrowRight, Sparkles, Zap, Target, Users, TrendingUp, Shield, Star, CheckCircle, X, Menu, Play} from "lucide-react"
 
 import Link from "next/link"
-import { ScheduleDemoModal } from "@/components/schedule/schedule-demo-modal"
+import { ScheduleDemoModal} from "@/components/schedule/schedule-demo-modal"
 
 interface SharedLandingPageProps {
   showAuthModal?: boolean

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getScrapingSystemHealth } from '@/lib/scraping-startup'
-import { queueProcessor } from '@/lib/scraping-queue-processor'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
+import { NextRequest, NextResponse} from 'next/server'
+import { getScrapingSystemHealth} from '@/lib/scraping-startup'
+import { queueProcessor} from '@/lib/scraping-queue-processor'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
