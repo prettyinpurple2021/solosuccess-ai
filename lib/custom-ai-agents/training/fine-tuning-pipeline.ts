@@ -23,7 +23,7 @@ export interface FineTuningParameters {
   learningRate: number
   batchSize: number
   temperature: number
-  maxTokens: number
+  maxOutputTokens: number
   customPrompts: string[]
   dataFilters: {
     minRating?: number
@@ -440,7 +440,7 @@ export class FineTuningPipeline {
         learningRate: 0.0001,
         batchSize: 32,
         temperature: 0.7,
-        maxTokens: 1000,
+        maxOutputTokens: 1000,
         customPrompts: [],
         dataFilters: {}
       }

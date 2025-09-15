@@ -323,7 +323,7 @@ export class NovaProductIntelligence {
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
-      maxTokens: 2500,
+      maxOutputTokens: 2500,
     })
 
     const analysis = this.parseProductFeatureAnalysis(text, competitorId)
@@ -346,7 +346,7 @@ export class NovaProductIntelligence {
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     const analysis = this.parseUXAnalysis(text, competitorId)
@@ -377,7 +377,7 @@ export class NovaProductIntelligence {
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.8,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     const gaps = this.parseProductGapAnalysis(text)
@@ -408,7 +408,7 @@ export class NovaProductIntelligence {
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
-      maxTokens: 1800,
+      maxOutputTokens: 1800,
     })
 
     const patterns = this.parseDesignPatternAnalysis(text)
@@ -441,7 +441,7 @@ export class NovaProductIntelligence {
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,
-      maxTokens: 2200,
+      maxOutputTokens: 2200,
     })
 
     const prediction = this.parseRoadmapPrediction(text, competitorId)
@@ -474,7 +474,7 @@ export class NovaProductIntelligence {
       model: this.novaConfig.model as any,
       prompt: briefingPrompt,
       temperature: 0.7,
-      maxTokens: 2800,
+      maxOutputTokens: 2800,
     })
 
     return text
