@@ -189,9 +189,7 @@ Be specific, actionable, and maintain your ${this.name} personality.`
       const { text } = await generateText({
         model: this.model as any,
         prompt: fullPrompt,
-        temperature: 0.7,
-        maxTokens: 1000
-      })
+        temperature: 0.7,})
 
       // Parse the response (in a real implementation, you'd want more robust parsing)
       const lines = text.split('\n').filter(line => line.trim())

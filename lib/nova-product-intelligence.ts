@@ -322,9 +322,7 @@ export class NovaProductIntelligence {
     const { text } = await generateText({
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2500,
-    })
+      temperature: 0.7,})
 
     const analysis = this.parseProductFeatureAnalysis(text, competitorId)
     await this.storeProductIntelligence(competitorId, 'product_features', analysis, userId)
@@ -345,9 +343,7 @@ export class NovaProductIntelligence {
     const { text } = await generateText({
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2000,
-    })
+      temperature: 0.7,})
 
     const analysis = this.parseUXAnalysis(text, competitorId)
     await this.storeProductIntelligence(competitorId, 'ux_trends', analysis, userId)
@@ -376,9 +372,7 @@ export class NovaProductIntelligence {
     const { text } = await generateText({
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.8,
-      maxTokens: 2000,
-    })
+      temperature: 0.8,})
 
     const gaps = this.parseProductGapAnalysis(text)
 
@@ -407,9 +401,7 @@ export class NovaProductIntelligence {
     const { text } = await generateText({
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 1800,
-    })
+      temperature: 0.7,})
 
     const patterns = this.parseDesignPatternAnalysis(text)
 
@@ -440,9 +432,7 @@ export class NovaProductIntelligence {
     const { text } = await generateText({
       model: this.novaConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2200,
-    })
+      temperature: 0.7,})
 
     const prediction = this.parseRoadmapPrediction(text, competitorId)
     await this.storeProductIntelligence(competitorId, 'roadmap_prediction', prediction, userId || '')
@@ -473,9 +463,7 @@ export class NovaProductIntelligence {
     const { text } = await generateText({
       model: this.novaConfig.model as any,
       prompt: briefingPrompt,
-      temperature: 0.7,
-      maxTokens: 2800,
-    })
+      temperature: 0.7,})
 
     return text
   }

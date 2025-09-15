@@ -314,9 +314,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
-        temperature: 0.7,
-        maxTokens: 2000
-      })
+        temperature: 0.7,})
 
       // Parse and structure the analysis
       const analysis = this.parsePricingAnalysis(response.text, competitorId)
@@ -384,9 +382,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
-        temperature: 0.6,
-        maxTokens: 1500
-      })
+        temperature: 0.6,})
 
       return this.parseGrowthRecommendations(response.text, competitorId)
     } catch (error) {
@@ -463,9 +459,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
-        temperature: 0.7,
-        maxTokens: 2000
-      })
+        temperature: 0.7,})
 
       return this.parseGrowthPatternAnalysis(response.text, competitorId)
     } catch (error) {
@@ -542,9 +536,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
-        temperature: 0.6,
-        maxTokens: 1800
-      })
+        temperature: 0.6,})
 
       return this.parseGrowthRecommendations(response.text, competitorIds[0])
     } catch (error) {
@@ -600,9 +592,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
-        temperature: 0.6,
-        maxTokens: 1500
-      })
+        temperature: 0.6,})
 
       return this.parseGrowthRecommendations(response.text, competitorId)
     } catch (error) {

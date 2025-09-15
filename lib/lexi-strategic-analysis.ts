@@ -312,9 +312,7 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.6,
-      maxTokens: 2500,
-    })
+      temperature: 0.6,})
 
     const analysis = this.parsePositioningAnalysis(text, competitorId)
     await this.storeStrategicAnalysis(competitorId, 'competitive_positioning', analysis, userId)
@@ -341,9 +339,7 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2500,
-    })
+      temperature: 0.7,})
 
     const analysis = this.parseMarketTrendAnalysis(text)
     
@@ -374,9 +370,7 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2000,
-    })
+      temperature: 0.7,})
 
     const analysis = this.parseStrategicMoveAnalysis(text, competitorId)
     await this.storeStrategicAnalysis(competitorId, 'strategic_moves', analysis, userId)
@@ -397,9 +391,7 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.6,
-      maxTokens: 2000,
-    })
+      temperature: 0.6,})
 
     const assessment = this.parseThreatAssessment(text, competitorId)
     await this.storeStrategicAnalysis(competitorId, 'threat_assessment', assessment, userId)
@@ -424,9 +416,7 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.8,
-      maxTokens: 2000,
-    })
+      temperature: 0.8,})
 
     const opportunities = this.parseOpportunityAnalysis(text)
 
@@ -461,9 +451,7 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: briefingPrompt,
-      temperature: 0.7,
-      maxTokens: 3000,
-    })
+      temperature: 0.7,})
 
     return text
   }

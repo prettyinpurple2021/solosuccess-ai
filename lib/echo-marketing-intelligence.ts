@@ -175,9 +175,7 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2000,
-    })
+      temperature: 0.7,})
 
     // Parse Echo's response into structured analysis
     const analysis = this.parseContentStrategyAnalysis(text, competitorId)
@@ -200,9 +198,7 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.6,
-      maxTokens: 1500,
-    })
+      temperature: 0.6,})
 
     const analysis = this.parseBrandPositioningAnalysis(text, competitorId)
     await this.storeMarketingIntelligence(competitorId, 'brand_positioning', analysis)
@@ -223,9 +219,7 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,
-      maxTokens: 2000,
-    })
+      temperature: 0.7,})
 
     const analysis = this.parseCampaignEffectivenessAnalysis(text, competitorId)
     await this.storeMarketingIntelligence(competitorId, 'campaign_effectiveness', analysis)
@@ -250,9 +244,7 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.8,
-      maxTokens: 1500,
-    })
+      temperature: 0.8,})
 
     return this.parseContentGapAnalysis(text)
   }
@@ -276,9 +268,7 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: briefingPrompt,
-      temperature: 0.7,
-      maxTokens: 2500,
-    })
+      temperature: 0.7,})
 
     return text
   }

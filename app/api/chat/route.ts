@@ -113,9 +113,7 @@ export async function POST(request: NextRequest) {
           content: message
         }
       ],
-      temperature: 0.7,
-      maxTokens: 1500 // Increased for competitive intelligence context
-    })
+      temperature: 0.7,})
 
     // Update conversation with response
     const response = await result.text
@@ -124,7 +122,7 @@ export async function POST(request: NextRequest) {
       [response, conversation.id]
     )
 
-    return result.toDataStreamResponse()
+    return result.toTextStreamResponse()
   } catch (error) {
     console.error('Error in chat:', error)
     return NextResponse.json(
