@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react'
+import FaqSection from '@/components/faq/faq-section'
 
 export const metadata: Metadata = {
   title: 'Launch Plan — Free AI Co-founder for Solo Founders',
@@ -145,6 +146,16 @@ export default function LaunchPlanPage() {
           </div>
         </div>
       </div>
+      {/* FAQs */}
+      <FaqSection
+        id="faq-launch-plan"
+        title="Launch Plan FAQs"
+        items={[
+          { question: 'Is Launch really free?', answer: 'Yes. It is free forever with no credit card required.' },
+          { question: 'What do I get on Launch?', answer: 'Core AI assistants, basic automation, and community access to get started.' },
+          { question: 'Can I upgrade later?', answer: 'Anytime. Your data and settings carry over when you upgrade.' },
+        ]}
+      />
     </>
   )
 }

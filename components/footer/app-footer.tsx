@@ -15,6 +15,11 @@ const footerLinks = {
     { name: "Pricing", href: "/pricing" },
     { name: "System Status", href: "/status" },
   ],
+  popular: [
+    { name: "Launch (Free)", href: "/pricing/launch" },
+    { name: "Accelerator ($19/mo)", href: "/pricing/accelerator" },
+    { name: "Dominator ($29/mo)", href: "/pricing/dominator" },
+  ],
   company: [
     { name: "About SoloSuccess", href: "/about" },
     { name: "Boss Blog", href: "/blog" },
@@ -183,6 +188,23 @@ export function AppFooter() {
             <h3 className="font-bold text-gray-900 mb-4 empowering-text">Product 🚀</h3>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Popular Plans */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 empowering-text">Popular Plans ⭐</h3>
+            <ul className="space-y-3">
+              {footerLinks.popular.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react'
+import FaqSection from '@/components/faq/faq-section'
 
 export const metadata: Metadata = {
   title: 'Dominator Plan — Unlimited AI Business Co-pilot for Empire Builders',
@@ -151,6 +152,16 @@ export default function DominatorPlanPage() {
           </div>
         </div>
       </div>
+      {/* FAQs */}
+      <FaqSection
+        id="faq-dominator-plan"
+        title="Dominator Plan FAQs"
+        items={[
+          { question: 'Who is Dominator for?', answer: 'Founders who need unlimited scale, custom workflows, and white‑label options.' },
+          { question: 'Do you offer support SLAs?', answer: 'Yes, Dominator includes 24/7 priority and phone support.' },
+          { question: 'Can I request custom features?', answer: 'We offer bespoke solutions and API access—contact sales to scope.' },
+        ]}
+      />
     </>
   )
 }

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react'
+import FaqSection from '@/components/faq/faq-section'
 
 export const metadata: Metadata = {
   title: 'Accelerator Plan — AI Business Co-pilot for Growing Founders',
@@ -148,6 +149,16 @@ export default function AcceleratorPlanPage() {
           </div>
         </div>
       </div>
+      {/* FAQs */}
+      <FaqSection
+        id="faq-accelerator-plan"
+        title="Accelerator Plan FAQs"
+        items={[
+          { question: 'Who is Accelerator for?', answer: 'Growing founders needing more automation, analytics, and collaboration.' },
+          { question: 'Is there a trial?', answer: 'You can start on Launch and upgrade anytime—no lock‑in.' },
+          { question: 'Can I add team members?', answer: 'Yes, Accelerator supports small teams (up to 3).' },
+        ]}
+      />
     </>
   )
 }
