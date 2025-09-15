@@ -124,10 +124,15 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   ]
 
   const updateData = (section: keyof OnboardingData, updates: any) => {
-    setData((prev) => ({
-      ...prev,
-      [section]: { ...prev[section], ...updates },
-    }))
+    console.log(`Updating ${section}:`, updates)
+    setData((prev) => {
+      const newData = {
+        ...prev,
+        [section]: { ...prev[section], ...updates },
+      }
+      console.log('New data state:', newData)
+      return newData
+    })
   }
 
   const nextStep = () => {
@@ -145,18 +150,22 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   const toggleGoal = (goalId: string) => {
+    console.log('Toggling goal:', goalId, 'Current goals:', data.goals.primaryGoals)
     const currentGoals = data.goals.primaryGoals
     const newGoals = currentGoals.includes(goalId)
       ? currentGoals.filter((g) => g !== goalId)
       : [...currentGoals, goalId]
+    console.log('New goals:', newGoals)
     updateData("goals", { primaryGoals: newGoals })
   }
 
   const toggleAgent = (agentId: string) => {
+    console.log('Toggling agent:', agentId, 'Current agents:', data.aiTeam.selectedAgents)
     const currentAgents = data.aiTeam.selectedAgents
     const newAgents = currentAgents.includes(agentId)
       ? currentAgents.filter((a) => a !== agentId)
       : [...currentAgents, agentId]
+    console.log('New agents:', newAgents)
     updateData("aiTeam", { selectedAgents: newAgents })
   }
 
@@ -245,12 +254,16 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               {goalOptions.map((goal) => (
                 <Card
                   key={goal.id}
-                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md select-none active:scale-95 ${
                     data.goals.primaryGoals.includes(goal.id)
-                      ? "ring-2 ring-purple-500 bg-gradient-to-r from-purple-50 to-pink-50"
-                      : "hover:bg-purple-50/50"
+                      ? "ring-2 ring-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-md scale-[1.02]"
+                      : "hover:bg-purple-50/50 hover:shadow-sm hover:scale-[1.01]"
                   }`}
-                  onClick={() => toggleGoal(goal.id)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    toggleGoal(goal.id)
+                  }}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -302,12 +315,17 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                   ].map((style) => (
                     <Card
                       key={style.value}
-                      className={`cursor-pointer transition-all ${
+                      className={`cursor-pointer transition-all select-none ${
                         data.preferences.workStyle === style.value
-                          ? "ring-2 ring-purple-500 bg-purple-50"
-                          : "hover:bg-purple-50/50"
+                          ? "ring-2 ring-purple-500 bg-purple-50 shadow-md"
+                          : "hover:bg-purple-50/50 hover:shadow-sm"
                       }`}
-                      onClick={() => updateData("preferences", { workStyle: style.value })}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        console.log('Setting work style:', style.value)
+                        updateData("preferences", { workStyle: style.value })
+                      }}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
@@ -335,12 +353,17 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                   ].map((style) => (
                     <Card
                       key={style.value}
-                      className={`cursor-pointer transition-all ${
+                      className={`cursor-pointer transition-all select-none ${
                         data.preferences.communicationStyle === style.value
-                          ? "ring-2 ring-purple-500 bg-purple-50"
-                          : "hover:bg-purple-50/50"
+                          ? "ring-2 ring-purple-500 bg-purple-50 shadow-md"
+                          : "hover:bg-purple-50/50 hover:shadow-sm"
                       }`}
-                      onClick={() => updateData("preferences", { communicationStyle: style.value })}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        console.log('Setting communication style:', style.value)
+                        updateData("preferences", { communicationStyle: style.value })
+                      }}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
@@ -376,12 +399,16 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
               {agentOptions.map((agent) => (
                 <Card
                   key={agent.id}
-                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md select-none ${
                     data.aiTeam.selectedAgents.includes(agent.id)
-                      ? "ring-2 ring-purple-500 bg-gradient-to-r from-purple-50 to-pink-50"
-                      : "hover:bg-purple-50/50"
+                      ? "ring-2 ring-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-md"
+                      : "hover:bg-purple-50/50 hover:shadow-sm"
                   }`}
-                  onClick={() => toggleAgent(agent.id)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    toggleAgent(agent.id)
+                  }}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
@@ -517,8 +544,8 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto boss-card border-2 border-purple-200">
+    <Dialog open={open} onOpenChange={(newOpen) => !newOpen && onSkip()}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto boss-card border-2 border-purple-200" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
