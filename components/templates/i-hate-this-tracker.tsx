@@ -1,10 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import { useTemplateSave } from '@/hooks/use-template-save';
-import { Save, Trash2, AlertTriangle } from 'lucide-react';
+import { Button} from '@/components/ui/button';
+import { Input} from '@/components/ui/input';
+import { useState} from 'react';
+import { useTemplateSave} from '@/hooks/use-template-save';
+import { Save, Trash2, AlertTriangle} from 'lucide-react';
 
 export function IHateThisTracker() {
   const [items, setItems] = useState<string[]>([]);

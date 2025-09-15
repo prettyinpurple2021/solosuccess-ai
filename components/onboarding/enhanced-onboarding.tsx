@@ -1,28 +1,17 @@
 "use client"
 
-import { useState } from "react"
-import { OnboardingWizard } from "./onboarding-wizard"
-import { InteractiveTutorial } from "./interactive-tutorial"
-import { EnhancedWelcomeFlow } from "./enhanced-welcome-flow"
-import { FeatureDiscovery } from "./feature-discovery"
-import { ProgressiveOnboarding } from "./progressive-onboarding"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState} from "react"
+import { OnboardingWizard} from "./onboarding-wizard"
+import { InteractiveTutorial} from "./interactive-tutorial"
+import { EnhancedWelcomeFlow} from "./enhanced-welcome-flow"
+import { FeatureDiscovery} from "./feature-discovery"
+import { ProgressiveOnboarding} from "./progressive-onboarding"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
 import { 
-  Lightbulb,
-  CheckCircle,
-  Play,
-  SkipForward,
-  Rocket,
-  Crown,
-  Gift,
-  Users,
-  Target,
-  TrendingUp,
-  Sparkles
-} from "lucide-react"
+  Lightbulb, CheckCircle, Play, SkipForward, Rocket, Crown, Gift, Users, Target, TrendingUp, Sparkles} from "lucide-react"
 
 interface EnhancedOnboardingProps {
   open: boolean

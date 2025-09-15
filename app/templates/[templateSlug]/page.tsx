@@ -1,7 +1,7 @@
-import { notFound } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { TemplateRenderer } from '@/components/templates/template-renderer'
+import { notFound} from 'next/navigation';
+import { Card, CardContent} from '@/components/ui/card';
+import { Badge} from '@/components/ui/badge';
+import { TemplateRenderer} from '@/components/templates/template-renderer'
 import templateData from '@/data/templates.json';
 
 // Helper function to find template in JSON data

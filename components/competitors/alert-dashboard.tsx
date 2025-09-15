@@ -1,31 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import { Badge} from '@/components/ui/badge';
+import { Button} from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import { ScrollArea} from '@/components/ui/scroll-area';
+import { Separator} from '@/components/ui/separator';
 import { 
-  Bell, 
-  AlertTriangle, 
-  AlertCircle, 
-  Info, 
-  CheckCircle2, 
-  Archive,
-  Filter,
-  RefreshCw,
-  TrendingUp,
-  DollarSign,
-  Users,
-  Newspaper,
-  Globe
-} from 'lucide-react';
-import { useCompetitorAlerts, CompetitorAlert, AlertStats } from '@/hooks/use-competitor-alerts';
-import { AlertSeverity, AlertType } from '@/lib/competitor-alert-system';
-import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+  Bell, AlertTriangle, AlertCircle, Info, CheckCircle2, Archive, Filter, RefreshCw, TrendingUp, DollarSign, Users, Newspaper, Globe} from 'lucide-react';
+import { useCompetitorAlerts, CompetitorAlert, AlertStats} from '@/hooks/use-competitor-alerts';
+import { AlertSeverity, AlertType} from '@/lib/competitor-alert-system';
+import { cn} from '@/lib/utils';
+import { formatDistanceToNow} from 'date-fns';
 
 interface AlertDashboardProps {
   className?: string;

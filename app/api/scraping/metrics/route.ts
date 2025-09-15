@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { scrapingScheduler } from '@/lib/scraping-scheduler'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { scrapingScheduler} from '@/lib/scraping-scheduler'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

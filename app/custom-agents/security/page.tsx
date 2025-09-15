@@ -1,5 +1,5 @@
-import { Metadata } from 'next'
-import { SecurityDashboard } from '@/components/custom-agents/security-dashboard'
+import { Metadata} from 'next'
+import { SecurityDashboard} from '@/components/custom-agents/security-dashboard'
 
 export const metadata: Metadata = {
   title: 'Agent Security Dashboard | SoloSuccess AI',

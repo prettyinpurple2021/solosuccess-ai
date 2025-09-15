@@ -1,31 +1,18 @@
 "use client"
 
-import { useState, type DragEvent, type ChangeEvent } from "react"
-import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useState, type DragEvent, type ChangeEvent} from "react"
+import { motion} from "framer-motion"
+import { useRouter} from "next/navigation"
 import { 
-  ArrowLeft, 
-  Upload, 
-  Download, 
-  CheckCircle, 
-  AlertTriangle,
-  X,
-  Trash2
-} from "lucide-react"
+  ArrowLeft, Upload, Download, CheckCircle, AlertTriangle, X, Trash2} from "lucide-react"
 import Link from "next/link"
 
-import { EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Badge} from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 
 interface ImportedCompetitor {
   id: string

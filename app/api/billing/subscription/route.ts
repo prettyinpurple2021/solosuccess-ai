@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getClient } from '@/lib/neon/client'
+import { NextRequest, NextResponse} from 'next/server'
+import { getClient} from '@/lib/neon/client'
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId')

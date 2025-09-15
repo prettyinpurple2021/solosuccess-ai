@@ -2,27 +2,14 @@
 
 import type * as React from "react"
 import {
-  AudioWaveform,
-  Bot,
-  Command,
-  GalleryVerticalEnd,
-  SquareTerminal,
-  Briefcase,
-  Palette,
-  Target,
-  Shield,
-  CheckSquare,
-  FileText,
-  Eye,
-  Focus,
-} from "lucide-react"
+  AudioWaveform, Bot, Command, GalleryVerticalEnd, SquareTerminal, Briefcase, Palette, Target, Shield, CheckSquare, FileText, Eye, Focus, } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
-import { useAuth } from "@/hooks/use-auth"
+import { NavMain} from "@/components/nav-main"
+import { NavProjects} from "@/components/nav-projects"
+import { NavUser} from "@/components/nav-user"
+import { TeamSwitcher} from "@/components/team-switcher"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail} from "@/components/ui/sidebar"
+import { useAuth} from "@/hooks/use-auth"
 
 // This is sample data.
 const data = {

@@ -1,22 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState, useEffect} from "react"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Alert, AlertDescription} from "@/components/ui/alert"
 import { 
-  AlertTriangle, 
-  RefreshCw, 
-  Wifi, 
-  WifiOff, 
-  X, 
-  Info,
-  CheckCircle,
-  Clock,
-  Zap,
-  Lightbulb
-} from "lucide-react"
+  AlertTriangle, RefreshCw, Wifi, WifiOff, X, Info, CheckCircle, Clock, Zap, Lightbulb} from "lucide-react"
 
 interface ErrorInfo {
   id: string

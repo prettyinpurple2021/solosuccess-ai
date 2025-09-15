@@ -1,32 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useDashboardData } from "@/hooks/use-dashboard-data"
-import { useAuth } from "@/hooks/use-auth"
-import { useAnalytics, usePageTracking, usePerformanceTracking } from "@/hooks/use-analytics"
-import { EnhancedOnboarding } from "@/components/onboarding/enhanced-onboarding"
-import { WelcomeDashboard } from "@/components/onboarding/welcome-dashboard"
-import { Loading } from "@/components/ui/loading"
-import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Progress } from "@/components/ui/progress"
-import { motion, easeOut } from "framer-motion"
+import { useState, useEffect} from "react"
+import { useDashboardData} from "@/hooks/use-dashboard-data"
+import { useAuth} from "@/hooks/use-auth"
+import { useAnalytics, usePageTracking, usePerformanceTracking} from "@/hooks/use-analytics"
+import { EnhancedOnboarding} from "@/components/onboarding/enhanced-onboarding"
+import { WelcomeDashboard} from "@/components/onboarding/welcome-dashboard"
+import { Loading} from "@/components/ui/loading"
+import { BossCard, EmpowermentCard, StatsCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Progress} from "@/components/ui/progress"
+import { motion, easeOut} from "framer-motion"
 import { 
-  CheckCircle, 
-  Target, 
-  Clock, 
-  MessageCircle, 
-  Trophy,
-  Crown,
-  Sparkles,
-  Flame,
-  ArrowRight,
-  BarChart3,
-  Plus,
-  Briefcase
-} from "lucide-react"
+  CheckCircle, Target, Clock, MessageCircle, Trophy, Crown, Sparkles, Flame, ArrowRight, BarChart3, Plus, Briefcase} from "lucide-react"
 import Link from "next/link"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams, useRouter} from "next/navigation"
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()

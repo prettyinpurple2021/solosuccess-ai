@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { createClient } from '@/lib/neon/server'
-import { z } from 'zod'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { createClient} from '@/lib/neon/server'
+import { z} from 'zod'
 
 // POST /api/tasks/bulk-update
 // Body: { ids: string[], status?: string, priority?: string }

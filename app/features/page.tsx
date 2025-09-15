@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, Crown, Brain, Target, Sparkles, Zap, TrendingUp, Shield, Users, Briefcase, Calendar, MessageCircle, Palette, Focus, CheckCircle, Play } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, Crown, Brain, Target, Sparkles, Zap, TrendingUp, Shield, Users, Briefcase, Calendar, MessageCircle, Palette, Focus, CheckCircle, Play} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 
 export default function FeaturesPage() {
   const aiAgents = [

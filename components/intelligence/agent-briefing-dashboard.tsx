@@ -1,28 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { useIntelligenceBriefings } from '@/hooks/use-intelligence-briefings'
-import { AgentBriefing } from '@/lib/agent-intelligence-briefings'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Button} from '@/components/ui/button'
+import { Badge} from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
+import { ScrollArea} from '@/components/ui/scroll-area'
+import { Separator} from '@/components/ui/separator'
+import { useIntelligenceBriefings} from '@/hooks/use-intelligence-briefings'
+import { AgentBriefing} from '@/lib/agent-intelligence-briefings'
 import { 
-  User, 
-  Brain, 
-  Palette, 
-  TrendingUp, 
-  Users,
-  Loader2,
-  RefreshCw,
-  AlertTriangle,
-  Target,
-  Lightbulb,
-  CheckCircle
-} from 'lucide-react'
-import { format } from 'date-fns'
+  User, Brain, Palette, TrendingUp, Users, Loader2, RefreshCw, AlertTriangle, Target, Lightbulb, CheckCircle} from 'lucide-react'
+import { format} from 'date-fns'
 
 interface AgentBriefingDashboardProps {
   competitorIds?: string[]

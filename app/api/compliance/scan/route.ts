@@ -1,7 +1,7 @@
 import '@/lib/server-polyfills'
-import { NextRequest, NextResponse } from 'next/server'
-import { Pool } from 'pg'
-import { analyze } from '@/lib/compliance-analyzer'
+import { NextRequest, NextResponse} from 'next/server'
+import { Pool} from 'pg'
+import { analyze} from '@/lib/compliance-analyzer'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 

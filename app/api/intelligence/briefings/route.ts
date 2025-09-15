@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { intelligenceBriefingService } from '@/lib/intelligence-briefing-system'
-import { z } from 'zod'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
+import { z} from 'zod'
 
 const briefingRequestSchema = z.object({
   briefingType: z.enum(['daily', 'weekly', 'monthly', 'on-demand']),
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = briefingRequestSchema.parse(body)
     
-    const { briefingType, competitorIds, topics, _customization } = validatedData
+    const { briefingType, competitorIds, topics, customization } = validatedData
     
     // Generate briefing based on type
     let briefing

@@ -1,32 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect, useRef} from "react"
+import { motion, AnimatePresence} from "framer-motion"
+import { Card, CardContent} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
 import { 
-  Sparkles, 
-  Target, 
-  Users, 
-  Brain,
-  FileText,
-  TrendingUp,
-  Zap,
-  Crown,
-  CheckCircle,
-  ArrowRight,
-  ArrowLeft,
-  Lightbulb,
-  Star,
-  Gift,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  X,
-  SkipForward
-} from "lucide-react"
+  Sparkles, Target, Users, Brain, FileText, TrendingUp, Zap, Crown, CheckCircle, ArrowRight, ArrowLeft, Lightbulb, Star, Gift, Play, Pause, Volume2, VolumeX, X, SkipForward} from "lucide-react"
 
 interface ProgressiveOnboardingProps {
   open: boolean

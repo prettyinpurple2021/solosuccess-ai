@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { AgentSecurityManager } from '@/lib/custom-ai-agents/security/agent-security-manager'
-import { SecurityMiddleware } from '@/lib/custom-ai-agents/security/security-middleware'
+import { NextRequest, NextResponse} from 'next/server'
+import { AgentSecurityManager} from '@/lib/custom-ai-agents/security/agent-security-manager'
+import { SecurityMiddleware} from '@/lib/custom-ai-agents/security/security-middleware'
 
 const securityManager = AgentSecurityManager.getInstance()
 const _securityMiddleware = new SecurityMiddleware()
@@ -97,7 +97,7 @@ async function getUserPermissions(request: NextRequest) {
 
     // Check if user has permission to view permissions
     const hasPermission = await securityManager.authorizeAgentAccess(
-      userId, 
+      _userId, 
       agentId, 
       'view_permissions'
     )
@@ -115,7 +115,7 @@ async function getUserPermissions(request: NextRequest) {
       SELECT permissions, restrictions, expires_at
       FROM agent_permissions 
       WHERE user_id = $1 AND agent_id = $2
-    `, [userId, agentId])
+    `, [_userId, agentId])
 
     if (result.rows.length === 0) {
       return NextResponse.json({

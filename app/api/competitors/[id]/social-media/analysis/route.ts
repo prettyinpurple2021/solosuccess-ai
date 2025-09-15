@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest } from '@/lib/auth-server';
-import { rateLimitByIp } from '@/lib/rate-limit';
-import { db } from '@/db';
-import { competitorProfiles, intelligenceData } from '@/db/schema';
-import { eq, and, desc, gte } from 'drizzle-orm';
-import { z } from 'zod';
+import { NextRequest, NextResponse} from 'next/server';
+import { authenticateRequest} from '@/lib/auth-server';
+import { rateLimitByIp} from '@/lib/rate-limit';
+import { db} from '@/db';
+import { competitorProfiles, intelligenceData} from '@/db/schema';
+import { eq, and, desc, gte} from 'drizzle-orm';
+import { z} from 'zod';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

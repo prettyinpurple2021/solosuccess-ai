@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { validateRecaptcha } from '@/lib/recaptcha'
+import { NextRequest, NextResponse} from 'next/server'
+import { validateRecaptcha} from '@/lib/recaptcha'
 
 export async function POST(request: NextRequest) {
   try {

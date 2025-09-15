@@ -1,7 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Crown, Sparkles } from "lucide-react"
+import { motion} from "framer-motion"
+import { Crown, Sparkles} from "lucide-react"
 
 interface LoadingProps {
   size?: "sm" | "md" | "lg"

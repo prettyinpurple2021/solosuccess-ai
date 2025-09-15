@@ -1,4 +1,4 @@
-import { EmpowermentCard } from "@/components/ui/boss-card"
+import { EmpowermentCard} from "@/components/ui/boss-card"
 
 export default function StackHandlerPage() {
   return (

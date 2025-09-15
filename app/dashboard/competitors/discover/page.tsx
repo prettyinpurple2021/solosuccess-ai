@@ -1,34 +1,19 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useState} from "react"
+import { motion} from "framer-motion"
+import { useRouter} from "next/navigation"
 import { 
-  ArrowLeft, 
-  Search, 
-  _Plus, 
-  _Eye, 
-  _Zap,
-  Globe,
-  Building,
-  Users,
-  DollarSign,
-  TrendingUp,
-  CheckCircle,
-  AlertTriangle,
-  Lightbulb,
-  Target,
-  _Sparkles
-} from "lucide-react"
+  ArrowLeft, Search, Plus, Eye, Zap, Globe, Building, Users, DollarSign, TrendingUp, CheckCircle, AlertTriangle, Lightbulb, Target, Sparkles} from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Loading } from "@/components/ui/loading"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
+import { Badge} from "@/components/ui/badge"
+import { Loading} from "@/components/ui/loading"
 
 interface CompetitorSuggestion {
   id: string

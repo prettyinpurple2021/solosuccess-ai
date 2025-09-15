@@ -1,5 +1,5 @@
-import { FeatureFlagTest } from '@/components/feature-flag-test'
-import { PostHogDebug } from '@/components/posthog-debug'
+import { FeatureFlagTest} from '@/components/feature-flag-test'
+import { PostHogDebug} from '@/components/posthog-debug'
 
 export default function FeatureTestPage() {
   return (

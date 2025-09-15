@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { intelligenceBriefingService } from '@/lib/intelligence-briefing-system'
-import { z } from 'zod'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
+import { z} from 'zod'
 
 const weeklyBriefingSchema = z.object({
   competitorIds: z.array(z.string()).optional()
