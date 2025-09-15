@@ -1,12 +1,12 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Calendar, Clock } from "lucide-react"
+import { useState} from "react"
+import { Button} from "@/components/ui/button"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
+import { Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog"
+import { Calendar, Clock} from "lucide-react"
 
 interface ScheduleDemoModalProps {
   isOpen: boolean

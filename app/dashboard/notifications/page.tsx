@@ -1,16 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import { useAuth } from "@/hooks/use-auth"
-import { Loading } from "@/components/ui/loading"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/hooks/use-toast"
-import { Bell, Mail, Smartphone, _Settings, Save } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState} from "react"
+import { useAuth} from "@/hooks/use-auth"
+import { Loading} from "@/components/ui/loading"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Switch} from "@/components/ui/switch"
+import { Label} from "@/components/ui/label"
+import { Separator} from "@/components/ui/separator"
+import { useToast} from "@/hooks/use-toast"
+import { Bell, Mail, Smartphone, Settings, Save} from "lucide-react"
+import { motion} from "framer-motion"
 
 export default function NotificationsPage() {
   const { user, loading } = useAuth()

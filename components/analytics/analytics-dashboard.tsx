@@ -1,23 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Progress } from '@/components/ui/progress'
+import { useState, useEffect} from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Badge} from '@/components/ui/badge'
+import { Button} from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
+import { Progress} from '@/components/ui/progress'
 import { 
-  Users, 
-  Activity, 
-  TrendingUp, 
-  Clock, 
-  Target, 
-  CheckCircle, 
-  AlertCircle,
-  BarChart3,
-  PieChart,
-  LineChart
-} from 'lucide-react'
+  Users, Activity, TrendingUp, Clock, Target, CheckCircle, AlertCircle, BarChart3, PieChart, LineChart} from 'lucide-react'
 
 interface AnalyticsData {
   events: any[]

@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
-import { useTemplateSave } from '@/hooks/use-template-save';
-import { Save, Star, Plus, Trash2, Copy } from 'lucide-react';
+import { Button} from '@/components/ui/button';
+import { Input} from '@/components/ui/input';
+import { Textarea} from '@/components/ui/textarea';
+import { Label} from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import { Badge} from '@/components/ui/badge';
+import { useState} from 'react';
+import { useTemplateSave} from '@/hooks/use-template-save';
+import { Save, Star, Plus, Trash2, Copy} from 'lucide-react';
 
 interface BragEntry {
   type: string;
@@ -156,6 +156,7 @@ export function BragBankTemplate() {
                     className="w-full p-2 border rounded-md"
                     value={entry.type}
                     onChange={(e) => updateEntry(index, 'type', e.target.value)}
+                    aria-label="Select entry type"
                   >
                     {entryTypes.map((type) => (
                       <option key={type} value={type}>{type}</option>

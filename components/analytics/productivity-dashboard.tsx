@@ -1,23 +1,12 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect} from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Badge} from '@/components/ui/badge'
+import { Progress} from '@/components/ui/progress'
+import { Button} from '@/components/ui/button'
 import { 
-  TrendingUp, 
-  Target, 
-  CheckCircle, 
-  Clock, 
-  BarChart3,
-  Activity,
-  Zap,
-  Award,
-  Users,
-  ArrowUpRight,
-  ArrowDownRight
-} from 'lucide-react'
+  TrendingUp, Target, CheckCircle, Clock, BarChart3, Activity, Zap, Award, Users, ArrowUpRight, ArrowDownRight} from 'lucide-react'
 
 interface AnalyticsData {
   tasks: {

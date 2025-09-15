@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { _CompetitiveIntelligenceGamification, _CompetitiveVictory } from '@/lib/competitive-intelligence-gamification'
-import { db } from '@/db'
-import { users, userCompetitiveStats } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import { z } from 'zod'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { CompetitiveIntelligenceGamification, CompetitiveVictory} from '@/lib/competitive-intelligence-gamification'
+import { db} from '@/db'
+import { users, userCompetitiveStats} from '@/db/schema'
+import { eq} from 'drizzle-orm'
+import { z} from 'zod'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       }).optional()
     })
 
-    const { action, stat_type, stat_value, _achievement_id, _victory_data } = BodySchema.parse(body)
+    const { action, stat_type, stat_value, achievement_id, victory_data } = BodySchema.parse(body)
 
     // Get or create competitive stats
     let competitiveStatsRows = await db.select().from(userCompetitiveStats).where(eq(userCompetitiveStats.user_id, user.id))

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Mail, AlertCircle, CheckCircle } from "lucide-react";
+import { Button} from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import { Input} from "@/components/ui/input";
+import { Label} from "@/components/ui/label";
+import { Alert, AlertDescription} from "@/components/ui/alert";
+import { Mail, AlertCircle, CheckCircle} from "lucide-react";
 import Link from "next/link";
 
 export default function AccountRecoveryPage() {

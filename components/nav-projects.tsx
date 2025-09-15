@@ -1,25 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { Folder, Forward, MoreHorizontal, Trash2, Plus, FolderOpen, Briefcase, Target, Palette } from "lucide-react"
-import { useProjects } from "@/hooks/use-projects"
+import { Folder, Forward, MoreHorizontal, Trash2, Plus, FolderOpen, Briefcase, Target, Palette} from "lucide-react"
+import { useProjects} from "@/hooks/use-projects"
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
+  SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, useSidebar, } from "@/components/ui/sidebar"
 
 const iconMap = {
   Folder,

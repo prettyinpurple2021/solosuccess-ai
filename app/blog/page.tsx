@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, Crown, Calendar, BookOpen, Sparkles, Bell, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { ArrowLeft, Crown, Calendar, BookOpen, Sparkles, Bell, Mail} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
 
 export default function BlogComingSoonPage() {
   return (

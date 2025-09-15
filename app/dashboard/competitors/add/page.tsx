@@ -1,36 +1,21 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useState} from "react"
+import { motion} from "framer-motion"
+import { useRouter} from "next/navigation"
 import { 
-  ArrowLeft, 
-  Globe, 
-  Building, 
-  Users, 
-  DollarSign,
-  _Shield,
-  Eye,
-  _Zap,
-  CheckCircle,
-  AlertTriangle
-} from "lucide-react"
+  ArrowLeft, Globe, Building, Users, DollarSign, Shield, Eye, Zap, CheckCircle, AlertTriangle} from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+import { Badge} from "@/components/ui/badge"
+import { Switch} from "@/components/ui/switch"
 
 interface CompetitorFormData {
   name: string

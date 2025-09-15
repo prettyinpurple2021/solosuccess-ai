@@ -1,5 +1,5 @@
-import { lazy } from 'react'
-import { TemplateData } from './base-template'
+import { lazy} from 'react'
+import { TemplateData} from './base-template'
 
 // Template component type
 export type TemplateComponent = React.ComponentType<any>

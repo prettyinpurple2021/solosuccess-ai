@@ -1,9 +1,9 @@
 "use client"
 
 // No React hooks needed for this component
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Shield } from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { ArrowLeft, Shield} from "lucide-react"
 import Link from "next/link"
 
 export default function UnauthorizedSignInPage() {

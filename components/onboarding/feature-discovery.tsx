@@ -1,31 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState, useEffect, useRef} from "react"
+import { motion, AnimatePresence} from "framer-motion"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
 import { 
-  Sparkles, 
-  Target, 
-  Users, 
-  Brain,
-  FileText,
-  TrendingUp,
-  Zap,
-  Crown,
-  CheckCircle,
-  ArrowRight,
-  ArrowLeft,
-  Lightbulb,
-  Star,
-  Gift,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX
-} from "lucide-react"
+  Sparkles, Target, Users, Brain, FileText, TrendingUp, Zap, Crown, CheckCircle, ArrowRight, ArrowLeft, Lightbulb, Star, Gift, Play, Pause, Volume2, VolumeX} from "lucide-react"
 
 interface FeatureDiscoveryProps {
   open: boolean

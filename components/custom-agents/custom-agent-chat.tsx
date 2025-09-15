@@ -1,32 +1,17 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useCustomAgents, Workflow } from "@/hooks/use-custom-agents"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { motion, AnimatePresence} from "framer-motion"
+import { useCustomAgents, Workflow} from "@/hooks/use-custom-agents"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Input} from "@/components/ui/input"
+import { Badge} from "@/components/ui/badge"
+import { ScrollArea} from "@/components/ui/scroll-area"
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import { 
-  Brain, 
-  Users, 
-  Workflow as WorkflowIcon, 
-  Send, 
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-  TrendingUp,
-  Target,
-  Zap
-} from "lucide-react"
+  Brain, Users, Workflow as WorkflowIcon, Send, Loader2, CheckCircle, AlertCircle, TrendingUp, Target, Zap} from "lucide-react"
 
 interface ChatMessage {
   id: string

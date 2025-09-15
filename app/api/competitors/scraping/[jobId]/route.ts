@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { ScrapingScheduler } from '@/lib/database-scraping-scheduler'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { db } from '@/db'
-import { scrapingJobs, scrapingJobResults } from '@/db/schema'
-import { eq, and, desc } from 'drizzle-orm'
+import { NextRequest, NextResponse} from 'next/server'
+import { ScrapingScheduler} from '@/lib/database-scraping-scheduler'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { db} from '@/db'
+import { scrapingJobs, scrapingJobResults} from '@/db/schema'
+import { eq, and, desc} from 'drizzle-orm'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

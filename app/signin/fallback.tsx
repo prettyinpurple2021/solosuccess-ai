@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Crown, Lock } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState, type FormEvent} from 'react'
+import { useRouter} from "next/navigation"
+import { Button} from "@/components/ui/button"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { AlertCircle, Crown, Lock} from "lucide-react"
+import { motion} from "framer-motion"
 
 export default function FallbackSignIn() {
   const router = useRouter()

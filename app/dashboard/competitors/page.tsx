@@ -1,60 +1,23 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { motion, easeOut } from "framer-motion"
+import { motion, easeOut} from "framer-motion"
 import {
-  Search,
-  _Filter,
-  Plus,
-  Eye,
-  AlertTriangle,
-  TrendingUp,
-  Users,
-  Globe,
-  Shield,
-  Target,
-  Zap,
-  MoreVertical,
-  RefreshCw,
-  Download,
-  Settings,
-  Activity,
-  BarChart3,
-  Map,
-  Clock,
-  Radar,
-  Grid3X3,
-  Layers,
-  _Crosshair
-} from "lucide-react"
+  Search, Filter, Plus, Eye, AlertTriangle, TrendingUp, Users, Globe, Shield, Target, Zap, MoreVertical, RefreshCw, Download, Settings, Activity, BarChart3, Map, Clock, Radar, Grid3X3, Layers, Crosshair} from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { BossCard, EmpowermentCard, StatsCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Badge} from "@/components/ui/badge"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu"
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator} from "@/components/ui/dropdown-menu"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import { Loading } from "@/components/ui/loading"
-import { Progress as _Progress } from "@/components/ui/progress"
+  Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
+import { Loading} from "@/components/ui/loading"
+import { Progress as _Progress} from "@/components/ui/progress"
 
 interface Competitor {
   id: number
@@ -763,7 +726,7 @@ export default function CompetitorDashboardPage() {
                             key={activity.id}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
+                            transition={{ delay: _index * 0.05 }}
                             className="flex items-start space-x-4 p-4 glass rounded-xl hover-lift"
                           >
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getActivityColor(activity.importance)}`}>
@@ -1096,11 +1059,11 @@ export default function CompetitorDashboardPage() {
                           key={activity.id}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
+                          transition={{ delay: _index * 0.05 }}
                           className="relative flex items-start space-x-4"
                         >
                           {/* Timeline Line */}
-                          {index < realtimeActivities.length - 1 && (
+                          {_index < realtimeActivities.length - 1 && (
                             <div className="absolute left-5 top-10 bottom-0 w-px bg-gray-200 dark:bg-gray-700" />
                           )}
 

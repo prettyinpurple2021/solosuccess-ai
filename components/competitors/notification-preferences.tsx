@@ -1,33 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import { Button} from '@/components/ui/button';
+import { Switch} from '@/components/ui/switch';
+import { Input} from '@/components/ui/input';
+import { Label} from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import { Badge} from '@/components/ui/badge';
+import { Separator} from '@/components/ui/separator';
 import { 
-  Bell, 
-  Mail, 
-  Smartphone, 
-  MessageSquare, 
-  Webhook,
-  Clock,
-  Settings,
-  TestTube,
-  CheckCircle2,
-  AlertCircle,
-  Plus,
-  Trash2
-} from 'lucide-react';
-import { NotificationChannel, type NotificationPreferences } from '@/lib/notification-delivery-system';
-import { AlertSeverity, AlertType } from '@/lib/competitor-alert-system';
-import { cn } from '@/lib/utils';
-import { toast } from '@/hooks/use-toast';
+  Bell, Mail, Smartphone, MessageSquare, Webhook, Clock, Settings, TestTube, CheckCircle2, AlertCircle, Plus, Trash2} from 'lucide-react';
+import { NotificationChannel, type NotificationPreferences} from '@/lib/notification-delivery-system';
+import { AlertSeverity, AlertType} from '@/lib/competitor-alert-system';
+import { cn} from '@/lib/utils';
+import { toast} from '@/hooks/use-toast';
 
 interface NotificationPreferencesProps {
   className?: string;

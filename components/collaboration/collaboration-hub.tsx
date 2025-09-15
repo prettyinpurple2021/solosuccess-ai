@@ -3,38 +3,22 @@
 import type React from "react"
 import Image from "next/image"
 
-import { useState, useEffect, useCallback } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect, useCallback} from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Label} from "@/components/ui/label"
+import { Textarea} from "@/components/ui/textarea"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
+import { ScrollArea} from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useCollaboration } from "@/hooks/use-collaboration"
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { useCollaboration} from "@/hooks/use-collaboration"
 import type { CollaborationTask, AgentHandoff } from "@/lib/agent-collaboration"
 import {
-  Users,
-  Play,
-  CheckCircle,
-  Clock,
-  ArrowRight,
-  Lightbulb,
-  Loader2,
-  Plus,
-  Workflow,
-  MessageSquare,
-} from "lucide-react"
+  Users, Play, CheckCircle, Clock, ArrowRight, Lightbulb, Loader2, Plus, Workflow, MessageSquare, } from "lucide-react"
 
 // Add this function at the top of the component
 const getAgentAvatar = (agent: string) => {

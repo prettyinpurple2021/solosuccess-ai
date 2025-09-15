@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, Crown, Shield, FileText, Download, Trash2, Edit, Eye, Lock, CheckCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { ArrowLeft, Crown, Shield, FileText, Download, Trash2, Edit, Eye, Lock, CheckCircle} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
+import { Separator} from "@/components/ui/separator"
 
 export default function GDPRPage() {
   return (

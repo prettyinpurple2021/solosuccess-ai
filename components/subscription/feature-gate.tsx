@@ -1,10 +1,10 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Crown, Zap, Lock } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Crown, Zap, Lock} from "lucide-react"
 
 interface FeatureGateProps {
   children: ReactNode

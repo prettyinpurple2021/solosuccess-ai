@@ -1,29 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect} from "react"
+import { motion} from "framer-motion"
 import { 
-  AlertTriangle, 
-  TrendingUp, 
-  Eye, 
-  Users,
-  DollarSign,
-  Calendar,
-  ArrowUp,
-  ArrowDown,
-  Minus,
-  Info
-} from "lucide-react"
+  AlertTriangle, TrendingUp, Eye, Users, DollarSign, Calendar, ArrowUp, ArrowDown, Minus, Info} from "lucide-react"
 
-import { BossCard } from "@/components/ui/boss-card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { BossCard} from "@/components/ui/boss-card"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
 import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip"
 
 interface CompetitorThreat {
   id: number

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { createClient } from '@/lib/neon/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { createClient} from '@/lib/neon/server'
+import { GoogleGenerativeAI} from '@google/generative-ai'
 
 // Type for document search results from database
 interface DocumentSearchResult {

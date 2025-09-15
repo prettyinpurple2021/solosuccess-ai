@@ -2,8 +2,8 @@
 
 import React from 'react'
 import templateData from '@/data/templates.json'
-import { Card, CardContent } from '@/components/ui/card'
-import { templateComponents } from './index'
+import { Card, CardContent} from '@/components/ui/card'
+import { templateComponents} from './index'
 
 export function TemplateRenderer({ slug }: { slug: string }) {
   const Component = templateComponents[slug]

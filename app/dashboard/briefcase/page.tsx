@@ -1,43 +1,20 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef} from "react"
 
-import { Button } from "@/components/ui/button"
+import { Button} from "@/components/ui/button"
 
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 
-import { Progress } from "@/components/ui/progress"
+import { Progress} from "@/components/ui/progress"
 import { 
-  Briefcase, 
-  Upload, 
-  FileText, 
-  Image as ImageIcon, 
-  Video, 
-  Music,
-  Archive,
-  Search,
-  Grid3x3,
-  List,
-  Trash2,
-  FolderPlus,
-  Folder,
-  FileSpreadsheet,
-  FileType,
-  FileCode,
-  Loader2,
-  Download,
-  Brain,
-  Share2,
-  History,
-  CheckSquare,
-  Square
-} from "lucide-react"
-import { motion, _AnimatePresence } from "framer-motion"
-import { useToast } from "@/hooks/use-toast"
+  Briefcase, Upload, FileText, Image as ImageIcon, Video, Music, Archive, Search, Grid3x3, List, Trash2, FolderPlus, Folder, FileSpreadsheet, FileType, FileCode, Loader2, Download, Brain, Share2, History, CheckSquare, Square} from "lucide-react"
+import { motion, AnimatePresence} from "framer-motion"
+import { useToast} from "@/hooks/use-toast"
 import _FilePreviewModal from "@/components/file-preview-modal"
 import EnhancedFilePreviewModal from "@/components/briefcase/enhanced-file-preview-modal"
 import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
@@ -179,9 +156,9 @@ export default function BriefcasePage() {
     try {
       setLoading(true)
       const params = new URLSearchParams()
-      if (selectedCategory !== 'all') params.append('category', selectedCategory)
+      if (_selectedCategory !== 'all') params.append('category', _selectedCategory)
       if (selectedFolder) params.append('folder', selectedFolder)
-      if (searchTerm) params.append('search', searchTerm)
+      if (_searchTerm) params.append('search', _searchTerm)
       
       const response = await authenticatedFetch(`/api/briefcase/files?${params.toString()}`)
       if (!response.ok) throw new Error('Failed to fetch files')
@@ -199,7 +176,7 @@ export default function BriefcasePage() {
     } finally {
       setLoading(false)
     }
-  }, [selectedCategory, selectedFolder, searchTerm, toast])
+  }, [_selectedCategory, selectedFolder, _searchTerm, toast])
 
   // Fetch folders
   const fetchFolders = useCallback(async () => {
@@ -271,7 +248,7 @@ export default function BriefcasePage() {
         formData.append('files', files[i])
       }
       
-      formData.append('category', category || selectedCategory)
+      formData.append('category', category || _selectedCategory)
       if (folderId) formData.append('folderId', folderId)
       formData.append('description', description || '')
       formData.append('tags', tags || '')
@@ -597,11 +574,11 @@ export default function BriefcasePage() {
 
   // Use search results if available, otherwise filter regular files
   const filteredFiles = searchResults.length > 0 ? searchResults : files.filter(file => {
-    const matchesSearch = !searchTerm || 
-      file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (file.description && file.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    const matchesSearch = !_searchTerm || 
+      file.name.toLowerCase().includes(_searchTerm.toLowerCase()) ||
+      (file.description && file.description.toLowerCase().includes(_searchTerm.toLowerCase()))
     
-    const matchesCategory = selectedCategory === 'all' || file.category === selectedCategory
+    const matchesCategory = _selectedCategory === 'all' || file.category === _selectedCategory
     
     return matchesSearch && matchesCategory
   })
@@ -842,12 +819,12 @@ export default function BriefcasePage() {
           <p className="text-gray-600 mb-4">
             {searchResults.length > 0 
               ? 'No files match your search criteria. Try adjusting your filters.'
-              : searchTerm || selectedCategory !== 'all' 
+              : _searchTerm || _selectedCategory !== 'all' 
                 ? 'Try adjusting your search or filters'
                 : 'Upload your first file to get started'
             }
           </p>
-          {searchResults.length === 0 && !searchTerm && selectedCategory === 'all' && (
+          {searchResults.length === 0 && !_searchTerm && _selectedCategory === 'all' && (
             <Button
               onClick={() => setShowUploadDialog(true)}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"

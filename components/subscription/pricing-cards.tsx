@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Check, Loader2, Zap, Crown, Rocket } from 'lucide-react'
-import { useAuth } from '@/hooks/use-auth'
-import { toast } from '@/hooks/use-toast'
+import { useState} from 'react'
+import { Button} from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Badge} from '@/components/ui/badge'
+import { Check, Loader2, Zap, Crown, Rocket} from 'lucide-react'
+import { useAuth} from '@/hooks/use-auth'
+import { toast} from '@/hooks/use-toast'
 
 interface PricingCardProps {
   tier: 'launch' | 'accelerator' | 'dominator'

@@ -1,65 +1,25 @@
 "use client"
 
 import React, { useState } from "react"
-import { motion } from "framer-motion"
+import { motion} from "framer-motion"
 import {
-  Globe,
-  Users,
-  Activity,
-  Briefcase,
-  Smartphone,
-  FileText,
-  Calendar,
-  Tag,
-  Brain,
-  TrendingUp,
-  AlertTriangle,
-  Target,
-  Lightbulb,
-  ExternalLink,
-  Eye,
-  MoreVertical,
-  Star,
-  Bookmark,
-  Share,
-  Edit,
-  Trash2,
-  Plus,
-  Check,
-  X,
-  Clock,
-  BarChart3,
-  Zap,
-  Filter,
-  Search
-} from "lucide-react"
+  Globe, Users, Activity, Briefcase, Smartphone, FileText, Calendar, Tag, Brain, TrendingUp, AlertTriangle, Target, Lightbulb, ExternalLink, Eye, MoreVertical, Star, Bookmark, Share, Edit, Trash2, Plus, Check, X, Clock, BarChart3, Zap, Filter, Search} from "lucide-react"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton } from "@/components/ui/boss-button"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton} from "@/components/ui/boss-button"
+import { Badge} from "@/components/ui/badge"
+import { Button} from "@/components/ui/button"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
+import { Checkbox} from "@/components/ui/checkbox"
+import { Separator} from "@/components/ui/separator"
+import { ScrollArea} from "@/components/ui/scroll-area"
+import { Progress} from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 
 interface IntelligenceItem {
   id: number

@@ -1,8 +1,8 @@
 import '@/lib/server-polyfills'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse} from 'next/server'
 import _fs from 'fs/promises'
 import path from 'path'
-import { MOCK_FILES } from '../../files/mock-files'
+import { MOCK_FILES} from '../../files/mock-files'
 // Deprecated mock route: prefer /api/briefcase/files/[id]/preview which serves real file data
 
 // MIME type mappings for file extensions

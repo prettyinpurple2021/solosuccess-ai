@@ -1,80 +1,29 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence} from "framer-motion"
 import {
-  Search,
-  Filter,
-  X,
-  Save,
-  Star,
-  Download,
-  Tag,
-  Calendar,
-  Users,
-  Globe,
-  Activity,
-  Briefcase,
-  Smartphone,
-  FileText,
-  Brain,
-  TrendingUp,
-  AlertTriangle,
-  Target,
-  Clock,
-  BarChart3,
-  Settings,
-  ChevronDown,
-  ChevronUp,
-  Bookmark,
-  History,
-  Trash2,
-  Edit,
-  Plus,
-  Check,
-  Loader2
-} from "lucide-react"
-import { useDebounce } from "@/hooks/use-debounce"
+  Search, Filter, X, Save, Star, Download, Tag, Calendar, Users, Globe, Activity, Briefcase, Smartphone, FileText, Brain, TrendingUp, AlertTriangle, Target, Clock, BarChart3, Settings, ChevronDown, ChevronUp, Bookmark, History, Trash2, Edit, Plus, Check, Loader2} from "lucide-react"
+import { useDebounce} from "@/hooks/use-debounce"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Badge} from "@/components/ui/badge"
+import { Button} from "@/components/ui/button"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+  Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, } from "@/components/ui/command"
+import { Checkbox} from "@/components/ui/checkbox"
+import { Label} from "@/components/ui/label"
+import { Textarea} from "@/components/ui/textarea"
+import { Separator} from "@/components/ui/separator"
+import { ScrollArea} from "@/components/ui/scroll-area"
 
 interface IntelligenceSearchFilters {
   query?: string

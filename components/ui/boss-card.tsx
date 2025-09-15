@@ -1,9 +1,9 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { ReactNode } from "react"
-import { cn } from "@/lib/utils"
-import { Crown, Sparkles } from "lucide-react"
+import { motion} from "framer-motion"
+import { ReactNode} from "react"
+import { cn} from "@/lib/utils"
+import { Crown, Sparkles} from "lucide-react"
 
 interface BossCardProps {
   children: ReactNode

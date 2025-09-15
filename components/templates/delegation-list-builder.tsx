@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useState } from 'react';
-import { useTemplateSave } from '@/hooks/use-template-save';
-import { Save, Trash2 } from 'lucide-react';
+import { Button} from '@/components/ui/button';
+import { Input} from '@/components/ui/input';
+import { Checkbox} from '@/components/ui/checkbox';
+import { useState} from 'react';
+import { useTemplateSave} from '@/hooks/use-template-save';
+import { Save, Trash2} from 'lucide-react';
 
 export function DelegationListBuilder() {
   const [tasks, setTasks] = useState<{ text: string, type: string, done: boolean }[]>([]);
