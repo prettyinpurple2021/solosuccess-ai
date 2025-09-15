@@ -17,8 +17,11 @@ import {
   Calendar,
   Flag,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Brain
 } from "lucide-react"
+import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
+import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
 
 interface Goal {
   id: string
@@ -164,6 +167,49 @@ export default function SlaylistPage() {
       }
     } catch (error) {
       console.error('Error updating task:', error)
+    }
+  }
+
+  const handleApplySuggestion = async (taskId: string, suggestion: TaskSuggestion) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priority: suggestion.suggestedPriority,
+          due_date: suggestion.suggestedDeadline,
+          category: suggestion.suggestedCategory,
+          estimated_minutes: suggestion.estimatedCompletionTime
+        })
+      })
+      
+      if (response.ok) {
+        await fetchTasks()
+      }
+    } catch (error) {
+      console.error('Error applying AI suggestion:', error)
+    }
+  }
+
+  const handleReorderTasks = async (optimizedOrder: string[]) => {
+    try {
+      // Update task order in bulk
+      const updates = optimizedOrder.map((taskId, index) => ({
+        id: taskId,
+        sort_order: index
+      }))
+      
+      const response = await fetch('/api/tasks/bulk-update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates })
+      })
+      
+      if (response.ok) {
+        await fetchTasks()
+      }
+    } catch (error) {
+      console.error('Error reordering tasks:', error)
     }
   }
 
@@ -425,6 +471,17 @@ export default function SlaylistPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Task Intelligence Panel */}
+      {tasks.length > 0 && (
+        <div className="mb-6">
+          <TaskIntelligencePanel
+            tasks={tasks as TaskIntelligenceData[]}
+            onApplySuggestion={handleApplySuggestion}
+            onReorderTasks={handleReorderTasks}
+          />
+        </div>
+      )}
 
       {/* Goals and Tasks Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
