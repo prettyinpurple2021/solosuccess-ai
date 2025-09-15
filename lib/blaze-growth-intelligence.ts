@@ -314,6 +314,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.7,})
         temperature: 0.7,
         maxOutputTokens: 2000
       })
@@ -384,6 +385,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.6,})
         temperature: 0.6,
         maxOutputTokens: 1500
       })
@@ -463,6 +465,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.7,})
         temperature: 0.7,
         maxOutputTokens: 2000
       })
@@ -542,6 +545,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.6,})
         temperature: 0.6,
         maxOutputTokens: 1800
       })
@@ -600,6 +604,7 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.6,})
         temperature: 0.6,
         maxOutputTokens: 1500
       })
