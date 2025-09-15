@@ -148,8 +148,8 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-cyan-100 to-pink-100 dark:from-purple-900/30 dark:via-cyan-900/30 dark:to-pink-900/30 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-cyan-400/20 to-pink-400/20"></div>
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-cyan-400/20 to-pink-400/20 -z-10"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 -z-10"></div>
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-purple-200 dark:border-teal-800">
         <div className="container-responsive py-4">
@@ -315,7 +315,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       </nav>
 
       {/* Hero Section */}
-      <section className="p-responsive-xl">
+      <section className="relative p-responsive-xl z-20">
         <div className="container-responsive">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left side - Content */}
@@ -712,7 +712,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       </section>
 
       {/* CTA Section */}
-      <section className="p-responsive-xl">
+      <section className="relative p-responsive-xl z-20">
         <div className="container-responsive text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -751,7 +751,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white p-responsive-xl">
+      <footer className="relative bg-gray-900 text-white p-responsive-xl z-10">
         <div className="container-responsive">
           <div className="mobile-first-grid">
             <div>
@@ -860,7 +860,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           </div>
           <Separator className="my-8 bg-gray-800" />
           <div className="flex-responsive justify-between items-center">
-            <p className="text-gray-400">© 2024 SoloSuccess AI. All rights reserved.</p>
+            <p className="text-gray-400">© 2025 SoloSuccess AI. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Privacy

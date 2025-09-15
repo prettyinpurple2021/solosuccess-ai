@@ -20,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 interface DashboardHeaderProps {
   title?: string
@@ -69,6 +70,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       <div className="flex items-center justify-between">
         {/* Left side - Title or Search */}
         <div className="flex items-center gap-6 flex-1">
+          {/* Sidebar Toggle */}
+          <SidebarTrigger className="text-purple-600 hover:text-pink-600" />
+          
           {title ? (
             <div>
               <div className="flex items-center gap-3">
