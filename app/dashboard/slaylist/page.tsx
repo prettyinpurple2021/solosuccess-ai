@@ -18,7 +18,8 @@ import {
   Flag,
   Clock,
   TrendingUp,
-  Brain
+  Brain,
+  Mic
 } from "lucide-react"
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
 import VoiceTaskCreator from "@/components/tasks/voice-task-creator"
