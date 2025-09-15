@@ -117,7 +117,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error subscribing to push notifications:', error)
     
-    if (error.code === '23505') { // PostgreSQL unique constraint violation
+    // Type-safe error handling
+    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+      // PostgreSQL unique constraint violation
       return NextResponse.json(
         { error: 'Subscription already exists for this endpoint' },
         { status: 409 }
