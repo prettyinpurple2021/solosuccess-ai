@@ -16,6 +16,7 @@
     "setup-templates": "node scripts/setup-templates-database.mjs",
     "setup-compliance": "node scripts/setup-compliance-database.mjs",
     "setup-migration": "node scripts/setup-migration-database.mjs",
+    "setup-unified-briefcase": "node scripts/setup-unified-briefcase.mjs",
     "db:run-sql": "node scripts/run-sql-file.mjs",
     "verify-triggers": "node scripts/verify-updated-at-triggers.js",
     "migrate-profile-fields": "node scripts/run-profile-fields-migration.mjs",

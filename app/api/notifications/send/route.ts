@@ -30,7 +30,7 @@ function ensureVapidConfigured(): boolean {
       console.log('✅ VAPID keys configured successfully')
       return true
     } catch (error) {
-      console.warn('⚠️ VAPID configuration failed:', error.message)
+      console.warn('⚠️ VAPID configuration failed:', error instanceof Error ? error.message : 'Unknown error')
       return false
     }
   } else {
