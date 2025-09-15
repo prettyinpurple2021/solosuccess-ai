@@ -1,12 +1,42 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { ArrowLeft, Crown, Calendar, BookOpen, Sparkles, Bell, Mail} from "lucide-react"
 import { Button} from "@/components/ui/button"
 import { Card, CardContent} from "@/components/ui/card"
 import { Badge} from "@/components/ui/badge"
 
 export default function BlogComingSoonPage() {
+  const [email, setEmail] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [message, setMessage] = useState("")
+
+  const submitNewsletter = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || submitting) return
+    setSubmitting(true)
+    setMessage("")
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'blog_hero' }),
+      })
+      if (res.ok) {
+        setMessage("You're on the list! 🎉")
+        setEmail("")
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setMessage(data.error || 'Something went wrong. Try again.')
+      }
+    } catch {
+      setMessage('Network error. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -64,6 +94,22 @@ export default function BlogComingSoonPage() {
             </div>
             <div className="text-3xl font-bold">September 1, 2025</div>
           </div>
+
+          {/* Hero Newsletter */}
+          <form onSubmit={submitNewsletter} className="max-w-xl mx-auto flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email to get updates"
+              required
+              className="flex-1 rounded-lg border border-purple-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+            />
+            <Button type="submit" disabled={submitting || !email} className="px-6">
+              {submitting ? 'Subscribing…' : 'Subscribe'}
+            </Button>
+          </form>
+          {message && <div className="text-sm text-gray-700 mt-2">{message}</div>}
         </div>
       </section>
 
@@ -168,6 +214,10 @@ export default function BlogComingSoonPage() {
               <p className="text-gray-600 text-sm">
                 A complete guide to getting started with AI agents and building your virtual team from scratch.
               </p>
+              <div className="mt-3 text-sm">
+                <span className="text-gray-500 mr-2">Related:</span>
+                <Link href="/blog/how-to-scale-a-solo-business" className="text-purple-600 underline">Scale a Solo Business</Link>
+              </div>
             </div>
 
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
@@ -186,6 +236,10 @@ export default function BlogComingSoonPage() {
               <p className="text-gray-600 text-sm">
                 Real case study of revenue-generating automation systems you can implement today.
               </p>
+              <div className="mt-3 text-sm">
+                <span className="text-gray-500 mr-2">Related:</span>
+                <Link href="/blog/how-to-automate-revenue-workflows" className="text-purple-600 underline">Automate Revenue Workflows</Link>
+              </div>
             </div>
 
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
@@ -195,6 +249,10 @@ export default function BlogComingSoonPage() {
               <p className="text-gray-600 text-sm">
                 Practical strategies for maintaining mental wellness while building your empire.
               </p>
+              <div className="mt-3 text-sm">
+                <span className="text-gray-500 mr-2">Related:</span>
+                <Link href="/blog/how-to-build-marketing-system-with-ai" className="text-purple-600 underline">AI Marketing System</Link>
+              </div>
             </div>
           </div>
         </div>
