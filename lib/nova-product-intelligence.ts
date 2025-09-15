@@ -96,6 +96,25 @@ export interface ProductFeatureAnalysis {
   analyzedAt: Date
 }
 
+export interface DesignPattern {
+  id: string
+  name: string
+  description: string
+  category: 'navigation' | 'layout' | 'interaction' | 'visual' | 'accessibility'
+  usage: 'widespread' | 'emerging' | 'declining' | 'innovative'
+  advantages: string[]
+  implementation: string
+  examples: string[]
+}
+
+export interface ProductRoadmapPrediction {
+  competitorId: number
+  predictions: ProductInsight[]
+  timeline: string
+  confidence: number
+  analyzedAt: Date
+}
+
 // ... [Interfaces unchanged for brevity] ...
 
 /**
@@ -233,9 +252,7 @@ export class NovaProductIntelligence {
 
     const analysisPrompt = this.buildRoadmapPredictionPrompt(
       competitor, 
-      hiringData, 
-      productData, 
-      socialMediaData
+      hiringData
     )
 
     const { text } = await generateText({
@@ -344,7 +361,7 @@ export class NovaProductIntelligence {
     return { gaps: [], opportunities: [], confidence: 0.5, analyzedAt: new Date() }
   }
 
-  private buildRoadmapPredictionPrompt(competitor: any, data: any[]): string {
+  private buildRoadmapPredictionPrompt(competitor: any, hiringData: any[]): string {
     return `Predict roadmap for ${competitor.name || 'competitor'}`
   }
 

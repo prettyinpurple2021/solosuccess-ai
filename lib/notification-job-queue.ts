@@ -252,8 +252,11 @@ export class NotificationJobQueue {
     }
 
     result.rows.forEach(row => {
-      stats[row.status] = parseInt(row.count)
-      stats.total += parseInt(row.count)
+      const status = row.status as keyof JobQueueStats
+      if (status in stats && status !== 'total') {
+        stats[status] = parseInt(row.count)
+        stats.total += parseInt(row.count)
+      }
     })
 
     return stats

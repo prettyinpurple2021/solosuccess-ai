@@ -117,7 +117,7 @@ export class WebPushNotificationManager {
       // Create new subscription
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlB64ToUint8Array(this.VAPID_PUBLIC_KEY)
+        applicationServerKey: this.urlB64ToUint8Array(this.VAPID_PUBLIC_KEY) as any
       })
     }
 
@@ -172,9 +172,8 @@ export class WebPushNotificationManager {
         data: payload.data,
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
-        silent: payload.silent,
-        vibrate: payload.vibrate || [200, 100, 200]
-      })
+        silent: payload.silent
+      } as any)
     } else {
       // Use service worker notification
       await registration.showNotification(payload.title, {
@@ -185,9 +184,8 @@ export class WebPushNotificationManager {
         actions: payload.actions || [],
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
-        silent: payload.silent,
-        vibrate: payload.vibrate || [200, 100, 200]
-      })
+        silent: payload.silent
+      } as any)
     }
   }
 
@@ -360,7 +358,8 @@ export class WebPushNotificationManager {
     if (!('serviceWorker' in navigator)) return null
     
     try {
-      return await navigator.serviceWorker.getRegistration()
+      const registration = await navigator.serviceWorker.getRegistration()
+      return registration || null
     } catch (error) {
       console.error('Error getting service worker registration:', error)
       return null
