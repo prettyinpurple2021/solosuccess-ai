@@ -1,8 +1,8 @@
 import '@/lib/server-polyfills'
-import { NextRequest, NextResponse } from 'next/server';
-import { DocumentParser } from '@/lib/documentParser';
-import { authenticateRequest } from '@/lib/auth-server'
-import { createClient } from '@/lib/neon/server'
+import { NextRequest, NextResponse} from 'next/server';
+import { DocumentParser} from '@/lib/documentParser';
+import { authenticateRequest} from '@/lib/auth-server'
+import { createClient} from '@/lib/neon/server'
 
 export async function POST(request: NextRequest) {
   try {

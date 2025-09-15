@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { getUserSubscription, hasActiveSubscription } from '@/lib/stripe-db-utils'
-import { stripe } from '@/lib/stripe'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { getUserSubscription, hasActiveSubscription} from '@/lib/stripe-db-utils'
+import { stripe} from '@/lib/stripe'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

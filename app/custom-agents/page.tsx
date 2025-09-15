@@ -1,23 +1,12 @@
 "use client"
 
 import React from "react"
-import { CustomAgentChat } from "@/components/custom-agents/custom-agent-chat"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { SubscriptionGuard } from "@/components/subscription/subscription-guard"
+import { CustomAgentChat} from "@/components/custom-agents/custom-agent-chat"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
+import { SubscriptionGuard} from "@/components/subscription/subscription-guard"
 import { 
-  Brain, 
-  Users, 
-  Workflow, 
-  Sparkles,
-  Target,
-  Zap,
-  Shield,
-  Code,
-  BarChart3,
-  Palette,
-  Bug
-} from "lucide-react"
+  Brain, Users, Workflow, Sparkles, Target, Zap, Shield, Code, BarChart3, Palette, Bug} from "lucide-react"
 
 const AGENT_INFO = [
   {

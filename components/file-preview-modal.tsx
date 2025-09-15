@@ -1,29 +1,14 @@
 "use client"
 
 import React, { useState, useEffect, useCallback, TouchEvent } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Dialog, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog'
+import { Button} from '@/components/ui/button'
+import { Badge} from '@/components/ui/badge'
+import { ScrollArea} from '@/components/ui/scroll-area'
 import NextImage from 'next/image'
 
 import { 
-  X, 
-  Download, 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCw,
-  Maximize2,
-  Minimize2,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  Image,
-  Music,
-  Video,
-  FileCode,
-  Archive
-} from 'lucide-react'
+  X, Download, ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2, ChevronLeft, ChevronRight, FileText, Image, Music, Video, FileCode, Archive} from 'lucide-react'
 
 
 interface BriefcaseFile {

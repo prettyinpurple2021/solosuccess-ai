@@ -1,4 +1,4 @@
-import { SharedLandingPage } from "@/components/shared/shared-landing-page"
+import { SharedLandingPage} from "@/components/shared/shared-landing-page"
 
 export const dynamic = 'force-dynamic'
 

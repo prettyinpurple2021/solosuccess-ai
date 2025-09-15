@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { CompetitiveIntelligenceIntegration } from '@/lib/competitive-intelligence-integration'
-import { _db } from '@/db'
-import { createClient } from '@/lib/neon/server'
-import { z } from 'zod'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligence-integration'
+import { db} from '@/db'
+import { createClient} from '@/lib/neon/server'
+import { z} from 'zod'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       goal_id: z.number().optional()
     })
 
-    const { alert_id, _template_id, custom_title, custom_description, priority, goal_id } = BodySchema.parse(body)
+    const { alert_id, template_id, custom_title, custom_description, priority, goal_id } = BodySchema.parse(body)
 
     
     // Get the alert

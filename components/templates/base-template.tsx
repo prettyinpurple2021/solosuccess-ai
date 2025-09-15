@@ -1,23 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState} from "react"
 
-import { Badge } from "@/components/ui/badge"
-import { BossButton } from "@/components/ui/boss-button"
-import { BossCard } from "@/components/ui/boss-card"
-import { Progress } from "@/components/ui/progress"
+import { Badge} from "@/components/ui/badge"
+import { BossButton} from "@/components/ui/boss-button"
+import { BossCard} from "@/components/ui/boss-card"
+import { Progress} from "@/components/ui/progress"
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence} from "framer-motion"
 import { 
-  Download, 
-  Share2, 
-  Bookmark, 
-  ArrowLeft, 
-  Sparkles,
-  Crown,
-  Save,
-  RefreshCw
-} from "lucide-react"
+  Download, Share2, Bookmark, ArrowLeft, Sparkles, Crown, Save, RefreshCw} from "lucide-react"
 import Link from "next/link"
 
 export interface TemplateData {

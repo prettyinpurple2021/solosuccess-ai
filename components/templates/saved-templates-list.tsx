@@ -1,22 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState} from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import { Button} from '@/components/ui/button';
 import Link from 'next/link';
 
-import { useTemplates } from '@/hooks/use-templates-swr';
-import { SavedTemplate } from '@/lib/types';
-import { FileText, Download, Trash2, Eye } from 'lucide-react';
+import { useTemplates} from '@/hooks/use-templates-swr';
+import { SavedTemplate} from '@/lib/types';
+import { FileText, Download, Trash2, Eye} from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog';
 
 // Uses SavedTemplate from hook to avoid duplicate/conflicting types
 

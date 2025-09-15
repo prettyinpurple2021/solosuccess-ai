@@ -1,36 +1,21 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
-import { Slider } from '@/components/ui/slider'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DatePickerWithRange } from '@/components/ui/date-range-picker'
-import { useToast } from '@/hooks/use-toast'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Button} from '@/components/ui/button'
+import { Input} from '@/components/ui/input'
+import { Label} from '@/components/ui/label'
+import { Badge} from '@/components/ui/badge'
+import { Switch} from '@/components/ui/switch'
+import { Slider} from '@/components/ui/slider'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
+import { DatePickerWithRange} from '@/components/ui/date-range-picker'
+import { useToast} from '@/hooks/use-toast'
+import { motion, AnimatePresence} from 'framer-motion'
 import { 
-  Search, 
-  Filter, 
-  X, 
-  Calendar, 
-  FileType, 
-  Hash, 
-  User, 
-  HardDrive,
-  Sparkles,
-  Folder,
-  Star,
-  RotateCcw,
-  SlidersHorizontal,
-  Brain,
-  Target
-} from 'lucide-react'
-import { DateRange } from 'react-day-picker'
+  Search, Filter, X, Calendar, FileType, Hash, User, HardDrive, Sparkles, Folder, Star, RotateCcw, SlidersHorizontal, Brain, Target} from 'lucide-react'
+import { DateRange} from 'react-day-picker'
 
 export interface SearchFilters {
   query: string

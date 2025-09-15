@@ -1,51 +1,25 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { useParams, useRouter } from "next/navigation"
+import { useState, useEffect} from "react"
+import { motion} from "framer-motion"
+import { useParams, useRouter} from "next/navigation"
 import { 
-  ArrowLeft, 
-  _Save, 
-  Trash2,
-  AlertTriangle,
-  _CheckCircle,
-  Globe,
-  Building,
-  Users,
-  DollarSign,
-  _Shield,
-  Eye,
-  _Zap
-} from "lucide-react"
+  ArrowLeft, Save, Trash2, AlertTriangle, CheckCircle, Globe, Building, Users, DollarSign, Shield, Eye, Zap} from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton, DangerButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton, DangerButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loading } from "@/components/ui/loading"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+import { Badge} from "@/components/ui/badge"
+import { Switch} from "@/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Loading} from "@/components/ui/loading"
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 
 interface CompetitorFormData {
   name: string

@@ -3,15 +3,15 @@
 // Force dynamic rendering to avoid static generation issues with StackAuth
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, type FormEvent } from "react"
-import { useRouter } from "next/navigation"
-import { EmpowermentButton } from "@/components/ui/boss-button"
-import { EmpowermentCard } from "@/components/ui/boss-card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, Lock, ArrowLeft } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState, useEffect, type FormEvent} from "react"
+import { useRouter} from "next/navigation"
+import { EmpowermentButton} from "@/components/ui/boss-button"
+import { EmpowermentCard} from "@/components/ui/boss-card"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { AlertCircle, CheckCircle, Lock, ArrowLeft} from "lucide-react"
+import { motion} from "framer-motion"
 
 export default function ForgotPasswordPage() {
   const router = useRouter()

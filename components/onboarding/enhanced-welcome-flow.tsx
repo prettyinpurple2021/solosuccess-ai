@@ -1,32 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState, useEffect} from "react"
+import { motion, AnimatePresence} from "framer-motion"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
 import { 
-  Crown, 
-  Sparkles, 
-  Target, 
-  Users, 
-  Rocket, 
-  Gift, 
-  Star,
-  Zap,
-  TrendingUp,
-  Brain,
-  Heart,
-  CheckCircle,
-  ArrowRight,
-  ArrowLeft,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Settings
-} from "lucide-react"
+  Crown, Sparkles, Target, Users, Rocket, Gift, Star, Zap, TrendingUp, Brain, Heart, CheckCircle, ArrowRight, ArrowLeft, Play, Pause, Volume2, VolumeX, Settings} from "lucide-react"
 
 interface WelcomeFlowProps {
   open: boolean

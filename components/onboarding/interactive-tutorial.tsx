@@ -1,30 +1,11 @@
 "use client"
-import { useState, useEffect, useRef, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { useState, useEffect, useRef, useMemo} from "react"
+import { Button} from "@/components/ui/button"
+import { Progress} from "@/components/ui/progress"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
+import { TooltipProvider} from "@/components/ui/tooltip"
 import { 
-  Crown, 
-  Sparkles, 
-  Target,
-  Users, 
-  ArrowRight, 
-  ArrowLeft, 
-  CheckCircle, 
-  Rocket, 
-  Brain,
-  X,
-  Lightbulb,
-  Zap,
-  TrendingUp,
-  FileText,
-  Settings,
-  Search,
-  Plus,
-  Star,
-  SkipForward
-} from "lucide-react"
+  Crown, Sparkles, Target, Users, ArrowRight, ArrowLeft, CheckCircle, Rocket, Brain, X, Lightbulb, Zap, TrendingUp, FileText, Settings, Search, Plus, Star, SkipForward} from "lucide-react"
 
 interface TutorialStep {
   id: string

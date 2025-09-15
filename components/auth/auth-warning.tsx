@@ -1,7 +1,7 @@
 "use client"
 
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertTriangle } from "lucide-react"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { AlertTriangle} from "lucide-react"
 
 export function AuthWarning() {
   // Only show in development

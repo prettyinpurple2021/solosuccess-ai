@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { EmpowermentCard } from "@/components/ui/boss-card"
-import { Crown, CheckCircle, XCircle, RefreshCw, ArrowRight } from "lucide-react"
+import { useState, useEffect} from "react"
+import { Button} from "@/components/ui/button"
+import { EmpowermentCard} from "@/components/ui/boss-card"
+import { Crown, CheckCircle, XCircle, RefreshCw, ArrowRight} from "lucide-react"
 
 export default function DebugAuthPage() {
   const [token, setToken] = useState<string | null>(null)

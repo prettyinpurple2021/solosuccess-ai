@@ -1,8 +1,8 @@
 "use client"
 
 import type { ReactNode } from 'react'
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { AppSidebar} from "@/components/app-sidebar"
+import { SidebarProvider, SidebarInset} from "@/components/ui/sidebar"
 
 export const dynamic = 'force-dynamic'
 

@@ -1,32 +1,20 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
+import { Button} from '@/components/ui/button'
+import { Input} from '@/components/ui/input'
+import { Label} from '@/components/ui/label'
+import { ScrollArea} from '@/components/ui/scroll-area'
+import { Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar'
+import { Badge} from '@/components/ui/badge'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToast } from '@/hooks/use-toast'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
+import { useToast} from '@/hooks/use-toast'
 import { 
-  History, 
-  RotateCcw, 
-  RotateCw, 
-  CalendarClock, 
-  FileText, 
-  Save, 
-  Check, 
-  ArrowLeft,
-  ArrowRight,
-  Download,
-  Lock,
-  Unlock
-} from 'lucide-react'
+  History, RotateCcw, RotateCw, CalendarClock, FileText, Save, Check, ArrowLeft, ArrowRight, Download, Lock, Unlock} from 'lucide-react'
 
 interface BriefcaseFile {
   id: string

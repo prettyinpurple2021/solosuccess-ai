@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { EmpowermentCard } from "@/components/ui/boss-card"
-import { CalendarIcon, AlertCircle, CheckCircle, Lock, Crown } from "lucide-react"
-import { format, subYears } from "date-fns"
-import { motion } from "framer-motion"
+import { useState, useEffect} from "react"
+import { useRouter, usePathname} from "next/navigation"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { EmpowermentCard} from "@/components/ui/boss-card"
+import { CalendarIcon, AlertCircle, CheckCircle, Lock, Crown} from "lucide-react"
+import { format, subYears} from "date-fns"
+import { motion} from "framer-motion"
 
 export function SimpleAuth() {
   const router = useRouter()

@@ -2,10 +2,10 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { useUser } from "@/lib/auth-client"
-import { Loader2 } from "lucide-react"
+import { useEffect, useState} from "react"
+import { useRouter, usePathname} from "next/navigation"
+import { useUser} from "@/lib/auth-client"
+import { Loader2} from "lucide-react"
 
 interface AuthGuardProps {
   children: React.ReactNode

@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { db } from '@/db'
-import { competitorProfiles, intelligenceData } from '@/db/schema'
-import { eq, and, gte, desc, inArray } from 'drizzle-orm'
-import { blazeGrowthIntelligence } from '@/lib/blaze-growth-intelligence'
-import { z } from 'zod'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { db} from '@/db'
+import { competitorProfiles, intelligenceData} from '@/db/schema'
+import { eq, and, gte, desc, inArray} from 'drizzle-orm'
+import { blazeGrowthIntelligence} from '@/lib/blaze-growth-intelligence'
+import { z} from 'zod'
 import type { SourceType, ImportanceLevel, ExtractedData, AnalysisResult } from '@/lib/competitor-intelligence-types'
 
 // Force dynamic rendering
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
       competitor_ids, 
       analysis_scope,
       market_context,
-      _include_recommendations 
+      include_recommendations 
     } = pricingAnalysisSchema.parse(body)
 
     // Verify all competitors exist and belong to user

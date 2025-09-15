@@ -1,39 +1,26 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo} from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
 
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Button } from "@/components/ui/button"
-import { BossButton } from "@/components/ui/boss-button"
-import { BossCard } from "@/components/ui/boss-card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
+import { Slider} from "@/components/ui/slider"
+import { Button} from "@/components/ui/button"
+import { BossButton} from "@/components/ui/boss-button"
+import { BossCard} from "@/components/ui/boss-card"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 
-import { Switch } from "@/components/ui/switch"
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { motion } from "framer-motion"
+import { Switch} from "@/components/ui/switch"
+import { CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { motion} from "framer-motion"
 import { 
-  Calendar, 
-  Users, 
-  Target, 
-  AlertTriangle, 
-  AlertCircle,
-  Plus,
-  Minus,
-  BarChart3,
-  Flag,
-  Lightbulb,
-  Trash2,
-  ChevronRight,
-  ChevronDown
-} from "lucide-react"
+  Calendar, Users, Target, AlertTriangle, AlertCircle, Plus, Minus, BarChart3, Flag, Lightbulb, Trash2, ChevronRight, ChevronDown} from "lucide-react"
 
 interface ProjectTask {
   id: string

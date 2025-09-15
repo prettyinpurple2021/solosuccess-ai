@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { EmpowermentCard } from "@/components/ui/boss-card"
-import { Crown, CheckCircle, XCircle, ArrowRight } from "lucide-react"
+import { useState, useEffect} from "react"
+import { useRouter} from "next/navigation"
+import { Button} from "@/components/ui/button"
+import { EmpowermentCard} from "@/components/ui/boss-card"
+import { Crown, CheckCircle, XCircle, ArrowRight} from "lucide-react"
 
 export default function TestAuthPage() {
   const router = useRouter()

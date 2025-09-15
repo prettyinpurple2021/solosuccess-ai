@@ -1,16 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { ArrowLeft, Crown, Mail, MessageCircle, Phone, MapPin, Clock, _Send, CheckCircle, Sparkles, _Shield } from "lucide-react"
-import { _BossButton, EmpowermentButton } from "@/components/ui/boss-button"
-import { BossCard, EmpowermentCard } from "@/components/ui/boss-card"
-import { RecaptchaContactButton } from "@/components/ui/recaptcha-button"
-import { _Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState} from "react"
+import { motion} from "framer-motion"
+import { ArrowLeft, Crown, Mail, MessageCircle, Phone, MapPin, Clock, Send, CheckCircle, Sparkles, Shield} from "lucide-react"
+import { BossButton, EmpowermentButton} from "@/components/ui/boss-button"
+import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
+import { RecaptchaContactButton} from "@/components/ui/recaptcha-button"
+import { Badge} from "@/components/ui/badge"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({

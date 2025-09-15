@@ -1,41 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, easeOut } from "framer-motion"
+import { useState, useEffect} from "react"
+import { motion, easeOut} from "framer-motion"
 import { 
-  Activity, 
-  AlertTriangle, 
-  TrendingUp, 
-  Eye, 
-  Globe,
-  Shield,
-  Target,
-  Zap,
-  Clock,
-  Filter,
-  Search,
-  RefreshCw,
-  BarChart3,
-  PieChart,
-  Calendar,
-  ArrowUp,
-  ArrowDown,
-  Minus
-} from "lucide-react"
+  Activity, AlertTriangle, TrendingUp, Eye, Globe, Shield, Target, Zap, Clock, Filter, Search, RefreshCw, BarChart3, PieChart, Calendar, ArrowUp, ArrowDown, Minus} from "lucide-react"
 
-import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { BossCard, EmpowermentCard, StatsCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Input} from "@/components/ui/input"
+import { Badge} from "@/components/ui/badge"
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Loading } from "@/components/ui/loading"
-import { Progress } from "@/components/ui/progress"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+import { Loading} from "@/components/ui/loading"
+import { Progress} from "@/components/ui/progress"
 
 interface CompetitorActivity {
   id: string

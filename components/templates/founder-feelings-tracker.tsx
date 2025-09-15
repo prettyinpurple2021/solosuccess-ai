@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { useState } from 'react';
-import { useTemplateSave } from '@/hooks/use-template-save';
-import { Save, Heart, Brain, Zap, TrendingDown } from 'lucide-react';
+import { Button} from '@/components/ui/button';
+import { Input} from '@/components/ui/input';
+import { Textarea} from '@/components/ui/textarea';
+import { Label} from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import { Slider} from '@/components/ui/slider';
+import { useState} from 'react';
+import { useTemplateSave} from '@/hooks/use-template-save';
+import { Save, Heart, Brain, Zap, TrendingDown} from 'lucide-react';
 
 interface FeelingEntry {
   date: string;

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { createClient } from '@/lib/neon/server'
-import { v4 as uuidv4 } from 'uuid'
-import { headers } from 'next/headers'
+import { NextRequest, NextResponse} from 'next/server'
+import { authenticateRequest} from '@/lib/auth-server'
+import { createClient} from '@/lib/neon/server'
+import { v4 as uuidv4} from 'uuid'
+import { headers} from 'next/headers'
 
 // File type validation
 const ALLOWED_FILE_TYPES = {

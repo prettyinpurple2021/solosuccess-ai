@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth-utils'
-import { db } from '@/db'
-import { users } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { NextRequest, NextResponse} from 'next/server'
+import { verifyToken} from '@/lib/auth-utils'
+import { db} from '@/db'
+import { users} from '@/db/schema'
+import { eq} from 'drizzle-orm'
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Mic, MicOff, Loader2, XCircle } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+import { useState, useRef, useEffect} from 'react'
+import { Button} from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Badge} from '@/components/ui/badge'
+import { Mic, MicOff, Loader2, XCircle} from 'lucide-react'
+import { useToast} from '@/hooks/use-toast'
 
 interface VoiceInputProps {
   onTranscript: (_text: string) => void

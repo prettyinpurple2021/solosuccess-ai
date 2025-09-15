@@ -312,7 +312,6 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.6,})
       temperature: 0.6,
       maxOutputTokens: 2500,
     })
@@ -342,7 +341,6 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,})
       temperature: 0.7,
       maxOutputTokens: 2500,
     })
@@ -376,7 +374,6 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,})
       temperature: 0.7,
       maxOutputTokens: 2000,
     })
@@ -400,7 +397,6 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.6,})
       temperature: 0.6,
       maxOutputTokens: 2000,
     })
@@ -428,7 +424,6 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.8,})
       temperature: 0.8,
       maxOutputTokens: 2000,
     })
@@ -466,7 +461,6 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: briefingPrompt,
-      temperature: 0.7,})
       temperature: 0.7,
       maxOutputTokens: 3000,
     })

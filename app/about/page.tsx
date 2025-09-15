@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState} from "react"
 
 import Link from "next/link"
-import { ArrowLeft, Crown, Rocket, Heart, Flame, CheckCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { ArrowLeft, Crown, Rocket, Heart, Flame, CheckCircle} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
 
 export default function AboutPage() {
   const [mounted, setMounted] = useState(false)

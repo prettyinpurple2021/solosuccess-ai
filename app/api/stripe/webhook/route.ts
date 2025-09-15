@@ -1,12 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { stripe, STRIPE_WEBHOOK_EVENTS } from '@/lib/stripe'
-import { headers } from 'next/headers'
+import { NextRequest, NextResponse} from 'next/server'
+import { stripe, STRIPE_WEBHOOK_EVENTS} from '@/lib/stripe'
+import { headers} from 'next/headers'
 import Stripe from 'stripe'
 import { 
-  getUserByStripeCustomerId, 
-  updateUserSubscription, 
-  getSubscriptionTierFromPriceId 
-} from '@/lib/stripe-db-utils'
+  getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId} from '@/lib/stripe-db-utils'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

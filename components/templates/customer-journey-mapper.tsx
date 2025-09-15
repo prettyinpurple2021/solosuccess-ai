@@ -1,44 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState} from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
 
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Button } from "@/components/ui/button"
-import { BossButton } from "@/components/ui/boss-button"
-import { BossCard } from "@/components/ui/boss-card"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
+import { Slider} from "@/components/ui/slider"
+import { Button} from "@/components/ui/button"
+import { BossButton} from "@/components/ui/boss-button"
+import { BossCard} from "@/components/ui/boss-card"
+import { Badge} from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 
-import { motion } from "framer-motion"
+import { motion} from "framer-motion"
 import { 
-  User, 
-  MapPin, 
-  Frown, 
-  Meh, 
-  Smile,
-  Plus,
-  Minus,
-  ArrowRight,
-  Target,
-  AlertTriangle,
-  MessageCircle,
-  Phone,
-  Mail,
-  Globe,
-  Store,
-  Smartphone,
-  Monitor,
-  Lightbulb,
-  BarChart3,
-  Route
-} from "lucide-react"
+  User, MapPin, Frown, Meh, Smile, Plus, Minus, ArrowRight, Target, AlertTriangle, MessageCircle, Phone, Mail, Globe, Store, Smartphone, Monitor, Lightbulb, BarChart3, Route} from "lucide-react"
 
 interface Touchpoint {
   id: string

@@ -1,22 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { toast} from '@/hooks/use-toast';
+import { Card, CardContent} from '@/components/ui/card';
+import { Button} from '@/components/ui/button';
+import { Badge} from '@/components/ui/badge';
 import { 
-  Bell, 
-  AlertTriangle, 
-  AlertCircle, 
-  Info, 
-  X,
-  Eye,
-  Archive
-} from 'lucide-react';
-import { useCompetitorAlerts, CompetitorAlert } from '@/hooks/use-competitor-alerts';
-import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+  Bell, AlertTriangle, AlertCircle, Info, X, Eye, Archive} from 'lucide-react';
+import { useCompetitorAlerts, CompetitorAlert} from '@/hooks/use-competitor-alerts';
+import { cn} from '@/lib/utils';
+import { formatDistanceToNow} from 'date-fns';
 
 interface AlertNotificationsProps {
   className?: string;

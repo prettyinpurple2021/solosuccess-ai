@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest } from '@/lib/auth-server';
-import { rateLimitByIp } from '@/lib/rate-limit';
-import { alertSystem } from '@/lib/competitor-alert-system';
-import { z } from 'zod';
+import { NextRequest, NextResponse} from 'next/server';
+import { authenticateRequest} from '@/lib/auth-server';
+import { rateLimitByIp} from '@/lib/rate-limit';
+import { alertSystem} from '@/lib/competitor-alert-system';
+import { z} from 'zod';
 
 const updateAlertSchema = z.object({
   action: z.enum(['mark_read', 'archive']),

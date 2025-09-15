@@ -1,53 +1,19 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
-import { motion } from "framer-motion"
-import { useParams } from "next/navigation"
+import { motion} from "framer-motion"
+import { useParams} from "next/navigation"
 import {
-  ArrowLeft,
-  Globe,
-  Building,
-  Users,
-  DollarSign,
-  Zap,
-  AlertTriangle,
-  TrendingUp,
-  Calendar,
-  ExternalLink,
-  Settings,
-  RefreshCw,
-  Target,
-  Lightbulb,
-  Activity,
-  MessageSquare,
-  ThumbsUp,
-  ThumbsDown,
-  Clock,
-  MapPin,
-  Briefcase,
-  Award,
-  ChevronRight,
-  Plus,
-  Brain,
-  Radar,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Info,
-  Download,
-  Crosshair,
-  Sparkles,
-  Flame
-} from "lucide-react"
+  ArrowLeft, Globe, Building, Users, DollarSign, Zap, AlertTriangle, TrendingUp, Calendar, ExternalLink, Settings, RefreshCw, Target, Lightbulb, Activity, MessageSquare, ThumbsUp, ThumbsDown, Clock, MapPin, Briefcase, Award, ChevronRight, Plus, Brain, Radar, CheckCircle, XCircle, AlertCircle, Info, Download, Crosshair, Sparkles, Flame} from "lucide-react"
 import Link from "next/link"
 
-import { EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Loading } from "@/components/ui/loading"
+import { EmpowermentCard, StatsCard} from "@/components/ui/boss-card"
+import { BossButton, ZapButton} from "@/components/ui/boss-button"
+import { Badge} from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Progress} from "@/components/ui/progress"
+import { Avatar, AvatarFallback} from "@/components/ui/avatar"
+import { Loading} from "@/components/ui/loading"
 
 interface CompetitorProfile {
   id: number

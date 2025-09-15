@@ -1,21 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState} from "react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import { Button} from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Badge} from "@/components/ui/badge"
 import { 
-  HelpCircle, 
-  Lightbulb, 
-  Zap, 
-  Star, 
-  ArrowRight,
-  Play,
-  BookOpen,
-  Video,
-  ExternalLink
-} from "lucide-react"
+  HelpCircle, Lightbulb, Zap, Star, ArrowRight, Play, BookOpen, Video, ExternalLink} from "lucide-react"
 
 interface HelpTooltipProps {
   children: React.ReactNode

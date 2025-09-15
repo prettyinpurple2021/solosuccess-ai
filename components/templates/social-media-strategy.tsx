@@ -1,50 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect} from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Button } from "@/components/ui/button"
-import { BossButton } from "@/components/ui/boss-button"
-import { BossCard } from "@/components/ui/boss-card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { motion, AnimatePresence } from "framer-motion"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Input} from "@/components/ui/input"
+import { Textarea} from "@/components/ui/textarea"
+import { Label} from "@/components/ui/label"
+import { Slider} from "@/components/ui/slider"
+import { Button} from "@/components/ui/button"
+import { BossButton} from "@/components/ui/boss-button"
+import { BossCard} from "@/components/ui/boss-card"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { motion, AnimatePresence} from "framer-motion"
 import { 
-  Share2, 
-  Target, 
-  Calendar, 
-  Hash, 
-  BarChart3, 
-  Users, 
-  TrendingUp,
-  MessageCircle,
-  Heart,
-  Eye,
-  Plus,
-  Minus,
-  Clock,
-  Zap,
-  Crown,
-  Brain,
-  AlertTriangle,
-  CheckCircle,
-  Edit3,
-  Settings,
-  Camera,
-  Video,
-  FileText,
-  Link,
-  Tag,
-  Lightbulb,
-  Star
-} from "lucide-react"
+  Share2, Target, Calendar, Hash, BarChart3, Users, TrendingUp, MessageCircle, Heart, Eye, Plus, Minus, Clock, Zap, Crown, Brain, AlertTriangle, CheckCircle, Edit3, Settings, Camera, Video, FileText, Link, Tag, Lightbulb, Star} from "lucide-react"
 
 interface SocialPlatform {
   name: string

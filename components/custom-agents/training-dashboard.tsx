@@ -1,26 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useState, useEffect} from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Button} from "@/components/ui/button"
+import { Badge} from "@/components/ui/badge"
+import { Progress} from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Alert, AlertDescription} from "@/components/ui/alert"
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Brain, 
-  Target, 
-  Clock, 
-  Star,
-  AlertTriangle,
-  CheckCircle,
-  Lightbulb,
-  Download,
-  Play,
-  Settings
-} from "lucide-react"
+  BarChart3, TrendingUp, Brain, Target, Clock, Star, AlertTriangle, CheckCircle, Lightbulb, Download, Play, Settings} from "lucide-react"
 
 interface TrainingMetrics {
   totalInteractions: number

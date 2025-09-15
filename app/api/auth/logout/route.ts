@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { AUTH_COOKIE_OPTIONS } from '@/lib/auth-utils'
+import { NextRequest, NextResponse} from 'next/server'
+import { AUTH_COOKIE_OPTIONS} from '@/lib/auth-utils'
 
 /**
  * Handles user logout by clearing authentication cookies

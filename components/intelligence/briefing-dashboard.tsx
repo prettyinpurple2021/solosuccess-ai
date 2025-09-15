@@ -1,25 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { useIntelligenceBriefings } from '@/hooks/use-intelligence-briefings'
-import { IntelligenceBriefing } from '@/lib/intelligence-briefing-system'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
+import { Button} from '@/components/ui/button'
+import { Badge} from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
+import { ScrollArea} from '@/components/ui/scroll-area'
+import { Separator} from '@/components/ui/separator'
+import { useIntelligenceBriefings} from '@/hooks/use-intelligence-briefings'
+import { IntelligenceBriefing} from '@/lib/intelligence-briefing-system'
 import { 
-  Calendar, 
-  Clock, 
-  TrendingUp, 
-  AlertTriangle, 
-  Target, 
-  FileText,
-  Loader2,
-  RefreshCw
-} from 'lucide-react'
-import { format } from 'date-fns'
+  Calendar, Clock, TrendingUp, AlertTriangle, Target, FileText, Loader2, RefreshCw} from 'lucide-react'
+import { format} from 'date-fns'
 
 interface BriefingDashboardProps {
   competitorIds?: string[]

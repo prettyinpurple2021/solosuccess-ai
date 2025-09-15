@@ -1,4 +1,4 @@
-import { IntegrationHub } from '@/components/integrations/integration-hub';
+import { IntegrationHub} from '@/components/integrations/integration-hub';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

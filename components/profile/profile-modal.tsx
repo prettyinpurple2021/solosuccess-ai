@@ -2,25 +2,19 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect} from "react"
+import { Button} from "@/components/ui/button"
+import { Input} from "@/components/ui/input"
+import { Label} from "@/components/ui/label"
+import { Textarea} from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useAuth } from "@/hooks/use-auth"
-import { Loader2, User, Camera, Trash2, AlertTriangle } from "lucide-react"
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { Alert, AlertDescription} from "@/components/ui/alert"
+import { Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import { useAuth} from "@/hooks/use-auth"
+import { Loader2, User, Camera, Trash2, AlertTriangle} from "lucide-react"
 
 interface ProfileModalProps {
   open: boolean

@@ -1,15 +1,15 @@
 import "./globals.css"
 import type { ReactNode } from 'react'
-import { Inter as FontSans } from "next/font/google"
-import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
-import { StackAuthProvider } from "@/components/auth/stack-provider"
-import { AuthProvider } from "@/hooks/use-auth"
-// import { RecaptchaProvider } from "@/components/recaptcha/recaptcha-provider"
-import { PerformanceMonitor } from "@/components/performance/performance-monitor"
-import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"
-import { AccessibilityProvider } from "@/components/ui/accessibility"
-import { ErrorBoundary } from "@/components/ui/error-handler"
+import { Inter as FontSans} from "next/font/google"
+import { cn} from "@/lib/utils"
+import { ThemeProvider} from "@/components/theme-provider"
+import { StackAuthProvider} from "@/components/auth/stack-provider"
+import { AuthProvider} from "@/hooks/use-auth"
+// import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
+import { PerformanceMonitor} from "@/components/performance/performance-monitor"
+import { ServiceWorkerRegister} from "@/components/performance/service-worker-register"
+import { AccessibilityProvider} from "@/components/ui/accessibility"
+import { ErrorBoundary} from "@/components/ui/error-handler"
 
 const fontSans = FontSans({
   subsets: ["latin"],
