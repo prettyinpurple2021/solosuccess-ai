@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation"
 import { 
   ArrowLeft, 
   Search, 
-  Plus, 
-  Eye, 
-  Zap,
+  _Plus, 
+  _Eye, 
+  _Zap,
   Globe,
   Building,
   Users,
@@ -18,7 +18,7 @@ import {
   AlertTriangle,
   Lightbulb,
   Target,
-  Sparkles
+  _Sparkles
 } from "lucide-react"
 import Link from "next/link"
 

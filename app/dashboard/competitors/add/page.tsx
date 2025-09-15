@@ -9,9 +9,9 @@ import {
   Building, 
   Users, 
   DollarSign,
-  Shield,
+  _Shield,
   Eye,
-  Zap,
+  _Zap,
   CheckCircle,
   AlertTriangle
 } from "lucide-react"

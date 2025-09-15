@@ -35,7 +35,7 @@ export default function DashboardPage() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showWelcomeDashboard, setShowWelcomeDashboard] = useState(false)
   const searchParams = useSearchParams()
-  const router = useRouter()
+  const _router = useRouter()
 
   // Track page views and performance
   usePageTracking()
