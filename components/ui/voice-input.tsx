@@ -7,6 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mic, MicOff, Volume2, VolumeX, Square, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// Provide minimal fallbacks for browser-only Web Speech API types during Node builds
+type SpeechGrammarList = any
+type SpeechRecognitionResultList = any
+
 interface VoiceInputProps {
   onTranscript: (text: string) => void
   onFinalTranscript?: (text: string) => void
