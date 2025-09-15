@@ -3,28 +3,6 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Script from 'next/script'
 
-export const metadata: Metadata = {
-  title: 'Boss Blog — SoloSuccess AI: Solo Founder Playbooks',
-  description:
-    'AI-powered Productivity, Business Automation, and Strategic Planning Tools for Solo Founders, Solopreneurs, Consultants, and Small Business Owners.',
-  alternates: {
-    canonical: 'https://solosuccess.ai/blog',
-  },
-  openGraph: {
-    title: 'Boss Blog — SoloSuccess AI',
-    description:
-      'Guides on Workflow Automation AI, AI Executive Assistant routines, and Business Intelligence Tools.',
-    url: 'https://solosuccess.ai/blog',
-    type: 'website',
-    siteName: 'SoloSuccess AI',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'SoloSuccess AI Blog',
-    description:
-      'Marketing, sales, and operations playbooks for Solo Founders powered by AI.',
-  },
-}
 
 export default function BlogLayout({ children }: { children: ReactNode }) {
   const blogSchema = {

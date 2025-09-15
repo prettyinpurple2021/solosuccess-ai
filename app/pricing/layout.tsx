@@ -3,28 +3,6 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Script from 'next/script'
 
-export const metadata: Metadata = {
-  title: 'Pricing — SoloSuccess AI: AI Co-founder Plans',
-  description:
-    'Pricing for Solo Founder, Solopreneur, Consultant, and Small Business Owner. Plans with AI Business Co-pilot, Founder AI Tools, Workflow Automation AI, and AI-powered Productivity.',
-  alternates: {
-    canonical: 'https://solosuccess.ai/pricing',
-  },
-  openGraph: {
-    title: 'Pricing — SoloSuccess AI',
-    description:
-      'Choose a plan that fits your solo business: AI Business Assistant, Workflow Automation AI, and Strategic Planning Tools.',
-    url: 'https://solosuccess.ai/pricing',
-    type: 'website',
-    siteName: 'SoloSuccess AI',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'SoloSuccess AI Pricing',
-    description:
-      'Plans for Solo Founders and Small Business Owners. Build your Virtual Team for Founders.',
-  },
-}
 
 export default function PricingLayout({ children }: { children: ReactNode }) {
   const products = {
