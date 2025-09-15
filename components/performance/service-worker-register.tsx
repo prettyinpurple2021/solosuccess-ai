@@ -43,6 +43,11 @@ export function ServiceWorkerRegister() {
     }
   }, [])
 
+  useEffect(() => {
+    // Fire-and-forget sitemap ping after deploy in browser context
+    fetch('/api/ping-search', { method: 'POST' }).catch(() => {})
+  }, [])
+
   const registerServiceWorker = async () => {
     try {
       if ('serviceWorker' in navigator) {

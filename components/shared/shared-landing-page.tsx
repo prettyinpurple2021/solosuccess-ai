@@ -14,6 +14,7 @@ import {
 
 import Link from "next/link"
 import { ScheduleDemoModal} from "@/components/schedule/schedule-demo-modal"
+import FaqSection from "@/components/faq/faq-section"
 
 interface SharedLandingPageProps {
   showAuthModal?: boolean
@@ -196,16 +197,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               >
                 AI Squad
               </a>
-              <a
-                href="#testimonials"
-                onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("testimonials")
-                }}
-                className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
-              >
-                Testimonials
-              </a>
+              
               <a
                 href="#pricing"
                 onClick={(e) => {
@@ -273,17 +265,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   >
                     AI Squad
                   </a>
-                  <a
-                    href="#testimonials"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      scrollToSection("testimonials")
-                      setMobileMenuOpen(false)
-                    }}
-                    className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
-                  >
-                    Testimonials
-                  </a>
+                  
                   <a
                     href="#pricing"
                     onClick={(e) => {
@@ -329,8 +311,18 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-pink-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">SoloSuccess</span>
               </h1>
               <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 mb-8">
-                Transform your productivity with AI agents that work 24/7. Automate everything, achieve more, and dominate
-                your industry like never before.
+                Meet your <strong>AI Co-founder</strong> and <strong>AI Business Co-pilot</strong>—a <strong>Virtual Team for Founders</strong> inside a
+                <strong> Solopreneur Operating System</strong>. This is the all‑in‑one <strong>AI Business Assistant</strong> and <strong>Startup AI Platform</strong>
+                that brings together <strong>Founder AI Tools</strong> and <strong>One-Person Business Software</strong> so every <strong>Solo Founder</strong>,
+                <strong> Solopreneur</strong>, or <strong>Individual Creator</strong> can move faster with clarity.
+              </p>
+              <p className="text-responsive-base lg:text-responsive-lg text-gray-600 dark:text-gray-300">
+                Whether you’re using <strong>Freelancer Tools</strong>, building as a <strong>Bootstrapped Founder</strong>, growing as an
+                <strong> E-commerce Entrepreneur</strong>, scaling as a <strong>Small Business Owner</strong>, or consulting with dedicated
+                <strong> Consultant Software</strong>—we help you avoid <strong>Founder Burnout</strong>, <strong>Reduce Context Switching</strong>, and
+                <strong> Overcome Decision Fatigue</strong>. Execute confidently, <strong>Scale a Solo Business</strong>, and unlock
+                <strong> Business Automation</strong> with <strong>Strategic Planning Tools</strong> that <strong>Streamline Operations</strong> and answer
+                <strong> How to Grow a Business Alone</strong> with proven AI workflows.
               </p>
               <div className="flex-responsive mb-10">
                 <Link href="/signup">
@@ -433,8 +425,10 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               Supercharge Your Success
             </h2>
             <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Our AI-powered platform gives you everything you need to dominate your market and achieve unprecedented
-              growth.
+              Your <strong>AI Marketing Assistant</strong> and <strong>AI Sales Strategist</strong> collaborate to deliver
+              <strong> Automated Content Creation</strong>, <strong>AI for Social Media</strong>, and <strong>Business Intelligence Tools</strong>,
+              powered by <strong>Workflow Automation AI</strong> and an <strong>AI Executive Assistant</strong>—all wrapped in
+              <strong> AI-powered Productivity</strong> that compounds day after day.
             </p>
           </motion.div>
 
@@ -556,78 +550,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-4">
-        <div className="container mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-              Success Stories
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Join thousands of entrepreneurs who&apos;ve transformed their businesses with SoloSuccess AI.
-            </p>
-          </motion.div>
-
-          <div className="max-w-4xl mx-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentTestimonial}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card className="text-center p-8 border-purple-200 dark:border-teal-800">
-                  <CardContent>
-                    <div className="flex justify-center mb-4">
-                      {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    <blockquote className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-6 italic">
-                      &ldquo;{testimonials[currentTestimonial].content}&rdquo;
-                    </blockquote>
-                    <div className="flex items-center justify-center space-x-4">
-                      <ResponsiveImage
-                        src={testimonials[currentTestimonial].avatar || "/default-user.svg"}
-                        alt={testimonials[currentTestimonial].name}
-                        width={60}
-                        height={60}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <div className="font-bold text-gray-900 dark:text-white">
-                          {testimonials[currentTestimonial].name}
-                        </div>
-                        <div className="text-gray-600 dark:text-gray-400">{testimonials[currentTestimonial].role}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="flex justify-center mt-8 space-x-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonial(index)}
-                  aria-label={`View testimonial ${index + 1}`}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentTestimonial ? "bg-purple-500" : "bg-gray-300 dark:bg-gray-600"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Pricing Section */}
       <section id="pricing" className="p-responsive-xl bg-white/50 dark:bg-slate-800/50">
@@ -643,7 +566,9 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               Choose Your Power Level
             </h2>
             <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Start your journey to becoming a SoloSuccess with our flexible pricing plans.
+              Pricing tailored for every stage: from <strong>Solo Founder</strong> just starting, to the scaling
+              <strong> Small Business Owner</strong> and <strong>Consultant</strong> seeking <strong>Business Automation</strong> that
+              <strong> Streamlines Operations</strong>.
             </p>
           </motion.div>
 
@@ -686,6 +611,11 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                         </li>
                       ))}
                     </ul>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                      Built for <strong>Bootstrapped Founders</strong>, <strong>Freelancers</strong>, and
+                      <strong> E-commerce Entrepreneurs</strong>—with <strong>Strategic Planning Tools</strong> and an integrated
+                      <strong> AI Business Assistant</strong>.
+                    </div>
                     <Button
                       className={`w-full ${
                         plan.popular
@@ -749,6 +679,30 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           </motion.div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FaqSection
+        id="faq-home"
+        title="SoloSuccess AI FAQs"
+        items={[
+          {
+            question: "What is SoloSuccess AI?",
+            answer: "An AI Co-founder and AI Business Co-pilot that operates as a Solopreneur Operating System to automate workflows and accelerate growth.",
+          },
+          {
+            question: "Who is it for?",
+            answer: "Solo Founders, Solopreneurs, Freelancers, Individual Creators, Small Business Owners, E-commerce Entrepreneurs, and Consultants.",
+          },
+          {
+            question: "How does pricing work?",
+            answer: "Start free on the Launch plan. Upgrade to Accelerator for automation scale or Dominator for unlimited power and advanced capabilities.",
+          },
+          {
+            question: "Can I cancel anytime?",
+            answer: "Yes. You can upgrade, downgrade, or cancel anytime without penalties.",
+          },
+        ]}
+      />
 
       {/* Footer */}
       <footer className="relative bg-gray-900 text-white p-responsive-xl z-10">

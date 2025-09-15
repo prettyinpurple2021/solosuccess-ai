@@ -20,13 +20,59 @@ const fontSans = FontSans({
 })
 
 export const metadata = {
-  title: 'SoloSuccess AI',
-  description: 'SoloSuccess AI Platform',
+  title: 'SoloSuccess AI — AI Co-founder for Solo Founders',
+  description: 'AI Business Co-pilot and Virtual Team for Founders. Solopreneur Operating System with AI Business Assistant, Startup AI Platform, and Founder AI Tools to scale a one-person business.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'SoloSuccess AI',
+  },
+  keywords: [
+    'AI Co-founder',
+    'AI Business Co-pilot',
+    'Virtual Team for Founders',
+    'Solopreneur Operating System',
+    'AI Business Assistant',
+    'Startup AI Platform',
+    'Founder AI Tools',
+    'One-Person Business Software',
+    'Solo Founder',
+    'Solopreneur',
+    'Freelancer Tools',
+    'Individual Creator',
+    'Bootstrapped Founder',
+    'E-commerce Entrepreneur',
+    'Small Business Owner',
+    'Consultant Software',
+    'Founder Burnout',
+    'Reduce Context Switching',
+    'Overcome Decision Fatigue',
+    'Scale a Solo Business',
+    'Business Automation',
+    'Strategic Planning Tools',
+    'Streamline Operations',
+    'How to Grow a Business Alone',
+    'AI Marketing Assistant',
+    'AI Sales Strategist',
+    'Automated Content Creation',
+    'AI for Social Media',
+    'Business Intelligence Tools',
+    'Workflow Automation AI',
+    'AI Executive Assistant',
+    'AI-powered Productivity',
+  ],
+  openGraph: {
+    title: 'SoloSuccess AI — AI Co-founder for Solo Founders',
+    description: 'Virtual Team for Founders. AI Business Co-pilot and Solopreneur OS to automate workflows, streamline operations, and scale a solo business.',
+    type: 'website',
+    url: 'https://solosuccess.ai',
+    siteName: 'SoloSuccess AI',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SoloSuccess AI — Founder AI Tools',
+    description: 'AI Business Assistant, Workflow Automation AI, and AI-powered Productivity for solo founders.',
   },
   other: {
     'mobile-web-app-capable': 'yes',
@@ -85,6 +131,36 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
           fontSans.variable
         )}
       >
+        <link rel="canonical" href="https://solosuccess.ai/" />
+        <Script id="ld-org" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'SoloSuccess AI',
+            url: 'https://solosuccess.ai/',
+            logo: 'https://solosuccess.ai/images/logo.png',
+            sameAs: [
+              'https://twitter.com/solosuccessai',
+              'https://www.linkedin.com/company/solosuccessai'
+            ]
+          })}
+        </Script>
+        <Script id="ld-software" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'SoloSuccess AI',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            url: 'https://solosuccess.ai/',
+            description: 'AI Co-founder and AI Business Co-pilot for solo founders. Virtual Team for Founders with Solopreneur Operating System.',
+            offers: {
+              '@type': 'Offer',
+              price: 0,
+              priceCurrency: 'USD'
+            }
+          })}
+        </Script>
         <noscript
           dangerouslySetInnerHTML={{
             __html:

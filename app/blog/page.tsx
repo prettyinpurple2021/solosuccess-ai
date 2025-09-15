@@ -50,8 +50,10 @@ export default function BlogComingSoonPage() {
             <span className="text-gray-600 text-3xl md:text-4xl">is Almost Here!</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Get ready for empire-building strategies, AI productivity hacks, and real talk about the solo entrepreneur journey. 
-            The boss blog launches September 1st, 2025! 🚀
+            Actionable playbooks on <strong>Business Automation</strong>, <strong>Strategic Planning Tools</strong>, and how to
+            <strong> Streamline Operations</strong> as a <strong>Solo Founder</strong>, <strong>Solopreneur</strong>, or
+            <strong> Small Business Owner</strong>. We cover <strong>AI-powered Productivity</strong> for
+            <strong> Freelancers</strong>, <strong>Consultants</strong>, and the <strong>Individual Creator</strong>.
           </p>
           
           {/* Launch Date */}
@@ -71,7 +73,8 @@ export default function BlogComingSoonPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">What to Expect</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The Boss Blog will be your go-to resource for authentic entrepreneurship content
+              Learn how to <strong>Scale a Solo Business</strong>, <strong>Reduce Context Switching</strong>, and
+              <strong> Overcome Decision Fatigue</strong> with practical systems and founder‑friendly frameworks.
             </p>
           </div>
 
@@ -83,7 +86,7 @@ export default function BlogComingSoonPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Empire Building Strategies</h3>
                 <p className="text-gray-600">
-                  Deep-dive guides on scaling your solo business, building systems, and creating sustainable growth without burning out.
+                  Deep dives on <strong>How to Grow a Business Alone</strong> using automation, delegation to AI, and sustainable pace.
                 </p>
               </CardContent>
             </Card>
@@ -95,7 +98,8 @@ export default function BlogComingSoonPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-4">AI Productivity Hacks</h3>
                 <p className="text-gray-600">
-                  Practical tips for leveraging AI in your business, automation workflows, and how to work smarter (not harder).
+                  Practical <strong>Workflow Automation AI</strong> tutorials, <strong>AI Executive Assistant</strong> routines, and
+                  <strong> Business Intelligence Tools</strong> you can copy‑paste.
                 </p>
               </CardContent>
             </Card>
@@ -105,9 +109,10 @@ export default function BlogComingSoonPage() {
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Real Entrepreneur Stories</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Marketing & Growth Systems</h3>
                 <p className="text-gray-600">
-                  Authentic case studies, wins, failures, and lessons learned from real solo entrepreneurs building their empires.
+                  Systems for <strong>Automated Content Creation</strong>, <strong>AI for Social Media</strong>, and
+                  <strong> AI Marketing Assistant</strong> + <strong>AI Sales Strategist</strong> playbooks.
                 </p>
               </CardContent>
             </Card>
