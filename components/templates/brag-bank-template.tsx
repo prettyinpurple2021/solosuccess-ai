@@ -156,6 +156,7 @@ export function BragBankTemplate() {
                     className="w-full p-2 border rounded-md"
                     value={entry.type}
                     onChange={(e) => updateEntry(index, 'type', e.target.value)}
+                    aria-label="Select entry type"
                   >
                     {entryTypes.map((type) => (
                       <option key={type} value={type}>{type}</option>
