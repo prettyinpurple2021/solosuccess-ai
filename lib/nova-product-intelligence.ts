@@ -169,10 +169,9 @@ export class NovaProductIntelligence {
       competitorIds.map(id => this.getWebsiteIntelligence(id, 90))
     )
 
-    const analysisPrompt = this.buildProductGapAnalysisPrompt(
-      competitors, 
-      competitorProductData, 
-      userProductData
+    const analysisPrompt = this.buildProductGapsPrompt(
+      competitors,
+      userProductData || {}
     )
 
     const { text } = await generateText({
@@ -182,7 +181,7 @@ export class NovaProductIntelligence {
       maxOutputTokens: 2000,
     })
 
-    const gaps = this.parseProductGapAnalysis(text)
+    const gaps = this.parseProductGapsAnalysis(text)
 
     // Store gap analysis for each competitor
     for (const competitorId of competitorIds) {
@@ -204,7 +203,7 @@ export class NovaProductIntelligence {
       competitorIds.map(id => this.getWebsiteIntelligence(id, 60))
     )
 
-    const analysisPrompt = this.buildDesignPatternAnalysisPrompt(competitors, designData)
+    const analysisPrompt = this.buildDesignPatternsPrompt(competitors, designData)
 
     const { text } = await generateText({
       model: this.novaConfig.model as any,
@@ -213,7 +212,7 @@ export class NovaProductIntelligence {
       maxOutputTokens: 1800,
     })
 
-    const patterns = this.parseDesignPatternAnalysis(text)
+    const patterns = this.parseDesignPatternsAnalysis(text, competitorIds[0] || 0)
 
     // Store design pattern analysis
     for (const competitorId of competitorIds) {
@@ -355,6 +354,14 @@ export class NovaProductIntelligence {
 
   private buildProductBriefingPrompt(briefingData: any[], timeframe: string): string {
     return `Product intelligence briefing for ${timeframe}`
+  }
+
+  private async getHiringIntelligence(competitorId: number, days: number): Promise<any[]> {
+    return []
+  }
+
+  private async getProductAnnouncements(competitorId: number, days: number): Promise<any[]> {
+    return []
   }
 
   // ... [Rest of the file unchanged] ...
