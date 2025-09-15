@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { query } from '@/lib/neon/client'
+import { authenticateRequest } from '@/lib/auth-server'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 // Input validation schema
 const TaskIntelligenceRequestSchema = z.object({
@@ -42,17 +38,10 @@ const TaskIntelligenceRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Get user from session
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
-    }
-
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse and validate request body
@@ -68,15 +57,27 @@ export async function POST(request: NextRequest) {
     )
 
     // Log usage for analytics
-    await supabase
-      .from('ai_usage_logs')
-      .insert({
-        user_id: user.id,
-        feature: 'task_intelligence',
-        request_type: 'optimize_tasks',
-        task_count: validatedData.tasks.length,
-        created_at: new Date().toISOString()
-      })
+    try {
+      // Create ai_usage_logs table if it doesn't exist
+      await query(`
+        CREATE TABLE IF NOT EXISTS ai_usage_logs (
+          id SERIAL PRIMARY KEY,
+          user_id VARCHAR(255) NOT NULL,
+          feature VARCHAR(255) NOT NULL,
+          request_type VARCHAR(255) NOT NULL,
+          task_count INTEGER,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        )
+      `)
+      
+      await query(`
+        INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date()])
+    } catch (logError) {
+      console.error('Error logging AI usage:', logError)
+      // Continue execution even if logging fails
+    }
 
     return NextResponse.json({
       success: true,
@@ -113,30 +114,25 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user from session
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
-    }
-
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Get user's recent AI usage stats
-    const { data: usageStats, error: statsError } = await supabase
-      .from('ai_usage_logs')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('feature', 'task_intelligence')
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    if (statsError) {
+    let usageStats = []
+    try {
+      const result = await query(`
+        SELECT * FROM ai_usage_logs
+        WHERE user_id = $1 AND feature = $2
+        ORDER BY created_at DESC
+        LIMIT 10
+      `, [user.id, 'task_intelligence'])
+      usageStats = result.rows
+    } catch (statsError) {
       console.error('Error fetching usage stats:', statsError)
+      // Continue execution even if stats fetching fails
     }
 
     return NextResponse.json({
@@ -150,7 +146,7 @@ export async function GET(request: NextRequest) {
           'productivity_tips',
           'schedule_optimization'
         ],
-        recentUsage: usageStats || [],
+        recentUsage: usageStats,
         limits: {
           requestsPerDay: 100,
           tasksPerRequest: 50
