@@ -11,6 +11,7 @@ import { ServiceWorkerRegister } from "@/components/performance/service-worker-r
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
+import { GoogleAnalytics } from "@/components/analytics/google-analytics"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -48,6 +49,8 @@ export default function RootLayout({
 }: {
   children: ReactNode
 }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -56,6 +59,7 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
+        {gaId && <GoogleAnalytics measurementId={gaId} />}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
