@@ -12,7 +12,7 @@ import { ServiceWorkerRegister } from "@/components/performance/service-worker-r
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
-import { GoogleAnalytics } from "@/components/analytics/google-analytics"
+// Removed GoogleAnalytics component usage; using manual GA4 snippet
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -50,7 +50,7 @@ export default function RootLayout({
 }: {
   children: ReactNode
 }) {
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  // GA4 is injected manually; no env var needed
   
   return (
     <html lang="en" suppressHydrationWarning>
@@ -61,6 +61,22 @@ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-MPXM3ZZT');`}
+        </Script>
+        {/* Google tag (gtag.js) - exact snippet per instructions */}
+        <Script
+          id="ga4-gtag-src"
+          src="https://www.googletagmanager.com/gtag/js?id=G-W174T4ZFNF"
+          strategy="afterInteractive"
+          async
+        />
+        <Script id="ga4-gtag-init" strategy="afterInteractive">
+          {`
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);} 
+  gtag('js', new Date());
+
+  gtag('config', 'G-W174T4ZFNF');
+          `}
         </Script>
       </head>
       <body
@@ -75,7 +91,6 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
               '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPXM3ZZT" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
           }}
         />
-        {gaId && <GoogleAnalytics measurementId={gaId} />}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
