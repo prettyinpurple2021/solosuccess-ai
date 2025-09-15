@@ -5,7 +5,7 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { z } from 'zod'
 import { eq, and, desc, asc, gte, lte, inArray } from 'drizzle-orm'
 import type { 
-  IntelligenceData, 
+  _IntelligenceData, 
   SourceType, 
   ImportanceLevel,
   ExtractedData,

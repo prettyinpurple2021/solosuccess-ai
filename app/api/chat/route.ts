@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     
     // Get agent-specific prompts with competitive intelligence integration
     const agentPrompts = CompetitiveIntelligenceContextService.getAgentCompetitivePrompts()
-    const agentId_typed = agentId as keyof typeof agentPrompts
+    const _agentId_typed = agentId as keyof typeof agentPrompts
     
     // Get agent personality based on agentId
     const agentPersonalities = {
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         }
       ],
       temperature: 0.7,
-      maxTokens: 1500 // Increased for competitive intelligence context
+      maxOutputTokens: 1500, // Updated for AI SDK v5
     })
 
     // Update conversation with response
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       [response, conversation.id]
     )
 
-    return result.toDataStreamResponse()
+    return result.toTextStreamResponse()
   } catch (error) {
     console.error('Error in chat:', error)
     return NextResponse.json(

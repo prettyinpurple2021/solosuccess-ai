@@ -314,8 +314,9 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.7,})
         temperature: 0.7,
-        maxTokens: 2000
+        maxOutputTokens: 2000
       })
 
       // Parse and structure the analysis
@@ -384,8 +385,9 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.6,})
         temperature: 0.6,
-        maxTokens: 1500
+        maxOutputTokens: 1500
       })
 
       return this.parseGrowthRecommendations(response.text, competitorId)
@@ -463,8 +465,9 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.7,})
         temperature: 0.7,
-        maxTokens: 2000
+        maxOutputTokens: 2000
       })
 
       return this.parseGrowthPatternAnalysis(response.text, competitorId)
@@ -542,8 +545,9 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.6,})
         temperature: 0.6,
-        maxTokens: 1800
+        maxOutputTokens: 1800
       })
 
       return this.parseGrowthRecommendations(response.text, competitorIds[0])
@@ -600,8 +604,9 @@ export class BlazeGrowthIntelligence {
             content: analysisPrompt
           }
         ],
+        temperature: 0.6,})
         temperature: 0.6,
-        maxTokens: 1500
+        maxOutputTokens: 1500
       })
 
       return this.parseGrowthRecommendations(response.text, competitorId)

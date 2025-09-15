@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET /api/competitive-intelligence/frameworks - Get available frameworks and templates
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
       if (error || !user) {

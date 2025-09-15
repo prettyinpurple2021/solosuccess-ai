@@ -36,9 +36,9 @@ import {
   CheckSquare,
   Square
 } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, _AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
-import FilePreviewModal from "@/components/file-preview-modal"
+import _FilePreviewModal from "@/components/file-preview-modal"
 import EnhancedFilePreviewModal from "@/components/briefcase/enhanced-file-preview-modal"
 import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
 import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advanced-search-panel"
@@ -86,8 +86,8 @@ export default function BriefcasePage() {
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [_searchTerm, setSearchTerm] = useState("")
+  const [_selectedCategory, setSelectedCategory] = useState("all")
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
   const [showUploadDialog, setShowUploadDialog] = useState(false)
   const [showFolderDialog, setShowFolderDialog] = useState(false)
@@ -123,8 +123,8 @@ export default function BriefcasePage() {
   const [selectAll, setSelectAll] = useState(false)
   
   // Mobile optimization state
-  const [_isRefreshing, setIsRefreshing] = useState(false)
-  const [_lastTouchY, setLastTouchY] = useState(0)
+  const [_isRefreshing, _setIsRefreshing] = useState(false)
+  const [_lastTouchY, _setLastTouchY] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Advanced search state
@@ -147,7 +147,7 @@ export default function BriefcasePage() {
   })
   const [searchResults, setSearchResults] = useState<BriefcaseFile[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [searchStats, setSearchStats] = useState({
+  const [_searchStats, setSearchStats] = useState({
     fileTypes: [],
     categories: [],
     tags: []
@@ -1217,7 +1217,7 @@ export default function BriefcasePage() {
                 setPreviewIndex(previewIndex + 1)
               }
             }}
-            onEdit={(file) => {
+            onEdit={(_file) => {
               // Open description edit via metadata panel; handled inside modal callbacks
             }}
             onDelete={(file: any) => { handleFileDelete(file.id) }}

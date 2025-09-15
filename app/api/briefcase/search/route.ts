@@ -32,13 +32,13 @@ export async function POST(request: NextRequest) {
       tags = [],
       dateRange,
       sizeRange = [0, 1000],
-      authors = [],
+      _authors = [],
       favorites = false,
       folders = [],
       sortBy = 'relevance',
       sortOrder = 'desc',
       includeContent = true,
-      includeComments = false,
+      _includeComments = false,
       limit = 50,
       offset = 0
     } = await request.json()

@@ -6,8 +6,8 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { eq, and, or, gte, lte, inArray, ilike, sql } from 'drizzle-orm'
 import type { 
-  SourceType,
-  ImportanceLevel,
+  _SourceType,
+  _ImportanceLevel,
   ExtractedData,
   AnalysisResult
 } from '@/lib/competitor-intelligence-types'

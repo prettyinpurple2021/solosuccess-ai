@@ -36,7 +36,7 @@ const SavedSearchCreateSchema = z.object({
   isFavorite: z.boolean().default(false),
 })
 
-const SavedSearchUpdateSchema = z.object({
+const _SavedSearchUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
   searchParams: z.object({
@@ -62,7 +62,7 @@ const SavedSearchUpdateSchema = z.object({
   isFavorite: z.boolean().optional(),
 })
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
     

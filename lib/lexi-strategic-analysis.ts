@@ -312,8 +312,9 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
+      temperature: 0.6,})
       temperature: 0.6,
-      maxTokens: 2500,
+      maxOutputTokens: 2500,
     })
 
     const analysis = this.parsePositioningAnalysis(text, competitorId)
@@ -341,8 +342,9 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
+      temperature: 0.7,})
       temperature: 0.7,
-      maxTokens: 2500,
+      maxOutputTokens: 2500,
     })
 
     const analysis = this.parseMarketTrendAnalysis(text)
@@ -374,8 +376,9 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
+      temperature: 0.7,})
       temperature: 0.7,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     const analysis = this.parseStrategicMoveAnalysis(text, competitorId)
@@ -397,8 +400,9 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
+      temperature: 0.6,})
       temperature: 0.6,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     const assessment = this.parseThreatAssessment(text, competitorId)
@@ -424,8 +428,9 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: analysisPrompt,
+      temperature: 0.8,})
       temperature: 0.8,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     const opportunities = this.parseOpportunityAnalysis(text)
@@ -461,8 +466,9 @@ export class LexiStrategicAnalysis {
     const { text } = await generateText({
       model: this.lexiConfig.model as any,
       prompt: briefingPrompt,
+      temperature: 0.7,})
       temperature: 0.7,
-      maxTokens: 3000,
+      maxOutputTokens: 3000,
     })
 
     return text
