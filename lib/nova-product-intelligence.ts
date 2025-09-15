@@ -194,7 +194,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze design patterns for competitive advantage identification
    */
-  async analyzeDesignPatterns(competitorIds: number[], userId?: string): Promise<DesignPattern[]> {
+  async analyzeDesignPatterns(competitorIds: number[], userId?: string): Promise<ProductInsight[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
