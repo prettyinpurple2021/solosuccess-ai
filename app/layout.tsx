@@ -1,7 +1,7 @@
 import "./globals.css"
 import type { ReactNode } from 'react'
-import Script from 'next/script'
 import { Inter as FontSans} from "next/font/google"
+import Script from 'next/script'
 import { cn} from "@/lib/utils"
 import { ThemeProvider} from "@/components/theme-provider"
 import { StackAuthProvider} from "@/components/auth/stack-provider"
@@ -107,29 +107,36 @@ export default function RootLayout({
         {/* Search engine verification placeholders */}
         <meta name="google-site-verification" content="CHANGE_ME" />
         <meta name="msvalidate.01" content="CHANGE_ME" />
-        <Script id="gtm-base" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        {/* Google Tag Manager */}
+        <Script 
+          id="gtm-base" 
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-MPXM3ZZT');`}
-        </Script>
+})(window,document,'script','dataLayer','GTM-MPXM3ZZT');`
+          }}
+        />
         {/* Google tag (gtag.js) - exact snippet per instructions */}
         <Script
           id="ga4-gtag-src"
           src="https://www.googletagmanager.com/gtag/js?id=G-W174T4ZFNF"
           strategy="afterInteractive"
-          async
         />
-        <Script id="ga4-gtag-init" strategy="afterInteractive">
-          {`
+        <Script 
+          id="ga4-gtag-init" 
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);} 
   gtag('js', new Date());
 
-  gtag('config', 'G-W174T4ZFNF');
-          `}
-        </Script>
+  gtag('config', 'G-W174T4ZFNF');`
+          }}
+        />
       </head>
       <body
         className={cn(
@@ -138,35 +145,45 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
         )}
       >
         <link rel="canonical" href="https://solosuccess.ai/" />
-        <Script id="ld-org" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: 'SoloSuccess AI',
-            url: 'https://solosuccess.ai/',
-            logo: 'https://solosuccess.ai/images/logo.png',
-            sameAs: [
-              'https://twitter.com/solosuccessai',
-              'https://www.linkedin.com/company/solosuccessai'
-            ]
-          })}
-        </Script>
-        <Script id="ld-software" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'SoftwareApplication',
-            name: 'SoloSuccess AI',
-            applicationCategory: 'BusinessApplication',
-            operatingSystem: 'Web',
-            url: 'https://solosuccess.ai/',
-            description: 'AI Co-founder and AI Business Co-pilot for solo founders. Virtual Team for Founders with Solopreneur Operating System.',
-            offers: {
-              '@type': 'Offer',
-              price: 0,
-              priceCurrency: 'USD'
-            }
-          })}
-        </Script>
+        <Script 
+          id="ld-org" 
+          type="application/ld+json" 
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'SoloSuccess AI',
+              url: 'https://solosuccess.ai/',
+              logo: 'https://solosuccess.ai/images/logo.png',
+              sameAs: [
+                'https://twitter.com/solosuccessai',
+                'https://www.linkedin.com/company/solosuccessai'
+              ]
+            })
+          }}
+        />
+        <Script 
+          id="ld-software" 
+          type="application/ld+json" 
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: 'SoloSuccess AI',
+              applicationCategory: 'BusinessApplication',
+              operatingSystem: 'Web',
+              url: 'https://solosuccess.ai/',
+              description: 'AI Co-founder and AI Business Co-pilot for solo founders. Virtual Team for Founders with Solopreneur Operating System.',
+              offers: {
+                '@type': 'Offer',
+                price: 0,
+                priceCurrency: 'USD'
+              }
+            })
+          }}
+        />
         <noscript
           dangerouslySetInnerHTML={{
             __html:
