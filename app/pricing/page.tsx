@@ -4,6 +4,7 @@ import { PricingCards} from '@/components/subscription/pricing-cards'
 import Link from 'next/link'
 import { Button} from '@/components/ui/button'
 import { Sparkles} from 'lucide-react'
+import FaqSection from '@/components/faq/faq-section'
 
 export default function PricingPage() {
   return (
@@ -67,6 +68,17 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      {/* FAQ Section */}
+      <FaqSection
+        id="faq-pricing"
+        title="Pricing FAQs"
+        items={[
+          { question: 'Is there a free plan?', answer: 'Yes. The Launch plan is free forever and great for getting started.' },
+          { question: 'Can I switch plans later?', answer: 'Absolutely. You can switch plans anytime as your needs evolve.' },
+          { question: 'Do I need a credit card to start?', answer: 'No credit card is required for the free Launch plan.' },
+          { question: 'Do you offer refunds?', answer: 'Monthly plans can be cancelled anytime; future charges stop immediately.' },
+        ]}
+      />
     </div>
   )
 }
