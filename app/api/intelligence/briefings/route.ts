@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = briefingRequestSchema.parse(body)
     
-    const { briefingType, competitorIds, topics, customization } = validatedData
+    const { briefingType, competitorIds, topics, _customization } = validatedData
     
     // Generate briefing based on type
     let briefing

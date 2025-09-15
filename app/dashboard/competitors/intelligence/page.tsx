@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, _useEffect, _useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { _Textarea } from "@/components/ui/textarea"
 import { 
   Search, 
   TrendingUp, 
@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic'
 
 export default function IntelligencePage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [_isLoading, setIsLoading] = useState(false)
 
   return (
     <div className="p-6 space-y-6">

@@ -20,7 +20,7 @@ const createActionSchema = z.object({
   dueDate: z.string().optional()
 })
 
-const updateActionSchema = z.object({
+const _updateActionSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
   priority: z.enum(['low', 'medium', 'high']).optional(),

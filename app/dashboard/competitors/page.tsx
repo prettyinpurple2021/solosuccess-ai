@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react"
 import { motion, easeOut } from "framer-motion"
 import {
   Search,
-  Filter,
+  _Filter,
   Plus,
   Eye,
   AlertTriangle,
@@ -25,7 +25,7 @@ import {
   Radar,
   Grid3X3,
   Layers,
-  Crosshair
+  _Crosshair
 } from "lucide-react"
 import Link from "next/link"
 
@@ -54,7 +54,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { Loading } from "@/components/ui/loading"
-import { Progress } from "@/components/ui/progress"
+import { Progress as _Progress } from "@/components/ui/progress"
 
 interface Competitor {
   id: number
@@ -132,7 +132,7 @@ export default function CompetitorDashboardPage() {
   const [realtimeActivities, setRealtimeActivities] = useState<IntelligenceActivity[]>([])
   const [threatMatrix, setThreatMatrix] = useState<ThreatMatrixData[]>([])
   const [marketPositioning, setMarketPositioning] = useState<MarketPositionData[]>([])
-  const [selectedCompetitors, setSelectedCompetitors] = useState<number[]>([])
+  const [_selectedCompetitors, _setSelectedCompetitors] = useState<number[]>([])
   const [timelineFilter, setTimelineFilter] = useState<string>("24h")
 
   // Fetch competitors and stats
@@ -151,7 +151,7 @@ export default function CompetitorDashboardPage() {
         setCompetitors(competitorsData.competitors || [])
 
         // Generate threat matrix data
-        const threatMatrixData = (competitorsData.competitors || []).map((comp: Competitor, index: number) => ({
+        const threatMatrixData = (competitorsData.competitors || []).map((comp: Competitor, _index: number) => ({
           competitorId: comp.id,
           name: comp.name,
           threatLevel: comp.threat_level,
@@ -166,7 +166,7 @@ export default function CompetitorDashboardPage() {
         setThreatMatrix(threatMatrixData)
 
         // Generate market positioning data
-        const marketPositionData = (competitorsData.competitors || []).map((comp: Competitor, index: number) => ({
+        const marketPositionData = (competitorsData.competitors || []).map((comp: Competitor, _index: number) => ({
           competitorId: comp.id,
           name: comp.name,
           marketShare: Math.random() * 30 + 5, // Mock data - replace with real calculation
@@ -758,7 +758,7 @@ export default function CompetitorDashboardPage() {
 
                     <div className="space-y-4 max-h-[600px] overflow-y-auto">
                       {realtimeActivities.length > 0 ? (
-                        realtimeActivities.map((activity, index) => (
+                        realtimeActivities.map((activity, _index) => (
                           <motion.div
                             key={activity.id}
                             initial={{ opacity: 0, x: -20 }}
@@ -847,7 +847,7 @@ export default function CompetitorDashboardPage() {
                       {realtimeActivities
                         .filter(a => a.importance === 'critical')
                         .slice(0, 3)
-                        .map((activity, index) => (
+                        .map((activity, _index) => (
                           <div key={activity.id} className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                             <p className="font-medium text-sm">{activity.competitorName}</p>
                             <p className="text-xs text-gray-600 dark:text-gray-400">{activity.title}</p>
@@ -1091,7 +1091,7 @@ export default function CompetitorDashboardPage() {
                   {/* Timeline */}
                   <div className="space-y-6">
                     {realtimeActivities.length > 0 ? (
-                      realtimeActivities.map((activity, index) => (
+                      realtimeActivities.map((activity, _index) => (
                         <motion.div
                           key={activity.id}
                           initial={{ opacity: 0, x: -20 }}

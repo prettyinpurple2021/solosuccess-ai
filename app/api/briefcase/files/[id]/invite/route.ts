@@ -15,7 +15,7 @@ export async function POST(
     const params = await context.params
     const { id } = params
     const documentId = id
-    const { email, role, message, invitedBy } = await request.json()
+    const { email, role, message, _invitedBy } = await request.json()
 
     if (!email || !role) {
       return NextResponse.json({ error: 'Email and role are required' }, { status: 400 })

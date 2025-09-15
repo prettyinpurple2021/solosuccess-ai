@@ -5,7 +5,7 @@ import {
   stripe, 
   createCheckoutSession, 
   SUBSCRIPTION_TIERS,
-  STRIPE_PRICES 
+  _STRIPE_PRICES 
 } from '@/lib/stripe'
 import { updateUserStripeCustomerId } from '@/lib/stripe-db-utils'
 import { z } from 'zod'

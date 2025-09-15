@@ -162,7 +162,7 @@ export async function GET(
 async function generateSocialMediaAnalysis(
   data: any[],
   analysisType: string,
-  platform?: string
+  _platform?: string
 ) {
   const platformData: Record<string, any[]> = {};
   

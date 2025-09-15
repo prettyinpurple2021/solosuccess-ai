@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
-import { stripe, createBillingPortalSession } from '@/lib/stripe'
+import { _stripe, createBillingPortalSession } from '@/lib/stripe'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

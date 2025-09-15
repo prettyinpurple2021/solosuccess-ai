@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { opportunityRecommendationSystem } from '@/lib/opportunity-recommendation-system'
-import { competitiveOpportunityDetector } from '@/lib/competitive-opportunity-detection'
+import { _competitiveOpportunityDetector } from '@/lib/competitive-opportunity-detection'
 import { z } from 'zod'
 
 // Force dynamic rendering

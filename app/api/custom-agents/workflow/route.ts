@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           id: `workflow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           name,
           description: description || "Custom workflow",
-          steps: steps.map((step: any, index: number) => ({
+          steps: steps.map((step: any, _index: number) => ({
             agentId: step.agentId,
             task: step.task,
             dependencies: step.dependencies || [],

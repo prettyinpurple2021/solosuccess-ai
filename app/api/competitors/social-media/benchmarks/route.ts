@@ -447,7 +447,7 @@ function generateBenchmarkSummary(benchmarks: any[]) {
 }
 
 // Placeholder functions for different benchmark types
-async function generatePerformanceBenchmarks(competitorIds: number[], platform?: string, days: number = 30, metrics: string[] = []) {
+async function generatePerformanceBenchmarks(competitorIds: number[], platform?: string, _days: number = 30, metrics: string[] = []) {
   // Implementation for performance benchmarks
   return {
     type: 'performance',
@@ -456,7 +456,7 @@ async function generatePerformanceBenchmarks(competitorIds: number[], platform?:
   };
 }
 
-async function generateContentBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+async function generateContentBenchmarks(competitorIds: number[], platform?: string, _days: number = 30) {
   // Implementation for content benchmarks
   return {
     type: 'content',
@@ -464,7 +464,7 @@ async function generateContentBenchmarks(competitorIds: number[], platform?: str
   };
 }
 
-async function generateTimingBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+async function generateTimingBenchmarks(competitorIds: number[], platform?: string, _days: number = 30) {
   // Implementation for timing benchmarks
   return {
     type: 'timing',
@@ -472,7 +472,7 @@ async function generateTimingBenchmarks(competitorIds: number[], platform?: stri
   };
 }
 
-async function generateAudienceBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+async function generateAudienceBenchmarks(competitorIds: number[], platform?: string, _days: number = 30) {
   // Implementation for audience benchmarks
   return {
     type: 'audience',
@@ -480,7 +480,7 @@ async function generateAudienceBenchmarks(competitorIds: number[], platform?: st
   };
 }
 
-async function getIndustryAverages(industry?: string, platform?: string) {
+async function getIndustryAverages(_industry?: string, _platform?: string) {
   // Implementation for industry averages
   // In a real implementation, this would fetch from industry benchmark databases
   return {

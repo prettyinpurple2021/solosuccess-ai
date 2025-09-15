@@ -6,8 +6,8 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray } from 'drizzle-orm'
 import type { 
-  IntelligenceData,
-  IntelligenceFilters,
+  _IntelligenceData,
+  _IntelligenceFilters,
   SourceType,
   ImportanceLevel,
   ExtractedData,
@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
     if (filters.tags && filters.tags.length > 0) {
       // Use JSON contains operator for tags array
       conditions.push(
-        or(...filters.tags.map(tag => 
+        or(...filters.tags.map(_tag => 
           // This is a simplified approach - in production you'd want proper JSON array contains
           eq(intelligenceData.tags, JSON.stringify(filters.tags))
         ))!
