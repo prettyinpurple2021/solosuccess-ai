@@ -156,7 +156,22 @@ export async function POST(request: NextRequest) {
       `
       subscriptionsParams = [notification.userIds]
     } else {
-      // Default to sending to the requesting user only
+      // For system jobs without specific targeting, require explicit userIds or allUsers
+      if (isSystemJob) {
+        return NextResponse.json(
+          { error: 'System jobs must specify userIds or set allUsers=true' },
+          { status: 400 }
+        )
+      }
+      
+      // Default to sending to the requesting user only (for authenticated users)
+      if (!user) {
+        return NextResponse.json(
+          { error: 'No authenticated user and no targeting specified' },
+          { status: 400 }
+        )
+      }
+      
       subscriptionsQuery = `
         SELECT ps.*, u.email
         FROM push_subscriptions ps
