@@ -176,6 +176,9 @@ export class EchoMarketingIntelligence {
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,})
+      temperature: 0.7,
+      maxOutputTokens: 2000,
+    })
 
     // Parse Echo's response into structured analysis
     const analysis = this.parseContentStrategyAnalysis(text, competitorId)
@@ -199,6 +202,9 @@ export class EchoMarketingIntelligence {
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.6,})
+      temperature: 0.6,
+      maxOutputTokens: 1500,
+    })
 
     const analysis = this.parseBrandPositioningAnalysis(text, competitorId)
     await this.storeMarketingIntelligence(competitorId, 'brand_positioning', analysis)
@@ -220,6 +226,9 @@ export class EchoMarketingIntelligence {
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.7,})
+      temperature: 0.7,
+      maxOutputTokens: 2000,
+    })
 
     const analysis = this.parseCampaignEffectivenessAnalysis(text, competitorId)
     await this.storeMarketingIntelligence(competitorId, 'campaign_effectiveness', analysis)
@@ -245,6 +254,9 @@ export class EchoMarketingIntelligence {
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
       temperature: 0.8,})
+      temperature: 0.8,
+      maxOutputTokens: 1500,
+    })
 
     return this.parseContentGapAnalysis(text)
   }
@@ -269,6 +281,9 @@ export class EchoMarketingIntelligence {
       model: this.echoConfig.model as any,
       prompt: briefingPrompt,
       temperature: 0.7,})
+      temperature: 0.7,
+      maxOutputTokens: 2500,
+    })
 
     return text
   }

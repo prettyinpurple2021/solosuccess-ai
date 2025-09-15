@@ -113,7 +113,9 @@ export async function POST(request: NextRequest) {
           content: message
         }
       ],
-      temperature: 0.7,})
+      temperature: 0.7,
+      maxOutputTokens: 1500, // Updated for AI SDK v5
+    })
 
     // Update conversation with response
     const response = await result.text
