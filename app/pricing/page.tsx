@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button} from '@/components/ui/button'
 import { Sparkles} from 'lucide-react'
 import FaqSection from '@/components/faq/faq-section'
+import PlanQuiz from '@/components/marketing/plan-quiz'
 
 export default function PricingPage() {
   return (
@@ -21,7 +22,8 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* Pricing Cards */}
+        {/* Pricing Cards */
+        }
         <PricingCards />
 
         {/* Deep Links to Plan Pages */}
@@ -44,6 +46,11 @@ export default function PricingPage() {
               <div className="text-gray-600">Unlimited AI Business Co-pilot and custom workflows</div>
             </div>
           </Link>
+        </div>
+
+        {/* Plan Quiz */}
+        <div className="mt-12">
+          <PlanQuiz />
         </div>
 
         {/* CTA Section */}

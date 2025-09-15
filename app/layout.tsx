@@ -9,6 +9,7 @@ import { AuthProvider} from "@/hooks/use-auth"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
 import { PerformanceMonitor } from "@/components/performance/performance-monitor"
 import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"
+import ExitIntentSurvey from "@/components/marketing/exit-intent-survey"
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
@@ -101,6 +102,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/images/soloboss-hero-silhouette.jpg" as="image" />
+        {/* Search engine verification placeholders */}
+        <meta name="google-site-verification" content="CHANGE_ME" />
+        <meta name="msvalidate.01" content="CHANGE_ME" />
         <Script id="gtm-base" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -187,6 +193,7 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
             </AuthProvider>
           </StackAuthProvider>
         </ThemeProvider>
+        <ExitIntentSurvey />
       </body>
     </html>
   )
