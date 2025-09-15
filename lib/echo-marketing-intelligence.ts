@@ -175,7 +175,6 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,})
       temperature: 0.7,
       maxOutputTokens: 2000,
     })
@@ -201,7 +200,6 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.6,})
       temperature: 0.6,
       maxOutputTokens: 1500,
     })
@@ -225,7 +223,6 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.7,})
       temperature: 0.7,
       maxOutputTokens: 2000,
     })
@@ -253,7 +250,6 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: analysisPrompt,
-      temperature: 0.8,})
       temperature: 0.8,
       maxOutputTokens: 1500,
     })
@@ -280,7 +276,6 @@ export class EchoMarketingIntelligence {
     const { text } = await generateText({
       model: this.echoConfig.model as any,
       prompt: briefingPrompt,
-      temperature: 0.7,})
       temperature: 0.7,
       maxOutputTokens: 2500,
     })

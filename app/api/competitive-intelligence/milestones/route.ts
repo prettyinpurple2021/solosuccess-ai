@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration } from '@/lib/competitive-intelligence-integration'
-import { _db } from '@/db'
+import { db } from '@/db'
 import { createClient } from '@/lib/neon/server'
 import { z } from 'zod'
 
