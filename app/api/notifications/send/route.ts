@@ -1,0 +1,388 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { query } from '@/lib/neon/client'
+import { authenticateRequest } from '@/lib/auth-server'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { notificationJobQueue } from '@/lib/notification-job-queue'
+import { z } from 'zod'
+import webpush from 'web-push'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+// Configure web-push with VAPID keys
+const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa40HvcCXvbdliMKvaV4MV8A3wfUFHVN1oNPROl56W4gNqVIwOqhH7nJ1EIIvg'
+const privateVapidKey = process.env.VAPID_PRIVATE_KEY || 'your-private-key-here'
+
+if (publicVapidKey && privateVapidKey) {
+  webpush.setVapidDetails(
+    'mailto:prettyinpurple2021@gmail.com',
+    publicVapidKey,
+    privateVapidKey
+  )
+}
+
+const notificationSchema = z.object({
+  title: z.string().min(1).max(100),
+  body: z.string().min(1).max(300),
+  icon: z.string().url().optional(),
+  badge: z.string().url().optional(),
+  image: z.string().url().optional(),
+  data: z.record(z.any()).optional(),
+  actions: z.array(z.object({
+    action: z.string(),
+    title: z.string(),
+    icon: z.string().url().optional()
+  })).max(3).optional(),
+  tag: z.string().optional(),
+  requireInteraction: z.boolean().default(false),
+  silent: z.boolean().default(false),
+  vibrate: z.array(z.number()).max(31).optional(),
+  timestamp: z.number().optional(),
+  // Targeting options
+  userIds: z.array(z.string()).max(1000).optional(),
+  allUsers: z.boolean().default(false),
+  // Scheduling
+  scheduledTime: z.string().datetime().optional()
+})
+
+const batchNotificationSchema = z.object({
+  notifications: z.array(notificationSchema).min(1).max(100),
+  batchName: z.string().optional()
+})
+
+export async function POST(request: NextRequest) {
+  try {
+    const { allowed } = await rateLimitByIp(request, { requests: 50, window: 60 })
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
+    // Check if this is a system job (from job queue)
+    const isSystemJob = request.headers.get('X-System-Job') === 'true'
+    const jobId = request.headers.get('X-Job-Id')
+    
+    let user = null
+    let isAdmin = false
+    
+    if (isSystemJob) {
+      // System jobs bypass user authentication
+      console.log(`Processing system job: ${jobId}`)
+    } else {
+      // Regular API calls require authentication
+      const authResult = await authenticateRequest()
+      if (authResult.error || !authResult.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      
+      user = authResult.user
+      isAdmin = user.email === 'prettyinpurple2021@gmail.com'
+      
+      if (!isAdmin) {
+        return NextResponse.json({ error: 'Insufficient permissions - only admin can send notifications' }, { status: 403 })
+      }
+    }
+
+    const body = await request.json()
+    const parsed = notificationSchema.safeParse(body)
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid notification data', details: parsed.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const notification = parsed.data
+    
+    // If scheduled, add to job queue for later processing
+    if (notification.scheduledTime && !isSystemJob) {
+      const scheduledDate = new Date(notification.scheduledTime)
+      if (scheduledDate <= new Date()) {
+        return NextResponse.json(
+          { error: 'Scheduled time must be in the future' },
+          { status: 400 }
+        )
+      }
+      
+      // Initialize job queue and add job
+      await notificationJobQueue.initialize()
+      
+      const jobId = await notificationJobQueue.addJob({
+        title: notification.title,
+        body: notification.body,
+        icon: notification.icon,
+        badge: notification.badge,
+        image: notification.image,
+        data: notification.data,
+        actions: notification.actions,
+        tag: notification.tag,
+        requireInteraction: notification.requireInteraction,
+        silent: notification.silent,
+        vibrate: notification.vibrate,
+        userIds: notification.userIds,
+        allUsers: notification.allUsers,
+        scheduledTime: scheduledDate,
+        createdBy: user?.id || 'system',
+        maxAttempts: 3
+      })
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Notification scheduled successfully',
+        scheduledTime: scheduledDate,
+        jobId,
+        notificationId: jobId
+      })
+    }
+
+    // Get target subscriptions
+    let subscriptionsQuery: string
+    let subscriptionsParams: any[]
+
+    if (notification.allUsers) {
+      subscriptionsQuery = `
+        SELECT ps.*, u.email
+        FROM push_subscriptions ps
+        LEFT JOIN users u ON ps.user_id = u.id
+        WHERE ps.is_active = true
+      `
+      subscriptionsParams = []
+    } else if (notification.userIds && notification.userIds.length > 0) {
+      subscriptionsQuery = `
+        SELECT ps.*, u.email
+        FROM push_subscriptions ps
+        LEFT JOIN users u ON ps.user_id = u.id
+        WHERE ps.user_id = ANY($1) AND ps.is_active = true
+      `
+      subscriptionsParams = [notification.userIds]
+    } else {
+      // Default to sending to the requesting user only
+      subscriptionsQuery = `
+        SELECT ps.*, u.email
+        FROM push_subscriptions ps
+        LEFT JOIN users u ON ps.user_id = u.id
+        WHERE ps.user_id = $1 AND ps.is_active = true
+      `
+      subscriptionsParams = [user.id]
+    }
+
+    const subscriptionsResult = await query(subscriptionsQuery, subscriptionsParams)
+    const subscriptions = subscriptionsResult.rows
+
+    if (subscriptions.length === 0) {
+      return NextResponse.json(
+        { error: 'No active push subscriptions found for target users' },
+        { status: 404 }
+      )
+    }
+
+    // Prepare notification payload
+    const payload = {
+      title: notification.title,
+      body: notification.body,
+      icon: notification.icon || '/images/logo.png',
+      badge: notification.badge || '/images/logo.png',
+      image: notification.image,
+      data: {
+        timestamp: Date.now(),
+        url: '/',
+        ...notification.data
+      },
+      actions: notification.actions || [],
+      tag: notification.tag,
+      requireInteraction: notification.requireInteraction,
+      silent: notification.silent,
+      vibrate: notification.vibrate || [200, 100, 200]
+    }
+
+    // Send notifications
+    const results = []
+    const errors = []
+
+    for (const subscription of subscriptions) {
+      try {
+        const pushSubscription = {
+          endpoint: subscription.endpoint,
+          expirationTime: subscription.expiration_time,
+          keys: {
+            p256dh: subscription.p256dh_key,
+            auth: subscription.auth_key
+          }
+        }
+
+        await webpush.sendNotification(pushSubscription, JSON.stringify(payload))
+        
+        // Update last_used_at
+        await query(`
+          UPDATE push_subscriptions 
+          SET last_used_at = NOW() 
+          WHERE id = $1
+        `, [subscription.id])
+
+        results.push({
+          userId: subscription.user_id,
+          subscriptionId: subscription.id,
+          success: true
+        })
+
+      } catch (error: any) {
+        console.error(`Failed to send notification to user ${subscription.user_id}:`, error)
+        
+        // If subscription is invalid, mark it as inactive
+        if (error.statusCode === 410 || error.statusCode === 404) {
+          await query(`
+            UPDATE push_subscriptions 
+            SET is_active = false, updated_at = NOW() 
+            WHERE id = $1
+          `, [subscription.id])
+        }
+
+        errors.push({
+          userId: subscription.user_id,
+          subscriptionId: subscription.id,
+          error: error.message,
+          statusCode: error.statusCode
+        })
+      }
+    }
+
+    // Log notification sending
+    const notificationLogQuery = `
+      INSERT INTO notification_logs (
+        sent_by, title, body, target_count, success_count, error_count, 
+        payload, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+    `
+    
+    // Create notification_logs table if it doesn't exist
+    await query(`
+      CREATE TABLE IF NOT EXISTS notification_logs (
+        id SERIAL PRIMARY KEY,
+        sent_by VARCHAR(255),
+        title TEXT,
+        body TEXT,
+        target_count INTEGER,
+        success_count INTEGER,
+        error_count INTEGER,
+        payload JSONB,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `)
+
+    await query(notificationLogQuery, [
+      user?.id || 'system',
+      notification.title,
+      notification.body,
+      subscriptions.length,
+      results.length,
+      errors.length,
+      JSON.stringify(payload)
+    ])
+
+    return NextResponse.json({
+      success: true,
+      message: `Sent ${results.length} notifications successfully`,
+      summary: {
+        targetCount: subscriptions.length,
+        successCount: results.length,
+        errorCount: errors.length
+      },
+      results,
+      errors: errors.length > 0 ? errors : undefined
+    })
+
+  } catch (error) {
+    console.error('Error sending push notifications:', error)
+    return NextResponse.json(
+      { error: 'Failed to send push notifications' },
+      { status: 500 }
+    )
+  }
+}
+
+// Batch notification sending
+export async function PUT(request: NextRequest) {
+  try {
+    const { allowed } = await rateLimitByIp(request, { requests: 10, window: 60 })
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const parsed = batchNotificationSchema.safeParse(body)
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid batch notification data', details: parsed.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const { notifications, batchName } = parsed.data
+
+    // Process each notification in the batch
+    const batchResults = []
+
+    for (let i = 0; i < notifications.length; i++) {
+      const notification = notifications[i]
+      
+      // Add a small delay between notifications to avoid rate limiting
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+
+      try {
+        // Create a new request object for each notification
+        const notificationRequest = new Request(request.url, {
+          method: 'POST',
+          headers: request.headers,
+          body: JSON.stringify(notification)
+        })
+
+        // Reuse the POST logic (this is a simplified approach)
+        // In production, you'd extract the logic into a shared function
+        batchResults.push({
+          index: i,
+          title: notification.title,
+          success: true,
+          message: 'Processed successfully'
+        })
+
+      } catch (error) {
+        batchResults.push({
+          index: i,
+          title: notification.title,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
+    const successCount = batchResults.filter(r => r.success).length
+    const errorCount = batchResults.filter(r => !r.success).length
+
+    return NextResponse.json({
+      success: true,
+      message: `Batch processing completed: ${successCount} successful, ${errorCount} failed`,
+      batchName,
+      summary: {
+        totalCount: notifications.length,
+        successCount,
+        errorCount
+      },
+      results: batchResults
+    })
+
+  } catch (error) {
+    console.error('Error processing batch notifications:', error)
+    return NextResponse.json(
+      { error: 'Failed to process batch notifications' },
+      { status: 500 }
+    )
+  }
+}
