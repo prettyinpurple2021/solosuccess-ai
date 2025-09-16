@@ -102,7 +102,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/images/soloboss-hero-silhouette.jpg" as="image" />
         {/* Search engine verification placeholders */}
         <meta name="google-site-verification" content="CHANGE_ME" />
@@ -205,12 +204,13 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
                   </ErrorBoundary>
                 </ChatProvider>
                 <PerformanceMonitor />
+                {/* Ensure this client component that calls useAuth is inside AuthProvider */}
                 <ServiceWorkerRegister />
+                <ExitIntentSurvey />
               </AccessibilityProvider>
             </AuthProvider>
           </StackAuthProvider>
         </ThemeProvider>
-        <ExitIntentSurvey />
       </body>
     </html>
   )
