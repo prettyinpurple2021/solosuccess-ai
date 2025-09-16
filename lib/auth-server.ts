@@ -83,6 +83,23 @@ export async function authenticateRequest(): Promise<AuthResult> {
 }
 
 /**
+ * Alternative authentication function for compatibility with collaboration APIs
+ * Returns user and error in a single object
+ */
+export async function verifyAuth(request?: NextRequest): Promise<{ user?: AuthenticatedUser; error?: string }> {
+  try {
+    const result = await authenticateRequest()
+    return {
+      user: result.user || undefined,
+      error: result.error || undefined
+    }
+  } catch (error) {
+    console.error('verifyAuth error:', error)
+    return { error: 'Authentication failed' }
+  }
+}
+
+/**
  * Middleware-style authentication wrapper for API route handlers
  */
 export function withAuth<T>(
