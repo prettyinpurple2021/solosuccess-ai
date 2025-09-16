@@ -24,6 +24,7 @@ import {
 import { cn } from '@/lib/utils'
 import { webPushManager, NotificationPermissionState } from '@/lib/web-push-notifications'
 import { useToast } from '@/hooks/use-toast'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
 
 interface NotificationPreferences {
   enabled: boolean
@@ -50,23 +51,47 @@ export default function NotificationSettings({ className = "" }: NotificationSet
     permission: 'default',
     subscription: null
   })
-  const [preferences, setPreferences] = useState<NotificationPreferences>({
+  const [subscribing, setSubscribing] = useState(false)
+  const { toast } = useToast()
+  
+  // Use database preferences with localStorage fallback
+  const { 
+    preferences: userPrefs, 
+    loading: prefsLoading, 
+    setPreference,
+    setPreferences 
+  } = useUserPreferences({
+    defaultValues: {
+      notifications: {
+        enabled: false,
+        taskReminders: true,
+        goalDeadlines: true,
+        workloadAlerts: true,
+        productivityTips: false,
+        reminderOffset: 60, // 1 hour
+        quietHours: {
+          enabled: false,
+          start: '22:00',
+          end: '08:00'
+        },
+        frequency: 'normal'
+      }
+    },
+    fallbackToLocalStorage: true
+  })
+  
+  const preferences = userPrefs.notifications || {
     enabled: false,
     taskReminders: true,
     goalDeadlines: true,
     workloadAlerts: true,
     productivityTips: false,
-    reminderOffset: 60, // 1 hour
-    quietHours: {
-      enabled: false,
-      start: '22:00',
-      end: '08:00'
-    },
+    reminderOffset: 60,
+    quietHours: { enabled: false, start: '22:00', end: '08:00' },
     frequency: 'normal'
-  })
-  const [loading, setLoading] = useState(true)
-  const [subscribing, setSubscribing] = useState(false)
-  const { toast } = useToast()
+  }
+  
+  const loading = prefsLoading
 
   useEffect(() => {
     loadSettings()
@@ -74,27 +99,25 @@ export default function NotificationSettings({ className = "" }: NotificationSet
 
   const loadSettings = async () => {
     try {
-      setLoading(true)
-      
       // Get permission state
       const state = await webPushManager.getPermissionState()
       setPermissionState(state)
-      
-      // Load saved preferences
-      const savedPrefs = localStorage.getItem('solosuccess_notification_preferences')
-      if (savedPrefs) {
-        setPreferences(JSON.parse(savedPrefs))
-      }
     } catch (error) {
       console.error('Error loading notification settings:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
-  const savePreferences = (newPreferences: NotificationPreferences) => {
-    setPreferences(newPreferences)
-    localStorage.setItem('solosuccess_notification_preferences', JSON.stringify(newPreferences))
+  const savePreferences = async (newPreferences: NotificationPreferences) => {
+    try {
+      await setPreference('notifications', newPreferences)
+    } catch (error) {
+      console.error('Failed to save notification preferences:', error)
+      toast({
+        title: "Failed to Save Settings",
+        description: "Your notification preferences could not be saved.",
+        variant: "destructive"
+      })
+    }
   }
 
   const handleEnableNotifications = async () => {

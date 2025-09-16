@@ -97,6 +97,7 @@ export default function DashboardPage() {
   }
 
   const handleOnboardingSkip = () => {
+    console.log('Dashboard - Onboarding skip called')
     setShowOnboarding(false)
   }
 

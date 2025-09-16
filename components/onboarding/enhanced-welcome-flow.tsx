@@ -20,12 +20,31 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [selectedPersonality, setSelectedPersonality] = useState<string>("")
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([])
+  const [selectedAgents, setSelectedAgents] = useState<string[]>([])
   const [userPreferences, setUserPreferences] = useState({
     animations: true,
     sound: true,
     autoAdvance: false,
     voiceGuidance: false
   })
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('Current step changed:', currentStep)
+  }, [currentStep])
+
+  useEffect(() => {
+    console.log('Selected personality changed:', selectedPersonality)
+  }, [selectedPersonality])
+
+  useEffect(() => {
+    console.log('Open prop changed:', open)
+    if (!open) {
+      console.log('Modal was closed externally!')
+    }
+  }, [open])
 
   const welcomeSteps = [
     {
@@ -129,7 +148,19 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="p-4 border-2 border-transparent hover:border-purple-200 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md"
+                className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 select-none ${
+                  selectedPersonality === style.id
+                    ? "border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-md scale-[1.02]"
+                    : "border-transparent hover:border-purple-200 hover:shadow-md hover:scale-[1.01]"
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('Personality card clicked:', style.id)
+                  console.log('Current step:', currentStep, 'Open:', open)
+                  setSelectedPersonality(style.id)
+                  console.log('Personality set to:', style.id)
+                }}
               >
                 <div className="flex items-center space-x-4">
                   <div className="text-3xl">{style.emoji}</div>
@@ -137,7 +168,10 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                     <h4 className="font-semibold">{style.name}</h4>
                     <p className="text-sm text-muted-foreground">{style.description}</p>
                   </div>
-                  <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${style.color}`} />
+                  <div className="flex items-center gap-2">
+                    <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${style.color}`} />
+                    {selectedPersonality === style.id && <CheckCircle className="h-5 w-5 text-purple-600" />}
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -174,7 +208,16 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
-                className="p-4 border-2 border-transparent hover:border-teal-200 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md"
+                className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 select-none ${
+                  selectedGoals.includes(goal.id)
+                    ? "border-teal-500 bg-gradient-to-r from-teal-50 to-blue-50 shadow-md scale-[1.02]"
+                    : "border-transparent hover:border-teal-200 hover:shadow-md hover:scale-[1.01]"
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggleGoal(goal.id)
+                }}
               >
                 <div className="flex items-center space-x-4">
                   <div className="text-2xl">{goal.emoji}</div>
@@ -182,7 +225,13 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                     <h4 className="font-semibold">{goal.label}</h4>
                     <p className="text-sm text-muted-foreground">{goal.desc}</p>
                   </div>
-                  <div className="w-5 h-5 border-2 border-gray-300 rounded-full" />
+                  <div className={`w-5 h-5 border-2 rounded-full transition-all duration-200 ${
+                    selectedGoals.includes(goal.id)
+                      ? "bg-teal-500 border-teal-500"
+                      : "border-gray-300"
+                  }`}>
+                    {selectedGoals.includes(goal.id) && <CheckCircle className="h-5 w-5 text-white" />}
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -245,14 +294,29 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
-                className="p-4 border-2 border-transparent hover:border-orange-200 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md"
+                className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 select-none ${
+                  selectedAgents.includes(agent.id)
+                    ? "border-orange-500 bg-gradient-to-r from-orange-50 to-red-50 shadow-md scale-[1.02]"
+                    : "border-transparent hover:border-orange-200 hover:shadow-md hover:scale-[1.01]"
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggleAgent(agent.id)
+                }}
               >
                 <div className="flex items-start space-x-4">
                   <div className="text-3xl">{agent.emoji}</div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-semibold">{agent.name}</h4>
-                      <div className="w-5 h-5 border-2 border-gray-300 rounded-full" />
+                      <div className={`w-5 h-5 border-2 rounded-full transition-all duration-200 ${
+                        selectedAgents.includes(agent.id)
+                          ? "bg-orange-500 border-orange-500"
+                          : "border-gray-300"
+                      }`}>
+                        {selectedAgents.includes(agent.id) && <CheckCircle className="h-5 w-5 text-white" />}
+                      </div>
                     </div>
                     <p className="text-sm font-medium text-orange-600 mb-2">{agent.role}</p>
                     <p className="text-sm text-muted-foreground mb-3">{agent.description}</p>
@@ -464,18 +528,56 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
     }
   ]
 
+  const toggleGoal = (goalId: string) => {
+    console.log('Toggling goal:', goalId, 'Current goals:', selectedGoals)
+    if (selectedGoals.length >= 3 && !selectedGoals.includes(goalId)) {
+      console.log('Maximum of 3 goals allowed')
+      return // Maximum 3 goals
+    }
+    const newGoals = selectedGoals.includes(goalId)
+      ? selectedGoals.filter((g) => g !== goalId)
+      : [...selectedGoals, goalId]
+    console.log('New goals:', newGoals)
+    setSelectedGoals(newGoals)
+  }
+
+  const toggleAgent = (agentId: string) => {
+    console.log('Toggling agent:', agentId, 'Current agents:', selectedAgents)
+    if (selectedAgents.length >= 3 && !selectedAgents.includes(agentId)) {
+      console.log('Maximum of 3 agents allowed')
+      return // Maximum 3 agents
+    }
+    const newAgents = selectedAgents.includes(agentId)
+      ? selectedAgents.filter((a) => a !== agentId)
+      : [...selectedAgents, agentId]
+    console.log('New agents:', newAgents)
+    setSelectedAgents(newAgents)
+  }
+
   const totalSteps = welcomeSteps.length
   const progress = ((currentStep + 1) / totalSteps) * 100
 
   const nextStep = () => {
+    console.log('NextStep called - Current step:', currentStep, 'Total steps:', totalSteps)
     if (currentStep < totalSteps - 1) {
+      console.log('Moving to next step:', currentStep + 1)
       setCurrentStep(currentStep + 1)
     } else {
-      onComplete({
-        userPreferences,
-        completedAt: new Date().toISOString(),
-        stepsCompleted: totalSteps
-      })
+      console.log('Ready to complete welcome flow, but let\'s double check...')
+      console.log('Current step:', currentStep, 'Should be:', totalSteps - 1)
+      if (currentStep === totalSteps - 1) {
+        console.log('Completing welcome flow')
+        onComplete({
+          selectedPersonality,
+          selectedGoals,
+          selectedAgents,
+          userPreferences,
+          completedAt: new Date().toISOString(),
+          stepsCompleted: totalSteps
+        })
+      } else {
+        console.error('Tried to complete welcome flow at wrong step!')
+      }
     }
   }
 
@@ -490,13 +592,14 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={(e) => e.target === e.currentTarget && console.log('Backdrop clicked but prevented')}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3 }}
         className="w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
       >
         <Card className="boss-card border-2 border-purple-200 shadow-2xl">
           <CardHeader className="pb-4">
@@ -510,7 +613,16 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 </CardTitle>
                 <p className="text-muted-foreground mt-1">{currentStepData.subtitle}</p>
               </div>
-              <Button variant="ghost" onClick={onSkip} className="text-sm">
+              <Button 
+                variant="ghost" 
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('Skip setup clicked')
+                  onSkip()
+                }} 
+                className="text-sm"
+              >
                 Skip Setup
               </Button>
             </div>
@@ -534,7 +646,12 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
           <div className="flex justify-between items-center p-6 border-t">
             <Button
               variant="outline"
-              onClick={prevStep}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                console.log('Back button clicked')
+                prevStep()
+              }}
               disabled={currentStep === 0}
               className="flex items-center gap-2"
             >
@@ -545,7 +662,12 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
             <div className="flex items-center gap-2">
               {currentStep < totalSteps - 1 ? (
                 <Button
-                  onClick={nextStep}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('Next button clicked on step:', currentStep)
+                    nextStep()
+                  }}
                   className="punk-button text-white flex items-center gap-2"
                 >
                   Next
@@ -553,7 +675,12 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 </Button>
               ) : (
                 <Button
-                  onClick={nextStep}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('Launch Empire button clicked')
+                    nextStep()
+                  }}
                   className="punk-button text-white flex items-center gap-2"
                 >
                   <Rocket className="h-4 w-4" />

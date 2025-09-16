@@ -1,6 +1,6 @@
 "use client"
 
-import { useState} from "react"
+import { useState, useEffect} from "react"
 import { OnboardingWizard} from "./onboarding-wizard"
 import { InteractiveTutorial} from "./interactive-tutorial"
 import { EnhancedWelcomeFlow} from "./enhanced-welcome-flow"
@@ -34,7 +34,17 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
 
   const tutorialOrder = ["dashboard", "ai-agents", "tasks", "goals", "files", "complete"]
 
+  // Debug phase changes
+  useEffect(() => {
+    console.log('Enhanced Onboarding - Current phase changed:', currentPhase)
+  }, [currentPhase])
+
+  useEffect(() => {
+    console.log('Enhanced Onboarding - Open prop:', open)
+  }, [open])
+
   const handleWelcomeComplete = (data: Record<string, unknown>) => {
+    console.log('Welcome flow completed with data:', data)
     setUserPreferences(data)
     setCurrentPhase("wizard")
   }

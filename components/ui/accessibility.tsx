@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, createContext, useContext} from "react"
+import { useUserPreferences } from "@/hooks/use-user-preferences"
 import { Button} from "@/components/ui/button"
 import { Switch} from "@/components/ui/switch"
 import { Label} from "@/components/ui/label"
@@ -24,24 +25,43 @@ interface AccessibilityContextType {
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined)
 
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
-  const [highContrast, setHighContrast] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(false)
-  const [screenReader, setScreenReader] = useState(false)
-  const [fontSize, setFontSize] = useState<"small" | "medium" | "large">("medium")
-  const [focusVisible, setFocusVisible] = useState(false)
+  const { preferences, setPreference, loading } = useUserPreferences({
+    defaultValues: {
+      accessibility: {
+        highContrast: false,
+        reducedMotion: false,
+        screenReader: false,
+        fontSize: "medium",
+        focusVisible: false
+      }
+    },
+    fallbackToLocalStorage: true
+  })
+  
+  const accessibilityPrefs = preferences.accessibility || {
+    highContrast: false,
+    reducedMotion: false,
+    screenReader: false,
+    fontSize: "medium",
+    focusVisible: false
+  }
+  
+  const [highContrast, setHighContrast] = useState(accessibilityPrefs.highContrast)
+  const [reducedMotion, setReducedMotion] = useState(accessibilityPrefs.reducedMotion)
+  const [screenReader, setScreenReader] = useState(accessibilityPrefs.screenReader)
+  const [fontSize, setFontSize] = useState<"small" | "medium" | "large">(accessibilityPrefs.fontSize)
+  const [focusVisible, setFocusVisible] = useState(accessibilityPrefs.focusVisible)
 
+  // Sync state with preferences when they load
   useEffect(() => {
-    // Load accessibility preferences from localStorage
-    const savedHighContrast = localStorage.getItem("accessibility-highContrast") === "true"
-    const savedReducedMotion = localStorage.getItem("accessibility-reducedMotion") === "true"
-    const savedScreenReader = localStorage.getItem("accessibility-screenReader") === "true"
-    const savedFontSize = localStorage.getItem("accessibility-fontSize") as "small" | "medium" | "large" || "medium"
-
-    setHighContrast(savedHighContrast)
-    setReducedMotion(savedReducedMotion)
-    setScreenReader(savedScreenReader)
-    setFontSize(savedFontSize)
-  }, [])
+    if (!loading) {
+      setHighContrast(accessibilityPrefs.highContrast)
+      setReducedMotion(accessibilityPrefs.reducedMotion)
+      setScreenReader(accessibilityPrefs.screenReader)
+      setFontSize(accessibilityPrefs.fontSize)
+      setFocusVisible(accessibilityPrefs.focusVisible)
+    }
+  }, [loading, accessibilityPrefs])
 
   useEffect(() => {
     // Apply accessibility settings to document
@@ -61,12 +81,17 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
 
     root.style.fontSize = fontSize === "small" ? "14px" : fontSize === "large" ? "18px" : "16px"
 
-    // Save to localStorage
-    localStorage.setItem("accessibility-highContrast", highContrast.toString())
-    localStorage.setItem("accessibility-reducedMotion", reducedMotion.toString())
-    localStorage.setItem("accessibility-screenReader", screenReader.toString())
-    localStorage.setItem("accessibility-fontSize", fontSize)
-  }, [highContrast, reducedMotion, fontSize])
+    // Save to database
+    if (!loading) {
+      setPreference('accessibility', {
+        highContrast,
+        reducedMotion,
+        screenReader,
+        fontSize,
+        focusVisible
+      }).catch(error => console.error('Failed to save accessibility preferences:', error))
+    }
+  }, [highContrast, reducedMotion, screenReader, fontSize, focusVisible, loading, setPreference])
 
   const toggleHighContrast = () => setHighContrast(!highContrast)
   const toggleReducedMotion = () => setReducedMotion(!reducedMotion)

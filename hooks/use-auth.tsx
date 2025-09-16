@@ -11,6 +11,7 @@ interface AuthContextType {
   signIn: (_email: string, _password: string) => Promise<{ error: unknown }>
   signUp: (_email: string, _password: string, _metadata?: Record<string, unknown>) => Promise<{ error: unknown }>
   signOut: () => Promise<void>
+  getToken: () => Promise<string | null>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -139,6 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null)
   }
 
+  const getToken = async () => {
+    return localStorage.getItem('authToken')
+  }
+
   const value = {
     user,
     session,
@@ -146,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signOut,
+    getToken,
   }
 
   return (

@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect, useRef, useMemo} from "react"
+import { useUserPreferences } from "@/hooks/use-user-preferences"
 import { Button} from "@/components/ui/button"
 import { Progress} from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
@@ -492,35 +493,44 @@ export function InteractiveTutorial({
     return currentSteps.reduce((total, step) => total + (step.estimatedTime || 0), 0)
   }, [currentSteps])
 
-  // Progress persistence with localStorage
-  const storageKey = useMemo(() => `tutorial-progress-${tutorialType}`, [tutorialType])
+  // Use database preferences for tutorial progress
+  const { preferences, setPreference } = useUserPreferences({
+    defaultValues: {
+      tutorialProgress: {},
+      tutorialPreferences: {
+        showAnimations: true,
+        autoAdvance: false,
+        voiceEnabled: false
+      }
+    },
+    fallbackToLocalStorage: true
+  })
+  
+  const tutorialKey = `tutorial-${tutorialType}`
+  const currentTutorialProgress = preferences.tutorialProgress?.[tutorialKey] || {}
   
   // Load saved progress on mount
   useEffect(() => {
     if (open) {
       try {
-        const savedProgress = localStorage.getItem(storageKey)
-        if (savedProgress) {
-          const { step, completed, startTime: savedStartTime, preferences } = JSON.parse(savedProgress)
-          setCurrentStep(step || 0)
-          setCompletedSteps(new Set(completed || []))
-          if (savedStartTime) {
-            setStartTime(new Date(savedStartTime))
-          } else {
-            setStartTime(new Date())
-          }
-          if (preferences) {
-            setUserPreferences(prev => ({ ...prev, ...preferences }))
-          }
+        const { step, completed, startTime: savedStartTime } = currentTutorialProgress
+        setCurrentStep(step || 0)
+        setCompletedSteps(new Set(completed || []))
+        if (savedStartTime) {
+          setStartTime(new Date(savedStartTime))
         } else {
           setStartTime(new Date())
         }
+        
+        // Load user preferences
+        const savedPreferences = preferences.tutorialPreferences || {}
+        setUserPreferences(prev => ({ ...prev, ...savedPreferences }))
       } catch (error) {
         console.warn('Failed to load tutorial progress:', error)
         setStartTime(new Date())
       }
     }
-  }, [open, storageKey])
+  }, [open, currentTutorialProgress, preferences.tutorialPreferences])
 
   // Save progress on step change
   useEffect(() => {
@@ -530,15 +540,28 @@ export function InteractiveTutorial({
           step: currentStep,
           completed: Array.from(completedSteps),
           startTime: startTime.toISOString(),
-          lastUpdated: new Date().toISOString(),
-          preferences: userPreferences
+          lastUpdated: new Date().toISOString()
         }
-        localStorage.setItem(storageKey, JSON.stringify(progressData))
+        
+        // Update tutorial progress
+        const newProgress = {
+          ...preferences.tutorialProgress,
+          [tutorialKey]: progressData
+        }
+        
+        setPreference('tutorialProgress', newProgress).catch(error => {
+          console.warn('Failed to save tutorial progress:', error)
+        })
+        
+        // Save user preferences
+        setPreference('tutorialPreferences', userPreferences).catch(error => {
+          console.warn('Failed to save tutorial preferences:', error)
+        })
       } catch (error) {
         console.warn('Failed to save tutorial progress:', error)
       }
     }
-  }, [open, currentStep, completedSteps, startTime, storageKey, userPreferences])
+  }, [open, currentStep, completedSteps, startTime, tutorialKey, userPreferences, preferences.tutorialProgress, setPreference])
 
   // Tutorial analytics tracking
   const trackTutorialEvent = (event: string, data?: any) => {
