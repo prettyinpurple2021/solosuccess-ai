@@ -68,6 +68,9 @@ export default function DashboardPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {}),
         },
         body: JSON.stringify({
           onboarding_completed: true,

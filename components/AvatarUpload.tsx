@@ -1,7 +1,6 @@
 'use client'
-
 import React, { useState, useRef } from 'react'
-import { Upload, Camera, User, X, Crown, Heart, Sparkles } from 'lucide-react'
+import { Upload, Camera, X, Crown, Heart, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 
 interface Avatar {
@@ -60,6 +59,11 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       const response = await fetch('/api/avatar/upload', {
         method: 'POST',
+        headers: {
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {})
+        },
         body: formData
       })
 
@@ -199,13 +203,14 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
           </p>
         </div>
       )}
-
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
+        aria-label="Upload avatar image"
+        title="Upload avatar image"
         className="hidden"
         disabled={isUploading}
       />

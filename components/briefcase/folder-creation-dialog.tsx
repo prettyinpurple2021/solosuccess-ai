@@ -119,7 +119,7 @@ export default function FolderCreationDialog({
                   <SelectValue placeholder="Select parent folder..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Root Level</SelectItem>
+                  <SelectItem value="__root__">Root Level</SelectItem>
                   {availableFolders.map((folder) => (
                     <SelectItem key={folder.id} value={folder.id}>
                       <div className="flex items-center gap-2">

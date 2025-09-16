@@ -1106,12 +1106,12 @@ export default function BriefcasePage() {
               </div>
               <div>
                 <Label>Folder</Label>
-                <Select value={selectedFolder || ''} onValueChange={(v) => setSelectedFolder(v || null)}>
+                <Select value={selectedFolder || '__root__'} onValueChange={(v) => setSelectedFolder(v === '__root__' ? null : v)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select folder (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Root</SelectItem>
+                    <SelectItem value="__root__">Root</SelectItem>
                     {folders.map((f) => (
                       <SelectItem key={f.id} value={f.id.toString()}>
                         {f.name}

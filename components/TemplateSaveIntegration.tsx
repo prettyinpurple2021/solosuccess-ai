@@ -102,7 +102,10 @@ export const TemplateSaveIntegration: React.FC<TemplateSaveIntegrationProps> = (
       const response = await fetch('/api/unified-briefcase', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {})
         },
         body: JSON.stringify({
           type: 'template_save',

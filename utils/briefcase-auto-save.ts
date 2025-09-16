@@ -46,7 +46,10 @@ class BriefcaseAutoSaver {
         const response = await fetch('/api/unified-briefcase', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+              ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+              : {})
           },
           body: JSON.stringify({
             type: 'chat',
@@ -90,7 +93,10 @@ class BriefcaseAutoSaver {
       const response = await fetch('/api/unified-briefcase', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {})
         },
         body: JSON.stringify({
           type: 'template_save',
@@ -127,7 +133,10 @@ class BriefcaseAutoSaver {
       const response = await fetch('/api/unified-briefcase', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {})
         },
         body: JSON.stringify({
           type: 'brand',
