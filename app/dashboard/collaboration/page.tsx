@@ -1,11 +1,9 @@
+import CollaborationDashboard from '@/components/collaboration/CollaborationDashboard'
+
 export default function CollaborationPage() {
   return (
-    <div style={{ 
-      padding: '20px',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      <h1 style={{ color: '#6d28d9' }}>Maintenance</h1>
-      <p>This page is currently under maintenance.</p>
+    <div className="container mx-auto px-4 py-6">
+      <CollaborationDashboard />
     </div>
   )
 }
