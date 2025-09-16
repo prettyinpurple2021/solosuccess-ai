@@ -5,6 +5,7 @@
   "packageManager": "npm@10.0.0",
   "scripts": {
     "build": "next build",
+    "start": "next start",
     "dev": "next dev",
     "lint": "next lint",
     "typecheck": "cross-env NODE_OPTIONS='--max-old-space-size=4096' tsc --noEmit",

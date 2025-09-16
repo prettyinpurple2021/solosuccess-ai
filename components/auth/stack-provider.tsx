@@ -14,10 +14,7 @@ export function StackAuthProvider({ children }: StackAuthProviderProps) {
   }, [])
 
   // Stack Auth removed - using JWT authentication instead
-  // This is now just a wrapper component
-  if (!isClient) {
-    return null
-  }
-
+  // This is now just a wrapper component that ensures SSR compatibility
+  // Always render children to avoid hydration mismatches
   return <>{children}</>
 }

@@ -22,11 +22,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check for existing token in localStorage
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      // Always let the server verify the token; do not verify on client
-      fetchUserData(token)
+    // Check for existing token in localStorage (client-side only)
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken')
+      if (token) {
+        // Always let the server verify the token; do not verify on client
+        fetchUserData(token)
+      } else {
+        setLoading(false)
+      }
     } else {
       setLoading(false)
     }
@@ -52,11 +56,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData)
         setSession(sessionData)
       } else {
-        localStorage.removeItem('authToken')
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('authToken')
+        }
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
-      localStorage.removeItem('authToken')
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken')
+      }
     } finally {
       setLoading(false)
     }
@@ -80,7 +88,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const { user, token } = data
-        localStorage.setItem('authToken', token)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', token)
+        }
         
         const sessionData: Session = {
           user,
@@ -114,7 +124,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const { user, token } = data
-        localStorage.setItem('authToken', token)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', token)
+        }
         
         const sessionData: Session = {
           user,
@@ -135,13 +147,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    localStorage.removeItem('authToken')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken')
+    }
     setUser(null)
     setSession(null)
   }
 
   const getToken = async () => {
-    return localStorage.getItem('authToken')
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('authToken')
+    }
+    return null
   }
 
   const value = {
