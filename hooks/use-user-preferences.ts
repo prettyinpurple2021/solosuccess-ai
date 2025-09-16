@@ -12,7 +12,10 @@ interface UserPreferencesHook {
   error: string | null
   setPreference: (key: string, value: any) => Promise<void>
   setPreferences: (prefs: Record<string, any>) => Promise<void>
-  getPreference: <T = any>(key: string, defaultValue?: T) => T
+  getPreference: {
+    <T>(key: string, defaultValue: T): T
+    <T>(key: string): T | undefined
+  }
   removePreference: (key: string) => Promise<void>
   refreshPreferences: () => Promise<void>
 }
@@ -160,8 +163,11 @@ export function useUserPreferences(
   }, [getAuthHeaders, options.fallbackToLocalStorage])
 
   // Get a specific preference with optional default value
-  const getPreference = useCallback(<T = any>(key: string, defaultValue?: T): T => {
+  const getPreference = useCallback((<T>(key: string, defaultValue?: T): T | undefined => {
     return preferences[key] !== undefined ? preferences[key] : defaultValue
+  }) as {
+    <T>(key: string, defaultValue: T): T
+    <T>(key: string): T | undefined
   }, [preferences])
 
   // Remove a preference

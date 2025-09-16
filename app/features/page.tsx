@@ -1,5 +1,8 @@
 "use client"
 
+// Force dynamic rendering to prevent auth issues during static generation
+export const dynamic = 'force-dynamic'
+
 import Link from "next/link"
 import { ArrowLeft, Crown, Brain, Target, Sparkles, Zap, TrendingUp, Shield, Users, Briefcase, Calendar, MessageCircle, Palette, Focus, CheckCircle, Play} from "lucide-react"
 import { Button} from "@/components/ui/button"

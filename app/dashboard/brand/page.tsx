@@ -1,5 +1,8 @@
 "use client"
 
+// Force dynamic rendering to prevent auth issues during static generation
+export const dynamic = 'force-dynamic'
+
 import { useState} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"

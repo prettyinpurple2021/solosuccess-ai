@@ -4,6 +4,9 @@ import { Badge} from '@/components/ui/badge';
 import { TemplateRenderer} from '@/components/templates/template-renderer'
 import templateData from '@/data/templates.json';
 
+// Force dynamic rendering to prevent auth issues during static generation
+export const dynamic = 'force-dynamic'
+
 // Helper function to find template in JSON data
 function findTemplateInJson(slug: string) {
   for (const category of templateData) {
