@@ -33,7 +33,15 @@ export default function AvatarUploadPage() {
           setBlob(newBlob);
         }}
       >
-        <input name="file" ref={inputFileRef} type="file" accept="image/jpeg, image/png, image/webp" required />
+        <label htmlFor="avatar-upload">Choose an avatar image</label>
+        <input 
+          id="avatar-upload"
+          name="file" 
+          ref={inputFileRef} 
+          type="file" 
+          accept="image/jpeg, image/png, image/webp" 
+          required 
+        />
         <button type="submit">Upload</button>
       </form>
       {blob && (
