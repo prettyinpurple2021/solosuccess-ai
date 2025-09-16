@@ -47,7 +47,7 @@ export default function FolderCreationDialog({
 
     setLoading(true)
     try {
-      await onCreateFolderAction(name.trim(), description.trim() || undefined, color, selectedParentId || undefined)
+      await onCreateFolderAction(name.trim(), description.trim() || undefined, color, selectedParentId === '__root__' ? undefined : selectedParentId || undefined)
       // Reset form
       setName('')
       setDescription('')

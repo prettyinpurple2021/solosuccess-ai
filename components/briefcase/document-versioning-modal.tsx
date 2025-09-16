@@ -529,13 +529,14 @@ export default function DocumentVersioningModal({
               <div>
                 <Label>Version 2</Label>
                 <Select 
-                  value={compareVersion || ''} 
+                  value={compareVersion || '__none__'} 
                   onValueChange={setCompareVersion}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select a version" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="__none__">Select a version</SelectItem>
                     {versions.map((version) => (
                       <SelectItem key={version.id} value={version.id}>
                         v{version.versionNumber} - {new Date(version.createdAt).toLocaleDateString()}

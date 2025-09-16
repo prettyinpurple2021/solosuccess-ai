@@ -89,6 +89,11 @@ export default function DashboardPage() {
         setShowOnboarding(false)
         // Refresh dashboard data
         window.location.reload()
+      } else {
+        const errorData = await response.json()
+        console.error('Onboarding completion failed:', errorData)
+        // Still close onboarding to prevent user being stuck
+        setShowOnboarding(false)
       }
     } catch (error) {
       console.error('Error saving onboarding data:', error)

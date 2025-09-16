@@ -56,15 +56,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData)
         setSession(sessionData)
       } else {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('authToken')
+        // Only remove token if it's actually invalid (401/403), not for network errors
+        if (response.status === 401 || response.status === 403) {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('authToken')
+          }
         }
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('authToken')
-      }
+      // Don't remove token for network errors - only for auth failures
+      // Network errors shouldn't clear authentication
+    }
     } finally {
       setLoading(false)
     }

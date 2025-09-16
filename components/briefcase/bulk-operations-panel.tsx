@@ -129,7 +129,7 @@ export default function BulkOperationsPanel({
       switch (selectedOperation) {
         case 'move':
         case 'copy':
-          if (!targetFolder) {
+          if (!targetFolder || targetFolder === '__root__') {
             toast({
               title: "Error",
               description: "Please select a target folder",
@@ -397,7 +397,7 @@ export default function BulkOperationsPanel({
                         <SelectValue placeholder="Select folder..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Root Level</SelectItem>
+                        <SelectItem value="__root__">Root Level</SelectItem>
                         {availableFolders.map((folder) => (
                           <SelectItem key={folder.id} value={folder.id}>
                             <div className="flex items-center gap-2">
