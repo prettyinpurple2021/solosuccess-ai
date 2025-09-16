@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import FloatingChatButton from '@/components/chat/floating-chat-button'
 import { useToast } from '@/hooks/use-toast'
+import { useUserPreferences } from '@/hooks/use-user-preferences'
 
 interface Message {
   id: string
@@ -112,29 +113,46 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  
+  // Use database preferences for chat messages with localStorage fallback
+  const { preferences, setPreference, loading: preferencesLoading } = useUserPreferences({
+    defaultValues: {
+      chatMessages: []
+    },
+    fallbackToLocalStorage: true
+  })
 
-  // Load cached messages on mount
+  // Load cached messages on mount from preferences
   useEffect(() => {
-    const cachedMessages = localStorage.getItem('solosuccess_chat_messages')
-    if (cachedMessages) {
+    if (!preferencesLoading && preferences.chatMessages) {
       try {
-        const parsed = JSON.parse(cachedMessages)
-        setMessages(parsed.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp)
-        })))
+        const cachedMessages = preferences.chatMessages
+        if (Array.isArray(cachedMessages) && cachedMessages.length > 0) {
+          setMessages(cachedMessages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          })))
+        }
       } catch (error) {
         console.error('Error loading cached messages:', error)
       }
     }
-  }, [])
+  }, [preferences.chatMessages, preferencesLoading])
 
-  // Cache messages when they change
+  // Cache messages when they change using preferences API
   useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('solosuccess_chat_messages', JSON.stringify(messages))
+    if (messages.length > 0 && !preferencesLoading) {
+      setPreference('chatMessages', messages).catch(error => {
+        console.error('Failed to save chat messages to preferences:', error)
+        // Fallback to localStorage on error
+        try {
+          localStorage.setItem('solosuccess_chat_messages', JSON.stringify(messages))
+        } catch (localError) {
+          console.error('Failed to save to localStorage as fallback:', localError)
+        }
+      })
     }
-  }, [messages])
+  }, [messages, setPreference, preferencesLoading])
 
   const addMessage = (message: Message) => {
     setMessages(prev => [...prev, message])
@@ -142,7 +160,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const clearMessages = () => {
     setMessages([])
-    localStorage.removeItem('solosuccess_chat_messages')
+    // Clear from preferences API and fallback to localStorage cleanup
+    setPreference('chatMessages', []).catch(error => {
+      console.error('Failed to clear chat messages from preferences:', error)
+      // Fallback to localStorage cleanup
+      try {
+        localStorage.removeItem('solosuccess_chat_messages')
+      } catch (localError) {
+        console.error('Failed to clear localStorage as fallback:', localError)
+      }
+    })
   }
 
   const handleSendMessage = async (messageContent: string, agentId: string) => {
