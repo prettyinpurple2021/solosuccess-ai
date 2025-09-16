@@ -127,12 +127,23 @@ export class SessionManager {
       }
 
       // Create session using collaboration hub
-      const session = await this.collaborationHub.createSession({
-        userId: config.userId,
-        goal: config.goal,
+      const collaborationResponse = await this.collaborationHub.initiateCollaboration({
+        userId: parseInt(config.userId, 10) || 0,
+        requestType: 'project',
         requiredAgents: availableAgents,
-        context: config.initialContext || {}
+        projectName: config.goal,
+        context: config.initialContext || {},
+        priority: 'medium'
       })
+
+      if (collaborationResponse.status === 'error') {
+        throw new Error(collaborationResponse.message || 'Failed to create collaboration session')
+      }
+
+      const session = this.collaborationHub.getSession(collaborationResponse.sessionId)
+      if (!session) {
+        throw new Error('Session was created but could not be retrieved')
+      }
 
       // Create session state
       const sessionState: SessionState = {
@@ -152,6 +163,10 @@ export class SessionManager {
           failedHandoffs: 0
         },
         configuration: {
+          autoArchiveAfter: 86400000, // 24 hours default
+          allowDynamicAgentJoining: true,
+          maxParticipants: 10,
+          requiresHumanApproval: false,
           ...template?.configuration,
           ...config.configuration
         }
@@ -508,8 +523,9 @@ export class SessionManager {
    * Get sessions by user
    */
   getUserSessions(userId: string): CollaborationSession[] {
+    const numericUserId = parseInt(userId, 10)
     return Array.from(this.activeSessions.values())
-      .filter(session => session.userId === userId)
+      .filter(session => session.userId === numericUserId)
   }
 
   /**
@@ -541,7 +557,7 @@ export class SessionManager {
         state: { ...sessionState },
         messageHistory: [], // In real implementation, get from message store
         agentStates: {}, // In real implementation, get from agents
-        userContext: session.context
+        userContext: session.metadata || {}
       }
 
       const checkpoints = this.sessionCheckpoints.get(sessionId) || []
@@ -657,7 +673,7 @@ export class SessionManager {
       sessionId,
       fromAgent: 'system',
       toAgent: null, // Broadcast to all
-      messageType: 'system',
+      messageType: 'notification',
       content,
       timestamp: new Date(),
       priority: 'medium',
