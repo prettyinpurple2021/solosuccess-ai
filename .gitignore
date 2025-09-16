@@ -30,6 +30,15 @@ next-env.d.ts
 *~
 .env*.local
 
+# Cloudflare Workers/Pages configurations - explicitly excluded to prevent accidental integration
+wrangler.toml
+.wrangler/
+workers-site/
+_worker.js
+_worker.ts
+*cloudflare*
+*wrangler*
+
 # templates should be tracked (do not ignore)
 !app/templates/**
 !components/templates/**

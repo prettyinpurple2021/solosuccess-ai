@@ -113,3 +113,12 @@ temp/
 # Local development
 uploads/
 secrets/
+
+# Cloudflare Workers/Pages configurations - explicitly excluded
+wrangler.toml
+.wrangler/
+workers-site/
+_worker.js
+_worker.ts
+*cloudflare*
+*wrangler*
