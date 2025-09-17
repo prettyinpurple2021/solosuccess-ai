@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/neon/client'
 import { authenticateRequest } from '@/lib/auth-server'
+import { createClient } from '@/lib/neon/server'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
 
@@ -38,10 +38,10 @@ const TaskIntelligenceRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Authenticate user
-    const { user, error: authError } = await authenticateRequest()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Authenticate user via JWT
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
     }
 
     // Parse and validate request body
@@ -56,28 +56,12 @@ export async function POST(request: NextRequest) {
       validatedData.tasks as TaskIntelligenceData[]
     )
 
-    // Log usage for analytics
-    try {
-      // Create ai_usage_logs table if it doesn't exist
-      await query(`
-        CREATE TABLE IF NOT EXISTS ai_usage_logs (
-          id SERIAL PRIMARY KEY,
-          user_id VARCHAR(255) NOT NULL,
-          feature VARCHAR(255) NOT NULL,
-          request_type VARCHAR(255) NOT NULL,
-          task_count INTEGER,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-        )
-      `)
-      
-      await query(`
-        INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at)
-        VALUES ($1, $2, $3, $4, $5)
-      `, [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date()])
-    } catch (logError) {
-      console.error('Error logging AI usage:', logError)
-      // Continue execution even if logging fails
-    }
+    // Log usage for analytics in Postgres (Neon)
+    const client = await createClient()
+    await client.query(
+      'INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at) VALUES ($1, $2, $3, $4, $5)',
+      [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date().toISOString()]
+    )
 
     return NextResponse.json({
       success: true,
@@ -114,26 +98,18 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate user
-    const { user, error: authError } = await authenticateRequest()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Authenticate user via JWT
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
     }
 
-    // Get user's recent AI usage stats
-    let usageStats = []
-    try {
-      const result = await query(`
-        SELECT * FROM ai_usage_logs
-        WHERE user_id = $1 AND feature = $2
-        ORDER BY created_at DESC
-        LIMIT 10
-      `, [user.id, 'task_intelligence'])
-      usageStats = result.rows
-    } catch (statsError) {
-      console.error('Error fetching usage stats:', statsError)
-      // Continue execution even if stats fetching fails
-    }
+    // Get user's recent AI usage stats from Postgres (Neon)
+    const client = await createClient()
+    const { rows: usageStats } = await client.query(
+      'SELECT * FROM ai_usage_logs WHERE user_id = $1 AND feature = $2 ORDER BY created_at DESC LIMIT 10',
+      [user.id, 'task_intelligence']
+    )
 
     return NextResponse.json({
       success: true,
@@ -146,7 +122,7 @@ export async function GET(request: NextRequest) {
           'productivity_tips',
           'schedule_optimization'
         ],
-        recentUsage: usageStats,
+        recentUsage: usageStats || [],
         limits: {
           requestsPerDay: 100,
           tasksPerRequest: 50

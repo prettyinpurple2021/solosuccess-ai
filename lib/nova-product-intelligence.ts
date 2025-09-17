@@ -213,7 +213,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze design patterns for competitive advantage identification
    */
-  async analyzeDesignPatterns(competitorIds: number[], userId?: string): Promise<DesignPattern[]> {
+  async analyzeDesignPatterns(competitorIds: number[], userId?: string): Promise<ProductInsight[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -244,7 +244,7 @@ export class NovaProductIntelligence {
   /**
    * Predict product roadmap based on competitor development patterns
    */
-  async predictProductRoadmap(competitorId: number, userId?: string): Promise<ProductRoadmapPrediction> {
+  async predictProductRoadmap(competitorId: number, userId?: string): Promise<RoadmapPrediction> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const hiringData = await this.getHiringIntelligence(competitorId, 180)
     const productData = await this.getWebsiteIntelligence(competitorId, 180)
