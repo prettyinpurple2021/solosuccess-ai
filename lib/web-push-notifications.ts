@@ -203,7 +203,7 @@ export class WebPushNotificationManager {
   /**
    * Schedule a notification for later
    */
-  scheduleNotification(notification: ScheduledNotification): void {
+  async scheduleNotification(notification: ScheduledNotification): Promise<void> {
     const timeUntilNotification = notification.scheduledTime.getTime() - Date.now()
     
     if (timeUntilNotification <= 0) {
@@ -250,7 +250,7 @@ export class WebPushNotificationManager {
   /**
    * Cancel a scheduled notification
    */
-  cancelScheduledNotification(id: string): void {
+  async cancelScheduledNotification(id: string): Promise<void> {
     const timeout = this.scheduledNotifications.get(id)
     if (timeout) {
       clearTimeout(timeout)
