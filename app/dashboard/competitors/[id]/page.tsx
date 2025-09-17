@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, RefreshCw, Settings, Clock, ExternalLink, Brain, Crosshair, Plus, AlertTriangle } from 'lucide-react'
 
 import { BossButton } from '@/components/ui/boss-button'
-import { EmpowermentCard } from '@/components/ui/empowerment-card'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -192,7 +192,7 @@ export default function CompetitorDetailPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard/competitors">
-              <BossButton variant="ghost" size="sm">
+              <BossButton variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Competitors
               </BossButton>
@@ -236,7 +236,7 @@ export default function CompetitorDetailPage() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Company Info */}
-              <EmpowermentCard className="lg:col-span-2">
+              <Card className="lg:col-span-2">
                 <h3 className="text-xl font-bold text-gradient mb-4">Company Overview</h3>
                 <div className="space-y-4">
                   <div>
@@ -254,10 +254,10 @@ export default function CompetitorDetailPage() {
                     </div>
                   </div>
                 </div>
-              </EmpowermentCard>
+              </Card>
 
               {/* Threat Level */}
-              <EmpowermentCard>
+              <Card>
                 <h3 className="text-xl font-bold text-gradient mb-4">Threat Assessment</h3>
                 <div className="text-center">
                   <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-2 ${
@@ -273,12 +273,12 @@ export default function CompetitorDetailPage() {
                      'Low priority monitoring'}
                   </p>
                 </div>
-              </EmpowermentCard>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-6">
-            <EmpowermentCard>
+            <Card>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gradient">Activity Timeline</h3>
                 <div className="flex items-center gap-3">
@@ -330,11 +330,11 @@ export default function CompetitorDetailPage() {
                   </div>
                 ))}
               </div>
-            </EmpowermentCard>
+            </Card>
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
-            <EmpowermentCard>
+            <Card>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gradient flex items-center">
                   <Brain className="w-6 h-6 mr-2" />
@@ -399,11 +399,11 @@ export default function CompetitorDetailPage() {
                   </div>
                 ))}
               </div>
-            </EmpowermentCard>
+            </Card>
           </TabsContent>
 
           <TabsContent value="threat" className="space-y-6">
-            <EmpowermentCard>
+            <Card>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gradient flex items-center">
                   <Crosshair className="w-6 h-6 mr-2" />
@@ -452,11 +452,11 @@ export default function CompetitorDetailPage() {
                   </div>
                 </div>
               </div>
-            </EmpowermentCard>
+            </Card>
           </TabsContent>
 
           <TabsContent value="actions" className="space-y-6">
-            <EmpowermentCard>
+            <Card>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gradient">Action Plan</h3>
                 <BossButton variant="secondary" size="sm">
@@ -488,11 +488,11 @@ export default function CompetitorDetailPage() {
                   </div>
                 </div>
               </div>
-            </EmpowermentCard>
+            </Card>
           </TabsContent>
 
           <TabsContent value="alerts" className="space-y-6">
-            <EmpowermentCard>
+            <Card>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gradient">Active Alerts</h3>
                 <BossButton variant="secondary" size="sm">
@@ -539,7 +539,7 @@ export default function CompetitorDetailPage() {
                   </div>
                 ))}
               </div>
-            </EmpowermentCard>
+            </Card>
           </TabsContent>
         </Tabs>
       </motion.div>

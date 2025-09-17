@@ -32,28 +32,7 @@ export async function GET(request: NextRequest) {
     const sql = getSql()
     const offset = (page - 1) * limit
 
-    // Build query with filters
-    let whereClause = `WHERE user_id = $1`
-    const params: any[] = [user.id]
-    let paramIndex = 2
-
-    if (category && category !== 'all') {
-      whereClause += ` AND category = $${paramIndex}`
-      params.push(category)
-      paramIndex++
-    }
-
-    if (search) {
-      whereClause += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`
-      params.push(`%${search}%`)
-      paramIndex++
-    }
-
-    if (folderId) {
-      whereClause += ` AND folder_id = $${paramIndex}`
-      params.push(folderId)
-      paramIndex++
-    }
+    // Query filters are now handled inline with conditional SQL
 
     // Get documents
     const documents = await sql`
@@ -77,17 +56,23 @@ export async function GET(request: NextRequest) {
         updated_at,
         folder_id
       FROM documents 
-      ${whereClause}
+      WHERE user_id = ${user.id}
+        ${category && category !== 'all' ? sql`AND category = ${category}` : sql``}
+        ${search ? sql`AND (name ILIKE ${`%${search}%`} OR description ILIKE ${`%${search}%`})` : sql``}
+        ${folderId ? sql`AND folder_id = ${folderId}` : sql``}
       ORDER BY created_at DESC
       LIMIT ${limit} OFFSET ${offset}
-    `.params(params)
+    `
 
     // Get total count
     const countResult = await sql`
       SELECT COUNT(*) as total
       FROM documents 
-      ${whereClause}
-    `.params(params)
+      WHERE user_id = ${user.id}
+        ${category && category !== 'all' ? sql`AND category = ${category}` : sql``}
+        ${search ? sql`AND (name ILIKE ${`%${search}%`} OR description ILIKE ${`%${search}%`})` : sql``}
+        ${folderId ? sql`AND folder_id = ${folderId}` : sql``}
+    `
 
     const total = parseInt(countResult[0]?.total || '0')
 

@@ -448,6 +448,10 @@ export class WebPushNotificationManager {
   private async removeSubscriptionFromServer(subscription: PushSubscription): Promise<void> {
     try {
       const subscriptionData = subscription.toJSON()
+      if (!subscriptionData.endpoint) {
+        console.warn('No endpoint found in subscription data')
+        return
+      }
       await fetch(`/api/notifications/push-subscriptions?endpoint=${encodeURIComponent(subscriptionData.endpoint)}`, {
         method: 'DELETE'
       })

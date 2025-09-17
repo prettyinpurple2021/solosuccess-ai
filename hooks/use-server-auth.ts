@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { jwt } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 
 export async function getServerAuthToken(): Promise<string | null> {
   try {

@@ -34,6 +34,7 @@ interface BrandSettings {
   targetAudience: string
   brandPersonality: string[]
   colorPalette: {
+    name?: string
     primary: string
     secondary: string
     accent: string
@@ -463,7 +464,9 @@ export default function BrandStudioPage() {
                   <div
                     key={index}
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                      brandSettings.colorPalette.name === palette.name 
+                      brandSettings.colorPalette.name === palette.name || 
+                      (brandSettings.colorPalette.primary === palette.primary && 
+                       brandSettings.colorPalette.secondary === palette.secondary)
                         ? 'border-blue-500 bg-blue-50' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
