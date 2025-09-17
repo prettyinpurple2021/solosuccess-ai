@@ -18,6 +18,7 @@
     "setup-compliance": "node scripts/setup-compliance-database.mjs",
     "setup-migration": "node scripts/setup-migration-database.mjs",
     "setup-unified-briefcase": "node scripts/setup-unified-briefcase.mjs",
+    "migrate": "node scripts/run-migration.mjs",
     "db:run-sql": "node scripts/run-sql-file.mjs",
     "verify-triggers": "node scripts/verify-updated-at-triggers.js",
     "migrate-profile-fields": "node scripts/run-profile-fields-migration.mjs",
