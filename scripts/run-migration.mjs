@@ -101,7 +101,7 @@ async function runMigration() {
       await sql`
         CREATE TABLE user_brand_settings (
           id SERIAL PRIMARY KEY,
-          user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
           company_name VARCHAR(255),
           tagline VARCHAR(500),
           description TEXT,
@@ -131,7 +131,7 @@ async function runMigration() {
       await sql`
         CREATE TABLE push_subscriptions (
           id SERIAL PRIMARY KEY,
-          user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
           endpoint VARCHAR(1000) NOT NULL,
           p256dh_key VARCHAR(500) NOT NULL,
           auth_key VARCHAR(500) NOT NULL,
@@ -147,6 +147,37 @@ async function runMigration() {
       console.log('   ✅ push_subscriptions table created')
     } else {
       console.log('   ⏭️  push_subscriptions table already exists')
+      
+      // Check if the existing table has the correct user_id type
+      const columnCheck = await sql`
+        SELECT data_type 
+        FROM information_schema.columns 
+        WHERE table_name = 'push_subscriptions' 
+        AND column_name = 'user_id'
+      `
+      
+      if (columnCheck.length > 0 && columnCheck[0].data_type === 'character varying') {
+        console.log('   ⚠️  push_subscriptions table has incorrect user_id type, recreating...')
+        await sql`DROP TABLE push_subscriptions CASCADE`
+        
+        await sql`
+          CREATE TABLE push_subscriptions (
+            id SERIAL PRIMARY KEY,
+            user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            endpoint VARCHAR(1000) NOT NULL,
+            p256dh_key VARCHAR(500) NOT NULL,
+            auth_key VARCHAR(500) NOT NULL,
+            device_info JSONB DEFAULT '{}',
+            is_active BOOLEAN DEFAULT true,
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+          )
+        `
+        await sql`CREATE INDEX IF NOT EXISTS push_subscriptions_user_id_idx ON push_subscriptions(user_id)`
+        await sql`CREATE INDEX IF NOT EXISTS push_subscriptions_endpoint_idx ON push_subscriptions(endpoint)`
+        await sql`CREATE INDEX IF NOT EXISTS push_subscriptions_is_active_idx ON push_subscriptions(is_active)`
+        console.log('   ✅ push_subscriptions table recreated with correct types')
+      }
     }
     
     console.log('\n🎉 Migration completed successfully!')

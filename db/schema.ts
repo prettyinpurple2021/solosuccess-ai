@@ -814,7 +814,7 @@ export const documentActivityRelations = relations(documentActivity, ({ one }) =
 // User Brand Settings table
 export const userBrandSettings = pgTable('user_brand_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   company_name: varchar('company_name', { length: 255 }),
   tagline: varchar('tagline', { length: 500 }),
   description: text('description'),
@@ -844,7 +844,7 @@ export const userBrandSettingsRelations = relations(userBrandSettings, ({ one })
 // Push Subscriptions table
 export const pushSubscriptions = pgTable('push_subscriptions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   endpoint: varchar('endpoint', { length: 1000 }).notNull(),
   p256dh_key: varchar('p256dh_key', { length: 500 }).notNull(),
   auth_key: varchar('auth_key', { length: 500 }).notNull(),
