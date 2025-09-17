@@ -89,8 +89,25 @@ export class WebPushNotificationManager {
 
     const permission = await Notification.requestPermission()
     
-    // Store permission preference
-    localStorage.setItem('solosuccess_notification_permission', permission)
+    // Store permission preference in database via preferences API
+    try {
+      const response = await fetch('/api/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          key: 'notificationPermission', 
+          value: permission 
+        })
+      })
+      
+      if (!response.ok) {
+        console.warn('Failed to save notification permission to database')
+      }
+    } catch (error) {
+      console.warn('Failed to save notification permission:', error)
+    }
     
     return permission
   }
@@ -121,10 +138,7 @@ export class WebPushNotificationManager {
       })
     }
 
-    // Store subscription info
-    localStorage.setItem('solosuccess_push_subscription', JSON.stringify(subscription))
-    
-    // Send subscription to server
+    // Send subscription to server (database)
     await this.sendSubscriptionToServer(subscription)
     
     return subscription
@@ -143,9 +157,6 @@ export class WebPushNotificationManager {
     const success = await subscription.unsubscribe()
     
     if (success) {
-      // Remove from localStorage
-      localStorage.removeItem('solosuccess_push_subscription')
-      
       // Notify server
       await this.removeSubscriptionFromServer(subscription)
     }
@@ -212,10 +223,28 @@ export class WebPushNotificationManager {
     
     this.scheduledNotifications.set(notification.id, timeout)
     
-    // Store in localStorage for persistence
-    const scheduled = this.getScheduledNotifications()
-    scheduled.push(notification)
-    localStorage.setItem('solosuccess_scheduled_notifications', JSON.stringify(scheduled))
+    // Store in database via preferences API
+    try {
+      const scheduled = await this.getScheduledNotifications()
+      scheduled.push(notification)
+      
+      const response = await fetch('/api/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          key: 'scheduledNotifications', 
+          value: scheduled 
+        })
+      })
+      
+      if (!response.ok) {
+        console.warn('Failed to save scheduled notifications to database')
+      }
+    } catch (error) {
+      console.warn('Failed to save scheduled notifications:', error)
+    }
   }
 
   /**
@@ -228,34 +257,57 @@ export class WebPushNotificationManager {
       this.scheduledNotifications.delete(id)
     }
     
-    // Remove from localStorage
-    const scheduled = this.getScheduledNotifications().filter(n => n.id !== id)
-    localStorage.setItem('solosuccess_scheduled_notifications', JSON.stringify(scheduled))
+    // Remove from database via preferences API
+    try {
+      const scheduled = (await this.getScheduledNotifications()).filter(n => n.id !== id)
+      
+      const response = await fetch('/api/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          key: 'scheduledNotifications', 
+          value: scheduled 
+        })
+      })
+      
+      if (!response.ok) {
+        console.warn('Failed to update scheduled notifications in database')
+      }
+    } catch (error) {
+      console.warn('Failed to update scheduled notifications:', error)
+    }
   }
 
   /**
    * Get all scheduled notifications
    */
-  getScheduledNotifications(): ScheduledNotification[] {
-    const stored = localStorage.getItem('solosuccess_scheduled_notifications')
-    if (!stored) return []
-    
+  async getScheduledNotifications(): Promise<ScheduledNotification[]> {
     try {
-      return JSON.parse(stored).map((n: any) => ({
-        ...n,
-        scheduledTime: new Date(n.scheduledTime)
-      }))
+      const response = await fetch('/api/preferences')
+      if (response.ok) {
+        const data = await response.json()
+        const stored = data.preferences?.scheduledNotifications
+        if (stored && Array.isArray(stored)) {
+          return stored.map((n: any) => ({
+            ...n,
+            scheduledTime: new Date(n.scheduledTime)
+          }))
+        }
+      }
     } catch (error) {
-      console.error('Error parsing scheduled notifications:', error)
-      return []
+      console.error('Error fetching scheduled notifications from database:', error)
     }
+    
+    return []
   }
 
   /**
    * Restore scheduled notifications after page load
    */
-  restoreScheduledNotifications(): void {
-    const notifications = this.getScheduledNotifications()
+  async restoreScheduledNotifications(): Promise<void> {
+    const notifications = await this.getScheduledNotifications()
     const now = new Date()
     
     notifications.forEach(notification => {
@@ -368,14 +420,20 @@ export class WebPushNotificationManager {
 
   private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
     try {
-      const response = await fetch('/api/notifications/subscribe', {
+      const deviceInfo = {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language
+      }
+
+      const response = await fetch('/api/notifications/push-subscriptions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          subscription: subscription.toJSON()
+          subscription: subscription.toJSON(),
+          deviceInfo
         })
       })
       
@@ -389,15 +447,9 @@ export class WebPushNotificationManager {
 
   private async removeSubscriptionFromServer(subscription: PushSubscription): Promise<void> {
     try {
-      await fetch('/api/notifications/unsubscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          subscription: subscription.toJSON()
-        })
+      const subscriptionData = subscription.toJSON()
+      await fetch(`/api/notifications/push-subscriptions?endpoint=${encodeURIComponent(subscriptionData.endpoint)}`, {
+        method: 'DELETE'
       })
     } catch (error) {
       console.error('Error removing subscription from server:', error)

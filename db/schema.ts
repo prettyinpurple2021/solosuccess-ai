@@ -547,6 +547,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   documentShareLinks: many(documentShareLinks),
   documentActivity: many(documentActivity),
   brandSettings: one(userBrandSettings),
+  pushSubscriptions: many(pushSubscriptions),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
@@ -836,6 +837,31 @@ export const userBrandSettings = pgTable('user_brand_settings', {
 export const userBrandSettingsRelations = relations(userBrandSettings, ({ one }) => ({
   user: one(users, {
     fields: [userBrandSettings.user_id],
+    references: [users.id],
+  }),
+}));
+
+// Push Subscriptions table
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  endpoint: varchar('endpoint', { length: 1000 }).notNull(),
+  p256dh_key: varchar('p256dh_key', { length: 500 }).notNull(),
+  auth_key: varchar('auth_key', { length: 500 }).notNull(),
+  device_info: jsonb('device_info').default('{}'),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('push_subscriptions_user_id_idx').on(table.user_id),
+  endpointIdx: index('push_subscriptions_endpoint_idx').on(table.endpoint),
+  isActiveIdx: index('push_subscriptions_is_active_idx').on(table.is_active),
+}));
+
+// Push Subscriptions Relations
+export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [pushSubscriptions.user_id],
     references: [users.id],
   }),
 }));

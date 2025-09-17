@@ -18,7 +18,7 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
           '@type': 'Offer',
           price: '0',
           priceCurrency: 'USD',
-          url: 'https://solosuccess.ai/signup',
+          url: 'https://solobossai.fun/signup',
           availability: 'https://schema.org/InStock',
         },
       },
@@ -31,7 +31,7 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
           '@type': 'Offer',
           price: '19',
           priceCurrency: 'USD',
-          url: 'https://solosuccess.ai/signup',
+          url: 'https://solobossai.fun/signup',
           availability: 'https://schema.org/InStock',
         },
       },
@@ -44,7 +44,7 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
           '@type': 'Offer',
           price: '29',
           priceCurrency: 'USD',
-          url: 'https://solosuccess.ai/contact',
+          url: 'https://solobossai.fun/contact',
           availability: 'https://schema.org/InStock',
         },
       },
@@ -65,13 +65,13 @@ export default function PricingLayout({ children }: { children: ReactNode }) {
               '@type': 'ListItem',
               position: 1,
               name: 'Home',
-              item: 'https://solosuccess.ai/'
+              item: 'https://solobossai.fun/'
             },
             {
               '@type': 'ListItem',
               position: 2,
               name: 'Pricing',
-              item: 'https://solosuccess.ai/pricing'
+              item: 'https://solobossai.fun/pricing'
             }
           ]
         })}
@@ -94,11 +94,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: localizedTitle,
     description: localizedDescription,
-    alternates: { canonical: 'https://solosuccess.ai/pricing' },
+    alternates: { canonical: 'https://solobossai.fun/pricing' },
     openGraph: {
       title: localizedTitle,
       description: localizedDescription,
-      url: 'https://solosuccess.ai/pricing',
+      url: 'https://solobossai.fun/pricing',
       type: 'website',
       siteName: 'SoloSuccess AI',
     },
