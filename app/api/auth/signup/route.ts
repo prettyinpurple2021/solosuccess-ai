@@ -101,10 +101,20 @@ export async function POST(request: NextRequest) {
       console.error('Failed to start onboarding workflow:', error)
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: userData,
-      token
+      message: 'Signup successful'
     })
+
+    // Set HTTP-only cookie instead of returning token
+    response.cookies.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 // 7 days
+    })
+
+    return response
 
   } catch (error) {
     console.error('Signup error:', error)

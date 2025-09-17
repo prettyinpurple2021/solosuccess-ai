@@ -1,102 +1,86 @@
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { neon } from '@neondatabase/serverless'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params
-    const { id } = params
-    
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const documentId = id
-    const client = await createClient()
+    const params = await context.params
+    const fileId = params.id
+    const sql = getSql()
 
-    // Get document info with file data
-    const { rows: [document] } = await client.query(`
-      SELECT id, name, original_name, mime_type, size, file_data, user_id
+    // Get file metadata
+    const documents = await sql`
+      SELECT 
+        id,
+        name,
+        original_name,
+        file_type,
+        mime_type,
+        size,
+        file_url,
+        download_count
       FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${fileId} AND user_id = ${user.id}
+      LIMIT 1
+    `
 
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+    if (documents.length === 0) {
+      return NextResponse.json({ error: 'File not found' }, { status: 404 })
     }
 
-    // Check if user has permission to download
-    const hasPermission = await checkDownloadPermission(client, documentId, user.id)
-    if (!hasPermission) {
-      return NextResponse.json({ error: 'No permission to download' }, { status: 403 })
+    const document = documents[0]
+
+    if (!document.file_url) {
+      return NextResponse.json({ error: 'File not available' }, { status: 404 })
     }
 
-    // Get file data from database
-    const fileBuffer = document.file_data
-
-    // Update download count and last accessed
-    await client.query(`
+    // Increment download count
+    await sql`
       UPDATE documents 
-      SET download_count = download_count + 1, 
-          last_accessed = NOW(),
-          updated_at = NOW()
-      WHERE id = $1
-    `, [documentId])
+      SET download_count = download_count + 1, last_accessed = NOW()
+      WHERE id = ${fileId}
+    `
 
-    // Log activity
-    await client.query(`
-      INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'downloaded', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        fileName: document.name,
-        fileSize: document.size,
-        userAgent: request.headers.get('user-agent'),
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
-      })
-    ])
+    // Fetch file from Vercel Blob storage
+    const fileResponse = await fetch(document.file_url)
+    
+    if (!fileResponse.ok) {
+      return NextResponse.json({ error: 'File not found in storage' }, { status: 404 })
+    }
 
-    // Return file with appropriate headers
+    const fileBuffer = await fileResponse.arrayBuffer()
+
+    // Return file with proper headers
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': document.mime_type,
         'Content-Disposition': `attachment; filename="${document.original_name}"`,
         'Content-Length': document.size.toString(),
-        'Cache-Control': 'private, max-age=3600',
-      },
+        'Cache-Control': 'private, max-age=3600'
+      }
     })
-
   } catch (error) {
-    console.error('Download error:', error)
-    return NextResponse.json(
-      { error: 'Failed to download file' },
-      { status: 500 }
-    )
+    console.error('Error downloading file:', error)
+    return NextResponse.json({ error: 'Failed to download file' }, { status: 500 })
   }
-}
-
-async function checkDownloadPermission(client: any, documentId: string, userId: string): Promise<boolean> {
-  // Check if user owns the document
-  const { rows: [document] } = await client.query(`
-    SELECT user_id FROM documents WHERE id = $1
-  `, [documentId])
-
-  if (document && document.user_id === userId) {
-    return true
-  }
-
-  // Check if user has explicit permission
-  const { rows: [permission] } = await client.query(`
-    SELECT role FROM document_permissions 
-    WHERE document_id = $1 AND user_id = $2 AND is_active = true
-  `, [documentId, userId])
-
-  return !!permission
 }

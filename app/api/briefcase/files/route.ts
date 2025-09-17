@@ -1,131 +1,211 @@
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { neon } from '@neondatabase/serverless'
+import { put } from '@vercel/blob'
 
-// GET /api/briefcase/files -> list user's documents with optional filters
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
+    
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
-    const folder = searchParams.get('folder')
-    const search = searchParams.get('search')
-    const limit = Number(searchParams.get('limit') || '100')
-    const offset = Number(searchParams.get('offset') || '0')
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get('page') || '1')
+    const limit = parseInt(url.searchParams.get('limit') || '20')
+    const category = url.searchParams.get('category')
+    const search = url.searchParams.get('search')
+    const folderId = url.searchParams.get('folderId')
+    
+    const sql = getSql()
+    const offset = (page - 1) * limit
 
-    const client = await createClient()
-
-    // Build dynamic conditions
-    const conditions: string[] = ['d.user_id = $1']
+    // Build query with filters
+    let whereClause = `WHERE user_id = $1`
     const params: any[] = [user.id]
     let paramIndex = 2
 
     if (category && category !== 'all') {
-      conditions.push(`d.category = $${paramIndex++}`)
+      whereClause += ` AND category = $${paramIndex}`
       params.push(category)
+      paramIndex++
     }
-    if (folder) {
-      conditions.push(`d.folder_id = $${paramIndex++}`)
-      params.push(folder)
-    }
+
     if (search) {
-      conditions.push(`(d.name ILIKE $${paramIndex} OR d.description ILIKE $${paramIndex})`)
+      whereClause += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`
       params.push(`%${search}%`)
       paramIndex++
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+    if (folderId) {
+      whereClause += ` AND folder_id = $${paramIndex}`
+      params.push(folderId)
+      paramIndex++
+    }
 
-    const query = `
-      SELECT d.id, d.user_id, d.folder_id, d.name, d.original_name, d.file_type, d.mime_type,
-             d.size, d.category, d.description, d.tags, d.metadata, d.ai_insights,
-             d.is_favorite, d.download_count, d.view_count, d.last_accessed,
-             d.created_at, d.updated_at,
-             f.name AS folder_name, f.color AS folder_color
-      FROM documents d
-      LEFT JOIN document_folders f ON f.id = d.folder_id
-      ${whereClause}
-      ORDER BY d.created_at DESC
-      LIMIT $${paramIndex++} OFFSET $${paramIndex}
-    `
-    params.push(limit, offset)
-
-    const { rows } = await client.query(query, params)
-
-    const files = rows.map((r: any) => {
-      let tags: string[] = []
-      try {
-        tags = Array.isArray(r.tags) ? r.tags : JSON.parse(r.tags || '[]')
-      } catch {
-        tags = []
-      }
-      return {
-        id: r.id,
-        name: r.name,
-        original_name: r.original_name || r.name,
-        file_type: r.file_type,
-        mime_type: r.mime_type,
-        size: Number(r.size || 0),
-        category: r.category || 'uncategorized',
-        description: r.description || '',
+    // Get documents
+    const documents = await sql`
+      SELECT 
+        id,
+        name,
+        original_name,
+        file_type,
+        mime_type,
+        size,
+        file_url,
+        category,
+        description,
         tags,
-        metadata: r.metadata || {},
-        ai_insights: r.ai_insights || {},
-        is_favorite: !!r.is_favorite,
-        download_count: Number(r.download_count || 0),
-        view_count: Number(r.view_count || 0),
-        last_accessed: r.last_accessed || null,
-        created_at: r.created_at,
-        updated_at: r.updated_at,
-        folder_id: r.folder_id,
-        folder_name: r.folder_name,
-        folder_color: r.folder_color,
-        downloadUrl: `/api/briefcase/files/${r.id}/download`,
-        previewUrl: `/api/briefcase/files/${r.id}/preview`,
-      }
-    })
+        is_favorite,
+        is_public,
+        download_count,
+        view_count,
+        last_accessed,
+        created_at,
+        updated_at,
+        folder_id
+      FROM documents 
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `.params(params)
 
-    // Stats
-    const { rows: categoryRows } = await client.query(
-      `SELECT category AS name, COUNT(*)::int AS count FROM documents WHERE user_id = $1 GROUP BY category`,
-      [user.id]
-    )
-    const { rows: typeRows } = await client.query(
-      `SELECT file_type, COUNT(*)::int AS count FROM documents WHERE user_id = $1 GROUP BY file_type`,
-      [user.id]
-    )
-    const { rows: totalRows } = await client.query(
-      `SELECT COUNT(*)::int AS total, COALESCE(SUM(size),0)::bigint AS total_size FROM documents WHERE user_id = $1`,
-      [user.id]
-    )
+    // Get total count
+    const countResult = await sql`
+      SELECT COUNT(*) as total
+      FROM documents 
+      ${whereClause}
+    `.params(params)
+
+    const total = parseInt(countResult[0]?.total || '0')
 
     return NextResponse.json({
-      success: true,
-      files,
-      stats: {
-        totalFiles: totalRows[0]?.total || 0,
-        totalSize: Number(totalRows[0]?.total_size || 0),
-        categories: categoryRows || [],
-        fileTypes: typeRows || [],
-      },
+      documents,
       pagination: {
-        total: totalRows[0]?.total || 0,
+        page,
         limit,
-        offset,
-        hasMore: offset + limit < (totalRows[0]?.total || 0),
-      },
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
     })
   } catch (error) {
-    console.error('Error fetching files:', error)
-    return NextResponse.json({ error: 'Failed to fetch files' }, { status: 500 })
+    console.error('Error fetching documents:', error)
+    return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 })
   }
 }
 
-// (Optional) POST can be used for server-side utilities; not used by UI currently
-export async function POST(_request: NextRequest) {
-  return NextResponse.json({ error: 'Not implemented' }, { status: 405 })
+export async function POST(request: NextRequest) {
+  try {
+    const { user, error } = await authenticateRequest()
+    
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const formData = await request.formData()
+    const files = formData.getAll('files') as File[]
+    const folderId = formData.get('folderId') as string
+
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: 'No files provided' }, { status: 400 })
+    }
+
+    const sql = getSql()
+    const uploadedFiles = []
+
+    for (const file of files) {
+      // Generate unique ID
+      const fileId = crypto.randomUUID()
+      
+      // Determine file category
+      const fileType = file.name.split('.').pop()?.toLowerCase() || 'unknown'
+      let category = 'uncategorized'
+      
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileType)) {
+        category = 'images'
+      } else if (['pdf', 'doc', 'docx', 'txt', 'md'].includes(fileType)) {
+        category = 'documents'
+      } else if (['mp4', 'avi', 'mov', 'wmv'].includes(fileType)) {
+        category = 'videos'
+      } else if (['mp3', 'wav', 'ogg', 'm4a'].includes(fileType)) {
+        category = 'audio'
+      }
+
+      try {
+        // Upload file to Vercel Blob storage
+        const blob = await put(`briefcase/${user.id}/${fileId}-${file.name}`, file, {
+          access: 'public',
+          contentType: file.type
+        })
+
+        // Insert document metadata into database (without file_data)
+        const result = await sql`
+          INSERT INTO documents (
+            id,
+            user_id,
+            folder_id,
+            name,
+            original_name,
+            file_type,
+            mime_type,
+            size,
+            file_url,
+            category,
+            tags,
+            is_favorite,
+            is_public,
+            download_count,
+            view_count,
+            created_at,
+            updated_at
+          ) VALUES (
+            ${fileId},
+            ${user.id},
+            ${folderId || null},
+            ${file.name},
+            ${file.name},
+            ${fileType},
+            ${file.type},
+            ${file.size},
+            ${blob.url},
+            ${category},
+            ${JSON.stringify([])},
+            false,
+            false,
+            0,
+            0,
+            NOW(),
+            NOW()
+          )
+          RETURNING id, name, file_type, size, category, created_at
+        `
+
+        uploadedFiles.push(result[0])
+      } catch (uploadError) {
+        console.error(`Error uploading file ${file.name}:`, uploadError)
+        // Continue with other files even if one fails
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      uploadedFiles,
+      message: `Successfully uploaded ${uploadedFiles.length} file(s)`
+    })
+  } catch (error) {
+    console.error('Error uploading files:', error)
+    return NextResponse.json({ error: 'Failed to upload files' }, { status: 500 })
+  }
 }

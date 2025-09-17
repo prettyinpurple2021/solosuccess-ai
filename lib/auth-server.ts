@@ -19,12 +19,28 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
     const headersList = await headers()
     const authHeader = headersList.get('authorization')
     
+    let token: string | null = null
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Try to get token from Authorization header first
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7)
+    } else {
+      // Fallback to cookie
+      const cookieHeader = headersList.get('cookie')
+      if (cookieHeader) {
+        const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+          const [name, value] = cookie.trim().split('=')
+          acc[name] = value
+          return acc
+        }, {} as Record<string, string>)
+        
+        token = cookies.auth_token || null
+      }
+    }
+    
+    if (!token) {
       return null
     }
-
-    const token = authHeader.substring(7)
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
     
     if (!decoded || !decoded.userId) {

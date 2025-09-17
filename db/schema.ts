@@ -401,7 +401,7 @@ export const documents = pgTable('documents', {
   file_type: varchar('file_type', { length: 50 }).notNull(),
   mime_type: varchar('mime_type', { length: 100 }).notNull(),
   size: integer('size').notNull(),
-  file_data: text('file_data').notNull(), // Store file content directly in database
+  file_url: varchar('file_url', { length: 1000 }), // URL to file in Vercel Blob storage
   category: varchar('category', { length: 100 }).default('uncategorized'),
   description: text('description'),
   tags: jsonb('tags').default('[]'),
@@ -524,7 +524,7 @@ export const documentActivity = pgTable('document_activity', {
 }));
 
 // Relations
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   briefcases: many(briefcases),
   goals: many(goals),
   tasks: many(tasks),
@@ -546,6 +546,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   documentPermissions: many(documentPermissions),
   documentShareLinks: many(documentShareLinks),
   documentActivity: many(documentActivity),
+  brandSettings: one(userBrandSettings),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
@@ -805,6 +806,36 @@ export const documentActivityRelations = relations(documentActivity, ({ one }) =
   }),
   user: one(users, {
     fields: [documentActivity.user_id],
+    references: [users.id],
+  }),
+}));
+
+// User Brand Settings table
+export const userBrandSettings = pgTable('user_brand_settings', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  company_name: varchar('company_name', { length: 255 }),
+  tagline: varchar('tagline', { length: 500 }),
+  description: text('description'),
+  industry: varchar('industry', { length: 100 }),
+  target_audience: text('target_audience'),
+  brand_personality: jsonb('brand_personality').default('[]'),
+  color_palette: jsonb('color_palette').default('{}'),
+  typography: jsonb('typography').default('{}'),
+  logo_url: varchar('logo_url', { length: 1000 }),
+  logo_prompt: text('logo_prompt'),
+  moodboard: jsonb('moodboard').default('[]'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('user_brand_settings_user_id_idx').on(table.user_id),
+  industryIdx: index('user_brand_settings_industry_idx').on(table.industry),
+}));
+
+// User Brand Settings Relations
+export const userBrandSettingsRelations = relations(userBrandSettings, ({ one }) => ({
+  user: one(users, {
+    fields: [userBrandSettings.user_id],
     references: [users.id],
   }),
 }));

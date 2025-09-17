@@ -1,557 +1,206 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback, useRef} from "react"
-
-import { Button} from "@/components/ui/button"
-
-import { Input} from "@/components/ui/input"
-import { Label} from "@/components/ui/label"
-
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
-
-import { Progress} from "@/components/ui/progress"
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
-  Briefcase, Upload, FileText, Image as ImageIcon, Video, Music, Archive, Search, Grid3x3, List, Trash2, FolderPlus, Folder, FileSpreadsheet, FileType, FileCode, Loader2, Download, Brain, Share2, History, CheckSquare, Square} from "lucide-react"
-import { motion, AnimatePresence} from "framer-motion"
-import { useToast} from "@/hooks/use-toast"
-import _FilePreviewModal from "@/components/file-preview-modal"
-import EnhancedFilePreviewModal from "@/components/briefcase/enhanced-file-preview-modal"
-import FolderCreationDialog from "@/components/briefcase/folder-creation-dialog"
-import AdvancedSearchPanel, { SearchFilters } from "@/components/briefcase/advanced-search-panel"
-import AIInsightsPanel from "@/components/briefcase/ai-insights-panel"
-import FileSharingModal from "@/components/briefcase/file-sharing-modal"
-import VersionHistoryModal from "@/components/briefcase/version-history-modal"
-import BulkOperationsPanel from "@/components/briefcase/bulk-operations-panel"
+  Upload, 
+  Search, 
+  Filter, 
+  Grid3X3, 
+  List, 
+  FolderPlus, 
+  FileText, 
+  Image, 
+  File,
+  Download,
+  Share,
+  MoreVertical,
+  Star,
+  Calendar,
+  User
+} from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
-interface BriefcaseFile {
+interface Document {
   id: string
   name: string
-  original_name: string
-  file_type: string
-  mime_type: string
+  originalName: string
+  fileType: string
+  mimeType: string
   size: number
+  fileUrl?: string
   category: string
   description?: string
   tags: string[]
-  metadata: any
-  ai_insights: any
-  is_favorite: boolean
-  download_count: number
-  view_count: number
-  last_accessed?: string
-  created_at: string
-  updated_at: string
-  folder_id?: number
-  folder_name?: string
-  folder_color?: string
-  downloadUrl: string
-  previewUrl: string
+  isFavorite: boolean
+  isPublic: boolean
+  downloadCount: number
+  viewCount: number
+  lastAccessed?: string
+  createdAt: string
+  updatedAt: string
+  folderId?: number
 }
 
 interface Folder {
-  id: string
+  id: number
   name: string
   description?: string
-  created_at: string
   color: string
-  file_count: number
+  icon?: string
+  fileCount: number
+  totalSize: number
+  createdAt: string
+  updatedAt: string
 }
 
 export default function BriefcasePage() {
-  const [files, setFiles] = useState<BriefcaseFile[]>([])
+  const [documents, setDocuments] = useState<Document[]>([])
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [_searchTerm, setSearchTerm] = useState("")
-  const [_selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
-  const [showUploadDialog, setShowUploadDialog] = useState(false)
-  const [showFolderDialog, setShowFolderDialog] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [isUploading, setIsUploading] = useState(false)
-  const [stats, setStats] = useState({
-    totalFiles: 0,
-    totalSize: 0,
-    categories: [],
-    fileTypes: []
-  })
-  
-  // Preview modal state
-  const [showPreviewModal, setShowPreviewModal] = useState(false)
-  const [_previewFile, setPreviewFile] = useState<BriefcaseFile | null>(null)
-  const [previewIndex, setPreviewIndex] = useState(0)
-  
-  // AI insights state
-  const [showAIInsights, setShowAIInsights] = useState(false)
-  const [aiInsightsFile, setAiInsightsFile] = useState<BriefcaseFile | null>(null)
-  
-  // File sharing state
-  const [showSharingModal, setShowSharingModal] = useState(false)
-  const [sharingFile, setSharingFile] = useState<BriefcaseFile | null>(null)
-  
-  // Version history state
-  const [showVersionHistory, setShowVersionHistory] = useState(false)
-  const [versionHistoryFile, setVersionHistoryFile] = useState<BriefcaseFile | null>(null)
-  
-  // Bulk operations state
-  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
-  const [showBulkOperations, setShowBulkOperations] = useState(false)
-  const [selectAll, setSelectAll] = useState(false)
-  
-  // Mobile optimization state
-  const [_isRefreshing, _setIsRefreshing] = useState(false)
-  const [_lastTouchY, _setLastTouchY] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  
-  // Advanced search state
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
-    query: '',
-    semantic: false,
-    fileTypes: [],
-    categories: [],
-    tags: [],
-    dateRange: undefined,
-    sizeRange: [0, 1000],
-    authors: [],
-    favorites: false,
-    folders: [],
-    sortBy: 'relevance',
-    sortOrder: 'desc',
-    includeContent: true,
-    includeComments: false
-  })
-  const [searchResults, setSearchResults] = useState<BriefcaseFile[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [_searchStats, setSearchStats] = useState({
-    fileTypes: [],
-    categories: [],
-    tags: []
-  })
-  // Upload dialog state
-  const [uploadSelectedFiles, setUploadSelectedFiles] = useState<FileList | null>(null)
-  const [uploadDescription, setUploadDescription] = useState("")
-  const [uploadTags, setUploadTags] = useState("")
-  const [uploadCategory, setUploadCategory] = useState("document")
+  const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set())
 
-  const { toast } = useToast()
+  useEffect(() => {
+    loadDocuments()
+    loadFolders()
+  }, [])
 
-  // Helper function for authenticated requests
-  const authenticatedFetch = (url: string, options: RequestInit = {}) => {
-    const token = localStorage.getItem('authToken')
-    const headers = {
-      ...options.headers,
-      ...(token && { 'Authorization': `Bearer ${token}` })
-    }
-    
-    return fetch(url, {
-      ...options,
-      headers
-    })
-  }
-
-  // Fetch files from API
-  const fetchFiles = useCallback(async () => {
+  const loadDocuments = async () => {
     try {
-      setLoading(true)
-      const params = new URLSearchParams()
-      if (_selectedCategory !== 'all') params.append('category', _selectedCategory)
-      if (selectedFolder) params.append('folder', selectedFolder)
-      if (_searchTerm) params.append('search', _searchTerm)
-      
-      const response = await authenticatedFetch(`/api/briefcase/files?${params.toString()}`)
-      if (!response.ok) throw new Error('Failed to fetch files')
-      
-      const data = await response.json()
-      setFiles(data.files || [])
-      setStats(data.stats || { totalFiles: 0, totalSize: 0, categories: [], fileTypes: [] })
-    } catch (error) {
-      console.error('Error fetching files:', error)
-      toast({
-        title: "Error",
-        description: "Failed to load files. Please try again.",
-        variant: "destructive"
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch('/api/briefcase/files', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       })
+
+      if (response.ok) {
+        const data = await response.json()
+        setDocuments(data.documents || [])
+      }
+    } catch (error) {
+      console.error('Error loading documents:', error)
     } finally {
       setLoading(false)
     }
-  }, [_selectedCategory, selectedFolder, _searchTerm, toast])
+  }
 
-  // Fetch folders
-  const fetchFolders = useCallback(async () => {
+  const loadFolders = async () => {
     try {
-      const response = await authenticatedFetch('/api/briefcase/folders')
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch('/api/briefcase/folders', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
       if (response.ok) {
         const data = await response.json()
         setFolders(data.folders || [])
       }
     } catch (error) {
-      console.error('Error fetching folders:', error)
+      console.error('Error loading folders:', error)
     }
-  }, [])
+  }
 
-  // Advanced search function
-  const performAdvancedSearch = useCallback(async (filters: SearchFilters) => {
-    try {
-      setIsSearching(true)
-      const response = await authenticatedFetch('/api/briefcase/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filters)
-      })
-      
-      if (!response.ok) throw new Error('Search failed')
-      
-      const data = await response.json()
-      setSearchResults(data.files || [])
-      setSearchStats(data.stats || { fileTypes: [], categories: [], tags: [] })
-      
-      toast({
-        title: "Search completed",
-        description: `Found ${data.files?.length || 0} files`,
-      })
-    } catch (error) {
-      console.error('Search error:', error)
-      toast({
-        title: "Search failed",
-        description: "Failed to perform search. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSearching(false)
-    }
-  }, [toast])
-
-  // Initial load
-  useEffect(() => {
-    fetchFiles()
-    fetchFolders()
-  }, [fetchFiles, fetchFolders])
-
-  // Handle file upload
-  const handleFileUpload = async (
-    files: FileList | null,
-    folderId?: string,
-    category?: string,
-    description?: string,
-    tags?: string
-  ) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
     if (!files || files.length === 0) return
 
-    setIsUploading(true)
-    setUploadProgress(0)
-
     try {
+      const token = localStorage.getItem('auth_token')
       const formData = new FormData()
+
       for (let i = 0; i < files.length; i++) {
         formData.append('files', files[i])
       }
-      
-      formData.append('category', category || _selectedCategory)
-      if (folderId) formData.append('folderId', folderId)
-      formData.append('description', description || '')
-      formData.append('tags', tags || '')
 
-      const response = await authenticatedFetch('/api/briefcase/upload', {
-        method: 'PUT', // Use PUT for bulk upload
+      const response = await fetch('/api/briefcase/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Upload failed')
+      if (response.ok) {
+        await loadDocuments()
       }
-
-      const result = await response.json()
-      
-      toast({
-        title: "Success!",
-        description: `Uploaded ${result.uploaded} file(s) successfully.`
-      })
-
-      setShowUploadDialog(false)
-      setUploadSelectedFiles(null)
-      setUploadDescription("")
-      setUploadTags("")
-      fetchFiles() // Refresh the file list
-      fetchFolders() // Refresh folders to update counts
     } catch (error) {
-      console.error('Upload error:', error)
-      toast({
-        title: "Upload Failed",
-        description: error instanceof Error ? error.message : "Failed to upload files. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsUploading(false)
-      setUploadProgress(0)
+      console.error('Error uploading files:', error)
     }
   }
 
-  // Handle file preview
-  const handleFilePreview = (file: BriefcaseFile, index: number) => {
-    setPreviewFile(file)
-    setPreviewIndex(index)
-    setShowPreviewModal(true)
-  }
+  const handleCreateFolder = async () => {
+    const name = prompt('Enter folder name:')
+    if (!name) return
 
-  // Handle AI insights
-  const handleAIInsights = (file: BriefcaseFile) => {
-    setAiInsightsFile(file)
-    setShowAIInsights(true)
-  }
-
-  // Handle file sharing
-  const handleFileSharing = (file: BriefcaseFile) => {
-    setSharingFile(file)
-    setShowSharingModal(true)
-  }
-
-  // Handle version history
-  const handleVersionHistory = (file: BriefcaseFile) => {
-    setVersionHistoryFile(file)
-    setShowVersionHistory(true)
-  }
-
-  // Handle file metadata operations
-  const handleToggleFavorite = async (file: BriefcaseFile) => {
     try {
-      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/favorite`, {
-        method: 'POST'
-      })
-
-      if (!response.ok) throw new Error('Failed to toggle favorite')
-
-      const result = await response.json()
-      
-      // Update the file in the local state
-      setFiles(prev => prev.map(f => 
-        f.id === file.id ? { ...f, is_favorite: result.isFavorite } : f
-      ))
-
-      toast({
-        title: result.isFavorite ? "Added to favorites" : "Removed from favorites",
-        description: `"${file.name}" ${result.isFavorite ? 'added to' : 'removed from'} your favorites`,
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update favorite status",
-        variant: "destructive"
-      })
-    }
-  }
-
-  const handleAddTag = async (file: BriefcaseFile, tag: string) => {
-    try {
-      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/tags`, {
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch('/api/briefcase/folders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tag })
-      })
-
-      if (!response.ok) throw new Error('Failed to add tag')
-
-      const result = await response.json()
-      
-      // Update the file in the local state
-      setFiles(prev => prev.map(f => 
-        f.id === file.id ? { ...f, tags: result.tags } : f
-      ))
-
-      toast({
-        title: "Tag added",
-        description: `Added "${tag}" to "${file.name}"`,
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add tag",
-        variant: "destructive"
-      })
-    }
-  }
-
-  const handleRemoveTag = async (file: BriefcaseFile, tag: string) => {
-    try {
-      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/tags?tag=${encodeURIComponent(tag)}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) throw new Error('Failed to remove tag')
-
-      const result = await response.json()
-      
-      // Update the file in the local state
-      setFiles(prev => prev.map(f => 
-        f.id === file.id ? { ...f, tags: result.tags } : f
-      ))
-
-      toast({
-        title: "Tag removed",
-        description: `Removed "${tag}" from "${file.name}"`,
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to remove tag",
-        variant: "destructive"
-      })
-    }
-  }
-
-  const handleUpdateDescription = async (file: BriefcaseFile, description: string) => {
-    try {
-      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/metadata`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description })
-      })
-
-      if (!response.ok) throw new Error('Failed to update description')
-
-      const result = await response.json()
-      
-      // Update the file in the local state
-      setFiles(prev => prev.map(f => 
-        f.id === file.id ? { ...f, description: result.document.description } : f
-      ))
-
-      toast({
-        title: "Description updated",
-        description: `Updated description for "${file.name}"`,
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update description",
-        variant: "destructive"
-      })
-    }
-  }
-
-  // Bulk operations handlers
-  const handleFileSelection = (fileId: string, selected: boolean) => {
-    setSelectedFiles(prev => {
-      const newSet = new Set(prev)
-      if (selected) {
-        newSet.add(fileId)
-      } else {
-        newSet.delete(fileId)
-      }
-      return newSet
-    })
-  }
-
-  const handleSelectAll = (selected: boolean) => {
-    if (selected) {
-      setSelectedFiles(new Set(filteredFiles.map(f => f.id)))
-    } else {
-      setSelectedFiles(new Set())
-    }
-    setSelectAll(selected)
-  }
-
-  const handleBulkOperationComplete = () => {
-    setSelectedFiles(new Set())
-    setSelectAll(false)
-    setShowBulkOperations(false)
-    fetchFiles() // Refresh the file list
-  }
-
-  // Handle folder creation
-  const handleCreateFolder = async (name: string, description?: string, color?: string) => {
-    try {
-      const response = await authenticatedFetch('/api/briefcase/folders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          description,
-          color: color || '#8B5CF6',
-          parentId: selectedFolder
-        })
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name })
       })
 
       if (response.ok) {
-        toast({
-          title: "Success!",
-          description: `Folder "${name}" created successfully.`
-        })
-        fetchFolders()
-        setShowFolderDialog(false)
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create folder')
+        await loadFolders()
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create folder",
-        variant: "destructive"
-      })
+      console.error('Error creating folder:', error)
     }
   }
 
-  // Handle file download
-  const handleFileDownload = async (file: BriefcaseFile) => {
-    try {
-      const response = await authenticatedFetch(`/api/briefcase/files/${file.id}/download`)
-      if (!response.ok) throw new Error('Download failed')
-      
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = file.name
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-      
-      toast({
-        title: "Download Started",
-        description: `${file.name} is being downloaded.`
-      })
-    } catch (error) {
-      console.error('Download error:', error)
-      toast({
-        title: "Download Failed",
-        description: "Failed to download file. Please try again.",
-        variant: "destructive"
-      })
+  const toggleDocumentSelection = (id: string) => {
+    const newSelection = new Set(selectedDocuments)
+    if (newSelection.has(id)) {
+      newSelection.delete(id)
+    } else {
+      newSelection.add(id)
+    }
+    setSelectedDocuments(newSelection)
+  }
+
+  const filteredDocuments = documents.filter(doc => {
+    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         doc.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
+
+  const getFileIcon = (fileType: string) => {
+    switch (fileType.toLowerCase()) {
+      case 'pdf':
+        return <FileText className="w-5 h-5 text-red-500" />
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
+        return <Image className="w-5 h-5 text-blue-500" />
+      default:
+        return <File className="w-5 h-5 text-gray-500" />
     }
   }
 
-  // Handle file deletion
-  const handleFileDelete = async (fileId: string) => {
-    if (!confirm('Are you sure you want to delete this file?')) return
-
-    try {
-      const response = await authenticatedFetch(`/api/briefcase/files/${fileId}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) throw new Error('Delete failed')
-
-      toast({
-        title: "File Deleted",
-        description: "File has been deleted successfully."
-      })
-
-      fetchFiles() // Refresh the file list
-    } catch (error) {
-      console.error('Delete error:', error)
-      toast({
-        title: "Delete Failed",
-        description: "Failed to delete file. Please try again.",
-        variant: "destructive"
-      })
-    }
-  }
-
-  // Format file size
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
@@ -560,732 +209,299 @@ export default function BriefcasePage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  // Get file icon based on type
-  const getFileIcon = (type: string) => {
-    if (type.includes('image')) return <ImageIcon className="w-5 h-5" />
-    if (type.includes('video')) return <Video className="w-5 h-5" />
-    if (type.includes('audio')) return <Music className="w-5 h-5" />
-    if (type.includes('pdf')) return <FileText className="w-5 h-5" />
-    if (type.includes('spreadsheet') || type.includes('excel')) return <FileSpreadsheet className="w-5 h-5" />
-    if (type.includes('code') || type.includes('text')) return <FileCode className="w-5 h-5" />
-    if (type.includes('zip') || type.includes('archive')) return <Archive className="w-5 h-5" />
-    return <FileType className="w-5 h-5" />
-  }
+  const categories = ['all', ...new Set(documents.map(doc => doc.category))]
 
-  // Use search results if available, otherwise filter regular files
-  const filteredFiles = searchResults.length > 0 ? searchResults : files.filter(file => {
-    const matchesSearch = !_searchTerm || 
-      file.name.toLowerCase().includes(_searchTerm.toLowerCase()) ||
-      (file.description && file.description.toLowerCase().includes(_searchTerm.toLowerCase()))
-    
-    const matchesCategory = _selectedCategory === 'all' || file.category === _selectedCategory
-    
-    return matchesSearch && matchesCategory
-  })
-
-  return (
-    <div className="p-6 space-y-6" ref={containerRef}>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <motion.div
-              animate={{ 
-                rotate: [0, 5, -5, 0],
-                scale: [1, 1.05, 1]
-              }}
-              transition={{ 
-                duration: 3, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-              className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 rounded-full flex items-center justify-center"
-            >
-              <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </motion.div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-                Briefcase
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600 hidden sm:block">
-                {stats.totalFiles} files • {formatFileSize(stats.totalSize)}
-              </p>
-            </div>
-          </div>
-          
-          {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <button 
-              onClick={() => setSelectedFolder(null)}
-              className="hover:text-purple-600 transition-colors"
-            >
-              All Files
-            </button>
-            {selectedFolder && (
-              <>
-                <span>/</span>
-                <span className="text-purple-600 font-medium">
-                  {folders.find(f => f.id.toString() === selectedFolder)?.name || 'Folder'}
-                </span>
-              </>
-            )}
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="h-48 bg-gray-200 rounded"></div>
+            ))}
           </div>
         </div>
-        
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button
-            onClick={() => setShowUploadDialog(true)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Upload Files
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => setShowFolderDialog(true)}
-          >
+      </div>
+    )
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Briefcase</h1>
+          <p className="text-gray-600">Manage your business documents and files</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button onClick={handleCreateFolder} variant="outline">
             <FolderPlus className="w-4 h-4 mr-2" />
             New Folder
+          </Button>
+          <label className="cursor-pointer">
+            <Button asChild>
+              <span>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Files
+              </span>
+            </Button>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileUpload}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp"
+            />
+          </label>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Files</p>
+                <p className="text-2xl font-bold">{documents.length}</p>
+              </div>
+              <File className="w-8 h-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Folders</p>
+                <p className="text-2xl font-bold">{folders.length}</p>
+              </div>
+              <FolderPlus className="w-8 h-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Storage Used</p>
+                <p className="text-2xl font-bold">
+                  {formatFileSize(documents.reduce((total, doc) => total + doc.size, 0))}
+                </p>
+              </div>
+              <Download className="w-8 h-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Favorites</p>
+                <p className="text-2xl font-bold">{documents.filter(doc => doc.isFavorite).length}</p>
+              </div>
+              <Star className="w-8 h-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            placeholder="Search documents..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="px-3 py-2 border rounded-md"
+          aria-label="Filter by category"
+        >
+          {categories.map(category => (
+            <option key={category} value={category}>
+              {category === 'all' ? 'All Categories' : category}
+            </option>
+          ))}
+        </select>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('grid')}
+          >
+            <Grid3X3 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('list')}
+          >
+            <List className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="flex gap-6">
-        {/* Folder Sidebar */}
-        <div className="hidden lg:block w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg border p-4 space-y-3">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Folder className="w-4 h-4" />
-              Folders
-            </h3>
-            
-            <div className="space-y-1">
-              <button
-                onClick={() => setSelectedFolder(null)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                  !selectedFolder 
-                    ? 'bg-purple-100 text-purple-700 font-medium' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Folder className="w-4 h-4" />
-                  All Files
-                  <span className="ml-auto text-xs text-gray-500">
-                    {stats.totalFiles}
-                  </span>
-                </div>
-              </button>
-              
-              {folders.map((folder) => (
-                <button
-                  key={folder.id}
-                  onClick={() => setSelectedFolder(folder.id.toString())}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                    selectedFolder === folder.id.toString()
-                      ? 'bg-purple-100 text-purple-700 font-medium' 
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
+      {/* Folders */}
+      {folders.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Folders</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {folders.map(folder => (
+              <Card key={folder.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
                     <div 
-                      className="w-3 h-3 rounded-full" 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
                       style={{ backgroundColor: folder.color }}
-                    />
-                    {folder.name}
-                    <span className="ml-auto text-xs text-gray-500">
-                      {folder.file_count}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 space-y-6">
-          {/* Advanced Search Panel */}
-          <AdvancedSearchPanel
-            filters={searchFilters}
-            onFiltersChange={setSearchFilters}
-            onSearch={performAdvancedSearch}
-            availableFileTypes={stats.fileTypes.map((ft: any) => ft.file_type)}
-            availableCategories={stats.categories.map((cat: any) => cat.name)}
-            availableTags={stats.categories.map((cat: any) => ({ name: cat.name, count: cat.count }))}
-            availableAuthors={[]} // TODO: Implement authors
-            availableFolders={folders.map(f => ({ name: f.name, id: f.id.toString(), count: f.file_count }))}
-            totalFiles={stats.totalFiles}
-          />
-
-          {/* View Mode Toggle */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            {/* Bulk Operations */}
-            {selectedFiles.size > 0 && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setShowBulkOperations(true)}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <CheckSquare className="w-4 h-4 mr-2" />
-                  Bulk Operations ({selectedFiles.size})
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedFiles(new Set())
-                    setSelectAll(false)
-                  }}
-                >
-                  Clear Selection
-                </Button>
-              </div>
-            )}
-
-            {/* Search Results Toggle */}
-            {searchResults.length > 0 && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={showAdvancedSearch ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                >
-                  <Search className="w-4 h-4 mr-2" />
-                  Search Results ({searchResults.length})
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSearchResults([])
-                    setSearchFilters({
-                      query: '',
-                      semantic: false,
-                      fileTypes: [],
-                      categories: [],
-                      tags: [],
-                      dateRange: undefined,
-                      sizeRange: [0, 1000],
-                      authors: [],
-                      favorites: false,
-                      folders: [],
-                      sortBy: 'relevance',
-                      sortOrder: 'desc',
-                      includeContent: true,
-                      includeComments: false
-                    })
-                  }}
-                >
-                  Clear Search
-                </Button>
-              </div>
-            )}
-          </div>
-
-      {/* Files Grid/List */}
-      {loading || isSearching ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-          <span className="ml-2 text-gray-600">
-            {isSearching ? 'Searching...' : 'Loading files...'}
-          </span>
-        </div>
-      ) : filteredFiles.length === 0 ? (
-        <div className="text-center py-12">
-          <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No files found</h3>
-          <p className="text-gray-600 mb-4">
-            {searchResults.length > 0 
-              ? 'No files match your search criteria. Try adjusting your filters.'
-              : _searchTerm || _selectedCategory !== 'all' 
-                ? 'Try adjusting your search or filters'
-                : 'Upload your first file to get started'
-            }
-          </p>
-          {searchResults.length === 0 && !_searchTerm && _selectedCategory === 'all' && (
-            <Button
-              onClick={() => setShowUploadDialog(true)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Files
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {/* Select All Header */}
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleSelectAll(!selectAll)}
-                className="p-1"
-              >
-                {selectAll ? (
-                  <CheckSquare className="w-4 h-4 text-purple-600" />
-                ) : (
-                  <Square className="w-4 h-4 text-gray-400" />
-                )}
-              </Button>
-              <span className="text-sm font-medium">
-                {selectAll ? 'All selected' : 'Select all'} ({filteredFiles.length} files)
-              </span>
-            </div>
-            {selectedFiles.size > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowBulkOperations(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
-              >
-                <CheckSquare className="w-4 h-4 mr-2" />
-                Bulk Actions ({selectedFiles.size})
-              </Button>
-            )}
-          </div>
-
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-            : "space-y-2"
-          }>
-            {filteredFiles.map((file, index) => (
-            <motion.div
-              key={file.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={viewMode === 'grid' 
-                ? `group relative bg-white rounded-lg border transition-all duration-200 cursor-pointer ${
-                    selectedFiles.has(file.id) 
-                      ? 'border-purple-500 bg-purple-50' 
-                      : 'border-gray-200 hover:border-purple-300 hover:shadow-lg'
-                  }`
-                : `group flex items-center space-x-4 bg-white rounded-lg border transition-all duration-200 cursor-pointer p-4 ${
-                    selectedFiles.has(file.id) 
-                      ? 'border-purple-500 bg-purple-50' 
-                      : 'border-gray-200 hover:border-purple-300 hover:shadow-lg'
-                  }`
-              }
-              onClick={(e) => {
-                // Don't trigger preview if clicking on checkbox
-                if ((e.target as HTMLElement).closest('[data-checkbox]')) {
-                  return
-                }
-                handleFilePreview(file, index)
-              }}
-            >
-              {viewMode === 'grid' ? (
-                <>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleFileSelection(file.id, !selectedFiles.has(file.id))
-                          }}
-                          className="p-1"
-                          data-checkbox
-                        >
-                          {selectedFiles.has(file.id) ? (
-                            <CheckSquare className="w-4 h-4 text-purple-600" />
-                          ) : (
-                            <Square className="w-4 h-4 text-gray-400" />
-                          )}
-                        </Button>
-                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                          {getFileIcon(file.file_type)}
-                        </div>
-                      </div>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleAIInsights(file)
-                          }}
-                          title="AI Analysis"
-                        >
-                          <Brain className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleFileSharing(file)
-                          }}
-                          title="Share"
-                        >
-                          <Share2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleVersionHistory(file)
-                          }}
-                          title="Version History"
-                        >
-                          <History className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleFileDownload(file)
-                          }}
-                          title="Download"
-                        >
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </div>
+                    >
+                      <FolderPlus className="w-5 h-5" />
                     </div>
-                    <h3 className="font-medium text-sm text-gray-900 truncate">{file.name}</h3>
-                    <p className="text-xs text-gray-500 mt-1">{formatFileSize(file.size)}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(file.created_at).toLocaleDateString()}
-                    </p>
+                    <div className="flex-1">
+                      <h3 className="font-medium">{folder.name}</h3>
+                      <p className="text-sm text-gray-600">{folder.fileCount} files</p>
+                    </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleFileSelection(file.id, !selectedFiles.has(file.id))
-                    }}
-                    className="p-1"
-                    data-checkbox
-                  >
-                    {selectedFiles.has(file.id) ? (
-                      <CheckSquare className="w-4 h-4 text-purple-600" />
-                    ) : (
-                      <Square className="w-4 h-4 text-gray-400" />
-                    )}
-                  </Button>
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    {getFileIcon(file.file_type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-sm text-gray-900 truncate">{file.name}</h3>
-                    <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
-                  </div>
-                  <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleAIInsights(file)
-                      }}
-                      title="AI Analysis"
-                    >
-                      <Brain className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleFileSharing(file)
-                      }}
-                      title="Share"
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleVersionHistory(file)
-                      }}
-                      title="Version History"
-                    >
-                      <History className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleFileDownload(file)
-                      }}
-                      title="Download"
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleFileDelete(file.id)
-                      }}
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Upload Dialog */}
-      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Upload Files</DialogTitle>
-            <DialogDescription>
-              Select files to upload to your briefcase
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="files">Files</Label>
-              <Input
-                id="files"
-                type="file"
-                multiple
-                onChange={(e) => setUploadSelectedFiles(e.target.files)}
-                disabled={isUploading}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label>Category</Label>
-                <Select value={uploadCategory} onValueChange={setUploadCategory}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="document">Document</SelectItem>
-                    <SelectItem value="image">Image</SelectItem>
-                    <SelectItem value="video">Video</SelectItem>
-                    <SelectItem value="audio">Audio</SelectItem>
-                    <SelectItem value="template">Template</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Folder</Label>
-                <Select value={selectedFolder || '__root__'} onValueChange={(v) => setSelectedFolder(v === '__root__' ? null : v)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select folder (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__root__">Root</SelectItem>
-                    {folders.map((f) => (
-                      <SelectItem key={f.id} value={f.id.toString()}>
-                        {f.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="upload-description">Description (optional)</Label>
-              <Input
-                id="upload-description"
-                value={uploadDescription}
-                onChange={(e) => setUploadDescription(e.target.value)}
-                placeholder="Describe these files..."
-                disabled={isUploading}
-              />
-            </div>
-            <div>
-              <Label htmlFor="upload-tags">Tags (comma separated, optional)</Label>
-              <Input
-                id="upload-tags"
-                value={uploadTags}
-                onChange={(e) => setUploadTags(e.target.value)}
-                placeholder="tag1, tag2"
-                disabled={isUploading}
-              />
-            </div>
-            
-            {isUploading && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Uploading...</span>
-                  <span>{uploadProgress}%</span>
-                </div>
-                <Progress value={uploadProgress} />
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowUploadDialog(false)} disabled={isUploading}>Cancel</Button>
-              <Button
-                onClick={() => handleFileUpload(uploadSelectedFiles, selectedFolder || undefined, uploadCategory, uploadDescription, uploadTags)}
-                disabled={!uploadSelectedFiles || uploadSelectedFiles.length === 0 || isUploading}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-              >
-                Start Upload
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-          {/* Enhanced File Preview Modal */}
-          <EnhancedFilePreviewModal
-            isOpen={showPreviewModal}
-            onClose={() => setShowPreviewModal(false)}
-            file={filteredFiles[previewIndex] ? {
-              ...filteredFiles[previewIndex],
-              folderId: filteredFiles[previewIndex].folder_id?.toString(),
-              type: filteredFiles[previewIndex].file_type,
-              createdAt: new Date(filteredFiles[previewIndex].created_at),
-              modifiedAt: new Date(filteredFiles[previewIndex].updated_at),
-              favorite: filteredFiles[previewIndex].is_favorite
-            } as any : null}
-            files={filteredFiles.map(file => ({
-              ...file,
-              folderId: file.folder_id?.toString(),
-              type: file.file_type,
-              createdAt: new Date(file.created_at),
-              modifiedAt: new Date(file.updated_at),
-              favorite: file.is_favorite
-            })) as any}
-            currentIndex={previewIndex}
-            onNavigate={(direction) => {
-              if (direction === 'prev' && previewIndex > 0) {
-                setPreviewIndex(previewIndex - 1)
-              } else if (direction === 'next' && previewIndex < filteredFiles.length - 1) {
-                setPreviewIndex(previewIndex + 1)
-              }
-            }}
-            onEdit={(_file) => {
-              // Open description edit via metadata panel; handled inside modal callbacks
-            }}
-            onDelete={(file: any) => { handleFileDelete(file.id) }}
-            onShare={handleFileSharing as any}
-            onDownload={(file: any) => { handleFileDownload(file) }}
-            onToggleFavorite={(file: any) => { handleToggleFavorite(file) }}
-            onAddTag={(file: any, tag: string) => { handleAddTag(file, tag) }}
-            onRemoveTag={(file: any, tag: string) => { handleRemoveTag(file, tag) }}
-            onUpdateDescription={(file: any, description: string) => { handleUpdateDescription(file, description) }}
-            onUpdateCategory={(file, category) => {
-              fetch(`/api/briefcase/files/${file.id}/category`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
-                body: JSON.stringify({ category })
-              }).then(async (res) => {
-                if (!res.ok) throw new Error('Failed to update category')
-                const result = await res.json()
-                setFiles(prev => prev.map(f => f.id === file.id ? { ...f, category: result.category } : f))
-                toast({ title: 'Category updated', description: `Moved to ${category}` })
-              }).catch(() => {
-                toast({ title: 'Update failed', description: 'Could not update category', variant: 'destructive' })
-              })
-            }}
-          />
-
-          {/* Folder Creation Dialog */}
-          <FolderCreationDialog
-            isOpen={showFolderDialog}
-            onCloseAction={() => setShowFolderDialog(false)}
-            onCreateFolderAction={handleCreateFolder}
-            parentFolder={selectedFolder ? folders.find(f => f.id.toString() === selectedFolder)?.name : undefined}
-          />
-
-          {/* AI Insights Panel */}
-          {showAIInsights && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <AIInsightsPanel
-                  file={aiInsightsFile as any}
-                  onClose={() => {
-                    setShowAIInsights(false)
-                    setAiInsightsFile(null)
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* File Sharing Modal */}
-          {showSharingModal && sharingFile && (
-            <FileSharingModal
-              isOpen={showSharingModal}
-              onClose={() => {
-                setShowSharingModal(false)
-                setSharingFile(null)
-              }}
-              file={sharingFile as any}
-              currentUserId="current-user-id" // TODO: Get from auth context
-              currentUserName="Current User" // TODO: Get from auth context
-            />
-          )}
-
-          {/* Version History Modal */}
-          {showVersionHistory && versionHistoryFile && (
-            <VersionHistoryModal
-              isOpen={showVersionHistory}
-              onClose={() => {
-                setShowVersionHistory(false)
-                setVersionHistoryFile(null)
-              }}
-              file={versionHistoryFile as any}
-              currentUserId="current-user-id" // TODO: Get from auth context
-            />
-          )}
-
-          {/* Bulk Operations Modal */}
-          {showBulkOperations && selectedFiles.size > 0 && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                  <BulkOperationsPanel
-                    selectedFiles={filteredFiles.filter(f => selectedFiles.has(f.id)) as any}
-                    availableFolders={folders as any}
-                    onClose={() => setShowBulkOperations(false)}
-                    onOperationComplete={handleBulkOperationComplete}
+      {/* Documents */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Documents</h2>
+        {filteredDocuments.length === 0 ? (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <File className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">No documents found</h3>
+              <p className="text-gray-600 mb-4">
+                {searchTerm || selectedCategory !== 'all' 
+                  ? 'Try adjusting your search or filter criteria'
+                  : 'Upload your first document to get started'
+                }
+              </p>
+              {!searchTerm && selectedCategory === 'all' && (
+                <label className="cursor-pointer">
+                  <Button>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Files
+                  </Button>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp"
                   />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+                </label>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className={viewMode === 'grid' 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            : "space-y-2"
+          }>
+            {filteredDocuments.map(doc => (
+              <Card key={doc.id} className={`cursor-pointer hover:shadow-md transition-shadow ${
+                selectedDocuments.has(doc.id) ? 'ring-2 ring-blue-500' : ''
+              }`}>
+                <CardContent className={viewMode === 'grid' ? 'p-4' : 'p-3'}>
+                  {viewMode === 'grid' ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        {getFileIcon(doc.fileType)}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => window.open(`/api/briefcase/files/${doc.id}/download`, '_blank')}>
+                              <Download className="w-4 h-4 mr-2" />
+                              Download
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Share className="w-4 h-4 mr-2" />
+                              Share
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              <Star className="w-4 h-4 mr-2" />
+                              {doc.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-sm truncate" title={doc.name}>
+                          {doc.name}
+                        </h3>
+                        <p className="text-xs text-gray-600">{formatFileSize(doc.size)}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {doc.category}
+                          </Badge>
+                          {doc.isFavorite && (
+                            <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      {getFileIcon(doc.fileType)}
+                      <div className="flex-1">
+                        <h3 className="font-medium">{doc.name}</h3>
+                        <p className="text-sm text-gray-600">
+                          {formatFileSize(doc.size)} • {doc.category}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{doc.fileType.toUpperCase()}</Badge>
+                        {doc.isFavorite && (
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => window.open(`/api/briefcase/files/${doc.id}/download`, '_blank')}>
+                              <Download className="w-4 h-4 mr-2" />
+                              Download
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Share className="w-4 h-4 mr-2" />
+                              Share
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              <Star className="w-4 h-4 mr-2" />
+                              {doc.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
