@@ -67,7 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error fetching user data:', error)
       // Don't remove token for network errors - only for auth failures
       // Network errors shouldn't clear authentication
-    }
     } finally {
       setLoading(false)
     }
