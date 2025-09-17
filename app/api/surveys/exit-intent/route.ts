@@ -13,7 +13,7 @@ function getSql() {
   return neon(url)
 }
 
-function getUserIdFromToken(request: NextRequest): number | null {
+function getUserIdFromToken(request: NextRequest): string | null {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     // Create table if it doesn't exist
     await sql`create table if not exists user_survey_status (
       id serial primary key,
-      user_id integer,
+      user_id varchar(255),
       survey_type varchar(50) not null,
       status varchar(20) not null, -- 'submitted' or 'dismissed'
       created_at timestamptz default now(),
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     // Create tables if they don't exist
     await sql`create table if not exists exit_intent_surveys (
       id serial primary key,
-      user_id integer,
+      user_id varchar(255),
       role varchar(120),
       goal text,
       blocker text,
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     
     await sql`create table if not exists user_survey_status (
       id serial primary key,
-      user_id integer,
+      user_id varchar(255),
       survey_type varchar(50) not null,
       status varchar(20) not null,
       created_at timestamptz default now(),

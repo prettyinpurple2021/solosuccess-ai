@@ -13,7 +13,7 @@ function getSql() {
   return neon(url)
 }
 
-function getUserIdFromToken(request: NextRequest): number | null {
+function getUserIdFromToken(request: NextRequest): string | null {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     // Create table if it doesn't exist
     await sql`create table if not exists user_preferences (
       id serial primary key,
-      user_id integer not null,
+      user_id varchar(255) not null,
       preference_key varchar(100) not null,
       preference_value jsonb not null,
       created_at timestamptz default now(),
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     // Create table if it doesn't exist
     await sql`create table if not exists user_preferences (
       id serial primary key,
-      user_id integer not null,
+      user_id varchar(255) not null,
       preference_key varchar(100) not null,
       preference_value jsonb not null,
       created_at timestamptz default now(),

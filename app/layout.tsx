@@ -67,7 +67,7 @@ export const metadata = {
     title: 'SoloSuccess AI — AI Co-founder for Solo Founders',
     description: 'Virtual Team for Founders. AI Business Co-pilot and Solopreneur OS to automate workflows, streamline operations, and scale a solo business.',
     type: 'website',
-    url: 'https://solosuccess.ai',
+    url: 'https://solobossai.fun',
     siteName: 'SoloSuccess AI',
   },
   twitter: {
@@ -143,7 +143,7 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
           fontSans.variable
         )}
       >
-        <link rel="canonical" href="https://solosuccess.ai/" />
+        <link rel="canonical" href="https://solobossai.fun/" />
         <Script 
           id="ld-org" 
           type="application/ld+json" 
@@ -153,8 +153,8 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'SoloSuccess AI',
-              url: 'https://solosuccess.ai/',
-              logo: 'https://solosuccess.ai/images/logo.png',
+              url: 'https://solobossai.fun/',
+              logo: 'https://solobossai.fun/images/logo.png',
               sameAs: [
                 'https://twitter.com/solosuccessai',
                 'https://www.linkedin.com/company/solosuccessai'
@@ -173,7 +173,7 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
               name: 'SoloSuccess AI',
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'Web',
-              url: 'https://solosuccess.ai/',
+              url: 'https://solobossai.fun/',
               description: 'AI Co-founder and AI Business Co-pilot for solo founders. Virtual Team for Founders with Solopreneur Operating System.',
               offers: {
                 '@type': 'Offer',
