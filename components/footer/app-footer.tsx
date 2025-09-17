@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import Script from "next/script"
 
 import { useState, type FormEvent} from "react"
 import { Crown, Heart, Sparkles, Twitter, Instagram, Linkedin, Github, Mail, CheckCircle} from "lucide-react"
@@ -298,5 +299,14 @@ export function AppFooter() {
         </div>
       </div>
     </footer>
+    
+    {/* Metricool Tracking */}
+    <Script
+      id="metricool-tracker"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"c3b56672bacfe8e1e7f2c4938b5d7e46"})});`
+      }}
+    />
   )
 }
