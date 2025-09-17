@@ -98,86 +98,85 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
       // Simulate file processing
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // Mock parsed data with validation
-      const mockData: ImportedCompetitor[] = [
-        {
-          id: "1",
-          name: "TechRival Corp",
-          domain: "techrival.com",
-          description: "AI-powered productivity platform",
-          industry: "Technology",
-          headquarters: "San Francisco, CA",
-          employeeCount: 150,
-          fundingStage: "series-b",
-          threatLevel: "high",
-          status: "valid",
-          issues: []
-        },
-        {
-          id: "2",
-          name: "StartupSlayer",
-          domain: "startupslayer.io",
-          description: "Business automation tools",
-          industry: "Technology",
-          headquarters: "Austin, TX",
-          employeeCount: 75,
-          fundingStage: "series-a",
-          threatLevel: "critical",
-          status: "valid",
-          issues: []
-        },
-        {
-          id: "3",
-          name: "Invalid Company",
-          domain: "invalid-domain",
-          description: "",
-          industry: "",
-          headquarters: "",
-          employeeCount: null,
-          fundingStage: "",
-          threatLevel: "unknown",
-          status: "error",
-          issues: [
-            "Invalid domain format",
-            "Missing description",
-            "Missing industry",
-            "Invalid threat level"
-          ]
-        },
-        {
-          id: "4",
-          name: "Warning Company",
-          domain: "warning.com",
-          description: "Some description",
-          industry: "Technology",
-          headquarters: "",
-          employeeCount: null,
-          fundingStage: "",
-          threatLevel: "medium",
-          status: "warning",
-          issues: [
-            "Missing headquarters",
-            "Missing employee count",
-            "Missing funding stage"
-          ]
-        }
-      ]
+      // Parse CSV data with real validation
+      const csvText = await file.text()
+      const lines = csvText.split('\n').filter(line => line.trim())
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
       
-      setImportedData(mockData)
+      const parsedData: ImportedCompetitor[] = []
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim())
+        const row: any = {}
+        
+        headers.forEach((header, index) => {
+          row[header] = values[index] || ''
+        })
+        
+        const issues: string[] = []
+        
+        // Validate required fields
+        if (!row.name || row.name.trim() === '') {
+          issues.push('Company name is required')
+        }
+        
+        if (!row.domain || row.domain.trim() === '') {
+          issues.push('Domain is required')
+        } else if (!/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,})$/.test(row.domain)) {
+          issues.push('Invalid domain format')
+        }
+        
+        if (!row.description || row.description.trim() === '') {
+          issues.push('Description is required')
+        }
+        
+        if (!row.industry || row.industry.trim() === '') {
+          issues.push('Industry is required')
+        }
+        
+        // Validate threat level
+        const validThreatLevels = ['low', 'medium', 'high', 'critical']
+        if (!validThreatLevels.includes(row.threatlevel?.toLowerCase())) {
+          issues.push('Invalid threat level. Must be: low, medium, high, or critical')
+        }
+        
+        // Validate employee count if provided
+        if (row.employeecount && isNaN(parseInt(row.employeecount))) {
+          issues.push('Employee count must be a number')
+        }
+        
+        const status = issues.length === 0 ? 'valid' : issues.length <= 2 ? 'warning' : 'error'
+        
+        parsedData.push({
+          id: i.toString(),
+          name: row.name || '',
+          domain: row.domain || '',
+          description: row.description || '',
+          industry: row.industry || '',
+          headquarters: row.headquarters || '',
+          employeeCount: row.employeecount ? parseInt(row.employeecount) : null,
+          fundingStage: row.fundingstage || '',
+          threatLevel: row.threatlevel?.toLowerCase() || 'medium',
+          status,
+          issues
+        })
+      }
+      
+      setImportedData(parsedData)
       
       // Calculate validation results
       const validation: ValidationResult = {
-        valid: mockData.filter(item => item.status === 'valid').length,
-        warnings: mockData.filter(item => item.status === 'warning').length,
-        errors: mockData.filter(item => item.status === 'error').length,
-        total: mockData.length
+        valid: parsedData.filter(item => item.status === 'valid').length,
+        warnings: parsedData.filter(item => item.status === 'warning').length,
+        errors: parsedData.filter(item => item.status === 'error').length,
+        total: parsedData.length
       }
       
       setValidationResult(validation)
       setActiveTab("review")
       
       // Select all valid and warning items by default
-      const validItems = mockData
+      const validItems = parsedData
         .filter(item => item.status === 'valid' || item.status === 'warning')
         .map(item => item.id)
       setSelectedRows(new Set(validItems))

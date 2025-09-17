@@ -11,23 +11,13 @@ import { TeamSwitcher} from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail} from "@/components/ui/sidebar"
 import { useAuth} from "@/hooks/use-auth"
 
-// This is sample data.
+// Production data - will be fetched from user's actual teams
 const data = {
   teams: [
     {
       name: "SoloSuccess AI",
       logo: GalleryVerticalEnd,
       plan: "Empire Builder",
-    },
-    {
-      name: "My Empire",
-      logo: AudioWaveform,
-      plan: "Dominator",
-    },
-    {
-      name: "Boss Squad",
-      logo: Command,
-      plan: "Accelerator",
     },
   ],
   navMain: [

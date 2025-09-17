@@ -86,47 +86,27 @@ export function ComplianceScanner() {
       } catch (apiError) {
         console.error('API Error:', apiError)
         
-        // Use mock data for testing purposes when API fails
+        // Fallback to empty results when API fails
         clearInterval(progressInterval)
         setScanProgress(100)
         
-        const mockScanResults: ComplianceScan = {
+        const emptyScanResults: ComplianceScan = {
           url: url,
           scanDate: new Date(),
-          trustScore: 75,
-          issues: [
-            {
-              id: "1",
-              type: "critical",
-              category: "consent",
-              title: "Missing Cookie Consent Banner",
-              description: "No cookie consent mechanism detected despite collecting user data",
-              recommendation: "Implement a GDPR-compliant cookie consent banner that appears before any cookies are set",
-              gdpr_article: "Article 7",
-              ccpa_section: "Section 1798.135"
-            },
-            {
-              id: "2",
-              type: "warning",
-              category: "data_collection",
-              title: "Contact Form Without Privacy Notice",
-              description: "Contact form collects personal data without clear privacy notice",
-              recommendation: "Add a privacy notice link near the form explaining how data will be used",
-              gdpr_article: "Article 13"
-            }
-          ],
-          dataCollectionPoints: ["Contact Form", "Analytics Tracking"],
-          cookieTypes: ["Necessary", "Analytics"],
+          trustScore: 0,
+          issues: [],
+          dataCollectionPoints: [],
+          cookieTypes: [],
           consentMechanisms: [],
-          pageTitle: "Example Domain",
+          pageTitle: "",
           hasPrivacyPolicy: false,
           hasCookieBanner: false,
-          hasContactForm: true,
+          hasContactForm: false,
           hasNewsletterSignup: false,
-          hasAnalytics: true
+          hasAnalytics: false
         }
         
-        setScanResults(mockScanResults)
+        setScanResults(emptyScanResults)
       }
     } catch (error) {
       console.error('Scan error:', error)

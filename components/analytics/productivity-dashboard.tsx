@@ -55,57 +55,31 @@ export function ProductivityDashboard({ className = "" }: ProductivityDashboardP
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter'>('week')
 
   useEffect(() => {
-    // Simulate loading analytics data
     const loadAnalytics = async () => {
       setIsLoading(true)
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // Mock data - in real app, this would come from API
-      const mockData: AnalyticsData = {
-        tasks: {
-          total: 47,
-          completed: 32,
-          pending: 12,
-          overdue: 3,
-          completionRate: 68,
-          weeklyTrend: 12
-        },
-        goals: {
-          total: 8,
-          achieved: 3,
-          inProgress: 5,
-          achievementRate: 37.5,
-          weeklyProgress: 8
-        },
-        focus: {
-          totalSessions: 24,
-          totalHours: 18.5,
-          averageSessionLength: 46,
-          weeklyHours: 6.2,
-          weeklyTrend: -5
-        },
-        productivity: {
-          overallScore: 78,
-          weeklyScore: 82,
-          monthlyScore: 75,
-          improvement: 9
-        },
-        insights: {
-          topPerformingDay: "Tuesday",
-          mostProductiveTime: "9:00 AM - 11:00 AM",
-          commonDistractions: ["Social media", "Email checking", "Meetings"],
-          recommendations: [
-            "Schedule deep work blocks in your most productive hours",
-            "Reduce meeting frequency to increase focus time",
-            "Set specific time limits for email and social media"
-          ]
+      try {
+        const token = localStorage.getItem('auth_token')
+        const response = await fetch(`/api/analytics/productivity?range=${timeRange}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch analytics data')
         }
+        
+        const analyticsData: AnalyticsData = await response.json()
+        setData(analyticsData)
+      } catch (error) {
+        console.error('Error loading analytics:', error)
+        // Fallback to empty state instead of mock data
+        setData(null)
+      } finally {
+        setIsLoading(false)
       }
-      
-      setData(mockData)
-      setIsLoading(false)
     }
     
     loadAnalytics()

@@ -1,68 +1,17 @@
-import { NextRequest, NextResponse} from 'next/server'
-import { db} from '@/db'
-import { competitorProfiles} from '@/db/schema'
-import { authenticateRequest} from '@/lib/auth-server'
-import { rateLimitByIp} from '@/lib/rate-limit'
-import { z} from 'zod'
-import { eq, and} from 'drizzle-orm'
-import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { neon } from '@neondatabase/serverless'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// Validation schema for updates
-const CompetitorUpdateSchema = z.object({
-  name: z.string().min(1).max(255).optional(),
-  domain: z.string().url().optional().or(z.literal('')),
-  description: z.string().max(1000).optional(),
-  industry: z.string().max(100).optional(),
-  headquarters: z.string().max(255).optional(),
-  foundedYear: z.number().int().min(1800).max(new Date().getFullYear()).optional(),
-  employeeCount: z.number().int().min(0).optional(),
-  fundingAmount: z.number().min(0).optional(),
-  fundingStage: z.enum(['seed', 'series-a', 'series-b', 'series-c', 'ipo', 'private']).optional(),
-  threatLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  monitoringStatus: z.enum(['active', 'paused', 'archived']).optional(),
-  socialMediaHandles: z.object({
-    linkedin: z.string().url().optional(),
-    twitter: z.string().url().optional(),
-    facebook: z.string().url().optional(),
-    instagram: z.string().url().optional(),
-    youtube: z.string().url().optional(),
-  }).optional(),
-  keyPersonnel: z.array(z.object({
-    name: z.string(),
-    role: z.string(),
-    linkedinProfile: z.string().url().optional(),
-    joinedDate: z.string().optional(),
-    previousCompanies: z.array(z.string()).default([]),
-  })).optional(),
-  products: z.array(z.object({
-    name: z.string(),
-    description: z.string().optional(),
-    category: z.string().optional(),
-    launchDate: z.string().optional(),
-    status: z.enum(['active', 'discontinued', 'beta']).default('active'),
-    features: z.array(z.string()).default([]),
-  })).optional(),
-  competitiveAdvantages: z.array(z.string()).optional(),
-  vulnerabilities: z.array(z.string()).optional(),
-  monitoringConfig: z.object({
-    websiteMonitoring: z.boolean().optional(),
-    socialMediaMonitoring: z.boolean().optional(),
-    newsMonitoring: z.boolean().optional(),
-    jobPostingMonitoring: z.boolean().optional(),
-    appStoreMonitoring: z.boolean().optional(),
-    monitoringFrequency: z.enum(['hourly', 'daily', 'weekly']).optional(),
-    alertThresholds: z.object({
-      pricing: z.boolean().optional(),
-      productLaunches: z.boolean().optional(),
-      hiring: z.boolean().optional(),
-      funding: z.boolean().optional(),
-      partnerships: z.boolean().optional(),
-    }).optional(),
-  }).optional(),
-})
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 export async function GET(
   request: NextRequest,
@@ -75,62 +24,90 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await context.params
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
-      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
-    }
+    const params = await context.params
+    const competitorId = params.id
+    const sql = getSql()
 
     // Get competitor profile
-    const [competitor] = await db
-      .select()
-      .from(competitorProfiles)
-      .where(
-        and(
-          eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, user.id)
-        )
-      )
-      .limit(1)
+    const competitors = await sql`
+      SELECT 
+        cp.*,
+        COUNT(DISTINCT cd.id) as intelligence_count,
+        COUNT(DISTINCT ca.id) as alert_count
+      FROM competitor_profiles cp
+      LEFT JOIN intelligence_data cd ON cd.competitor_id = cp.id
+      LEFT JOIN competitor_alerts ca ON ca.competitor_id = cp.id
+      WHERE cp.id = ${competitorId} AND cp.user_id = ${user.id}
+      GROUP BY cp.id
+    `
 
-    if (!competitor) {
+    if (competitors.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
     }
 
-    // Transform database result to match interface
-    const transformedCompetitor = {
+    const competitor = competitors[0]
+
+    // Get key personnel (from intelligence data)
+    const personnel = await sql`
+      SELECT 
+        id,
+        extracted_data->'personnel' as personnel_data,
+        collected_at
+      FROM intelligence_data 
+      WHERE competitor_id = ${competitorId} 
+        AND data_type = 'company_info'
+        AND extracted_data->'personnel' IS NOT NULL
+      ORDER BY collected_at DESC
+      LIMIT 1
+    `
+
+    // Get products (from intelligence data)
+    const products = await sql`
+      SELECT 
+        id,
+        extracted_data->'products' as products_data,
+        collected_at
+      FROM intelligence_data 
+      WHERE competitor_id = ${competitorId} 
+        AND data_type = 'products'
+        AND extracted_data->'products' IS NOT NULL
+      ORDER BY collected_at DESC
+      LIMIT 1
+    `
+
+    // Format the response
+    const competitorProfile = {
       id: competitor.id,
-      userId: competitor.user_id,
       name: competitor.name,
-      domain: competitor.domain || undefined,
-      description: competitor.description || undefined,
-      industry: competitor.industry || undefined,
-      headquarters: competitor.headquarters || undefined,
-      foundedYear: competitor.founded_year || undefined,
-      employeeCount: competitor.employee_count || undefined,
-      fundingAmount: competitor.funding_amount ? parseFloat(competitor.funding_amount) : undefined,
-      fundingStage: competitor.funding_stage as FundingStage || undefined,
-      threatLevel: competitor.threat_level as ThreatLevel,
-      monitoringStatus: competitor.monitoring_status as MonitoringStatus,
+      domain: competitor.domain,
+      description: competitor.description,
+      industry: competitor.industry,
+      headquarters: competitor.headquarters,
+      foundedYear: competitor.founded_year,
+      employeeCount: competitor.employee_count,
+      fundingStage: competitor.funding_stage,
+      fundingAmount: competitor.funding_amount,
+      threatLevel: competitor.threat_level,
+      monitoringStatus: competitor.monitoring_status,
       socialMediaHandles: competitor.social_media_handles || {},
-      keyPersonnel: competitor.key_personnel || [],
-      products: competitor.products || [],
+      keyPersonnel: personnel.length > 0 ? 
+        (personnel[0].personnel_data || []) : [],
+      products: products.length > 0 ? 
+        (products[0].products_data || []) : [],
       marketPosition: competitor.market_position || {},
       competitiveAdvantages: competitor.competitive_advantages || [],
       vulnerabilities: competitor.vulnerabilities || [],
-      monitoringConfig: competitor.monitoring_config || {},
-      lastAnalyzed: competitor.last_analyzed || undefined,
-      createdAt: competitor.created_at!,
-      updatedAt: competitor.updated_at!,
+      lastAnalyzed: competitor.last_analyzed,
+      intelligenceCount: parseInt(competitor.intelligence_count) || 0,
+      alertCount: parseInt(competitor.alert_count) || 0,
+      createdAt: competitor.created_at,
+      updatedAt: competitor.updated_at
     }
 
-    return NextResponse.json({ competitor: transformedCompetitor })
+    return NextResponse.json(competitorProfile)
   } catch (error) {
     console.error('Error fetching competitor:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch competitor' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch competitor data' }, { status: 500 })
   }
 }
 
@@ -139,156 +116,52 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const ip = request.headers.get('x-forwarded-for') || 'unknown'
-    const { allowed } = rateLimitByIp('competitors:update', ip, 60_000, 20)
-    if (!allowed) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
-    }
-
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await context.params
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
-      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
-    }
+    const params = await context.params
+    const competitorId = params.id
+    const updates = await request.json()
+    const sql = getSql()
 
-    const body = await request.json()
-    const parsed = CompetitorUpdateSchema.safeParse(body)
-    
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid payload', details: parsed.error.flatten() },
-        { status: 400 }
-      )
-    }
+    // Update competitor profile
+    const result = await sql`
+      UPDATE competitor_profiles 
+      SET 
+        name = COALESCE(${updates.name}, name),
+        domain = COALESCE(${updates.domain}, domain),
+        description = COALESCE(${updates.description}, description),
+        industry = COALESCE(${updates.industry}, industry),
+        headquarters = COALESCE(${updates.headquarters}, headquarters),
+        founded_year = COALESCE(${updates.foundedYear}, founded_year),
+        employee_count = COALESCE(${updates.employeeCount}, employee_count),
+        funding_stage = COALESCE(${updates.fundingStage}, funding_stage),
+        funding_amount = COALESCE(${updates.fundingAmount}, funding_amount),
+        threat_level = COALESCE(${updates.threatLevel}, threat_level),
+        monitoring_status = COALESCE(${updates.monitoringStatus}, monitoring_status),
+        social_media_handles = COALESCE(${updates.socialMediaHandles}, social_media_handles),
+        market_position = COALESCE(${updates.marketPosition}, market_position),
+        competitive_advantages = COALESCE(${updates.competitiveAdvantages}, competitive_advantages),
+        vulnerabilities = COALESCE(${updates.vulnerabilities}, vulnerabilities),
+        updated_at = NOW()
+      WHERE id = ${competitorId} AND user_id = ${user.id}
+      RETURNING *
+    `
 
-    const data = parsed.data
-
-    // Check if competitor exists and belongs to user
-    const [existingCompetitor] = await db
-      .select()
-      .from(competitorProfiles)
-      .where(
-        and(
-          eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, user.id)
-        )
-      )
-      .limit(1)
-
-    if (!existingCompetitor) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
     }
 
-    // Check for name/domain conflicts if they're being updated
-    if (data.name || data.domain) {
-      const conflictConditions = []
-      
-      if (data.name && data.name !== existingCompetitor.name) {
-        conflictConditions.push(eq(competitorProfiles.name, data.name))
-      }
-      
-      if (data.domain && data.domain !== existingCompetitor.domain) {
-        conflictConditions.push(eq(competitorProfiles.domain, data.domain))
-      }
-
-      if (conflictConditions.length > 0) {
-        const conflictingCompetitor = await db
-          .select()
-          .from(competitorProfiles)
-          .where(
-            and(
-              eq(competitorProfiles.user_id, user.id),
-              ...conflictConditions
-            )
-          )
-          .limit(1)
-
-        if (conflictingCompetitor.length > 0) {
-          return NextResponse.json(
-            { error: 'Competitor with this name or domain already exists' },
-            { status: 409 }
-          )
-        }
-      }
-    }
-
-    // Build update object
-    const updateData: any = {}
-    
-    if (data.name !== undefined) updateData.name = data.name
-    if (data.domain !== undefined) updateData.domain = data.domain || null
-    if (data.description !== undefined) updateData.description = data.description || null
-    if (data.industry !== undefined) updateData.industry = data.industry || null
-    if (data.headquarters !== undefined) updateData.headquarters = data.headquarters || null
-    if (data.foundedYear !== undefined) updateData.founded_year = data.foundedYear || null
-    if (data.employeeCount !== undefined) updateData.employee_count = data.employeeCount || null
-    if (data.fundingAmount !== undefined) updateData.funding_amount = data.fundingAmount?.toString() || null
-    if (data.fundingStage !== undefined) updateData.funding_stage = data.fundingStage || null
-    if (data.threatLevel !== undefined) updateData.threat_level = data.threatLevel
-    if (data.monitoringStatus !== undefined) updateData.monitoring_status = data.monitoringStatus
-    if (data.socialMediaHandles !== undefined) updateData.social_media_handles = data.socialMediaHandles
-    if (data.keyPersonnel !== undefined) updateData.key_personnel = data.keyPersonnel
-    if (data.products !== undefined) updateData.products = data.products
-    if (data.competitiveAdvantages !== undefined) updateData.competitive_advantages = data.competitiveAdvantages
-    if (data.vulnerabilities !== undefined) updateData.vulnerabilities = data.vulnerabilities
-    if (data.monitoringConfig !== undefined) {
-      // Merge with existing monitoring config
-      const existingConfig = existingCompetitor.monitoring_config || {}
-      updateData.monitoring_config = { ...existingConfig, ...data.monitoringConfig }
-    }
-
-    // Update competitor
-    const [updatedCompetitor] = await db
-      .update(competitorProfiles)
-      .set(updateData)
-      .where(
-        and(
-          eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, user.id)
-        )
-      )
-      .returning()
-
-    // Transform result to match interface
-    const transformedCompetitor = {
-      id: updatedCompetitor.id,
-      userId: updatedCompetitor.user_id,
-      name: updatedCompetitor.name,
-      domain: updatedCompetitor.domain || undefined,
-      description: updatedCompetitor.description || undefined,
-      industry: updatedCompetitor.industry || undefined,
-      headquarters: updatedCompetitor.headquarters || undefined,
-      foundedYear: updatedCompetitor.founded_year || undefined,
-      employeeCount: updatedCompetitor.employee_count || undefined,
-      fundingAmount: updatedCompetitor.funding_amount ? parseFloat(updatedCompetitor.funding_amount) : undefined,
-      fundingStage: updatedCompetitor.funding_stage as FundingStage || undefined,
-      threatLevel: updatedCompetitor.threat_level as ThreatLevel,
-      monitoringStatus: updatedCompetitor.monitoring_status as MonitoringStatus,
-      socialMediaHandles: updatedCompetitor.social_media_handles || {},
-      keyPersonnel: updatedCompetitor.key_personnel || [],
-      products: updatedCompetitor.products || [],
-      marketPosition: updatedCompetitor.market_position || {},
-      competitiveAdvantages: updatedCompetitor.competitive_advantages || [],
-      vulnerabilities: updatedCompetitor.vulnerabilities || [],
-      monitoringConfig: updatedCompetitor.monitoring_config || {},
-      lastAnalyzed: updatedCompetitor.last_analyzed || undefined,
-      createdAt: updatedCompetitor.created_at!,
-      updatedAt: updatedCompetitor.updated_at!,
-    }
-
-    return NextResponse.json({ competitor: transformedCompetitor })
+    return NextResponse.json({ 
+      success: true, 
+      competitor: result[0] 
+    })
   } catch (error) {
     console.error('Error updating competitor:', error)
-    return NextResponse.json(
-      { error: 'Failed to update competitor' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to update competitor' }, { status: 500 })
   }
 }
 
@@ -297,52 +170,33 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const ip = request.headers.get('x-forwarded-for') || 'unknown'
-    const { allowed } = rateLimitByIp('competitors:delete', ip, 60_000, 10)
-    if (!allowed) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
-    }
-
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await context.params
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
-      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
-    }
+    const params = await context.params
+    const competitorId = params.id
+    const sql = getSql()
 
-    // Soft delete by setting monitoring_status to 'archived'
-    const [deletedCompetitor] = await db
-      .update(competitorProfiles)
-      .set({ 
-        monitoring_status: 'archived',
-        updated_at: new Date()
-      })
-      .where(
-        and(
-          eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, user.id)
-        )
-      )
-      .returning()
+    // Delete competitor (cascade will handle related data)
+    const result = await sql`
+      DELETE FROM competitor_profiles 
+      WHERE id = ${competitorId} AND user_id = ${user.id}
+      RETURNING id
+    `
 
-    if (!deletedCompetitor) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
     }
 
     return NextResponse.json({ 
-      message: 'Competitor archived successfully',
-      competitorId: deletedCompetitor.id
+      success: true, 
+      message: 'Competitor deleted successfully' 
     })
   } catch (error) {
     console.error('Error deleting competitor:', error)
-    return NextResponse.json(
-      { error: 'Failed to delete competitor' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to delete competitor' }, { status: 500 })
   }
 }

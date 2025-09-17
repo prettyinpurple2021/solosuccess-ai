@@ -136,8 +136,20 @@ export default function CompetitorProfilePage() {
     try {
       setLoading(true)
 
-      // Mock data for now
-      const mockCompetitor: CompetitorProfile = {
+      // Fetch real competitor data from API
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch(`/api/competitors/${competitorId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch competitor data')
+      }
+
+      const competitor: CompetitorProfile = await response.json()
         id: parseInt(competitorId),
         name: "TechRival Corp",
         domain: "techrival.com",
@@ -463,12 +475,45 @@ export default function CompetitorProfilePage() {
         }
       ]
 
-      setCompetitor(mockCompetitor)
-      setActivities(mockActivities)
-      setAlerts(mockAlerts)
-      setInsights(mockInsights)
-      setThreatAssessment(mockThreatAssessment)
-      setActionRecommendations(mockActionRecommendations)
+      setCompetitor(competitor)
+
+      // Fetch related data
+      const [activitiesResponse, alertsResponse, insightsResponse] = await Promise.all([
+        fetch(`/api/competitors/${competitorId}/activities`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/competitors/${competitorId}/alerts`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/competitors/${competitorId}/insights`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ])
+
+      if (activitiesResponse.ok) {
+        const activities = await activitiesResponse.json()
+        setActivities(activities)
+      }
+
+      if (alertsResponse.ok) {
+        const alerts = await alertsResponse.json()
+        setAlerts(alerts)
+      }
+
+      if (insightsResponse.ok) {
+        const insights = await insightsResponse.json()
+        setInsights(insights)
+      }
+
+      // Set default threat assessment (will be calculated by backend)
+      setThreatAssessment({
+        overallThreat: competitor.threatLevel,
+        riskFactors: [],
+        mitigationStrategies: [],
+        lastUpdated: new Date().toISOString()
+      })
+
+      setActionRecommendations([])
     } catch (error) {
       console.error('Error fetching competitor data:', error)
     } finally {
