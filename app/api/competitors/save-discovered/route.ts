@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    logError('Error saving discovered competitor:', error)
+    logError('Error saving discovered competitor:', error as any)
     return NextResponse.json(
       { error: 'Failed to save competitor' },
       { status: 500 }

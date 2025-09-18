@@ -172,7 +172,7 @@ export const GlobalSearch: React.FC = () => {
             <CommandList className="max-h-96 p-4">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-transparent bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-transparent bg-gradient-to-r from-purple-500 to-pink-500"></div>
                   <span className="ml-3 text-purple-600 font-medium">Searching your content...</span>
                 </div>
               ) : (

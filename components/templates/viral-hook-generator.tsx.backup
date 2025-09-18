@@ -1,7 +1,6 @@
 'use client';
 
-// @ts-nocheck
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,15 +18,15 @@ interface HookOption {
 }
 
 export function ViralHookGenerator() {
-  const [contentIdea, setContentIdea] = (React as any).useState('');
-  const [targetAudience, setTargetAudience] = (React as any).useState('');
-  const [desiredVibe, setDesiredVibe] = (React as any).useState('');
-  const [platform, setPlatform] = (React as any).useState('Instagram');
-  const [contentType, setContentType] = (React as any).useState('Post');
-  const [generatedHooks, setGeneratedHooks] = (React as any).useState([]);
-  const [title, setTitle] = (React as any).useState('');
-  const [isGenerating, setIsGenerating] = (React as any).useState(false);
-  const [generatedMetadata, setGeneratedMetadata] = (React as any).useState(null);
+  const [contentIdea, setContentIdea] = useState('');
+  const [targetAudience, setTargetAudience] = useState('');
+  const [desiredVibe, setDesiredVibe] = useState('');
+  const [platform, setPlatform] = useState('Instagram');
+  const [contentType, setContentType] = useState('Post');
+  const [generatedHooks, setGeneratedHooks] = useState<HookOption[]>([]);
+  const [title, setTitle] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedMetadata, setGeneratedMetadata] = useState<any>(null);
   
   const { saveTemplate, isSaving } = useTemplateSave();
 

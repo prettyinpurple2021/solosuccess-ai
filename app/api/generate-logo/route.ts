@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -49,7 +50,6 @@ export async function POST(request: NextRequest) {
     if (process.env.OPENAI_API_KEY) {
       try {
         const openai = require('openai')
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
         const client = new openai.OpenAI({
           apiKey: process.env.OPENAI_API_KEY,
         })
@@ -81,7 +81,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
           }, { status: 200 })
         }
       } catch (aiError) {
-        logError('OpenAI logo generation failed:', aiError)
+        logError('OpenAI logo generation failed:', aiError as any)
         // Fall through to fallback
       }
     }
@@ -114,7 +114,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
       fallbackReason: process.env.OPENAI_API_KEY ? 'AI service temporarily unavailable' : 'OpenAI API key not configured'
     }, { status: 200 })
   } catch (error) {
-    logError('Error generating logos:', error)
+    logError('Error generating logos:', error as any)
     return NextResponse.json(
       { error: 'Failed to generate logos' },
       { status: 500 }
