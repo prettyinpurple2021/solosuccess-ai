@@ -1,15 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Upload, 
   Search, 
-  Filter, 
   Grid3X3, 
   List, 
   FolderPlus, 
@@ -19,9 +17,7 @@ import {
   Download,
   Share,
   MoreVertical,
-  Star,
-  Calendar,
-  User
+  Star
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -72,6 +68,25 @@ export default function BriefcasePage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set())
+
+  // Helper function to map folder colors to Tailwind classes
+  const getFolderColorClass = (color: string) => {
+    const colorMap: Record<string, string> = {
+      '#8B5CF6': 'bg-purple-500',
+      '#EC4899': 'bg-pink-500', 
+      '#6366F1': 'bg-indigo-500',
+      '#F59E0B': 'bg-yellow-500',
+      '#10B981': 'bg-emerald-500',
+      '#EF4444': 'bg-red-500',
+      '#06B6D4': 'bg-cyan-500',
+      '#3B82F6': 'bg-blue-500',
+      '#F97316': 'bg-orange-500',
+      '#84CC16': 'bg-lime-500',
+      '#A855F7': 'bg-violet-500',
+      '#F43F5E': 'bg-rose-500'
+    }
+    return colorMap[color] || 'bg-gray-500'
+  }
 
   useEffect(() => {
     loadDocuments()
@@ -169,15 +184,6 @@ export default function BriefcasePage() {
     }
   }
 
-  const toggleDocumentSelection = (id: string) => {
-    const newSelection = new Set(selectedDocuments)
-    if (newSelection.has(id)) {
-      newSelection.delete(id)
-    } else {
-      newSelection.add(id)
-    }
-    setSelectedDocuments(newSelection)
-  }
 
   const filteredDocuments = documents.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -358,8 +364,7 @@ export default function BriefcasePage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div 
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
-                      style={{ backgroundColor: folder.color }}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center text-white ${getFolderColorClass(folder.color)}`}
                     >
                       <FolderPlus className="w-5 h-5" />
                     </div>

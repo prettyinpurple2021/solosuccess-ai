@@ -123,7 +123,7 @@ docs/                  # Documentation
 - **NO console.log**: Use proper logging or remove debug statements
 - **NO unused imports**: Clean up unused imports immediately
 - **NO duplicate code**: Check for existing implementations before creating new ones
-- **NO mock data**: Replace all mock/demo data with real implementations
+- **NO mock data**: Replace all mock/demo data with real implementations and DO NOT CREATE MOCK DATA or MOCK API RESPONSES or DEMO DATA or PLACEHOLDER CONTENT. ALWAYS USE OR CREATE REAL DATA.
 - **NO placeholder URLs**: Use real API endpoints and data
 
 ### Accessibility Requirements

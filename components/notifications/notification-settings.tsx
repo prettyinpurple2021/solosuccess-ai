@@ -459,6 +459,7 @@ export default function NotificationSettings({ className = "" }: NotificationSet
                         quietHours: { ...preferences.quietHours, start: e.target.value }
                       })}
                       className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                      aria-label="Quiet hours start time"
                     />
                   </div>
                   <div>
@@ -471,6 +472,7 @@ export default function NotificationSettings({ className = "" }: NotificationSet
                         quietHours: { ...preferences.quietHours, end: e.target.value }
                       })}
                       className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                      aria-label="Quiet hours end time"
                     />
                   </div>
                 </div>
