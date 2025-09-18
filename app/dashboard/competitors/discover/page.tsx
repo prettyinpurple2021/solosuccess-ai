@@ -54,159 +54,25 @@ export default function CompetitorDiscoveryPage() {
     try {
       setSearching(true)
       
-      // Simulate AI-powered competitor discovery
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // Call real AI-powered competitor discovery API
+      const response = await fetch('/api/competitors/discover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessDescription,
+          targetMarket,
+          keyProducts
+        })
+      })
       
-      // Mock suggestions based on business description
-      const mockSuggestions: CompetitorSuggestion[] = [
-        {
-          id: "1",
-          name: "ProductivityPro",
-          domain: "productivitypro.com",
-          description: "AI-powered task management and productivity platform for entrepreneurs",
-          industry: "Technology",
-          headquarters: "Austin, TX",
-          employeeCount: 45,
-          fundingStage: "Series A",
-          threatLevel: "high",
-          matchScore: 92,
-          matchReasons: [
-            "Similar target market (entrepreneurs)",
-            "AI-powered productivity features",
-            "Task management focus",
-            "Small business segment"
-          ],
-          keyProducts: ["AI Task Assistant", "Productivity Analytics", "Team Collaboration"],
-          recentNews: [
-            "Raised $5M Series A funding",
-            "Launched AI-powered scheduling feature",
-            "Partnership with Microsoft Teams"
-          ],
-          socialMediaFollowers: {
-            linkedin: 12500,
-            twitter: 8900
-          },
-          isAlreadyTracked: false
-        },
-        {
-          id: "2",
-          name: "SmartFlow Solutions",
-          domain: "smartflow.io",
-          description: "Business automation and workflow optimization platform",
-          industry: "Technology",
-          headquarters: "San Francisco, CA",
-          employeeCount: 120,
-          fundingStage: "Series B",
-          threatLevel: "critical",
-          matchScore: 88,
-          matchReasons: [
-            "Business automation focus",
-            "Workflow optimization",
-            "Similar feature set",
-            "Enterprise and SMB market"
-          ],
-          keyProducts: ["Workflow Builder", "Process Automation", "Analytics Dashboard"],
-          recentNews: [
-            "Acquired by enterprise software company",
-            "Launched new API platform",
-            "Expanded to European market"
-          ],
-          socialMediaFollowers: {
-            linkedin: 25000,
-            twitter: 15600
-          },
-          isAlreadyTracked: false
-        },
-        {
-          id: "3",
-          name: "TaskMaster Elite",
-          domain: "taskmaster-elite.com",
-          description: "Premium task and project management solution for professionals",
-          industry: "Technology",
-          headquarters: "New York, NY",
-          employeeCount: 75,
-          fundingStage: "Seed",
-          threatLevel: "medium",
-          matchScore: 76,
-          matchReasons: [
-            "Task management core feature",
-            "Professional target market",
-            "Premium positioning",
-            "Project management capabilities"
-          ],
-          keyProducts: ["Task Manager Pro", "Project Templates", "Time Tracking"],
-          recentNews: [
-            "Featured in Forbes productivity tools list",
-            "Launched mobile app redesign",
-            "Partnership with Slack"
-          ],
-          socialMediaFollowers: {
-            linkedin: 8200,
-            twitter: 5400
-          },
-          isAlreadyTracked: true
-        },
-        {
-          id: "4",
-          name: "BizBoost AI",
-          domain: "bizboost-ai.com",
-          description: "AI-driven business intelligence and automation platform",
-          industry: "Technology",
-          headquarters: "Seattle, WA",
-          employeeCount: 200,
-          fundingStage: "Series C",
-          threatLevel: "high",
-          matchScore: 84,
-          matchReasons: [
-            "AI-driven approach",
-            "Business intelligence focus",
-            "Automation capabilities",
-            "Similar technology stack"
-          ],
-          keyProducts: ["AI Business Assistant", "Predictive Analytics", "Smart Automation"],
-          recentNews: [
-            "Raised $30M Series C funding",
-            "Launched enterprise AI platform",
-            "Acquired machine learning startup"
-          ],
-          socialMediaFollowers: {
-            linkedin: 35000,
-            twitter: 22000
-          },
-          isAlreadyTracked: false
-        },
-        {
-          id: "5",
-          name: "WorkSmart Technologies",
-          domain: "worksmart.tech",
-          description: "Smart workplace solutions and productivity enhancement tools",
-          industry: "Technology",
-          headquarters: "Boston, MA",
-          employeeCount: 90,
-          fundingStage: "Series A",
-          threatLevel: "medium",
-          matchScore: 71,
-          matchReasons: [
-            "Workplace productivity focus",
-            "Smart technology integration",
-            "Similar business model",
-            "B2B market approach"
-          ],
-          keyProducts: ["Smart Workspace", "Productivity Insights", "Team Analytics"],
-          recentNews: [
-            "Launched remote work optimization suite",
-            "Partnership with Google Workspace",
-            "Expanded customer base by 150%"
-          ],
-          socialMediaFollowers: {
-            linkedin: 15000,
-            twitter: 9800
-          },
-          isAlreadyTracked: false
-        }
-      ]
+      if (!response.ok) {
+        throw new Error('Failed to discover competitors')
+      }
       
-      setSuggestions(mockSuggestions)
+      const data = await response.json()
+      const suggestions: CompetitorSuggestion[] = data.suggestions || []
+      
+      setSuggestions(suggestions)
     } catch (error) {
       logError('Error discovering competitors:', error)
     } finally {
@@ -230,29 +96,20 @@ export default function CompetitorDiscoveryPage() {
     try {
       setLoading(true)
       
-      // Simulate adding competitors
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Save selected competitors via API
+      const selectedCompetitorsData = suggestions.filter(s => selectedCompetitors.has(s.id))
       
-      // TODO: Replace with actual API calls
-      // for (const competitorId of selectedCompetitors) {
-      //   const competitor = suggestions.find(s => s.id === competitorId)
-      //   if (competitor) {
-      //     await fetch('/api/competitors', {
-      //       method: 'POST',
-      //       headers: { 'Content-Type': 'application/json' },
-      //       body: JSON.stringify({
-      //         name: competitor.name,
-      //         domain: competitor.domain,
-      //         description: competitor.description,
-      //         industry: competitor.industry,
-      //         headquarters: competitor.headquarters,
-      //         employeeCount: competitor.employeeCount,
-      //         fundingStage: competitor.fundingStage,
-      //         threatLevel: competitor.threatLevel,
-      //       })
-      //     })
-      //   }
-      // }
+      const response = await fetch('/api/competitors/save-discovered', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          competitors: selectedCompetitorsData
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to save competitors')
+      }
       
       router.push('/dashboard/competitors')
     } catch (error) {

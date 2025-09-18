@@ -1,112 +1,134 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
-import { db} from '@/db'
-import { competitorProfiles, competitorAlerts, intelligenceData} from '@/db/schema'
 import { authenticateRequest} from '@/lib/auth-server'
-import { eq, and, count, gte} from 'drizzle-orm'
+import { rateLimitByIp} from '@/lib/rate-limit'
+import { db} from '@/db'
+import { competitors, competitorAlerts, competitorActivities} from '@/db/schema'
+import { eq, count, desc, gte, sql} from 'drizzle-orm'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { allowed } = rateLimitByIp('competitors:stats', ip, 60_000, 10)
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get current date for recent calculations
-    const now = new Date()
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const userId = user.id
 
     // Get total competitors count
-    const totalCompetitorsResult = await db
+    const [totalCompetitors] = await db
       .select({ count: count() })
-      .from(competitorProfiles)
-      .where(eq(competitorProfiles.user_id, user.id))
+      .from(competitors)
+      .where(eq(competitors.user_id, userId))
 
-    const totalCompetitors = totalCompetitorsResult[0]?.count || 0
+    // Get competitors by threat level
+    const threatLevelStats = await db
+      .select({
+        threat_level: competitors.threat_level,
+        count: count()
+      })
+      .from(competitors)
+      .where(eq(competitors.user_id, userId))
+      .groupBy(competitors.threat_level)
 
-    // Get active monitoring count
-    const activeMonitoringResult = await db
-      .select({ count: count() })
-      .from(competitorProfiles)
-      .where(
-        and(
-          eq(competitorProfiles.user_id, user.id),
-          eq(competitorProfiles.monitoring_status, 'active')
-        )
-      )
+    // Get recent alerts count (last 30 days)
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const activeMonitoring = activeMonitoringResult[0]?.count || 0
-
-    // Get critical threats count
-    const criticalThreatsResult = await db
-      .select({ count: count() })
-      .from(competitorProfiles)
-      .where(
-        and(
-          eq(competitorProfiles.user_id, user.id),
-          eq(competitorProfiles.threat_level, 'critical')
-        )
-      )
-
-    const criticalThreats = criticalThreatsResult[0]?.count || 0
-
-    // Get recent alerts count (last 7 days)
-    const recentAlertsResult = await db
+    const [recentAlerts] = await db
       .select({ count: count() })
       .from(competitorAlerts)
       .where(
-        and(
-          eq(competitorAlerts.user_id, user.id),
-          gte(competitorAlerts.created_at, sevenDaysAgo)
-        )
+        sql`${competitorAlerts.competitor_id} IN (
+          SELECT id FROM ${competitors} WHERE user_id = ${userId}
+        ) AND ${competitorAlerts.created_at} >= ${thirtyDaysAgo.toISOString()}`
       )
 
-    const recentAlerts = recentAlertsResult[0]?.count || 0
+    // Get recent activities count (last 7 days)
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-    // Get intelligence collected count (last 30 days)
-    const intelligenceCollectedResult = await db
+    const [recentActivities] = await db
       .select({ count: count() })
-      .from(intelligenceData)
+      .from(competitorActivities)
       .where(
-        and(
-          eq(intelligenceData.user_id, user.id),
-          gte(intelligenceData.collected_at, thirtyDaysAgo)
-        )
+        sql`${competitorActivities.competitor_id} IN (
+          SELECT id FROM ${competitors} WHERE user_id = ${userId}
+        ) AND ${competitorActivities.created_at} >= ${sevenDaysAgo.toISOString()}`
       )
 
-    const intelligenceCollected = intelligenceCollectedResult[0]?.count || 0
-
-    // Get opportunities identified count (high importance intelligence in last 30 days)
-    const opportunitiesResult = await db
+    // Get active monitoring count
+    const [activeMonitoring] = await db
       .select({ count: count() })
-      .from(intelligenceData)
+      .from(competitors)
       .where(
-        and(
-          eq(intelligenceData.user_id, user.id),
-          eq(intelligenceData.importance, 'high'),
-          gte(intelligenceData.collected_at, thirtyDaysAgo)
-        )
+        sql`${competitors.user_id} = ${userId} AND ${competitors.monitoring_status} = 'active'`
       )
 
-    const opportunitiesIdentified = opportunitiesResult[0]?.count || 0
+    // Calculate threat distribution
+    const threatDistribution = {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0
+    }
+
+    threatLevelStats.forEach(stat => {
+      if (stat.threat_level in threatDistribution) {
+        threatDistribution[stat.threat_level as keyof typeof threatDistribution] = stat.count
+      }
+    })
+
+    // Calculate average employee count
+    const [avgEmployeeCount] = await db
+      .select({
+        avg: sql<number>`AVG(${competitors.employee_count})`
+      })
+      .from(competitors)
+      .where(eq(competitors.user_id, userId))
+
+    // Calculate total funding tracked
+    const [totalFunding] = await db
+      .select({
+        sum: sql<number>`SUM(${competitors.funding_amount})`
+      })
+      .from(competitors)
+      .where(eq(competitors.user_id, userId))
 
     const stats = {
-      total_competitors: totalCompetitors,
-      active_monitoring: activeMonitoring,
-      critical_threats: criticalThreats,
-      recent_alerts: recentAlerts,
-      intelligence_collected: intelligenceCollected,
-      opportunities_identified: opportunitiesIdentified,
+      totalCompetitors: totalCompetitors.count,
+      activeMonitoring: activeMonitoring.count,
+      recentAlerts: recentAlerts.count,
+      recentActivities: recentActivities.count,
+      threatDistribution,
+      averageEmployeeCount: Math.round(avgEmployeeCount.avg || 0),
+      totalFundingTracked: totalFunding.sum || 0,
+      monitoringCoverage: totalCompetitors.count > 0 ? 
+        Math.round((activeMonitoring.count / totalCompetitors.count) * 100) : 0,
+      alertFrequency: recentAlerts.count > 0 ? 
+        Math.round(recentAlerts.count / 30 * 7) : 0, // Alerts per week
+      activityLevel: recentActivities.count > 0 ? 
+        Math.round(recentActivities.count / 7) : 0, // Activities per day
+      lastUpdated: new Date().toISOString()
     }
+
+    logInfo('Competitor stats calculated successfully', { userId, stats })
 
     return NextResponse.json(stats)
   } catch (error) {
     logError('Error fetching competitor stats:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch competitor stats' },
+      { error: 'Failed to fetch competitor statistics' },
       { status: 500 }
     )
   }

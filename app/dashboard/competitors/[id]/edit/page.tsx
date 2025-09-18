@@ -130,58 +130,38 @@ export default function EditCompetitorPage() {
     try {
       setLoading(true)
       
-      // Mock data for now - replace with actual API call
-      const mockData: CompetitorFormData = {
-        name: "TechRival Corp",
-        domain: "techrival.com",
-        description: "AI-powered productivity platform targeting solo entrepreneurs and small businesses with advanced automation tools.",
-        industry: "Technology",
-        headquarters: "San Francisco, CA",
-        foundedYear: 2019,
-        employeeCount: 150,
-        fundingAmount: 25000000,
-        fundingStage: "series-b",
-        threatLevel: "high",
-        monitoringStatus: "active",
+      // Fetch real competitor data from API
+      const response = await fetch(`/api/competitors/${competitorId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch competitor data')
+      }
+      
+      const competitorData = await response.json()
+      
+      // Transform API data to form data structure
+      const formData: CompetitorFormData = {
+        name: competitorData.name || "",
+        domain: competitorData.domain || "",
+        description: competitorData.description || "",
+        industry: competitorData.industry || "",
+        headquarters: competitorData.headquarters || "",
+        foundedYear: competitorData.founded_year || null,
+        employeeCount: competitorData.employee_count || null,
+        fundingAmount: competitorData.funding_amount || null,
+        fundingStage: competitorData.funding_stage || "",
+        threatLevel: competitorData.threat_level || "medium",
+        monitoringStatus: competitorData.monitoring_status || "active",
         socialMediaHandles: {
-          linkedin: "https://linkedin.com/company/techrival",
-          twitter: "https://twitter.com/techrival",
-          facebook: "https://facebook.com/techrival",
-          instagram: ""
+          linkedin: competitorData.linkedin_url || "",
+          twitter: competitorData.twitter_url || "",
+          facebook: competitorData.facebook_url || "",
+          instagram: competitorData.instagram_url || "",
         },
-        keyPersonnel: [
-          {
-            name: "Sarah Chen",
-            role: "CEO & Co-founder",
-            linkedinProfile: "https://linkedin.com/in/sarahchen",
-            joinedDate: "2019-01-15"
-          },
-          {
-            name: "Marcus Rodriguez",
-            role: "CTO & Co-founder",
-            linkedinProfile: "https://linkedin.com/in/marcusrodriguez",
-            joinedDate: "2019-01-15"
-          }
-        ],
-        products: [
-          {
-            name: "TechRival AI Assistant",
-            description: "AI-powered business automation platform",
-            category: "Productivity",
-            status: "active"
-          }
-        ],
-        competitiveAdvantages: [
-          "Strong VC backing ($25M Series B)",
-          "Experienced founding team",
-          "Enterprise partnerships with Fortune 500"
-        ],
-        vulnerabilities: [
-          "Limited mobile app functionality",
-          "High pricing compared to competitors",
-          "Dependency on third-party integrations"
-        ],
-        monitoringConfig: {
+        keyPersonnel: competitorData.key_personnel || [],
+        products: competitorData.products || [],
+        competitiveAdvantages: competitorData.competitive_advantages || [],
+        vulnerabilities: competitorData.vulnerabilities || [],
+        monitoringConfig: competitorData.monitoring_config || {
           websiteMonitoring: true,
           socialMediaMonitoring: true,
           newsMonitoring: true,
@@ -198,7 +178,7 @@ export default function EditCompetitorPage() {
         }
       }
       
-      setFormData(mockData)
+      setFormData(formData)
     } catch (error) {
       logError('Error fetching competitor data:', error)
     } finally {
@@ -364,15 +344,16 @@ export default function EditCompetitorPage() {
     try {
       setSaving(true)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Save competitor data via API
+      const response = await fetch(`/api/competitors/${competitorId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
       
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/competitors/${competitorId}`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // })
+      if (!response.ok) {
+        throw new Error('Failed to save competitor data')
+      }
       
       setHasChanges(false)
       router.push(`/dashboard/competitors/${competitorId}`)
@@ -387,13 +368,14 @@ export default function EditCompetitorPage() {
     try {
       setDeleting(true)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Delete competitor via API
+      const response = await fetch(`/api/competitors/${competitorId}`, {
+        method: 'DELETE'
+      })
       
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/competitors/${competitorId}`, {
-      //   method: 'DELETE'
-      // })
+      if (!response.ok) {
+        throw new Error('Failed to delete competitor')
+      }
       
       router.push('/dashboard/competitors')
     } catch (error) {
