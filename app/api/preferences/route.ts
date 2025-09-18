@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -76,7 +77,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ preferences })
     }
   } catch (error) {
-    console.error('Preferences GET error:', error)
+    logError('Preferences GET error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
@@ -146,7 +147,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Key and value, or preferences object required' }, { status: 400 })
     }
   } catch (error) {
-    console.error('Preferences POST error:', error)
+    logError('Preferences POST error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
@@ -174,7 +175,7 @@ export async function DELETE(req: NextRequest) {
     
     return NextResponse.json({ success: true, deleted: key })
   } catch (error) {
-    console.error('Preferences DELETE error:', error)
+    logError('Preferences DELETE error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

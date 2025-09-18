@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/
 import { useToast} from '@/hooks/use-toast'
 import { motion} from 'framer-motion'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   BarChart3, PieChart, TrendingUp, Activity, HardDrive, Files, Users, Eye, Share2, Star, Hash, FolderOpen, FileType, Brain, Sparkles, Zap, Target, AlertTriangle, ArrowUp, ArrowDown, Minus, Plus, RefreshCw, Crown, Shield, Globe} from 'lucide-react'
 
 interface DashboardStats {
@@ -123,7 +124,7 @@ export default function EnhancedDashboard({ className = "" }: EnhancedDashboardP
       }
 
     } catch (error) {
-      console.error('Failed to load dashboard data:', error)
+      logError('Failed to load dashboard data:', error)
       toast({
         title: "Error",
         description: "Failed to load dashboard data",

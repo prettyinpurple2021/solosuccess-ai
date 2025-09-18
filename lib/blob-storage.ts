@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 // Generic file storage interface - can be implemented with various providers
 export interface FileUploadResult {
   url: string
@@ -38,7 +39,7 @@ class LocalFileStorage implements FileStorageProvider {
 
   async delete(_pathname: string): Promise<void> {
     // No-op for local storage
-    console.log(`Would delete file: ${_pathname}`)
+    logInfo(`Would delete file: ${_pathname}`)
   }
 
   async list(_prefix: string): Promise<Array<{
@@ -74,7 +75,7 @@ export const uploadFile = async (file: File, filename: string, userId: string): 
       contentDisposition: `attachment; filename="${filename}"`,
     }
   } catch (error) {
-    console.error("Error uploading file:", error)
+    logError("Error uploading file:", error)
     throw new Error("Failed to upload file")
   }
 }
@@ -83,7 +84,7 @@ export const deleteFile = async (pathname: string): Promise<void> => {
   try {
     await storageProvider.delete(pathname)
   } catch (error) {
-    console.error("Error deleting file:", error)
+    logError("Error deleting file:", error)
     throw new Error("Failed to delete file")
   }
 }
@@ -99,7 +100,7 @@ export const listUserFiles = async (userId: string) => {
       uploadedAt: file.uploadedAt,
     }))
   } catch (error) {
-    console.error("Error listing files:", error)
+    logError("Error listing files:", error)
     throw new Error("Failed to list files")
   }
 }
@@ -137,7 +138,7 @@ export const checkFileQuota = async (
       canUpload,
     }
   } catch (error) {
-    console.error("Error checking file quota:", error)
+    logError("Error checking file quota:", error)
     return {
       used: 0,
       limit: getFileQuota(subscriptionTier),

@@ -24,6 +24,7 @@ import { Label} from "@/components/ui/label"
 import { Textarea} from "@/components/ui/textarea"
 import { Separator} from "@/components/ui/separator"
 import { ScrollArea} from "@/components/ui/scroll-area"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface IntelligenceSearchFilters {
   query?: string
@@ -160,7 +161,7 @@ export function IntelligenceSearch({
         setSavedSearches(data.savedSearches || [])
       }
     } catch (error) {
-      console.error('Error loading saved searches:', error)
+      logError('Error loading saved searches:', error)
     } finally {
       setLoadingSavedSearches(false)
     }
@@ -178,7 +179,7 @@ export function IntelligenceSearch({
         setAvailableTags([...data.userTags, ...data.suggestedTags])
       }
     } catch (error) {
-      console.error('Error loading tags:', error)
+      logError('Error loading tags:', error)
     } finally {
       setLoadingTags(false)
     }
@@ -262,7 +263,7 @@ export function IntelligenceSearch({
         setSaveSearchFavorite(false)
       }
     } catch (error) {
-      console.error('Error saving search:', error)
+      logError('Error saving search:', error)
     }
   }
 
@@ -283,7 +284,7 @@ export function IntelligenceSearch({
         )
       }
     } catch (error) {
-      console.error('Error loading saved search:', error)
+      logError('Error loading saved search:', error)
     }
   }
 
@@ -297,7 +298,7 @@ export function IntelligenceSearch({
         setSavedSearches(prev => prev.filter(search => search.id !== searchId))
       }
     } catch (error) {
-      console.error('Error deleting saved search:', error)
+      logError('Error deleting saved search:', error)
     }
   }
 

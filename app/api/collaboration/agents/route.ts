@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CollaborationHub } from '@/lib/collaboration-hub'
 import { verifyAuth } from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize collaboration hub
 const collaborationHub = new CollaborationHub()
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error retrieving agents:', error)
+    logError('Error retrieving agents:', error)
 
     return NextResponse.json({
       error: 'Internal Server Error',

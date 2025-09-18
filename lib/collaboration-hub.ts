@@ -6,6 +6,7 @@
 import { z } from 'zod'
 import { MessageRouter } from './message-router'
 import { ContextManager } from './context-manager'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types and Interfaces
 export const AgentMessageSchema = z.object({
@@ -213,7 +214,7 @@ export class CollaborationHub {
       this.agents.set(agent.id, agent)
     })
 
-    console.log(`✅ Collaboration Hub initialized with ${defaultAgents.length} agents`)
+    logInfo(`✅ Collaboration Hub initialized with ${defaultAgents.length} agents`)
   }
 
   /**
@@ -291,7 +292,7 @@ export class CollaborationHub {
       }
 
     } catch (error) {
-      console.error('Error initiating collaboration:', error)
+      logError('Error initiating collaboration:', error)
       return {
         sessionId: '',
         participants: [],
@@ -328,7 +329,7 @@ export class CollaborationHub {
       })
 
     } catch (error) {
-      console.error('Error routing message:', error)
+      logError('Error routing message:', error)
       throw error
     }
   }
@@ -400,7 +401,7 @@ export class CollaborationHub {
 
       return true
     } catch (error) {
-      console.error('Error completing session:', error)
+      logError('Error completing session:', error)
       return false
     }
   }
@@ -492,7 +493,7 @@ export class CollaborationHub {
       try {
         callback(data)
       } catch (error) {
-        console.error(`Error in event listener for ${event}:`, error)
+        logError(`Error in event listener for ${event}:`, error)
       }
     })
   }

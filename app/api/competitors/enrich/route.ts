@@ -7,6 +7,7 @@ import { competitorEnrichmentService} from '@/lib/competitor-enrichment-service'
 import { z} from 'zod'
 import { eq, and, inArray} from 'drizzle-orm'
 import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -270,7 +271,7 @@ export async function POST(request: NextRequest) {
       completedAt: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('Error in batch enrichment:', error)
+    logError('Error in batch enrichment:', error)
     return NextResponse.json(
       { error: 'Failed to perform batch enrichment' },
       { status: 500 }
@@ -390,7 +391,7 @@ export async function GET(_request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error getting enrichment statistics:', error)
+    logError('Error getting enrichment statistics:', error)
     return NextResponse.json(
       { error: 'Failed to get enrichment statistics' },
       { status: 500 }

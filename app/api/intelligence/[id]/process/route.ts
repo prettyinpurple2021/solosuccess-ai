@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
 import type { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AnalysisResult,
   ExtractedData,
   SourceType,
@@ -222,7 +223,7 @@ export async function POST(
       },
     })
   } catch (error) {
-    console.error('Error processing intelligence data:', error)
+    logError('Error processing intelligence data:', error)
     return NextResponse.json(
       { error: 'Failed to process intelligence data' },
       { status: 500 }

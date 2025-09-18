@@ -1,4 +1,5 @@
 import { NextResponse} from 'next/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -34,7 +35,7 @@ Ready to level up your decision-making game? Let's do this! 🚀`
       testType: 'mock_response'
     })
   } catch (error) {
-    console.error('AI test error:', error)
+    logError('AI test error:', error)
     return NextResponse.json(
       { 
         status: 'error',

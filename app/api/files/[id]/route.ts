@@ -1,6 +1,7 @@
 import { NextResponse} from 'next/server'
 import { createClient} from '@/lib/neon/server'
 import { authenticateRequest} from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -39,7 +40,7 @@ export async function GET(
       },
     })
   } catch (error) {
-    console.error('Error serving file:', error)
+    logError('Error serving file:', error)
     return NextResponse.json({ error: 'Failed to serve file' }, { status: 500 })
   }
 }
@@ -69,7 +70,7 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 })
   } catch (error) {
-    console.error('Error deleting file:', error)
+    logError('Error deleting file:', error)
     return NextResponse.json({ error: 'Failed to delete file' }, { status: 500 })
   }
 }

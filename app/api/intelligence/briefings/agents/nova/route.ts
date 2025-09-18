@@ -4,6 +4,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { agentIntelligenceBriefingService} from '@/lib/agent-intelligence-briefings'
 import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const novaRequestSchema = z.object({
   competitorIds: z.array(z.string()).optional()
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Error generating Nova briefing:', error)
+    logError('Error generating Nova briefing:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

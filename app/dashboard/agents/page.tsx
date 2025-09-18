@@ -15,6 +15,7 @@ import { Input} from "@/components/ui/input"
 import { Label} from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import { motion} from "framer-motion"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Message {
   id: string
@@ -144,7 +145,7 @@ export default function AgentsPage() {
         setConversations(data.conversations || [])
       }
     } catch (error) {
-      console.error('Error fetching conversations:', error)
+      logError('Error fetching conversations:', error)
     }
   }
 
@@ -219,7 +220,7 @@ export default function AgentsPage() {
         }
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      logError('Error sending message:', error)
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: "assistant",
@@ -375,7 +376,7 @@ export default function AgentsPage() {
         throw new Error('Failed to save')
       }
     } catch (error) {
-      console.error('Save error:', error)
+      logError('Save error:', error)
       toast({
         title: "Save Failed",
         description: "Failed to save to Briefcase. Please try again.",

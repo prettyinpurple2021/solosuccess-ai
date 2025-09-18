@@ -13,6 +13,7 @@ import { Separator} from '@/components/ui/separator'
 import { useToast} from '@/hooks/use-toast'
 import { motion, AnimatePresence} from 'framer-motion'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Trash2, Move, Copy, Tag, Folder, Star, StarOff, Download, Share2, X, Check, AlertTriangle, Loader2, FileText, Hash} from 'lucide-react'
 
 interface BriefcaseFile {
@@ -236,7 +237,7 @@ export default function BulkOperationsPanel({
       onOperationComplete()
 
     } catch (error) {
-      console.error('Bulk operation error:', error)
+      logError('Bulk operation error:', error)
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Operation failed",
@@ -403,7 +404,7 @@ export default function BulkOperationsPanel({
                             <div className="flex items-center gap-2">
                               <div 
                                 className="w-3 h-3 rounded-full" 
-                                style={{ backgroundColor: folder.color }}
+                                style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                               />
                               {folder.name}
                             </div>

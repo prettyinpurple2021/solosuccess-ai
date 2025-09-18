@@ -5,6 +5,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, sql} from 'drizzle-orm'
 import { savedIntelligenceSearches} from '@/lib/schemas/saved-intelligence-searches'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -101,7 +102,7 @@ export async function GET(
       savedSearch: transformedSearch,
     })
   } catch (error) {
-    console.error('Error fetching saved search:', error)
+    logError('Error fetching saved search:', error)
     return NextResponse.json(
       { error: 'Failed to fetch saved search' },
       { status: 500 }
@@ -218,7 +219,7 @@ export async function PUT(
       savedSearch: transformedSearch,
     })
   } catch (error) {
-    console.error('Error updating saved search:', error)
+    logError('Error updating saved search:', error)
     return NextResponse.json(
       { error: 'Failed to update saved search' },
       { status: 500 }
@@ -278,7 +279,7 @@ export async function DELETE(
       message: 'Saved search deleted successfully',
     })
   } catch (error) {
-    console.error('Error deleting saved search:', error)
+    logError('Error deleting saved search:', error)
     return NextResponse.json(
       { error: 'Failed to delete saved search' },
       { status: 500 }

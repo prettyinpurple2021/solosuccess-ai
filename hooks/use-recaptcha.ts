@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { RECAPTCHA_CONFIG } from '@/lib/recaptcha-client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 declare global {
   interface Window {
@@ -42,7 +43,7 @@ export function useRecaptcha(options: UseRecaptchaOptions = {}) {
       if (window.grecaptcha?.enterprise) {
         window.grecaptcha.enterprise.ready(() => {
           setIsReady(true)
-          console.log('reCAPTCHA ready in useRecaptcha hook')
+          logInfo('reCAPTCHA ready in useRecaptcha hook')
         })
       } else {
         setTimeout(checkRecaptchaReady, 100) // Retry if not ready
@@ -54,13 +55,13 @@ export function useRecaptcha(options: UseRecaptchaOptions = {}) {
   // Execute reCAPTCHA
   const execute = useCallback(async (): Promise<string | null> => {
     if (!RECAPTCHA_CONFIG.siteKey) {
-      console.warn('reCAPTCHA site key not configured, skipping validation')
+      logWarn('reCAPTCHA site key not configured, skipping validation')
       return null
     }
 
     if (!isReady) {
       const errorMsg = 'reCAPTCHA not ready'
-      console.error('reCAPTCHA not ready. Site key:', RECAPTCHA_CONFIG.siteKey)
+      logError('reCAPTCHA not ready. Site key:', RECAPTCHA_CONFIG.siteKey)
       setError(errorMsg)
       onError?.(errorMsg)
       return null
@@ -71,13 +72,13 @@ export function useRecaptcha(options: UseRecaptchaOptions = {}) {
     onLoading?.(true)
 
     try {
-      console.log('Executing reCAPTCHA for action:', action)
+      logInfo('Executing reCAPTCHA for action:', action)
       const token = await window.grecaptcha.enterprise.execute(
         RECAPTCHA_CONFIG.siteKey,
         { action }
       )
 
-      console.log('reCAPTCHA token generated, validating with backend')
+      logInfo('reCAPTCHA token generated, validating with backend')
 
       // Send token to backend for validation
       const response = await fetch('/api/recaptcha/validate', {
@@ -99,19 +100,19 @@ export function useRecaptcha(options: UseRecaptchaOptions = {}) {
       const result = await response.json()
       
       if (result.success) {
-        console.log('reCAPTCHA validation successful')
+        logInfo('reCAPTCHA validation successful')
         onSuccess?.(token, result.score)
         return token
       } else {
         const errorMsg = result.error || 'reCAPTCHA validation failed'
-        console.error('reCAPTCHA validation failed:', errorMsg)
+        logError('reCAPTCHA validation failed:', errorMsg)
         setError(errorMsg)
         onError?.(errorMsg)
         return null
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'reCAPTCHA execution failed'
-      console.error('reCAPTCHA execution error:', err)
+      logError('reCAPTCHA execution error:', err)
       setError(errorMsg)
       onError?.(errorMsg)
       return null

@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { CompetitorAlert } from '@/hooks/use-competitor-alerts';
 import { AlertSeverity, AlertType } from './competitor-alert-system';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface NotificationChannel {
   id: string;
@@ -322,7 +323,7 @@ Received: ${new Date(alert.created_at).toLocaleString()}
     };
 
     // In a real implementation, you would send this to FCM/APNs
-    console.log('Push notification payload:', payload);
+    logInfo('Push notification payload:', payload);
     
     return `push_${alert.id}_${Date.now()}`;
   }

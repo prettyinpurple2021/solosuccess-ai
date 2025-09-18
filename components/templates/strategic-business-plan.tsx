@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { motion, AnimatePresence} from "framer-motion"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Building2, Target, TrendingUp, Users, DollarSign, BarChart3, Lightbulb, CheckCircle, Plus, Minus, PieChart, Crown, Zap, Brain, AlertTriangle, FileText, Globe} from "lucide-react"
 
 interface FinancialProjection {
@@ -282,7 +283,7 @@ export default function StrategicBusinessPlan({ template, onSave, onExport }: St
       
       setAiInsights(insights.slice(0, 4))
     } catch (error) {
-      console.error('Failed to get AI insights:', error)
+      logError('Failed to get AI insights:', error)
     } finally {
       setIsAnalyzing(false)
     }

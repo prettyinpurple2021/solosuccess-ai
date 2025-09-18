@@ -321,7 +321,7 @@ export default function FileMetadataPanel({
             <div className="flex items-center gap-2">
               <div 
                 className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: file.folder_color || '#8B5CF6' }}
+                style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
               />
               <span className="font-medium">{file.folder_name}</span>
             </div>

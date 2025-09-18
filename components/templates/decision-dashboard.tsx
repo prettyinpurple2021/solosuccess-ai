@@ -17,6 +17,7 @@ import { Alert, AlertDescription} from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { motion, AnimatePresence} from "framer-motion"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Plus, Minus, TrendingUp, TrendingDown, Brain, Target, AlertTriangle, CheckCircle, Lightbulb, Scale, Crown, BarChart3} from "lucide-react"
 
 interface DecisionOption {
@@ -149,7 +150,7 @@ export default function DecisionDashboard({ template, onSave: _onSave, onExport:
       
       setAiInsights(insights.slice(0, Math.min(3, (_data as any).options.length + 1)))
     } catch (error) {
-      console.error('Failed to get AI insights:', error)
+      logError('Failed to get AI insights:', error)
     } finally {
       setIsAnalyzing(false)
     }

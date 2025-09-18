@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { v4 as uuidv4} from 'uuid'
 import { headers} from 'next/headers'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // File type validation
 const ALLOWED_FILE_TYPES = {
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
     const saved = await saveFile({ userId: user.id, file, folderId, category, description, tags })
     return NextResponse.json({ success: true, document: saved })
   } catch (error) {
-    console.error('Upload error:', error)
+    logError('Upload error:', error)
     const message = error instanceof Error ? error.message : 'Failed to upload file'
     return NextResponse.json({ error: message }, { status: 500 })
   }
@@ -221,7 +222,7 @@ export async function PUT(request: NextRequest) {
       errors: failures.map(f => (f.reason instanceof Error ? f.reason.message : String(f.reason))),
     })
   } catch (error) {
-    console.error('Bulk upload error:', error)
+    logError('Bulk upload error:', error)
     return NextResponse.json({ error: 'Failed to upload files' }, { status: 500 })
   }
 }

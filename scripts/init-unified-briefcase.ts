@@ -1,12 +1,13 @@
 import { unifiedBriefcase } from '@/lib/unified-briefcase'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 async function initializeDatabase() {
   try {
-    console.log('Initializing unified briefcase database...')
+    logInfo('Initializing unified briefcase database...')
     await unifiedBriefcase.initialize()
-    console.log('Database initialized successfully!')
+    logInfo('Database initialized successfully!')
   } catch (error) {
-    console.error('Failed to initialize database:', error)
+    logError('Failed to initialize database:', error)
     process.exit(1)
   }
 }

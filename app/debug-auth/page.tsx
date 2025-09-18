@@ -4,6 +4,7 @@ import { useState, useEffect} from "react"
 import { Button} from "@/components/ui/button"
 import { EmpowermentCard} from "@/components/ui/boss-card"
 import { Crown, CheckCircle, XCircle, RefreshCw, ArrowRight} from "lucide-react"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export default function DebugAuthPage() {
   const [token, setToken] = useState<string | null>(null)
@@ -47,14 +48,14 @@ export default function DebugAuthPage() {
           const dashboardData = await dashboardResponse.json()
           setDashboardData(dashboardData)
         } else {
-          console.error('Dashboard API failed:', dashboardResponse.status, await dashboardResponse.text())
+          logError('Dashboard API failed:', dashboardResponse.status, await dashboardResponse.text())
         }
       } else {
-        console.error('User API failed:', userResponse.status, await userResponse.text())
+        logError('User API failed:', userResponse.status, await userResponse.text())
         setError('Token validation failed')
       }
     } catch (err) {
-      console.error('Test failed:', err)
+      logError('Test failed:', err)
       setError('Test failed: ' + (err as Error).message)
     } finally {
       setLoading(false)

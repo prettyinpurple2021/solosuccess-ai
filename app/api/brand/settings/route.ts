@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ brand })
   } catch (error) {
-    console.error('Error fetching brand settings:', error)
+    logError('Error fetching brand settings:', error)
     return NextResponse.json({ error: 'Failed to fetch brand settings' }, { status: 500 })
   }
 }
@@ -155,7 +156,7 @@ export async function POST(request: NextRequest) {
       })
     }
   } catch (error) {
-    console.error('Error saving brand settings:', error)
+    logError('Error saving brand settings:', error)
     return NextResponse.json({ error: 'Failed to save brand settings' }, { status: 500 })
   }
 }

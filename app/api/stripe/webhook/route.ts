@@ -3,6 +3,7 @@ import { stripe, STRIPE_WEBHOOK_EVENTS} from '@/lib/stripe'
 import { headers} from 'next/headers'
 import Stripe from 'stripe'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId} from '@/lib/stripe-db-utils'
 
 // Force dynamic rendering
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
         process.env.STRIPE_WEBHOOK_SECRET
       )
     } catch (err) {
-      console.error('Webhook signature verification failed:', err)
+      logError('Webhook signature verification failed:', err)
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -78,13 +79,13 @@ export async function POST(request: NextRequest) {
         break
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        logInfo(`Unhandled event type: ${event.type}`)
     }
 
     return NextResponse.json({ received: true })
 
   } catch (error) {
-    console.error('Webhook error:', error)
+    logError('Webhook error:', error)
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }
@@ -101,7 +102,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     // Get user by Stripe customer ID
     const user = await getUserByStripeCustomerId(customerId)
     if (!user) {
-      console.error('User not found for customer:', customerId)
+      logError('User not found for customer:', customerId)
       return
     }
 
@@ -120,12 +121,12 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     })
 
     if (result.success) {
-      console.log(`Subscription created for user ${user.id} (customer ${customerId}): ${tier}`)
+      logInfo(`Subscription created for user ${user.id} (customer ${customerId}): ${tier}`)
     } else {
-      console.error('Failed to update user subscription:', result.error)
+      logError('Failed to update user subscription:', result.error)
     }
   } catch (error) {
-    console.error('Error handling subscription created:', error)
+    logError('Error handling subscription created:', error)
   }
 }
 
@@ -138,7 +139,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     // Get user by Stripe customer ID
     const user = await getUserByStripeCustomerId(customerId)
     if (!user) {
-      console.error('User not found for customer:', customerId)
+      logError('User not found for customer:', customerId)
       return
     }
 
@@ -155,12 +156,12 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     })
 
     if (result.success) {
-      console.log(`Subscription updated for user ${user.id} (customer ${customerId}): ${tier}`)
+      logInfo(`Subscription updated for user ${user.id} (customer ${customerId}): ${tier}`)
     } else {
-      console.error('Failed to update user subscription:', result.error)
+      logError('Failed to update user subscription:', result.error)
     }
   } catch (error) {
-    console.error('Error handling subscription updated:', error)
+    logError('Error handling subscription updated:', error)
   }
 }
 
@@ -172,7 +173,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     // Get user by Stripe customer ID
     const user = await getUserByStripeCustomerId(customerId)
     if (!user) {
-      console.error('User not found for customer:', customerId)
+      logError('User not found for customer:', customerId)
       return
     }
 
@@ -185,12 +186,12 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     })
 
     if (result.success) {
-      console.log(`Subscription deleted for user ${user.id} (customer ${customerId}) - downgraded to launch`)
+      logInfo(`Subscription deleted for user ${user.id} (customer ${customerId}) - downgraded to launch`)
     } else {
-      console.error('Failed to update user subscription:', result.error)
+      logError('Failed to update user subscription:', result.error)
     }
   } catch (error) {
-    console.error('Error handling subscription deleted:', error)
+    logError('Error handling subscription deleted:', error)
   }
 }
 
@@ -207,9 +208,9 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     //   payment_status: 'succeeded'
     // })
 
-    console.log(`Payment succeeded for customer ${customerId}, subscription ${subscriptionId}`)
+    logInfo(`Payment succeeded for customer ${customerId}, subscription ${subscriptionId}`)
   } catch (error) {
-    console.error('Error handling payment succeeded:', error)
+    logError('Error handling payment succeeded:', error)
   }
 }
 
@@ -228,28 +229,28 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
     // Send notification to user about failed payment
     // await sendPaymentFailedNotification(user.id, invoice)
 
-    console.log(`Payment failed for customer ${customerId}, subscription ${subscriptionId}`)
+    logError(`Payment failed for customer ${customerId}, subscription ${subscriptionId}`)
   } catch (error) {
-    console.error('Error handling payment failed:', error)
+    logError('Error handling payment failed:', error)
   }
 }
 
 // Handle customer created
 async function handleCustomerCreated(customer: Stripe.Customer) {
   try {
-    console.log(`Customer created: ${customer.id}`)
+    logInfo(`Customer created: ${customer.id}`)
     // Additional customer creation logic if needed
   } catch (error) {
-    console.error('Error handling customer created:', error)
+    logError('Error handling customer created:', error)
   }
 }
 
 // Handle customer updated
 async function handleCustomerUpdated(customer: Stripe.Customer) {
   try {
-    console.log(`Customer updated: ${customer.id}`)
+    logInfo(`Customer updated: ${customer.id}`)
     // Additional customer update logic if needed
   } catch (error) {
-    console.error('Error handling customer updated:', error)
+    logError('Error handling customer updated:', error)
   }
 }

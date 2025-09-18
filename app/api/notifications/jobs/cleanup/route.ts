@@ -3,6 +3,7 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error cleaning up notification jobs:', error)
+    logError('Error cleaning up notification jobs:', error)
     return NextResponse.json(
       { error: 'Failed to cleanup notification jobs' },
       { status: 500 }

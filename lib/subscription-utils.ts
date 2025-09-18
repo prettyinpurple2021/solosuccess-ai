@@ -1,4 +1,5 @@
 import { query } from '@/lib/neon/client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface SubscriptionInfo {
   tier: 'free' | 'launch' | 'accelerator' | 'dominator'
@@ -38,7 +39,7 @@ export async function getUserSubscription(userId: string): Promise<SubscriptionI
       features: getFeaturesByTier(tier)
     }
   } catch (error) {
-    console.error('Error fetching user subscription:', error)
+    logError('Error fetching user subscription:', error)
     // Return default free tier on error
     return {
       tier: 'launch',

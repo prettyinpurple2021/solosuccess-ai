@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ subscriptions })
   } catch (error) {
-    console.error('Error fetching push subscriptions:', error)
+    logError('Error fetching push subscriptions:', error)
     return NextResponse.json({ error: 'Failed to fetch subscriptions' }, { status: 500 })
   }
 }
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
       })
     }
   } catch (error) {
-    console.error('Error saving push subscription:', error)
+    logError('Error saving push subscription:', error)
     return NextResponse.json({ error: 'Failed to save subscription' }, { status: 500 })
   }
 }
@@ -156,7 +157,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Subscription deactivated'
     })
   } catch (error) {
-    console.error('Error deleting push subscription:', error)
+    logError('Error deleting push subscription:', error)
     return NextResponse.json({ error: 'Failed to delete subscription' }, { status: 500 })
   }
 }

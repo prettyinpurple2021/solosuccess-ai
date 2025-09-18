@@ -5,6 +5,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { NextRequest } from 'next/server';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -44,7 +45,7 @@ export function log({
   };
 
   // Log to console
-  console.log(JSON.stringify(logEntry));
+  logInfo(`JSON.stringify(logEntry`));
   
   // For errors, also log to Sentry if available
   if (level === 'error' && error instanceof Error) {
@@ -61,7 +62,7 @@ export function log({
       });
     } catch (sentryError) {
       // Fail silently if Sentry isn't configured
-      console.error('Failed to log to Sentry:', sentryError);
+      logError('Failed to log to Sentry:', sentryError);
     }
   }
 }

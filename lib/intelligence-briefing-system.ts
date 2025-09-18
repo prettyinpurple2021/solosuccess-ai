@@ -4,6 +4,7 @@ import { eq, desc, gte, and, sql } from 'drizzle-orm'
 import { generateObject } from 'ai'
 import { openai } from '@/lib/ai-config'
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Briefing types and interfaces
 export type BriefingType = 'daily' | 'weekly' | 'monthly' | 'on-demand'
@@ -386,7 +387,7 @@ export class IntelligenceBriefingService {
       
       return result.object
     } catch (error) {
-      console.error('Error generating briefing content:', error)
+      logError('Error generating briefing content:', error)
       
       // Fallback to basic briefing structure
       return this.createFallbackBriefing(briefingType, data)
@@ -514,7 +515,7 @@ Generate a structured intelligence briefing that helps the user make informed st
   ): Promise<void> {
     // This would integrate with a job scheduler like Bull Queue or similar
     // For now, we'll store the configuration for manual triggering
-    console.log(`Scheduled ${frequency} briefing for user ${userId}`)
+    logInfo(`Scheduled ${frequency} briefing for user ${userId}`)
   }
   
   /**
@@ -542,7 +543,7 @@ Generate a structured intelligence briefing that helps the user make informed st
     }
   ): Promise<void> {
     // This would update user preferences in the database
-    console.log(`Updated briefing preferences for user ${userId}`)
+    logInfo(`Updated briefing preferences for user ${userId}`)
   }
 }
 

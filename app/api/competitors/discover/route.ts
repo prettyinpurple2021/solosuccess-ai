@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -235,7 +236,7 @@ export async function POST(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error discovering competitors:', error)
+    logError('Error discovering competitors:', error)
     return NextResponse.json(
       { error: 'Failed to discover competitors' },
       { status: 500 }

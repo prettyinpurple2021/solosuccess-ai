@@ -1,5 +1,6 @@
 import { generateText } from 'ai'
 import { openai } from '@ai-sdk/openai'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface TaskIntelligenceData {
   id: string
@@ -110,7 +111,7 @@ export class TaskIntelligenceEngine {
         productivityTips
       }
     } catch (error) {
-      console.error('Error optimizing task list:', error)
+      logError('Error optimizing task list:', error)
       throw new Error('Failed to optimize task list')
     }
   }
@@ -134,7 +135,7 @@ export class TaskIntelligenceEngine {
 
       return this.parseTaskSuggestion(result.text, task.id)
     } catch (error) {
-      console.error('Error generating task suggestion:', error)
+      logError('Error generating task suggestion:', error)
       return this.createDefaultSuggestion(task)
     }
   }
@@ -354,7 +355,7 @@ Provide specific, actionable tips that would help improve productivity and task 
 
       return result.text.split('\n').filter(line => line.trim().length > 0).slice(0, 5)
     } catch (error) {
-      console.error('Error generating productivity tips:', error)
+      logError('Error generating productivity tips:', error)
       return [
         '🎯 Focus on one task at a time for better results',
         '⏰ Use time blocking to structure your day',
@@ -423,7 +424,7 @@ Provide a JSON response with:
         urgency: parsed.urgency || 'medium'
       }
     } catch (error) {
-      console.error('Error parsing task suggestion:', error)
+      logError('Error parsing task suggestion:', error)
       return this.createDefaultSuggestion({ id: taskId } as TaskIntelligenceData)
     }
   }

@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray} from 'drizzle-orm'
 import type { IntelligenceData,
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   IntelligenceFilters,
   SourceType,
   ImportanceLevel,
@@ -251,7 +252,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Error fetching intelligence data:', error)
+    logError('Error fetching intelligence data:', error)
     return NextResponse.json(
       { error: 'Failed to fetch intelligence data' },
       { status: 500 }
@@ -350,7 +351,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Error creating intelligence entry:', error)
+    logError('Error creating intelligence entry:', error)
     return NextResponse.json(
       { error: 'Failed to create intelligence entry' },
       { status: 500 }

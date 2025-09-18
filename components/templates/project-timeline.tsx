@@ -476,7 +476,7 @@ export default function ProjectTimeline({ template: _template, onSave: _onSave, 
                 className="absolute top-0"
                 style={{ left: `${getTaskPosition(milestone.date)}px` }}
               >
-                <div className="w-4 h-4 rotate-45 border-2" style={{ borderColor: milestone.color, backgroundColor: milestone.color }}></div>
+                <div className="w-4 h-4 rotate-45 border-2" style={{ borderColor: milestone.color, backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}></div>
                 <div className="text-xs mt-1 whitespace-nowrap">{milestone.name}</div>
               </div>
             ))}
@@ -1348,7 +1348,7 @@ export default function ProjectTimeline({ template: _template, onSave: _onSave, 
                       <div className="flex items-center gap-3">
                         <div 
                           className="w-4 h-4 rotate-45 border-2" 
-                          style={{ borderColor: milestone.color, backgroundColor: milestone.color }}
+                          style={{ borderColor: milestone.color, backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                         ></div>
                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                           <Input

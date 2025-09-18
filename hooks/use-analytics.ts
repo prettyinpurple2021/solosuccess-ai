@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useAuth } from './use-auth'
 import { AnalyticsEvent } from '@/lib/analytics'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface AnalyticsHook {
   track: (event: AnalyticsEvent, properties?: Record<string, any>) => Promise<void>
@@ -70,10 +71,10 @@ export function useAnalytics(): AnalyticsHook {
       })
 
       if (!response.ok) {
-        console.error('Failed to track analytics event:', response.statusText)
+        logError('Failed to track analytics event:', response.statusText)
       }
     } catch (error) {
-      console.error('Error tracking analytics event:', error)
+      logError('Error tracking analytics event:', error)
     }
   }, [user])
 
@@ -106,10 +107,10 @@ export function useAnalytics(): AnalyticsHook {
       })
 
       if (!response.ok) {
-        console.error('Failed to track performance metrics:', response.statusText)
+        logError('Failed to track performance metrics:', response.statusText)
       }
     } catch (error) {
-      console.error('Error tracking performance metrics:', error)
+      logError('Error tracking performance metrics:', error)
     }
   }, [user])
 

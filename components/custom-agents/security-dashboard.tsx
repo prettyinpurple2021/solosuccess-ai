@@ -7,6 +7,7 @@ import { Badge} from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Shield, Lock, Eye, AlertTriangle, CheckCircle, Clock, Users, Activity, Settings, Key, UserCheck, Ban} from "lucide-react"
 
 interface SecurityMetrics {
@@ -77,7 +78,7 @@ export function SecurityDashboard() {
       }
 
     } catch (error) {
-      console.error('Error loading security data:', error)
+      logError('Error loading security data:', error)
     } finally {
       setLoading(false)
     }

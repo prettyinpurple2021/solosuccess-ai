@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import { Loading} from "@/components/ui/loading"
 import { Progress} from "@/components/ui/progress"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface CompetitorActivity {
   id: string
@@ -103,7 +104,7 @@ export function IntelligenceDashboard({ className }: IntelligenceDashboardProps)
         setThreatMatrix(threatData.competitors || [])
       }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
+      logError('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
     }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -62,7 +63,7 @@ export async function GET(
     })))
 
   } catch (error) {
-    console.error('Get versions error:', error)
+    logError('Get versions error:', error)
     return NextResponse.json({ 
       error: 'Failed to get versions' 
     }, { status: 500 })
@@ -157,7 +158,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Create version error:', error)
+    logError('Create version error:', error)
     return NextResponse.json({ 
       error: 'Failed to create version' 
     }, { status: 500 })

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/neon/server"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface AgentPermission {
   agentId: string
@@ -89,7 +90,7 @@ export class AgentSecurityManager {
       
       return true
     } catch (error) {
-      console.error('Authentication error:', error)
+      logError('Authentication error:', error)
       return false
     }
   }
@@ -129,7 +130,7 @@ export class AgentSecurityManager {
       
       return false
     } catch (error) {
-      console.error('Authorization error:', error)
+      logError('Authorization error:', error)
       return false
     }
   }
@@ -192,7 +193,7 @@ export class AgentSecurityManager {
         new Date()
       ])
     } catch (error) {
-      console.error('Audit logging error:', error)
+      logError('Audit logging error:', error)
     }
   }
 
@@ -229,7 +230,7 @@ export class AgentSecurityManager {
         new Date()
       ])
     } catch (error) {
-      console.error('Permission grant error:', error)
+      logError('Permission grant error:', error)
       throw new Error('Failed to grant permission')
     }
   }
@@ -243,7 +244,7 @@ export class AgentSecurityManager {
         WHERE user_id = $1 AND agent_id = $2
       `, [userId, agentId])
     } catch (error) {
-      console.error('Permission revoke error:', error)
+      logError('Permission revoke error:', error)
       throw new Error('Failed to revoke permission')
     }
   }
@@ -415,7 +416,7 @@ export class AgentSecurityManager {
         rateLimitHits: 0 // This would need to be tracked separately
       }
     } catch (error) {
-      console.error('Error getting security metrics:', error)
+      logError('Error getting security metrics:', error)
       return {
         activeSessions: this.activeSessions.size,
         totalAuditLogs: 0,

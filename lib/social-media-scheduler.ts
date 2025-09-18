@@ -3,6 +3,7 @@ import { competitorProfiles, scrapingJobs, scrapingJobResults } from '@/db/schem
 import { eq, and, lte } from 'drizzle-orm';
 import { socialMediaMonitor } from './social-media-monitor';
 import { v4 as uuidv4 } from 'uuid';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface SocialMediaJobConfig {
   platforms: string[];
@@ -75,7 +76,7 @@ export class SocialMediaScheduler {
       const platformHandle = socialHandles?.[platform];
 
       if (!platformHandle) {
-        console.log(`No ${platform} handle found for competitor ${competitorId}`);
+        logInfo(`No ${platform} handle found for competitor ${competitorId}`);
         return null;
       }
 
@@ -100,11 +101,11 @@ export class SocialMediaScheduler {
         }
       });
 
-      console.log(`Created social media job ${jobId} for ${platform} monitoring of competitor ${competitorId}`);
+      logInfo(`Created social media job ${jobId} for ${platform} monitoring of competitor ${competitorId}`);
       return jobId;
 
     } catch (error) {
-      console.error(`Error creating social media job for platform ${platform}:`, error);
+      logError(`Error creating social media job for platform ${platform}:`, error);
       return null;
     }
   }
@@ -126,14 +127,14 @@ export class SocialMediaScheduler {
           )
         );
 
-      console.log(`Processing ${pendingJobs.length} pending social media jobs`);
+      logInfo(`Processing ${pendingJobs.length} pending social media jobs`);
 
       for (const job of pendingJobs) {
         await this.processJob(job);
       }
 
     } catch (error) {
-      console.error('Error processing pending social media jobs:', error);
+      logError('Error processing pending social media jobs:', error);
     }
   }
 
@@ -156,7 +157,7 @@ export class SocialMediaScheduler {
       const config = job.config as any;
       const platform = config.platform;
 
-      console.log(`Processing social media job ${job.id} for platform ${platform}`);
+      logInfo(`Processing social media job ${job.id} for platform ${platform}`);
 
       // Execute the monitoring based on platform
       let result;
@@ -193,7 +194,7 @@ export class SocialMediaScheduler {
         .where(eq(scrapingJobs.id, job.id));
 
     } catch (err) {
-      console.error(`Error processing social media job ${job.id}:`, err);
+      logError(`Error processing social media job ${job.id}:`, err);
       success = false;
       error = err instanceof Error ? err.message : 'Unknown error';
 
@@ -294,7 +295,7 @@ export class SocialMediaScheduler {
       }
 
     } catch (error) {
-      console.error('Error updating social media monitoring config:', error);
+      logError('Error updating social media monitoring config:', error);
       throw error;
     }
   }
@@ -427,9 +428,9 @@ export class SocialMediaScheduler {
         .delete(scrapingJobResults)
         .where(lte(scrapingJobResults.completed_at, cutoffDate));
 
-      console.log(`Cleaned up old social media job results older than ${daysToKeep} days`);
+      logInfo(`Cleaned up old social media job results older than ${daysToKeep} days`);
     } catch (error) {
-      console.error('Error cleaning up old job results:', error);
+      logError('Error cleaning up old job results:', error);
     }
   }
 

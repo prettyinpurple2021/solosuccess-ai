@@ -11,6 +11,7 @@ import { motion, AnimatePresence} from "framer-motion"
 import { 
   Download, Share2, Bookmark, ArrowLeft, Sparkles, Crown, Save, RefreshCw} from "lucide-react"
 import Link from "next/link"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface TemplateData {
   title: string
@@ -56,7 +57,7 @@ export default function BaseTemplate({
       await onSave(data)
       setLastSaved(new Date())
     } catch (error) {
-      console.error('Failed to save template data:', error)
+      logError('Failed to save template data:', error)
     } finally {
       setIsSaving(false)
     }

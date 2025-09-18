@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Avatar {
   id: string
@@ -34,7 +35,7 @@ export const useAvatar = () => {
       setAvatar(result.avatar)
 
     } catch (error) {
-      console.error('Fetch avatar error:', error)
+      logError('Fetch avatar error:', error)
       setError(error instanceof Error ? error.message : 'Failed to fetch avatar')
     } finally {
       setLoading(false)

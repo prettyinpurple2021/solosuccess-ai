@@ -1,4 +1,5 @@
 import { notificationJobQueue } from './notification-job-queue'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Job processor configuration
 const PROCESSOR_CONFIG = {
@@ -17,7 +18,7 @@ let processorStarted = false
  */
 export async function initializeNotificationProcessor(): Promise<void> {
   if (processorStarted) {
-    console.log('Notification processor already started')
+    logInfo('Notification processor already started')
     return
   }
 
@@ -31,15 +32,15 @@ export async function initializeNotificationProcessor(): Promise<void> {
     processorStarted = true
     
     if (PROCESSOR_CONFIG.enableLogging) {
-      console.log('✅ Notification job processor initialized and started')
-      console.log(`   - Interval: ${PROCESSOR_CONFIG.intervalMs / 1000}s`)
-      console.log(`   - Environment: ${process.env.NODE_ENV}`)
+      logInfo('✅ Notification job processor initialized and started')
+      logInfo(`   - Interval: ${PROCESSOR_CONFIG.intervalMs / 1000}s`)
+      logInfo(`   - Environment: ${process.env.NODE_ENV}`)
       
       // Log initial stats
       const stats = await notificationJobQueue.getStats()
-      console.log(`   - Pending jobs: ${stats.pending}`)
-      console.log(`   - Processing jobs: ${stats.processing}`)
-      console.log(`   - Total jobs: ${stats.total}`)
+      logInfo(`   - Pending jobs: ${stats.pending}`)
+      logInfo(`   - Processing jobs: ${stats.processing}`)
+      logInfo(`   - Total jobs: ${stats.total}`)
     }
 
     // Set up cleanup job (runs once per day)
@@ -48,16 +49,16 @@ export async function initializeNotificationProcessor(): Promise<void> {
         try {
           const deletedCount = await notificationJobQueue.cleanup(30)
           if (deletedCount > 0 && PROCESSOR_CONFIG.enableLogging) {
-            console.log(`🧹 Cleaned up ${deletedCount} old notification jobs`)
+            logInfo(`🧹 Cleaned up ${deletedCount} old notification jobs`)
           }
         } catch (error) {
-          console.error('Error during job cleanup:', error)
+          logError('Error during job cleanup:', error)
         }
       }, 24 * 60 * 60 * 1000) // 24 hours
     }
 
   } catch (error) {
-    console.error('❌ Failed to initialize notification processor:', error)
+    logError('❌ Failed to initialize notification processor:', error)
     throw error
   }
 }
@@ -68,7 +69,7 @@ export async function initializeNotificationProcessor(): Promise<void> {
 export function stopNotificationProcessor(): void {
   notificationJobQueue.stopProcessor()
   processorStarted = false
-  console.log('🛑 Notification job processor stopped')
+  logInfo('🛑 Notification job processor stopped')
 }
 
 /**
@@ -86,7 +87,7 @@ if (PROCESSOR_CONFIG.autoStart && typeof window === 'undefined') {
   // Only run on server-side with a small delay
   setTimeout(() => {
     initializeNotificationProcessor().catch(error => {
-      console.error('Failed to auto-start notification processor:', error)
+      logError('Failed to auto-start notification processor:', error)
     })
   }, 1000) // 1 second delay
 }

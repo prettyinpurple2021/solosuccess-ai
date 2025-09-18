@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AlertSeverity, AlertType } from '@/lib/competitor-alert-system';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface CompetitorAlert {
   id: number;
@@ -79,7 +80,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
       setStats(data.stats || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch alerts');
-      console.error('Error fetching alerts:', err);
+      logError('Error fetching alerts:', err);
     } finally {
       setLoading(false);
     }
@@ -115,7 +116,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to mark alert as read');
-      console.error('Error marking alert as read:', err);
+      logError('Error marking alert as read:', err);
     }
   }, [stats]);
 
@@ -152,7 +153,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to archive alert');
-      console.error('Error archiving alert:', err);
+      logError('Error archiving alert:', err);
     }
   }, [alerts, stats]);
 
@@ -180,7 +181,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
       return data.result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process intelligence');
-      console.error('Error processing intelligence:', err);
+      logError('Error processing intelligence:', err);
       throw err;
     }
   }, [fetchAlerts]);
@@ -230,7 +231,7 @@ export function useCompetitorSpecificAlerts(competitorId: number, limit: number 
       setAlerts(data.alerts || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch competitor alerts');
-      console.error('Error fetching competitor alerts:', err);
+      logError('Error fetching competitor alerts:', err);
     } finally {
       setLoading(false);
     }

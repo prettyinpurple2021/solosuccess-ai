@@ -3,6 +3,7 @@ import { verifyToken} from '@/lib/auth-utils'
 import { db} from '@/db'
 import { users} from '@/db/schema'
 import { eq} from 'drizzle-orm'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error updating profile:', error)
+    logError('Error updating profile:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

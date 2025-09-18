@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveDecisionFrameworks} from '@/lib/competitive-decision-frameworks'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       generated_at: new Date().toISOString()
     })
   } catch (error) {
-    console.error('Error generating competitive decision framework:', error)
+    logError('Error generating competitive decision framework:', error)
     return NextResponse.json(
       { error: 'Failed to generate competitive decision framework' },
       { status: 500 }
@@ -157,7 +158,7 @@ export async function GET(_request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error fetching competitive frameworks:', error)
+    logError('Error fetching competitive frameworks:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitive frameworks' },
       { status: 500 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { GoogleGenerativeAI} from '@google/generative-ai'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Suggestion type definition
 type Suggestion = {
@@ -152,11 +153,11 @@ Focus on practical, specific suggestions that will help them find their document
           suggestions.push(...aiSuggestions)
         }
       } catch (parseError) {
-        console.error('Failed to parse AI suggestions:', parseError)
+        logError('Failed to parse AI suggestions:', parseError)
         // Fallback to basic suggestions if AI parsing fails
       }
     } catch (aiError) {
-      console.error('AI suggestion generation failed:', aiError)
+      logError('AI suggestion generation failed:', aiError)
       // Continue with basic suggestions
     }
 
@@ -177,7 +178,7 @@ Focus on practical, specific suggestions that will help them find their document
     })
 
   } catch (error) {
-    console.error('Search suggestions error:', error)
+    logError('Search suggestions error:', error)
     return NextResponse.json({ 
       error: 'Failed to generate suggestions' 
     }, { status: 500 })

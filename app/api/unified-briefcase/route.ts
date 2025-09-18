@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { unifiedBriefcase } from '@/lib/unified-briefcase'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // JWT authentication helper
 async function authenticateJWTRequest(request: NextRequest) {
@@ -22,7 +23,7 @@ async function authenticateJWTRequest(request: NextRequest) {
       error: null 
     }
   } catch (error) {
-    console.error('JWT authentication error:', error)
+    logError('JWT authentication error:', error)
     return { user: null, error: 'Invalid token' }
   }
 }
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Get briefcase items error:', error)
+    logError('Get briefcase items error:', error)
     
     return NextResponse.json(
       { error: 'Failed to fetch briefcase items' },
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Save briefcase item error:', error)
+    logError('Save briefcase item error:', error)
     
     const errorMessage = error instanceof Error ? error.message : 'Save failed'
     
@@ -208,7 +209,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Delete briefcase item error:', error)
+    logError('Delete briefcase item error:', error)
     
     return NextResponse.json(
       { error: 'Failed to delete item' },

@@ -13,6 +13,7 @@ import { useCompetitorAlerts, CompetitorAlert, AlertStats} from '@/hooks/use-com
 import { AlertSeverity, AlertType} from '@/lib/competitor-alert-system';
 import { cn} from '@/lib/utils';
 import { formatDistanceToNow} from 'date-fns';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface AlertDashboardProps {
   className?: string;
@@ -84,7 +85,7 @@ export function AlertDashboard({ className }: AlertDashboardProps) {
     try {
       await markAsRead(alertId);
     } catch (error) {
-      console.error('Failed to mark alert as read:', error);
+      logError('Failed to mark alert as read:', error);
     }
   };
 
@@ -92,7 +93,7 @@ export function AlertDashboard({ className }: AlertDashboardProps) {
     try {
       await archiveAlert(alertId);
     } catch (error) {
-      console.error('Failed to archive alert:', error);
+      logError('Failed to archive alert:', error);
     }
   };
 

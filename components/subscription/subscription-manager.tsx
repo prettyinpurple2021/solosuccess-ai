@@ -7,6 +7,7 @@ import { Badge} from '@/components/ui/badge'
 import { useAuth} from '@/hooks/use-auth'
 import { Loader2, CreditCard, Calendar, AlertCircle, CheckCircle} from 'lucide-react'
 import { toast} from '@/hooks/use-toast'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface SubscriptionData {
   subscription_tier: string
@@ -38,7 +39,7 @@ export function SubscriptionManager() {
         setSubscription(data.subscription)
       }
     } catch (error) {
-      console.error('Error fetching subscription:', error)
+      logError('Error fetching subscription:', error)
       toast({
         title: "Error",
         description: "Failed to fetch subscription details",
@@ -67,7 +68,7 @@ export function SubscriptionManager() {
         throw new Error(data.error || 'Failed to create checkout session')
       }
     } catch (error) {
-      console.error('Error creating checkout session:', error)
+      logError('Error creating checkout session:', error)
       toast({
         title: "Error",
         description: "Failed to start upgrade process",
@@ -95,7 +96,7 @@ export function SubscriptionManager() {
         throw new Error(data.error || 'Failed to open billing portal')
       }
     } catch (error) {
-      console.error('Error opening billing portal:', error)
+      logError('Error opening billing portal:', error)
       toast({
         title: "Error",
         description: "Failed to open billing portal",
@@ -131,7 +132,7 @@ export function SubscriptionManager() {
         throw new Error(data.error || 'Failed to cancel subscription')
       }
     } catch (error) {
-      console.error('Error canceling subscription:', error)
+      logError('Error canceling subscription:', error)
       toast({
         title: "Error",
         description: "Failed to cancel subscription",
@@ -163,7 +164,7 @@ export function SubscriptionManager() {
         throw new Error(data.error || 'Failed to reactivate subscription')
       }
     } catch (error) {
-      console.error('Error reactivating subscription:', error)
+      logError('Error reactivating subscription:', error)
       toast({
         title: "Error",
         description: "Failed to reactivate subscription",

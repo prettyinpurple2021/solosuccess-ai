@@ -10,6 +10,7 @@ import { MessageRouter } from '@/lib/message-router'
 import { SessionManager } from '@/lib/session-manager'
 import { ContextManager } from '@/lib/context-manager'
 import { verifyAuth } from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize collaboration system components
 const collaborationHub = new CollaborationHub()
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating collaboration session:', error)
+    logError('Error creating collaboration session:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({
@@ -203,7 +204,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error retrieving collaboration sessions:', error)
+    logError('Error retrieving collaboration sessions:', error)
 
     return NextResponse.json({
       error: 'Internal Server Error',

@@ -1,4 +1,5 @@
 import { Resend } from "resend"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 if (!process.env.RESEND_API_KEY) {
   throw new Error("RESEND_API_KEY is not set")
@@ -52,13 +53,13 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
     })
 
     if (error) {
-      console.error("Error sending welcome email:", error)
+      logError("Error sending welcome email:", error)
       return { success: false, error }
     }
 
     return { success: true, data }
   } catch (error) {
-    console.error("Error sending welcome email:", error)
+    logError("Error sending welcome email:", error)
     return { success: false, error }
   }
 }
@@ -112,13 +113,13 @@ export const sendSubscriptionConfirmation = async (email: string, name: string, 
     })
 
     if (error) {
-      console.error("Error sending subscription confirmation:", error)
+      logError("Error sending subscription confirmation:", error)
       return { success: false, error }
     }
 
     return { success: true, data }
   } catch (error) {
-    console.error("Error sending subscription confirmation:", error)
+    logError("Error sending subscription confirmation:", error)
     return { success: false, error }
   }
 }

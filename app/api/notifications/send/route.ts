@@ -5,6 +5,7 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
 import webpush from 'web-push'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -27,14 +28,14 @@ function ensureVapidConfigured(): boolean {
         privateVapidKey
       )
       vapidConfigured = true
-      console.log('✅ VAPID keys configured successfully')
+      logInfo('✅ VAPID keys configured successfully')
       return true
     } catch (error) {
-      console.warn('⚠️ VAPID configuration failed:', error instanceof Error ? error.message : 'Unknown error')
+      logWarn('⚠️ VAPID configuration failed:', error instanceof Error ? error.message : 'Unknown error')
       return false
     }
   } else {
-    console.warn('⚠️ VAPID keys not configured - push notifications disabled')
+    logWarn('⚠️ VAPID keys not configured - push notifications disabled')
     return false
   }
 }
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     
     if (isSystemJob) {
       // System jobs bypass user authentication
-      console.log(`Processing system job: ${jobId}`)
+      logInfo(`Processing system job: ${jobId}`)
     } else {
       // Regular API calls require authentication
       const authResult = await authenticateRequest()
@@ -267,7 +268,7 @@ export async function POST(request: NextRequest) {
         })
 
       } catch (error: any) {
-        console.error(`Failed to send notification to user ${subscription.user_id}:`, error)
+        logError(`Failed to send notification to user ${subscription.user_id}:`, error)
         
         // If subscription is invalid, mark it as inactive
         if (error.statusCode === 410 || error.statusCode === 404) {
@@ -333,7 +334,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error sending push notifications:', error)
+    logError('Error sending push notifications:', error)
     return NextResponse.json(
       { error: 'Failed to send push notifications' },
       { status: 500 }
@@ -420,7 +421,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error processing batch notifications:', error)
+    logError('Error processing batch notifications:', error)
     return NextResponse.json(
       { error: 'Failed to process batch notifications' },
       { status: 500 }

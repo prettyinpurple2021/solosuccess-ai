@@ -29,6 +29,7 @@ import {
   Target
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types
 interface Agent {
@@ -534,7 +535,7 @@ const AgentInterface: React.FC = () => {
           setAgents(data.data?.agents || [])
         }
       } catch (error) {
-        console.error('Error fetching agents:', error)
+        logError('Error fetching agents:', error)
       } finally {
         setLoading(false)
       }

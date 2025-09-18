@@ -4,6 +4,7 @@ import { rateLimitByIp} from '@/lib/rate-limit';
 import { notificationDelivery} from '@/lib/notification-delivery-system';
 import { CompetitorAlert} from '@/hooks/use-competitor-alerts';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const testNotificationSchema = z.object({
   channel_type: z.enum(['email', 'push', 'slack', 'discord', 'webhook']),
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error sending test notification:', error);
+    logError('Error sending test notification:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

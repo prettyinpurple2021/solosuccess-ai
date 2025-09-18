@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server';
 import { rateLimitByIp} from '@/lib/rate-limit';
 import { alertSystem} from '@/lib/competitor-alert-system';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const updateAlertSchema = z.object({
   action: z.enum(['mark_read', 'archive']),
@@ -60,7 +61,7 @@ export async function PATCH(
     });
 
   } catch (error) {
-    console.error('Error updating alert:', error);
+    logError('Error updating alert:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -111,7 +112,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching alert details:', error);
+    logError('Error fetching alert details:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

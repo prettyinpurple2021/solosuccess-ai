@@ -19,6 +19,7 @@ import { Switch} from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Loading} from "@/components/ui/loading"
 import {
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 
 interface CompetitorFormData {
@@ -198,7 +199,7 @@ export default function EditCompetitorPage() {
       
       setFormData(mockData)
     } catch (error) {
-      console.error('Error fetching competitor data:', error)
+      logError('Error fetching competitor data:', error)
     } finally {
       setLoading(false)
     }
@@ -375,7 +376,7 @@ export default function EditCompetitorPage() {
       setHasChanges(false)
       router.push(`/dashboard/competitors/${competitorId}`)
     } catch (error) {
-      console.error('Error saving competitor:', error)
+      logError('Error saving competitor:', error)
     } finally {
       setSaving(false)
     }
@@ -395,7 +396,7 @@ export default function EditCompetitorPage() {
       
       router.push('/dashboard/competitors')
     } catch (error) {
-      console.error('Error deleting competitor:', error)
+      logError('Error deleting competitor:', error)
     } finally {
       setDeleting(false)
     }

@@ -16,6 +16,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import { Badge} from "@/components/ui/badge"
 import { Switch} from "@/components/ui/switch"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface CompetitorFormData {
   name: string
@@ -118,7 +119,7 @@ export default function AddCompetitorPage() {
       
       router.push('/dashboard/competitors')
     } catch (error) {
-      console.error('Error creating competitor:', error)
+      logError('Error creating competitor:', error)
     } finally {
       setLoading(false)
     }

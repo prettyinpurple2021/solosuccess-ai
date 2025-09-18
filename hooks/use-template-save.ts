@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useToast } from './use-toast';
 import type { SavedTemplate } from '@/lib/types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface TemplateData {
   [key: string]: unknown;
@@ -49,7 +50,7 @@ export function useTemplateSave() {
 
       return true;
     } catch (error) {
-      console.error('Error saving template:', error);
+      logError('Error saving template:', error);
       toast({
         title: "Save Failed",
         description: error instanceof Error ? error.message : "Failed to save template",
@@ -75,7 +76,7 @@ export function useTemplateSave() {
       const result = await response.json();
       return result.templates || [];
     } catch (error) {
-      console.error('Error loading templates:', error);
+      logError('Error loading templates:', error);
       toast({
         title: "Load Failed",
         description: error instanceof Error ? error.message : "Failed to load saved templates",

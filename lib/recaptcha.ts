@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 // reCAPTCHA configuration
 export const RECAPTCHA_CONFIG = {
   siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
@@ -24,7 +25,7 @@ export async function createAssessment(
 ): Promise<number | null> {
   try {
     if (!RECAPTCHA_CONFIG.secretKey) {
-      console.warn('reCAPTCHA secret key not configured, skipping validation')
+      logWarn('reCAPTCHA secret key not configured, skipping validation')
       return 0.9 // Return high score if not configured
     }
 
@@ -42,16 +43,16 @@ export async function createAssessment(
     const data = await response.json()
 
     if (!data.success) {
-      console.error(`reCAPTCHA validation failed: ${data['error-codes']?.join(', ')}`)
+      logError(`reCAPTCHA validation failed: ${data['error-codes']?.join(', ')}`)
       return null
     }
 
     const score = data.score || 0
-    console.log(`reCAPTCHA score for action '${action}': ${score}`)
+    logInfo(`reCAPTCHA score for action '${action}': ${score}`)
 
     return score
   } catch (error) {
-    console.error('Error verifying reCAPTCHA token:', error)
+    logError('Error verifying reCAPTCHA token:', error)
     return null
   }
 }

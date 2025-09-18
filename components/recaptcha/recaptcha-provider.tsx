@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import Script from 'next/script'
 import { useToast} from '@/hooks/use-toast'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''
 
@@ -37,12 +38,12 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
 
   const executeRecaptcha = async (action: string): Promise<string | null> => {
     if (!RECAPTCHA_SITE_KEY) {
-      console.warn('reCAPTCHA site key not configured, skipping validation')
+      logWarn('reCAPTCHA site key not configured, skipping validation')
       return null
     }
     
     if (!isReady || !window.grecaptcha?.enterprise) {
-      console.error('reCAPTCHA is not ready')
+      logError('reCAPTCHA is not ready')
       toast({
         title: "reCAPTCHA Error",
         description: "reCAPTCHA is not ready. Please try again.",
@@ -59,10 +60,10 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
               action: action
             })
             
-            console.log(`reCAPTCHA token generated for action: ${action}`)
+            logInfo(`reCAPTCHA token generated for action: ${action}`)
             resolve(token)
           } catch (error) {
-            console.error('reCAPTCHA execution error:', error)
+            logError('reCAPTCHA execution error:', error)
             toast({
               title: "reCAPTCHA Error",
               description: "Failed to verify. Please try again.",
@@ -73,7 +74,7 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
         })
       })
     } catch (error) {
-      console.error('reCAPTCHA execution error:', error)
+      logError('reCAPTCHA execution error:', error)
       toast({
         title: "reCAPTCHA Error",
         description: "Failed to verify. Please try again.",
@@ -90,17 +91,17 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   }
 
   const handleScriptLoad = () => {
-    console.log('reCAPTCHA script loaded successfully')
-    console.log('reCAPTCHA site key:', RECAPTCHA_SITE_KEY)
+    logInfo('reCAPTCHA script loaded successfully')
+    logInfo('reCAPTCHA site key:', RECAPTCHA_SITE_KEY)
     setIsLoading(false)
     
     if (window.grecaptcha?.enterprise) {
       window.grecaptcha.enterprise.ready(() => {
         setIsReady(true)
-        console.log('reCAPTCHA is ready')
+        logInfo('reCAPTCHA is ready')
       })
     } else {
-      console.error('reCAPTCHA enterprise not available after script load')
+      logError('reCAPTCHA enterprise not available after script load')
       toast({
         title: "reCAPTCHA Error",
         description: "Security verification failed to initialize. Please refresh the page.",
@@ -110,8 +111,8 @@ export function RecaptchaProvider({ children }: RecaptchaProviderProps) {
   }
 
   const handleScriptError = () => {
-    console.error('Failed to load reCAPTCHA script')
-    console.error('reCAPTCHA site key:', RECAPTCHA_SITE_KEY)
+    logError('Failed to load reCAPTCHA script')
+    logError('reCAPTCHA site key:', RECAPTCHA_SITE_KEY)
     setIsLoading(false)
     toast({
       title: "reCAPTCHA Error",

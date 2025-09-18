@@ -5,6 +5,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, sql} from 'drizzle-orm'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
       suggestedTags: suggestedTags.map(tag => ({ tag, usageCount: 0 })),
     })
   } catch (error) {
-    console.error('Error fetching tags:', error)
+    logError('Error fetching tags:', error)
     return NextResponse.json(
       { error: 'Failed to fetch tags' },
       { status: 500 }
@@ -175,7 +176,7 @@ export async function POST(request: NextRequest) {
       affectedEntries: intelligenceIds.length,
     })
   } catch (error) {
-    console.error('Error managing tags:', error)
+    logError('Error managing tags:', error)
     return NextResponse.json(
       { error: 'Failed to manage tags' },
       { status: 500 }

@@ -10,6 +10,7 @@ import { Alert, AlertDescription} from '@/components/ui/alert'
 import { useToast} from '@/hooks/use-toast'
 import { motion as _motion, AnimatePresence as _AnimatePresence} from 'framer-motion'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Brain, FileText, Hash, TrendingUp, Minus, Lightbulb, Target, CheckCircle, Sparkles, Tag, Users, RefreshCw, ArrowRight, BookOpen, ThumbsUp, ThumbsDown, Smile, Frown, Meh} from 'lucide-react'
 
 interface BriefcaseFile {
@@ -155,7 +156,7 @@ export default function AIInsightsPanel({ file, onClose, className = "" }: AIIns
       })
 
     } catch (error) {
-      console.error('Failed to generate insights:', error)
+      logError('Failed to generate insights:', error)
       toast({
         title: "Error",
         description: "Failed to analyze document with AI",

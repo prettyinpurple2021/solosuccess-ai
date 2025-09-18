@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { createClient} from '@/lib/neon/server'
 import bcrypt from 'bcryptjs'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -83,7 +84,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Get shared file error:', error)
+    logError('Get shared file error:', error)
     return NextResponse.json({ 
       error: 'Failed to access shared file' 
     }, { status: 500 })
@@ -162,7 +163,7 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('Shared file action error:', error)
+    logError('Shared file action error:', error)
     return NextResponse.json({ 
       error: 'Failed to process request' 
     }, { status: 500 })

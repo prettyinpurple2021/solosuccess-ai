@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from "next/server"
 import { AgentCollaborationSystem} from "@/lib/custom-ai-agents/agent-collaboration-system"
 import { SecurityMiddleware} from "@/lib/custom-ai-agents/security/security-middleware"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Store collaboration systems per user (in production, use Redis or database)
 const userCollaborationSystems = new Map<string, AgentCollaborationSystem>()
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Error in custom agents API:", error)
+    logError("Error in custom agents API:", error)
     return NextResponse.json(
       { error: "Failed to process request with custom agents" },
       { status: 500 }
@@ -176,7 +177,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error("Error in custom agents GET API:", error)
+    logError("Error in custom agents GET API:", error)
     return NextResponse.json(
       { error: "Failed to retrieve custom agents data" },
       { status: 500 }

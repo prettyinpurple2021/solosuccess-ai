@@ -1,5 +1,6 @@
 import { query } from '@/lib/neon/client'
 import { put, del } from '@vercel/blob'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface UserBriefcase {
   id: string
@@ -94,7 +95,7 @@ export class UnifiedBriefcaseManager {
     await query(`CREATE INDEX IF NOT EXISTS idx_briefcase_items_type ON briefcase_items(type)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_briefcase_items_tags ON briefcase_items USING GIN(tags)`)
 
-    console.log('Unified briefcase system initialized')
+    logInfo('Unified briefcase system initialized')
   }
 
   /**
@@ -496,7 +497,7 @@ export class UnifiedBriefcaseManager {
         try {
           await del(item.blob_url)
         } catch (error) {
-          console.warn('Failed to delete blob:', error)
+          logWarn('Failed to delete blob:', error)
         }
       }
     }
@@ -525,7 +526,7 @@ export class UnifiedBriefcaseManager {
       try {
         await del(result.rows[0].blob_url)
       } catch (error) {
-        console.warn('Failed to delete blob:', error)
+        logWarn('Failed to delete blob:', error)
       }
     }
 

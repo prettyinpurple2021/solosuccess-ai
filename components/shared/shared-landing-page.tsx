@@ -15,6 +15,7 @@ import {
 import Link from "next/link"
 import { ScheduleDemoModal} from "@/components/schedule/schedule-demo-modal"
 import FaqSection from "@/components/faq/faq-section"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface SharedLandingPageProps {
   showAuthModal?: boolean
@@ -163,11 +164,11 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 height={40} 
                 className="rounded-lg"
                 onError={(e) => {
-                  console.error('Logo image failed to load:', e.currentTarget.src);
+                  logError('Logo image failed to load:', e.currentTarget.src);
                   e.currentTarget.src = "/images/logo.png";
                 }}
                 onLoad={() => {
-                  console.log('Logo image loaded successfully');
+                  logInfo('Logo image loaded successfully');
                 }}
               />
               <span className="text-responsive-xl lg:text-responsive-2xl font-bold bg-gradient-to-r from-purple-600 via-teal-500 to-pink-600 bg-clip-text text-transparent">

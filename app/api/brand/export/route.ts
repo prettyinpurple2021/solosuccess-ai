@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
       downloadUrl: dataUrl
     }, { status: 200 })
   } catch (error) {
-    console.error('Error exporting brand kit:', error)
+    logError('Error exporting brand kit:', error)
     return NextResponse.json(
       { error: 'Failed to export brand kit' },
       { status: 500 }

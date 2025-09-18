@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { v4 as uuidv4} from 'uuid'
 import bcrypt from 'bcryptjs'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -54,7 +55,7 @@ export async function GET(
     })))
 
   } catch (error) {
-    console.error('Get share links error:', error)
+    logError('Get share links error:', error)
     return NextResponse.json({ 
       error: 'Failed to get share links' 
     }, { status: 500 })
@@ -161,7 +162,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Create share link error:', error)
+    logError('Create share link error:', error)
     return NextResponse.json({ 
       error: 'Failed to create share link' 
     }, { status: 500 })

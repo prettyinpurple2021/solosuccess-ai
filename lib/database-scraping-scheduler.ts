@@ -2,6 +2,7 @@ import { eq, and, lte, desc, asc, sql, inArray, isNull, or } from 'drizzle-orm'
 import { db } from '@/db'
 import { scrapingJobs, scrapingJobResults, competitorProfiles, intelligenceData } from '@/db/schema'
 import { v4 as uuidv4 } from 'uuid'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export type JobType = 'website' | 'pricing' | 'products' | 'jobs' | 'social'
 export type JobPriority = 'low' | 'medium' | 'high' | 'critical'
@@ -278,7 +279,7 @@ export class ScrapingScheduler {
       })
 
     } catch (error) {
-      console.error(`Error executing job ${jobId}:`, error)
+      logError(`Error executing job ${jobId}:`, error)
       
       await this.recordJobResult(jobId, {
         success: false,
@@ -399,7 +400,7 @@ export class ScrapingScheduler {
    * Start the scheduler (process pending jobs)
    */
   async start(): Promise<void> {
-    console.log('Starting scraping scheduler...')
+    logInfo('Starting scraping scheduler...')
     
     // Load and schedule existing jobs
     const pendingJobs = await db
@@ -411,14 +412,14 @@ export class ScrapingScheduler {
       this.scheduleJob(job.id, job.next_run_at)
     }
 
-    console.log(`Scheduled ${pendingJobs.length} existing jobs`)
+    logInfo(`Scheduled ${pendingJobs.length} existing jobs`)
   }
 
   /**
    * Stop the scheduler
    */
   stop(): void {
-    console.log('Stopping scraping scheduler...')
+    logInfo('Stopping scraping scheduler...')
     
     // Clear all timeouts
     for (const timeout of this.jobQueue.values()) {
@@ -426,7 +427,7 @@ export class ScrapingScheduler {
     }
     
     this.jobQueue.clear()
-    console.log('Scraping scheduler stopped')
+    logInfo('Scraping scheduler stopped')
   }
 
   /**

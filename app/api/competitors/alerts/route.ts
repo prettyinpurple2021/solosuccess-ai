@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server';
 import { rateLimitByIp} from '@/lib/rate-limit';
 import { alertSystem} from '@/lib/competitor-alert-system';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const getAlertsSchema = z.object({
   limit: z.string().optional().transform(val => val ? parseInt(val) : 50),
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching alerts:', error);
+    logError('Error fetching alerts:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error processing intelligence for alerts:', error);
+    logError('Error processing intelligence for alerts:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

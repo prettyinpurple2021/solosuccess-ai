@@ -6,6 +6,7 @@ import { Card, CardContent} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
 import { Badge} from "@/components/ui/badge"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Sparkles, Target, Users, Brain, FileText, TrendingUp, Zap, Crown, CheckCircle, ArrowRight, ArrowLeft, Lightbulb, Star, Gift, Play, Pause, Volume2, VolumeX, X, SkipForward} from "lucide-react"
 
 interface ProgressiveOnboardingProps {
@@ -65,7 +66,7 @@ export function ProgressiveOnboarding({ open, onComplete, onSkip, userData }: Pr
         label: "Create Goal",
         onClick: () => {
           // This would trigger the goal creation modal
-          console.log("Creating first goal...")
+          logInfo("Creating first goal...")
         }
       },
       estimatedTime: 60,
@@ -85,7 +86,7 @@ export function ProgressiveOnboarding({ open, onComplete, onSkip, userData }: Pr
         label: "Add Task",
         onClick: () => {
           // This would trigger the task creation modal
-          console.log("Creating first task...")
+          logInfo("Creating first task...")
         }
       },
       estimatedTime: 45,
@@ -105,7 +106,7 @@ export function ProgressiveOnboarding({ open, onComplete, onSkip, userData }: Pr
         label: "Start Chat",
         onClick: () => {
           // This would open the AI chat interface
-          console.log("Starting AI chat...")
+          logInfo("Starting AI chat...")
         }
       },
       estimatedTime: 90,
@@ -138,7 +139,7 @@ export function ProgressiveOnboarding({ open, onComplete, onSkip, userData }: Pr
         label: "Upload File",
         onClick: () => {
           // This would trigger the file upload modal
-          console.log("Uploading file...")
+          logInfo("Uploading file...")
         }
       },
       estimatedTime: 60,

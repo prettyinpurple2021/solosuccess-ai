@@ -3,6 +3,7 @@ import { query } from '@/lib/neon/client'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     if (parseInt(userSubscriptionsCount.rows[0].count) === 1) {
       // This might be their first subscription - log the milestone
-      console.log(`User ${user.id} subscribed to push notifications for the first time`)
+      logInfo(`User ${user.id} subscribed to push notifications for the first time`)
     }
 
     return NextResponse.json({
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error subscribing to push notifications:', error)
+    logError('Error subscribing to push notifications:', error)
     
     // Type-safe error handling
     if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {

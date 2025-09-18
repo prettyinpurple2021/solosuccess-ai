@@ -7,6 +7,7 @@ import { eq, and, gte, desc} from 'drizzle-orm'
 import { blazeGrowthIntelligence} from '@/lib/blaze-growth-intelligence'
 import { z} from 'zod'
 import type { SourceType, ImportanceLevel, ExtractedData, AnalysisResult } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -159,7 +160,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error in growth analysis:', error)
+    logError('Error in growth analysis:', error)
     return NextResponse.json(
       { error: 'Failed to analyze competitor growth strategy' },
       { status: 500 }
@@ -309,7 +310,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Error in comprehensive growth analysis:', error)
+    logError('Error in comprehensive growth analysis:', error)
     return NextResponse.json(
       { error: 'Failed to perform comprehensive growth analysis' },
       { status: 500 }

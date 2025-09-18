@@ -3,6 +3,7 @@ import { getScrapingSystemHealth} from '@/lib/scraping-startup'
 import { queueProcessor} from '@/lib/scraping-queue-processor'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
     }, { status: statusCode })
 
   } catch (error) {
-    console.error('Error getting scraping system health:', error)
+    logError('Error getting scraping system health:', error)
     
     return NextResponse.json({
       success: false,
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
     )
 
   } catch (error) {
-    console.error('Error restarting scraping system:', error)
+    logError('Error restarting scraping system:', error)
     return NextResponse.json(
       { error: 'Failed to restart scraping system' },
       { status: 500 }

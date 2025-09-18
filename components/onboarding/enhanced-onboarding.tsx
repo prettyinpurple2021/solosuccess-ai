@@ -11,6 +11,7 @@ import { Button} from "@/components/ui/button"
 import { Badge} from "@/components/ui/badge"
 import { Progress} from "@/components/ui/progress"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Lightbulb, CheckCircle, Play, SkipForward, Rocket, Crown, Gift, Users, Target, TrendingUp, Sparkles} from "lucide-react"
 
 interface EnhancedOnboardingProps {
@@ -36,15 +37,15 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
 
   // Debug phase changes
   useEffect(() => {
-    console.log('Enhanced Onboarding - Current phase changed:', currentPhase)
+    logInfo('Enhanced Onboarding - Current phase changed:', currentPhase)
   }, [currentPhase])
 
   useEffect(() => {
-    console.log('Enhanced Onboarding - Open prop:', open)
+    logInfo('Enhanced Onboarding - Open prop:', open)
   }, [open])
 
   const handleWelcomeComplete = (data: Record<string, unknown>) => {
-    console.log('Welcome flow completed with data:', data)
+    logInfo('Welcome flow completed with data:', data)
     setUserPreferences(data)
     setCurrentPhase("wizard")
   }

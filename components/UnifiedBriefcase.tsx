@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   MessageCircle, 
   Palette, 
   FileText, 
@@ -121,7 +122,7 @@ const UnifiedBriefcase: React.FC<UnifiedBriefcaseProps> = ({ className = '' }) =
       })
 
     } catch (error) {
-      console.error('Load briefcase items error:', error)
+      logError('Load briefcase items error:', error)
       setError(error instanceof Error ? error.message : 'Failed to load items')
     } finally {
       setLoading(false)
@@ -145,7 +146,7 @@ const UnifiedBriefcase: React.FC<UnifiedBriefcaseProps> = ({ className = '' }) =
       setItems(prev => prev.filter(item => item.id !== itemId))
 
     } catch (error) {
-      console.error('Delete item error:', error)
+      logError('Delete item error:', error)
       setError(error instanceof Error ? error.message : 'Failed to delete item')
     }
   }

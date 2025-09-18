@@ -1,4 +1,5 @@
 import { CompetitorAlert } from '@/hooks/use-competitor-alerts';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface WebSocketMessage {
   type: 'competitor_alert' | 'alert_update' | 'connection_status' | 'ping' | 'pong';
@@ -61,7 +62,7 @@ export class WebSocketNotificationService {
       const wsUrl = this.getWebSocketUrl(userId);
       
       // Simulate WebSocket connection
-      console.log(`Connecting to WebSocket: ${wsUrl}`);
+      logInfo(`Connecting to WebSocket: ${wsUrl}`);
       
       // For development, we'll simulate a successful connection
       setTimeout(() => {
@@ -69,7 +70,7 @@ export class WebSocketNotificationService {
         this.reconnectAttempts = 0;
         this.notifyConnectionStatus();
         this.startHeartbeat();
-        console.log('WebSocket connected (simulated)');
+        logInfo('WebSocket connected (simulated)');
       }, 1000);
 
       // In a real implementation:
@@ -77,7 +78,7 @@ export class WebSocketNotificationService {
       // this.setupEventListeners();
       
     } catch (error) {
-      console.error('WebSocket connection error:', error);
+      logError('WebSocket connection error:', error);
       this.connectionStatus = 'error';
       this.notifyConnectionStatus();
       this.scheduleReconnect(userId);
@@ -94,7 +95,7 @@ export class WebSocketNotificationService {
     if (!this.ws) return;
 
     this.ws.onopen = () => {
-      console.log('WebSocket connected');
+      logInfo('WebSocket connected');
       this.connectionStatus = 'connected';
       this.reconnectAttempts = 0;
       this.notifyConnectionStatus();
@@ -106,12 +107,12 @@ export class WebSocketNotificationService {
         const message: WebSocketMessage = JSON.parse(event.data);
         this.handleMessage(message);
       } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
+        logError('Error parsing WebSocket message:', error);
       }
     };
 
     this.ws.onclose = (event) => {
-      console.log('WebSocket disconnected:', event.code, event.reason);
+      logInfo('WebSocket disconnected:', event.code, event.reason);
       this.connectionStatus = 'disconnected';
       this.notifyConnectionStatus();
       this.stopHeartbeat();
@@ -123,14 +124,14 @@ export class WebSocketNotificationService {
     };
 
     this.ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      logError('WebSocket error:', error);
       this.connectionStatus = 'error';
       this.notifyConnectionStatus();
     };
   }
 
   private handleMessage(message: WebSocketMessage): void {
-    console.log('Received WebSocket message:', message);
+    logInfo('Received WebSocket message:', message);
 
     switch (message.type) {
       case 'competitor_alert':
@@ -150,7 +151,7 @@ export class WebSocketNotificationService {
         break;
       
       default:
-        console.warn('Unknown message type:', message.type);
+        logWarn('Unknown message type:', message.type);
     }
   }
 
@@ -161,7 +162,7 @@ export class WebSocketNotificationService {
         try {
           listener(message);
         } catch (error) {
-          console.error('Error in WebSocket listener:', error);
+          logError('Error in WebSocket listener:', error);
         }
       });
     }
@@ -214,14 +215,14 @@ export class WebSocketNotificationService {
 
   private scheduleReconnect(userId?: string): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('Max reconnection attempts reached');
+      logError('Max reconnection attempts reached');
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
 
-    console.log(`Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
+    logInfo(`Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
     
     setTimeout(() => {
       if (userId) {

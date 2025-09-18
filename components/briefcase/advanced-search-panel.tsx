@@ -16,6 +16,7 @@ import { motion, AnimatePresence} from 'framer-motion'
 import { 
   Search, Filter, X, Calendar, FileType, Hash, User, HardDrive, Sparkles, Folder, Star, RotateCcw, SlidersHorizontal, Brain, Target} from 'lucide-react'
 import { DateRange} from 'react-day-picker'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface SearchFilters {
   query: string
@@ -179,7 +180,7 @@ export default function AdvancedSearchPanel({
           })
         }
       } catch (error) {
-        console.error('Failed to get AI suggestions:', error)
+        logError('Failed to get AI suggestions:', error)
       }
     }
 

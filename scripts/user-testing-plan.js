@@ -10,6 +10,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 class UserTestingPlan {
   constructor() {
@@ -321,10 +322,10 @@ class UserTestingPlan {
    * Run all tests
    */
   async runAllTests() {
-    console.log('🚀 Starting SoloSuccess AI Platform User Testing...\n');
+    logInfo('🚀 Starting SoloSuccess AI Platform User Testing...\n');
     
     this.totalTests = UserTestingPlan.TEST_SCENARIOS.length;
-    console.log(`📊 Total Tests to Run: ${this.totalTests}\n`);
+    logInfo(`📊 Total Tests to Run: ${this.totalTests}\n`);
 
     for (const test of UserTestingPlan.TEST_SCENARIOS) {
       await this.runTest(test);
@@ -338,17 +339,17 @@ class UserTestingPlan {
    * Run individual test
    */
   async runTest(test) {
-    console.log(`\n🔍 Test ${this.currentTest + 1}/${this.totalTests}: ${test.name}`);
-    console.log(`📋 Category: ${UserTestingPlan.TEST_CATEGORIES[test.category]}`);
-    console.log(`📝 Description: ${test.description}`);
-    console.log(`⚡ Priority: ${test.priority}`);
-    console.log(`📋 Steps:`);
+    logInfo(`\n🔍 Test ${this.currentTest + 1}/${this.totalTests}: ${test.name}`);
+    logInfo(`📋 Category: ${UserTestingPlan.TEST_CATEGORIES[test.category]}`);
+    logInfo(`📝 Description: ${test.description}`);
+    logInfo(`⚡ Priority: ${test.priority}`);
+    logInfo(`📋 Steps:`);
     
     test.steps.forEach((step, index) => {
-      console.log(`   ${index + 1}. ${step}`);
+      logInfo(`   ${index + 1}. ${step}`);
     });
 
-    console.log(`✅ Expected: ${test.expected}`);
+    logInfo(`✅ Expected: ${test.expected}`);
 
     // Simulate test execution
     const result = await this.executeTest(test);
@@ -360,9 +361,9 @@ class UserTestingPlan {
       duration: Math.random() * 5000 + 1000 // Simulate test duration
     });
 
-    console.log(`🎯 Result: ${result.status}`);
+    logInfo(`🎯 Result: ${result.status}`);
     if (result.notes) {
-      console.log(`📝 Notes: ${result.notes}`);
+      logInfo(`📝 Notes: ${result.notes}`);
     }
   }
 
@@ -397,16 +398,16 @@ class UserTestingPlan {
    * Generate test report
    */
   generateReport() {
-    console.log('\n📊 TESTING REPORT');
-    console.log('================\n');
+    logInfo('\n📊 TESTING REPORT');
+    logInfo('================\n');
 
     const passed = this.testResults.filter(r => r.result.status === 'PASSED').length;
     const failed = this.testResults.filter(r => r.result.status === 'FAILED').length;
     const passRate = (passed / this.totalTests * 100).toFixed(1);
 
-    console.log(`✅ Tests Passed: ${passed}`);
-    console.log(`❌ Tests Failed: ${failed}`);
-    console.log(`📈 Pass Rate: ${passRate}%\n`);
+    logInfo(`✅ Tests Passed: ${passed}`);
+    logError(`❌ Tests Failed: ${failed}`);
+    logInfo(`📈 Pass Rate: ${passRate}%\n`);
 
     // Group by category
     const byCategory = {};
@@ -417,25 +418,25 @@ class UserTestingPlan {
       byCategory[result.category].push(result);
     });
 
-    console.log('📋 Results by Category:');
-    console.log('=======================\n');
+    logInfo('📋 Results by Category:');
+    logInfo('=======================\n');
 
     Object.entries(byCategory).forEach(([category, tests]) => {
       const categoryName = UserTestingPlan.TEST_CATEGORIES[category];
       const passed = tests.filter(t => t.result.status === 'PASSED').length;
       const total = tests.length;
       
-      console.log(`${categoryName}:`);
-      console.log(`  ✅ ${passed}/${total} tests passed`);
+      logInfo(`${categoryName}:`);
+      logInfo(`  ✅ ${passed}/${total} tests passed`);
       
       const failedTests = tests.filter(t => t.result.status === 'FAILED');
       if (failedTests.length > 0) {
-        console.log(`  ❌ Failed tests:`);
+        logError(`  ❌ Failed tests:`);
         failedTests.forEach(test => {
-          console.log(`    - ${test.name}: ${test.result.notes}`);
+          logInfo(`    - ${test.name}: ${test.result.notes}`);
         });
       }
-      console.log('');
+      logInfo('');
     });
 
     // Generate recommendations
@@ -446,13 +447,13 @@ class UserTestingPlan {
    * Generate recommendations based on test results
    */
   generateRecommendations() {
-    console.log('💡 RECOMMENDATIONS');
-    console.log('==================\n');
+    logInfo('💡 RECOMMENDATIONS');
+    logInfo('==================\n');
 
     const failedTests = this.testResults.filter(r => r.result.status === 'FAILED');
     
     if (failedTests.length === 0) {
-      console.log('🎉 All tests passed! The platform is ready for launch.');
+      logInfo('🎉 All tests passed! The platform is ready for launch.');
       return;
     }
 
@@ -460,27 +461,27 @@ class UserTestingPlan {
     const highFailures = failedTests.filter(t => t.priority === 'HIGH');
 
     if (criticalFailures.length > 0) {
-      console.log('🚨 CRITICAL ISSUES MUST BE FIXED BEFORE LAUNCH:');
+      logInfo('🚨 CRITICAL ISSUES MUST BE FIXED BEFORE LAUNCH:');
       criticalFailures.forEach(test => {
-        console.log(`  - ${test.name}: ${test.result.notes}`);
+        logInfo(`  - ${test.name}: ${test.result.notes}`);
       });
-      console.log('');
+      logInfo('');
     }
 
     if (highFailures.length > 0) {
-      console.log('⚠️  HIGH PRIORITY ISSUES SHOULD BE ADDRESSED:');
+      logInfo('⚠️  HIGH PRIORITY ISSUES SHOULD BE ADDRESSED:');
       highFailures.forEach(test => {
-        console.log(`  - ${test.name}: ${test.result.notes}`);
+        logInfo(`  - ${test.name}: ${test.result.notes}`);
       });
-      console.log('');
+      logInfo('');
     }
 
-    console.log('📋 NEXT STEPS:');
-    console.log('  1. Fix critical issues first');
-    console.log('  2. Address high priority issues');
-    console.log('  3. Re-run failed tests');
-    console.log('  4. Conduct user acceptance testing');
-    console.log('  5. Prepare for launch');
+    logInfo('📋 NEXT STEPS:');
+    logInfo('  1. Fix critical issues first');
+    logInfo('  2. Address high priority issues');
+    logError('  3. Re-run failed tests');
+    logInfo('  4. Conduct user acceptance testing');
+    logInfo('  5. Prepare for launch');
   }
 
   /**
@@ -497,7 +498,7 @@ class UserTestingPlan {
 
     const filename = `test-results-${new Date().toISOString().split('T')[0]}.json`;
     fs.writeFileSync(filename, JSON.stringify(report, null, 2));
-    console.log(`\n💾 Test results saved to: ${filename}`);
+    logInfo(`\n💾 Test results saved to: ${filename}`);
   }
 }
 
@@ -510,7 +511,7 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch(error => {
-      console.error('❌ Testing failed:', error);
+      logError('❌ Testing failed:', error);
       process.exit(1);
     });
 }

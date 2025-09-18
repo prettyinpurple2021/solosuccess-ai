@@ -6,6 +6,7 @@ import { db} from '@/db'
 import { competitiveOpportunities, opportunityActions, opportunityMetrics} from '@/db/schema'
 import { eq, and} from 'drizzle-orm'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -84,7 +85,7 @@ export async function GET(
       metrics
     })
   } catch (error) {
-    console.error('Error getting opportunity:', error)
+    logError('Error getting opportunity:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -187,7 +188,7 @@ export async function PUT(
       opportunity: updatedOpportunity[0]
     })
   } catch (error) {
-    console.error('Error updating opportunity:', error)
+    logError('Error updating opportunity:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -261,7 +262,7 @@ export async function DELETE(
       message: 'Opportunity archived successfully'
     })
   } catch (error) {
-    console.error('Error deleting opportunity:', error)
+    logError('Error deleting opportunity:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

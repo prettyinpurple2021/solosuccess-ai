@@ -16,6 +16,7 @@ import { NotificationChannel, type NotificationPreferences} from '@/lib/notifica
 import { AlertSeverity, AlertType} from '@/lib/competitor-alert-system';
 import { cn} from '@/lib/utils';
 import { toast} from '@/hooks/use-toast';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface NotificationPreferencesProps {
   className?: string;
@@ -69,7 +70,7 @@ export function NotificationPreferences({ className }: NotificationPreferencesPr
         setPreferences(data.preferences);
       }
     } catch (error) {
-      console.error('Error fetching preferences:', error);
+      logError('Error fetching preferences:', error);
       toast({
         title: 'Error',
         description: 'Failed to load notification preferences',
@@ -102,7 +103,7 @@ export function NotificationPreferences({ className }: NotificationPreferencesPr
         throw new Error('Failed to save preferences');
       }
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logError('Error saving preferences:', error);
       toast({
         title: 'Error',
         description: 'Failed to save notification preferences',
@@ -143,7 +144,7 @@ export function NotificationPreferences({ className }: NotificationPreferencesPr
         });
       }
     } catch (error) {
-      console.error('Error testing channel:', error);
+      logError('Error testing channel:', error);
       toast({
         title: 'Test Failed',
         description: 'Failed to send test notification',

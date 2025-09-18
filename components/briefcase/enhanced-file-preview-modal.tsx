@@ -10,6 +10,7 @@ import { useToast} from '@/hooks/use-toast'
 import { motion, AnimatePresence} from 'framer-motion'
 import FileMetadataPanel from './file-metadata-panel'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   X, Download, ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2, ChevronLeft, ChevronRight, FileText, Image, Music, Video, FileCode, Archive, Eye, Share2, Edit, Trash2, Star, StarOff} from 'lucide-react'
 
 interface BriefcaseFile {
@@ -173,7 +174,7 @@ export default function EnhancedFilePreviewModal({
         })
       }
     } catch (error) {
-      console.error('Preview load error:', error)
+      logError('Preview load error:', error)
       setPreviewState({
         loading: false,
         error: error instanceof Error ? error.message : 'Failed to load preview',
@@ -310,7 +311,7 @@ export default function EnhancedFilePreviewModal({
                     transform: `scale(${imageZoom}) rotate(${imageRotation}deg)`,
                   }}
                   onError={(e) => {
-                    console.error('Image load error:', e)
+                    logError('Image load error:', e)
                     setPreviewState(prev => ({
                       ...prev,
                       error: 'Failed to load image'

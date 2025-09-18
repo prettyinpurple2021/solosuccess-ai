@@ -10,6 +10,7 @@ import { CalendarIcon, AlertCircle, CheckCircle, Lock, Crown} from "lucide-react
 import { format, subYears} from "date-fns"
 import { motion} from "framer-motion"
 import type { User as AppUser } from "@/lib/neon/types"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export function NeonAuth() {
   const router = useRouter()
@@ -57,7 +58,7 @@ export function NeonAuth() {
         localStorage.removeItem('authToken')
       }
     } catch (error) {
-      console.error('Token verification failed:', error)
+      logError('Token verification failed:', error)
       localStorage.removeItem('authToken')
     }
   }, [router])

@@ -41,6 +41,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types
 interface SessionControlState {
@@ -95,7 +96,7 @@ const SessionControlPanel: React.FC<{ sessionId: string }> = ({ sessionId }) => 
           setControlState(data.data)
         }
       } catch (error) {
-        console.error('Error fetching control state:', error)
+        logError('Error fetching control state:', error)
       } finally {
         setLoading(false)
       }
@@ -109,7 +110,7 @@ const SessionControlPanel: React.FC<{ sessionId: string }> = ({ sessionId }) => 
           setAvailableAgents(data.data?.agents || [])
         }
       } catch (error) {
-        console.error('Error fetching agents:', error)
+        logError('Error fetching agents:', error)
       }
     }
 
@@ -153,7 +154,7 @@ const SessionControlPanel: React.FC<{ sessionId: string }> = ({ sessionId }) => 
         toast.error(error.message || 'Action failed')
       }
     } catch (error) {
-      console.error('Error performing action:', error)
+      logError('Error performing action:', error)
       toast.error('Action failed')
     } finally {
       setActionLoading(null)
@@ -402,7 +403,7 @@ const ContextManagement: React.FC<{ sessionId: string }> = ({ sessionId }) => {
           setContexts(data.data?.entries || [])
         }
       } catch (error) {
-        console.error('Error fetching contexts:', error)
+        logError('Error fetching contexts:', error)
       } finally {
         setLoading(false)
       }
@@ -468,7 +469,7 @@ const ContextManagement: React.FC<{ sessionId: string }> = ({ sessionId }) => {
         toast.error(error.message || 'Failed to add context')
       }
     } catch (error) {
-      console.error('Error adding context:', error)
+      logError('Error adding context:', error)
       toast.error('Failed to add context')
     }
   }

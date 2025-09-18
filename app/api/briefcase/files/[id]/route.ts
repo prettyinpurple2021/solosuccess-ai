@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
@@ -32,7 +33,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     return NextResponse.json({ success: true, document: updated })
   } catch (error) {
-    console.error('Error updating file:', error)
+    logError('Error updating file:', error)
     return NextResponse.json({ error: 'Failed to update file' }, { status: 500 })
   }
 }
@@ -66,7 +67,7 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error deleting file:', error)
+    logError('Error deleting file:', error)
     return NextResponse.json({ error: 'Failed to delete file' }, { status: 500 })
   }
 }
@@ -115,7 +116,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
       }
     })
   } catch (error) {
-    console.error('Error fetching file:', error)
+    logError('Error fetching file:', error)
     return NextResponse.json({ error: 'Failed to fetch file' }, { status: 500 })
   }
 }

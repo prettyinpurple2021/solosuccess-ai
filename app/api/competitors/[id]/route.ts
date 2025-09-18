@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { z } from 'zod'
 import { neon } from '@neondatabase/serverless'
 
 // Force dynamic rendering
@@ -13,190 +15,357 @@ function getSql() {
   return neon(url)
 }
 
+// Validation schema for updating competitor
+const UpdateCompetitorSchema = z.object({
+  name: z.string().min(1).optional(),
+  domain: z.string().url().optional(),
+  description: z.string().optional(),
+  industry: z.string().optional(),
+  estimatedSize: z.enum(['startup', 'small', 'medium', 'large', 'enterprise']).optional(),
+  threatLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  reasoning: z.string().optional(),
+  confidence: z.number().min(0).max(1).optional(),
+  keyIndicators: z.array(z.string()).optional(),
+  monitoringConfig: z.object({
+    websiteMonitoring: z.boolean().optional(),
+    socialMediaMonitoring: z.boolean().optional(),
+    newsMonitoring: z.boolean().optional(),
+    jobPostingMonitoring: z.boolean().optional(),
+    appStoreMonitoring: z.boolean().optional(),
+    monitoringFrequency: z.enum(['daily', 'weekly', 'monthly']).optional(),
+    alertThresholds: z.object({
+      pricing: z.boolean().optional(),
+      productLaunches: z.boolean().optional(),
+      hiring: z.boolean().optional(),
+      funding: z.boolean().optional(),
+      partnerships: z.boolean().optional(),
+    }).optional(),
+  }).optional(),
+  monitoringStatus: z.enum(['active', 'paused', 'archived']).optional(),
+})
+
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { allowed } = rateLimitByIp('competitors:get', ip, 60_000, 100)
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const params = await context.params
-    const competitorId = params.id
+    const competitorId = parseInt(params.id)
+    if (isNaN(competitorId)) {
+      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
+    }
+
     const sql = getSql()
 
-    // Get competitor profile
-    const competitors = await sql`
+    // Get competitor with related data
+    const competitor = await sql`
       SELECT 
-        cp.*,
-        COUNT(DISTINCT cd.id) as intelligence_count,
-        COUNT(DISTINCT ca.id) as alert_count
-      FROM competitor_profiles cp
-      LEFT JOIN intelligence_data cd ON cd.competitor_id = cp.id
-      LEFT JOIN competitor_alerts ca ON ca.competitor_id = cp.id
-      WHERE cp.id = ${competitorId} AND cp.user_id = ${user.id}
-      GROUP BY cp.id
+        id,
+        name,
+        domain,
+        description,
+        industry,
+        estimated_size,
+        threat_level,
+        reasoning,
+        confidence_score,
+        key_indicators,
+        monitoring_config,
+        monitoring_status,
+        last_scraped_at,
+        created_at,
+        updated_at
+      FROM competitor_profiles 
+      WHERE id = ${competitorId} AND user_id = ${user.id}
     `
 
-    if (competitors.length === 0) {
+    if (competitor.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
     }
 
-    const competitor = competitors[0]
+    const competitorData = competitor[0]
 
-    // Get key personnel (from intelligence data)
-    const personnel = await sql`
+    // Get recent alerts for this competitor
+    const alerts = await sql`
       SELECT 
         id,
-        extracted_data->'personnel' as personnel_data,
-        collected_at
-      FROM intelligence_data 
-      WHERE competitor_id = ${competitorId} 
-        AND data_type = 'company_info'
-        AND extracted_data->'personnel' IS NOT NULL
-      ORDER BY collected_at DESC
-      LIMIT 1
+        alert_type,
+        severity,
+        title,
+        description,
+        is_read,
+        is_archived,
+        created_at
+      FROM competitor_alerts 
+      WHERE competitor_id = ${competitorId} AND user_id = ${user.id}
+      ORDER BY created_at DESC
+      LIMIT 10
     `
 
-    // Get products (from intelligence data)
-    const products = await sql`
+    // Get recent intelligence data
+    const intelligence = await sql`
       SELECT 
         id,
-        extracted_data->'products' as products_data,
-        collected_at
+        data_type,
+        title,
+        content,
+        source_url,
+        confidence_score,
+        created_at
       FROM intelligence_data 
-      WHERE competitor_id = ${competitorId} 
-        AND data_type = 'products'
-        AND extracted_data->'products' IS NOT NULL
-      ORDER BY collected_at DESC
-      LIMIT 1
+      WHERE competitor_id = ${competitorId}
+      ORDER BY created_at DESC
+      LIMIT 10
     `
 
-    // Format the response
-    const competitorProfile = {
-      id: competitor.id,
-      name: competitor.name,
-      domain: competitor.domain,
-      description: competitor.description,
-      industry: competitor.industry,
-      headquarters: competitor.headquarters,
-      foundedYear: competitor.founded_year,
-      employeeCount: competitor.employee_count,
-      fundingStage: competitor.funding_stage,
-      fundingAmount: competitor.funding_amount,
-      threatLevel: competitor.threat_level,
-      monitoringStatus: competitor.monitoring_status,
-      socialMediaHandles: competitor.social_media_handles || {},
-      keyPersonnel: personnel.length > 0 ? 
-        (personnel[0].personnel_data || []) : [],
-      products: products.length > 0 ? 
-        (products[0].products_data || []) : [],
-      marketPosition: competitor.market_position || {},
-      competitiveAdvantages: competitor.competitive_advantages || [],
-      vulnerabilities: competitor.vulnerabilities || [],
-      lastAnalyzed: competitor.last_analyzed,
-      intelligenceCount: parseInt(competitor.intelligence_count) || 0,
-      alertCount: parseInt(competitor.alert_count) || 0,
-      createdAt: competitor.created_at,
-      updatedAt: competitor.updated_at
+    const transformedCompetitor = {
+      id: competitorData.id,
+      name: competitorData.name,
+      domain: competitorData.domain,
+      description: competitorData.description || '',
+      industry: competitorData.industry || '',
+      estimatedSize: competitorData.estimated_size || 'medium',
+      threatLevel: competitorData.threat_level,
+      reasoning: competitorData.reasoning || '',
+      confidence: competitorData.confidence_score || 0.5,
+      keyIndicators: competitorData.key_indicators || [],
+      monitoringConfig: competitorData.monitoring_config || {},
+      monitoringStatus: competitorData.monitoring_status || 'active',
+      lastScrapedAt: competitorData.last_scraped_at,
+      createdAt: competitorData.created_at,
+      updatedAt: competitorData.updated_at,
+      recentAlerts: alerts.map(alert => ({
+        id: alert.id,
+        type: alert.alert_type,
+        severity: alert.severity,
+        title: alert.title,
+        description: alert.description,
+        isRead: alert.is_read,
+        isArchived: alert.is_archived,
+        createdAt: alert.created_at,
+      })),
+      recentIntelligence: intelligence.map(item => ({
+        id: item.id,
+        type: item.data_type,
+        title: item.title,
+        content: item.content,
+        sourceUrl: item.source_url,
+        confidence: item.confidence_score,
+        createdAt: item.created_at,
+      })),
     }
 
-    return NextResponse.json(competitorProfile)
+    return NextResponse.json({
+      success: true,
+      competitor: transformedCompetitor
+    })
+
   } catch (error) {
     console.error('Error fetching competitor:', error)
-    return NextResponse.json({ error: 'Failed to fetch competitor data' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to fetch competitor' },
+      { status: 500 }
+    )
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { allowed } = rateLimitByIp('competitors:update', ip, 60_000, 20)
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const params = await context.params
-    const competitorId = params.id
-    const updates = await request.json()
+    const competitorId = parseInt(params.id)
+    if (isNaN(competitorId)) {
+      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
+    }
+
+    const body = await request.json()
+    const parsed = UpdateCompetitorSchema.safeParse(body)
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const updateData = parsed.data
     const sql = getSql()
 
-    // Update competitor profile
-    const result = await sql`
-      UPDATE competitor_profiles 
-      SET 
-        name = COALESCE(${updates.name}, name),
-        domain = COALESCE(${updates.domain}, domain),
-        description = COALESCE(${updates.description}, description),
-        industry = COALESCE(${updates.industry}, industry),
-        headquarters = COALESCE(${updates.headquarters}, headquarters),
-        founded_year = COALESCE(${updates.foundedYear}, founded_year),
-        employee_count = COALESCE(${updates.employeeCount}, employee_count),
-        funding_stage = COALESCE(${updates.fundingStage}, funding_stage),
-        funding_amount = COALESCE(${updates.fundingAmount}, funding_amount),
-        threat_level = COALESCE(${updates.threatLevel}, threat_level),
-        monitoring_status = COALESCE(${updates.monitoringStatus}, monitoring_status),
-        social_media_handles = COALESCE(${updates.socialMediaHandles}, social_media_handles),
-        market_position = COALESCE(${updates.marketPosition}, market_position),
-        competitive_advantages = COALESCE(${updates.competitiveAdvantages}, competitive_advantages),
-        vulnerabilities = COALESCE(${updates.vulnerabilities}, vulnerabilities),
-        updated_at = NOW()
+    // Check if competitor exists and belongs to user
+    const existingCompetitor = await sql`
+      SELECT id FROM competitor_profiles 
       WHERE id = ${competitorId} AND user_id = ${user.id}
-      RETURNING *
     `
+
+    if (existingCompetitor.length === 0) {
+      return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
+    }
+
+    // Build dynamic update query
+    const updateFields = []
+    const updateValues = []
+
+    if (updateData.name !== undefined) {
+      updateFields.push('name = $' + (updateValues.length + 1))
+      updateValues.push(updateData.name)
+    }
+    if (updateData.domain !== undefined) {
+      updateFields.push('domain = $' + (updateValues.length + 1))
+      updateValues.push(updateData.domain)
+    }
+    if (updateData.description !== undefined) {
+      updateFields.push('description = $' + (updateValues.length + 1))
+      updateValues.push(updateData.description)
+    }
+    if (updateData.industry !== undefined) {
+      updateFields.push('industry = $' + (updateValues.length + 1))
+      updateValues.push(updateData.industry)
+    }
+    if (updateData.estimatedSize !== undefined) {
+      updateFields.push('estimated_size = $' + (updateValues.length + 1))
+      updateValues.push(updateData.estimatedSize)
+    }
+    if (updateData.threatLevel !== undefined) {
+      updateFields.push('threat_level = $' + (updateValues.length + 1))
+      updateValues.push(updateData.threatLevel)
+    }
+    if (updateData.reasoning !== undefined) {
+      updateFields.push('reasoning = $' + (updateValues.length + 1))
+      updateValues.push(updateData.reasoning)
+    }
+    if (updateData.confidence !== undefined) {
+      updateFields.push('confidence_score = $' + (updateValues.length + 1))
+      updateValues.push(updateData.confidence)
+    }
+    if (updateData.keyIndicators !== undefined) {
+      updateFields.push('key_indicators = $' + (updateValues.length + 1))
+      updateValues.push(JSON.stringify(updateData.keyIndicators))
+    }
+    if (updateData.monitoringConfig !== undefined) {
+      updateFields.push('monitoring_config = $' + (updateValues.length + 1))
+      updateValues.push(JSON.stringify(updateData.monitoringConfig))
+    }
+    if (updateData.monitoringStatus !== undefined) {
+      updateFields.push('monitoring_status = $' + (updateValues.length + 1))
+      updateValues.push(updateData.monitoringStatus)
+    }
+
+    if (updateFields.length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    }
+
+    updateFields.push('updated_at = NOW()')
+    updateValues.push(competitorId, user.id)
+
+    const updateQuery = `
+      UPDATE competitor_profiles 
+      SET ${updateFields.join(', ')}
+      WHERE id = $${updateValues.length - 1} AND user_id = $${updateValues.length}
+      RETURNING id, name, domain, threat_level, monitoring_status, updated_at
+    `
+
+    const result = await sql.unsafe(updateQuery, updateValues)
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      competitor: result[0] 
+    const updatedCompetitor = result[0]
+
+    return NextResponse.json({
+      success: true,
+      competitor: {
+        id: updatedCompetitor.id,
+        name: updatedCompetitor.name,
+        domain: updatedCompetitor.domain,
+        threatLevel: updatedCompetitor.threat_level,
+        monitoringStatus: updatedCompetitor.monitoring_status,
+        updatedAt: updatedCompetitor.updated_at,
+      },
+      message: 'Competitor updated successfully'
     })
+
   } catch (error) {
     console.error('Error updating competitor:', error)
-    return NextResponse.json({ error: 'Failed to update competitor' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to update competitor' },
+      { status: 500 }
+    )
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { allowed } = rateLimitByIp('competitors:delete', ip, 60_000, 10)
+    if (!allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const params = await context.params
-    const competitorId = params.id
+    const competitorId = parseInt(params.id)
+    if (isNaN(competitorId)) {
+      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
+    }
+
     const sql = getSql()
 
     // Delete competitor (cascade will handle related data)
     const result = await sql`
       DELETE FROM competitor_profiles 
       WHERE id = ${competitorId} AND user_id = ${user.id}
-      RETURNING id
+      RETURNING id, name
     `
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Competitor deleted successfully' 
+    const deletedCompetitor = result[0]
+
+    return NextResponse.json({
+      success: true,
+      message: `Competitor "${deletedCompetitor.name}" has been deleted`,
+      deletedId: deletedCompetitor.id
     })
+
   } catch (error) {
     console.error('Error deleting competitor:', error)
-    return NextResponse.json({ error: 'Failed to delete competitor' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to delete competitor' },
+      { status: 500 }
+    )
   }
 }

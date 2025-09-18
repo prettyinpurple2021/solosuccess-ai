@@ -5,6 +5,7 @@ import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligenc
 import { db} from '@/db'
 import { createClient} from '@/lib/neon/server'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ milestones: enhancedMilestones })
   } catch (error) {
-    console.error('Error fetching competitive milestones:', error)
+    logError('Error fetching competitive milestones:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitive milestones' },
       { status: 500 }
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ milestone: milestoneRows[0] }, { status: 201 })
   } catch (error) {
-    console.error('Error creating competitive milestone:', error)
+    logError('Error creating competitive milestone:', error)
     return NextResponse.json(
       { error: 'Failed to create competitive milestone' },
       { status: 500 }
@@ -205,7 +206,7 @@ export async function PUT(request: NextRequest) {
     
     return NextResponse.json({ milestone: updatedRows[0] })
   } catch (error) {
-    console.error('Error updating competitive milestone:', error)
+    logError('Error updating competitive milestone:', error)
     return NextResponse.json(
       { error: 'Failed to update competitive milestone' },
       { status: 500 }

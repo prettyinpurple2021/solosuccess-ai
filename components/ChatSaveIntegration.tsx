@@ -5,6 +5,7 @@ import { Save, Crown, Heart, Sparkles } from 'lucide-react'
 import { briefcaseAutoSaver } from '@/utils/briefcase-auto-save'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface ChatMessage {
   role: string
@@ -96,7 +97,7 @@ export const ChatSaveIntegration: React.FC<ChatSaveIntegrationProps> = ({
       
       setLastSavedLength(messages.length)
     } catch (error) {
-      console.error('Save error:', error)
+      logError('Save error:', error)
       toast({
         title: "Save failed 💔",
         description: "Failed to save your chat. Please try again.",

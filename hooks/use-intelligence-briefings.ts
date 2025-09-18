@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { IntelligenceBriefing, BriefingType } from '@/lib/intelligence-briefing-system'
 import { AgentBriefing } from '@/lib/agent-intelligence-briefings'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface BriefingRequest {
   briefingType: BriefingType
@@ -77,7 +78,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate briefing'
       setError(errorMessage)
-      console.error('Error generating briefing:', err)
+      logError('Error generating briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -113,7 +114,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate daily briefing'
       setError(errorMessage)
-      console.error('Error generating daily briefing:', err)
+      logError('Error generating daily briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -149,7 +150,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate weekly briefing'
       setError(errorMessage)
-      console.error('Error generating weekly briefing:', err)
+      logError('Error generating weekly briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -185,7 +186,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate monthly report'
       setError(errorMessage)
-      console.error('Error generating monthly report:', err)
+      logError('Error generating monthly report:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -234,7 +235,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate agent briefing'
       setError(errorMessage)
-      console.error('Error generating agent briefing:', err)
+      logError('Error generating agent briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -270,7 +271,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate Echo briefing'
       setError(errorMessage)
-      console.error('Error generating Echo briefing:', err)
+      logError('Error generating Echo briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -306,7 +307,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate Lexi briefing'
       setError(errorMessage)
-      console.error('Error generating Lexi briefing:', err)
+      logError('Error generating Lexi briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -342,7 +343,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate Nova briefing'
       setError(errorMessage)
-      console.error('Error generating Nova briefing:', err)
+      logError('Error generating Nova briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -378,7 +379,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate Blaze briefing'
       setError(errorMessage)
-      console.error('Error generating Blaze briefing:', err)
+      logError('Error generating Blaze briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -414,7 +415,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate collaborative briefing'
       setError(errorMessage)
-      console.error('Error generating collaborative briefing:', err)
+      logError('Error generating collaborative briefing:', err)
     } finally {
       setIsGenerating(false)
     }
@@ -438,7 +439,7 @@ export function useIntelligenceBriefings(): UseBriefingsReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch briefing history'
       setError(errorMessage)
-      console.error('Error fetching briefing history:', err)
+      logError('Error fetching briefing history:', err)
     }
   }, [])
   

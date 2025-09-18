@@ -15,6 +15,7 @@ import { Progress} from '@/components/ui/progress'
 import { 
   Play, Pause, Square, RefreshCw, Plus, Settings, Clock, CheckCircle, XCircle, AlertTriangle, Globe, DollarSign, Package, Briefcase, Activity} from 'lucide-react'
 import { cn} from '@/lib/utils'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface ScrapingJob {
   id: string
@@ -229,7 +230,7 @@ export function ScrapingManager({ competitorId, competitorName, competitorDomain
       const result = await response.json()
       if (result.success) {
         // Show success message or handle result
-        console.log('Scraping result:', result.data)
+        logInfo('Scraping result:', result.data)
       } else {
         throw new Error(result.error || 'Scraping failed')
       }

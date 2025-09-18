@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Analytics event types
 export type AnalyticsEvent = 
@@ -109,7 +110,7 @@ class AnalyticsService {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('📊 Analytics Event:', event, properties)
+      logInfo('📊 Analytics Event:', event, properties)
     }
 
     // Note: PostHog integration was removed. Events are only stored internally now.

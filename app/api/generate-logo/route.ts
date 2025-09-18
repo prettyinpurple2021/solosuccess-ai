@@ -6,6 +6,24 @@ import { z} from 'zod'
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// Helper function to generate logo with OpenAI DALL-E
+async function generateLogoWithOpenAI(client: any, brandName: string, style: string, description: string) {
+  const prompt = `Create a professional logo for "${brandName}" in ${style} style. ${description}. The logo should be simple, memorable, and suitable for business use. Use clean lines and modern design principles. The logo should work well in both color and black & white.`
+  
+  const response = await client.images.generate({
+    model: "dall-e-3",
+    prompt: prompt,
+    n: 1,
+    size: "1024x1024",
+    quality: "standard",
+    style: "natural"
+  })
+
+  return {
+    url: response.data[0].url
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
@@ -27,8 +45,48 @@ export async function POST(request: NextRequest) {
     }
     const { brandName, style } = parsed.data
 
-    // For now, return mock logo data
-    // In a full implementation, this would call an AI service to generate logos
+    // Generate real logos using OpenAI DALL-E if API key is available
+    if (process.env.OPENAI_API_KEY) {
+      try {
+        const openai = require('openai')
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+        const client = new openai.OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+        })
+
+        // Generate multiple logo variations
+        const logoPromises = [
+          generateLogoWithOpenAI(client, brandName, style || 'modern', 'clean and professional'),
+          generateLogoWithOpenAI(client, brandName, style || 'elegant', 'sophisticated and refined'),
+          generateLogoWithOpenAI(client, brandName, style || 'bold', 'dynamic and impactful')
+        ]
+
+        const logoResults = await Promise.allSettled(logoPromises)
+        
+        const logos = logoResults
+          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+          .map((result, index) => ({
+            id: index + 1,
+            url: result.value.url,
+            style: [style || 'modern', style || 'elegant', style || 'bold'][index],
+            description: ['Modern logo design', 'Elegant logo design', 'Bold logo design'][index],
+            generated: true
+          }))
+
+        if (logos.length > 0) {
+          return NextResponse.json({ 
+            logos,
+            isFallback: false,
+            generatedBy: 'OpenAI DALL-E'
+          }, { status: 200 })
+        }
+      } catch (aiError) {
+        logError('OpenAI logo generation failed:', aiError)
+        // Fall through to fallback
+      }
+    }
+
+    // Fallback to mock data if AI service fails or is not available
     const mockLogos = [
       {
         id: 1,
@@ -53,10 +111,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       logos: mockLogos,
       isFallback: true,
-      fallbackReason: 'AI logo generation service not yet implemented'
+      fallbackReason: process.env.OPENAI_API_KEY ? 'AI service temporarily unavailable' : 'OpenAI API key not configured'
     }, { status: 200 })
   } catch (error) {
-    console.error('Error generating logos:', error)
+    logError('Error generating logos:', error)
     return NextResponse.json(
       { error: 'Failed to generate logos' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { db } from '@/db'
 import { competitors, intelligenceData, competitorAlerts } from '@/db/schema'
 import { eq, and, desc, gte, lte, sql, inArray } from 'drizzle-orm'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types for opportunity detection
 export interface OpportunityDetectionResult {
@@ -149,7 +150,7 @@ export class CompetitiveOpportunityDetector {
 
       return weaknesses
     } catch (error) {
-      console.error('Error detecting competitor weaknesses:', error)
+      logError('Error detecting competitor weaknesses:', error)
       return []
     }
   }
@@ -199,7 +200,7 @@ export class CompetitiveOpportunityDetector {
 
       return gaps
     } catch (error) {
-      console.error('Error identifying market gaps:', error)
+      logError('Error identifying market gaps:', error)
       return []
     }
   }
@@ -244,7 +245,7 @@ export class CompetitiveOpportunityDetector {
 
       return opportunities
     } catch (error) {
-      console.error('Error detecting pricing opportunities:', error)
+      logError('Error detecting pricing opportunities:', error)
       return []
     }
   }
@@ -302,7 +303,7 @@ export class CompetitiveOpportunityDetector {
 
       return opportunities
     } catch (error) {
-      console.error('Error identifying talent opportunities:', error)
+      logError('Error identifying talent opportunities:', error)
       return []
     }
   }
@@ -340,7 +341,7 @@ export class CompetitiveOpportunityDetector {
 
       return opportunities
     } catch (error) {
-      console.error('Error detecting partnership opportunities:', error)
+      logError('Error detecting partnership opportunities:', error)
       return []
     }
   }
@@ -613,7 +614,7 @@ export class CompetitiveOpportunityDetector {
         return scoreB - scoreA
       })
     } catch (error) {
-      console.error('Error generating opportunity analysis:', error)
+      logError('Error generating opportunity analysis:', error)
       return []
     }
   }

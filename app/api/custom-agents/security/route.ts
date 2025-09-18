@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { AgentSecurityManager} from '@/lib/custom-ai-agents/security/agent-security-manager'
 import { SecurityMiddleware} from '@/lib/custom-ai-agents/security/security-middleware'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const securityManager = AgentSecurityManager.getInstance()
 const _securityMiddleware = new SecurityMiddleware()
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
         )
     }
   } catch (error) {
-    console.error('Security API error:', error)
+    logError('Security API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
         )
     }
   } catch (error) {
-    console.error('Security API error:', error)
+    logError('Security API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -75,7 +76,7 @@ async function getSecurityMetrics(request: NextRequest) {
       metrics
     })
   } catch (error) {
-    console.error('Error getting security metrics:', error)
+    logError('Error getting security metrics:', error)
     return NextResponse.json(
       { error: 'Failed to get security metrics' },
       { status: 500 }
@@ -141,7 +142,7 @@ async function getUserPermissions(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error getting user permissions:', error)
+    logError('Error getting user permissions:', error)
     return NextResponse.json(
       { error: 'Failed to get user permissions' },
       { status: 500 }
@@ -158,7 +159,7 @@ async function getSecurityConfig(_request: NextRequest) {
       config
     })
   } catch (error) {
-    console.error('Error getting security config:', error)
+    logError('Error getting security config:', error)
     return NextResponse.json(
       { error: 'Failed to get security config' },
       { status: 500 }
@@ -206,7 +207,7 @@ async function grantPermission(request: NextRequest) {
       message: 'Permission granted successfully'
     })
   } catch (error) {
-    console.error('Error granting permission:', error)
+    logError('Error granting permission:', error)
     return NextResponse.json(
       { error: 'Failed to grant permission' },
       { status: 500 }
@@ -248,7 +249,7 @@ async function revokePermission(request: NextRequest) {
       message: 'Permission revoked successfully'
     })
   } catch (error) {
-    console.error('Error revoking permission:', error)
+    logError('Error revoking permission:', error)
     return NextResponse.json(
       { error: 'Failed to revoke permission' },
       { status: 500 }
@@ -276,7 +277,7 @@ async function createSession(request: NextRequest) {
       message: 'Session created successfully'
     })
   } catch (error) {
-    console.error('Error creating session:', error)
+    logError('Error creating session:', error)
     return NextResponse.json(
       { error: 'Failed to create session' },
       { status: 500 }
@@ -304,7 +305,7 @@ async function validateSession(request: NextRequest) {
       userId: validation.userId
     })
   } catch (error) {
-    console.error('Error validating session:', error)
+    logError('Error validating session:', error)
     return NextResponse.json(
       { error: 'Failed to validate session' },
       { status: 500 }
@@ -331,7 +332,7 @@ async function destroySession(request: NextRequest) {
       message: 'Session destroyed successfully'
     })
   } catch (error) {
-    console.error('Error destroying session:', error)
+    logError('Error destroying session:', error)
     return NextResponse.json(
       { error: 'Failed to destroy session' },
       { status: 500 }

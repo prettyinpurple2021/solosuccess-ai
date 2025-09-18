@@ -1,5 +1,6 @@
 import { NextResponse} from 'next/server';
 import { createClient} from '@/lib/neon/server';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Use Node runtime for database access
 export const runtime = 'nodejs';
@@ -20,7 +21,7 @@ export async function GET() {
         status: 'ok'
       };
     } catch (dbError) {
-      console.error('Database check error:', dbError);
+      logError('Database check error:', dbError);
       checks.database = {
         status: 'error'
       };
@@ -52,7 +53,7 @@ export async function GET() {
       environment: process.env.NODE_ENV,
     });
   } catch (error) {
-    console.error('Health check error:', error);
+    logError('Health check error:', error);
     return NextResponse.json(
       { 
         status: 'error',

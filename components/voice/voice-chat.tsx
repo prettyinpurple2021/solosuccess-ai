@@ -8,6 +8,7 @@ import { Progress} from "@/components/ui/progress"
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
 import { Mic, MicOff, Volume2, Loader2, Sparkles, Headphones, Radio} from "lucide-react"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface VoiceChatProps {
   agentId: string
@@ -128,7 +129,7 @@ export function VoiceChat({ agentId, agentName, agentAvatar, onTranscript, onRes
         setIsConnected(true)
       }
     } catch (error) {
-      console.error("Microphone setup error:", error)
+      logError("Microphone setup error:", error)
       setError("Microphone access denied or not available")
     }
   }

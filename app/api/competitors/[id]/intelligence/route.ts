@@ -5,6 +5,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { z} from 'zod'
 import { eq, and, desc, asc, gte, lte, inArray} from 'drizzle-orm'
 import type { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   IntelligenceData, 
   SourceType, 
   ImportanceLevel,
@@ -239,7 +240,7 @@ export async function GET(
       },
     })
   } catch (error) {
-    console.error('Error fetching competitor intelligence:', error)
+    logError('Error fetching competitor intelligence:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitor intelligence' },
       { status: 500 }

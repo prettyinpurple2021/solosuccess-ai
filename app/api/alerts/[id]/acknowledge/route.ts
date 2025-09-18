@@ -5,6 +5,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { eq, and} from 'drizzle-orm'
 import type { AlertSeverity, ActionItem, Recommendation } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -102,7 +103,7 @@ export async function POST(
       alert: transformedAlert,
     })
   } catch (error) {
-    console.error('Error acknowledging alert:', error)
+    logError('Error acknowledging alert:', error)
     return NextResponse.json(
       { error: 'Failed to acknowledge alert' },
       { status: 500 }

@@ -10,6 +10,7 @@ import { BossButton} from "@/components/ui/boss-button"
 import { Badge} from "@/components/ui/badge"
 import { Progress} from "@/components/ui/progress"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
 interface CompetitorMetrics {
@@ -68,7 +69,7 @@ export function CompetitorComparisonCharts({
         setCompetitors(data.competitors || [])
       }
     } catch (error) {
-      console.error('Error fetching competitor metrics:', error)
+      logError('Error fetching competitor metrics:', error)
     } finally {
       setLoading(false)
     }

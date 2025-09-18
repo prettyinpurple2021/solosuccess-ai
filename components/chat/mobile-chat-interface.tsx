@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Message {
   id: string
@@ -106,7 +107,7 @@ export default function MobileChatInterface({
         textareaRef.current.style.height = '44px'
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      logError('Error sending message:', error)
     }
   }
 
@@ -130,7 +131,7 @@ export default function MobileChatInterface({
     try {
       await navigator.clipboard.writeText(content)
     } catch (error) {
-      console.error('Failed to copy message:', error)
+      logError('Failed to copy message:', error)
     }
   }
 
@@ -163,10 +164,10 @@ export default function MobileChatInterface({
               {selectedAgent && (
                 <Avatar 
                   className="w-8 h-8"
-                  style={{ backgroundColor: selectedAgent.accent_color + '20' }}
+                  style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                 >
                   <AvatarFallback 
-                    style={{ backgroundColor: selectedAgent.accent_color, color: 'white' }}
+                    style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`, color: 'white' }}
                     className="text-xs font-bold"
                   >
                     {selectedAgent.display_name.charAt(0)}
@@ -220,7 +221,7 @@ export default function MobileChatInterface({
                       >
                         <Avatar className="w-6 h-6 mr-2">
                           <AvatarFallback 
-                            style={{ backgroundColor: agent.accent_color, color: 'white' }}
+                            style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`, color: 'white' }}
                             className="text-xs"
                           >
                             {agent.display_name.charAt(0)}
@@ -277,7 +278,7 @@ export default function MobileChatInterface({
                     {message.role === 'assistant' && selectedAgent && (
                       <Avatar className="w-8 h-8 flex-shrink-0">
                         <AvatarFallback 
-                          style={{ backgroundColor: selectedAgent.accent_color, color: 'white' }}
+                          style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`, color: 'white' }}
                           className="text-xs"
                         >
                           {selectedAgent.display_name.charAt(0)}
@@ -340,7 +341,7 @@ export default function MobileChatInterface({
                     {selectedAgent && (
                       <Avatar className="w-8 h-8 flex-shrink-0">
                         <AvatarFallback 
-                          style={{ backgroundColor: selectedAgent.accent_color, color: 'white' }}
+                          style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`, color: 'white' }}
                           className="text-xs"
                         >
                           {selectedAgent.display_name.charAt(0)}

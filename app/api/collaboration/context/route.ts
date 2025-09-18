@@ -10,6 +10,7 @@ import { SessionManager } from '@/lib/session-manager'
 import { CollaborationHub } from '@/lib/collaboration-hub'
 import { MessageRouter } from '@/lib/message-router'
 import { verifyAuth } from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize collaboration system components
 const collaborationHub = new CollaborationHub()
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error storing context:', error)
+    logError('Error storing context:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({
@@ -231,7 +232,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error retrieving context:', error)
+    logError('Error retrieving context:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({

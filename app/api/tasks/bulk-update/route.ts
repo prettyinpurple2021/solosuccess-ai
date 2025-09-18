@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // POST /api/tasks/bulk-update
 // Body: { ids: string[], status?: string, priority?: string }
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
     const { rows } = await client.query(query, [...values, ids])
     return NextResponse.json({ updated: rows })
   } catch (error) {
-    console.error('Bulk update tasks error:', error)
+    logError('Bulk update tasks error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

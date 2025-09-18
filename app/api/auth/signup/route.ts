@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
 import { randomUUID} from 'crypto'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -95,10 +96,10 @@ export async function POST(request: NextRequest) {
     // Start Temporal onboarding workflow in the background (disabled for now)
     try {
       // Temporarily disabled to prevent 500 errors
-      console.log(`User ${newUser.id} created successfully - onboarding workflow disabled`)
+      logInfo(`User ${newUser.id} created successfully - onboarding workflow disabled`)
     } catch (error) {
       // Don't fail the signup if Temporal workflow fails
-      console.error('Failed to start onboarding workflow:', error)
+      logError('Failed to start onboarding workflow:', error)
     }
 
     const response = NextResponse.json({
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
     return response
 
   } catch (error) {
-    console.error('Signup error:', error)
+    logError('Signup error:', error)
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,

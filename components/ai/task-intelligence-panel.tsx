@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import { useTaskIntelligence } from '@/hooks/use-task-intelligence'
 import { TaskIntelligenceData, TaskSuggestion, WorkloadAnalysis } from '@/lib/ai-task-intelligence'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface TaskIntelligencePanelProps {
   tasks: TaskIntelligenceData[]
@@ -67,7 +68,7 @@ export default function TaskIntelligencePanel({
     try {
       await optimizeTasks(tasks)
     } catch (err) {
-      console.error('Failed to optimize tasks:', err)
+      logError('Failed to optimize tasks:', err)
     } finally {
       setIsOptimizing(false)
     }
@@ -81,7 +82,7 @@ export default function TaskIntelligencePanel({
       await onApplySuggestion(taskId, suggestion)
       setAppliedSuggestions(prev => new Set([...prev, taskId]))
     } catch (err) {
-      console.error('Failed to apply suggestion:', err)
+      logError('Failed to apply suggestion:', err)
     }
   }
 
@@ -92,7 +93,7 @@ export default function TaskIntelligencePanel({
     try {
       await onReorderTasks(optimizedOrder)
     } catch (err) {
-      console.error('Failed to apply optimized order:', err)
+      logError('Failed to apply optimized order:', err)
     }
   }
 

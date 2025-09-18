@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
 import type { AlertSeverity, ActionItem, Recommendation } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -120,7 +121,7 @@ export async function POST(
       alert: transformedAlert,
     })
   } catch (error) {
-    console.error('Error archiving alert:', error)
+    logError('Error archiving alert:', error)
     return NextResponse.json(
       { error: 'Failed to archive alert' },
       { status: 500 }

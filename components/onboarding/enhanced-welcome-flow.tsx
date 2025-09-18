@@ -7,6 +7,7 @@ import { Button} from "@/components/ui/button"
 import { Badge} from "@/components/ui/badge"
 import { Progress} from "@/components/ui/progress"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Crown, Sparkles, Target, Users, Rocket, Gift, Star, Zap, TrendingUp, Brain, Heart, CheckCircle, ArrowRight, ArrowLeft, Play, Pause, Volume2, VolumeX, Settings} from "lucide-react"
 
 interface WelcomeFlowProps {
@@ -32,17 +33,17 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
 
   // Debug state changes
   useEffect(() => {
-    console.log('Current step changed:', currentStep)
+    logInfo('Current step changed:', currentStep)
   }, [currentStep])
 
   useEffect(() => {
-    console.log('Selected personality changed:', selectedPersonality)
+    logInfo('Selected personality changed:', selectedPersonality)
   }, [selectedPersonality])
 
   useEffect(() => {
-    console.log('Open prop changed:', open)
+    logInfo('Open prop changed:', open)
     if (!open) {
-      console.log('Modal was closed externally!')
+      logInfo('Modal was closed externally!')
     }
   }, [open])
 
@@ -156,10 +157,10 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  console.log('Personality card clicked:', style.id)
-                  console.log('Current step:', currentStep, 'Open:', open)
+                  logInfo('Personality card clicked:', style.id)
+                  logInfo('Current step:', currentStep, 'Open:', open)
                   setSelectedPersonality(style.id)
-                  console.log('Personality set to:', style.id)
+                  logInfo('Personality set to:', style.id)
                 }}
               >
                 <div className="flex items-center space-x-4">
@@ -529,28 +530,28 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   ]
 
   const toggleGoal = (goalId: string) => {
-    console.log('Toggling goal:', goalId, 'Current goals:', selectedGoals)
+    logInfo('Toggling goal:', goalId, 'Current goals:', selectedGoals)
     if (selectedGoals.length >= 3 && !selectedGoals.includes(goalId)) {
-      console.log('Maximum of 3 goals allowed')
+      logInfo('Maximum of 3 goals allowed')
       return // Maximum 3 goals
     }
     const newGoals = selectedGoals.includes(goalId)
       ? selectedGoals.filter((g) => g !== goalId)
       : [...selectedGoals, goalId]
-    console.log('New goals:', newGoals)
+    logInfo('New goals:', newGoals)
     setSelectedGoals(newGoals)
   }
 
   const toggleAgent = (agentId: string) => {
-    console.log('Toggling agent:', agentId, 'Current agents:', selectedAgents)
+    logInfo('Toggling agent:', agentId, 'Current agents:', selectedAgents)
     if (selectedAgents.length >= 3 && !selectedAgents.includes(agentId)) {
-      console.log('Maximum of 3 agents allowed')
+      logInfo('Maximum of 3 agents allowed')
       return // Maximum 3 agents
     }
     const newAgents = selectedAgents.includes(agentId)
       ? selectedAgents.filter((a) => a !== agentId)
       : [...selectedAgents, agentId]
-    console.log('New agents:', newAgents)
+    logInfo('New agents:', newAgents)
     setSelectedAgents(newAgents)
   }
 
@@ -558,15 +559,15 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   const progress = ((currentStep + 1) / totalSteps) * 100
 
   const nextStep = () => {
-    console.log('NextStep called - Current step:', currentStep, 'Total steps:', totalSteps)
+    logInfo('NextStep called - Current step:', currentStep, 'Total steps:', totalSteps)
     if (currentStep < totalSteps - 1) {
-      console.log('Moving to next step:', currentStep + 1)
+      logInfo('Moving to next step:', currentStep + 1)
       setCurrentStep(currentStep + 1)
     } else {
-      console.log('Ready to complete welcome flow, but let\'s double check...')
-      console.log('Current step:', currentStep, 'Should be:', totalSteps - 1)
+      logInfo('Ready to complete welcome flow, but let\'s double check...')
+      logInfo('Current step:', currentStep, 'Should be:', totalSteps - 1)
       if (currentStep === totalSteps - 1) {
-        console.log('Completing welcome flow')
+        logInfo('Completing welcome flow')
         onComplete({
           selectedPersonality,
           selectedGoals,
@@ -576,7 +577,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
           stepsCompleted: totalSteps
         })
       } else {
-        console.error('Tried to complete welcome flow at wrong step!')
+        logError('Tried to complete welcome flow at wrong step!')
       }
     }
   }
@@ -592,7 +593,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={(e) => e.target === e.currentTarget && console.log('Backdrop clicked but prevented')}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={(e) => e.target === e.currentTarget && logInfo('Backdrop clicked but prevented')}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -618,7 +619,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  console.log('Skip setup clicked')
+                  logInfo('Skip setup clicked')
                   onSkip()
                 }} 
                 className="text-sm"
@@ -649,7 +650,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                console.log('Back button clicked')
+                logInfo('Back button clicked')
                 prevStep()
               }}
               disabled={currentStep === 0}
@@ -665,7 +666,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    console.log('Next button clicked on step:', currentStep)
+                    logInfo('Next button clicked on step:', currentStep)
                     nextStep()
                   }}
                   className="punk-button text-white flex items-center gap-2"
@@ -678,7 +679,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    console.log('Launch Empire button clicked')
+                    logInfo('Launch Empire button clicked')
                     nextStep()
                   }}
                   className="punk-button text-white flex items-center gap-2"

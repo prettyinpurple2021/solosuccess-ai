@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 // Simplified training data collector that works with the current setup
 export interface TrainingInteraction {
   id: string
@@ -92,7 +93,7 @@ export class SimpleTrainingCollector {
     if (interaction) {
       interaction.userRating = rating
       interaction.userFeedback = feedback
-      console.log(`Updated rating for interaction ${interactionId}: ${rating} stars`)
+      logInfo(`Updated rating for interaction ${interactionId}: ${rating} stars`)
     }
   }
 

@@ -5,6 +5,7 @@ import { db} from '@/db';
 import { competitorProfiles, intelligenceData} from '@/db/schema';
 import { eq, and, desc, gte} from 'drizzle-orm';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -140,7 +141,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error generating social media analysis:', error);
+    logError('Error generating social media analysis:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

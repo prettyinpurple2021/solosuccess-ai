@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 interface ChatMessage {
   role: string
   content: string
@@ -68,10 +69,10 @@ class BriefcaseAutoSaver {
           throw new Error(result.error || 'Failed to save chat')
         }
 
-        console.log('Chat conversation saved to briefcase:', conversationId)
+        logInfo('Chat conversation saved to briefcase:', conversationId)
 
       } catch (error) {
-        console.error('Auto-save chat error:', error)
+        logError('Auto-save chat error:', error)
       } finally {
         this.saveQueue.delete(conversationId)
       }
@@ -115,10 +116,10 @@ class BriefcaseAutoSaver {
         throw new Error(result.error || 'Failed to save template')
       }
 
-      console.log('Template progress saved to briefcase:', templateSlug)
+      logInfo('Template progress saved to briefcase:', templateSlug)
 
     } catch (error) {
-      console.error('Auto-save template error:', error)
+      logError('Auto-save template error:', error)
     }
   }
 
@@ -150,10 +151,10 @@ class BriefcaseAutoSaver {
         throw new Error(result.error || 'Failed to save brand work')
       }
 
-      console.log('Brand work saved to briefcase:', title)
+      logInfo('Brand work saved to briefcase:', title)
 
     } catch (error) {
-      console.error('Auto-save brand work error:', error)
+      logError('Auto-save brand work error:', error)
     }
   }
 

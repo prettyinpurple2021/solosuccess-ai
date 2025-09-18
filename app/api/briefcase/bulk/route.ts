@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(
   request: NextRequest
@@ -78,7 +79,7 @@ export async function POST(
     return NextResponse.json(result)
 
   } catch (error) {
-    console.error('Bulk operation error:', error)
+    logError('Bulk operation error:', error)
     return NextResponse.json({ 
       error: 'Failed to perform bulk operation' 
     }, { status: 500 })

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -103,7 +104,7 @@ export async function GET(
 
     return NextResponse.json(formattedAlerts)
   } catch (error) {
-    console.error('Error fetching competitor alerts:', error)
+    logError('Error fetching competitor alerts:', error)
     return NextResponse.json({ error: 'Failed to fetch alerts' }, { status: 500 })
   }
 }

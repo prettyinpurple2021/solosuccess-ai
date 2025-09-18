@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 class UXTesting {
   constructor() {
@@ -27,7 +28,7 @@ class UXTesting {
   }
 
   async runAllTests() {
-    console.log('🚀 Starting SoloSuccess AI Platform UX Testing...\n');
+    logInfo('🚀 Starting SoloSuccess AI Platform UX Testing...\n');
     
     await this.testOnboardingEnhancements();
     await this.testInteractiveTutorials();
@@ -39,7 +40,7 @@ class UXTesting {
   }
 
   async testOnboardingEnhancements() {
-    console.log('📋 Testing Enhanced Onboarding Flow...');
+    logInfo('📋 Testing Enhanced Onboarding Flow...');
     
     const tests = [
       {
@@ -86,7 +87,7 @@ class UXTesting {
   }
 
   async testInteractiveTutorials() {
-    console.log('🎯 Testing Interactive Tutorials...');
+    logInfo('🎯 Testing Interactive Tutorials...');
     
     const tests = [
       {
@@ -138,7 +139,7 @@ class UXTesting {
   }
 
   async testErrorHandling() {
-    console.log('⚠️ Testing Error Handling System...');
+    logError('⚠️ Testing Error Handling System...');
     
     const tests = [
       {
@@ -190,7 +191,7 @@ class UXTesting {
   }
 
   async testAccessibilityFeatures() {
-    console.log('♿ Testing Accessibility Features...');
+    logInfo('♿ Testing Accessibility Features...');
     
     const tests = [
       {
@@ -252,7 +253,7 @@ class UXTesting {
   }
 
   async testHelpSystem() {
-    console.log('💡 Testing Help System...');
+    logInfo('💡 Testing Help System...');
     
     const tests = [
       {
@@ -330,7 +331,7 @@ class UXTesting {
   }
 
   generateReport() {
-    console.log('\n📊 UX Testing Results\n');
+    logInfo('\n📊 UX Testing Results\n');
     console.log('='.repeat(60));
 
     // Calculate totals
@@ -356,12 +357,12 @@ class UXTesting {
       const percentage = total > 0 ? Math.round((result.passed / total) * 100) : 0;
       const status = result.failed === 0 ? '✅' : result.passed === 0 ? '❌' : '⚠️';
       
-      console.log(`\n${status} ${categoryNames[category]}: ${result.passed}/${total} (${percentage}%)`);
+      logInfo(`\n${status} ${categoryNames[category]}: ${result.passed}/${total} (${percentage}%)`);
       
       if (result.failed > 0) {
-        console.log('   Failed tests:');
+        logError('   Failed tests:');
         result.tests.filter(t => !t.passed).forEach(test => {
-          console.log(`   - ${test.name}: ${test.error || 'Failed'}`);
+          logError(`   - ${test.name}: ${test.error || 'Failed'}`);
         });
       }
     });
@@ -369,30 +370,30 @@ class UXTesting {
     // Overall results
     const overallPercentage = Math.round((this.results.overall.passed / this.results.overall.total) * 100);
     console.log('\n' + '='.repeat(60));
-    console.log(`🎯 Overall UX Score: ${this.results.overall.passed}/${this.results.overall.total} (${overallPercentage}%)`);
+    logInfo(`🎯 Overall UX Score: ${this.results.overall.passed}/${this.results.overall.total} (${overallPercentage}%)`);
 
     if (overallPercentage >= 90) {
-      console.log('🌟 EXCELLENT - User experience is polished and ready for launch!');
+      logInfo('🌟 EXCELLENT - User experience is polished and ready for launch!');
     } else if (overallPercentage >= 80) {
-      console.log('✅ GOOD - User experience is solid with minor improvements needed');
+      logInfo('✅ GOOD - User experience is solid with minor improvements needed');
     } else if (overallPercentage >= 70) {
-      console.log('⚠️ FAIR - User experience needs some improvements');
+      logInfo('⚠️ FAIR - User experience needs some improvements');
     } else {
-      console.log('❌ NEEDS WORK - User experience requires significant improvements');
+      logInfo('❌ NEEDS WORK - User experience requires significant improvements');
     }
 
     // Recommendations
-    console.log('\n📋 Recommendations:');
+    logInfo('\n📋 Recommendations:');
     if (this.results.overall.failed > 0) {
-      console.log('- Fix failed tests to improve user experience');
+      logError('- Fix failed tests to improve user experience');
     }
     if (overallPercentage >= 90) {
-      console.log('- Consider user testing with real users');
-      console.log('- Monitor user feedback after launch');
+      logInfo('- Consider user testing with real users');
+      logInfo('- Monitor user feedback after launch');
     }
     if (overallPercentage < 80) {
-      console.log('- Prioritize fixing critical UX issues');
-      console.log('- Consider additional accessibility improvements');
+      logInfo('- Prioritize fixing critical UX issues');
+      logInfo('- Consider additional accessibility improvements');
     }
 
     // Save detailed report
@@ -413,7 +414,7 @@ class UXTesting {
       }
     }, null, 2));
 
-    console.log(`\n📄 Detailed report saved to: ${reportPath}`);
+    logInfo(`\n📄 Detailed report saved to: ${reportPath}`);
   }
 }
 

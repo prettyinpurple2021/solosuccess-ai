@@ -1,4 +1,5 @@
 import { query } from '@/lib/neon/client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface NotificationJob {
   id: string
@@ -89,7 +90,7 @@ export class NotificationJobQueue {
     await query(`CREATE INDEX IF NOT EXISTS idx_notification_jobs_status ON notification_jobs(status)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_notification_jobs_created_by ON notification_jobs(created_by)`)
 
-    console.log('Notification job queue initialized')
+    logInfo('Notification job queue initialized')
   }
 
   /**
@@ -128,7 +129,7 @@ export class NotificationJobQueue {
       'pending'
     ])
 
-    console.log(`Added notification job ${jobId} scheduled for ${job.scheduledTime}`)
+    logInfo(`Added notification job ${jobId} scheduled for ${job.scheduledTime}`)
     return jobId
   }
 
@@ -210,9 +211,9 @@ export class NotificationJobQueue {
 
     const job = result.rows[0]
     if (job && job.attempts >= job.max_attempts) {
-      console.log(`Job ${jobId} failed permanently after ${job.attempts} attempts`)
+      logError(`Job ${jobId} failed permanently after ${job.attempts} attempts`)
     } else {
-      console.log(`Job ${jobId} failed, will retry. Attempt ${job?.attempts || 0}/${job?.max_attempts || 3}`)
+      logError(`Job ${jobId} failed, will retry. Attempt ${job?.attempts || 0}/${job?.max_attempts || 3}`)
     }
   }
 
@@ -350,7 +351,7 @@ export class NotificationJobQueue {
 
     const deletedCount = result.rows.length
     if (deletedCount > 0) {
-      console.log(`Cleaned up ${deletedCount} old notification jobs`)
+      logInfo(`Cleaned up ${deletedCount} old notification jobs`)
     }
 
     return deletedCount
@@ -361,22 +362,22 @@ export class NotificationJobQueue {
    */
   startProcessor(intervalMs: number = 30000): void {
     if (this.processingInterval) {
-      console.log('Job processor is already running')
+      logInfo('Job processor is already running')
       return
     }
 
-    console.log(`Starting notification job processor with ${intervalMs}ms interval`)
+    logInfo(`Starting notification job processor with ${intervalMs}ms interval`)
     
     this.processingInterval = setInterval(async () => {
       if (this.isProcessing) {
-        console.log('Skipping job processing - already in progress')
+        logInfo('Skipping job processing - already in progress')
         return
       }
 
       try {
         await this.processJobs()
       } catch (error) {
-        console.error('Job processing error:', error)
+        logError('Job processing error:', error)
       }
     }, intervalMs)
   }
@@ -388,7 +389,7 @@ export class NotificationJobQueue {
     if (this.processingInterval) {
       clearInterval(this.processingInterval)
       this.processingInterval = null
-      console.log('Job processor stopped')
+      logInfo('Job processor stopped')
     }
   }
 
@@ -407,7 +408,7 @@ export class NotificationJobQueue {
         return
       }
 
-      console.log(`Processing ${jobs.length} notification jobs`)
+      logInfo(`Processing ${jobs.length} notification jobs`)
 
       for (const job of jobs) {
         try {
@@ -462,7 +463,7 @@ export class NotificationJobQueue {
       throw new Error(`Failed to send notification: ${error}`)
     }
 
-    console.log(`Successfully processed notification job ${job.id}`)
+    logInfo(`Successfully processed notification job ${job.id}`)
   }
 }
 

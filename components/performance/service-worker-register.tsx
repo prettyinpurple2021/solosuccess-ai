@@ -5,6 +5,7 @@ import { Button} from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Badge} from '@/components/ui/badge'
 import { Download, RefreshCw, CheckCircle} from 'lucide-react'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export function ServiceWorkerRegister() {
   const [isSupported, setIsSupported] = useState(false)
@@ -52,10 +53,10 @@ export function ServiceWorkerRegister() {
     try {
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.register('/sw.js')
-        console.log('Service Worker registered successfully:', registration)
+        logInfo('Service Worker registered successfully:', registration)
       }
     } catch (error) {
-      console.error('Service Worker registration failed:', error)
+      logError('Service Worker registration failed:', error)
     }
   }
 
@@ -67,7 +68,7 @@ export function ServiceWorkerRegister() {
       const { outcome } = await installPrompt.userChoice
       
       if (outcome === 'accepted') {
-        console.log('PWA installed successfully')
+        logInfo('PWA installed successfully')
         setIsInstalled(true)
       }
       

@@ -1,5 +1,6 @@
 import { CompetitiveIntelligenceIntegration } from './competitive-intelligence-integration'
 import { createClient } from '@/lib/neon/client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface AutomationRule {
   id: string
@@ -42,7 +43,7 @@ export class CompetitiveIntelligenceAutomation {
       )
       
       if (alertRows.length === 0) {
-        console.log(`Alert ${alertId} not found for user ${userId}`)
+        logInfo(`Alert ${alertId} not found for user ${userId}`)
         return
       }
       
@@ -58,7 +59,7 @@ export class CompetitiveIntelligenceAutomation {
         }
       }
     } catch (error) {
-      console.error('Error processing alert automation:', error)
+      logError('Error processing alert automation:', error)
     }
   }
   
@@ -125,7 +126,7 @@ export class CompetitiveIntelligenceAutomation {
           )
         }
         
-        console.log(`Created task ${taskId} from alert ${alert.id} via automation rule ${rule.id}`)
+        logInfo(`Created task ${taskId} from alert ${alert.id} via automation rule ${rule.id}`)
       }
       
       // Send notifications if configured
@@ -133,7 +134,7 @@ export class CompetitiveIntelligenceAutomation {
         await this.sendNotifications(actions.notify_channels, alert, rule, userId)
       }
     } catch (error) {
-      console.error(`Error executing automation rule ${rule.id}:`, error)
+      logError(`Error executing automation rule ${rule.id}:`, error)
     }
   }
   
@@ -285,7 +286,7 @@ export class CompetitiveIntelligenceAutomation {
       
       return createdGoals
     } catch (error) {
-      console.error('Error creating benchmarking goals:', error)
+      logError('Error creating benchmarking goals:', error)
       return []
     }
   }

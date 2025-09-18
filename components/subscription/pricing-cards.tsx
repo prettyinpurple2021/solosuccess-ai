@@ -7,6 +7,7 @@ import { Badge} from '@/components/ui/badge'
 import { Check, Loader2, Zap, Crown, Rocket} from 'lucide-react'
 import { useAuth} from '@/hooks/use-auth'
 import { toast} from '@/hooks/use-toast'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface PricingCardProps {
   tier: 'launch' | 'accelerator' | 'dominator'
@@ -111,7 +112,7 @@ export function PricingCards() {
         throw new Error(data.error || 'Failed to create checkout session')
       }
     } catch (error) {
-      console.error('Error creating checkout session:', error)
+      logError('Error creating checkout session:', error)
       toast({
         title: "Error",
         description: "Failed to start upgrade process",

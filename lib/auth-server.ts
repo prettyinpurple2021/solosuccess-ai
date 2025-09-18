@@ -5,6 +5,7 @@ import type { AuthenticatedUser, AuthResult } from "./auth-utils"
 import { headers } from "next/headers"
 import jwt from 'jsonwebtoken'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -74,7 +75,7 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
       subscription_status: user.subscription_status ?? 'active',
     }
   } catch (err) {
-    console.error('JWT authentication error:', err)
+    logError('JWT authentication error:', err)
     return null
   }
 }
@@ -93,7 +94,7 @@ export async function authenticateRequest(): Promise<AuthResult> {
       return { user: null, error: "No authenticated user session found" }
     }
   } catch (authError) {
-    console.error("Authentication error:", authError)
+    logError("Authentication error:", authError)
     return { user: null, error: "Authentication failed" }
   }
 }
@@ -110,7 +111,7 @@ export async function verifyAuth(request?: NextRequest): Promise<{ user?: Authen
       error: result.error || undefined
     }
   } catch (error) {
-    console.error('verifyAuth error:', error)
+    logError('verifyAuth error:', error)
     return { error: 'Authentication failed' }
   }
 }

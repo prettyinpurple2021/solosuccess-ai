@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function PATCH(
   request: NextRequest,
@@ -65,7 +66,7 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Update permission error:', error)
+    logError('Update permission error:', error)
     return NextResponse.json({ 
       error: 'Failed to update permission' 
     }, { status: 500 })
@@ -133,7 +134,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Delete permission error:', error)
+    logError('Delete permission error:', error)
     return NextResponse.json({ 
       error: 'Failed to delete permission' 
     }, { status: 500 })

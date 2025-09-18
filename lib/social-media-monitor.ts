@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { competitorProfiles, intelligenceData } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types for social media data
 export interface SocialMediaHandles {
@@ -117,7 +118,7 @@ export class SocialMediaMonitor {
             await this.storeIntelligenceData(competitorId, competitor.user_id, analysis);
           }
         } catch (error) {
-          console.error(`Error monitoring ${platform} for competitor ${competitorId}:`, error);
+          logError(`Error monitoring ${platform} for competitor ${competitorId}:`, error);
         }
       }
     }
@@ -157,7 +158,7 @@ export class SocialMediaMonitor {
 
       return posts;
     } catch (error) {
-      console.error(`Error monitoring LinkedIn for competitor ${competitorId}:`, error);
+      logError(`Error monitoring LinkedIn for competitor ${competitorId}:`, error);
       return [];
     }
   }
@@ -192,7 +193,7 @@ export class SocialMediaMonitor {
 
       return posts;
     } catch (error) {
-      console.error(`Error monitoring Twitter for competitor ${competitorId}:`, error);
+      logError(`Error monitoring Twitter for competitor ${competitorId}:`, error);
       return [];
     }
   }
@@ -227,7 +228,7 @@ export class SocialMediaMonitor {
 
       return posts;
     } catch (error) {
-      console.error(`Error monitoring Facebook for competitor ${competitorId}:`, error);
+      logError(`Error monitoring Facebook for competitor ${competitorId}:`, error);
       return [];
     }
   }
@@ -262,7 +263,7 @@ export class SocialMediaMonitor {
 
       return posts;
     } catch (error) {
-      console.error(`Error monitoring Instagram for competitor ${competitorId}:`, error);
+      logError(`Error monitoring Instagram for competitor ${competitorId}:`, error);
       return [];
     }
   }
@@ -301,7 +302,7 @@ export class SocialMediaMonitor {
         trends
       };
     } catch (error) {
-      console.error('Error analyzing sentiment:', error);
+      logError('Error analyzing sentiment:', error);
       return {
         overall: { score: 0, magnitude: 0, label: 'neutral', confidence: 0 },
         byPost: [],
@@ -394,7 +395,7 @@ export class SocialMediaMonitor {
         processed_at: new Date()
       });
     } catch (error) {
-      console.error('Error storing intelligence data:', error);
+      logError('Error storing intelligence data:', error);
     }
   }
 

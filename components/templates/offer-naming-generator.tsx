@@ -18,38 +18,82 @@ interface NameOption {
 }
 
 export function OfferNamingGenerator() {
-  const [productDetails, setProductDetails] = useState('');
+  const [productDescription, setProductDescription] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
-  const [desiredVibe, setDesiredVibe] = useState('');
-  const [keywords, setKeywords] = useState('');
+  const [tone, setTone] = useState('');
+  const [pricePoint, setPricePoint] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [keyBenefits, setKeyBenefits] = useState<string[]>([]);
   const [generatedNames, setGeneratedNames] = useState<NameOption[]>([]);
   const [title, setTitle] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedMetadata, setGeneratedMetadata] = useState<any>(null);
   
   const { saveTemplate, isSaving } = useTemplateSave();
 
-  const generateNames = () => {
-    // Simulate AI-generated names
-    const sampleNames: NameOption[] = [
-      {
-        name: "Boss Mode Accelerator",
-        reason: "Combines authority with momentum, perfect for entrepreneurs ready to level up",
-        vibe: "Confident, Action-oriented",
-        tone: "Professional yet approachable"
-      },
-      {
-        name: "Empire Builder Blueprint", 
-        reason: "Evokes building something substantial and lasting, appeals to ambitious founders",
-        vibe: "Ambitious, Strategic",
-        tone: "Aspirational and powerful"
-      },
-      {
-        name: "Solo Success System",
-        reason: "Clear benefit (success) with target audience (solo entrepreneurs) and structure (system)",
-        vibe: "Clear, Results-focused",
-        tone: "Direct and trustworthy"
+  const generateNames = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('/api/templates/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'offer-naming',
+          productDescription,
+          targetAudience,
+          pricePoint: pricePoint || undefined,
+          industry: industry || undefined,
+          keyBenefits: keyBenefits.length > 0 ? keyBenefits : undefined,
+          tone: tone || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate names');
       }
-    ];
-    setGeneratedNames(sampleNames);
+
+      const result = await response.json();
+      
+      if (result.success && result.content) {
+        setGeneratedNames(result.content);
+        setGeneratedMetadata({
+          ...result.metadata,
+          templateType: result.templateType,
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Error generating names:', error);
+      
+      // Fallback to sample names
+      const fallbackNames: NameOption[] = [
+        {
+          name: `${productDescription} Pro`,
+          reason: "Simple, professional, and clear about the product",
+          vibe: "Professional",
+          tone: "Confident"
+        },
+        {
+          name: `${targetAudience} Success System`, 
+          reason: "Targets the audience with clear benefit",
+          vibe: "Results-focused",
+          tone: "Direct"
+        },
+        {
+          name: `${productDescription} Mastery Program`,
+          reason: "Suggests expertise and comprehensive learning",
+          vibe: "Educational",
+          tone: "Authoritative"
+        }
+      ];
+      setGeneratedNames(fallbackNames);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const addCustomName = () => {

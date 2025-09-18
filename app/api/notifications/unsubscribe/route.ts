@@ -3,6 +3,7 @@ import { query } from '@/lib/neon/client'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the unsubscription
-    console.log(`User ${user.id} unsubscribed from push notifications`)
+    logInfo(`User ${user.id} unsubscribed from push notifications`)
 
     // Check if user has any remaining active subscriptions
     const remainingSubscriptions = await query(`
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error unsubscribing from push notifications:', error)
+    logError('Error unsubscribing from push notifications:', error)
     return NextResponse.json(
       { error: 'Failed to unsubscribe from push notifications' },
       { status: 500 }
@@ -118,7 +119,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error deleting push notification subscriptions:', error)
+    logError('Error deleting push notification subscriptions:', error)
     return NextResponse.json(
       { error: 'Failed to delete push notification subscriptions' },
       { status: 500 }

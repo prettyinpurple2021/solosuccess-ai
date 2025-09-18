@@ -24,6 +24,7 @@ import {
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
 import VoiceTaskCreator from "@/components/tasks/voice-task-creator"
 import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Goal {
   id: string
@@ -89,7 +90,7 @@ export default function SlaylistPage() {
         setGoals(data.goals || [])
       }
     } catch (error) {
-      console.error('Error fetching goals:', error)
+      logError('Error fetching goals:', error)
     }
   }
 
@@ -101,7 +102,7 @@ export default function SlaylistPage() {
         setTasks(data.tasks || [])
       }
     } catch (error) {
-      console.error('Error fetching tasks:', error)
+      logError('Error fetching tasks:', error)
     } finally {
       setLoading(false)
     }
@@ -127,7 +128,7 @@ export default function SlaylistPage() {
         })
       }
     } catch (error) {
-      console.error('Error creating goal:', error)
+      logError('Error creating goal:', error)
     }
   }
 
@@ -152,7 +153,7 @@ export default function SlaylistPage() {
         })
       }
     } catch (error) {
-      console.error('Error creating task:', error)
+      logError('Error creating task:', error)
     }
   }
 
@@ -177,7 +178,7 @@ export default function SlaylistPage() {
         throw new Error('Failed to create task')
       }
     } catch (error) {
-      console.error('Error creating voice task:', error)
+      logError('Error creating voice task:', error)
       throw error
     }
   }
@@ -195,7 +196,7 @@ export default function SlaylistPage() {
         await fetchGoals() // Refresh goals to update progress
       }
     } catch (error) {
-      console.error('Error updating task:', error)
+      logError('Error updating task:', error)
     }
   }
 
@@ -216,7 +217,7 @@ export default function SlaylistPage() {
         await fetchTasks()
       }
     } catch (error) {
-      console.error('Error applying AI suggestion:', error)
+      logError('Error applying AI suggestion:', error)
     }
   }
 
@@ -238,7 +239,7 @@ export default function SlaylistPage() {
         await fetchTasks()
       }
     } catch (error) {
-      console.error('Error reordering tasks:', error)
+      logError('Error reordering tasks:', error)
     }
   }
 

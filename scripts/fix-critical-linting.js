@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Function to fix unused imports by removing them
 function fixUnusedImports(content) {
@@ -124,7 +125,7 @@ function fixImgTags(content) {
 function processFile(filePath) {
   try {
     if (!fs.existsSync(filePath)) {
-      console.log(`File not found: ${filePath}`);
+      logInfo(`File not found: ${filePath}`);
       return;
     }
 
@@ -141,12 +142,12 @@ function processFile(filePath) {
     // Write back if changed
     if (content !== originalContent) {
       fs.writeFileSync(filePath, content, 'utf8');
-      console.log(`✅ Fixed: ${filePath}`);
+      logInfo(`✅ Fixed: ${filePath}`);
     } else {
-      console.log(`⏭️  No changes needed: ${filePath}`);
+      logInfo(`⏭️  No changes needed: ${filePath}`);
     }
   } catch (error) {
-    console.error(`❌ Error processing ${filePath}:`, error.message);
+    logError(`❌ Error processing ${filePath}:`, error.message);
   }
 }
 
@@ -165,8 +166,8 @@ const criticalFiles = [
 ];
 
 // Process files
-console.log('🔧 Fixing critical linting issues...\n');
+logInfo('🔧 Fixing critical linting issues...\n');
 criticalFiles.forEach(file => {
   processFile(file);
 });
-console.log('\n✨ Critical linting fixes completed!');
+logInfo('\n✨ Critical linting fixes completed!');

@@ -4,6 +4,7 @@ import React, { ErrorInfo } from 'react';
 import { Button} from './button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from './card';
 import { AlertCircle, Home, RefreshCw} from 'lucide-react';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    logError('Error caught by ErrorBoundary:', error, errorInfo);
     // You could log the error to a service here
   }
 

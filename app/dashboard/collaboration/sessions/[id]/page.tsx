@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import MessageInterface from '@/components/collaboration/MessageInterface'
 import AgentInterface from '@/components/collaboration/AgentInterface'
 import SessionControls from '@/components/collaboration/SessionControls'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface SessionData {
   id: string
@@ -44,7 +45,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           router.push('/dashboard/collaboration')
         }
       } catch (error) {
-        console.error('Error fetching session:', error)
+        logError('Error fetching session:', error)
       } finally {
         setLoading(false)
       }

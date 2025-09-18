@@ -6,6 +6,7 @@ import { Progress} from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import { TooltipProvider} from "@/components/ui/tooltip"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Crown, Sparkles, Target, Users, ArrowRight, ArrowLeft, CheckCircle, Rocket, Brain, X, Lightbulb, Zap, TrendingUp, FileText, Settings, Search, Plus, Star, SkipForward} from "lucide-react"
 
 interface TutorialStep {
@@ -278,7 +279,7 @@ export function InteractiveTutorial({
           label: "Start Chat",
           onClick: () => {
             // This would trigger the chat interface
-            console.log("Starting AI chat...")
+            logInfo("Starting AI chat...")
           }
         }
       }
@@ -352,7 +353,7 @@ export function InteractiveTutorial({
           label: "Create Task",
           onClick: () => {
             // This would open the task creation modal
-            console.log("Creating task...")
+            logInfo("Creating task...")
           }
         }
       }
@@ -526,7 +527,7 @@ export function InteractiveTutorial({
         const savedPreferences = preferences.tutorialPreferences || {}
         setUserPreferences(prev => ({ ...prev, ...savedPreferences }))
       } catch (error) {
-        console.warn('Failed to load tutorial progress:', error)
+        logWarn('Failed to load tutorial progress:', error)
         setStartTime(new Date())
       }
     }
@@ -550,15 +551,15 @@ export function InteractiveTutorial({
         }
         
         setPreference('tutorialProgress', newProgress).catch(error => {
-          console.warn('Failed to save tutorial progress:', error)
+          logWarn('Failed to save tutorial progress:', error)
         })
         
         // Save user preferences
         setPreference('tutorialPreferences', userPreferences).catch(error => {
-          console.warn('Failed to save tutorial preferences:', error)
+          logWarn('Failed to save tutorial preferences:', error)
         })
       } catch (error) {
-        console.warn('Failed to save tutorial progress:', error)
+        logWarn('Failed to save tutorial progress:', error)
       }
     }
   }, [open, currentStep, completedSteps, startTime, tutorialKey, userPreferences, preferences.tutorialProgress, setPreference])
@@ -567,7 +568,7 @@ export function InteractiveTutorial({
   const trackTutorialEvent = (event: string, data?: any) => {
     try {
       // You can integrate this with your analytics service
-      console.log('Tutorial Event:', { event, tutorialType, step: currentStep, data })
+      logInfo('Tutorial Event:', { event, tutorialType, step: currentStep, data })
       
       // Example: Send to analytics service
       // analytics.track('tutorial_event', { event, tutorialType, step: currentStep, data })
@@ -582,7 +583,7 @@ export function InteractiveTutorial({
       //   })
       // }
     } catch (error) {
-      console.warn('Failed to track tutorial event:', error)
+      logWarn('Failed to track tutorial event:', error)
     }
   }
 
@@ -605,13 +606,13 @@ export function InteractiveTutorial({
       // Add error handling for missing elements
       const element = document.querySelector(currentStepData.target) as HTMLElement
       if (!element) {
-        console.warn(`Tutorial target element not found: ${currentStepData.target}`)
+        logWarn(`Tutorial target element not found: ${currentStepData.target}`)
         trackTutorialEvent('element_not_found', { target: currentStepData.target })
         
         // Try to find alternative elements or show helpful message
         const alternativeElements = document.querySelectorAll('[data-tutorial-target]')
         if (alternativeElements.length > 0) {
-          console.log('Found alternative tutorial targets:', alternativeElements)
+          logInfo('Found alternative tutorial targets:', alternativeElements)
         }
         return
       }
@@ -623,7 +624,7 @@ export function InteractiveTutorial({
         try {
           element.scrollIntoView({ behavior: "smooth", block: "center" })
         } catch (error) {
-          console.warn('Smooth scroll not supported, using fallback')
+          logWarn('Smooth scroll not supported, using fallback')
           element.scrollIntoView()
         }
         

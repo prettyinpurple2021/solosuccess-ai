@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -160,7 +161,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(analyticsData)
   } catch (error) {
-    console.error('Analytics error:', error)
+    logError('Analytics error:', error)
     return NextResponse.json({ error: 'Failed to fetch analytics data' }, { status: 500 })
   }
 }

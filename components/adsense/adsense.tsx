@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { useEffect} from 'react';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface AdSenseProps {
   /**
@@ -58,7 +59,7 @@ export default function AdSense({ clientId }: AdSenseProps) {
         crossOrigin="anonymous"
         strategy="afterInteractive"
         onError={() => {
-          console.error('Failed to load AdSense script');
+          logError('Failed to load AdSense script');
         }}
       />
     </>

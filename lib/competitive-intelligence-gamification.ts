@@ -435,7 +435,7 @@ export class CompetitiveIntelligenceGamification extends GamificationEngine {
         percentile
       }
     } catch (error) {
-      console.error('Error getting leaderboard position:', error)
+      logError('Error getting leaderboard position:', error)
       return { position: 1, total_users: 1, percentile: 100 }
     }
   }
@@ -576,6 +576,7 @@ export class CompetitiveIntelligenceGamification extends GamificationEngine {
     }
     
     const currentValue = statMap[badge.requirements.metric] || 0
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
     return currentValue >= badge.requirements.threshold
   }
 

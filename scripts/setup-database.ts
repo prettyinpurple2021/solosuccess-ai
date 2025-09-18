@@ -13,6 +13,7 @@
 
 import { Pool } from 'pg'
 import * as dotenv from 'dotenv'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Load environment variables
 dotenv.config({ path: '.env.local' })
@@ -20,9 +21,9 @@ dotenv.config({ path: '.env.local' })
 const databaseUrl = process.env.DATABASE_URL!
 
 if (!databaseUrl) {
-  console.error('❌ Missing required environment variable:')
-  console.error('   - DATABASE_URL')
-  console.error('\nPlease check your .env.local file.')
+  logError('❌ Missing required environment variable:')
+  logError('   - DATABASE_URL')
+  logError('\nPlease check your .env.local file.')
   process.exit(1)
 }
 
@@ -32,7 +33,7 @@ const pool = new Pool({
 })
 
 async function setupDatabase() {
-  console.log('🚀 Setting up SoloSuccess AI database...\n')
+  logInfo('🚀 Setting up SoloSuccess AI database...\n')
 
   try {
     // 1. Check if AI agents already exist
@@ -41,10 +42,10 @@ async function setupDatabase() {
     )
 
     if (existingAgents[0].count > 0) {
-      console.log('ℹ️  AI agents already exist, skipping agent setup...')
+      logInfo('ℹ️  AI agents already exist, skipping agent setup...')
     } else {
       // Insert AI agents
-      console.log('👥 Creating AI agents...')
+      logInfo('👥 Creating AI agents...')
       
       const aiAgents = [
         {
@@ -210,7 +211,7 @@ When helping with problem-solving, always guide users through the Five Whys tech
         )
       }
 
-      console.log('✅ AI agents created successfully!')
+      logInfo('✅ AI agents created successfully!')
     }
 
     // 2. Check if achievements already exist
@@ -219,10 +220,10 @@ When helping with problem-solving, always guide users through the Five Whys tech
     )
 
     if (existingAchievements[0].count > 0) {
-      console.log('ℹ️  Achievements already exist, skipping achievement setup...')
+      logInfo('ℹ️  Achievements already exist, skipping achievement setup...')
     } else {
       // Insert achievements
-      console.log('🏆 Creating achievements...')
+      logInfo('🏆 Creating achievements...')
       
       const achievements = [
         {
@@ -333,31 +334,31 @@ When helping with problem-solving, always guide users through the Five Whys tech
         )
       }
 
-      console.log('✅ Achievements created successfully!')
+      logInfo('✅ Achievements created successfully!')
     }
 
     // 3. Test database connection
-    console.log('🔒 Testing database connection...')
+    logInfo('🔒 Testing database connection...')
     
     const { rows: agents } = await pool.query(
       'SELECT name, display_name FROM ai_agents LIMIT 3'
     )
 
-    console.log('✅ Database connection successful!')
-    console.log(`   Found ${agents?.length || 0} AI agents`)
+    logInfo('✅ Database connection successful!')
+    logInfo(`   Found ${agents?.length || 0} AI agents`)
 
-    console.log('\n🎉 Database setup completed successfully!')
-    console.log('\n📝 Next steps:')
-    console.log('   1. Run `npm run dev` to start the development server')
-    console.log('   2. Visit http://localhost:3000 to see your app')
-    console.log('   3. Create a user account to test the functionality')
-    console.log('   4. Check the /dashboard to see the BossRoom interface')
-    console.log('\n💡 Tip: The AI agents are ready to chat! Try starting a conversation.')
+    logInfo('\n🎉 Database setup completed successfully!')
+    logInfo('\n📝 Next steps:')
+    logInfo('   1. Run `npm run dev` to start the development server')
+    logInfo('   2. Visit http://localhost:3000 to see your app')
+    logInfo('   3. Create a user account to test the functionality')
+    logInfo('   4. Check the /dashboard to see the BossRoom interface')
+    logInfo('\n💡 Tip: The AI agents are ready to chat! Try starting a conversation.')
 
     return true
 
   } catch (error) {
-    console.error('❌ Database setup failed:', error)
+    logError('❌ Database setup failed:', error)
     return false
   } finally {
     await pool.end()

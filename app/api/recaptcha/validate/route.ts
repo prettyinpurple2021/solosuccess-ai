@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { validateRecaptcha} from '@/lib/recaptcha'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('reCAPTCHA validation error:', error)
+    logError('reCAPTCHA validation error:', error)
     
     return NextResponse.json(
       { 

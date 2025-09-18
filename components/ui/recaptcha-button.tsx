@@ -7,6 +7,7 @@ import { useRecaptcha, useRecaptchaForm} from "@/hooks/use-recaptcha"
 import { RECAPTCHA_ACTIONS, type RecaptchaAction} from "@/lib/recaptcha-client"
 import { Shield, AlertCircle, CheckCircle} from "lucide-react"
 import { RECAPTCHA_CONFIG} from "@/lib/recaptcha-client"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface RecaptchaButtonProps extends Omit<BossButtonProps, 'onClick'> {
   children: ReactNode
@@ -52,7 +53,7 @@ export function RecaptchaButton({
     resetError()
     
     if (!RECAPTCHA_CONFIG.siteKey) {
-      console.warn('reCAPTCHA site key not configured, proceeding without validation')
+      logWarn('reCAPTCHA site key not configured, proceeding without validation')
       if (onSubmit) {
         try {
           const result = await onSubmit(formData)
@@ -67,26 +68,26 @@ export function RecaptchaButton({
     
     if (!isReady) {
       const errorMsg = 'reCAPTCHA not ready. Please wait a moment and try again.'
-      console.error('reCAPTCHA not ready. Site key:', RECAPTCHA_CONFIG.siteKey)
+      logError('reCAPTCHA not ready. Site key:', RECAPTCHA_CONFIG.siteKey)
       onError?.(errorMsg)
       return
     }
 
     try {
-      console.log('Executing reCAPTCHA for action:', action)
+      logInfo('Executing reCAPTCHA for action:', action)
       const token = await execute()
       
       if (token && onSubmit) {
-        console.log('reCAPTCHA token generated, submitting form')
+        logInfo('reCAPTCHA token generated, submitting form')
         const result = await onSubmit(formData)
         return result
       } else if (!token) {
-        console.error('Failed to generate reCAPTCHA token')
+        logError('Failed to generate reCAPTCHA token')
         onError?.('Failed to generate security verification token')
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Submission failed'
-      console.error('reCAPTCHA execution error:', err)
+      logError('reCAPTCHA execution error:', err)
       onError?.(errorMsg)
     }
   }

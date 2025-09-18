@@ -4,6 +4,7 @@ import { createClient} from '@/lib/neon/server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
       brandProfile: rows[0]
     }, { status: 201 })
   } catch (error) {
-    console.error('Error saving brand kit:', error)
+    logError('Error saving brand kit:', error)
     return NextResponse.json(
       { error: 'Failed to save brand kit' },
       { status: 500 }

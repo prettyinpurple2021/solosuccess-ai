@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Palette, 
   Type, 
   ImageIcon, 
@@ -152,7 +153,7 @@ export default function BrandStudioPage() {
         }
       }
     } catch (error) {
-      console.error('Error loading brand settings:', error)
+      logError('Error loading brand settings:', error)
     } finally {
       setLoading(false)
     }
@@ -173,10 +174,10 @@ export default function BrandStudioPage() {
 
       if (response.ok) {
         // Show success message
-        console.log('Brand settings saved successfully')
+        logInfo('Brand settings saved successfully')
       }
     } catch (error) {
-      console.error('Error saving brand settings:', error)
+      logError('Error saving brand settings:', error)
     } finally {
       setSaving(false)
     }
@@ -221,7 +222,7 @@ export default function BrandStudioPage() {
         setLogoGenerated(true)
       }
     } catch (error) {
-      console.error('Error generating logo:', error)
+      logError('Error generating logo:', error)
     } finally {
       setGeneratingLogo(false)
     }
@@ -476,22 +477,22 @@ export default function BrandStudioPage() {
                     <div className="flex gap-2">
                       <div 
                         className="w-8 h-8 rounded-full border"
-                        style={{ backgroundColor: palette.primary }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                         title="Primary"
                       ></div>
                       <div 
                         className="w-8 h-8 rounded-full border"
-                        style={{ backgroundColor: palette.secondary }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                         title="Secondary"
                       ></div>
                       <div 
                         className="w-8 h-8 rounded-full border"
-                        style={{ backgroundColor: palette.accent }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                         title="Accent"
                       ></div>
                       <div 
                         className="w-8 h-8 rounded-full border"
-                        style={{ backgroundColor: palette.neutral }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                         title="Neutral"
                       ></div>
                     </div>
@@ -507,7 +508,7 @@ export default function BrandStudioPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div 
                         className="w-6 h-6 rounded border"
-                        style={{ backgroundColor: brandSettings.colorPalette.primary }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                       ></div>
                       <span className="text-sm font-mono">{brandSettings.colorPalette.primary}</span>
                     </div>
@@ -517,7 +518,7 @@ export default function BrandStudioPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div 
                         className="w-6 h-6 rounded border"
-                        style={{ backgroundColor: brandSettings.colorPalette.secondary }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                       ></div>
                       <span className="text-sm font-mono">{brandSettings.colorPalette.secondary}</span>
                     </div>
@@ -527,7 +528,7 @@ export default function BrandStudioPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div 
                         className="w-6 h-6 rounded border"
-                        style={{ backgroundColor: brandSettings.colorPalette.accent }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                       ></div>
                       <span className="text-sm font-mono">{brandSettings.colorPalette.accent}</span>
                     </div>
@@ -537,7 +538,7 @@ export default function BrandStudioPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div 
                         className="w-6 h-6 rounded border"
-                        style={{ backgroundColor: brandSettings.colorPalette.neutral }}
+                        style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                       ></div>
                       <span className="text-sm font-mono">{brandSettings.colorPalette.neutral}</span>
                     </div>

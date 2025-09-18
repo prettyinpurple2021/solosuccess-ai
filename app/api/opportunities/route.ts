@@ -4,6 +4,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { opportunityRecommendationSystem} from '@/lib/opportunity-recommendation-system'
 import { competitiveOpportunityDetector} from '@/lib/competitive-opportunity-detection'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -128,7 +129,7 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error getting opportunities:', error)
+    logError('Error getting opportunities:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -200,7 +201,7 @@ export async function POST(request: NextRequest) {
       prioritization
     }, { status: 201 })
   } catch (error) {
-    console.error('Error creating opportunity:', error)
+    logError('Error creating opportunity:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

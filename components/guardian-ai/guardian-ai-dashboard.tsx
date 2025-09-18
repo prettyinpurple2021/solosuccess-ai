@@ -10,6 +10,7 @@ import { Shield, CheckCircle, AlertTriangle, TrendingUp, Users, FileText, Settin
 import { ComplianceScanner} from "./compliance-scanner"
 import { PolicyGenerator} from "./policy-generator"
 import { ConsentManagement} from "./consent-management"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface ComplianceMetrics {
   trustScore: number
@@ -49,7 +50,7 @@ export function GuardianAiDashboard() {
           })
         }
       } catch (error) {
-        console.error('Error fetching compliance data:', error)
+        logError('Error fetching compliance data:', error)
       } finally {
         setLoading(false)
       }

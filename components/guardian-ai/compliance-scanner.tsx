@@ -10,6 +10,7 @@ import { Progress} from "@/components/ui/progress"
 import { Alert} from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import { Shield, AlertTriangle, Eye, CheckCircle, Database, Cookie, User, Download, FileText} from "lucide-react"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface ComplianceIssue {
   id: string
@@ -84,7 +85,7 @@ export function ComplianceScanner() {
         
         clearInterval(progressInterval)
       } catch (apiError) {
-        console.error('API Error:', apiError)
+        logError('API Error:', apiError)
         
         // Fallback to empty results when API fails
         clearInterval(progressInterval)
@@ -109,7 +110,7 @@ export function ComplianceScanner() {
         setScanResults(emptyScanResults)
       }
     } catch (error) {
-      console.error('Scan error:', error)
+      logError('Scan error:', error)
       // Handle error - could show a toast notification here
     } finally {
       setIsScanning(false)

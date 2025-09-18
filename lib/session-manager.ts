@@ -123,6 +123,7 @@ export class SessionManager {
 
       if (availableAgents.length < requiredAgents.length) {
         const unavailableAgents = requiredAgents.filter(id => !availableAgents.includes(id))
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
         throw new Error(`Required agents not available: ${unavailableAgents.join(', ')}`)
       }
 
@@ -190,12 +191,12 @@ export class SessionManager {
       sessionState.updatedAt = new Date()
       this.sessionStates.set(sessionId, sessionState)
 
-      console.log(`✅ Session ${sessionId} created with ${availableAgents.length} agents`)
+      logInfo(`✅ Session ${sessionId} created with ${availableAgents.length} agents`)
       
       return session
 
     } catch (error) {
-      console.error('Error creating session:', error)
+      logError('Error creating session:', error)
       throw error
     }
   }
@@ -260,12 +261,12 @@ export class SessionManager {
       // Create checkpoint
       await this.createCheckpoint(sessionId, `Agent ${agentId} joined`)
 
-      console.log(`✅ Agent ${agentId} joined session ${sessionId}`)
+      logInfo(`✅ Agent ${agentId} joined session ${sessionId}`)
       
       return true
 
     } catch (error) {
-      console.error(`Error joining session: ${error}`)
+      logError(`Error joining session: ${error}`)
       return false
     }
   }
@@ -322,12 +323,12 @@ export class SessionManager {
         await this.pauseSession(sessionId, 'No participants remaining')
       }
 
-      console.log(`✅ Agent ${agentId} left session ${sessionId}`)
+      logInfo(`✅ Agent ${agentId} left session ${sessionId}`)
       
       return true
 
     } catch (error) {
-      console.error(`Error leaving session: ${error}`)
+      logError(`Error leaving session: ${error}`)
       return false
     }
   }
@@ -360,12 +361,12 @@ export class SessionManager {
       // Create checkpoint
       await this.createCheckpoint(sessionId, `Session paused: ${reason || 'Manual pause'}`)
 
-      console.log(`⏸️ Session ${sessionId} paused: ${reason || 'Manual pause'}`)
+      logInfo(`⏸️ Session ${sessionId} paused: ${reason || 'Manual pause'}`)
       
       return true
 
     } catch (error) {
-      console.error(`Error pausing session: ${error}`)
+      logError(`Error pausing session: ${error}`)
       return false
     }
   }
@@ -399,12 +400,12 @@ export class SessionManager {
       // Create checkpoint
       await this.createCheckpoint(sessionId, 'Session resumed')
 
-      console.log(`▶️ Session ${sessionId} resumed`)
+      logInfo(`▶️ Session ${sessionId} resumed`)
       
       return true
 
     } catch (error) {
-      console.error(`Error resuming session: ${error}`)
+      logError(`Error resuming session: ${error}`)
       return false
     }
   }
@@ -456,12 +457,12 @@ export class SessionManager {
         this.archiveSession(sessionId).catch(console.error)
       }, sessionState.configuration.autoArchiveAfter)
 
-      console.log(`✅ Session ${sessionId} completed`)
+      logInfo(`✅ Session ${sessionId} completed`)
       
       return true
 
     } catch (error) {
-      console.error(`Error completing session: ${error}`)
+      logError(`Error completing session: ${error}`)
       return false
     }
   }
@@ -488,12 +489,12 @@ export class SessionManager {
       await this.createCheckpoint(sessionId, 'Session archived')
 
       // In a real implementation, move to cold storage
-      console.log(`📦 Session ${sessionId} archived`)
+      logInfo(`📦 Session ${sessionId} archived`)
       
       return true
 
     } catch (error) {
-      console.error(`Error archiving session: ${error}`)
+      logError(`Error archiving session: ${error}`)
       return false
     }
   }
@@ -570,12 +571,12 @@ export class SessionManager {
       
       this.sessionCheckpoints.set(sessionId, checkpoints)
 
-      console.log(`📸 Checkpoint created for session ${sessionId}: ${description}`)
+      logInfo(`📸 Checkpoint created for session ${sessionId}: ${description}`)
       
       return checkpointId
 
     } catch (error) {
-      console.error(`Error creating checkpoint: ${error}`)
+      logError(`Error creating checkpoint: ${error}`)
       throw error
     }
   }
@@ -605,12 +606,12 @@ export class SessionManager {
         { restoredFromCheckpoint: checkpointId }
       )
 
-      console.log(`🔄 Session ${sessionId} restored from checkpoint ${checkpointId}`)
+      logInfo(`🔄 Session ${sessionId} restored from checkpoint ${checkpointId}`)
       
       return true
 
     } catch (error) {
-      console.error(`Error restoring from checkpoint: ${error}`)
+      logError(`Error restoring from checkpoint: ${error}`)
       return false
     }
   }
@@ -650,12 +651,12 @@ export class SessionManager {
       sessionState.updatedAt = new Date()
       this.sessionStates.set(sessionId, sessionState)
 
-      console.log(`📝 Task ${taskId} marked as ${status} in session ${sessionId}`)
+      logInfo(`📝 Task ${taskId} marked as ${status} in session ${sessionId}`)
       
       return true
 
     } catch (error) {
-      console.error(`Error updating task status: ${error}`)
+      logError(`Error updating task status: ${error}`)
       return false
     }
   }
@@ -746,7 +747,7 @@ export class SessionManager {
       this.sessionTemplates.set(template.id, template)
     })
 
-    console.log(`✅ Session Manager initialized with ${templates.length} default templates`)
+    logInfo(`✅ Session Manager initialized with ${templates.length} default templates`)
   }
 
   /**
@@ -784,7 +785,7 @@ export class SessionManager {
     })
 
     if (sessionsToArchive.length > 0) {
-      console.log(`🧹 Cleaned up ${sessionsToArchive.length} inactive sessions`)
+      logInfo(`🧹 Cleaned up ${sessionsToArchive.length} inactive sessions`)
     }
   }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface DashboardData {
   user: {
@@ -134,7 +135,7 @@ export function useDashboardData() {
       setData(dashboardData)
       setLastUpdated(new Date())
     } catch (err) {
-      console.error('Error fetching dashboard data:', err)
+      logError('Error fetching dashboard data:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data')
     } finally {
       setLoading(false)

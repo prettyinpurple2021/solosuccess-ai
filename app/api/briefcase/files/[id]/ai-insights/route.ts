@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { GoogleGenerativeAI} from '@google/generative-ai'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize Google AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
@@ -108,7 +109,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('AI insights error:', error)
+    logError('AI insights error:', error)
     return NextResponse.json(
       { error: 'Failed to generate AI insights' },
       { status: 500 }
@@ -198,7 +199,7 @@ Focus on accuracy and provide realistic confidence scores. For sentiment analysi
       }
     }
   } catch (error) {
-    console.error('AI generation error:', error)
+    logError('AI generation error:', error)
     // Return basic insights if AI fails
     return {
       summary: `Document analysis for ${fileName}`,

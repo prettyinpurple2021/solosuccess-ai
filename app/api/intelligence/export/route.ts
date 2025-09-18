@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, or, gte, lte, inArray, ilike, sql} from 'drizzle-orm'
 import type { SourceType,
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   ImportanceLevel,
   ExtractedData,
   AnalysisResult
@@ -275,7 +276,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unsupported export format' }, { status: 400 })
     }
   } catch (error) {
-    console.error('Error exporting intelligence data:', error)
+    logError('Error exporting intelligence data:', error)
     return NextResponse.json(
       { error: 'Failed to export intelligence data' },
       { status: 500 }

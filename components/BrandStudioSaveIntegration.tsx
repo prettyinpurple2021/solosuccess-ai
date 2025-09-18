@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface BrandStudioSaveIntegrationProps {
   brandData: any
@@ -67,7 +68,7 @@ export const BrandStudioSaveIntegration: React.FC<BrandStudioSaveIntegrationProp
       setShowSaveDialog(false)
       
     } catch (error) {
-      console.error('Brand save error:', error)
+      logError('Brand save error:', error)
       toast({
         title: "Save failed 💔",
         description: "Failed to save your brand work. Please try again.",

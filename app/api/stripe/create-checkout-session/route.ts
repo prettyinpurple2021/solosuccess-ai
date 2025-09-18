@@ -5,6 +5,7 @@ import {
   stripe, createCheckoutSession, SUBSCRIPTION_TIERS, STRIPE_PRICES} from '@/lib/stripe'
 import { updateUserStripeCustomerId} from '@/lib/stripe-db-utils'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
       // Update user with Stripe customer ID
       const updateResult = await updateUserStripeCustomerId(user.id, customerId)
       if (!updateResult.success) {
-        console.error('Failed to update user with Stripe customer ID:', updateResult.error)
+        logError('Failed to update user with Stripe customer ID:', updateResult.error)
         return NextResponse.json(
           { error: 'Failed to create customer' },
           { status: 500 }
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    logError('Error creating checkout session:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

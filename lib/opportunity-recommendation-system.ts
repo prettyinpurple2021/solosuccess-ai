@@ -9,6 +9,7 @@ import {
 } from '@/db/schema'
 import { eq, and, desc, gte, sql, asc, lte, isNull, not, inArray } from 'drizzle-orm'
 import { competitiveOpportunityDetector, type OpportunityDetectionResult } from './competitive-opportunity-detection'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types for opportunity recommendation system
 export interface OpportunityRecommendation {
@@ -205,7 +206,7 @@ export class OpportunityRecommendationSystem {
         return b.expectedROI - a.expectedROI
       })
     } catch (error) {
-      console.error('Error generating recommendations:', error)
+      logError('Error generating recommendations:', error)
       return []
     }
   }
@@ -281,7 +282,7 @@ export class OpportunityRecommendationSystem {
         marketTimingScore
       }
     } catch (error) {
-      console.error('Error calculating priority score:', error)
+      logError('Error calculating priority score:', error)
       return {
         opportunityId: opportunity.id,
         priorityScore: 5,
@@ -370,7 +371,7 @@ export class OpportunityRecommendationSystem {
 
       return opportunity.id
     } catch (error) {
-      console.error('Error storing opportunity:', error)
+      logError('Error storing opportunity:', error)
       throw error
     }
   }
@@ -440,7 +441,7 @@ export class OpportunityRecommendationSystem {
 
       return await query
     } catch (error) {
-      console.error('Error getting opportunities:', error)
+      logError('Error getting opportunities:', error)
       return []
     }
   }
@@ -486,7 +487,7 @@ export class OpportunityRecommendationSystem {
 
       return true
     } catch (error) {
-      console.error('Error updating opportunity status:', error)
+      logError('Error updating opportunity status:', error)
       return false
     }
   }
@@ -528,7 +529,7 @@ export class OpportunityRecommendationSystem {
 
       return true
     } catch (error) {
-      console.error('Error tracking opportunity ROI:', error)
+      logError('Error tracking opportunity ROI:', error)
       return false
     }
   }
@@ -585,7 +586,7 @@ export class OpportunityRecommendationSystem {
 
       return true
     } catch (error) {
-      console.error('Error updating metric:', error)
+      logError('Error updating metric:', error)
       return false
     }
   }
@@ -671,7 +672,7 @@ export class OpportunityRecommendationSystem {
         timeframe
       }
     } catch (error) {
-      console.error('Error getting opportunity analytics:', error)
+      logError('Error getting opportunity analytics:', error)
       return null
     }
   }

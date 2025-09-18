@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/neon/client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface CompetitiveIntelligenceContext {
   competitors: {
@@ -182,7 +183,7 @@ export class CompetitiveIntelligenceContextService {
         market_insights
       }
     } catch (error) {
-      console.error('Error getting competitive intelligence context:', error)
+      logError('Error getting competitive intelligence context:', error)
       return {
         competitors: [],
         recent_alerts: [],
@@ -256,7 +257,7 @@ export class CompetitiveIntelligenceContextService {
       
       return insights.slice(0, 5) // Return top 5 insights
     } catch (error) {
-      console.error('Error generating market insights:', error)
+      logError('Error generating market insights:', error)
       return []
     }
   }

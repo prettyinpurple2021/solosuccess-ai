@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from 'pg'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 let pool: Pool | null = null
 
@@ -13,7 +14,7 @@ export const createClient = () => {
         if (process.env.NODE_ENV === 'production') {
           throw new Error('DATABASE_URL is required in production')
         } else {
-          console.warn('DATABASE_URL missing - using mock database client for development')
+          logWarn('DATABASE_URL missing - using mock database client for development')
           return {
             query: async () => ({ rows: [], rowCount: 0 }),
             connect: async () => ({
@@ -36,7 +37,7 @@ export const createClient = () => {
 
     // Handle pool errors
     pool.on('error', (err: Error) => {
-      console.error('Unexpected error on idle client', err)
+      logError('Unexpected error on idle client', err)
     })
   }
   

@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar'
 import { useToast} from '@/hooks/use-toast'
 import { motion, AnimatePresence} from 'framer-motion'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   History, Download, RotateCcw, Trash2, Plus, Clock, User, FileText, CheckCircle, AlertCircle} from 'lucide-react'
 
 interface BriefcaseFile {
@@ -82,7 +83,7 @@ export default function VersionHistoryModal({
         throw new Error('Failed to load versions')
       }
     } catch (error) {
-      console.error('Failed to load versions:', error)
+      logError('Failed to load versions:', error)
       toast({
         title: "Error",
         description: "Failed to load version history",

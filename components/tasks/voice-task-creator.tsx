@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Mic, Sparkles, CheckCircle, AlertCircle, Wand2 } from 'lucide-react'
 import VoiceInput from '@/components/ui/voice-input'
 import { cn } from '@/lib/utils'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface VoiceTaskCreatorProps {
   open: boolean
@@ -148,7 +149,7 @@ export default function VoiceTaskCreator({
         confidence: 0.8 // Mock confidence score
       }
     } catch (error) {
-      console.error('Error parsing voice input:', error)
+      logError('Error parsing voice input:', error)
       throw new Error('Failed to parse voice input')
     } finally {
       setIsProcessing(false)

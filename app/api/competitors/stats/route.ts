@@ -3,6 +3,7 @@ import { db} from '@/db'
 import { competitorProfiles, competitorAlerts, intelligenceData} from '@/db/schema'
 import { authenticateRequest} from '@/lib/auth-server'
 import { eq, and, count, gte} from 'drizzle-orm'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(_request: NextRequest) {
   try {
@@ -102,7 +103,7 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json(stats)
   } catch (error) {
-    console.error('Error fetching competitor stats:', error)
+    logError('Error fetching competitor stats:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitor stats' },
       { status: 500 }

@@ -8,6 +8,7 @@ import { ScrollArea} from '@/components/ui/scroll-area'
 import NextImage from 'next/image'
 
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   X, Download, ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2, ChevronLeft, ChevronRight, FileText, Image, Music, Video, FileCode, Archive} from 'lucide-react'
 
 
@@ -143,7 +144,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
         })
       }
     } catch (error) {
-      console.error('Preview load error:', error)
+      logError('Preview load error:', error)
       setPreviewState({
         loading: false,
         error: error instanceof Error ? error.message : 'Failed to load preview',
@@ -244,7 +245,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
   const handleDownload = () => {
     if (!file) return
     // In a real implementation, this would trigger a file download
-    console.log('Download file:', file.name)
+    logInfo('Download file:', file.name)
   }
 
 
@@ -374,7 +375,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                     touchAction: 'none'
                   }}
                   onError={(e) => {
-                    console.error('Image load error:', e)
+                    logError('Image load error:', e)
                     setPreviewState(prev => ({
                       ...prev,
                       error: 'Failed to load image'

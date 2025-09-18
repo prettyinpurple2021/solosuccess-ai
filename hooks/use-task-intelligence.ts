@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult, TaskSuggestion } from '@/lib/ai-task-intelligence'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface UseTaskIntelligenceOptions {
   autoOptimize?: boolean
@@ -43,7 +44,7 @@ export function useTaskIntelligence(options: UseTaskIntelligenceOptions = {}) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to optimize tasks'
       setError(errorMessage)
-      console.error('Task optimization error:', err)
+      logError('Task optimization error:', err)
       return null
     } finally {
       setLoading(false)
@@ -62,7 +63,7 @@ export function useTaskIntelligence(options: UseTaskIntelligenceOptions = {}) {
     try {
       return await engine.generateTaskSuggestion(task, allTasks)
     } catch (err) {
-      console.error('Error getting task suggestion:', err)
+      logError('Error getting task suggestion:', err)
       return null
     }
   }, [user, enableAI, engine])
@@ -89,7 +90,7 @@ export function useTaskIntelligence(options: UseTaskIntelligenceOptions = {}) {
         }
       }
     } catch (err) {
-      console.error('Error applying task suggestion:', err)
+      logError('Error applying task suggestion:', err)
       return null
     }
   }, [])
@@ -151,7 +152,7 @@ export function useTaskIntelligence(options: UseTaskIntelligenceOptions = {}) {
     const interval = setInterval(() => {
       // This would typically fetch current tasks and optimize them
       // For now, we'll just mark that auto-optimization is available
-      console.log('Auto-optimization interval triggered')
+      logInfo('Auto-optimization interval triggered')
     }, refreshInterval)
 
     return () => clearInterval(interval)

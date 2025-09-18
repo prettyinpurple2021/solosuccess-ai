@@ -18,6 +18,7 @@ import {
   Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
 import { Loading} from "@/components/ui/loading"
 import { Progress as _Progress} from "@/components/ui/progress"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Competitor {
   id: number
@@ -174,7 +175,7 @@ export default function CompetitorDashboardPage() {
         setRealtimeActivities(activities)
       }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
+      logError('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
     }

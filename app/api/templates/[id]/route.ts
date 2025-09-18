@@ -4,6 +4,7 @@ import { createClient} from '@/lib/neon/server'
 import { z} from 'zod'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // DELETE /api/templates/:id → delete a saved user template
 const IdParamSchema = z.object({ id: z.string().regex(/^\d+$/) })
@@ -47,7 +48,7 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 })
   } catch (error) {
-    console.error('Delete template error:', error)
+    logError('Delete template error:', error)
     return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
   }
 }

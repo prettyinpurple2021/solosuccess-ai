@@ -6,6 +6,7 @@ import { db} from '@/db';
 import { competitorProfiles, intelligenceData} from '@/db/schema';
 import { eq, and, desc} from 'drizzle-orm';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -135,7 +136,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching social media data:', error);
+    logError('Error fetching social media data:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -250,7 +251,7 @@ export async function POST(
             });
           }
         } catch (error) {
-          console.error(`Error monitoring ${platform}:`, error);
+          logError(`Error monitoring ${platform}:`, error);
           results.push({
             platform,
             posts_collected: 0,
@@ -272,7 +273,7 @@ export async function POST(
           sentiment: analysis.sentiment.overall
         }));
       } catch (error) {
-        console.error('Error monitoring competitor:', error);
+        logError('Error monitoring competitor:', error);
         return NextResponse.json(
           { error: 'Failed to monitor competitor social media' },
           { status: 500 }
@@ -301,7 +302,7 @@ export async function POST(
     });
 
   } catch (error) {
-    console.error('Error starting social media monitoring:', error);
+    logError('Error starting social media monitoring:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

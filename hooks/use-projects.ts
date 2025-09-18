@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useAuth } from '@/hooks/use-auth'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Project {
   id: string
@@ -53,7 +54,7 @@ export function useProjects(): UseProjectsResult {
         setError(data.error || "Failed to fetch projects")
       }
     } catch (err) {
-      console.error("Error fetching projects:", err)
+      logError("Error fetching projects:", err)
       setError("Failed to fetch projects")
     } finally {
       setLoading(false)

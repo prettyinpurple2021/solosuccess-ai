@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -56,7 +57,7 @@ export async function GET(
     })))
 
   } catch (error) {
-    console.error('Get activity error:', error)
+    logError('Get activity error:', error)
     return NextResponse.json({ 
       error: 'Failed to get activity' 
     }, { status: 500 })

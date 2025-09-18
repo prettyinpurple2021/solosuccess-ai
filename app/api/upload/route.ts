@@ -4,6 +4,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
       message: 'File uploaded successfully' 
     }, { status: 201 })
   } catch (error) {
-    console.error('Error uploading file:', error)
+    logError('Error uploading file:', error)
     return NextResponse.json(
       { error: 'Failed to upload file' },
       { status: 500 }
@@ -109,7 +110,7 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json({ files })
   } catch (error) {
-    console.error('Error fetching files:', error)
+    logError('Error fetching files:', error)
     return NextResponse.json(
       { error: 'Failed to fetch files' },
       { status: 500 }

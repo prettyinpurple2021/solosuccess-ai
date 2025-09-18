@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -56,7 +57,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Get version error:', error)
+    logError('Get version error:', error)
     return NextResponse.json({ 
       error: 'Failed to get version' 
     }, { status: 500 })
@@ -158,7 +159,7 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('Version action error:', error)
+    logError('Version action error:', error)
     return NextResponse.json({ 
       error: 'Failed to process version action' 
     }, { status: 500 })
@@ -230,7 +231,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Delete version error:', error)
+    logError('Delete version error:', error)
     return NextResponse.json({ 
       error: 'Failed to delete version' 
     }, { status: 500 })

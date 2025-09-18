@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { webScrapingService, type ScrapingResult } from './web-scraping-service'
 import type { CompetitorProfile } from './competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types for scheduling system
 export interface ScrapingJob {
@@ -140,12 +141,12 @@ export class ScrapingScheduler {
       this.jobQueue.set(jobId, job)
       this.updateMetrics()
       
-      console.log(`Scheduled scraping job: ${jobId} for ${url}`)
+      logInfo(`Scheduled scraping job: ${jobId} for ${url}`)
       return jobId
     } catch (error) {
       // Only log errors in non-test environments to reduce test noise
       if (process.env.NODE_ENV !== 'test') {
-        console.error('Error in scheduleJob:', error)
+        logError('Error in scheduleJob:', error)
       }
       throw error
     }
@@ -372,7 +373,7 @@ export class ScrapingScheduler {
       this.processQueue()
     }, this.PROCESSING_INTERVAL)
 
-    console.log('Scraping scheduler started')
+    logInfo('Scraping scheduler started')
   }
 
   private stopProcessing(): void {
@@ -384,7 +385,7 @@ export class ScrapingScheduler {
       this.processingInterval = undefined
     }
 
-    console.log('Scraping scheduler stopped')
+    logInfo('Scraping scheduler stopped')
   }
 
   private async processQueue(): Promise<void> {
@@ -412,7 +413,7 @@ export class ScrapingScheduler {
     
     for (const job of jobsToProcess) {
       this.processJob(job).catch(error => {
-        console.error(`Error processing job ${job.id}:`, error)
+        logError(`Error processing job ${job.id}:`, error)
       })
     }
   }
@@ -435,7 +436,7 @@ export class ScrapingScheduler {
     const startTime = Date.now()
     
     try {
-      console.log(`Processing scraping job: ${job.id} (${job.jobType}) for ${job.url}`)
+      logInfo(`Processing scraping job: ${job.id} (${job.jobType}) for ${job.url}`)
       
       // Now update job status to running since it wasn't cancelled
       this.runningJobs.add(job.id)
@@ -490,12 +491,12 @@ export class ScrapingScheduler {
         if (job.retryCount <= job.maxRetries) {
           job.status = 'pending'
           job.nextRunAt = this.calculateRetryTime(job.retryCount)
-          console.log(`Job ${job.id} failed, scheduling retry ${job.retryCount}/${job.maxRetries}`)
+          logError(`Job ${job.id} failed, scheduling retry ${job.retryCount}/${job.maxRetries}`)
         } else {
           job.status = 'failed'
           job.nextRunAt = this.calculateNextRun(job.frequency) // Try again next cycle
           this.metrics.failedJobs++
-          console.error(`Job ${job.id} failed permanently after ${job.maxRetries} retries`)
+          logError(`Job ${job.id} failed permanently after ${job.maxRetries} retries`)
         }
       }
 
@@ -550,7 +551,7 @@ export class ScrapingScheduler {
 
   private _cleanupCancelledJob(jobId: string): void {
     this.jobQueue.delete(jobId)
-    console.log(`Cleaned up cancelled job: ${jobId}`)
+    logInfo(`Cleaned up cancelled job: ${jobId}`)
     this.updateMetrics()
   }
 

@@ -6,6 +6,7 @@ import { db} from '@/db'
 import { users, userCompetitiveStats} from '@/db/schema'
 import { eq} from 'drizzle-orm'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -77,7 +78,7 @@ export async function GET(_request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error in competitive intelligence gamification:', error)
+    logError('Error in competitive intelligence gamification:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error updating competitive intelligence gamification:', error)
+    logError('Error updating competitive intelligence gamification:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

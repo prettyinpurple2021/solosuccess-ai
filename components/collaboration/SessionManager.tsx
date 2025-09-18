@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types
 interface SessionFormData {
@@ -134,7 +135,7 @@ const SessionManager: React.FC = () => {
           setAgents(data.data?.agents || [])
         }
       } catch (error) {
-        console.error('Error fetching agents:', error)
+        logError('Error fetching agents:', error)
       }
     }
 
@@ -199,7 +200,7 @@ const SessionManager: React.FC = () => {
         toast.error(error.message || 'Failed to create session')
       }
     } catch (error) {
-      console.error('Error creating session:', error)
+      logError('Error creating session:', error)
       toast.error('Failed to create session')
     } finally {
       setLoading(false)

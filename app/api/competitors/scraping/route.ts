@@ -3,6 +3,7 @@ import { z} from 'zod'
 import { queueProcessor} from '@/lib/scraping-queue-processor'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error getting scraping stats:', error)
+    logError('Error getting scraping stats:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating scraping job:', error)
+    logError('Error creating scraping job:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

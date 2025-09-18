@@ -3,6 +3,7 @@ import mammoth from 'mammoth';
 import * as ExcelJS from 'exceljs';
 import * as cheerio from 'cheerio';
 import { parse } from 'node-html-parser';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface ParseResult {
   content: string;
@@ -101,7 +102,7 @@ export class DocumentParser {
       };
       
     } catch (error) {
-      console.error('Document parsing error:', error);
+      logError('Document parsing error:', error);
       return {
         content: '',
         success: false,

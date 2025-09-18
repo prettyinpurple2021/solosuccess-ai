@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/use-auth'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface UseUserPreferencesOptions {
   defaultValues?: Record<string, any>
@@ -73,7 +74,7 @@ export function useUserPreferences(
         setPreferencesState(fallbackPrefs)
       }
     } catch (err) {
-      console.error('Failed to load preferences:', err)
+      logError('Failed to load preferences:', err)
       setError(err instanceof Error ? err.message : 'Failed to load preferences')
       
       if (options.fallbackToLocalStorage) {
@@ -115,14 +116,14 @@ export function useUserPreferences(
           localStorage.setItem(`pref_${key}`, JSON.stringify(value))
           setPreferencesState(prev => ({ ...prev, [key]: value }))
         } catch (localErr) {
-          console.error('Failed to save to localStorage:', localErr)
+          logError('Failed to save to localStorage:', localErr)
           throw new Error('Failed to save preference')
         }
       } else {
         throw new Error('Failed to save preference')
       }
     } catch (err) {
-      console.error('Failed to set preference:', err)
+      logError('Failed to set preference:', err)
       setError(err instanceof Error ? err.message : 'Failed to save preference')
       throw err
     }
@@ -149,14 +150,14 @@ export function useUserPreferences(
           })
           setPreferencesState(prev => ({ ...prev, ...prefs }))
         } catch (localErr) {
-          console.error('Failed to save to localStorage:', localErr)
+          logError('Failed to save to localStorage:', localErr)
           throw new Error('Failed to save preferences')
         }
       } else {
         throw new Error('Failed to save preferences')
       }
     } catch (err) {
-      console.error('Failed to set preferences:', err)
+      logError('Failed to set preferences:', err)
       setError(err instanceof Error ? err.message : 'Failed to save preferences')
       throw err
     }
@@ -196,14 +197,14 @@ export function useUserPreferences(
             return newPrefs
           })
         } catch (localErr) {
-          console.error('Failed to remove from localStorage:', localErr)
+          logError('Failed to remove from localStorage:', localErr)
           throw new Error('Failed to remove preference')
         }
       } else {
         throw new Error('Failed to remove preference')
       }
     } catch (err) {
-      console.error('Failed to remove preference:', err)
+      logError('Failed to remove preference:', err)
       setError(err instanceof Error ? err.message : 'Failed to remove preference')
       throw err
     }

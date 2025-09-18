@@ -20,6 +20,7 @@ import {
   Star
 } from 'lucide-react'
 import {
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -108,7 +109,7 @@ export default function BriefcasePage() {
         setDocuments(data.documents || [])
       }
     } catch (error) {
-      console.error('Error loading documents:', error)
+      logError('Error loading documents:', error)
     } finally {
       setLoading(false)
     }
@@ -129,7 +130,7 @@ export default function BriefcasePage() {
         setFolders(data.folders || [])
       }
     } catch (error) {
-      console.error('Error loading folders:', error)
+      logError('Error loading folders:', error)
     }
   }
 
@@ -157,7 +158,7 @@ export default function BriefcasePage() {
         await loadDocuments()
       }
     } catch (error) {
-      console.error('Error uploading files:', error)
+      logError('Error uploading files:', error)
     }
   }
 
@@ -180,7 +181,7 @@ export default function BriefcasePage() {
         await loadFolders()
       }
     } catch (error) {
-      console.error('Error creating folder:', error)
+      logError('Error creating folder:', error)
     }
   }
 

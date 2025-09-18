@@ -351,7 +351,7 @@ export const useAnalytics = () => {
    * Setup all analytics files
    */
   async setupAnalytics() {
-    console.log('🚀 Setting up SoloSuccess AI Platform Analytics...\n');
+    logInfo('🚀 Setting up SoloSuccess AI Platform Analytics...\n');
 
     try {
       // Create analytics directory
@@ -363,22 +363,22 @@ export const useAnalytics = () => {
       // Generate GA4 configuration
       const ga4Config = this.generateGA4Config();
       fs.writeFileSync(path.join(analyticsDir, 'ga4-config.js'), ga4Config);
-      console.log('✅ Generated Google Analytics 4 configuration');
+      logInfo('✅ Generated Google Analytics 4 configuration');
 
       // Generate React hook
       const analyticsHook = this.generateAnalyticsHook();
       fs.writeFileSync(path.join(analyticsDir, 'use-analytics.ts'), analyticsHook);
-      console.log('✅ Generated React analytics hook');
+      logInfo('✅ Generated React analytics hook');
 
       // Generate dashboard configuration
       const dashboardConfig = this.generateDashboardConfig();
       fs.writeFileSync(path.join(analyticsDir, 'dashboard-config.json'), dashboardConfig);
-      console.log('✅ Generated analytics dashboard configuration');
+      logInfo('✅ Generated analytics dashboard configuration');
 
       // Generate A/B testing configuration
       const abTestingConfig = this.generateABTestingConfig();
       fs.writeFileSync(path.join(analyticsDir, 'ab-testing-config.json'), abTestingConfig);
-      console.log('✅ Generated A/B testing configuration');
+      logInfo('✅ Generated A/B testing configuration');
 
       // Generate environment variables template
       const envTemplate = `
@@ -396,18 +396,18 @@ ERROR_TRACKING_ENABLED=true
 `;
 
       fs.writeFileSync(path.join(analyticsDir, '.env.analytics.example'), envTemplate);
-      console.log('✅ Generated environment variables template');
+      logInfo('✅ Generated environment variables template');
 
-      console.log('\n📊 Analytics Setup Complete!');
-      console.log('\n📋 Next Steps:');
-      console.log('1. Add your Google Analytics tracking ID to .env.local');
-      console.log('2. Include ga4-config.js in your _app.tsx or layout.tsx');
-      console.log('3. Use the useAnalytics hook in your components');
-      console.log('4. Set up conversion goals in Google Analytics');
-      console.log('5. Configure A/B testing experiments');
+      logInfo('\n📊 Analytics Setup Complete!');
+      logInfo('\n📋 Next Steps:');
+      logInfo('1. Add your Google Analytics tracking ID to .env.local');
+      logInfo('2. Include ga4-config.js in your _app.tsx or layout.tsx');
+      logInfo('3. Use the useAnalytics hook in your components');
+      logInfo('4. Set up conversion goals in Google Analytics');
+      logInfo('5. Configure A/B testing experiments');
 
     } catch (error) {
-      console.error('❌ Error setting up analytics:', error);
+      logError('❌ Error setting up analytics:', error);
       throw error;
     }
   }
@@ -491,6 +491,7 @@ export default function Layout({ children }) {
 ### 2. Use Analytics Hook
 \`\`\`tsx
 import { useAnalytics } from '@/lib/analytics/use-analytics';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export default function MyComponent() {
   const { trackUserRegistration, trackAIConversation } = useAnalytics();
@@ -578,12 +579,12 @@ if (require.main === module) {
       // Generate documentation
       const docs = analyticsSetup.generateDocumentation();
       fs.writeFileSync('docs/analytics-setup.md', docs);
-      console.log('✅ Generated analytics documentation');
-      console.log('\n🎉 Analytics setup completed successfully!');
+      logInfo('✅ Generated analytics documentation');
+      logInfo('\n🎉 Analytics setup completed successfully!');
       process.exit(0);
     })
     .catch(error => {
-      console.error('❌ Analytics setup failed:', error);
+      logError('❌ Analytics setup failed:', error);
       process.exit(1);
     });
 }

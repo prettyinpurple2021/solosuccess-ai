@@ -1,5 +1,6 @@
 import { CompetitiveIntelligenceGamification } from './competitive-intelligence-gamification'
 import { createClient } from '@/lib/neon/client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export class CompetitiveIntelligenceGamificationTriggers {
   /**
@@ -8,9 +9,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
   static async onCompetitorAdded(userId: string, competitorId: number): Promise<void> {
     try {
       await this.triggerGamificationEvent(userId, 'competitor_added', 1)
-      console.log(`Gamification triggered: competitor_added for user ${userId}`)
+      logInfo(`Gamification triggered: competitor_added for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering competitor added gamification:', error)
+      logError('Error triggering competitor added gamification:', error)
     }
   }
 
@@ -20,9 +21,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
   static async onIntelligenceGathered(userId: string, intelligenceCount: number = 1): Promise<void> {
     try {
       await this.triggerGamificationEvent(userId, 'intelligence_gathered', intelligenceCount)
-      console.log(`Gamification triggered: intelligence_gathered (${intelligenceCount}) for user ${userId}`)
+      logInfo(`Gamification triggered: intelligence_gathered (${intelligenceCount}) for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering intelligence gathered gamification:', error)
+      logError('Error triggering intelligence gathered gamification:', error)
     }
   }
 
@@ -45,9 +46,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
         await this.triggerGamificationEvent(userId, 'threat_response', 1)
       }
       
-      console.log(`Gamification triggered: alert_processed for user ${userId}`)
+      logInfo(`Gamification triggered: alert_processed for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering alert processed gamification:', error)
+      logError('Error triggering alert processed gamification:', error)
     }
   }
 
@@ -57,9 +58,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
   static async onOpportunityIdentified(userId: string, opportunityId: string): Promise<void> {
     try {
       await this.triggerGamificationEvent(userId, 'opportunity_identified', 1)
-      console.log(`Gamification triggered: opportunity_identified for user ${userId}`)
+      logInfo(`Gamification triggered: opportunity_identified for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering opportunity identified gamification:', error)
+      logError('Error triggering opportunity identified gamification:', error)
     }
   }
 
@@ -82,9 +83,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
         await this.awardBonusPoints(userId, 25, 'High-priority competitive task completion')
       }
       
-      console.log(`Gamification triggered: competitive_task_completed for user ${userId}`)
+      logInfo(`Gamification triggered: competitive_task_completed for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering competitive task completed gamification:', error)
+      logError('Error triggering competitive task completed gamification:', error)
     }
   }
 
@@ -94,9 +95,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
   static async onIntelligenceStreak(userId: string, streakDays: number): Promise<void> {
     try {
       await this.triggerGamificationEvent(userId, 'intelligence_streak', streakDays)
-      console.log(`Gamification triggered: intelligence_streak (${streakDays} days) for user ${userId}`)
+      logInfo(`Gamification triggered: intelligence_streak (${streakDays} days) for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering intelligence streak gamification:', error)
+      logError('Error triggering intelligence streak gamification:', error)
     }
   }
 
@@ -131,9 +132,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
         points_awarded: points
       })
       
-      console.log(`Gamification triggered: competitive_victory (${victoryData.impact_level}) for user ${userId}`)
+      logInfo(`Gamification triggered: competitive_victory (${victoryData.impact_level}) for user ${userId}`)
     } catch (error) {
-      console.error('Error triggering competitive victory gamification:', error)
+      logError('Error triggering competitive victory gamification:', error)
     }
   }
 
@@ -181,7 +182,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
         await this.onIntelligenceStreak(userId, currentStreak)
       }
     } catch (error) {
-      console.error('Error checking intelligence streaks:', error)
+      logError('Error checking intelligence streaks:', error)
     }
   }
 
@@ -204,9 +205,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
         [points, userId]
       )
       
-      console.log(`Bonus points awarded: ${points} points to user ${userId} for ${reason}`)
+      logInfo(`Bonus points awarded: ${points} points to user ${userId} for ${reason}`)
     } catch (error) {
-      console.error('Error awarding bonus points:', error)
+      logError('Error awarding bonus points:', error)
     }
   }
 
@@ -251,7 +252,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
       
       return challengeId
     } catch (error) {
-      console.error('Error generating team challenge:', error)
+      logError('Error generating team challenge:', error)
       throw error
     }
   }
@@ -299,9 +300,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
         WHERE cl.user_id = ru.user_id
       `)
       
-      console.log('Competitive intelligence leaderboards updated')
+      logInfo('Competitive intelligence leaderboards updated')
     } catch (error) {
-      console.error('Error updating leaderboards:', error)
+      logError('Error updating leaderboards:', error)
     }
   }
 
@@ -330,10 +331,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
       })
       
       if (!response.ok) {
-        console.error(`Failed to trigger gamification for ${activityType}:`, await response.text())
+        logError(`Failed to trigger gamification for ${activityType}:`, await response.text())
       }
     } catch (error) {
-      console.error(`Error triggering gamification for ${activityType}:`, error)
+      logError(`Error triggering gamification for ${activityType}:`, error)
       
       // Fallback: Direct database update for critical stats
       try {
@@ -350,7 +351,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
           await client.query(updateQuery, [userId, ...Object.values(statUpdates)])
         }
       } catch (fallbackError) {
-        console.error('Fallback gamification update failed:', fallbackError)
+        logError('Fallback gamification update failed:', fallbackError)
       }
     }
   }

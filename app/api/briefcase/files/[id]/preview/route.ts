@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -98,7 +99,7 @@ export async function GET(
       }
     })
   } catch (error) {
-    console.error('Error previewing file:', error)
+    logError('Error previewing file:', error)
     return NextResponse.json({ error: 'Failed to preview file' }, { status: 500 })
   }
 }

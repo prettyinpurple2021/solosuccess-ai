@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 "use client"
 
 export interface NotificationPermissionState {
@@ -103,10 +104,10 @@ export class WebPushNotificationManager {
       })
       
       if (!response.ok) {
-        console.warn('Failed to save notification permission to database')
+        logWarn('Failed to save notification permission to database')
       }
     } catch (error) {
-      console.warn('Failed to save notification permission:', error)
+      logWarn('Failed to save notification permission:', error)
     }
     
     return permission
@@ -169,7 +170,7 @@ export class WebPushNotificationManager {
    */
   async showNotification(payload: NotificationPayload): Promise<void> {
     if (!this.isSupported() || Notification.permission !== 'granted') {
-      console.warn('Cannot show notification: permission not granted')
+      logWarn('Cannot show notification: permission not granted')
       return
     }
 
@@ -240,10 +241,10 @@ export class WebPushNotificationManager {
       })
       
       if (!response.ok) {
-        console.warn('Failed to save scheduled notifications to database')
+        logWarn('Failed to save scheduled notifications to database')
       }
     } catch (error) {
-      console.warn('Failed to save scheduled notifications:', error)
+      logWarn('Failed to save scheduled notifications:', error)
     }
   }
 
@@ -273,10 +274,10 @@ export class WebPushNotificationManager {
       })
       
       if (!response.ok) {
-        console.warn('Failed to update scheduled notifications in database')
+        logWarn('Failed to update scheduled notifications in database')
       }
     } catch (error) {
-      console.warn('Failed to update scheduled notifications:', error)
+      logWarn('Failed to update scheduled notifications:', error)
     }
   }
 
@@ -297,7 +298,7 @@ export class WebPushNotificationManager {
         }
       }
     } catch (error) {
-      console.error('Error fetching scheduled notifications from database:', error)
+      logError('Error fetching scheduled notifications from database:', error)
     }
     
     return []
@@ -413,7 +414,7 @@ export class WebPushNotificationManager {
       const registration = await navigator.serviceWorker.getRegistration()
       return registration || null
     } catch (error) {
-      console.error('Error getting service worker registration:', error)
+      logError('Error getting service worker registration:', error)
       return null
     }
   }
@@ -441,7 +442,7 @@ export class WebPushNotificationManager {
         throw new Error('Failed to send subscription to server')
       }
     } catch (error) {
-      console.error('Error sending subscription to server:', error)
+      logError('Error sending subscription to server:', error)
     }
   }
 
@@ -449,14 +450,14 @@ export class WebPushNotificationManager {
     try {
       const subscriptionData = subscription.toJSON()
       if (!subscriptionData.endpoint) {
-        console.warn('No endpoint found in subscription data')
+        logWarn('No endpoint found in subscription data')
         return
       }
       await fetch(`/api/notifications/push-subscriptions?endpoint=${encodeURIComponent(subscriptionData.endpoint)}`, {
         method: 'DELETE'
       })
     } catch (error) {
-      console.error('Error removing subscription from server:', error)
+      logError('Error removing subscription from server:', error)
     }
   }
 

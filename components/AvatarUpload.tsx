@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react'
 import { Upload, Camera, X, Crown, Heart, Sparkles } from 'lucide-react'
 import Image from 'next/image'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Avatar {
   id: string
@@ -81,7 +82,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       setPreviewUrl(null)
 
     } catch (error) {
-      console.error('Avatar upload error:', error)
+      logError('Avatar upload error:', error)
       setError(error instanceof Error ? error.message : 'Upload failed')
       
       // Clean up preview on error
@@ -113,7 +114,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       onAvatarChange?.(null)
 
     } catch (error) {
-      console.error('Avatar removal error:', error)
+      logError('Avatar removal error:', error)
       setError(error instanceof Error ? error.message : 'Failed to remove avatar')
     } finally {
       setIsUploading(false)

@@ -8,6 +8,7 @@ import { Progress} from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   BarChart3, TrendingUp, Brain, Target, Clock, Star, AlertTriangle, CheckCircle, Lightbulb, Download, Play, Settings} from "lucide-react"
 
 interface TrainingMetrics {
@@ -109,7 +110,7 @@ export function TrainingDashboard() {
       }
 
     } catch (error) {
-      console.error('Error loading training data:', error)
+      logError('Error loading training data:', error)
     } finally {
       setLoading(false)
     }
@@ -158,7 +159,7 @@ export function TrainingDashboard() {
         alert(`Failed to start training: ${data.error}`)
       }
     } catch (error) {
-      console.error('Error starting training:', error)
+      logError('Error starting training:', error)
       alert('Failed to start training. Please try again.')
     } finally {
       setTrainingInProgress(false)
@@ -195,7 +196,7 @@ export function TrainingDashboard() {
         alert(`Failed to export data: ${data.error}`)
       }
     } catch (error) {
-      console.error('Error exporting data:', error)
+      logError('Error exporting data:', error)
       alert('Failed to export data. Please try again.')
     }
   }

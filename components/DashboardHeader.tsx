@@ -21,6 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface DashboardHeaderProps {
   title?: string
@@ -61,7 +62,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       await signOut()
       router.push('/')
     } catch (error) {
-      console.error('Sign out error:', error)
+      logError('Sign out error:', error)
     }
   }
 

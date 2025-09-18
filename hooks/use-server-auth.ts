@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function getServerAuthToken(): Promise<string | null> {
   try {
@@ -7,7 +8,7 @@ export async function getServerAuthToken(): Promise<string | null> {
     const token = cookieStore.get('auth_token')?.value
     return token || null
   } catch (error) {
-    console.error('Error getting auth token from cookies:', error)
+    logError('Error getting auth token from cookies:', error)
     return null
   }
 }
@@ -23,7 +24,7 @@ export async function getServerUser(): Promise<{ id: string; email: string } | n
       email: decoded.email
     }
   } catch (error) {
-    console.error('Error verifying auth token:', error)
+    logError('Error verifying auth token:', error)
     return null
   }
 }

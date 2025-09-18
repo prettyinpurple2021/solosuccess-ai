@@ -20,6 +20,7 @@ import {
   FileText
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types
 interface CollaborationSession {
@@ -102,7 +103,7 @@ const CollaborationDashboard: React.FC = () => {
         })
 
       } catch (error) {
-        console.error('Error fetching collaboration data:', error)
+        logError('Error fetching collaboration data:', error)
       } finally {
         setLoading(false)
       }

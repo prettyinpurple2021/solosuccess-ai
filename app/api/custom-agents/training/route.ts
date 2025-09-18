@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from "next/server"
 import { SimpleTrainingCollector} from "@/lib/custom-ai-agents/training/simple-training-collector"
 import { PerformanceAnalytics} from "@/lib/custom-ai-agents/training/performance-analytics"
 import { FineTuningPipeline} from "@/lib/custom-ai-agents/training/fine-tuning-pipeline"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Training API error:', error)
+    logError('Training API error:', error)
     return NextResponse.json(
       { 
         error: 'Internal server error',
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Training API error:', error)
+    logError('Training API error:', error)
     return NextResponse.json(
       { 
         error: 'Internal server error',

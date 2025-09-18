@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -19,7 +20,7 @@ export async function getUserByStripeCustomerId(customerId: string) {
     `
     return users[0] || null
   } catch (error) {
-    console.error('Error getting user by Stripe customer ID:', error)
+    logError('Error getting user by Stripe customer ID:', error)
     return null
   }
 }
@@ -99,7 +100,7 @@ export async function updateUserSubscription(
 
     return { success: true, user: result[0] }
   } catch (error) {
-    console.error('Error updating user subscription:', error)
+    logError('Error updating user subscription:', error)
     return { success: false, error: 'Database error' }
   }
 }
@@ -121,7 +122,7 @@ export async function updateUserStripeCustomerId(userId: string, customerId: str
 
     return { success: true, user: result[0] }
   } catch (error) {
-    console.error('Error updating user Stripe customer ID:', error)
+    logError('Error updating user Stripe customer ID:', error)
     return { success: false, error: 'Database error' }
   }
 }
@@ -151,7 +152,7 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
     const user = users[0]
     return user.subscription_status === 'active' && user.subscription_tier !== 'launch'
   } catch (error) {
-    console.error('Error checking active subscription:', error)
+    logError('Error checking active subscription:', error)
     return false
   }
 }
@@ -169,7 +170,7 @@ export async function getUserSubscription(userId: string) {
     
     return users[0] || null
   } catch (error) {
-    console.error('Error getting user subscription:', error)
+    logError('Error getting user subscription:', error)
     return null
   }
 }

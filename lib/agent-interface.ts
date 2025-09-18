@@ -12,6 +12,7 @@ import type {
 } from './collaboration-hub'
 import type { MessageRouter } from './message-router'
 import type { ContextManager, ContextEntry } from './context-manager'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Agent interface types
 export const AgentConfigSchema = z.object({
@@ -138,7 +139,7 @@ export class AgentInterface {
   async register(): Promise<boolean> {
     try {
       if (this.isRegistered) {
-        console.log(`Agent ${this.config.id} is already registered`)
+        logInfo(`Agent ${this.config.id} is already registered`)
         return true
       }
 
@@ -165,11 +166,11 @@ export class AgentInterface {
       // Start message processing
       this.startMessageProcessing()
 
-      console.log(`✅ Agent ${this.config.displayName} (${this.config.id}) registered successfully`)
+      logInfo(`✅ Agent ${this.config.displayName} (${this.config.id}) registered successfully`)
       return true
 
     } catch (error) {
-      console.error(`Error registering agent ${this.config.id}:`, error)
+      logError(`Error registering agent ${this.config.id}:`, error)
       return false
     }
   }
@@ -191,11 +192,11 @@ export class AgentInterface {
       this.isActive = false
       this.isRegistered = false
 
-      console.log(`✅ Agent ${this.config.displayName} unregistered successfully`)
+      logInfo(`✅ Agent ${this.config.displayName} unregistered successfully`)
       return true
 
     } catch (error) {
-      console.error(`Error unregistering agent ${this.config.id}:`, error)
+      logError(`Error unregistering agent ${this.config.id}:`, error)
       return false
     }
   }
@@ -231,11 +232,11 @@ export class AgentInterface {
         tags: ['session', 'join']
       })
 
-      console.log(`✅ Agent ${this.config.displayName} joined session ${sessionId}`)
+      logInfo(`✅ Agent ${this.config.displayName} joined session ${sessionId}`)
       return true
 
     } catch (error) {
-      console.error(`Error joining session: ${error}`)
+      logError(`Error joining session: ${error}`)
       return false
     }
   }
@@ -263,11 +264,11 @@ export class AgentInterface {
         tags: ['session', 'leave']
       })
 
-      console.log(`✅ Agent ${this.config.displayName} left session ${sessionId}: ${reason || 'No reason provided'}`)
+      logInfo(`✅ Agent ${this.config.displayName} left session ${sessionId}: ${reason || 'No reason provided'}`)
       return true
 
     } catch (error) {
-      console.error(`Error leaving session: ${error}`)
+      logError(`Error leaving session: ${error}`)
       return false
     }
   }
@@ -319,7 +320,7 @@ export class AgentInterface {
       return message.id
 
     } catch (error) {
-      console.error(`Error sending message: ${error}`)
+      logError(`Error sending message: ${error}`)
       throw error
     }
   }
@@ -330,7 +331,7 @@ export class AgentInterface {
   async handleMessage(message: AgentMessage): Promise<void> {
     try {
       if (!this.isActive) {
-        console.log(`Agent ${this.config.id} is not active, ignoring message`)
+        logInfo(`Agent ${this.config.id} is not active, ignoring message`)
         return
       }
 
@@ -343,7 +344,7 @@ export class AgentInterface {
       }
 
     } catch (error) {
-      console.error(`Error handling message: ${error}`)
+      logError(`Error handling message: ${error}`)
     }
   }
 
@@ -392,7 +393,7 @@ export class AgentInterface {
       try {
         capability.outputSchema.parse(result)
       } catch (error) {
-        console.warn(`Output validation failed for capability ${capabilityName}: ${error}`)
+        logWarn(`Output validation failed for capability ${capabilityName}: ${error}`)
       }
     }
 
@@ -432,10 +433,10 @@ export class AgentInterface {
       const newConfig = { ...this.config, ...updates }
       this.config = AgentConfigSchema.parse(newConfig)
       
-      console.log(`✅ Agent ${this.config.displayName} configuration updated`)
+      logInfo(`✅ Agent ${this.config.displayName} configuration updated`)
 
     } catch (error) {
-      console.error(`Error updating agent configuration: ${error}`)
+      logError(`Error updating agent configuration: ${error}`)
       throw error
     }
   }
@@ -483,7 +484,7 @@ export class AgentInterface {
       }
 
     } catch (error) {
-      console.error(`Error getting message context: ${error}`)
+      logError(`Error getting message context: ${error}`)
       return {
         sessionId,
         conversationHistory: [],
@@ -547,7 +548,7 @@ export class AgentInterface {
       }
 
     } catch (error) {
-      console.error(`Error processing message ${message.id}: ${error}`)
+      logError(`Error processing message ${message.id}: ${error}`)
     }
   }
 
@@ -612,7 +613,7 @@ export class AgentInterface {
       }
 
     } catch (error) {
-      console.error(`Error processing response: ${error}`)
+      logError(`Error processing response: ${error}`)
     }
   }
 
@@ -657,11 +658,11 @@ export class AgentInterface {
           break
           
         default:
-          console.warn(`Unknown action type: ${action.type}`)
+          logWarn(`Unknown action type: ${action.type}`)
       }
 
     } catch (error) {
-      console.error(`Error processing action ${action.type}: ${error}`)
+      logError(`Error processing action ${action.type}: ${error}`)
     }
   }
 
@@ -720,7 +721,7 @@ export class AgentInterface {
       }
     })
 
-    console.log(`✅ Default message handlers initialized for agent ${this.config.displayName}`)
+    logInfo(`✅ Default message handlers initialized for agent ${this.config.displayName}`)
   }
 
   /**

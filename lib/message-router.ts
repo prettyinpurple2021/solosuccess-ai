@@ -136,7 +136,7 @@ export class MessageRouter {
       }
 
     } catch (error) {
-      console.error('Error routing message:', error)
+      logError('Error routing message:', error)
       return {
         messageId: message.id,
         successful: [],
@@ -204,6 +204,7 @@ export class MessageRouter {
       // Score based on required capabilities
       if (request.requiredCapabilities?.length) {
         const matchingCapabilities = request.requiredCapabilities.filter(cap =>
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
           agent.capabilities.some(agentCap => 
             agentCap.toLowerCase().includes(cap.toLowerCase()) ||
             cap.toLowerCase().includes(agentCap.toLowerCase())
@@ -273,7 +274,7 @@ export class MessageRouter {
 
     this.routingRules.set(channelId, channelRule)
 
-    console.log(`✅ Communication channel ${channelId} established for agents: ${validAgents.join(', ')}`)
+    logInfo(`✅ Communication channel ${channelId} established for agents: ${validAgents.join(', ')}`)
     
     return channelId
   }
@@ -314,7 +315,7 @@ export class MessageRouter {
         if (rule.condition(message)) {
           switch (rule.action) {
             case 'block':
-              console.log(`Message ${message.id} blocked by rule: ${rule.name}`)
+              logInfo(`Message ${message.id} blocked by rule: ${rule.name}`)
               return null
               
             case 'transform':
@@ -355,7 +356,7 @@ export class MessageRouter {
           }
         }
       } catch (error) {
-        console.error(`Error applying routing rule ${rule.name}:`, error)
+        logError(`Error applying routing rule ${rule.name}:`, error)
       }
     }
 
@@ -472,7 +473,7 @@ export class MessageRouter {
   private async persistMessage(message: AgentMessage, deliveryResult: MessageDeliveryResult): Promise<void> {
     // This will be implemented when we create the API endpoints
     // For now, just log the message
-    console.log(`📨 Message routed: ${message.fromAgent} -> ${deliveryResult.successful.join(', ')}`)
+    logInfo(`📨 Message routed: ${message.fromAgent} -> ${deliveryResult.successful.join(', ')}`)
   }
 
   /**
@@ -509,7 +510,7 @@ export class MessageRouter {
       this.routingRules.set(rule.id, rule)
     })
 
-    console.log(`✅ Message Router initialized with ${defaultRules.length} default routing rules`)
+    logInfo(`✅ Message Router initialized with ${defaultRules.length} default routing rules`)
   }
 
   /**

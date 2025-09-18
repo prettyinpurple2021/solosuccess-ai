@@ -10,6 +10,7 @@ import {
 import { useCompetitorAlerts, CompetitorAlert} from '@/hooks/use-competitor-alerts';
 import { cn} from '@/lib/utils';
 import { formatDistanceToNow} from 'date-fns';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface AlertNotificationsProps {
   className?: string;
@@ -150,7 +151,7 @@ export function AlertNotifications({
       await markAsRead(alert.id);
       handleDismiss(alert.notificationId);
     } catch (error) {
-      console.error('Failed to mark alert as read:', error);
+      logError('Failed to mark alert as read:', error);
     }
   };
 
@@ -159,7 +160,7 @@ export function AlertNotifications({
       await archiveAlert(alert.id);
       handleDismiss(alert.notificationId);
     } catch (error) {
-      console.error('Failed to archive alert:', error);
+      logError('Failed to archive alert:', error);
     }
   };
 

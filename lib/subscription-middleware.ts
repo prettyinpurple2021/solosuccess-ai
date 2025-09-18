@@ -76,6 +76,7 @@ export async function checkSubscriptionAccess(
 
     // Check if user has required tier
     const hasTier = hasRequiredTier(subscription.subscription_tier, requiredTier)
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
     if (!hasTier) {
       return {
         allowed: false,
@@ -86,7 +87,7 @@ export async function checkSubscriptionAccess(
 
     return { allowed: true }
   } catch (error) {
-    console.error('Error checking subscription access:', error)
+    logError('Error checking subscription access:', error)
     return {
       allowed: false,
       redirectTo: '/pricing',

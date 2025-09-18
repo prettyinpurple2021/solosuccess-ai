@@ -3,6 +3,7 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching notification jobs:', error)
+    logError('Error fetching notification jobs:', error)
     return NextResponse.json(
       { error: 'Failed to fetch notification jobs' },
       { status: 500 }
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error creating notification job:', error)
+    logError('Error creating notification job:', error)
     return NextResponse.json(
       { error: 'Failed to create notification job' },
       { status: 500 }
@@ -221,7 +222,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error cancelling notification jobs:', error)
+    logError('Error cancelling notification jobs:', error)
     return NextResponse.json(
       { error: 'Failed to cancel notification jobs' },
       { status: 500 }

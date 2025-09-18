@@ -1,12 +1,13 @@
 import { createClient } from './neon/client';
 import { Template, TemplateCategory } from './templates-types';
 import templateData from '../data/templates.json';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function getAllTemplates(): Promise<TemplateCategory[]> {
   try {
     // Only try to connect to database if environment variables are available
     if (!process.env.DATABASE_URL) {
-      console.log('Neon database environment variables not available, using fallback data');
+      logInfo('Neon database environment variables not available, using fallback data');
       return templateData as TemplateCategory[];
     }
 
@@ -35,7 +36,7 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
 
     // Handle database errors
     if (error) {
-      console.error('Error fetching templates from database:', error);
+      logError('Error fetching templates from database:', error);
       // Fallback to JSON data
       return templateData as TemplateCategory[];
     }
@@ -53,7 +54,7 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
 
     return mappedData as TemplateCategory[];
   } catch (error) {
-    console.error('Database connection failed, using JSON fallback:', error);
+    logError('Database connection failed, using JSON fallback:', error);
     // Fallback to JSON data
     return templateData as TemplateCategory[];
   }
@@ -63,7 +64,7 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
   try {
     // Only try to connect to database if environment variables are available
     if (!process.env.DATABASE_URL) {
-      console.log('Neon database environment variables not available, using fallback data');
+      logInfo('Neon database environment variables not available, using fallback data');
       return findTemplateInJson(slug);
     }
 
@@ -75,14 +76,14 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
 
     // Handle database errors
     if (error) {
-      console.error('Error fetching template by slug from database:', error);
+      logError('Error fetching template by slug from database:', error);
       // Fallback to JSON data for any other errors
       return findTemplateInJson(slug);
     }
 
     return rows?.[0] as Template | null;
   } catch (error) {
-    console.error('Database connection failed, using JSON fallback:', error);
+    logError('Database connection failed, using JSON fallback:', error);
     // Fallback to JSON data
     return findTemplateInJson(slug);
   }

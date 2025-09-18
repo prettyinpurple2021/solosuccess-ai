@@ -8,6 +8,7 @@
 
 const fetch = require('node-fetch');
 const fs = require('fs');
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 class APITesting {
   constructor() {
@@ -152,11 +153,11 @@ class APITesting {
    * Run all API tests
    */
   async runAllTests() {
-    console.log('🚀 Starting SoloSuccess AI Platform API Testing...\n');
-    console.log(`🌐 Base URL: ${this.baseUrl}\n`);
+    logInfo('🚀 Starting SoloSuccess AI Platform API Testing...\n');
+    logInfo(`🌐 Base URL: ${this.baseUrl}\n`);
 
     const totalTests = APITesting.ENDPOINTS.length;
-    console.log(`📊 Total API Tests: ${totalTests}\n`);
+    logInfo(`📊 Total API Tests: ${totalTests}\n`);
 
     for (let i = 0; i < APITesting.ENDPOINTS.length; i++) {
       const endpoint = APITesting.ENDPOINTS[i];
@@ -170,9 +171,9 @@ class APITesting {
    * Test individual endpoint
    */
   async testEndpoint(endpoint, current, total) {
-    console.log(`🔍 Test ${current}/${total}: ${endpoint.name}`);
-    console.log(`📋 Method: ${endpoint.method} ${endpoint.path}`);
-    console.log(`⚡ Priority: ${endpoint.priority}`);
+    logInfo(`🔍 Test ${current}/${total}: ${endpoint.name}`);
+    logInfo(`📋 Method: ${endpoint.method} ${endpoint.path}`);
+    logInfo(`⚡ Priority: ${endpoint.priority}`);
 
     try {
       const result = await this.makeRequest(endpoint);
@@ -184,17 +185,17 @@ class APITesting {
       });
 
       if (result.success) {
-        console.log(`✅ Status: ${result.status} - PASSED`);
+        logInfo(`✅ Status: ${result.status} - PASSED`);
         if (result.responseTime) {
-          console.log(`⏱️  Response Time: ${result.responseTime}ms`);
+          logInfo(`⏱️  Response Time: ${result.responseTime}ms`);
         }
       } else {
-        console.log(`❌ Status: ${result.status} - FAILED`);
-        console.log(`📝 Error: ${result.error}`);
+        logError(`❌ Status: ${result.status} - FAILED`);
+        logError(`📝 Error: ${result.error}`);
       }
 
     } catch (error) {
-      console.log(`❌ Exception: ${error.message}`);
+      logError(`❌ Exception: ${error.message}`);
       this.testResults.push({
         ...endpoint,
         result: {
@@ -206,7 +207,7 @@ class APITesting {
       });
     }
 
-    console.log('');
+    logInfo('');
   }
 
   /**
@@ -277,17 +278,17 @@ class APITesting {
    * Generate test report
    */
   generateReport() {
-    console.log('📊 API TESTING REPORT');
-    console.log('====================\n');
+    logInfo('📊 API TESTING REPORT');
+    logInfo('====================\n');
 
     const total = this.testResults.length;
     const passed = this.testResults.filter(r => r.result.success).length;
     const failed = this.testResults.filter(r => !r.result.success).length;
     const passRate = (passed / total * 100).toFixed(1);
 
-    console.log(`✅ Tests Passed: ${passed}`);
-    console.log(`❌ Tests Failed: ${failed}`);
-    console.log(`📈 Pass Rate: ${passRate}%\n`);
+    logInfo(`✅ Tests Passed: ${passed}`);
+    logError(`❌ Tests Failed: ${failed}`);
+    logInfo(`📈 Pass Rate: ${passRate}%\n`);
 
     // Group by priority
     const byPriority = {
@@ -301,8 +302,8 @@ class APITesting {
       byPriority[result.priority].push(result);
     });
 
-    console.log('📋 Results by Priority:');
-    console.log('========================\n');
+    logInfo('📋 Results by Priority:');
+    logInfo('========================\n');
 
     Object.entries(byPriority).forEach(([priority, tests]) => {
       if (tests.length === 0) return;
@@ -310,17 +311,17 @@ class APITesting {
       const passed = tests.filter(t => t.result.success).length;
       const total = tests.length;
       
-      console.log(`${priority}:`);
-      console.log(`  ✅ ${passed}/${total} tests passed`);
+      logInfo(`${priority}:`);
+      logInfo(`  ✅ ${passed}/${total} tests passed`);
       
       const failedTests = tests.filter(t => !t.result.success);
       if (failedTests.length > 0) {
-        console.log(`  ❌ Failed tests:`);
+        logError(`  ❌ Failed tests:`);
         failedTests.forEach(test => {
-          console.log(`    - ${test.name}: ${test.result.error}`);
+          logError(`    - ${test.name}: ${test.result.error}`);
         });
       }
-      console.log('');
+      logInfo('');
     });
 
     // Performance analysis
@@ -344,33 +345,33 @@ class APITesting {
     const maxResponseTime = Math.max(...responseTimes);
     const minResponseTime = Math.min(...responseTimes);
 
-    console.log('⚡ Performance Analysis:');
-    console.log('=======================\n');
-    console.log(`📊 Average Response Time: ${avgResponseTime.toFixed(2)}ms`);
-    console.log(`🚀 Fastest Response: ${minResponseTime}ms`);
-    console.log(`🐌 Slowest Response: ${maxResponseTime}ms`);
+    logInfo('⚡ Performance Analysis:');
+    logInfo('=======================\n');
+    logInfo(`📊 Average Response Time: ${avgResponseTime.toFixed(2)}ms`);
+    logInfo(`🚀 Fastest Response: ${minResponseTime}ms`);
+    logInfo(`🐌 Slowest Response: ${maxResponseTime}ms`);
 
     const slowEndpoints = this.testResults.filter(r => r.result.responseTime > 2000);
     if (slowEndpoints.length > 0) {
-      console.log(`⚠️  Slow Endpoints (>2s):`);
+      logInfo(`⚠️  Slow Endpoints (>2s):`);
       slowEndpoints.forEach(endpoint => {
-        console.log(`  - ${endpoint.name}: ${endpoint.result.responseTime}ms`);
+        logInfo(`  - ${endpoint.name}: ${endpoint.result.responseTime}ms`);
       });
     }
-    console.log('');
+    logInfo('');
   }
 
   /**
    * Generate recommendations
    */
   generateRecommendations() {
-    console.log('💡 RECOMMENDATIONS:');
-    console.log('===================\n');
+    logInfo('💡 RECOMMENDATIONS:');
+    logInfo('===================\n');
 
     const failedTests = this.testResults.filter(r => !r.result.success);
     
     if (failedTests.length === 0) {
-      console.log('🎉 All API tests passed! The API is ready for production.');
+      logInfo('🎉 All API tests passed! The API is ready for production.');
       return;
     }
 
@@ -378,27 +379,27 @@ class APITesting {
     const highFailures = failedTests.filter(t => t.priority === 'HIGH');
 
     if (criticalFailures.length > 0) {
-      console.log('🚨 CRITICAL API ISSUES MUST BE FIXED:');
+      logInfo('🚨 CRITICAL API ISSUES MUST BE FIXED:');
       criticalFailures.forEach(test => {
-        console.log(`  - ${test.name}: ${test.result.error}`);
+        logError(`  - ${test.name}: ${test.result.error}`);
       });
-      console.log('');
+      logInfo('');
     }
 
     if (highFailures.length > 0) {
-      console.log('⚠️  HIGH PRIORITY API ISSUES SHOULD BE ADDRESSED:');
+      logInfo('⚠️  HIGH PRIORITY API ISSUES SHOULD BE ADDRESSED:');
       highFailures.forEach(test => {
-        console.log(`  - ${test.name}: ${test.result.error}`);
+        logError(`  - ${test.name}: ${test.result.error}`);
       });
-      console.log('');
+      logInfo('');
     }
 
-    console.log('📋 API NEXT STEPS:');
-    console.log('  1. Fix critical API issues');
-    console.log('  2. Address high priority issues');
-    console.log('  3. Optimize slow endpoints');
-    console.log('  4. Add rate limiting if needed');
-    console.log('  5. Implement proper error handling');
+    logInfo('📋 API NEXT STEPS:');
+    logInfo('  1. Fix critical API issues');
+    logInfo('  2. Address high priority issues');
+    logInfo('  3. Optimize slow endpoints');
+    logInfo('  4. Add rate limiting if needed');
+    logError('  5. Implement proper error handling');
   }
 
   /**
@@ -416,7 +417,7 @@ class APITesting {
 
     const filename = `api-test-results-${new Date().toISOString().split('T')[0]}.json`;
     fs.writeFileSync(filename, JSON.stringify(report, null, 2));
-    console.log(`\n💾 API test results saved to: ${filename}`);
+    logInfo(`\n💾 API test results saved to: ${filename}`);
   }
 }
 
@@ -429,7 +430,7 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch(error => {
-      console.error('❌ API testing failed:', error);
+      logError('❌ API testing failed:', error);
       process.exit(1);
     });
 }

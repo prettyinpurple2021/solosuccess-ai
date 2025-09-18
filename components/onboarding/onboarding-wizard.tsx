@@ -11,6 +11,7 @@ import { Progress} from "@/components/ui/progress"
 import { Badge} from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import { Crown, Target, CheckCircle, Brain, Users, Rocket, Sparkles, ArrowLeft, ArrowRight} from 'lucide-react'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 
 interface OnboardingData {
@@ -124,13 +125,13 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   ]
 
   const updateData = (section: keyof OnboardingData, updates: any) => {
-    console.log(`Updating ${section}:`, updates)
+    logInfo(`Updating ${section}:`, updates)
     setData((prev) => {
       const newData = {
         ...prev,
         [section]: { ...prev[section], ...updates },
       }
-      console.log('New data state:', newData)
+      logInfo('New data state:', newData)
       return newData
     })
   }
@@ -150,22 +151,22 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   const toggleGoal = (goalId: string) => {
-    console.log('Toggling goal:', goalId, 'Current goals:', data.goals.primaryGoals)
+    logInfo('Toggling goal:', goalId, 'Current goals:', data.goals.primaryGoals)
     const currentGoals = data.goals.primaryGoals
     const newGoals = currentGoals.includes(goalId)
       ? currentGoals.filter((g) => g !== goalId)
       : [...currentGoals, goalId]
-    console.log('New goals:', newGoals)
+    logInfo('New goals:', newGoals)
     updateData("goals", { primaryGoals: newGoals })
   }
 
   const toggleAgent = (agentId: string) => {
-    console.log('Toggling agent:', agentId, 'Current agents:', data.aiTeam.selectedAgents)
+    logInfo('Toggling agent:', agentId, 'Current agents:', data.aiTeam.selectedAgents)
     const currentAgents = data.aiTeam.selectedAgents
     const newAgents = currentAgents.includes(agentId)
       ? currentAgents.filter((a) => a !== agentId)
       : [...currentAgents, agentId]
-    console.log('New agents:', newAgents)
+    logInfo('New agents:', newAgents)
     updateData("aiTeam", { selectedAgents: newAgents })
   }
 
@@ -323,7 +324,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        console.log('Setting work style:', style.value)
+                        logInfo('Setting work style:', style.value)
                         updateData("preferences", { workStyle: style.value })
                       }}
                     >
@@ -361,7 +362,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        console.log('Setting communication style:', style.value)
+                        logInfo('Setting communication style:', style.value)
                         updateData("preferences", { communicationStyle: style.value })
                       }}
                     >

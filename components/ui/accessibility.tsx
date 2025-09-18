@@ -7,6 +7,7 @@ import { Switch} from "@/components/ui/switch"
 import { Label} from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Eye, EyeOff, Volume2, VolumeX, Keyboard, MousePointer, Accessibility, Settings, Sun, Moon, Contrast} from "lucide-react"
 
 interface AccessibilityContextType {
@@ -89,7 +90,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         screenReader,
         fontSize,
         focusVisible
-      }).catch(error => console.error('Failed to save accessibility preferences:', error))
+      }).catch(error => logError('Failed to save accessibility preferences:', error))
     }
   }, [highContrast, reducedMotion, screenReader, fontSize, focusVisible, loading, setPreference])
 

@@ -5,6 +5,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
 import type { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   SourceType, 
   ImportanceLevel,
   ExtractedData,
@@ -117,7 +118,7 @@ export async function GET(
       } : undefined,
     })
   } catch (error) {
-    console.error('Error fetching intelligence entry:', error)
+    logError('Error fetching intelligence entry:', error)
     return NextResponse.json(
       { error: 'Failed to fetch intelligence entry' },
       { status: 500 }
@@ -237,7 +238,7 @@ export async function PUT(
       } : undefined,
     })
   } catch (error) {
-    console.error('Error updating intelligence entry:', error)
+    logError('Error updating intelligence entry:', error)
     return NextResponse.json(
       { error: 'Failed to update intelligence entry' },
       { status: 500 }
@@ -291,7 +292,7 @@ export async function DELETE(
       deletedId: intelligenceId,
     })
   } catch (error) {
-    console.error('Error deleting intelligence entry:', error)
+    logError('Error deleting intelligence entry:', error)
     return NextResponse.json(
       { error: 'Failed to delete intelligence entry' },
       { status: 500 }

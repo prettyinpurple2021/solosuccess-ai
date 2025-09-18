@@ -4,6 +4,7 @@ import { rateLimitByIp} from '@/lib/rate-limit';
 import { notificationDelivery, NotificationPreferences} from '@/lib/notification-delivery-system';
 import { AlertType} from '@/lib/competitor-alert-system';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const notificationChannelSchema = z.object({
   id: z.string(),
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching notification preferences:', error);
+    logError('Error fetching notification preferences:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -100,7 +101,7 @@ export async function PUT(request: NextRequest) {
 
     // In a real implementation, save to database
     // For now, we'll just validate and return success
-    console.log('Saving notification preferences for user:', user.id, fullPreferences);
+    logInfo('Saving notification preferences for user:', user.id, fullPreferences);
 
     return NextResponse.json({
       success: true,
@@ -109,7 +110,7 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error updating notification preferences:', error);
+    logError('Error updating notification preferences:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

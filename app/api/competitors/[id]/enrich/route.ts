@@ -7,6 +7,7 @@ import { competitorEnrichmentService} from '@/lib/competitor-enrichment-service'
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
 import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -275,7 +276,7 @@ export async function POST(
       }
     })
   } catch (error) {
-    console.error('Error enriching competitor:', error)
+    logError('Error enriching competitor:', error)
     return NextResponse.json(
       { error: 'Failed to enrich competitor profile' },
       { status: 500 }
@@ -377,7 +378,7 @@ export async function GET(
       }
     })
   } catch (error) {
-    console.error('Error checking enrichment status:', error)
+    logError('Error checking enrichment status:', error)
     return NextResponse.json(
       { error: 'Failed to check enrichment status' },
       { status: 500 }

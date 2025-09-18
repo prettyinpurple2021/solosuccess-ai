@@ -12,6 +12,7 @@ import { BossButton, ZapButton} from "@/components/ui/boss-button"
 import { Badge} from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 
 interface ImportedCompetitor {
@@ -182,7 +183,7 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
       setSelectedRows(new Set(validItems))
       
     } catch (error) {
-      console.error('Error processing file:', error)
+      logError('Error processing file:', error)
     } finally {
       setUploading(false)
     }
@@ -263,7 +264,7 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
       
       router.push('/dashboard/competitors')
     } catch (error) {
-      console.error('Error importing competitors:', error)
+      logError('Error importing competitors:', error)
     } finally {
       setImporting(false)
     }

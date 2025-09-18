@@ -4,6 +4,7 @@ import { z} from 'zod'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { scrapingScheduler} from '@/lib/scraping-scheduler'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Request schemas
 const updateJobSchema = z.object({
@@ -90,7 +91,7 @@ export async function GET(
       },
     })
   } catch (error) {
-    console.error('Error fetching job details:', error)
+    logError('Error fetching job details:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -216,7 +217,7 @@ export async function PUT(
       },
     })
   } catch (error) {
-    console.error('Error updating job:', error)
+    logError('Error updating job:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -290,7 +291,7 @@ export async function DELETE(
       },
     })
   } catch (error) {
-    console.error('Error deleting job:', error)
+    logError('Error deleting job:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

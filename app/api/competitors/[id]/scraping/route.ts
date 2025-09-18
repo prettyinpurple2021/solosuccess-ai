@@ -3,6 +3,7 @@ import { z} from 'zod'
 import { queueProcessor} from '@/lib/scraping-queue-processor'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -65,7 +66,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error getting competitor scraping jobs:', error)
+    logError('Error getting competitor scraping jobs:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -129,7 +130,7 @@ export async function POST(
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating default scraping jobs:', error)
+    logError('Error creating default scraping jobs:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -202,7 +203,7 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Error updating scraping frequencies:', error)
+    logError('Error updating scraping frequencies:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -267,7 +268,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Error deleting competitor scraping jobs:', error)
+    logError('Error deleting competitor scraping jobs:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

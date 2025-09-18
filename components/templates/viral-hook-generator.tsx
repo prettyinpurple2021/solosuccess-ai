@@ -25,6 +25,8 @@ export function ViralHookGenerator() {
   const [contentType, setContentType] = useState('Post');
   const [generatedHooks, setGeneratedHooks] = useState<HookOption[]>([]);
   const [title, setTitle] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedMetadata, setGeneratedMetadata] = useState<any>(null);
   
   const { saveTemplate, isSaving } = useTemplateSave();
 
@@ -32,41 +34,97 @@ export function ViralHookGenerator() {
   const contentTypes = ['Post', 'Video', 'Story', 'Reel', 'Thread', 'Carousel'];
   const vibes = ['Educational', 'Inspirational', 'Controversial', 'Behind-the-scenes', 'Personal', 'Trending'];
 
-  const generateHooks = () => {
-    // Simulate AI-generated hooks
-    const sampleHooks: HookOption[] = [
-      {
-        hook: "What nobody tells you about starting a business...",
-        platform: platform,
-        contentType: contentType,
-        reasoning: "Curiosity gap + insider knowledge positioning creates strong engagement"
-      },
-      {
-        hook: "I made every beginner mistake so you don't have to",
-        platform: platform,
-        contentType: contentType,
-        reasoning: "Vulnerability + value promise builds trust and saves time for audience"
-      },
-      {
-        hook: "Here's the truth about [your topic] that influencers won't tell you:",
-        platform: platform,
-        contentType: contentType,
-        reasoning: "Contrarian angle + authority positioning cuts through noise"
-      },
-      {
-        hook: "Plot twist: Everything you think you know about [topic] is wrong",
-        platform: platform,
-        contentType: contentType,
-        reasoning: "Pattern interrupt + bold claim stops scroll and demands attention"
-      },
-      {
-        hook: "3 signs you're ready to [achieve goal] (most people ignore #2)",
-        platform: platform,
-        contentType: contentType,
-        reasoning: "Specificity + curiosity about the 'missed' point drives engagement"
+  const generateHooks = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('/api/templates/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'generic',
+          templateType: 'viral-hook',
+          requirements: `Generate 5 viral hooks for ${contentType} on ${platform} targeting ${targetAudience}`,
+          context: `Content idea: ${contentIdea}. Desired vibe: ${desiredVibe}`,
+          tone: desiredVibe.toLowerCase(),
+          length: 'short',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate hooks');
       }
-    ];
-    setGeneratedHooks(sampleHooks);
+
+      const result = await response.json();
+      
+      if (result.success && result.content) {
+        // Transform generic response to hook format
+        const generatedHooks = Array.isArray(result.content) 
+          ? result.content.map((item: any, index: number) => ({
+              hook: item.hook || item.content || `Generated hook ${index + 1}`,
+              platform: platform,
+              contentType: contentType,
+              reasoning: item.reasoning || item.explanation || "AI-generated viral hook"
+            }))
+          : [
+              {
+                hook: result.content.hook || result.content.content || "AI-generated hook",
+                platform: platform,
+                contentType: contentType,
+                reasoning: result.content.reasoning || result.content.explanation || "AI-generated viral hook"
+              }
+            ];
+        
+        setGeneratedHooks(generatedHooks);
+        setGeneratedMetadata({
+          ...result.metadata,
+          templateType: result.templateType,
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Error generating hooks:', error);
+      
+      // Fallback to sample hooks
+      const fallbackHooks: HookOption[] = [
+        {
+          hook: `What nobody tells you about ${contentIdea || 'starting a business'}...`,
+          platform: platform,
+          contentType: contentType,
+          reasoning: "Curiosity gap + insider knowledge positioning creates strong engagement"
+        },
+        {
+          hook: `I made every beginner mistake so you don't have to`,
+          platform: platform,
+          contentType: contentType,
+          reasoning: "Vulnerability + value promise builds trust and saves time for audience"
+        },
+        {
+          hook: `Here's the truth about ${contentIdea || 'your topic'} that influencers won't tell you:`,
+          platform: platform,
+          contentType: contentType,
+          reasoning: "Contrarian angle + authority positioning cuts through noise"
+        },
+        {
+          hook: `Plot twist: Everything you think you know about ${contentIdea || 'this topic'} is wrong`,
+          platform: platform,
+          contentType: contentType,
+          reasoning: "Pattern interrupt + bold claim stops scroll and demands attention"
+        },
+        {
+          hook: `3 signs you're ready to ${contentIdea || 'achieve your goal'} (most people ignore #2)`,
+          platform: platform,
+          contentType: contentType,
+          reasoning: "Specificity + curiosity about the 'missed' point drives engagement"
+        }
+      ];
+      setGeneratedHooks(fallbackHooks);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const addCustomHook = () => {

@@ -33,6 +33,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types
 interface Message {
@@ -321,7 +322,7 @@ const MessageInterface: React.FC<{ sessionId: string }> = ({ sessionId }) => {
           setMessages(data.data?.messages || [])
         }
       } catch (error) {
-        console.error('Error fetching messages:', error)
+        logError('Error fetching messages:', error)
       } finally {
         setLoading(false)
       }
@@ -405,7 +406,7 @@ const MessageInterface: React.FC<{ sessionId: string }> = ({ sessionId }) => {
         toast.error('Failed to send message')
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      logError('Error sending message:', error)
       setMessages(prev => 
         prev.map(msg => 
           msg.id === tempId 

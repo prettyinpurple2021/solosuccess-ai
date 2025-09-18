@@ -10,6 +10,7 @@ import { useToast} from '@/hooks/use-toast'
 import { useRecaptchaValidation} from '@/hooks/use-recaptcha-validation'
 import { RECAPTCHA_ACTIONS} from '@/components/recaptcha/recaptcha-provider'
 import { Loader2, Shield, Send} from 'lucide-react'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface ContactFormData {
   name: string
@@ -112,7 +113,7 @@ export function SecureContactForm({ onSubmit, className = "" }: SecureContactFor
       })
 
     } catch (error) {
-      console.error('Form submission error:', error)
+      logError('Form submission error:', error)
       toast({
         title: "Submission Failed",
         description: error instanceof Error ? error.message : "Failed to send message. Please try again.",
@@ -213,5 +214,5 @@ export function SecureContactForm({ onSubmit, className = "" }: SecureContactFor
 // Example usage in other components:
 // <SecureContactForm onSubmit={async (data) => {
 //   // Handle form submission
-//   console.log('Contact form data:', data)
+//   logInfo('Contact form data:', data)
 // }} />

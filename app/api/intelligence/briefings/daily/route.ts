@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const dailyBriefingSchema = z.object({
   competitorIds: z.array(z.string()).optional()
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Error generating daily briefing:', error)
+    logError('Error generating daily briefing:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

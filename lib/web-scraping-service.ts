@@ -438,7 +438,7 @@ export class WebScrapingService {
       return robots.isAllowed(url, this.config.userAgent) ?? true
     } catch (error) {
       // If robots.txt is not accessible, allow scraping but log warning
-      console.warn(`Could not fetch robots.txt for ${url}:`, error)
+      logWarn(`Could not fetch robots.txt for ${url}:`, error)
       return true
     }
   }
@@ -720,6 +720,7 @@ export class WebScrapingService {
           const location = $job.find('.location, [class*="location"]').first().text().trim()
           const department = $job.find('.department, [class*="department"]').first().text().trim()
           const requirements = $job.find('li, .requirement').map((_, el) => $(el).text().trim()).get()
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
           
           jobs.push({
             title,

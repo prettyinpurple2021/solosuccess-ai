@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import FloatingChatButton from '@/components/chat/floating-chat-button'
 import { useToast } from '@/hooks/use-toast'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Message {
   id: string
@@ -134,7 +135,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           })))
         }
       } catch (error) {
-        console.error('Error loading cached messages:', error)
+        logError('Error loading cached messages:', error)
       }
     }
   }, [preferences.chatMessages, preferencesLoading])
@@ -143,12 +144,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (messages.length > 0 && !preferencesLoading) {
       setPreference('chatMessages', messages).catch(error => {
-        console.error('Failed to save chat messages to preferences:', error)
+        logError('Failed to save chat messages to preferences:', error)
         // Fallback to localStorage on error
         try {
           localStorage.setItem('solosuccess_chat_messages', JSON.stringify(messages))
         } catch (localError) {
-          console.error('Failed to save to localStorage as fallback:', localError)
+          logError('Failed to save to localStorage as fallback:', localError)
         }
       })
     }
@@ -162,12 +163,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setMessages([])
     // Clear from preferences API and fallback to localStorage cleanup
     setPreference('chatMessages', []).catch(error => {
-      console.error('Failed to clear chat messages from preferences:', error)
+      logError('Failed to clear chat messages from preferences:', error)
       // Fallback to localStorage cleanup
       try {
         localStorage.removeItem('solosuccess_chat_messages')
       } catch (localError) {
-        console.error('Failed to clear localStorage as fallback:', localError)
+        logError('Failed to clear localStorage as fallback:', localError)
       }
     })
   }
@@ -235,7 +236,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Failed to send message')
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      logError('Error sending message:', error)
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",

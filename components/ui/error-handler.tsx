@@ -6,6 +6,7 @@ import { Button} from "@/components/ui/button"
 import { Badge} from "@/components/ui/badge"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AlertTriangle, RefreshCw, Wifi, WifiOff, X, Info, CheckCircle, Clock, Zap, Lightbulb} from "lucide-react"
 
 interface ErrorInfo {
@@ -67,7 +68,7 @@ export function ErrorHandler({
     try {
       await error.retryAction()
     } catch (retryError) {
-      console.error('Retry failed:', retryError)
+      logError('Retry failed:', retryError)
     } finally {
       setIsRetrying(false)
     }
@@ -253,13 +254,13 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
-      console.error('Global error caught:', event.error)
+      logError('Global error caught:', event.error)
       setError(event.error)
       setHasError(true)
     }
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection:', event.reason)
+      logError('Unhandled promise rejection:', event.reason)
       setError(new Error(event.reason?.message || 'Promise rejected'))
       setHasError(true)
     }

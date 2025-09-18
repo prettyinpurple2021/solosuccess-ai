@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   initializeNotificationProcessor, 
   stopNotificationProcessor, 
   getProcessorStatus 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching processor status:', error)
+    logError('Error fetching processor status:', error)
     return NextResponse.json(
       { error: 'Failed to fetch processor status' },
       { status: 500 }
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error controlling processor:', error)
+    logError('Error controlling processor:', error)
     return NextResponse.json(
       { error: 'Failed to control notification processor' },
       { status: 500 }

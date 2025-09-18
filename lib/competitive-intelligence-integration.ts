@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/neon/client'
 import type { CompetitorAlert, CompetitiveOpportunity } from '@/lib/types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface CompetitiveTaskTemplate {
   id: string
@@ -131,7 +132,7 @@ export class CompetitiveIntelligenceIntegration {
       )
       
       if (!template) {
-        console.log(`No task template found for alert type: ${alert.alert_type}`)
+        logInfo(`No task template found for alert type: ${alert.alert_type}`)
         return null
       }
       
@@ -172,7 +173,7 @@ export class CompetitiveIntelligenceIntegration {
       
       return taskRows[0]?.id || null
     } catch (error) {
-      console.error('Error creating task from alert:', error)
+      logError('Error creating task from alert:', error)
       return null
     }
   }
@@ -240,7 +241,7 @@ export class CompetitiveIntelligenceIntegration {
       
       return context
     } catch (error) {
-      console.error('Error adding competitive context to goal:', error)
+      logError('Error adding competitive context to goal:', error)
       return null
     }
   }
@@ -292,7 +293,7 @@ export class CompetitiveIntelligenceIntegration {
       
       return taskRows[0]?.id || null
     } catch (error) {
-      console.error('Error creating competitive milestone:', error)
+      logError('Error creating competitive milestone:', error)
       return null
     }
   }
@@ -350,7 +351,7 @@ export class CompetitiveIntelligenceIntegration {
         recentIntelligence
       }
     } catch (error) {
-      console.error('Error getting competitive progress:', error)
+      logError('Error getting competitive progress:', error)
       return null
     }
   }

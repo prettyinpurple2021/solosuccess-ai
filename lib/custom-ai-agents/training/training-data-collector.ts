@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/neon/server"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface TrainingInteraction {
   id: string
@@ -88,7 +89,7 @@ export class TrainingDataCollector {
 
       return id
     } catch (error) {
-      console.error('Error recording training interaction:', error)
+      logError('Error recording training interaction:', error)
       throw new Error('Failed to record training interaction')
     }
   }
@@ -102,7 +103,7 @@ export class TrainingDataCollector {
         WHERE id = $3
       `, [rating, feedback || null, interactionId])
     } catch (error) {
-      console.error('Error updating interaction rating:', error)
+      logError('Error updating interaction rating:', error)
       throw new Error('Failed to update interaction rating')
     }
   }
@@ -209,7 +210,7 @@ export class TrainingDataCollector {
         }))
       }
     } catch (error) {
-      console.error('Error getting training metrics:', error)
+      logError('Error getting training metrics:', error)
       throw new Error('Failed to get training metrics')
     }
   }
@@ -243,7 +244,7 @@ export class TrainingDataCollector {
         metadata: JSON.parse(row.metadata || '{}')
       }))
     } catch (error) {
-      console.error('Error getting training data for agent:', error)
+      logError('Error getting training data for agent:', error)
       throw new Error('Failed to get training data for agent')
     }
   }
@@ -293,7 +294,7 @@ export class TrainingDataCollector {
 
       return JSON.stringify(data, null, 2)
     } catch (error) {
-      console.error('Error exporting training data:', error)
+      logError('Error exporting training data:', error)
       throw new Error('Failed to export training data')
     }
   }

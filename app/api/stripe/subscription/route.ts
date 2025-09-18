@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { getUserSubscription, hasActiveSubscription} from '@/lib/stripe-db-utils'
 import { stripe} from '@/lib/stripe'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -33,7 +34,7 @@ export async function GET(_request: NextRequest) {
       try {
         stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id)
       } catch (error) {
-        console.error('Error fetching Stripe subscription:', error)
+        logError('Error fetching Stripe subscription:', error)
         // Continue without Stripe data
       }
     }
@@ -46,7 +47,7 @@ export async function GET(_request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error getting subscription:', error)
+    logError('Error getting subscription:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error checking feature access:', error)
+    logError('Error checking feature access:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

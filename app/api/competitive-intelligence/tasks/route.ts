@@ -5,6 +5,7 @@ import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligenc
 import { db} from '@/db'
 import { createClient} from '@/lib/neon/server'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ tasks })
   } catch (error) {
-    console.error('Error fetching competitive intelligence tasks:', error)
+    logError('Error fetching competitive intelligence tasks:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitive intelligence tasks' },
       { status: 500 }
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ task: taskRows[0] }, { status: 201 })
   } catch (error) {
-    console.error('Error creating competitive intelligence task:', error)
+    logError('Error creating competitive intelligence task:', error)
     return NextResponse.json(
       { error: 'Failed to create competitive intelligence task' },
       { status: 500 }

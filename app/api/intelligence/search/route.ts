@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray, ilike, sql} from 'drizzle-orm'
 import type { IntelligenceData, 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   SourceType, 
   ImportanceLevel,
   ExtractedData,
@@ -308,7 +309,7 @@ export async function GET(request: NextRequest) {
       appliedFilters: filters,
     })
   } catch (error) {
-    console.error('Error searching intelligence data:', error)
+    logError('Error searching intelligence data:', error)
     return NextResponse.json(
       { error: 'Failed to search intelligence data' },
       { status: 500 }

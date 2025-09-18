@@ -16,6 +16,7 @@ import { Card, CardHeader, CardTitle, CardContent} from '@/components/ui/card'
 import { useToast} from '@/hooks/use-toast'
 import { motion, AnimatePresence} from 'framer-motion'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Share2, Copy, Link, Mail, Users, Shield, Calendar, Clock, Eye, Edit, Download, MessageCircle, Settings, Trash2, Lock, Crown} from 'lucide-react'
 
 interface BriefcaseFile {
@@ -144,7 +145,7 @@ export default function FileSharingModal({
       }
 
     } catch (error) {
-      console.error('Failed to load sharing data:', error)
+      logError('Failed to load sharing data:', error)
       toast({
         title: "Error",
         description: "Failed to load sharing information",
@@ -352,7 +353,7 @@ export default function FileSharingModal({
         setInviteSuggestions(suggestions.slice(0, 5))
       }
     } catch (error) {
-      console.error('Failed to search team members:', error)
+      logError('Failed to search team members:', error)
     }
   }, [])
 

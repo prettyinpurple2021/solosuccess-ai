@@ -6,6 +6,7 @@ import { CompetitiveIntelligenceGamificationTriggers} from '@/lib/competitive-in
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
 import type { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AlertSeverity,
   ActionItem,
   Recommendation
@@ -136,7 +137,7 @@ export async function GET(
       } : undefined,
     })
   } catch (error) {
-    console.error('Error fetching alert:', error)
+    logError('Error fetching alert:', error)
     return NextResponse.json(
       { error: 'Failed to fetch alert' },
       { status: 500 }
@@ -285,7 +286,7 @@ export async function PUT(
       } : undefined,
     })
   } catch (error) {
-    console.error('Error updating alert:', error)
+    logError('Error updating alert:', error)
     return NextResponse.json(
       { error: 'Failed to update alert' },
       { status: 500 }
@@ -341,7 +342,7 @@ export async function DELETE(
       deletedId: alertId,
     })
   } catch (error) {
-    console.error('Error deleting alert:', error)
+    logError('Error deleting alert:', error)
     return NextResponse.json(
       { error: 'Failed to delete alert' },
       { status: 500 }

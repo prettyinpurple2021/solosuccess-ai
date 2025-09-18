@@ -4,6 +4,7 @@ import { db } from '@/db'
 import { intelligenceData, competitorProfiles } from '@/db/schema'
 import { eq, and, gte, desc } from 'drizzle-orm'
 import type { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   CompetitorProfile, 
   IntelligenceData, 
   AnalysisResult, 
@@ -323,7 +324,7 @@ export class BlazeGrowthIntelligence {
       
       return analysis
     } catch (error) {
-      console.error('Error analyzing pricing strategy:', error)
+      logError('Error analyzing pricing strategy:', error)
       throw error
     }
   }
@@ -389,7 +390,7 @@ export class BlazeGrowthIntelligence {
 
       return this.parseGrowthRecommendations(response.text, competitorId)
     } catch (error) {
-      console.error('Error performing cost-benefit analysis:', error)
+      logError('Error performing cost-benefit analysis:', error)
       throw error
     }
   }
@@ -468,7 +469,7 @@ export class BlazeGrowthIntelligence {
 
       return this.parseGrowthPatternAnalysis(response.text, competitorId)
     } catch (error) {
-      console.error('Error analyzing growth strategy:', error)
+      logError('Error analyzing growth strategy:', error)
       throw error
     }
   }
@@ -546,7 +547,7 @@ export class BlazeGrowthIntelligence {
 
       return this.parseGrowthRecommendations(response.text, competitorIds[0])
     } catch (error) {
-      console.error('Error building market positioning recommendations:', error)
+      logError('Error building market positioning recommendations:', error)
       throw error
     }
   }
@@ -603,7 +604,7 @@ export class BlazeGrowthIntelligence {
 
       return this.parseGrowthRecommendations(response.text, competitorId)
     } catch (error) {
-      console.error('Error generating revenue optimization suggestions:', error)
+      logError('Error generating revenue optimization suggestions:', error)
       throw error
     }
   }

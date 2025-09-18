@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { analytics} from '@/lib/analytics'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error tracking analytics event:', error)
+    logError('Error tracking analytics event:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching analytics data:', error)
+    logError('Error fetching analytics data:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

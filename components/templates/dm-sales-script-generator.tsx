@@ -16,16 +16,65 @@ export function DmSalesScriptGenerator() {
   const [tone, setTone] = useState('');
   const [scripts, setScripts] = useState<string[]>([]);
   const [title, setTitle] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [industry, setIndustry] = useState('');
+  const [painPoints, setPainPoints] = useState<string[]>([]);
+  const [generatedMetadata, setGeneratedMetadata] = useState<any>(null);
   
   const { saveTemplate, isSaving } = useTemplateSave();
 
-  const handleGenerate = () => {
-    const generatedScripts = [
-      `Hey [Name]! I noticed you're passionate about [topic/industry]. I help [persona] achieve [outcome] through [offer]. Would you be interested in learning more about how [specific benefit]?`,
-      `Hi [Name], your content about [specific topic] really resonated with me! I work with [persona] to [solve problem]. I'd love to share a quick strategy that could help you [specific outcome]. Mind if I send it over?`,
-      `[Name], I saw your post about [challenge/topic]. I've actually helped other [persona] overcome this exact issue with [solution approach]. Would you be open to a quick chat about it?`,
-    ];
-    setScripts(generatedScripts);
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('/api/templates/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'sales-script',
+          persona,
+          offerDetails,
+          platform,
+          tone,
+          industry: industry || undefined,
+          painPoints: painPoints.length > 0 ? painPoints : undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate scripts');
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.content) {
+        // Extract scripts from AI response
+        const generatedScripts = result.content.map((item: any) => item.script || item);
+        setScripts(generatedScripts);
+        
+        // Store metadata for saving
+        setGeneratedMetadata({
+          ...result.metadata,
+          templateType: result.templateType,
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Error generating scripts:', error);
+      
+      // Fallback to sample scripts
+      const fallbackScripts = [
+        `Hey [Name]! I noticed you're passionate about [topic/industry]. I help ${persona} achieve [outcome] through ${offerDetails}. Would you be interested in learning more about how [specific benefit]?`,
+        `Hi [Name], your content about [specific topic] really resonated with me! I work with ${persona} to [solve problem]. I'd love to share a quick strategy that could help you [specific outcome]. Mind if I send it over?`,
+        `[Name], I saw your post about [challenge/topic]. I've actually helped other ${persona} overcome this exact issue with [solution approach]. Would you be open to a quick chat about it?`,
+      ];
+      setScripts(fallbackScripts);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSave = async () => {

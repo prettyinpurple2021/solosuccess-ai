@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -38,7 +39,7 @@ async function authenticateJWTRequest(request: NextRequest) {
       error: null 
     }
   } catch (error) {
-    console.error('JWT authentication error:', error)
+    logError('JWT authentication error:', error)
     return { user: null, error: 'Invalid token' }
   }
 }
@@ -206,7 +207,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Briefcase API error:', error)
+    logError('Briefcase API error:', error)
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
@@ -252,7 +253,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Briefcase creation error:', error)
+    logError('Briefcase creation error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -268,7 +268,7 @@ export default function MobileDashboardWidgets({
               >
                 <Avatar className="w-8 h-8 mx-auto mb-2">
                   <AvatarFallback 
-                    style={{ backgroundColor: agent.accent_color }}
+                    style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
                     className="text-white text-xs"
                   >
                     {agent.display_name.charAt(0)}

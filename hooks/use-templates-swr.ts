@@ -4,6 +4,7 @@ import useSWR from 'swr'
 import { useState } from 'react'
 import { SavedTemplate } from '@/lib/types'
 import { toast } from 'sonner'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const authFetch = async (url: string, init?: RequestInit) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
@@ -82,7 +83,7 @@ export function useTemplates() {
       
       return true
     } catch (err) {
-      console.error('Export failed', err)
+      logError('Export failed', err)
       toast.error("Export failed", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })

@@ -10,6 +10,7 @@ import { MessageRouter } from '@/lib/message-router'
 import { SessionManager } from '@/lib/session-manager'
 import { ContextManager } from '@/lib/context-manager'
 import { verifyAuth } from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize collaboration system components (singleton pattern)
 const collaborationHub = new CollaborationHub()
@@ -119,7 +120,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error retrieving collaboration session:', error)
+    logError('Error retrieving collaboration session:', error)
 
     return NextResponse.json({
       error: 'Internal Server Error',
@@ -228,7 +229,7 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Error updating collaboration session:', error)
+    logError('Error updating collaboration session:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({
@@ -299,7 +300,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Error archiving collaboration session:', error)
+    logError('Error archiving collaboration session:', error)
 
     return NextResponse.json({
       error: 'Internal Server Error',

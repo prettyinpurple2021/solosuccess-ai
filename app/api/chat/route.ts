@@ -6,6 +6,7 @@ import { openai} from '@ai-sdk/openai'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     return result.toTextStreamResponse()
   } catch (error) {
-    console.error('Error in chat:', error)
+    logError('Error in chat:', error)
     return NextResponse.json(
       { error: 'Failed to process chat message' },
       { status: 500 }

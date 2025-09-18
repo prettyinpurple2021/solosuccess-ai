@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import type { User, Session } from "@/lib/neon/types"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface AuthContextType {
   user: User | null
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Error fetching user data:', error)
+      logError('Error fetching user data:', error)
       // Don't remove token for network errors - only for auth failures
       // Network errors shouldn't clear authentication
     } finally {

@@ -4,6 +4,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { agentIntelligenceBriefingService} from '@/lib/agent-intelligence-briefings'
 import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const agentBriefingRequestSchema = z.object({
   agentId: z.enum(['echo', 'lexi', 'nova', 'blaze', 'collaborative']),
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Error generating agent briefing:', error)
+    logError('Error generating agent briefing:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -15,6 +15,7 @@ import {
   CheckCircle, Target, Clock, MessageCircle, Trophy, Crown, Sparkles, Flame, ArrowRight, BarChart3, Plus, Briefcase} from "lucide-react"
 import Link from "next/link"
 import { useSearchParams, useRouter} from "next/navigation"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -91,12 +92,12 @@ export default function DashboardPage() {
         window.location.reload()
       } else {
         const errorData = await response.json()
-        console.error('Onboarding completion failed:', errorData)
+        logError('Onboarding completion failed:', errorData)
         // Still close onboarding to prevent user being stuck
         setShowOnboarding(false)
       }
     } catch (error) {
-      console.error('Error saving onboarding data:', error)
+      logError('Error saving onboarding data:', error)
       track('error_occurred', {
         error: 'onboarding_completion_failed',
         details: error instanceof Error ? error.message : 'Unknown error'
@@ -105,7 +106,7 @@ export default function DashboardPage() {
   }
 
   const handleOnboardingSkip = () => {
-    console.log('Dashboard - Onboarding skip called')
+    logInfo('Dashboard - Onboarding skip called')
     setShowOnboarding(false)
   }
 

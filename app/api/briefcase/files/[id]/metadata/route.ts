@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Consolidated PATCH handler for updating document metadata
 export async function PATCH(
@@ -111,7 +112,7 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Update metadata error:', error)
+    logError('Update metadata error:', error)
     return NextResponse.json({ 
       error: 'Failed to update metadata' 
     }, { status: 500 })

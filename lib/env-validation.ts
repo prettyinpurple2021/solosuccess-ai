@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 /**
  * Environment variable validation schema for the SoloSuccess AI Platform
@@ -42,23 +43,23 @@ export function validateEnv() {
   try {
     const env = envSchema.parse(process.env)
     if (process.env.NODE_ENV === "development") {
-      console.log("✅ Environment variables validated successfully")
+      logInfo("✅ Environment variables validated successfully")
     }
     return env
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error("❌ Environment variable validation failed:")
+      logError("❌ Environment variable validation failed:")
       error.errors.forEach((err) => {
-        console.error(`  - ${err.path.join(".")}: ${err.message}`)
+        logError(`  - ${err.path.join(".")}: ${err.message}`)
       })
       
       // In development, show helpful setup messages
       if (process.env.NODE_ENV !== "production") {
-        console.error("\n📝 Setup Instructions:")
-        console.error("  1. Copy .env.example to .env.local")
-        console.error("  2. Fill in your actual environment values")
-        console.error("  3. Restart your development server")
-        console.error("\n🔗 Documentation: Check README.md for detailed setup instructions")
+        logError("\n📝 Setup Instructions:")
+        logError("  1. Copy .env.example to .env.local")
+        logError("  2. Fill in your actual environment values")
+        logError("  3. Restart your development server")
+        logError("\n🔗 Documentation: Check README.md for detailed setup instructions")
       }
       
       // Do not crash build by default. Opt-in via VALIDATE_ENV=true.

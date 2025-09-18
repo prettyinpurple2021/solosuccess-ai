@@ -5,6 +5,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, desc} from 'drizzle-orm'
 import { savedIntelligenceSearches} from '@/lib/schemas/saved-intelligence-searches'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -93,7 +94,7 @@ export async function GET(_request: NextRequest) {
       savedSearches: transformedSearches,
     })
   } catch (error) {
-    console.error('Error fetching saved searches:', error)
+    logError('Error fetching saved searches:', error)
     return NextResponse.json(
       { error: 'Failed to fetch saved searches' },
       { status: 500 }
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Error creating saved search:', error)
+    logError('Error creating saved search:', error)
     return NextResponse.json(
       { error: 'Failed to create saved search' },
       { status: 500 }

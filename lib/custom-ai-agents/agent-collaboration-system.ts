@@ -7,6 +7,7 @@ import { VexAgent } from "./vex-agent"
 import { LexiAgent } from "./lexi-agent"
 import { NovaAgent } from "./nova-agent"
 import { GlitchAgent } from "./glitch-agent"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface CollaborationRequest {
   id: string
@@ -169,7 +170,7 @@ export class AgentCollaborationSystem {
     for (const req of requests) {
       const targetAgent = this.agents.get(req.agentId)
       if (!targetAgent) {
-        console.warn(`Agent ${req.agentId} not found for collaboration`)
+        logWarn(`Agent ${req.agentId} not found for collaboration`)
         continue
       }
 
@@ -181,7 +182,7 @@ export class AgentCollaborationSystem {
         targetAgent.updateRelationship(fromAgentId, req, { success: true })
         
       } catch (error) {
-        console.error(`Collaboration failed between ${fromAgentId} and ${req.agentId}:`, error)
+        logError(`Collaboration failed between ${fromAgentId} and ${req.agentId}:`, error)
         targetAgent.updateRelationship(fromAgentId, req, { success: false, error: error instanceof Error ? error.message : 'Unknown error' })
       }
     }

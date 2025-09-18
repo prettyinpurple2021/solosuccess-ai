@@ -9,6 +9,7 @@ import { Progress} from '@/components/ui/progress'
 import { Alert, AlertDescription} from '@/components/ui/alert'
 import { CheckCircle, Clock, AlertCircle, Play, RefreshCw} from 'lucide-react'
 import { motion, AnimatePresence} from 'framer-motion'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface WorkflowStatusProps {
   workflowId?: string | null
@@ -23,10 +24,10 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
     currentWorkflowId ?? null,
     {
       onComplete: (result) => {
-        console.log('Onboarding completed:', result)
+        logInfo('Onboarding completed:', result)
       },
       onError: (error) => {
-        console.error('Onboarding failed:', error)
+        logError('Onboarding failed:', error)
       }
     }
   )
@@ -40,7 +41,7 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
       const result = await startOnboarding(userId, userData)
       setCurrentWorkflowId(result.workflowId)
     } catch (error) {
-      console.error('Failed to start onboarding:', error)
+      logError('Failed to start onboarding:', error)
     }
   }
 

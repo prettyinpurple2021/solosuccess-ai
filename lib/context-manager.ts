@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Context types and schemas
 export const ContextEntrySchema = z.object({
@@ -117,12 +118,12 @@ export class ContextManager {
       // Update session context
       await this.updateSessionContext(validatedEntry)
       
-      console.log(`📝 Context stored: ${validatedEntry.contextType}/${validatedEntry.key} for ${validatedEntry.agentId}`)
+      logInfo(`📝 Context stored: ${validatedEntry.contextType}/${validatedEntry.key} for ${validatedEntry.agentId}`)
       
       return validatedEntry.id
 
     } catch (error) {
-      console.error('Error storing context:', error)
+      logError('Error storing context:', error)
       throw error
     }
   }
@@ -218,7 +219,7 @@ export class ContextManager {
       return results
 
     } catch (error) {
-      console.error('Error retrieving context:', error)
+      logError('Error retrieving context:', error)
       throw error
     }
   }
@@ -264,10 +265,10 @@ export class ContextManager {
         this.sessionContexts.set(sessionId, updatedContext)
       }
 
-      console.log(`🔄 Conversation context updated for session ${sessionId}`)
+      logInfo(`🔄 Conversation context updated for session ${sessionId}`)
 
     } catch (error) {
-      console.error('Error updating conversation context:', error)
+      logError('Error updating conversation context:', error)
       throw error
     }
   }
@@ -319,7 +320,7 @@ export class ContextManager {
       this.sessionContexts.set(sessionId, context)
 
     } catch (error) {
-      console.error('Error adding to conversation history:', error)
+      logError('Error adding to conversation history:', error)
       throw error
     }
   }
@@ -363,10 +364,10 @@ export class ContextManager {
       context.lastUpdated = new Date()
       this.sessionContexts.set(sessionId, context)
 
-      console.log(`🧠 Shared knowledge stored: ${key} for session ${sessionId}`)
+      logInfo(`🧠 Shared knowledge stored: ${key} for session ${sessionId}`)
 
     } catch (error) {
-      console.error('Error storing shared knowledge:', error)
+      logError('Error storing shared knowledge:', error)
       throw error
     }
   }
@@ -434,10 +435,10 @@ export class ContextManager {
         tags: ['goal', goal.status]
       })
 
-      console.log(`🎯 Goal updated: ${goal.id} (${goal.status}) for session ${sessionId}`)
+      logInfo(`🎯 Goal updated: ${goal.id} (${goal.status}) for session ${sessionId}`)
 
     } catch (error) {
-      console.error('Error updating goal:', error)
+      logError('Error updating goal:', error)
       throw error
     }
   }
@@ -506,7 +507,7 @@ export class ContextManager {
       }
 
     } catch (error) {
-      console.error('Error generating context summary:', error)
+      logError('Error generating context summary:', error)
       throw error
     }
   }
@@ -528,13 +529,13 @@ export class ContextManager {
       }
 
       if (clearedCount > 0) {
-        console.log(`🧹 Cleared ${clearedCount} expired context entries`)
+        logInfo(`🧹 Cleared ${clearedCount} expired context entries`)
       }
 
       return clearedCount
 
     } catch (error) {
-      console.error('Error clearing expired context:', error)
+      logError('Error clearing expired context:', error)
       return 0
     }
   }
@@ -572,10 +573,10 @@ export class ContextManager {
         this.updateIndices(entry)
       }
 
-      console.log(`📥 Imported context for session ${data.conversationContext.sessionId}`)
+      logInfo(`📥 Imported context for session ${data.conversationContext.sessionId}`)
 
     } catch (error) {
-      console.error('Error importing session context:', error)
+      logError('Error importing session context:', error)
       throw error
     }
   }

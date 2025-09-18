@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 import { GoogleGenerativeAI} from '@google/generative-ai'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Type for document search results from database
 interface DocumentSearchResult {
@@ -229,7 +230,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Search error:', error)
+    logError('Search error:', error)
     return NextResponse.json({ 
       error: 'Search failed' 
     }, { status: 500 })
@@ -306,7 +307,7 @@ Focus on semantic relevance rather than exact keyword matches.
 
     return []
   } catch (error) {
-    console.error('Semantic search error:', error)
+    logError('Semantic search error:', error)
     return []
   }
 }
@@ -348,7 +349,7 @@ async function getSearchStats(client: any, userId: string, whereConditions: stri
       tags: tagStats
     }
   } catch (error) {
-    console.error('Stats error:', error)
+    logError('Stats error:', error)
     return {
       fileTypes: [],
       categories: [],

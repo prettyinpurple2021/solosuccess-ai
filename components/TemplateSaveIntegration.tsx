@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { Progress } from '@/components/ui/progress'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface TemplateSaveIntegrationProps {
   templateSlug: string
@@ -74,7 +75,7 @@ export const TemplateSaveIntegration: React.FC<TemplateSaveIntegrationProps> = (
       
       setLastSavedData(JSON.stringify(templateData))
     } catch (error) {
-      console.error('Auto-save error:', error)
+      logError('Auto-save error:', error)
     }
   }
 
@@ -133,7 +134,7 @@ export const TemplateSaveIntegration: React.FC<TemplateSaveIntegrationProps> = (
       onSave?.(saveTitle.trim())
       
     } catch (error) {
-      console.error('Save error:', error)
+      logError('Save error:', error)
       toast({
         title: "Save failed 💔",
         description: "Failed to save your template progress. Please try again.",

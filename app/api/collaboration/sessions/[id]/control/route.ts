@@ -9,6 +9,7 @@ import { CollaborationHub } from '@/lib/collaboration-hub'
 import { MessageRouter } from '@/lib/message-router'
 import { SessionManager } from '@/lib/session-manager'
 import { verifyAuth } from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize collaboration system components
 const collaborationHub = new CollaborationHub()
@@ -243,7 +244,7 @@ export async function POST(
     }
 
   } catch (error) {
-    console.error('Error performing session control action:', error)
+    logError('Error performing session control action:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({
@@ -355,7 +356,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error getting session control status:', error)
+    logError('Error getting session control status:', error)
 
     return NextResponse.json({
       error: 'Internal Server Error',

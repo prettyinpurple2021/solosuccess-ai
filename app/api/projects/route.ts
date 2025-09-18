@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { z} from 'zod'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -37,37 +38,42 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Mock projects data for now - replace with actual database query
-    const projects = [
-      {
-        id: '1',
-        name: 'SoloSuccess AI Platform',
-        description: 'Main platform development project',
-        color: '#6366f1',
-        icon: '🚀',
-        status: 'active' as const,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: '2',
-        name: 'Marketing Campaign',
-        description: 'Q1 marketing initiatives',
-        color: '#f59e0b',
-        icon: '📈',
-        status: 'active' as const,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
-    ]
+    // Get real projects from database
+    const sql = getSql()
+    
+    const projects = await sql`
+      SELECT 
+        id,
+        title as name,
+        description,
+        status,
+        metadata,
+        created_at,
+        updated_at
+      FROM briefcases 
+      WHERE user_id = ${user.id}
+      ORDER BY created_at DESC
+    `
+
+    // Transform the data to match the expected format
+    const transformedProjects = projects.map(project => ({
+      id: project.id.toString(),
+      name: project.name,
+      description: project.description || '',
+      color: project.metadata?.color || '#6366f1',
+      icon: project.metadata?.icon || '📁',
+      status: project.status as 'active' | 'completed' | 'paused',
+      created_at: project.created_at,
+      updated_at: project.updated_at
+    }))
 
     return NextResponse.json({
       success: true,
-      projects
+      projects: transformedProjects
     })
 
   } catch (error) {
-    console.error('Error fetching projects:', error)
+    logError('Error fetching projects:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -99,12 +105,42 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const projectData = ProjectSchema.parse(body)
 
-    // Create new project - replace with actual database operation
+    // Create new project in database
+    const sql = getSql()
+    
+    const result = await sql`
+      INSERT INTO briefcases (
+        user_id,
+        title,
+        description,
+        status,
+        metadata,
+        created_at,
+        updated_at
+      ) VALUES (
+        ${user.id},
+        ${projectData.name},
+        ${projectData.description || ''},
+        ${projectData.status || 'active'},
+        ${JSON.stringify({
+          color: projectData.color || '#6366f1',
+          icon: projectData.icon || '📁'
+        })},
+        NOW(),
+        NOW()
+      )
+      RETURNING id, title, description, status, metadata, created_at, updated_at
+    `
+
     const newProject = {
-      id: Date.now().toString(),
-      ...projectData,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      id: result[0].id.toString(),
+      name: result[0].title,
+      description: result[0].description || '',
+      color: result[0].metadata?.color || '#6366f1',
+      icon: result[0].metadata?.icon || '📁',
+      status: result[0].status as 'active' | 'completed' | 'paused',
+      created_at: result[0].created_at,
+      updated_at: result[0].updated_at
     }
 
     return NextResponse.json({
@@ -113,7 +149,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating project:', error)
+    logError('Error creating project:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -175,7 +211,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error updating project:', error)
+    logError('Error updating project:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -229,7 +265,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error deleting project:', error)
+    logError('Error deleting project:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

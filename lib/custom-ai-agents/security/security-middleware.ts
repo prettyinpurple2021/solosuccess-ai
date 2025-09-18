@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AgentSecurityManager } from './agent-security-manager'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface SecurityContext {
   userId: string
@@ -61,7 +62,7 @@ export class SecurityMiddleware {
 
       return { success: true, userId }
     } catch (error) {
-      console.error('Authentication error:', error)
+      logError('Authentication error:', error)
       return { success: false, error: 'Authentication error' }
     }
   }
@@ -80,7 +81,7 @@ export class SecurityMiddleware {
 
       return { success: true }
     } catch (error) {
-      console.error('Authorization error:', error)
+      logError('Authorization error:', error)
       return { success: false, error: 'Authorization error' }
     }
   }
@@ -106,7 +107,7 @@ export class SecurityMiddleware {
 
       return { success: true }
     } catch (error) {
-      console.error('Rate limit check error:', error)
+      logError('Rate limit check error:', error)
       return { success: false, error: 'Rate limit check failed' }
     }
   }
@@ -127,7 +128,7 @@ export class SecurityMiddleware {
 
       return { success: true, sanitized: validation.sanitized }
     } catch (error) {
-      console.error('Input validation error:', error)
+      logError('Input validation error:', error)
       return { success: false, error: 'Input validation error' }
     }
   }
@@ -149,7 +150,7 @@ export class SecurityMiddleware {
         context.userAgent
       )
     } catch (error) {
-      console.error('Security logging error:', error)
+      logError('Security logging error:', error)
     }
   }
 
@@ -284,7 +285,7 @@ export class SecurityMiddleware {
         context
       }
     } catch (error) {
-      console.error('Security middleware error:', error)
+      logError('Security middleware error:', error)
       return {
         success: false,
         response: NextResponse.json(

@@ -10,6 +10,7 @@ import { BossButton } from '@/components/ui/boss-button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Types
 interface CompetitorProfile {
@@ -117,7 +118,7 @@ export default function CompetitorDetailPage() {
       }
 
     } catch (error) {
-      console.error('Error fetching competitor data:', error)
+      logError('Error fetching competitor data:', error)
     } finally {
       setLoading(false)
     }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function GET(
   request: NextRequest,
@@ -63,7 +64,7 @@ export async function GET(
     })))
 
   } catch (error) {
-    console.error('Get permissions error:', error)
+    logError('Get permissions error:', error)
     return NextResponse.json({ 
       error: 'Failed to get permissions' 
     }, { status: 500 })
@@ -144,7 +145,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Create permission error:', error)
+    logError('Create permission error:', error)
     return NextResponse.json({ 
       error: 'Failed to create permission' 
     }, { status: 500 })

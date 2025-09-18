@@ -3,6 +3,7 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { createClient } from '@/lib/neon/server'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Input validation schema
 const TaskIntelligenceRequestSchema = z.object({
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Task intelligence error:', error)
+    logError('Task intelligence error:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -131,7 +132,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Task intelligence info error:', error)
+    logError('Task intelligence info error:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve task intelligence info' }, 
       { status: 500 }

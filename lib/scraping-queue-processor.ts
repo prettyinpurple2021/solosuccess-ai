@@ -2,6 +2,7 @@ import { ScrapingScheduler } from './database-scraping-scheduler'
 import { db } from '@/db'
 import { scrapingJobs } from '@/db/schema'
 import { eq, and, lte, inArray } from 'drizzle-orm'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export class ScrapingQueueProcessor {
   private static instance: ScrapingQueueProcessor
@@ -27,11 +28,11 @@ export class ScrapingQueueProcessor {
    */
   async start(): Promise<void> {
     if (this.isProcessing) {
-      console.log('Queue processor already running')
+      logInfo('Queue processor already running')
       return
     }
 
-    console.log('Starting scraping queue processor...')
+    logInfo('Starting scraping queue processor...')
     this.isProcessing = true
 
     // Start the scheduler
@@ -40,14 +41,14 @@ export class ScrapingQueueProcessor {
     // Start periodic processing
     this.processingInterval = setInterval(() => {
       this.processQueue().catch(error => {
-        console.error('Error processing queue:', error)
+        logError('Error processing queue:', error)
       })
     }, this.PROCESSING_INTERVAL)
 
     // Process queue immediately
     await this.processQueue()
 
-    console.log('Scraping queue processor started')
+    logInfo('Scraping queue processor started')
   }
 
   /**
@@ -58,7 +59,7 @@ export class ScrapingQueueProcessor {
       return
     }
 
-    console.log('Stopping scraping queue processor...')
+    logInfo('Stopping scraping queue processor...')
     this.isProcessing = false
 
     if (this.processingInterval) {
@@ -67,7 +68,7 @@ export class ScrapingQueueProcessor {
     }
 
     this.scheduler.stop()
-    console.log('Scraping queue processor stopped')
+    logInfo('Scraping queue processor stopped')
   }
 
   /**
@@ -86,7 +87,7 @@ export class ScrapingQueueProcessor {
         return
       }
 
-      console.log(`Processing ${jobsToRun.length} jobs from queue`)
+      logInfo(`Processing ${jobsToRun.length} jobs from queue`)
 
       // Process jobs with concurrency limit
       const chunks = this.chunkArray(jobsToRun, this.MAX_CONCURRENT_JOBS)
@@ -98,7 +99,7 @@ export class ScrapingQueueProcessor {
       }
 
     } catch (error) {
-      console.error('Error in queue processing:', error)
+      logError('Error in queue processing:', error)
     }
   }
 
@@ -107,7 +108,7 @@ export class ScrapingQueueProcessor {
    */
   private async processJob(job: any): Promise<void> {
     try {
-      console.log(`Processing job ${job.id} (${job.job_type}) for competitor ${job.competitor_id}`)
+      logInfo(`Processing job ${job.id} (${job.job_type}) for competitor ${job.competitor_id}`)
       
       // Update job status to running
       await this.scheduler.updateJobStatus(job.id, 'running', new Date())
@@ -116,7 +117,7 @@ export class ScrapingQueueProcessor {
       // The scheduler's executeJob method will handle the actual execution
       
     } catch (error) {
-      console.error(`Error processing job ${job.id}:`, error)
+      logError(`Error processing job ${job.id}:`, error)
       
       // Record failure
       await this.scheduler.recordJobResult(job.id, {
@@ -143,11 +144,11 @@ export class ScrapingQueueProcessor {
     frequencyTimezone?: string
     config?: any
   }): Promise<string> {
-    console.log(`Adding new job: ${params.jobType} for competitor ${params.competitorId}`)
+    logInfo(`Adding new job: ${params.jobType} for competitor ${params.competitorId}`)
     
     const jobId = await this.scheduler.createJob(params)
     
-    console.log(`Job ${jobId} added to queue`)
+    logInfo(`Job ${jobId} added to queue`)
     return jobId
   }
 
@@ -368,7 +369,7 @@ export class ScrapingQueueProcessor {
       }
     }
 
-    console.log(`Created ${jobIds.length} default monitoring jobs for competitor ${competitorId}`)
+    logInfo(`Created ${jobIds.length} default monitoring jobs for competitor ${competitorId}`)
     return jobIds
   }
 

@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
                            context.opportunities.length > 0
     })
   } catch (error) {
-    console.error('Error fetching competitive intelligence chat context:', error)
+    logError('Error fetching competitive intelligence chat context:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitive intelligence context' },
       { status: 500 }
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       context_summary: generateContextSummary(context)
     })
   } catch (error) {
-    console.error('Error analyzing competitive intelligence context:', error)
+    logError('Error analyzing competitive intelligence context:', error)
     return NextResponse.json(
       { error: 'Failed to analyze competitive intelligence context' },
       { status: 500 }

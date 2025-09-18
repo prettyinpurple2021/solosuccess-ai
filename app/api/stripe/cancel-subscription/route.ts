@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { stripe} from '@/lib/stripe'
 import { getUserSubscription, updateUserSubscription} from '@/lib/stripe-db-utils'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!result.success) {
-      console.error('Failed to update user subscription:', result.error)
+      logError('Failed to update user subscription:', result.error)
       return NextResponse.json(
         { error: 'Failed to update subscription' },
         { status: 500 }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error canceling subscription:', error)
+    logError('Error canceling subscription:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

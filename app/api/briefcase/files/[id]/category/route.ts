@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(
   request: NextRequest,
@@ -61,7 +62,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Update category error:', error)
+    logError('Update category error:', error)
     return NextResponse.json({ 
       error: 'Failed to update category' 
     }, { status: 500 })
@@ -99,7 +100,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Get category error:', error)
+    logError('Get category error:', error)
     return NextResponse.json({ 
       error: 'Failed to get category' 
     }, { status: 500 })

@@ -8,6 +8,7 @@ import { Progress} from '@/components/ui/progress'
 import { 
   Brain, Clock, TrendingUp, Target, CheckCircle, AlertTriangle, ArrowUpDown, Sparkles} from 'lucide-react'
 import { useToast} from '@/hooks/use-toast'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface Task {
   id: string
@@ -94,7 +95,7 @@ export function SmartPrioritizer({ tasks, onPrioritize, className = "" }: SmartP
       })
 
     } catch (error) {
-      console.error('AI analysis failed:', error)
+      logError('AI analysis failed:', error)
       toast({
         title: "❌ Analysis failed",
         description: "Please try again or prioritize manually",

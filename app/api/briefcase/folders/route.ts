@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ folders })
   } catch (error) {
-    console.error('Error fetching folders:', error)
+    logError('Error fetching folders:', error)
     return NextResponse.json({ error: 'Failed to fetch folders' }, { status: 500 })
   }
 }
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
       folder: result[0]
     })
   } catch (error) {
-    console.error('Error creating folder:', error)
+    logError('Error creating folder:', error)
     return NextResponse.json({ error: 'Failed to create folder' }, { status: 500 })
   }
 }

@@ -6,6 +6,7 @@ import { db} from '@/db';
 import { competitorProfiles} from '@/db/schema';
 import { eq, and} from 'drizzle-orm';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -91,7 +92,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error getting social media schedule:', error);
+    logError('Error getting social media schedule:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -222,7 +223,7 @@ export async function POST(
     });
 
   } catch (error) {
-    console.error('Error scheduling social media monitoring:', error);
+    logError('Error scheduling social media monitoring:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -334,7 +335,7 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('Error updating social media monitoring:', error);
+    logError('Error updating social media monitoring:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -421,7 +422,7 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Error pausing social media monitoring:', error);
+    logError('Error pausing social media monitoring:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

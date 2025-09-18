@@ -3,6 +3,7 @@ import { openai } from "@ai-sdk/openai"
 import { anthropic } from "@ai-sdk/anthropic"
 import { google } from "@ai-sdk/google"
 import { SimpleTrainingCollector } from "./training/simple-training-collector"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface AgentCapabilities {
   frameworks: string[]
@@ -206,7 +207,7 @@ Be specific, actionable, and maintain your ${this.name} personality.`
         followUpTasks: []
       }
     } catch (error) {
-      console.error(`Error generating response for ${this.name}:`, error)
+      logError(`Error generating response for ${this.name}:`, error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       const errorStack = error instanceof Error ? error.stack : 'No stack trace'
       
@@ -265,7 +266,7 @@ Be specific, actionable, and maintain your ${this.name} personality.`
         }
       })
     } catch (error) {
-      console.error(`Error recording training data for ${this.name}:`, error)
+      logError(`Error recording training data for ${this.name}:`, error)
       // Don't throw - training data recording shouldn't break the main flow
     }
   }

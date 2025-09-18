@@ -6,6 +6,7 @@ import { Badge} from '@/components/ui/badge'
 import { Progress} from '@/components/ui/progress'
 import { Button} from '@/components/ui/button'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   TrendingUp, Target, CheckCircle, Clock, BarChart3, Activity, Zap, Award, Users, ArrowUpRight, ArrowDownRight} from 'lucide-react'
 
 interface AnalyticsData {
@@ -74,7 +75,7 @@ export function ProductivityDashboard({ className = "" }: ProductivityDashboardP
         const analyticsData: AnalyticsData = await response.json()
         setData(analyticsData)
       } catch (error) {
-        console.error('Error loading analytics:', error)
+        logError('Error loading analytics:', error)
         // Fallback to empty state instead of mock data
         setData(null)
       } finally {

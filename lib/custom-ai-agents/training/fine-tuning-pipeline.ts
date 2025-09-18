@@ -1,6 +1,7 @@
 import { SimpleTrainingCollector } from "./simple-training-collector"
 import type { TrainingInteraction } from "./simple-training-collector"
 import { PerformanceAnalytics, TrainingRecommendation } from "./performance-analytics"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface FineTuningJob {
   id: string
@@ -113,12 +114,12 @@ export class FineTuningPipeline {
 
       // Start training process (run asynchronously)
       this.startFineTuningProcess(job, trainingData).catch(error => {
-        console.error('Error in fine-tuning process:', error)
+        logError('Error in fine-tuning process:', error)
       })
 
       return job
     } catch (error) {
-      console.error('Error creating fine-tuning job:', error)
+      logError('Error creating fine-tuning job:', error)
       throw error
     }
   }
@@ -130,7 +131,7 @@ export class FineTuningPipeline {
   ): Promise<TrainingInteraction[]> {
     let data = await this.dataCollector.getTrainingDataForAgent(agentId, userId, 5000)
 
-    console.log(`Found ${data.length} training interactions for agent ${agentId}`)
+    logInfo(`Found ${data.length} training interactions for agent ${agentId}`)
 
     // Apply filters
     if (filters.minRating) {
@@ -145,7 +146,7 @@ export class FineTuningPipeline {
       data = data.filter(d => d.success)
     }
 
-    console.log(`After filtering: ${data.length} training interactions`)
+    logInfo(`After filtering: ${data.length} training interactions`)
 
     if (filters.timeRange) {
       data = data.filter(d => 
@@ -172,7 +173,7 @@ export class FineTuningPipeline {
   private async storeFineTuningJob(job: FineTuningJob): Promise<void> {
     // Store in memory (in a real implementation, store in database)
     this.jobs.set(job.id, job)
-    console.log('Storing fine-tuning job:', job.id)
+    logInfo('Storing fine-tuning job:', job.id)
   }
 
   private async startFineTuningProcess(job: FineTuningJob, trainingData: TrainingInteraction[]): Promise<void> {
@@ -265,7 +266,7 @@ export class FineTuningPipeline {
 
   private async simulateFineTuning(job: FineTuningJob, dataset: TrainingDataset): Promise<any> {
     // Simulate training process
-    console.log(`Simulating fine-tuning for ${job.agentId} with ${dataset.size} samples`)
+    logInfo(`Simulating fine-tuning for ${job.agentId} with ${dataset.size} samples`)
     
     // In real implementation, this would call the actual fine-tuning API
     await new Promise(resolve => setTimeout(resolve, 5000)) // Simulate 5 second training
@@ -332,18 +333,18 @@ export class FineTuningPipeline {
   private async updateJobStatus(job: FineTuningJob): Promise<void> {
     // Update in memory (in real implementation, update in database)
     this.jobs.set(job.id, job)
-    console.log(`Job ${job.id} status updated to: ${job.status}`)
+    logInfo(`Job ${job.id} status updated to: ${job.status}`)
   }
 
   async getFineTuningJob(jobId: string): Promise<FineTuningJob | null> {
     // Fetch from memory (in real implementation, fetch from database)
-    console.log(`Fetching fine-tuning job: ${jobId}`)
+    logInfo(`Fetching fine-tuning job: ${jobId}`)
     return this.jobs.get(jobId) || null
   }
 
   async listFineTuningJobs(userId: string): Promise<FineTuningJob[]> {
     // Fetch from memory (in real implementation, fetch from database)
-    console.log(`Listing fine-tuning jobs for user: ${userId}`)
+    logInfo(`Listing fine-tuning jobs for user: ${userId}`)
     return Array.from(this.jobs.values()).filter(job => job.userId === userId)
   }
 

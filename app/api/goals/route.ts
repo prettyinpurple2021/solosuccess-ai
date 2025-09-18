@@ -4,6 +4,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ goals: enhancedGoals })
   } catch (error) {
-    console.error('Error fetching goals:', error)
+    logError('Error fetching goals:', error)
     return NextResponse.json(
       { error: 'Failed to fetch goals' },
       { status: 500 }
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ goal: rows[0] }, { status: 201 })
   } catch (error) {
-    console.error('Error creating goal:', error)
+    logError('Error creating goal:', error)
     return NextResponse.json(
       { error: 'Failed to create goal' },
       { status: 500 }

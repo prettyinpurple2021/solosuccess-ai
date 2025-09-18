@@ -4,6 +4,7 @@ import { socialMediaAnalysisEngine } from './social-media-analysis-engine';
 import { db } from '@/db';
 import { competitorProfiles, competitorAlerts } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 /**
  * Social Media Job Processor
@@ -18,11 +19,11 @@ export class SocialMediaJobProcessor {
    */
   start(intervalMinutes: number = 15): void {
     if (this.processingInterval) {
-      console.log('Social media job processor is already running');
+      logInfo('Social media job processor is already running');
       return;
     }
 
-    console.log(`Starting social media job processor with ${intervalMinutes} minute intervals`);
+    logInfo(`Starting social media job processor with ${intervalMinutes} minute intervals`);
     
     // Process immediately on start
     this.processJobs();
@@ -40,7 +41,7 @@ export class SocialMediaJobProcessor {
     if (this.processingInterval) {
       clearInterval(this.processingInterval);
       this.processingInterval = null;
-      console.log('Social media job processor stopped');
+      logInfo('Social media job processor stopped');
     }
   }
 
@@ -49,14 +50,14 @@ export class SocialMediaJobProcessor {
    */
   async processJobs(): Promise<void> {
     if (this.isProcessing) {
-      console.log('Social media job processing already in progress, skipping...');
+      logInfo('Social media job processing already in progress, skipping...');
       return;
     }
 
     this.isProcessing = true;
     
     try {
-      console.log('Starting social media job processing cycle');
+      logInfo('Starting social media job processing cycle');
       
       // Process pending monitoring jobs
       await socialMediaScheduler.processPendingJobs();
@@ -70,10 +71,10 @@ export class SocialMediaJobProcessor {
       // Clean up old data
       await this.cleanupOldData();
       
-      console.log('Social media job processing cycle completed');
+      logInfo('Social media job processing cycle completed');
       
     } catch (error) {
-      console.error('Error during social media job processing:', error);
+      logError('Error during social media job processing:', error);
     } finally {
       this.isProcessing = false;
     }
@@ -90,18 +91,18 @@ export class SocialMediaJobProcessor {
         .from(competitorProfiles)
         .where(eq(competitorProfiles.monitoring_status, 'active'));
 
-      console.log(`Running analysis for ${activeCompetitors.length} active competitors`);
+      logInfo(`Running analysis for ${activeCompetitors.length} active competitors`);
 
       for (const competitor of activeCompetitors) {
         try {
           await this.runCompetitorAnalysis(competitor);
         } catch (error) {
-          console.error(`Error analyzing competitor ${competitor.id}:`, error);
+          logError(`Error analyzing competitor ${competitor.id}:`, error);
         }
       }
 
     } catch (error) {
-      console.error('Error running analysis jobs:', error);
+      logError('Error running analysis jobs:', error);
     }
   }
 
@@ -141,7 +142,7 @@ export class SocialMediaJobProcessor {
       });
 
     } catch (error) {
-      console.error(`Error in competitor analysis for ${competitorId}:`, error);
+      logError(`Error in competitor analysis for ${competitorId}:`, error);
     }
   }
 
@@ -349,10 +350,10 @@ export class SocialMediaJobProcessor {
         is_archived: false
       });
 
-      console.log(`Created alert for competitor ${competitor.id}: ${alertData.title}`);
+      logInfo(`Created alert for competitor ${competitor.id}: ${alertData.title}`);
 
     } catch (error) {
-      console.error('Error creating alert:', error);
+      logError('Error creating alert:', error);
     }
   }
 
@@ -364,10 +365,10 @@ export class SocialMediaJobProcessor {
       // This method processes the insights generated during analysis
       // and creates alerts for significant competitive intelligence
       
-      console.log('Alert generation completed during analysis processing');
+      logInfo('Alert generation completed during analysis processing');
       
     } catch (error) {
-      console.error('Error generating alerts:', error);
+      logError('Error generating alerts:', error);
     }
   }
 
@@ -379,10 +380,10 @@ export class SocialMediaJobProcessor {
       // Clean up old scraping job results (keep last 30 days)
       await socialMediaScheduler.cleanupOldResults(30);
       
-      console.log('Old social media data cleanup completed');
+      logInfo('Old social media data cleanup completed');
       
     } catch (error) {
-      console.error('Error cleaning up old data:', error);
+      logError('Error cleaning up old data:', error);
     }
   }
 
@@ -402,7 +403,7 @@ export class SocialMediaJobProcessor {
    * Process jobs manually (for testing or immediate execution)
    */
   async processJobsManually(): Promise<void> {
-    console.log('Manual social media job processing triggered');
+    logInfo('Manual social media job processing triggered');
     await this.processJobs();
   }
 
@@ -421,7 +422,7 @@ export class SocialMediaJobProcessor {
         throw new Error(`Competitor ${competitorId} not found`);
       }
 
-      console.log(`Manual analysis triggered for competitor ${competitorId}`);
+      logInfo(`Manual analysis triggered for competitor ${competitorId}`);
       await this.runCompetitorAnalysis(competitor);
       
       return {
@@ -431,7 +432,7 @@ export class SocialMediaJobProcessor {
       };
 
     } catch (error) {
-      console.error(`Error in manual competitor analysis:`, error);
+      logError(`Error in manual competitor analysis:`, error);
       throw error;
     }
   }

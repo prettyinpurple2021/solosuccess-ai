@@ -2,6 +2,7 @@ import { generateObject } from 'ai'
 import { openai } from '@/lib/ai-config'
 import { z } from 'zod'
 import { IntelligenceBriefing } from './intelligence-briefing-system'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Agent-specific briefing interfaces
 export interface AgentBriefing {
@@ -428,7 +429,7 @@ export class AgentIntelligenceBriefingService {
       } as EchoMarketingBriefing
       
     } catch (error) {
-      console.error('Error generating Echo briefing:', error)
+      logError('Error generating Echo briefing:', error)
       return this.createFallbackEchoBriefing()
     }
   }  /**
@@ -457,7 +458,7 @@ export class AgentIntelligenceBriefingService {
       } as LexiStrategicBriefing
       
     } catch (error) {
-      console.error('Error generating Lexi briefing:', error)
+      logError('Error generating Lexi briefing:', error)
       return this.createFallbackLexiBriefing()
     }
   }
@@ -487,7 +488,7 @@ export class AgentIntelligenceBriefingService {
       } as NovaProductBriefing
       
     } catch (error) {
-      console.error('Error generating Nova briefing:', error)
+      logError('Error generating Nova briefing:', error)
       return this.createFallbackNovaBriefing()
     }
   }
@@ -517,7 +518,7 @@ export class AgentIntelligenceBriefingService {
       } as BlazeGrowthBriefing
       
     } catch (error) {
-      console.error('Error generating Blaze briefing:', error)
+      logError('Error generating Blaze briefing:', error)
       return this.createFallbackBlazeBriefing()
     }
   }
@@ -549,7 +550,7 @@ export class AgentIntelligenceBriefingService {
       } as CollaborativeBriefing
       
     } catch (error) {
-      console.error('Error generating collaborative briefing:', error)
+      logError('Error generating collaborative briefing:', error)
       return this.createFallbackCollaborativeBriefing(participatingAgents)
     }
   }

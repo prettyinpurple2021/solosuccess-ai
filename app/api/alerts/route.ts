@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, desc, asc, gte, lte, inArray} from 'drizzle-orm'
 import type { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AlertSeverity,
   ActionItem,
   Recommendation
@@ -265,7 +266,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Error fetching alerts:', error)
+    logError('Error fetching alerts:', error)
     return NextResponse.json(
       { error: 'Failed to fetch alerts' },
       { status: 500 }
@@ -393,7 +394,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Error creating alert:', error)
+    logError('Error creating alert:', error)
     return NextResponse.json(
       { error: 'Failed to create alert' },
       { status: 500 }

@@ -5,6 +5,7 @@ import { db} from '@/db'
 import { competitiveOpportunities, opportunityActions} from '@/db/schema'
 import { eq, and} from 'drizzle-orm'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -89,7 +90,7 @@ export async function GET(
       actions
     })
   } catch (error) {
-    console.error('Error getting opportunity actions:', error)
+    logError('Error getting opportunity actions:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -168,7 +169,7 @@ export async function POST(
       action: newAction
     }, { status: 201 })
   } catch (error) {
-    console.error('Error creating opportunity action:', error)
+    logError('Error creating opportunity action:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, inArray, gte, desc} from 'drizzle-orm'
 import type { IntelligenceData,
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AnalysisResult,
   ExtractedData,
   SourceType,
@@ -302,7 +303,7 @@ export async function POST(request: NextRequest) {
       })),
     })
   } catch (error) {
-    console.error('Error analyzing intelligence data:', error)
+    logError('Error analyzing intelligence data:', error)
     return NextResponse.json(
       { error: 'Failed to analyze intelligence data' },
       { status: 500 }

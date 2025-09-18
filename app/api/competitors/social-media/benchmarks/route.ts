@@ -6,6 +6,7 @@ import { db} from '@/db';
 import { competitorProfiles} from '@/db/schema';
 import { eq, and, inArray} from 'drizzle-orm';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error generating competitive benchmarks:', error);
+    logError('Error generating competitive benchmarks:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -243,7 +244,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error creating custom benchmark:', error);
+    logError('Error creating custom benchmark:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Checkbox} from "@/components/ui/checkbox"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { FileText, Shield, CheckCircle, Copy, Download} from "lucide-react"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface PolicyData {
   businessName: string
@@ -116,7 +117,7 @@ export function PolicyGenerator() {
       const result = await response.json()
       setGeneratedPolicies(result.policies)
     } catch (error) {
-      console.error('Policy generation error:', error)
+      logError('Policy generation error:', error)
       // Handle error - could show a toast notification here
     } finally {
       setIsGenerating(false)

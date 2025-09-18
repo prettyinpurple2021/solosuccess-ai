@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { z} from 'zod'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching conversations:', error)
+    logError('Error fetching conversations:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error creating conversation:', error)
+    logError('Error creating conversation:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -182,7 +183,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error updating conversation:', error)
+    logError('Error updating conversation:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -236,7 +237,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error deleting conversation:', error)
+    logError('Error deleting conversation:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

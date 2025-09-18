@@ -6,6 +6,7 @@ import { db} from '@/db';
 import { competitorProfiles} from '@/db/schema';
 import { eq, and} from 'drizzle-orm';
 import { z} from 'zod';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -102,7 +103,7 @@ export async function GET(
           days
         );
       } catch (error) {
-        console.error('Error analyzing engagement patterns:', error);
+        logError('Error analyzing engagement patterns:', error);
         insights.engagement_patterns = [];
       }
     }
@@ -115,7 +116,7 @@ export async function GET(
           days
         );
       } catch (error) {
-        console.error('Error analyzing posting frequency:', error);
+        logError('Error analyzing posting frequency:', error);
         insights.posting_frequency = [];
       }
     }
@@ -128,7 +129,7 @@ export async function GET(
           days
         );
       } catch (error) {
-        console.error('Error analyzing audience:', error);
+        logError('Error analyzing audience:', error);
         insights.audience_analysis = [];
       }
     }
@@ -141,7 +142,7 @@ export async function GET(
           days * 3 // Use longer period for campaign detection
         );
       } catch (error) {
-        console.error('Error analyzing campaigns:', error);
+        logError('Error analyzing campaigns:', error);
         insights.campaign_analysis = [];
       }
     }
@@ -158,7 +159,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error generating social media insights:', error);
+    logError('Error generating social media insights:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

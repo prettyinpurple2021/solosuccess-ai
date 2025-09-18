@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 const briefingRequestSchema = z.object({
   briefingType: z.enum(['daily', 'weekly', 'monthly', 'on-demand']),
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Error generating intelligence briefing:', error)
+    logError('Error generating intelligence briefing:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -145,7 +146,7 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Error fetching briefing history:', error)
+    logError('Error fetching briefing history:', error)
     
     return NextResponse.json(
       { error: 'Failed to fetch briefings' },

@@ -8,6 +8,7 @@ import { Switch} from '@/components/ui/switch'
 import { 
   Calendar, Clock, CheckCircle, XCircle, ExternalLink, Settings, RefreshCw, Plus} from 'lucide-react'
 import { useToast} from '@/hooks/use-toast'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface CalendarEvent {
   id: string
@@ -49,7 +50,7 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
         loadCalendarEvents()
       }
     } catch {
-      console.error('Failed to check calendar connection')
+      logError('Failed to check calendar connection')
     }
   }, [])
 
@@ -151,7 +152,7 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
       
       setEvents(mockEvents)
     } catch {
-      console.error('Failed to load calendar events')
+      logError('Failed to load calendar events')
     }
   }
 

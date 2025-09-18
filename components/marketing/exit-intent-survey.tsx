@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export default function ExitIntentSurvey() {
   const [open, setOpen] = useState(false)
@@ -55,7 +56,7 @@ export default function ExitIntentSurvey() {
         }
         setStatusChecked(true)
       } catch (error) {
-        console.error('Failed to check survey status:', error)
+        logError('Failed to check survey status:', error)
         // On error, still allow survey after delay for anonymous users
         const timer = setTimeout(() => {
           setCanShow(true)
@@ -104,13 +105,13 @@ export default function ExitIntentSurvey() {
         setSubmitted(true)
         setOpen(false)
       } else {
-        console.error('Failed to submit survey: Server error')
+        logError('Failed to submit survey: Server error')
         // Even if submission fails, mark as submitted to avoid repeated attempts
         setSubmitted(true)
         setOpen(false)
       }
     } catch (error) {
-      console.error('Failed to submit survey:', error)
+      logError('Failed to submit survey:', error)
       // Even if submission fails, mark as submitted to avoid repeated attempts
       setSubmitted(true)
       setOpen(false)
@@ -138,7 +139,7 @@ export default function ExitIntentSurvey() {
       setDismissed(true)
       setOpen(false)
     } catch (error) {
-      console.error('Failed to dismiss survey:', error)
+      logError('Failed to dismiss survey:', error)
       // Even if API call fails, still dismiss locally
       setDismissed(true)
       setOpen(false)

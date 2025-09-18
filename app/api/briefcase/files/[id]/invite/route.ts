@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(
   request: NextRequest,
@@ -68,7 +69,7 @@ export async function POST(
 
     // TODO: Send email invitation
     // This would integrate with your email service (SendGrid, AWS SES, etc.)
-    console.log(`Invitation sent to ${email} for document ${document.name} with role ${role}`)
+    logInfo(`Invitation sent to ${email} for document ${document.name} with role ${role}`)
 
     return NextResponse.json({
       id: newPermission.id,
@@ -81,7 +82,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Send invitation error:', error)
+    logError('Send invitation error:', error)
     return NextResponse.json({ 
       error: 'Failed to send invitation' 
     }, { status: 500 })

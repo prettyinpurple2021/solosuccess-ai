@@ -1,10 +1,11 @@
 import { NextResponse} from 'next/server';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    console.log('Health check requested at:', new Date().toISOString());
+    logInfo('Health check requested at:', new Date().toISOString());
     
     // Basic health check that doesn't depend on database
     const healthStatus = {
@@ -16,10 +17,10 @@ export async function GET() {
       hostname: process.env.HOSTNAME,
     };
 
-    console.log('Health check response:', healthStatus);
+    logInfo('Health check response:', healthStatus);
     return NextResponse.json(healthStatus);
   } catch (error) {
-    console.error('Health check error:', error);
+    logError('Health check error:', error);
     return NextResponse.json(
       { 
         status: 'error',

@@ -9,6 +9,7 @@ import { CollaborationHub } from '@/lib/collaboration-hub'
 import { SessionManager } from '@/lib/session-manager'
 import { MessageRouter } from '@/lib/message-router'
 import { verifyAuth } from '@/lib/auth-server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Initialize collaboration system components
 const collaborationHub = new CollaborationHub()
@@ -108,7 +109,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error retrieving agent details:', error)
+    logError('Error retrieving agent details:', error)
 
     return NextResponse.json({
       error: 'Internal Server Error',
@@ -200,7 +201,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Error executing agent capability:', error)
+    logError('Error executing agent capability:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({

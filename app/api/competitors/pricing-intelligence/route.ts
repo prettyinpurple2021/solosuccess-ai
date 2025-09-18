@@ -7,6 +7,7 @@ import { eq, and, gte, desc, inArray} from 'drizzle-orm'
 import { blazeGrowthIntelligence} from '@/lib/blaze-growth-intelligence'
 import { z} from 'zod'
 import type { SourceType, ImportanceLevel, ExtractedData, AnalysisResult } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -152,7 +153,7 @@ export async function GET(request: NextRequest) {
             intelligence_points: competitorPricingData.length
           }
         } catch (error) {
-          console.error(`Error analyzing pricing for competitor ${competitor.id}:`, error)
+          logError(`Error analyzing pricing for competitor ${competitor.id}:`, error)
           return {
             competitor: {
               id: competitor.id,
@@ -188,7 +189,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error in pricing intelligence overview:', error)
+    logError('Error in pricing intelligence overview:', error)
     return NextResponse.json(
       { error: 'Failed to generate pricing intelligence overview' },
       { status: 500 }
@@ -303,7 +304,7 @@ export async function POST(request: NextRequest) {
               intelligence_data_points: competitorIntelligence.length
             }
           } catch (error) {
-            console.error(`Pricing analysis failed for competitor ${competitor.id}:`, error)
+            logError(`Pricing analysis failed for competitor ${competitor.id}:`, error)
             return {
               competitor_id: competitor.id,
               competitor_name: competitor.name,
@@ -342,7 +343,7 @@ export async function POST(request: NextRequest) {
                   revenue_suggestions: suggestions
                 }
               } catch (error) {
-                console.error(`Revenue optimization failed for competitor ${analysis.competitor_id}:`, error)
+                logError(`Revenue optimization failed for competitor ${analysis.competitor_id}:`, error)
                 return {
                   competitor_id: analysis.competitor_id,
                   competitor_name: analysis.competitor_name,
@@ -383,7 +384,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error in comprehensive pricing analysis:', error)
+    logError('Error in comprehensive pricing analysis:', error)
     return NextResponse.json(
       { error: 'Failed to perform comprehensive pricing analysis' },
       { status: 500 }

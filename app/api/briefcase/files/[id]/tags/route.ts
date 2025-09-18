@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(
   request: NextRequest,
@@ -72,7 +73,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Add tag error:', error)
+    logError('Add tag error:', error)
     return NextResponse.json({ 
       error: 'Failed to add tag' 
     }, { status: 500 })
@@ -150,7 +151,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Remove tag error:', error)
+    logError('Remove tag error:', error)
     return NextResponse.json({ 
       error: 'Failed to remove tag' 
     }, { status: 500 })

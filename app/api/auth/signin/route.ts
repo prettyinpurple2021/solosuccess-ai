@@ -2,6 +2,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
     return response
 
   } catch (error) {
-    console.error('Signin error:', error)
+    logError('Signin error:', error)
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,

@@ -5,6 +5,7 @@ import { Search, Crown, Heart, Sparkles, MessageCircle, Palette, FileText, Star,
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface SearchResult {
   id: string
@@ -99,7 +100,7 @@ export const GlobalSearch: React.FC = () => {
         setResults(searchResults)
       }
     } catch (error) {
-      console.error('Search error:', error)
+      logError('Search error:', error)
     } finally {
       setLoading(false)
     }

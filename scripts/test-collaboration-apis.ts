@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Mock authentication for testing
 const mockUser = {
@@ -19,7 +20,7 @@ class ApiTestSuite {
   private agentId: string = 'test-agent-1'
   
   constructor() {
-    console.log('🚀 Starting Collaboration API Integration Tests')
+    logInfo('🚀 Starting Collaboration API Integration Tests')
   }
 
   private async makeRequest(endpoint: string, options: RequestInit = {}) {
@@ -43,7 +44,7 @@ class ApiTestSuite {
         data
       }
     } catch (error) {
-      console.error(`❌ Request failed for ${endpoint}:`, error)
+      logError(`❌ Request failed for ${endpoint}:`, error)
       return {
         status: 500,
         success: false,
@@ -57,22 +58,22 @@ class ApiTestSuite {
 
   private log(testName: string, result: any, expected?: any) {
     const status = result.success ? '✅' : '❌'
-    console.log(`${status} ${testName}`)
+    logInfo(`${status} ${testName}`)
     
     if (!result.success) {
-      console.log(`   Status: ${result.status}`)
-      console.log(`   Error: ${result.data.message || result.data.error}`)
+      logInfo(`   Status: ${result.status}`)
+      logError(`   Error: ${result.data.message || result.data.error}`)
     } else if (expected) {
-      console.log(`   Expected: ${expected}`)
-      console.log(`   Received: ${JSON.stringify(result.data, null, 2)}`)
+      logInfo(`   Expected: ${expected}`)
+      logInfo(`   Received: ${JSON.stringify(result.data, null, 2)}`)
     }
     
-    console.log('')
+    logInfo('')
   }
 
   // Session API Tests
   async testSessionAPIs() {
-    console.log('📁 Testing Session APIs')
+    logInfo('📁 Testing Session APIs')
     console.log('=' .repeat(50))
 
     // Test: Create new session
@@ -122,7 +123,7 @@ class ApiTestSuite {
 
   // Agent API Tests
   async testAgentAPIs() {
-    console.log('🤖 Testing Agent APIs')
+    logInfo('🤖 Testing Agent APIs')
     console.log('=' .repeat(50))
 
     // Test: List agents
@@ -139,7 +140,7 @@ class ApiTestSuite {
       body: JSON.stringify({
         capability: 'analyze_code',
         input: {
-          code: 'console.log("Hello, World!");',
+          code: 'logInfo("Hello, World!");',
           language: 'javascript'
         }
       })
@@ -149,11 +150,11 @@ class ApiTestSuite {
 
   // Message API Tests
   async testMessageAPIs() {
-    console.log('💬 Testing Message APIs')
+    logInfo('💬 Testing Message APIs')
     console.log('=' .repeat(50))
 
     if (!this.sessionId) {
-      console.log('❌ Session ID not available, skipping message tests')
+      logInfo('❌ Session ID not available, skipping message tests')
       return
     }
 
@@ -185,11 +186,11 @@ class ApiTestSuite {
 
   // Context API Tests
   async testContextAPIs() {
-    console.log('🧠 Testing Context APIs')
+    logInfo('🧠 Testing Context APIs')
     console.log('=' .repeat(50))
 
     if (!this.sessionId) {
-      console.log('❌ Session ID not available, skipping context tests')
+      logInfo('❌ Session ID not available, skipping context tests')
       return
     }
 
@@ -229,11 +230,11 @@ class ApiTestSuite {
 
   // Session Control API Tests
   async testSessionControlAPIs() {
-    console.log('🎮 Testing Session Control APIs')
+    logInfo('🎮 Testing Session Control APIs')
     console.log('=' .repeat(50))
 
     if (!this.sessionId) {
-      console.log('❌ Session ID not available, skipping control tests')
+      logInfo('❌ Session ID not available, skipping control tests')
       return
     }
 
@@ -289,9 +290,9 @@ class ApiTestSuite {
 
   // Run all tests
   async runAllTests() {
-    console.log('🧪 Starting Comprehensive API Integration Tests')
+    logInfo('🧪 Starting Comprehensive API Integration Tests')
     console.log('=' .repeat(80))
-    console.log('')
+    logInfo('')
 
     try {
       await this.testSessionAPIs()
@@ -300,16 +301,16 @@ class ApiTestSuite {
       await this.testContextAPIs()
       await this.testSessionControlAPIs()
       
-      console.log('🎉 All Integration Tests Completed!')
+      logInfo('🎉 All Integration Tests Completed!')
       console.log('=' .repeat(80))
       
       if (this.sessionId) {
-        console.log(`📋 Test Session ID: ${this.sessionId}`)
-        console.log('You can use this session ID for manual testing')
+        logInfo(`📋 Test Session ID: ${this.sessionId}`)
+        logInfo('You can use this session ID for manual testing')
       }
       
     } catch (error) {
-      console.error('💥 Test Suite Failed:', error)
+      logError('💥 Test Suite Failed:', error)
     }
   }
 }
@@ -319,7 +320,7 @@ class ValidationTestSuite {
   private baseUrl = 'http://localhost:3000/api/collaboration'
 
   async testValidationErrors() {
-    console.log('⚠️  Testing Validation & Error Handling')
+    logError('⚠️  Testing Validation & Error Handling')
     console.log('=' .repeat(50))
 
     // Test invalid session creation
@@ -329,11 +330,11 @@ class ValidationTestSuite {
         // Missing required fields
       })
     })
-    console.log('✅ Invalid Session Creation:', invalidSession.status === 400 ? 'PASS' : 'FAIL')
+    logInfo('✅ Invalid Session Creation:', invalidSession.status === 400 ? 'PASS' : 'FAIL')
 
     // Test invalid session ID format
     const invalidId = await this.makeRequest('/sessions/invalid-uuid')
-    console.log('✅ Invalid Session ID:', invalidId.status === 400 ? 'PASS' : 'FAIL')
+    logInfo('✅ Invalid Session ID:', invalidId.status === 400 ? 'PASS' : 'FAIL')
 
     // Test unauthorized access
     const unauthorized = await this.makeRequest('/sessions', {
@@ -341,9 +342,9 @@ class ValidationTestSuite {
         'Authorization': '' // No auth token
       }
     })
-    console.log('✅ Unauthorized Access:', unauthorized.status === 401 ? 'PASS' : 'FAIL')
+    logInfo('✅ Unauthorized Access:', unauthorized.status === 401 ? 'PASS' : 'FAIL')
 
-    console.log('')
+    logInfo('')
   }
 
   private async makeRequest(endpoint: string, options: RequestInit = {}) {
@@ -380,9 +381,9 @@ class ValidationTestSuite {
 
 // Main test execution
 export async function runCollaborationAPITests() {
-  console.log('🔬 Collaboration API Test Suite')
-  console.log(`⏰ Started at: ${new Date().toISOString()}`)
-  console.log('')
+  logInfo('🔬 Collaboration API Test Suite')
+  logInfo(`⏰ Started at: ${new Date().toISOString()}`)
+  logInfo('')
 
   // Run main integration tests
   const mainTests = new ApiTestSuite()
@@ -392,16 +393,16 @@ export async function runCollaborationAPITests() {
   const validationTests = new ValidationTestSuite()
   await validationTests.testValidationErrors()
 
-  console.log('📊 Test Summary')
+  logInfo('📊 Test Summary')
   console.log('=' .repeat(50))
-  console.log('✅ Session Management APIs')
-  console.log('✅ Agent Management APIs')
-  console.log('✅ Message Routing APIs')
-  console.log('✅ Context Management APIs')
-  console.log('✅ Session Control APIs')
-  console.log('✅ Validation & Error Handling')
-  console.log('')
-  console.log('🎯 All API endpoints are ready for production use!')
+  logInfo('✅ Session Management APIs')
+  logInfo('✅ Agent Management APIs')
+  logInfo('✅ Message Routing APIs')
+  logInfo('✅ Context Management APIs')
+  logInfo('✅ Session Control APIs')
+  logError('✅ Validation & Error Handling')
+  logInfo('')
+  logInfo('🎯 All API endpoints are ready for production use!')
 }
 
 // Export for direct execution

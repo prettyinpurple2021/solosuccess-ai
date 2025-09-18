@@ -6,6 +6,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, gte, desc, inArray, sql} from 'drizzle-orm'
 import type { AlertSeverity } from '@/lib/competitor-intelligence-types'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -169,7 +170,7 @@ export async function GET(_request: NextRequest) {
       })),
     })
   } catch (error) {
-    console.error('Error fetching notification summary:', error)
+    logError('Error fetching notification summary:', error)
     return NextResponse.json(
       { error: 'Failed to fetch notification summary' },
       { status: 500 }
@@ -291,7 +292,7 @@ export async function POST(request: NextRequest) {
       })),
     })
   } catch (error) {
-    console.error('Error sending notifications:', error)
+    logError('Error sending notifications:', error)
     return NextResponse.json(
       { error: 'Failed to send notifications' },
       { status: 500 }

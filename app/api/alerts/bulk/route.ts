@@ -5,6 +5,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, inArray} from 'drizzle-orm'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -157,7 +158,7 @@ export async function POST(request: NextRequest) {
       operationTimestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('Error performing bulk alert operation:', error)
+    logError('Error performing bulk alert operation:', error)
     return NextResponse.json(
       { error: 'Failed to perform bulk operation' },
       { status: 500 }

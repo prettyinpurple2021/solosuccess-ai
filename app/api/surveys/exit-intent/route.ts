@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json({ status, canShow })
   } catch (error) {
-    console.error('Survey status check error:', error)
+    logError('Survey status check error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
@@ -119,7 +120,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, action: 'submitted' })
     }
   } catch (error) {
-    console.error('Survey submission error:', error)
+    logError('Survey submission error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

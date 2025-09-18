@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NotificationPreferences, NotificationChannel } from '@/lib/notification-delivery-system';
 import { AlertSeverity, AlertType } from '@/lib/competitor-alert-system';
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface UseNotificationPreferencesReturn {
   preferences: NotificationPreferences | null;
@@ -29,7 +30,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       setPreferences(data.preferences);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch preferences');
-      console.error('Error fetching notification preferences:', err);
+      logError('Error fetching notification preferences:', err);
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       setPreferences(data.preferences);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update preferences');
-      console.error('Error updating notification preferences:', err);
+      logError('Error updating notification preferences:', err);
       throw err;
     }
   }, []);
@@ -83,7 +84,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       return result.success;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to test channel');
-      console.error('Error testing notification channel:', err);
+      logError('Error testing notification channel:', err);
       return false;
     }
   }, []);

@@ -3,6 +3,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { opportunityRecommendationSystem} from '@/lib/opportunity-recommendation-system'
 import { z} from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(analytics)
   } catch (error) {
-    console.error('Error getting opportunity analytics:', error)
+    logError('Error getting opportunity analytics:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

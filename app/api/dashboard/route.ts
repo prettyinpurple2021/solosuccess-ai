@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -41,7 +42,7 @@ async function authenticateJWTRequest(request: NextRequest) {
       error: null 
     }
   } catch (error) {
-    console.error('JWT authentication error:', error)
+    logError('JWT authentication error:', error)
     return { user: null, error: 'Invalid token' }
   }
 }
@@ -223,7 +224,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData)
   } catch (error) {
-    console.error('Dashboard API error:', error)
+    logError('Dashboard API error:', error)
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/comp
 import { Badge} from '@/components/ui/badge'
 import { Loader2, Lock, Zap, Crown} from 'lucide-react'
 import { useRouter} from 'next/navigation'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface SubscriptionGuardProps {
   children: React.ReactNode
@@ -53,7 +54,7 @@ export function SubscriptionGuard({
         setHasAccess(false)
       }
     } catch (error) {
-      console.error('Error checking subscription access:', error)
+      logError('Error checking subscription access:', error)
       setHasAccess(false)
     } finally {
       setLoading(false)
@@ -159,7 +160,7 @@ export function useSubscriptionAccess(requiredTier: 'accelerator' | 'dominator')
           setHasAccess(false)
         }
       } catch (error) {
-        console.error('Error checking subscription access:', error)
+        logError('Error checking subscription access:', error)
         setHasAccess(false)
       } finally {
         setLoading(false)

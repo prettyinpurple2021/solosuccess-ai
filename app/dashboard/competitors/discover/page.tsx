@@ -14,6 +14,7 @@ import { Textarea} from "@/components/ui/textarea"
 import { Label} from "@/components/ui/label"
 import { Badge} from "@/components/ui/badge"
 import { Loading} from "@/components/ui/loading"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface CompetitorSuggestion {
   id: string
@@ -206,7 +207,7 @@ export default function CompetitorDiscoveryPage() {
       
       setSuggestions(mockSuggestions)
     } catch (error) {
-      console.error('Error discovering competitors:', error)
+      logError('Error discovering competitors:', error)
     } finally {
       setSearching(false)
     }
@@ -254,7 +255,7 @@ export default function CompetitorDiscoveryPage() {
       
       router.push('/dashboard/competitors')
     } catch (error) {
-      console.error('Error adding competitors:', error)
+      logError('Error adding competitors:', error)
     } finally {
       setLoading(false)
     }

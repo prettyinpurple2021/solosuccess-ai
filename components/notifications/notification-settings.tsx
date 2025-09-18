@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils'
 import { webPushManager, NotificationPermissionState } from '@/lib/web-push-notifications'
 import { useToast } from '@/hooks/use-toast'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 interface NotificationPreferences {
   enabled: boolean
@@ -103,7 +104,7 @@ export default function NotificationSettings({ className = "" }: NotificationSet
       const state = await webPushManager.getPermissionState()
       setPermissionState(state)
     } catch (error) {
-      console.error('Error loading notification settings:', error)
+      logError('Error loading notification settings:', error)
     }
   }
 
@@ -111,7 +112,7 @@ export default function NotificationSettings({ className = "" }: NotificationSet
     try {
       await setPreference('notifications', newPreferences)
     } catch (error) {
-      console.error('Failed to save notification preferences:', error)
+      logError('Failed to save notification preferences:', error)
       toast({
         title: "Failed to Save Settings",
         description: "Your notification preferences could not be saved.",
@@ -151,7 +152,7 @@ export default function NotificationSettings({ className = "" }: NotificationSet
         })
         
       } catch (error) {
-        console.error('Error enabling notifications:', error)
+        logError('Error enabling notifications:', error)
         toast({
           title: "Failed to Enable Notifications",
           description: error instanceof Error ? error.message : "Please check your browser settings.",
@@ -185,7 +186,7 @@ export default function NotificationSettings({ className = "" }: NotificationSet
         description: "You won't receive any more notifications.",
       })
     } catch (error) {
-      console.error('Error disabling notifications:', error)
+      logError('Error disabling notifications:', error)
       toast({
         title: "Error",
         description: "Failed to disable notifications completely.",

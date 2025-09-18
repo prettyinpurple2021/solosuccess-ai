@@ -3,6 +3,7 @@ import { NextRequest, NextResponse} from 'next/server';
 import { DocumentParser} from '@/lib/documentParser';
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Content parsing API error:', error);
+    logError('Content parsing API error:', error);
     return NextResponse.json(
       { 
         success: false,

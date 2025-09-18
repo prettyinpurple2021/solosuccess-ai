@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import { useToast} from '@/hooks/use-toast'
 import { 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   History, RotateCcw, RotateCw, CalendarClock, FileText, Save, Check, ArrowLeft, ArrowRight, Download, Lock, Unlock} from 'lucide-react'
 
 interface BriefcaseFile {
@@ -98,7 +99,7 @@ export default function DocumentVersioningModal({
         }
       }
     } catch (error) {
-      console.error('Failed to load version history:', error)
+      logError('Failed to load version history:', error)
       toast({
         title: "Error",
         description: "Failed to load version history",
@@ -136,7 +137,7 @@ export default function DocumentVersioningModal({
         setVersionCompare(compareData)
       }
     } catch (error) {
-      console.error('Failed to load version comparison:', error)
+      logError('Failed to load version comparison:', error)
       toast({
         title: "Error",
         description: "Failed to compare versions",
