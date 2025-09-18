@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { ReactNode} from "react"
 import { motion} from "framer-motion"
 import { BossButton, type BossButtonProps} from "./boss-button"
@@ -7,7 +8,7 @@ import { useRecaptcha, useRecaptchaForm} from "@/hooks/use-recaptcha"
 import { RECAPTCHA_ACTIONS, type RecaptchaAction} from "@/lib/recaptcha-client"
 import { Shield, AlertCircle, CheckCircle} from "lucide-react"
 import { RECAPTCHA_CONFIG} from "@/lib/recaptcha-client"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface RecaptchaButtonProps extends Omit<BossButtonProps, 'onClick'> {
   children: ReactNode

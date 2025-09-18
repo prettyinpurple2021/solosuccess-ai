@@ -1,7 +1,8 @@
 "use client"
 
-import { useAuth } from '@/hooks/use-auth'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { useAuth } from '@/hooks/use-auth'
+
 
 export function useSafeUser() {
   try {

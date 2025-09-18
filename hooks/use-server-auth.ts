@@ -1,6 +1,7 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export async function getServerAuthToken(): Promise<string | null> {
   try {

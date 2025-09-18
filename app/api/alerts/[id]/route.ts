@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { db} from '@/db'
 import { competitorAlerts, competitorProfiles, intelligenceData} from '@/db/schema'
@@ -5,8 +6,8 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { CompetitiveIntelligenceGamificationTriggers} from '@/lib/competitive-intelligence-gamification-triggers'
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
+
 import type { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   AlertSeverity,
   ActionItem,
   Recommendation

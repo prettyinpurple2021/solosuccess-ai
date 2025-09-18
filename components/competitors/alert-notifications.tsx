@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client';
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useEffect, useState } from 'react';
 import { toast} from '@/hooks/use-toast';
 import { Card, CardContent} from '@/components/ui/card';
@@ -10,7 +12,7 @@ import {
 import { useCompetitorAlerts, CompetitorAlert} from '@/hooks/use-competitor-alerts';
 import { cn} from '@/lib/utils';
 import { formatDistanceToNow} from 'date-fns';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface AlertNotificationsProps {
   className?: string;

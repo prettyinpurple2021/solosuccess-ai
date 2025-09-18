@@ -1,5 +1,6 @@
-import { Pool, PoolClient } from 'pg'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { Pool, PoolClient } from 'pg'
+
 
 let pool: Pool | null = null
 

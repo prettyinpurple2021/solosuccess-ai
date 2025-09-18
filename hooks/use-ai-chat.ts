@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useCallback, useRef, useEffect } from "react"
+import React, { useState, useCallback, useRef, useEffect } from "react"
 
 export interface Message {
   id: string

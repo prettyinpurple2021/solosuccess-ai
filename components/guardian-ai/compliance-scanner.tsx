@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
@@ -10,7 +11,7 @@ import { Progress} from "@/components/ui/progress"
 import { Alert} from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import { Shield, AlertTriangle, Eye, CheckCircle, Database, Cookie, User, Download, FileText} from "lucide-react"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface ComplianceIssue {
   id: string

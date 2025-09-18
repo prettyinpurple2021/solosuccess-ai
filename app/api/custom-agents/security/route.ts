@@ -1,7 +1,8 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { AgentSecurityManager} from '@/lib/custom-ai-agents/security/agent-security-manager'
 import { SecurityMiddleware} from '@/lib/custom-ai-agents/security/security-middleware'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 const securityManager = AgentSecurityManager.getInstance()
 const _securityMiddleware = new SecurityMiddleware()

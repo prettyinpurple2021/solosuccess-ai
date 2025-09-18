@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { CustomAgent, AgentResponse, AgentTask } from "./core-agent"
 import { RoxyAgent } from "./roxy-agent"
 import { BlazeAgent } from "./blaze-agent"
@@ -7,7 +8,7 @@ import { VexAgent } from "./vex-agent"
 import { LexiAgent } from "./lexi-agent"
 import { NovaAgent } from "./nova-agent"
 import { GlitchAgent } from "./glitch-agent"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export interface CollaborationRequest {
   id: string

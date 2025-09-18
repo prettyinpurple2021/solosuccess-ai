@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from "react"
 import { motion, easeOut} from "framer-motion"
 import {
@@ -18,7 +19,7 @@ import {
   Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
 import { Loading} from "@/components/ui/loading"
 import { Progress as _Progress} from "@/components/ui/progress"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface Competitor {
   id: number

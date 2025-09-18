@@ -1,8 +1,9 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { eq, and, lte, desc, asc, sql, inArray, isNull, or } from 'drizzle-orm'
 import { db } from '@/db'
 import { scrapingJobs, scrapingJobResults, competitorProfiles, intelligenceData } from '@/db/schema'
 import { v4 as uuidv4 } from 'uuid'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export type JobType = 'website' | 'pricing' | 'products' | 'jobs' | 'social'
 export type JobPriority = 'low' | 'medium' | 'high' | 'critical'

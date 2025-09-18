@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { motion} from "framer-motion"
 import { 
@@ -8,8 +9,8 @@ import {
 import { BossCard} from "@/components/ui/boss-card"
 import { Badge} from "@/components/ui/badge"
 import { Progress} from "@/components/ui/progress"
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip"
 
 interface CompetitorThreat {

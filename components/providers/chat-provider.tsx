@@ -1,10 +1,11 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import FloatingChatButton from '@/components/chat/floating-chat-button'
 import { useToast } from '@/hooks/use-toast'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface Message {
   id: string

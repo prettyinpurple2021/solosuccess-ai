@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Button} from '@/components/ui/button'
@@ -8,7 +9,7 @@ import { Progress} from '@/components/ui/progress'
 import { 
   Brain, Clock, TrendingUp, Target, CheckCircle, AlertTriangle, ArrowUpDown, Sparkles} from 'lucide-react'
 import { useToast} from '@/hooks/use-toast'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface Task {
   id: string

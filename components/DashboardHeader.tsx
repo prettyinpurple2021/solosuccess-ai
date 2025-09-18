@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client'
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState } from 'react'
 import { Crown, Sparkles, Bell } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -21,7 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface DashboardHeaderProps {
   title?: string

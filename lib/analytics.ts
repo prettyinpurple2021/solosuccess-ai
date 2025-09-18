@@ -1,5 +1,6 @@
-import { NextRequest } from 'next/server'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { NextRequest } from 'next/server'
+
 
 // Analytics event types
 export type AnalyticsEvent = 

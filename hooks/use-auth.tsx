@@ -1,9 +1,10 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useEffect, useState } from "react"
-import type { User, Session } from "@/lib/neon/types"
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import type React from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
+import type { User, Session } from "@/lib/neon/types"
+
 
 interface AuthContextType {
   user: User | null

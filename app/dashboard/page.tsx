@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { useDashboardData} from "@/hooks/use-dashboard-data"
 import { useAuth} from "@/hooks/use-auth"
@@ -15,7 +16,7 @@ import {
   CheckCircle, Target, Clock, MessageCircle, Trophy, Crown, Sparkles, Flame, ArrowRight, BarChart3, Plus, Briefcase} from "lucide-react"
 import Link from "next/link"
 import { useSearchParams, useRouter} from "next/navigation"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()

@@ -1,4 +1,4 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 // Generic file storage interface - can be implemented with various providers
 export interface FileUploadResult {
   url: string
@@ -147,3 +147,5 @@ export const checkFileQuota = async (
     }
   }
 }
+
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'

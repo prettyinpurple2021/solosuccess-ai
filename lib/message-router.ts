@@ -3,6 +3,7 @@
  * Supports point-to-point messaging, broadcasts, and priority handling
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { z } from 'zod'
 import type { AgentMessage, AgentDefinition, CollaborationHub } from './collaboration-hub'
 
@@ -204,7 +205,6 @@ export class MessageRouter {
       // Score based on required capabilities
       if (request.requiredCapabilities?.length) {
         const matchingCapabilities = request.requiredCapabilities.filter(cap =>
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
           agent.capabilities.some(agentCap => 
             agentCap.toLowerCase().includes(cap.toLowerCase()) ||
             cap.toLowerCase().includes(agentCap.toLowerCase())

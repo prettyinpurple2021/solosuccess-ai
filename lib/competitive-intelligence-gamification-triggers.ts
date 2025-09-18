@@ -1,6 +1,7 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { CompetitiveIntelligenceGamification } from './competitive-intelligence-gamification'
 import { createClient } from '@/lib/neon/client'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export class CompetitiveIntelligenceGamificationTriggers {
   /**

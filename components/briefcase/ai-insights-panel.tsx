@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Button} from '@/components/ui/button'
@@ -9,8 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs'
 import { Alert, AlertDescription} from '@/components/ui/alert'
 import { useToast} from '@/hooks/use-toast'
 import { motion as _motion, AnimatePresence as _AnimatePresence} from 'framer-motion'
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Brain, FileText, Hash, TrendingUp, Minus, Lightbulb, Target, CheckCircle, Sparkles, Tag, Users, RefreshCw, ArrowRight, BookOpen, ThumbsUp, ThumbsDown, Smile, Frown, Meh} from 'lucide-react'
 
 interface BriefcaseFile {

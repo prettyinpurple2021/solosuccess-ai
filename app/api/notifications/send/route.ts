@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/neon/client'
 import { authenticateRequest } from '@/lib/auth-server'
@@ -5,7 +6,7 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
 import webpush from 'web-push'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

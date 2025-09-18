@@ -1,8 +1,9 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect, useCallback } from 'react'
 import { RECAPTCHA_CONFIG } from '@/lib/recaptcha-client'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 declare global {
   interface Window {

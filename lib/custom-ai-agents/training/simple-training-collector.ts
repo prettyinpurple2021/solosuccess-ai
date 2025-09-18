@@ -1,4 +1,4 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 // Simplified training data collector that works with the current setup
 export interface TrainingInteraction {
   id: string
@@ -219,3 +219,5 @@ export class SimpleTrainingCollector {
     this.interactions = []
   }
 }
+
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'

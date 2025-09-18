@@ -1,10 +1,11 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { db } from '@/db'
 import { competitorProfiles, intelligenceData, competitorAlerts } from '@/db/schema'
 import { eq, desc, gte, and, sql } from 'drizzle-orm'
 import { generateObject } from 'ai'
 import { openai } from '@/lib/ai-config'
 import { z } from 'zod'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Briefing types and interfaces
 export type BriefingType = 'daily' | 'weekly' | 'monthly' | 'on-demand'

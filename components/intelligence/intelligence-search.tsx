@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { motion, AnimatePresence} from "framer-motion"
 import {
@@ -24,7 +25,7 @@ import { Label} from "@/components/ui/label"
 import { Textarea} from "@/components/ui/textarea"
 import { Separator} from "@/components/ui/separator"
 import { ScrollArea} from "@/components/ui/scroll-area"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface IntelligenceSearchFilters {
   query?: string

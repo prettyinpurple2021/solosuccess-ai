@@ -1,10 +1,11 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { Button} from "@/components/ui/button"
 import { EmpowermentCard} from "@/components/ui/boss-card"
 import { Crown, CheckCircle, XCircle, RefreshCw, ArrowRight} from "lucide-react"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export default function DebugAuthPage() {
   const [token, setToken] = useState<string | null>(null)

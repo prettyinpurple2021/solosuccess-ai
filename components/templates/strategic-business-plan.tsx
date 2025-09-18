@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
@@ -16,8 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { motion, AnimatePresence} from "framer-motion"
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Building2, Target, TrendingUp, Users, DollarSign, BarChart3, Lightbulb, CheckCircle, Plus, Minus, PieChart, Crown, Zap, Brain, AlertTriangle, FileText, Globe} from "lucide-react"
 
 interface FinancialProjection {

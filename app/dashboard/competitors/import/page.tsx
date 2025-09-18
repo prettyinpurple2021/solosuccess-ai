@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, type DragEvent, type ChangeEvent} from "react"
 import { motion} from "framer-motion"
 import { useRouter} from "next/navigation"
@@ -11,8 +12,8 @@ import { EmpowermentCard} from "@/components/ui/boss-card"
 import { BossButton, ZapButton} from "@/components/ui/boss-button"
 import { Badge} from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 
 interface ImportedCompetitor {

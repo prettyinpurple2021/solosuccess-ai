@@ -11,9 +11,10 @@
  * Run with: npm run setup-db
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { Pool } from 'pg'
 import * as dotenv from 'dotenv'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Load environment variables
 dotenv.config({ path: '.env.local' })

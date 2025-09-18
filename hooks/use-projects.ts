@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { useAuth } from '@/hooks/use-auth'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import React, { useState, useEffect, useCallback } from "react"
+import { useAuth } from '@/hooks/use-auth'
+
 
 interface Project {
   id: string

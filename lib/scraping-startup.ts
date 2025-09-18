@@ -1,5 +1,6 @@
-import { queueProcessor } from './scraping-queue-processor'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { queueProcessor } from './scraping-queue-processor'
+
 
 let isStarted = false
 

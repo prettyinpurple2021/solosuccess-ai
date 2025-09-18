@@ -1,5 +1,6 @@
-import { query } from '@/lib/neon/client'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { query } from '@/lib/neon/client'
+
 
 export interface NotificationJob {
   id: string

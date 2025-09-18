@@ -1,6 +1,7 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextResponse} from 'next/server';
 import { createClient} from '@/lib/neon/server';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Use Node runtime for database access
 export const runtime = 'nodejs';

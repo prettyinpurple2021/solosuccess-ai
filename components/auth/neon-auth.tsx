@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect, useCallback} from "react"
 import { useRouter, usePathname} from "next/navigation"
 import { Input} from "@/components/ui/input"
@@ -10,7 +11,7 @@ import { CalendarIcon, AlertCircle, CheckCircle, Lock, Crown} from "lucide-react
 import { format, subYears} from "date-fns"
 import { motion} from "framer-motion"
 import type { User as AppUser } from "@/lib/neon/types"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export function NeonAuth() {
   const router = useRouter()

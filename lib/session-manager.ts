@@ -3,6 +3,7 @@
  * Handles session lifecycle, state persistence, and coordination
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { z } from 'zod'
 import type { 
   CollaborationSession, 
@@ -123,7 +124,6 @@ export class SessionManager {
 
       if (availableAgents.length < requiredAgents.length) {
         const unavailableAgents = requiredAgents.filter(id => !availableAgents.includes(id))
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
         throw new Error(`Required agents not available: ${unavailableAgents.join(', ')}`)
       }
 

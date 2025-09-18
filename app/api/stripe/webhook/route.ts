@@ -1,9 +1,10 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { stripe, STRIPE_WEBHOOK_EVENTS} from '@/lib/stripe'
 import { headers} from 'next/headers'
 import Stripe from 'stripe'
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId} from '@/lib/stripe-db-utils'
 
 // Force dynamic rendering

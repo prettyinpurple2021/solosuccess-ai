@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
@@ -6,7 +7,7 @@ import { db} from '@/db'
 import { users, userCompetitiveStats} from '@/db/schema'
 import { eq} from 'drizzle-orm'
 import { z} from 'zod'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

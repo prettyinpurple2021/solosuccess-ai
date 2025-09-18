@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { motion} from "framer-motion"
 import { 
@@ -9,8 +10,8 @@ import { BossCard, EmpowermentCard} from "@/components/ui/boss-card"
 import { BossButton} from "@/components/ui/boss-button"
 import { Badge} from "@/components/ui/badge"
 import { Progress} from "@/components/ui/progress"
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
 interface CompetitorMetrics {

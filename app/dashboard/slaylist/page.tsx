@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
@@ -24,7 +25,7 @@ import {
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
 import VoiceTaskCreator from "@/components/tasks/voice-task-creator"
 import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface Goal {
   id: string

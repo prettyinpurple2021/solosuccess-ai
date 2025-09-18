@@ -3,6 +3,7 @@
  * Provides agent lifecycle management, message handling, and context integration
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { z } from 'zod'
 import type { 
   AgentMessage, 
@@ -12,7 +13,7 @@ import type {
 } from './collaboration-hub'
 import type { MessageRouter } from './message-router'
 import type { ContextManager, ContextEntry } from './context-manager'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Agent interface types
 export const AgentConfigSchema = z.object({

@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/
 import { useAuth} from "@/hooks/use-auth"
 import { useProfile} from "@/hooks/use-profile-swr"
 import { User, Camera, Upload, Crown, Sparkles, Bell, Settings, Shield, X, Save, Trash2} from "lucide-react"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface EnhancedProfileModalProps {
   _open: boolean

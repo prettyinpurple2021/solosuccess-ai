@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserSubscription, hasActiveSubscription } from './stripe-db-utils'
 
@@ -76,7 +77,7 @@ export async function checkSubscriptionAccess(
 
     // Check if user has required tier
     const hasTier = hasRequiredTier(subscription.subscription_tier, requiredTier)
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
     if (!hasTier) {
       return {
         allowed: false,

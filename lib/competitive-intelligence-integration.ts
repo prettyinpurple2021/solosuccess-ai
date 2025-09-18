@@ -1,6 +1,7 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { createClient } from '@/lib/neon/client'
 import type { CompetitorAlert, CompetitiveOpportunity } from '@/lib/types'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export interface CompetitiveTaskTemplate {
   id: string

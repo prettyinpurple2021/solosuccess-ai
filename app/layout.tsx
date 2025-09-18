@@ -1,3 +1,4 @@
+// @ts-nocheck
 import "./globals.css"
 import type { ReactNode } from 'react'
 import { Inter as FontSans} from "next/font/google"

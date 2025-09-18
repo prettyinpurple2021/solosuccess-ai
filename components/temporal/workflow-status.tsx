@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from 'react'
 import { useOnboardingWorkflow, useStartOnboarding} from '@/hooks/use-temporal-workflow'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
@@ -9,7 +10,7 @@ import { Progress} from '@/components/ui/progress'
 import { Alert, AlertDescription} from '@/components/ui/alert'
 import { CheckCircle, Clock, AlertCircle, Play, RefreshCw} from 'lucide-react'
 import { motion, AnimatePresence} from 'framer-motion'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface WorkflowStatusProps {
   workflowId?: string | null

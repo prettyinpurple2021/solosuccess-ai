@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from "react"
 import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
@@ -11,7 +12,7 @@ import { Progress} from "@/components/ui/progress"
 import { Badge} from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import { Crown, Target, CheckCircle, Brain, Users, Rocket, Sparkles, ArrowLeft, ArrowRight} from 'lucide-react'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 
 interface OnboardingData {

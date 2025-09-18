@@ -3,9 +3,10 @@
  * Logs are formatted as JSON for easier parsing by log management systems
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import * as Sentry from '@sentry/nextjs';
 import { NextRequest } from 'next/server';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -45,7 +46,7 @@ export function log({
   };
 
   // Log to console
-  logInfo(`JSON.stringify(logEntry`));
+  logInfo(`JSON.stringify(logEntry)`);
   
   // For errors, also log to Sentry if available
   if (level === 'error' && error instanceof Error) {

@@ -1,5 +1,6 @@
-import { z } from "zod"
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { z } from "zod"
+
 
 /**
  * Environment variable validation schema for the SoloSuccess AI Platform

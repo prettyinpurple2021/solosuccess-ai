@@ -1,13 +1,14 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect, createContext, useContext} from "react"
 import { useUserPreferences } from "@/hooks/use-user-preferences"
 import { Button} from "@/components/ui/button"
 import { Switch} from "@/components/ui/switch"
 import { Label} from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Eye, EyeOff, Volume2, VolumeX, Keyboard, MousePointer, Accessibility, Settings, Sun, Moon, Contrast} from "lucide-react"
 
 interface AccessibilityContextType {

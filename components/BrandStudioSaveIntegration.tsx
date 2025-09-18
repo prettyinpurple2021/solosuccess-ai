@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client'
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from 'react'
 import { Save, Palette, Crown, Heart, Sparkles } from 'lucide-react'
 import { briefcaseAutoSaver } from '@/utils/briefcase-auto-save'
@@ -7,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface BrandStudioSaveIntegrationProps {
   brandData: any

@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { OnboardingWizard} from "./onboarding-wizard"
 import { InteractiveTutorial} from "./interactive-tutorial"
@@ -10,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
 import { Badge} from "@/components/ui/badge"
 import { Progress} from "@/components/ui/progress"
+
 import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Lightbulb, CheckCircle, Play, SkipForward, Rocket, Crown, Gift, Users, Target, TrendingUp, Sparkles} from "lucide-react"
 
 interface EnhancedOnboardingProps {

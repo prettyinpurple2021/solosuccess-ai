@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { db } from '@/db'
 import { 
   competitiveOpportunities, 
@@ -9,7 +10,7 @@ import {
 } from '@/db/schema'
 import { eq, and, desc, gte, sql, asc, lte, isNull, not, inArray } from 'drizzle-orm'
 import { competitiveOpportunityDetector, type OpportunityDetectionResult } from './competitive-opportunity-detection'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Types for opportunity recommendation system
 export interface OpportunityRecommendation {

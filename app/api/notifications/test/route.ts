@@ -1,10 +1,11 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server';
 import { authenticateRequest} from '@/lib/auth-server';
 import { rateLimitByIp} from '@/lib/rate-limit';
 import { notificationDelivery} from '@/lib/notification-delivery-system';
 import { CompetitorAlert} from '@/hooks/use-competitor-alerts';
 import { z} from 'zod';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 const testNotificationSchema = z.object({
   channel_type: z.enum(['email', 'push', 'slack', 'discord', 'webhook']),

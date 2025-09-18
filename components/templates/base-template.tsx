@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from "react"
 
 import { Badge} from "@/components/ui/badge"
@@ -11,7 +12,7 @@ import { motion, AnimatePresence} from "framer-motion"
 import { 
   Download, Share2, Bookmark, ArrowLeft, Sparkles, Crown, Save, RefreshCw} from "lucide-react"
 import Link from "next/link"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export interface TemplateData {
   title: string

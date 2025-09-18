@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client';
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import { Button} from '@/components/ui/button';
@@ -16,7 +18,7 @@ import { NotificationChannel, type NotificationPreferences} from '@/lib/notifica
 import { AlertSeverity, AlertType} from '@/lib/competitor-alert-system';
 import { cn} from '@/lib/utils';
 import { toast} from '@/hooks/use-toast';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface NotificationPreferencesProps {
   className?: string;

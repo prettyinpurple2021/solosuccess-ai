@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
@@ -10,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Checkbox} from "@/components/ui/checkbox"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { FileText, Shield, CheckCircle, Copy, Download} from "lucide-react"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface PolicyData {
   businessName: string

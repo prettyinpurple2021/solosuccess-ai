@@ -1,5 +1,6 @@
-import { neon } from '@neondatabase/serverless'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { neon } from '@neondatabase/serverless'
+
 
 function getSql() {
   const url = process.env.DATABASE_URL

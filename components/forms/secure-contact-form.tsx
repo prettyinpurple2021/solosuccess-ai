@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState } from 'react'
 import { Button} from '@/components/ui/button'
 import { Input} from '@/components/ui/input'
@@ -10,7 +11,7 @@ import { useToast} from '@/hooks/use-toast'
 import { useRecaptchaValidation} from '@/hooks/use-recaptcha-validation'
 import { RECAPTCHA_ACTIONS} from '@/components/recaptcha/recaptcha-provider'
 import { Loader2, Shield, Send} from 'lucide-react'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface ContactFormData {
   name: string

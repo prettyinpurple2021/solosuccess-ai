@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { db} from '@/db'
 import { intelligenceData, competitorProfiles} from '@/db/schema'
@@ -5,8 +6,8 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, or, gte, lte, inArray, ilike, sql} from 'drizzle-orm'
+
 import type { SourceType,
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   ImportanceLevel,
   ExtractedData,
   AnalysisResult

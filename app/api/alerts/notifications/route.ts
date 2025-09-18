@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { db} from '@/db'
 import { competitorAlerts, competitorProfiles} from '@/db/schema'
@@ -6,7 +7,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, gte, desc, inArray, sql} from 'drizzle-orm'
 import type { AlertSeverity } from '@/lib/competitor-intelligence-types'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

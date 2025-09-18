@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
@@ -7,7 +8,7 @@ import { eq, and, gte, desc, inArray} from 'drizzle-orm'
 import { blazeGrowthIntelligence} from '@/lib/blaze-growth-intelligence'
 import { z} from 'zod'
 import type { SourceType, ImportanceLevel, ExtractedData, AnalysisResult } from '@/lib/competitor-intelligence-types'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

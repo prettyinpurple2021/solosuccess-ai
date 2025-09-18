@@ -1,9 +1,10 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { db } from '@/db';
 import { competitorProfiles, scrapingJobs, scrapingJobResults } from '@/db/schema';
 import { eq, and, lte } from 'drizzle-orm';
 import { socialMediaMonitor } from './social-media-monitor';
 import { v4 as uuidv4 } from 'uuid';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export interface SocialMediaJobConfig {
   platforms: string[];

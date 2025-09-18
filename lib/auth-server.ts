@@ -1,11 +1,12 @@
 // lib/auth-server.ts
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from "next/server"
 import type { AuthenticatedUser, AuthResult } from "./auth-utils"
 import { headers } from "next/headers"
 import jwt from 'jsonwebtoken'
 import { neon } from '@neondatabase/serverless'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 function getSql() {
   const url = process.env.DATABASE_URL

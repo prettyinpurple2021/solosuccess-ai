@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client'
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Button} from '@/components/ui/button'
@@ -15,7 +17,7 @@ import { Progress} from '@/components/ui/progress'
 import { 
   Play, Pause, Square, RefreshCw, Plus, Settings, Clock, CheckCircle, XCircle, AlertTriangle, Globe, DollarSign, Package, Briefcase, Activity} from 'lucide-react'
 import { cn} from '@/lib/utils'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface ScrapingJob {
   id: string

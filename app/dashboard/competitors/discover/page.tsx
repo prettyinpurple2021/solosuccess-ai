@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from "react"
 import { motion} from "framer-motion"
 import { useRouter} from "next/navigation"
@@ -14,7 +15,7 @@ import { Textarea} from "@/components/ui/textarea"
 import { Label} from "@/components/ui/label"
 import { Badge} from "@/components/ui/badge"
 import { Loading} from "@/components/ui/loading"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface CompetitorSuggestion {
   id: string

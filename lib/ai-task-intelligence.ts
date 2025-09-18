@@ -1,6 +1,7 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { generateText } from 'ai'
 import { openai } from '@ai-sdk/openai'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export interface TaskIntelligenceData {
   id: string

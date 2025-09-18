@@ -1,8 +1,9 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { generateObject } from 'ai'
 import { openai } from '@/lib/ai-config'
 import { z } from 'zod'
 import { IntelligenceBriefing } from './intelligence-briefing-system'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Agent-specific briefing interfaces
 export interface AgentBriefing {

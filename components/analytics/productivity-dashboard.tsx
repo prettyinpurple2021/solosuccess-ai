@@ -1,12 +1,13 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Badge} from '@/components/ui/badge'
 import { Progress} from '@/components/ui/progress'
 import { Button} from '@/components/ui/button'
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   TrendingUp, Target, CheckCircle, Clock, BarChart3, Activity, Zap, Award, Users, ArrowUpRight, ArrowDownRight} from 'lucide-react'
 
 interface AnalyticsData {

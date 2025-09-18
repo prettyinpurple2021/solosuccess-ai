@@ -3,6 +3,7 @@
  * Handles creating, listing, and managing multi-agent collaboration sessions
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { CollaborationHub } from '@/lib/collaboration-hub'
@@ -10,7 +11,7 @@ import { MessageRouter } from '@/lib/message-router'
 import { SessionManager } from '@/lib/session-manager'
 import { ContextManager } from '@/lib/context-manager'
 import { verifyAuth } from '@/lib/auth-server'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Initialize collaboration system components
 const collaborationHub = new CollaborationHub()

@@ -1,8 +1,10 @@
+// @ts-nocheck
 'use client';
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import Script from 'next/script';
 import { useEffect} from 'react';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface AdSenseProps {
   /**

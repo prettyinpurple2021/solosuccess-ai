@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog'
 import { Button} from '@/components/ui/button'
@@ -10,8 +11,8 @@ import { ScrollArea} from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar'
 import { useToast} from '@/hooks/use-toast'
 import { motion, AnimatePresence} from 'framer-motion'
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   History, Download, RotateCcw, Trash2, Plus, Clock, User, FileText, CheckCircle, AlertCircle} from 'lucide-react'
 
 interface BriefcaseFile {

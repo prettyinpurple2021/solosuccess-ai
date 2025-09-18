@@ -1,4 +1,5 @@
 // import { z } from 'zod'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import * as cheerio from 'cheerio'
 import robotsParser from 'robots-parser'
 
@@ -720,7 +721,6 @@ export class WebScrapingService {
           const location = $job.find('.location, [class*="location"]').first().text().trim()
           const department = $job.find('.department, [class*="department"]').first().text().trim()
           const requirements = $job.find('li, .requirement').map((_, el) => $(el).text().trim()).get()
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
           
           jobs.push({
             title,

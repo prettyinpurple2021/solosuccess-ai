@@ -1,7 +1,8 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { createClient } from './neon/client';
 import { Template, TemplateCategory } from './templates-types';
 import templateData from '../data/templates.json';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export async function getAllTemplates(): Promise<TemplateCategory[]> {
   try {

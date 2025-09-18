@@ -1,5 +1,6 @@
-import { notificationJobQueue } from './notification-job-queue'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { notificationJobQueue } from './notification-job-queue'
+
 
 // Job processor configuration
 const PROCESSOR_CONFIG = {

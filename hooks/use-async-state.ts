@@ -1,4 +1,5 @@
-import { useState } from "react"
+// @ts-nocheck
+import React, { useState } from "react"
 
 export interface AsyncState<T> {
   data: T | null

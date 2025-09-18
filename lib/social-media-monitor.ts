@@ -1,7 +1,8 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { db } from '@/db';
 import { competitorProfiles, intelligenceData } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Types for social media data
 export interface SocialMediaHandles {

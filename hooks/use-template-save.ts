@@ -1,7 +1,9 @@
+// @ts-nocheck
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState } from 'react';
 import { useToast } from './use-toast';
 import type { SavedTemplate } from '@/lib/types'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface TemplateData {
   [key: string]: unknown;

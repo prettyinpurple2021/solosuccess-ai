@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent} from '@/components/ui/card'
 import { Button} from '@/components/ui/button'
@@ -12,8 +13,8 @@ import { Checkbox} from '@/components/ui/checkbox'
 import { Separator} from '@/components/ui/separator'
 import { useToast} from '@/hooks/use-toast'
 import { motion, AnimatePresence} from 'framer-motion'
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Trash2, Move, Copy, Tag, Folder, Star, StarOff, Download, Share2, X, Check, AlertTriangle, Loader2, FileText, Hash} from 'lucide-react'
 
 interface BriefcaseFile {

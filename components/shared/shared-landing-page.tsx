@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState} from "react"
 import { motion, AnimatePresence} from "framer-motion"
 import { useRouter} from "next/navigation"
@@ -15,7 +16,7 @@ import {
 import Link from "next/link"
 import { ScheduleDemoModal} from "@/components/schedule/schedule-demo-modal"
 import FaqSection from "@/components/faq/faq-section"
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface SharedLandingPageProps {
   showAuthModal?: boolean

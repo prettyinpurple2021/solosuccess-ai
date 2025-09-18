@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client'
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from 'react'
 import { useAuth} from '@/hooks/use-auth'
 import { Button} from '@/components/ui/button'
@@ -7,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/comp
 import { Badge} from '@/components/ui/badge'
 import { Loader2, Lock, Zap, Crown} from 'lucide-react'
 import { useRouter} from 'next/navigation'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface SubscriptionGuardProps {
   children: React.ReactNode

@@ -1,8 +1,9 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { ScrapingScheduler } from './database-scraping-scheduler'
 import { db } from '@/db'
 import { scrapingJobs } from '@/db/schema'
 import { eq, and, lte, inArray } from 'drizzle-orm'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export class ScrapingQueueProcessor {
   private static instance: ScrapingQueueProcessor

@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,7 +23,7 @@ import {
 } from "lucide-react"
 import { useTaskIntelligence } from '@/hooks/use-task-intelligence'
 import { TaskIntelligenceData, TaskSuggestion, WorkloadAnalysis } from '@/lib/ai-task-intelligence'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface TaskIntelligencePanelProps {
   tasks: TaskIntelligenceData[]

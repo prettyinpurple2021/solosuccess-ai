@@ -1,7 +1,8 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { db } from '@/db'
 import { competitors, intelligenceData, competitorAlerts } from '@/db/schema'
 import { eq, and, desc, gte, lte, sql, inArray } from 'drizzle-orm'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Types for opportunity detection
 export interface OpportunityDetectionResult {

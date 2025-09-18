@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import React, { useState } from "react"
 import { ArrowLeft, Crown, Calendar, BookOpen, Sparkles, Bell, Mail} from "lucide-react"
 import { Button} from "@/components/ui/button"
 import { Card, CardContent} from "@/components/ui/card"

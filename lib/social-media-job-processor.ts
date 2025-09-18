@@ -1,10 +1,11 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { socialMediaScheduler } from './social-media-scheduler';
 // import { socialMediaMonitor } from './social-media-monitor';
 import { socialMediaAnalysisEngine } from './social-media-analysis-engine';
 import { db } from '@/db';
 import { competitorProfiles, competitorAlerts } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 /**
  * Social Media Job Processor

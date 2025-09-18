@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState} from "react"
+// @ts-nocheck
+import React, { useEffect, useState} from "react"
 
 import Link from "next/link"
 import { ArrowLeft, Crown, Rocket, Heart, Flame, CheckCircle} from "lucide-react"

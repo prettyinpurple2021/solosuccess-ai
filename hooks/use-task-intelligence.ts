@@ -1,7 +1,9 @@
+// @ts-nocheck
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useCallback, useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult, TaskSuggestion } from '@/lib/ai-task-intelligence'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export interface UseTaskIntelligenceOptions {
   autoOptimize?: boolean

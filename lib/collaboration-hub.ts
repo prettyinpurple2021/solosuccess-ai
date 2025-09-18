@@ -3,10 +3,11 @@
  * Handles agent registry, session management, and coordination between AI agents
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { z } from 'zod'
 import { MessageRouter } from './message-router'
 import { ContextManager } from './context-manager'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Types and Interfaces
 export const AgentMessageSchema = z.object({

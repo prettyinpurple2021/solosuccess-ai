@@ -1,4 +1,4 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 // reCAPTCHA configuration
 export const RECAPTCHA_CONFIG = {
   siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
@@ -109,4 +109,5 @@ export const RECAPTCHA_ACTIONS = {
   SUBSCRIPTION: 'subscription'
 } as const
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 export type RecaptchaAction = typeof RECAPTCHA_ACTIONS[keyof typeof RECAPTCHA_ACTIONS]

@@ -1,5 +1,6 @@
-import { createClient } from '@/lib/neon/client'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { createClient } from '@/lib/neon/client'
+
 
 export interface CompetitiveIntelligenceContext {
   competitors: {

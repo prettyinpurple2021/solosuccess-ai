@@ -1,5 +1,6 @@
-import { query } from '@/lib/neon/client'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { query } from '@/lib/neon/client'
+
 
 export interface SubscriptionInfo {
   tier: 'free' | 'launch' | 'accelerator' | 'dominator'

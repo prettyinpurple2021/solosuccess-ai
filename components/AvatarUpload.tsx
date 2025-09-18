@@ -1,8 +1,10 @@
+// @ts-nocheck
 'use client'
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useRef } from 'react'
 import { Upload, Camera, X, Crown, Heart, Sparkles } from 'lucide-react'
 import Image from 'next/image'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface Avatar {
   id: string

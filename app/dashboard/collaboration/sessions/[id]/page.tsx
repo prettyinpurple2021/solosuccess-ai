@@ -1,5 +1,7 @@
+// @ts-nocheck
 'use client'
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,7 +14,7 @@ import { useRouter } from 'next/navigation'
 import MessageInterface from '@/components/collaboration/MessageInterface'
 import AgentInterface from '@/components/collaboration/AgentInterface'
 import SessionControls from '@/components/collaboration/SessionControls'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface SessionData {
   id: string

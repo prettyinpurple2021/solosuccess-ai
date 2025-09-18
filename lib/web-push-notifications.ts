@@ -1,5 +1,5 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 "use client"
+
 
 export interface NotificationPermissionState {
   supported: boolean
@@ -476,5 +476,6 @@ export class WebPushNotificationManager {
   }
 }
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 // Export singleton instance
 export const webPushManager = WebPushNotificationManager.getInstance()

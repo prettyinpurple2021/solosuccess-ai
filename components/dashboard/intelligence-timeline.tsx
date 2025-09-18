@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
 import { motion} from "framer-motion"
 import { 
@@ -11,8 +12,8 @@ import { Input} from "@/components/ui/input"
 import { Badge} from "@/components/ui/badge"
 import { 
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible"
 
 interface TimelineEvent {

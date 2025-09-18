@@ -1,3 +1,4 @@
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { Achievement, UserStats, GamificationEngine } from './gamification-system'
 import { createClient } from '@/lib/neon/client'
 
@@ -576,7 +577,7 @@ export class CompetitiveIntelligenceGamification extends GamificationEngine {
     }
     
     const currentValue = statMap[badge.requirements.metric] || 0
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
     return currentValue >= badge.requirements.threshold
   }
 

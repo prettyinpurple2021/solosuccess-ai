@@ -1,11 +1,12 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useEffect, useState} from 'react'
 import { Button} from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Badge} from '@/components/ui/badge'
 import { Download, RefreshCw, CheckCircle} from 'lucide-react'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 export function ServiceWorkerRegister() {
   const [isSupported, setIsSupported] = useState(false)

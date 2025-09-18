@@ -1,5 +1,6 @@
-import { unifiedBriefcase } from '@/lib/unified-briefcase'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { unifiedBriefcase } from '@/lib/unified-briefcase'
+
 
 async function initializeDatabase() {
   try {

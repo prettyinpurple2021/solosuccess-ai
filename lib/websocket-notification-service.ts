@@ -1,5 +1,6 @@
-import { CompetitorAlert } from '@/hooks/use-competitor-alerts';
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { CompetitorAlert } from '@/hooks/use-competitor-alerts';
+
 
 export interface WebSocketMessage {
   type: 'competitor_alert' | 'alert_update' | 'connection_status' | 'ping' | 'pong';

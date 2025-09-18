@@ -1,12 +1,13 @@
 "use client"
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect, useRef, useMemo} from "react"
 import { useUserPreferences } from "@/hooks/use-user-preferences"
 import { Button} from "@/components/ui/button"
 import { Progress} from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import { TooltipProvider} from "@/components/ui/tooltip"
+
 import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Crown, Sparkles, Target, Users, ArrowRight, ArrowLeft, CheckCircle, Rocket, Brain, X, Lightbulb, Zap, TrendingUp, FileText, Settings, Search, Plus, Star, SkipForward} from "lucide-react"
 
 interface TutorialStep {

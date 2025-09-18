@@ -3,13 +3,14 @@
  * Handles operations on specific AI agents
  */
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { CollaborationHub } from '@/lib/collaboration-hub'
 import { SessionManager } from '@/lib/session-manager'
 import { MessageRouter } from '@/lib/message-router'
 import { verifyAuth } from '@/lib/auth-server'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 // Initialize collaboration system components
 const collaborationHub = new CollaborationHub()

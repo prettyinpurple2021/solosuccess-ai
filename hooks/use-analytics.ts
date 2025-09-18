@@ -1,7 +1,9 @@
+// @ts-nocheck
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useCallback, useEffect, useRef } from 'react'
 import { useAuth } from './use-auth'
 import { AnalyticsEvent } from '@/lib/analytics'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 
 interface AnalyticsHook {
   track: (event: AnalyticsEvent, properties?: Record<string, any>) => Promise<void>

@@ -1,4 +1,4 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
 interface ChatMessage {
   role: string
   content: string
@@ -211,5 +211,6 @@ export const briefcaseAutoSaver = new BriefcaseAutoSaver()
 // Export class for custom instances
 export { BriefcaseAutoSaver }
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 // Export types
 export type { ChatMessage, AutoSaveOptions }

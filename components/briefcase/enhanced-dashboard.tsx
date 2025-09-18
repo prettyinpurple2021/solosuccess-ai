@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import { Button} from '@/components/ui/button'
@@ -11,8 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
 import { useToast} from '@/hooks/use-toast'
 import { motion} from 'framer-motion'
-import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+
+import {
   BarChart3, PieChart, TrendingUp, Activity, HardDrive, Files, Users, Eye, Share2, Star, Hash, FolderOpen, FileType, Brain, Sparkles, Zap, Target, AlertTriangle, ArrowUp, ArrowDown, Minus, Plus, RefreshCw, Crown, Shield, Globe} from 'lucide-react'
 
 interface DashboardStats {

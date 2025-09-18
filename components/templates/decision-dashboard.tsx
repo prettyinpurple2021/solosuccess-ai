@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect, useCallback} from "react"
 import BaseTemplate, { TemplateData } from "./base-template"
 
@@ -16,8 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { motion, AnimatePresence} from "framer-motion"
+
 import { 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
   Plus, Minus, TrendingUp, TrendingDown, Brain, Target, AlertTriangle, CheckCircle, Lightbulb, Scale, Crown, BarChart3} from "lucide-react"
 
 interface DecisionOption {
