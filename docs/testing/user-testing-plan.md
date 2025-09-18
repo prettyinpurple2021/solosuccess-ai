@@ -342,7 +342,7 @@
 ## 📞 **Testing Support**
 
 ### **Support Channels:**
-- **Email:** beta-support@SoloSuccess.ai
+- **Email:** beta-support@solobossai.fun
 - **Slack:** Dedicated beta tester channel
 - **Video Calls:** Weekly office hours
 - **Documentation:** Comprehensive user guides

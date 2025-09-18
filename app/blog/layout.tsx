@@ -9,13 +9,13 @@ export default function BlogLayout({ children }: { children: ReactNode }) {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: 'Boss Blog — SoloSuccess AI',
-    url: 'https://solosuccess.ai/blog',
+    url: 'https://solobossai.fun/blog',
     description:
       'Actionable playbooks for Business Automation, AI-powered Productivity, and growth systems for solo founders.',
     publisher: {
       '@type': 'Organization',
       name: 'SoloSuccess AI',
-      url: 'https://solosuccess.ai/',
+      url: 'https://solobossai.fun/',
     },
   }
 
@@ -33,13 +33,13 @@ export default function BlogLayout({ children }: { children: ReactNode }) {
               '@type': 'ListItem',
               position: 1,
               name: 'Home',
-              item: 'https://solosuccess.ai/'
+              item: 'https://solobossai.fun/'
             },
             {
               '@type': 'ListItem',
               position: 2,
               name: 'Blog',
-              item: 'https://solosuccess.ai/blog'
+              item: 'https://solobossai.fun/blog'
             }
           ]
         })}
@@ -62,11 +62,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: localizedTitle,
     description: localizedDescription,
-    alternates: { canonical: 'https://solosuccess.ai/blog' },
+    alternates: { canonical: 'https://solobossai.fun/blog' },
     openGraph: {
       title: localizedTitle,
       description: localizedDescription,
-      url: 'https://solosuccess.ai/blog',
+      url: 'https://solobossai.fun/blog',
       type: 'website',
       siteName: 'SoloSuccess AI',
     },

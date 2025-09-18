@@ -454,7 +454,7 @@ Earn XP through:
 
 #### Direct Support
 - **In-App Chat**: Direct support chat within the platform
-- **Email Support**: [support@SoloSuccess.ai](mailto:support@SoloSuccess.ai)
+- **Email Support**: [support@solobossai.fun](mailto:support@solobossai.fun)
 - **Bug Reports**: Dedicated channel for reporting issues
 - **Feature Feedback**: Share feedback on existing features
 

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-  const base = 'https://solosuccess.ai'
+  const base = 'https://solobossai.fun'
   return {
     rules: [
       {

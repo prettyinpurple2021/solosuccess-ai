@@ -571,7 +571,7 @@ Contact our support team if you experience:
 #### Support Channels
 
 1. **In-App Chat**: Click support icon in platform
-2. **Email**: [support@SoloSuccess.ai](mailto:support@SoloSuccess.ai)
+2. **Email**: [support@solobossai.fun](mailto:support@solobossai.fun)
 3. **Community Forum**: For non-urgent questions
 4. **Emergency Issues**: Use priority support channel
 

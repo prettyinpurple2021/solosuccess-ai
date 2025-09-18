@@ -9,7 +9,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export const sendWelcomeEmail = async (email: string, name: string) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@SoloSuccess.ai>",
+      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@solobossai.fun>",
       to: [email],
       subject: "Welcome to SoloSuccess AI - Your Empire Awaits! 👑",
       html: `
@@ -66,7 +66,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
 export const sendSubscriptionConfirmation = async (email: string, name: string, planName: string, amount: number) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@SoloSuccess.ai>",
+      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@solobossai.fun>",
       to: [email],
       subject: `Welcome to ${planName} - Your Empire Just Leveled Up! 🚀`,
       html: `

@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: 'Launch Plan — Free AI Co-founder for Solo Founders',
   description: 'Start free with AI Business Assistant, basic automation, and community access. Perfect for Solo Founders, Solopreneurs, and Individual Creators getting started.',
   alternates: {
-    canonical: 'https://solosuccess.ai/pricing/launch',
+    canonical: 'https://solobossai.fun/pricing/launch',
   },
   openGraph: {
     title: 'Launch Plan — Free AI Co-founder',
     description: 'Free plan for Solo Founders with AI Business Assistant and basic automation.',
-    url: 'https://solosuccess.ai/pricing/launch',
+    url: 'https://solobossai.fun/pricing/launch',
     type: 'website',
     siteName: 'SoloSuccess AI',
   },
@@ -38,7 +38,7 @@ export default function LaunchPlanPage() {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
-      url: 'https://solosuccess.ai/signup',
+      url: 'https://solobossai.fun/signup',
       availability: 'https://schema.org/InStock',
       priceValidUntil: '2025-12-31',
     },
@@ -49,9 +49,9 @@ export default function LaunchPlanPage() {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://solosuccess.ai/' },
-      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://solosuccess.ai/pricing' },
-      { '@type': 'ListItem', position: 3, name: 'Launch Plan', item: 'https://solosuccess.ai/pricing/launch' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://solobossai.fun/' },
+      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://solobossai.fun/pricing' },
+      { '@type': 'ListItem', position: 3, name: 'Launch Plan', item: 'https://solobossai.fun/pricing/launch' },
     ],
   }
 

@@ -20,7 +20,7 @@ const rebrandMappings = {
   'solo_boss': 'solo_success',
   
   // Domain and URL changes
-  'soloboss.ai': 'solosuccess.ai',
+  'soloboss.ai': 'solobossai.fun',
   'soloboss.com': 'solosuccess.com',
   
   // File and directory name patterns
@@ -32,9 +32,9 @@ const rebrandMappings = {
   'SoloBoss AI - Your AI-Powered Business Assistant': 'SoloSuccess AI - Your AI-Powered Business Assistant',
   
   // Email and contact updates
-  'hello@soloboss.ai': 'hello@solosuccess.ai',
-  'support@soloboss.ai': 'support@solosuccess.ai',
-  'contact@soloboss.ai': 'contact@solosuccess.ai'
+  'hello@soloboss.ai': 'hello@solobossai.fun',
+  'support@soloboss.ai': 'support@solobossai.fun',
+  'contact@soloboss.ai': 'contact@solobossai.fun'
 };
 
 // File extensions to process

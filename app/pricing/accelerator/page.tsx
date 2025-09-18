@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: 'Accelerator Plan — AI Business Co-pilot for Growing Founders',
   description: 'Scale with 5 AI agents, advanced automation, and team collaboration. Perfect for growing Solo Founders, Small Business Owners, and E-commerce Entrepreneurs.',
   alternates: {
-    canonical: 'https://solosuccess.ai/pricing/accelerator',
+    canonical: 'https://solobossai.fun/pricing/accelerator',
   },
   openGraph: {
     title: 'Accelerator Plan — AI Business Co-pilot',
     description: 'Growth plan with Workflow Automation AI and Founder AI Tools for scaling businesses.',
-    url: 'https://solosuccess.ai/pricing/accelerator',
+    url: 'https://solobossai.fun/pricing/accelerator',
     type: 'website',
     siteName: 'SoloSuccess AI',
   },
@@ -38,7 +38,7 @@ export default function AcceleratorPlanPage() {
       '@type': 'Offer',
       price: '19',
       priceCurrency: 'USD',
-      url: 'https://solosuccess.ai/signup',
+      url: 'https://solobossai.fun/signup',
       availability: 'https://schema.org/InStock',
       priceValidUntil: '2025-12-31',
     },
@@ -49,9 +49,9 @@ export default function AcceleratorPlanPage() {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://solosuccess.ai/' },
-      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://solosuccess.ai/pricing' },
-      { '@type': 'ListItem', position: 3, name: 'Accelerator Plan', item: 'https://solosuccess.ai/pricing/accelerator' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://solobossai.fun/' },
+      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://solobossai.fun/pricing' },
+      { '@type': 'ListItem', position: 3, name: 'Accelerator Plan', item: 'https://solobossai.fun/pricing/accelerator' },
     ],
   }
 

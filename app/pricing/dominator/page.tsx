@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: 'Dominator Plan — Unlimited AI Business Co-pilot for Empire Builders',
   description: 'Unlimited AI agents, custom workflows, and white-label options. For empire builders who demand unlimited power with AI Business Assistant and Workflow Automation AI.',
   alternates: {
-    canonical: 'https://solosuccess.ai/pricing/dominator',
+    canonical: 'https://solobossai.fun/pricing/dominator',
   },
   openGraph: {
     title: 'Dominator Plan — Unlimited AI Business Co-pilot',
     description: 'Unlimited plan with AI Business Co-pilot, custom workflows, and white-label options.',
-    url: 'https://solosuccess.ai/pricing/dominator',
+    url: 'https://solobossai.fun/pricing/dominator',
     type: 'website',
     siteName: 'SoloSuccess AI',
   },
@@ -38,7 +38,7 @@ export default function DominatorPlanPage() {
       '@type': 'Offer',
       price: '29',
       priceCurrency: 'USD',
-      url: 'https://solosuccess.ai/contact',
+      url: 'https://solobossai.fun/contact',
       availability: 'https://schema.org/InStock',
       priceValidUntil: '2025-12-31',
     },
@@ -49,9 +49,9 @@ export default function DominatorPlanPage() {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://solosuccess.ai/' },
-      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://solosuccess.ai/pricing' },
-      { '@type': 'ListItem', position: 3, name: 'Dominator Plan', item: 'https://solosuccess.ai/pricing/dominator' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://solobossai.fun/' },
+      { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://solobossai.fun/pricing' },
+      { '@type': 'ListItem', position: 3, name: 'Dominator Plan', item: 'https://solobossai.fun/pricing/dominator' },
     ],
   }
 

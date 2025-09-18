@@ -13,7 +13,7 @@
 
 ### Backend & Database
 
-- **PostgreSQL** - Primary database (Neon/Supabase)
+- **PostgreSQL** - Primary database (Neon)
 - **Drizzle ORM 0.44+** - Type-safe database operations
 - **Next.js API Routes** - Server-side API endpoints
 

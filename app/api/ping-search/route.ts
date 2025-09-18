@@ -6,7 +6,7 @@ const ENDPOINTS = {
 }
 
 export async function POST() {
-  const sitemapUrl = 'https://solosuccess.ai/sitemap.xml'
+  const sitemapUrl = 'https://solobossai.fun/sitemap.xml'
   try {
     const [g, b] = await Promise.all([
       fetch(`${ENDPOINTS.google}${encodeURIComponent(sitemapUrl)}`),
