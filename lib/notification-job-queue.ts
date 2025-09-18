@@ -335,12 +335,18 @@ export class NotificationJobQueue {
    * Clean up old completed and failed jobs
    */
   async cleanup(olderThanDays: number = 30): Promise<number> {
+    // Validate input to prevent injection
+    if (typeof olderThanDays !== 'number' || olderThanDays < 0 || olderThanDays > 365) {
+      throw new Error('Invalid olderThanDays parameter: must be a number between 0 and 365')
+    }
+
+    // Use parameterized query to prevent SQL injection
     const result = await query(`
       DELETE FROM notification_jobs 
       WHERE status IN ('completed', 'failed', 'cancelled')
-        AND processed_at < NOW() - INTERVAL '${olderThanDays} days'
+        AND processed_at < NOW() - INTERVAL $1 || ' days'
       RETURNING id
-    `)
+    `, [olderThanDays.toString()])
 
     const deletedCount = result.rows.length
     if (deletedCount > 0) {
