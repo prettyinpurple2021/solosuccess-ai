@@ -29,7 +29,7 @@ export async function GET(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Get permissions
+    // Get permissions with access counts
     const { rows: permissions } = await client.query(`
       SELECT 
         dp.id,
@@ -42,10 +42,17 @@ export async function GET(
         u.name as user_name,
         u.avatar_url,
         dp.granted_by,
-        gb.name as granted_by_name
+        gb.name as granted_by_name,
+        COALESCE(a.access_count, 0) AS access_count
       FROM document_permissions dp
       LEFT JOIN users u ON dp.user_id = u.id
       LEFT JOIN users gb ON dp.granted_by = gb.id
+      LEFT JOIN (
+        SELECT permission_id, COUNT(*) AS access_count
+        FROM document_access_logs
+        WHERE document_id = $1
+        GROUP BY permission_id
+      ) a ON a.permission_id = dp.id
       WHERE dp.document_id = $1 AND dp.is_active = true
       ORDER BY dp.granted_at DESC
     `, [documentId])
@@ -60,7 +67,7 @@ export async function GET(
       granted: p.granted_at,
       expiresAt: p.expires_at,
       status: p.is_active ? 'accepted' : 'pending',
-      accessCount: 0, // TODO: Implement access tracking
+      accessCount: Number(p.access_count) || 0,
       invitedBy: p.granted_by_name || 'Unknown'
     })))
 
