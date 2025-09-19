@@ -137,6 +137,14 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
   gtag('config', 'G-W174T4ZFNF');`
           }}
         />
+        {/* Metricool Tracking */}
+        <Script 
+          id="metricool-tracking" 
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"c3b56672bacfe8e1e7f2c4938b5d7e46"})});`
+          }}
+        />
       </head>
       <body
         className={cn(
