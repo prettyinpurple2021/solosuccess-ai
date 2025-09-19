@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Check Users Table Structure
+ * Check Competitor Profiles Table Structure
  */
 
 import { neon } from '@neondatabase/serverless'
@@ -43,33 +43,33 @@ if (!process.env.DATABASE_URL) {
 
 const sql = neon(process.env.DATABASE_URL)
 
-async function checkUsersTable() {
+async function checkCompetitorProfiles() {
   try {
-    console.log('🔍 Checking users table structure...')
+    console.log('🔍 Checking competitor_profiles table structure...')
     
-    // Get users table structure
+    // Get competitor_profiles table structure
     const columns = await sql`
       SELECT column_name, data_type, character_maximum_length, is_nullable
       FROM information_schema.columns 
-      WHERE table_name = 'users' 
+      WHERE table_name = 'competitor_profiles' 
       AND table_schema = 'public'
       ORDER BY ordinal_position
     `
     
-    console.log('\n📊 Users Table Structure:')
+    console.log('\n📊 Competitor Profiles Table Structure:')
     columns.forEach(col => {
       console.log(`   ${col.column_name}: ${col.data_type}${col.character_maximum_length ? `(${col.character_maximum_length})` : ''} ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'}`)
     })
     
-    // Check if there are any existing users
-    const userCount = await sql`SELECT COUNT(*) as count FROM users`
-    console.log(`\n👥 Total users in database: ${userCount[0].count}`)
+    // Check if there are any existing competitor profiles
+    const profileCount = await sql`SELECT COUNT(*) as count FROM competitor_profiles`
+    console.log(`\n🏢 Total competitor profiles in database: ${profileCount[0].count}`)
     
-    if (userCount[0].count > 0) {
-      // Get a sample user ID
-      const sampleUser = await sql`SELECT id FROM users LIMIT 1`
-      console.log(`📝 Sample user ID: ${sampleUser[0].id}`)
-      console.log(`📝 Sample user ID type: ${typeof sampleUser[0].id}`)
+    if (profileCount[0].count > 0) {
+      // Get a sample competitor profile ID
+      const sampleProfile = await sql`SELECT id FROM competitor_profiles LIMIT 1`
+      console.log(`📝 Sample competitor profile ID: ${sampleProfile[0].id}`)
+      console.log(`📝 Sample competitor profile ID type: ${typeof sampleProfile[0].id}`)
     }
     
   } catch (error) {
@@ -78,4 +78,4 @@ async function checkUsersTable() {
   }
 }
 
-checkUsersTable()
+checkCompetitorProfiles()
