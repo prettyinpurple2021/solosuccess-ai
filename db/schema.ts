@@ -18,6 +18,8 @@ export const users = pgTable('users', {
   current_period_end: timestamp('current_period_end'),
   cancel_at_period_end: boolean('cancel_at_period_end').default(false),
   is_verified: boolean('is_verified').default(false),
+  onboarding_completed: boolean('onboarding_completed').default(false),
+  onboarding_completed_at: timestamp('onboarding_completed_at'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });

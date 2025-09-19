@@ -25,147 +25,57 @@ const AnalysisRequestSchema = z.object({
   focusAreas: z.array(z.enum(['marketing', 'strategic', 'product', 'pricing', 'technical', 'opportunity', 'threat'])).optional(),
 })
 
-// Mock AI analysis service - in production this would call actual AI services
+// Production AI analysis service
 async function performIntelligenceAnalysis(
   intelligenceEntries: any[],
   analysisType: string,
   agentIds?: string[],
   focusAreas?: string[]
 ): Promise<AnalysisResult[]> {
-  // This is a mock implementation - replace with actual AI service calls
-  const analysisResults: AnalysisResult[] = []
+  const { getTeamMemberConfig } = await import('@/lib/ai-config')
+  const agents = agentIds && agentIds.length ? agentIds : ['echo', 'lexi', 'nova', 'blaze']
 
-  // Simulate different agent analyses
-  const agents = agentIds || ['echo', 'lexi', 'nova', 'blaze']
-  
+  const results: AnalysisResult[] = []
   for (const agentId of agents) {
-    const insights = []
-    const recommendations = []
+    const { model, systemPrompt } = getTeamMemberConfig(agentId)
+    const prompt = `You are ${agentId}. Analyze the following competitive intelligence entries and return JSON with fields: insights[], recommendations[], confidence (0-1). Focus areas: ${focusAreas?.join(', ') || 'general'}. Analysis type: ${analysisType}. Entries:
+${JSON.stringify(intelligenceEntries.slice(0, 20)).slice(0, 12000)}`
 
-    // Generate mock insights based on agent specialization
-    switch (agentId) {
-      case 'echo':
-        if (!focusAreas || focusAreas.includes('marketing')) {
-          insights.push({
-            id: `echo-insight-${Date.now()}`,
-            type: 'marketing' as const,
-            title: 'Marketing Strategy Pattern Detected',
-            description: 'Competitor is shifting focus to social media engagement with increased posting frequency',
-            confidence: 0.85,
-            impact: 'medium' as const,
-            urgency: 'medium' as const,
-            supportingData: intelligenceEntries.filter(e => e.sourceType === 'social_media'),
-          })
-          
-          recommendations.push({
-            id: `echo-rec-${Date.now()}`,
-            type: 'offensive' as const,
-            title: 'Counter Social Media Strategy',
-            description: 'Increase our social media presence to match competitor engagement levels',
-            priority: 'medium' as const,
-            estimatedEffort: '2-3 weeks',
-            potentialImpact: 'Medium - could capture competitor audience',
-            timeline: 'Immediate',
-            actionItems: ['Audit current social media strategy', 'Increase posting frequency', 'Engage with competitor audience'],
-          })
-        }
-        break
-
-      case 'lexi':
-        if (!focusAreas || focusAreas.includes('strategic')) {
-          insights.push({
-            id: `lexi-insight-${Date.now()}`,
-            type: 'strategic' as const,
-            title: 'Strategic Direction Shift',
-            description: 'Hiring patterns suggest competitor is expanding into new market segments',
-            confidence: 0.78,
-            impact: 'high' as const,
-            urgency: 'high' as const,
-            supportingData: intelligenceEntries.filter(e => e.sourceType === 'job_posting'),
-          })
-          
-          recommendations.push({
-            id: `lexi-rec-${Date.now()}`,
-            type: 'strategic' as const,
-            title: 'Market Expansion Analysis',
-            description: 'Conduct thorough analysis of new market segments competitor is targeting',
-            priority: 'high' as const,
-            estimatedEffort: '1-2 months',
-            potentialImpact: 'High - could identify new opportunities or threats',
-            timeline: 'Within 30 days',
-            actionItems: ['Research target markets', 'Analyze competitive positioning', 'Evaluate our capabilities'],
-          })
-        }
-        break
-
-      case 'nova':
-        if (!focusAreas || focusAreas.includes('product')) {
-          insights.push({
-            id: `nova-insight-${Date.now()}`,
-            type: 'product' as const,
-            title: 'Product Feature Gap Identified',
-            description: 'Competitor website updates reveal new features we lack',
-            confidence: 0.92,
-            impact: 'high' as const,
-            urgency: 'medium' as const,
-            supportingData: intelligenceEntries.filter(e => e.sourceType === 'website'),
-          })
-          
-          recommendations.push({
-            id: `nova-rec-${Date.now()}`,
-            type: 'offensive' as const,
-            title: 'Feature Development Priority',
-            description: 'Prioritize development of identified missing features',
-            priority: 'high' as const,
-            estimatedEffort: '3-6 months',
-            potentialImpact: 'High - maintain competitive parity',
-            timeline: 'Next quarter',
-            actionItems: ['Spec out missing features', 'Estimate development effort', 'Plan roadmap integration'],
-          })
-        }
-        break
-
-      case 'blaze':
-        if (!focusAreas || focusAreas.includes('pricing')) {
-          insights.push({
-            id: `blaze-insight-${Date.now()}`,
-            type: 'pricing' as const,
-            title: 'Pricing Strategy Opportunity',
-            description: 'Competitor pricing changes create market positioning opportunity',
-            confidence: 0.88,
-            impact: 'medium' as const,
-            urgency: 'high' as const,
-            supportingData: intelligenceEntries.filter(e => e.dataType.includes('pricing')),
-          })
-          
-          recommendations.push({
-            id: `blaze-rec-${Date.now()}`,
-            type: 'offensive' as const,
-            title: 'Pricing Optimization',
-            description: 'Adjust pricing strategy to capitalize on competitor positioning gap',
-            priority: 'high' as const,
-            estimatedEffort: '1-2 weeks',
-            potentialImpact: 'Medium - potential revenue increase',
-            timeline: 'Immediate',
-            actionItems: ['Analyze pricing gap', 'Model revenue impact', 'Implement pricing changes'],
-          })
-        }
-        break
-    }
-
-    if (insights.length > 0 || recommendations.length > 0) {
-      analysisResults.push({
-        agentId,
-        analysisType,
-        insights,
-        recommendations,
-        confidence: insights.reduce((sum, i) => sum + i.confidence, 0) / (insights.length || 1),
-        analyzedAt: new Date(),
+    try {
+      const ai = await (model as any).generate({
+        model: (model as any).modelId || model,
+        input: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+        maxTokens: 1200,
+        temperature: 0.3
       })
+      const text = (ai?.outputText || ai?.text || '').toString()
+      let parsed: any = {}
+      try { parsed = JSON.parse(text) } catch { parsed = {} }
+
+      const insights = Array.isArray(parsed.insights) ? parsed.insights : []
+      const recommendations = Array.isArray(parsed.recommendations) ? parsed.recommendations : []
+      const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : 0.7
+
+      if (insights.length || recommendations.length) {
+        results.push({
+          agentId,
+          analysisType,
+          insights,
+          recommendations,
+          confidence,
+          analyzedAt: new Date(),
+        })
+      }
+    } catch (e) {
+      // Skip on provider errors, continue other agents
+      continue
     }
   }
 
-  return analysisResults
+  return results
 }
 
 export async function POST(request: NextRequest) {

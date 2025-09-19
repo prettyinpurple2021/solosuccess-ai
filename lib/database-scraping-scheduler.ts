@@ -295,33 +295,42 @@ export class ScrapingScheduler {
   }
 
   /**
-   * Perform the actual scraping (placeholder - will be implemented with web scraper)
+   * Perform the actual scraping using the production web scraping service
    */
   private async performScraping(job: any): Promise<Omit<JobResult, 'executionTime' | 'retryCount'>> {
-    // This is a placeholder implementation
-    // In the actual implementation, this would use the web scraper service
-    
     try {
-      // Simulate scraping delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Mock successful scraping result
-      return {
-        success: true,
-        data: {
-          url: job.url,
-          content: 'Mock scraped content',
-          timestamp: new Date().toISOString(),
-          jobType: job.job_type
-        },
-        changesDetected: Math.random() > 0.7 // 30% chance of changes
+      const { webScrapingService } = await import('@/lib/web-scraping-service')
+
+      switch (job.job_type as JobType) {
+        case 'website': {
+          const res = await webScrapingService.scrapeCompetitorWebsite(job.url)
+          if (!res.success) return { success: false, error: res.error || 'Scraping failed', changesDetected: false }
+          return { success: true, data: res.data, changesDetected: false }
+        }
+        case 'pricing': {
+          const res = await webScrapingService.monitorPricingPages(job.url)
+          if (!res.success) return { success: false, error: res.error || 'Pricing monitoring failed', changesDetected: false }
+          return { success: true, data: res.data, changesDetected: false }
+        }
+        case 'products': {
+          const res = await webScrapingService.trackProductPages(job.url)
+          if (!res.success) return { success: false, error: res.error || 'Product tracking failed', changesDetected: false }
+          return { success: true, data: res.data, changesDetected: false }
+        }
+        case 'jobs': {
+          const res = await webScrapingService.scrapeJobPostings(job.url)
+          if (!res.success) return { success: false, error: res.error || 'Job scraping failed', changesDetected: false }
+          return { success: true, data: res.data, changesDetected: false }
+        }
+        case 'social': {
+          // Social jobs handled by SocialMediaMonitor, but return a failure to route elsewhere
+          return { success: false, error: 'Use SocialMediaMonitor for social jobs', changesDetected: false }
+        }
+        default:
+          return { success: false, error: `Unsupported job type: ${job.job_type}`, changesDetected: false }
       }
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Scraping failed',
-        changesDetected: false
-      }
+      return { success: false, error: error instanceof Error ? error.message : 'Scraping failed', changesDetected: false }
     }
   }
 
