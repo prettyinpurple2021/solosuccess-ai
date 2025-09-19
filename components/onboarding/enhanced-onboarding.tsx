@@ -95,6 +95,12 @@ export function EnhancedOnboarding({ open, onComplete, onSkip, userData: _userDa
       onboardingCompleted: true,
       completionDate: new Date().toISOString()
     }
+    // Persist onboarding completion
+    fetch('/api/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ onboarding_completed: true, onboarding_data: finalData })
+    }).catch(() => {})
     onComplete(finalData)
   }
 
