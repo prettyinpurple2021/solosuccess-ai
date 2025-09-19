@@ -228,31 +228,80 @@ export class CompetitorEnrichmentService {
     }
 
     try {
-      // Check rate limiting
       if (!this.checkRateLimit('website_scraping')) {
         result.errors.push('Rate limit exceeded for website scraping')
         return result
       }
 
-      // Simulate website scraping (in production, use actual web scraping)
-      // This would use libraries like Puppeteer, Playwright, or Cheerio
-      const websiteData = await this.simulateWebsiteScraping(domain)
-      
-      if (websiteData) {
-        result.data = {
-          description: websiteData.description,
-          industry: websiteData.industry,
-          headquarters: websiteData.headquarters,
-          foundedYear: websiteData.foundedYear,
-          employeeCount: websiteData.employeeCount,
-          products: websiteData.products,
-        }
-        result.confidence = 0.75 // Moderate confidence for simulated data
-        result.success = true
-      } else {
-        result.errors.push('No data extracted from website')
+      const { webScrapingService } = await import('@/lib/web-scraping-service')
+      const url = domain.startsWith('http') ? domain : `https://${domain}`
+      const scrape = await webScrapingService.scrapeCompetitorWebsite(url)
+      if (!scrape.success || !scrape.data) {
+        result.errors.push(scrape.error || 'Website scrape failed')
+        return result
       }
 
+      const html = scrape.data.content
+      const cheerio = await import('cheerio')
+      const $ = cheerio.load(html)
+
+      // Basic fields from meta tags and JSON-LD
+      let description = $('meta[name="description"]').attr('content') || $('meta[property="og:description"]').attr('content') || undefined
+      let industry: string | undefined
+      let headquarters: string | undefined
+      let foundedYear: number | undefined
+      let employeeCount: number | undefined
+      let products: Product[] | undefined
+
+      $('script[type="application/ld+json"]').each((_, el) => {
+        try {
+          const json = JSON.parse($(el).html() || '{}')
+          const org = Array.isArray(json) ? json.find(j => j['@type'] === 'Organization') : (json['@type'] === 'Organization' ? json : null)
+          if (org) {
+            if (!description && typeof org.description === 'string') description = org.description
+            if (typeof org.foundingDate === 'string') {
+              const y = parseInt(org.foundingDate)
+              if (!Number.isNaN(y)) foundedYear = y
+            }
+            if (typeof org.numberOfEmployees === 'number') employeeCount = org.numberOfEmployees
+            if (org.address && typeof org.address === 'object') {
+              const addr = org.address
+              const parts = [addr.streetAddress, addr.addressLocality, addr.addressRegion, addr.addressCountry].filter(Boolean)
+              if (parts.length) headquarters = parts.join(', ')
+            }
+          }
+          const productJson = Array.isArray(json) ? json.filter(j => j['@type'] === 'Product') : (json['@type'] === 'Product' ? [json] : [])
+          if (productJson.length) {
+            products = productJson.map((p: any) => ({
+              name: p.name,
+              description: p.description,
+              category: p.category,
+              features: [],
+              status: 'active'
+            }))
+          }
+        } catch {}
+      })
+
+      // Heuristic industry detection from keywords
+      const text = $.text().toLowerCase()
+      for (const [ind, keywords] of Object.entries(INDUSTRY_KEYWORDS)) {
+        if (keywords.some(k => text.includes(k))) {
+          industry = ind
+          break
+        }
+      }
+
+      result.data = {
+        description,
+        industry,
+        headquarters,
+        foundedYear,
+        employeeCount,
+        products,
+      }
+      result.confidence = 0.7
+      result.success = true
       return result
     } catch (error) {
       result.errors.push(`Website extraction error: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -285,9 +334,27 @@ export class CompetitorEnrichmentService {
       const socialHandles: SocialMediaHandles = {}
       let foundHandles = 0
 
-      // Simulate social media handle discovery
-      // In production, this would use social media APIs or web scraping
-      const discoveredHandles = await this.simulateSocialMediaDiscovery(companyName, domain)
+      // Discover handles from homepage footer/header links and text
+      const discoveredHandles: Record<string, string> = {}
+      const { webScrapingService } = await import('@/lib/web-scraping-service')
+      const base = domain ? (domain.startsWith('http') ? domain : `https://${domain}`) : undefined
+      if (base) {
+        const page = await webScrapingService.scrapeCompetitorWebsite(base)
+        if (page.success && page.data) {
+          const cheerio = await import('cheerio')
+          const $ = cheerio.load(page.data.content)
+          $('a[href]').each((_, a) => {
+            const href = ($(a).attr('href') || '').trim()
+            const absolute = href.startsWith('http') ? href : (href.startsWith('/') && base ? `${base}${href}` : '')
+            if (!absolute) return
+            if (!discoveredHandles.linkedin && /linkedin\.com\/(company|in)\//i.test(absolute)) discoveredHandles.linkedin = absolute
+            if (!discoveredHandles.twitter && /(twitter\.com|x\.com)\//i.test(absolute)) discoveredHandles.twitter = absolute
+            if (!discoveredHandles.facebook && /facebook\.com\//i.test(absolute)) discoveredHandles.facebook = absolute
+            if (!discoveredHandles.instagram && /instagram\.com\//i.test(absolute)) discoveredHandles.instagram = absolute
+            if (!discoveredHandles.youtube && /youtube\.com\//i.test(absolute)) discoveredHandles.youtube = absolute
+          })
+        }
+      }
       
       // Validate discovered handles
       for (const [platform, url] of Object.entries(discoveredHandles)) {
@@ -336,9 +403,8 @@ export class CompetitorEnrichmentService {
         return result
       }
 
-      // Simulate personnel identification
-      // In production, this would use LinkedIn API, company websites, or business directories
-      const personnel = await this.simulatePersonnelIdentification(companyName, domain)
+      // Identify personnel from About/Team pages heuristically
+      const personnel = await this.identifyPersonnelFromWeb(companyName, domain)
       
       if (personnel.length > 0) {
         result.data = { keyPersonnel: personnel }
@@ -543,85 +609,59 @@ export class CompetitorEnrichmentService {
     return true
   }
 
-  // Simulation methods (replace with actual implementations in production)
-  
-  private async simulateWebsiteScraping(domain: string): Promise<CompanyInfo | null> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // Mock data based on domain
-    const mockData: Record<string, CompanyInfo> = {
-      'techcorp.com': {
-        name: 'TechCorp Solutions',
-        description: 'Leading provider of enterprise software solutions for modern businesses',
-        industry: 'Technology',
-        headquarters: 'San Francisco, CA',
-        foundedYear: 2015,
-        employeeCount: 250,
-        products: [
-          {
-            name: 'TechCorp Platform',
-            description: 'Enterprise automation platform',
-            category: 'Software',
-            status: 'active',
-            features: ['Automation', 'Analytics', 'Integration']
+  private async identifyPersonnelFromWeb(_companyName: string, domain: string): Promise<KeyPerson[]> {
+    try {
+      const { webScrapingService } = await import('@/lib/web-scraping-service')
+      const base = domain.startsWith('http') ? domain : `https://${domain}`
+      const candidatePaths = ['/', '/about', '/team', '/company', '/about-us']
+      const results: KeyPerson[] = []
+      const cheerio = await import('cheerio')
+
+      for (const path of candidatePaths) {
+        const url = path === '/' ? base : `${base}${path}`
+        const res = await webScrapingService.scrapeCompetitorWebsite(url)
+        if (!res.success || !res.data) continue
+        const $ = cheerio.load(res.data.content)
+
+        // JSON-LD Person
+        $('script[type="application/ld+json"]').each((_, el) => {
+          try {
+            const json = JSON.parse($(el).html() || '{}')
+            const persons = Array.isArray(json) ? json.filter(j => j['@type'] === 'Person') : (json['@type'] === 'Person' ? [json] : [])
+            for (const p of persons) {
+              results.push({
+                name: p.name,
+                role: p.jobTitle || 'Executive',
+                linkedinProfile: undefined,
+                previousCompanies: []
+              })
+            }
+          } catch {}
+        })
+
+        // Heuristic: look for names/titles in team sections
+        $('[class*=team], [class*=leadership], section:contains("Team"), section:contains("Leadership")').find('h1,h2,h3,h4,h5').each((_, h) => {
+          const name = $(h).text().trim()
+          if (name && name.split(' ').length >= 2) {
+            const role = $(h).next().text().trim() || 'Team'
+            results.push({ name, role, linkedinProfile: undefined, previousCompanies: [] })
           }
-        ]
-      }
-    }
-    
-    const domainKey = domain.replace(/^https?:\/\//, '').replace(/\/$/, '')
-    return mockData[domainKey] || null
-  }
+        })
 
-  private async simulateSocialMediaDiscovery(
-    companyName: string, 
-    domain?: string
-  ): Promise<Record<string, string>> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300))
-    
-    const handles: Record<string, string> = {}
-    const cleanName = companyName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '')
-    
-    // Simulate discovered handles
-    if (Math.random() > 0.3) {
-      handles.linkedin = `https://linkedin.com/company/${cleanName}`
-    }
-    if (Math.random() > 0.4) {
-      handles.twitter = `https://twitter.com/${cleanName}`
-    }
-    if (Math.random() > 0.6) {
-      handles.facebook = `https://facebook.com/${cleanName}`
-    }
-    
-    return handles
-  }
-
-  private async simulatePersonnelIdentification(
-    companyName: string,
-    domain: string
-  ): Promise<KeyPerson[]> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 400))
-    
-    const mockPersonnel: KeyPerson[] = [
-      {
-        name: 'John Smith',
-        role: 'CEO & Founder',
-        linkedinProfile: 'https://linkedin.com/in/johnsmith',
-        previousCompanies: ['Previous Corp', 'Startup Inc']
-      },
-      {
-        name: 'Sarah Johnson',
-        role: 'CTO',
-        linkedinProfile: 'https://linkedin.com/in/sarahjohnson',
-        previousCompanies: ['Tech Giant', 'Innovation Labs']
+        if (results.length >= 10) break
       }
-    ]
-    
-    // Return random subset
-    return mockPersonnel.slice(0, Math.floor(Math.random() * mockPersonnel.length) + 1)
+
+      // Deduplicate by name
+      const seen = new Set<string>()
+      return results.filter(p => {
+        const key = p.name.toLowerCase()
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      }).slice(0, 10)
+    } catch {
+      return []
+    }
   }
 }
 
