@@ -40,11 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (token: string) => {
     try {
+      logInfo('Auth hook: Fetching user data with token', { tokenLength: token.length })
       const response = await fetch('/api/auth/user', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
+      
+      logInfo('Auth hook: User API response', { status: response.status, ok: response.ok })
       
       if (response.ok) {
         const data = await response.json()
@@ -57,16 +60,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         setUser(userData)
         setSession(sessionData)
+        logInfo('Auth hook: User data set successfully', { userId: userData.id })
       } else {
+        logError('Auth hook: User API failed', { status: response.status })
         // Only remove token if it's actually invalid (401/403), not for network errors
         if (response.status === 401 || response.status === 403) {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('authToken')
+            // Only redirect if we're not already on the signin page
+            if (window.location.pathname !== '/signin') {
+              window.location.href = '/signin'
+            }
           }
         }
       }
     } catch (error) {
-      logError('Error fetching user data:', error)
+      logError('Auth hook: Error fetching user data:', error)
       // Don't remove token for network errors - only for auth failures
       // Network errors shouldn't clear authentication
     } finally {

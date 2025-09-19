@@ -126,8 +126,10 @@ export function useDashboardData() {
           // Token expired or invalid
           localStorage.removeItem('authToken')
           setError('Authentication expired. Please sign in again.')
-          // Redirect to sign in
-          window.location.href = '/signin'
+          // Only redirect if we're not already on the signin page
+          if (window.location.pathname !== '/signin') {
+            window.location.href = '/signin'
+          }
           return
         }
         throw new Error(`Failed to fetch dashboard data: ${response.status}`)

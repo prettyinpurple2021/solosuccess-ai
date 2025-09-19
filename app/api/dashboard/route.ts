@@ -20,11 +20,19 @@ async function authenticateJWTRequest(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      logError('Dashboard API: No authorization header found')
       return { user: null, error: 'No authorization header' }
     }
 
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    
+    if (!process.env.JWT_SECRET) {
+      logError('Dashboard API: JWT_SECRET is not set')
+      return { user: null, error: 'JWT secret not configured' }
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as any
+    logInfo('Dashboard API: JWT token verified successfully', { userId: decoded.userId })
     
     return { 
       user: {
@@ -43,7 +51,7 @@ async function authenticateJWTRequest(request: NextRequest) {
       error: null 
     }
   } catch (error) {
-    logError('JWT authentication error:', error)
+    logError('Dashboard API: JWT authentication error:', error)
     return { user: null, error: 'Invalid token' }
   }
 }

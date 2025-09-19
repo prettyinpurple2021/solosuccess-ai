@@ -99,10 +99,11 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       user: userData,
+      token: token,
       message: 'Login successful'
     })
 
-    // Set HTTP-only cookie instead of returning token
+    // Set HTTP-only cookie as backup
     response.cookies.set('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
