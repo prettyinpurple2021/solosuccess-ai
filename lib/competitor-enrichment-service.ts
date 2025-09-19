@@ -525,11 +525,11 @@ export class CompetitorEnrichmentService {
 
       // Determine threat level based on score
       let threatLevel: ThreatLevel
-      if (threatScore >= 80) {
+      if (threatScore >= 75) {
         threatLevel = 'critical'
-      } else if (threatScore >= 60) {
+      } else if (threatScore >= 55) {
         threatLevel = 'high'
-      } else if (threatScore >= 30) {
+      } else if (threatScore >= 25) {
         threatLevel = 'medium'
       } else {
         threatLevel = 'low'
