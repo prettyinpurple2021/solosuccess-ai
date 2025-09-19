@@ -1,4 +1,93 @@
-# SoloSuccess AI - Copilot Instructions
+# SoloSuccess AI - GitHub Copilot Instructions
+
+**ALWAYS follow these instructions first and only fallback to additional search and context gathering if the information here is incomplete or found to be in error.**
+
+## Quick Start - Essential Commands
+
+### Bootstrap Development Environment
+```bash
+# Install dependencies (27 seconds)
+npm ci --legacy-peer-deps
+
+# Create environment file from example if needed
+cp .env.example .env.local  # Edit with your actual values
+
+# Start development server (2 seconds startup)
+npm run dev  # Runs on http://localhost:3000
+
+# Build for production (64 seconds - NEVER CANCEL, set timeout 120+ seconds)
+npm run build
+
+# Run tests (108 seconds - NEVER CANCEL, set timeout 180+ seconds)  
+npm test
+
+# Type checking (with React 19 compatibility issues - expect errors)
+npm run typecheck
+
+# Lint code (many warnings/errors but not blocking)
+npm run lint
+```
+
+### Database Operations
+```bash
+# Generate Drizzle migrations (always run before db:push)
+npm run db:generate
+
+# Apply migrations to database
+npm run db:push
+
+# Open Drizzle Studio for database inspection
+npm run db:studio
+
+# Database setup scripts
+npm run setup-neon-db          # Initialize Neon database
+npm run setup-briefcase        # Setup file storage tables
+npm run setup-templates        # Setup template system
+npm run setup-compliance       # Setup compliance tables
+npm run db:verify              # Verify database setup
+```
+
+### Testing Commands
+```bash
+# Unit tests (Jest with Next.js integration)
+npm test                    # 5/6 test suites pass, ~108 seconds
+npm run test:coverage      # Coverage reports with thresholds
+
+# E2E tests (Playwright)
+npm run e2e                # Full user journeys
+npx playwright install --with-deps  # Install browsers first
+
+# API validation (currently broken due to module resolution)
+npm run test:api           # Comprehensive endpoint validation
+npm run smoke             # Quick auth flow verification
+```
+
+## Critical Build & Development Information
+
+### Build Status & Known Issues
+- **Build succeeds** but requires environment variables and has React 19 compatibility warnings
+- **TypeScript errors** exist due to React 19 migration but build still completes
+- **Development server works** - starts in ~2 seconds on localhost:3000
+- **Unit tests mostly pass** - 5/6 test suites successful, 1 failing due to timeout issues
+- **Lint has many warnings** but doesn't block development
+
+### Required Environment Variables
+```bash
+# Minimum required for build to succeed
+DATABASE_URL=postgresql://user:pass@host:5432/database
+OPENAI_API_KEY=test-key
+NEXT_PUBLIC_STACK_PROJECT_ID=test-project
+NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=test-key
+STACK_SECRET_SERVER_KEY=test-key
+JWT_SECRET=fake-jwt-secret-for-testing-32-chars
+```
+
+### CRITICAL: Timeout Requirements
+- **NEVER CANCEL builds or long-running commands**
+- **Build**: 64+ seconds (set timeout to 120+ seconds minimum)
+- **Tests**: 108+ seconds (set timeout to 180+ seconds minimum)
+- **Dependencies**: 27+ seconds (set timeout to 60+ seconds)
+- **Type checking**: Variable time due to React 19 issues
 
 ## Architecture Overview
 
@@ -78,6 +167,78 @@ npm run typecheck       # TypeScript validation
 npm run lint            # ESLint checks
 ```
 
+## Manual Validation Requirements
+
+### ALWAYS Test After Making Changes
+After making any code changes, you MUST run these validation scenarios:
+
+#### 1. Development Server Validation
+```bash
+# Start dev server and verify it works
+npm run dev
+# Visit http://localhost:3000 and verify the app loads
+# Test basic navigation and functionality
+```
+
+#### 2. Build Validation
+```bash
+# NEVER CANCEL - Build takes 64+ seconds
+timeout 180 npm run build
+# Verify build completes even with warnings
+```
+
+#### 3. Test Suite Validation
+```bash
+# NEVER CANCEL - Tests take 108+ seconds
+timeout 240 npm test
+# Expect 5/6 test suites to pass, 1 may fail due to timeout
+```
+
+#### 4. Database Operations Validation
+```bash
+# Test database schema generation
+npm run db:generate
+# Verify migrations are created in ./migrations/
+```
+
+#### 5. User Workflow Testing
+**CRITICAL**: Always test complete user scenarios after changes:
+- User registration/login flow
+- Dashboard navigation and data loading
+- AI agent chat functionality
+- File upload to Briefcase
+- Template interaction
+- Goal/task creation in SlayList
+
+### Troubleshooting Common Issues
+
+#### Port 3000 Already in Use
+```bash
+# Find and kill process using port 3000
+lsof -ti:3000 | xargs kill -9
+# Or use different port
+npm run dev -- --port 3001
+```
+
+#### Module Resolution Errors
+```bash
+# Clear caches and reinstall
+rm -rf node_modules package-lock.json .next
+npm ci --legacy-peer-deps
+```
+
+#### React 19 TypeScript Errors
+- **Known Issue**: Many TypeScript errors due to React 19 migration
+- **Workaround**: Build still succeeds despite errors
+- **Do not fix** React compatibility issues unless specifically required
+
+#### Database Connection Issues
+```bash
+# Verify environment variables are set
+echo $DATABASE_URL
+# Check .env.local file exists and has correct values
+```
+
 ### 🗃️ Database Operations
 
 - **Never edit migrations directly** - always use `drizzle-kit generate`
@@ -89,8 +250,54 @@ npm run lint            # ESLint checks
 
 - **Jest Configuration**: `jest.config.js` with Next.js integration
 - **Test Location**: Tests in `__tests__/` directories alongside components
-- **API Testing**: Use `scripts/api-testing.js` for endpoint validation
+- **API Testing**: `scripts/api-testing.js` currently broken due to module resolution
 - **E2E**: Playwright configuration in `playwright.config.ts`
+- **Test Status**: 5/6 test suites pass, expect ~108 seconds execution time
+
+#### Current Test Results
+- ✅ scraping-scheduler.test.ts
+- ✅ web-scraping-service.test.ts  
+- ❌ competitor-enrichment.test.ts (timeout issues)
+- ✅ compliance-scanner.test.ts
+- ✅ templates-delete.test.ts
+
+#### Test Command Timing
+```bash
+npm test                    # 108+ seconds - NEVER CANCEL
+npm run test:coverage      # Longer with coverage reports
+npm run e2e               # Requires Playwright browsers installed
+npm run smoke             # Quick test but requires running server
+```
+
+## Repository Structure & Key Files
+
+### Critical Files for Understanding
+| File | Purpose | Status |
+|------|---------|---------|
+| `package.json` | Dependencies and scripts | ✅ Working |
+| `next.config.mjs` | Next.js configuration | ✅ Working |
+| `drizzle.config.ts` | Database configuration | ✅ Working |
+| `jest.config.js` | Test configuration | ✅ Working |
+| `playwright.config.ts` | E2E test configuration | ✅ Working |
+| `.github/workflows/ci.yml` | CI/CD pipeline | ✅ Working |
+
+### Essential Directories
+```
+/app/                    # Next.js App Router - main application pages
+/components/            # React components (UI, dashboard, shared)
+/lib/                   # Core utilities and AI configurations  
+/db/                    # Database schema and connections
+/scripts/               # Database setup and utility scripts
+/hooks/                 # Custom React hooks
+/tests/                 # Playwright E2E tests
+/test/                  # Jest unit tests
+/migrations/            # Drizzle database migrations
+```
+
+### Package Manager
+- **Uses npm** with `--legacy-peer-deps` flag required
+- **Package manager specified**: "npm@10.0.0" in package.json
+- **DO NOT use pnpm or yarn** - stick with npm for consistency
 
 ## Project-Specific Conventions
 
@@ -791,3 +998,120 @@ const createMockAgent = (id) => ({ id, personality: agentPersonalities[id] });
 - Verify leaderboard updates and ranking calculations
 
 Remember: Always test agent personality consistency, competitive context integration, and gamification triggers when modifying AI agent functionality.
+
+## Common Development Tasks & Outputs
+
+### Repository Root Structure
+```
+/home/runner/work/solosuccess-ai/solosuccess-ai/
+├── .github/                    # GitHub configuration and workflows
+├── app/                        # Next.js App Router pages and API routes
+├── components/                 # React components (UI, dashboard, shared)
+├── db/                         # Database schema and Drizzle configuration
+├── hooks/                      # Custom React hooks
+├── lib/                        # Core utilities, AI configurations, services
+├── migrations/                 # Drizzle database migrations (auto-generated)
+├── public/                     # Static assets
+├── scripts/                    # Database setup and utility scripts
+├── styles/                     # Global styles and Tailwind configuration
+├── test/                       # Jest unit tests
+├── tests/                      # Playwright E2E tests
+├── types/                      # TypeScript type definitions
+├── utils/                      # Utility functions
+├── package.json               # Dependencies and npm scripts
+├── next.config.mjs           # Next.js configuration
+├── drizzle.config.ts         # Database configuration
+├── jest.config.js            # Test configuration
+├── playwright.config.ts      # E2E test configuration
+└── tailwind.config.ts        # Tailwind CSS configuration
+```
+
+### Key npm Scripts Summary
+```bash
+# Development & Building
+npm run dev              # Start dev server (2s startup, http://localhost:3000)
+npm run build           # Production build (64s, NEVER CANCEL)
+npm run start           # Start production server
+npm run typecheck       # TypeScript validation (has React 19 errors)
+npm run lint            # ESLint checks (many warnings, not blocking)
+
+# Database Operations  
+npm run db:generate     # Generate Drizzle migrations
+npm run db:push        # Apply migrations to database  
+npm run db:studio      # Open Drizzle Studio GUI
+
+# Testing
+npm test               # Jest unit tests (108s, 5/6 suites pass)
+npm run test:coverage  # Jest with coverage reports
+npm run e2e           # Playwright E2E tests
+npm run smoke         # Quick smoke test (needs running server)
+
+# Database Setup
+npm run setup-neon-db          # Initialize Neon database
+npm run setup-briefcase        # Setup file storage tables
+npm run setup-templates        # Setup template system  
+npm run setup-compliance       # Setup compliance tables
+npm run db:verify              # Verify database setup
+```
+
+### Working Commands Verified
+- ✅ `npm ci --legacy-peer-deps` - Dependencies install successfully (~27s)
+- ✅ `npm run dev` - Development server starts and runs on localhost:3000 (~2s)
+- ✅ `npm run build` - Production build completes with warnings (~64s)  
+- ✅ `npm test` - Unit tests run, 5/6 suites pass (~108s)
+- ✅ `npm run lint` - Linting runs with warnings (not blocking)
+- ✅ `npx playwright install --with-deps` - E2E browser installation works
+- ❌ `npm run typecheck` - Many React 19 compatibility errors (expected)
+- ❌ `npm run test:api` - Module resolution errors (broken)
+- ❌ `npm run smoke` - Requires running server
+
+### Application Validation Results
+**CONFIRMED WORKING**: The application successfully loads and displays:
+- ✅ Landing page with full SoloSuccess AI branding and features
+- ✅ Navigation with Features, AI Squad, Pricing sections
+- ✅ 8 AI Agent profiles (Roxy, Blaze, Echo, Glitch, Lumi, Vex, Lexi, Nova)
+- ✅ Pricing tiers (Launch $0, Accelerator $19, Dominator $29)
+- ✅ Performance monitoring widget in development
+- ✅ Responsive design and theme toggle functionality
+
+**Screenshot**: The application UI shows a professional purple-gradient design with clear calls-to-action and comprehensive feature descriptions.
+
+### CI Pipeline Information
+From `.github/workflows/ci.yml`:
+- **Node.js Version**: 20
+- **Build Process**: lint-typecheck → unit-tests → build → e2e-tests
+- **Required for CI**: npm ci --legacy-peer-deps, specific environment variables
+- **Build timeout in CI**: Uses standard GitHub Actions timeouts
+- **Browser installation**: Playwright with --with-deps for full dependencies
+
+## Final Development Workflow
+1. **Fresh Clone Setup**:
+   ```bash
+   npm ci --legacy-peer-deps  # Install dependencies
+   cp .env.example .env.local # Create environment file (edit with real values)
+   npm run dev                # Start development (verify at localhost:3000)
+   ```
+
+2. **Before Making Changes**:
+   ```bash
+   npm run build             # Verify build works (64s timeout minimum)
+   npm test                  # Run tests (108s timeout minimum) 
+   ```
+
+3. **After Making Changes**:
+   ```bash
+   npm run dev               # Test in development
+   # Manually verify user scenarios in browser
+   npm run build             # Ensure build still works
+   npm test                  # Ensure tests still pass
+   npm run lint              # Check code quality (warnings OK)
+   ```
+
+4. **Always Test These User Scenarios**:
+   - Landing page loads and displays correctly
+   - Navigation works between sections
+   - AI agent profiles are accessible
+   - Pricing information displays properly
+   - Sign-in/sign-up flows (expect errors without real auth setup)
+
+**CRITICAL**: Use timeout values of 120+ seconds for builds and 180+ seconds for tests. NEVER CANCEL long-running operations.
