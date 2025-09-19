@@ -550,6 +550,9 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   documentActivity: many(documentActivity),
   brandSettings: one(userBrandSettings),
   pushSubscriptions: many(pushSubscriptions),
+  competitorActivities: many(competitorActivities),
+  chatConversations: many(chatConversations),
+  chatMessages: many(chatMessages),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
@@ -864,6 +867,101 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
 export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
   user: one(users, {
     fields: [pushSubscriptions.user_id],
+    references: [users.id],
+  }),
+}));
+
+// Competitor Activities table
+export const competitorActivities = pgTable('competitor_activities', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  activity_type: varchar('activity_type', { length: 50 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  source_url: varchar('source_url', { length: 1000 }),
+  source_type: varchar('source_type', { length: 50 }).notNull(),
+  importance: varchar('importance', { length: 20 }).notNull().default('medium'),
+  confidence: decimal('confidence', { precision: 3, scale: 2 }).default('0.00'),
+  metadata: jsonb('metadata').default('{}'),
+  tags: jsonb('tags').default('[]'),
+  detected_at: timestamp('detected_at').defaultNow(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  competitorIdIdx: index('competitor_activities_competitor_id_idx').on(table.competitor_id),
+  userIdIdx: index('competitor_activities_user_id_idx').on(table.user_id),
+  activityTypeIdx: index('competitor_activities_activity_type_idx').on(table.activity_type),
+  importanceIdx: index('competitor_activities_importance_idx').on(table.importance),
+  detectedAtIdx: index('competitor_activities_detected_at_idx').on(table.detected_at),
+}));
+
+// Chat Conversations table
+export const chatConversations = pgTable('chat_conversations', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: varchar('title', { length: 255 }).notNull(),
+  agent_id: varchar('agent_id', { length: 50 }).notNull(),
+  agent_name: varchar('agent_name', { length: 100 }).notNull(),
+  last_message: text('last_message'),
+  last_message_at: timestamp('last_message_at'),
+  message_count: integer('message_count').default(0),
+  is_archived: boolean('is_archived').default(false),
+  metadata: jsonb('metadata').default('{}'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('chat_conversations_user_id_idx').on(table.user_id),
+  agentIdIdx: index('chat_conversations_agent_id_idx').on(table.agent_id),
+  lastMessageAtIdx: index('chat_conversations_last_message_at_idx').on(table.last_message_at),
+  isArchivedIdx: index('chat_conversations_is_archived_idx').on(table.is_archived),
+}));
+
+// Chat Messages table
+export const chatMessages = pgTable('chat_messages', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  conversation_id: varchar('conversation_id', { length: 255 }).notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  role: varchar('role', { length: 20 }).notNull(), // 'user' or 'assistant'
+  content: text('content').notNull(),
+  metadata: jsonb('metadata').default('{}'),
+  created_at: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  conversationIdIdx: index('chat_messages_conversation_id_idx').on(table.conversation_id),
+  userIdIdx: index('chat_messages_user_id_idx').on(table.user_id),
+  roleIdx: index('chat_messages_role_idx').on(table.role),
+  createdAtIdx: index('chat_messages_created_at_idx').on(table.created_at),
+}));
+
+// Competitor Activities Relations
+export const competitorActivitiesRelations = relations(competitorActivities, ({ one }) => ({
+  competitor: one(competitorProfiles, {
+    fields: [competitorActivities.competitor_id],
+    references: [competitorProfiles.id],
+  }),
+  user: one(users, {
+    fields: [competitorActivities.user_id],
+    references: [users.id],
+  }),
+}));
+
+// Chat Conversations Relations
+export const chatConversationsRelations = relations(chatConversations, ({ one, many }) => ({
+  user: one(users, {
+    fields: [chatConversations.user_id],
+    references: [users.id],
+  }),
+  messages: many(chatMessages),
+}));
+
+// Chat Messages Relations
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  conversation: one(chatConversations, {
+    fields: [chatMessages.conversation_id],
+    references: [chatConversations.id],
+  }),
+  user: one(users, {
+    fields: [chatMessages.user_id],
     references: [users.id],
   }),
 }));
