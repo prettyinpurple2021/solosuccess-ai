@@ -68,9 +68,31 @@ export async function POST(
       })
     ])
 
-    // TODO: Send email invitation
-    // This would integrate with your email service (SendGrid, AWS SES, etc.)
-    logInfo(`Invitation sent to ${email} for document ${document.name} with role ${role}`)
+    // Send email invitation via Resend
+    try {
+      const { Resend } = await import('resend')
+      const resendApiKey = process.env.RESEND_API_KEY
+      if (!resendApiKey) {
+        throw new Error('RESEND_API_KEY not configured')
+      }
+      const resend = new Resend(resendApiKey)
+      const appUrl = process.env.APP_URL || 'https://solobossai.fun'
+      const inviteLink = `${appUrl}/briefcase/invite/accept?doc=${encodeURIComponent(documentId)}&email=${encodeURIComponent(email)}`
+      await resend.emails.send({
+        from: 'SoloBoss AI <noreply@solobossai.fun>',
+        to: email,
+        subject: `You have been invited to access "${document.name}"`,
+        html: `<p>Hello,</p>
+               <p>${user.full_name || user.email} has invited you to access the document <strong>${document.name}</strong> with <strong>${role}</strong> access.</p>
+               ${message ? `<p>Message from ${user.full_name || user.email}: ${message}</p>` : ''}
+               <p>Click the link below to accept the invitation:</p>
+               <p><a href="${inviteLink}">Accept Invitation</a></p>
+               <p>If you did not expect this email, you can ignore it.</p>`
+      })
+      logInfo(`Invitation email sent to ${email} for document ${document.name} with role ${role}`)
+    } catch (mailError) {
+      logWarn('Failed to send invitation email. Proceeding without email.', mailError)
+    }
 
     return NextResponse.json({
       id: newPermission.id,

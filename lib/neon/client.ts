@@ -9,25 +9,14 @@ export const createClient = () => {
     const connectionString = process.env.DATABASE_URL
     
     if (!connectionString) {
-      // During build time or when env vars are missing, return a mock client
-      if (typeof window === 'undefined') {
-        // Server-side: throw error only in production builds
-        if (process.env.NODE_ENV === 'production') {
-          throw new Error('DATABASE_URL is required in production')
-        } else {
-          logWarn('DATABASE_URL missing - using mock database client for development')
-          return {
-            query: async () => ({ rows: [], rowCount: 0 }),
-            connect: async () => ({
-              query: async () => ({ rows: [], rowCount: 0 }),
-              release: () => {}
-            })
-          } as any
-        }
-      }
       throw new Error('Missing Neon database environment variables. Please set DATABASE_URL')
     }
     
+    // Prevent usage in the browser
+    if (typeof window !== 'undefined') {
+      throw new Error('Database client must not be created in the browser')
+    }
+
     pool = new Pool({
       connectionString,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
