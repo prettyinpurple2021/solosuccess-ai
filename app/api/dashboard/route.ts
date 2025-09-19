@@ -51,7 +51,7 @@ async function authenticateJWTRequest(request: NextRequest) {
       error: null 
     }
   } catch (error) {
-    logError('Dashboard API: JWT authentication error:', error)
+    logError('Dashboard API: JWT authentication error:', error as any)
     return { user: null, error: 'Invalid token' }
   }
 }
@@ -88,9 +88,48 @@ export async function GET(request: NextRequest) {
     }
 
     // Get basic data from existing tables (simplified for now)
-    let todaysStatsRes: any, todaysTasksRes: any, activeGoalsRes: any, conversationsRes: any, achievementsRes: any, weeklyFocusRes: any, briefcasesRes: any;
+    let todaysStatsRes: any, todaysTasksRes: any, activeGoalsRes: any, conversationsRes: any, achievementsRes: any, weeklyFocusRes: any, briefcasesRes: any, userStatsRes: any;
     
     try {
+      // Get real user stats from database
+      userStatsRes = await sql`
+        SELECT 
+          COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0) AS total_tasks_completed,
+          COALESCE(COUNT(DISTINCT t.id), 0) AS total_tasks,
+          COALESCE(SUM(CASE WHEN t.status = 'completed' AND DATE(t.updated_at) = CURRENT_DATE THEN 1 ELSE 0 END), 0) AS tasks_completed_today,
+          COALESCE(COUNT(DISTINCT CASE WHEN g.status = 'completed' THEN g.id END), 0) AS goals_achieved,
+          COALESCE(COUNT(DISTINCT c.id), 0) AS ai_interactions,
+          COALESCE(SUM(CASE WHEN t.estimated_minutes IS NOT NULL THEN t.estimated_minutes ELSE 0 END), 0) AS total_focus_minutes,
+          -- Calculate user level based on completed tasks (1 level per 10 tasks)
+          GREATEST(1, FLOOR(COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0) / 10) + 1) AS user_level,
+          -- Calculate total points (10 points per completed task, 50 per completed goal)
+          (COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0) * 10) + 
+          (COALESCE(COUNT(DISTINCT CASE WHEN g.status = 'completed' THEN g.id END), 0) * 50) AS total_points,
+          -- Calculate current streak (simplified - consecutive days with completed tasks)
+          COALESCE((
+            SELECT COUNT(DISTINCT DATE(updated_at))
+            FROM tasks 
+            WHERE user_id = ${user.id} 
+              AND status = 'completed' 
+              AND updated_at >= CURRENT_DATE - INTERVAL '30 days'
+          ), 0) AS current_streak,
+          -- Calculate wellness score based on task completion rate and goal progress
+          LEAST(100, GREATEST(0, 
+            CASE 
+              WHEN COUNT(DISTINCT t.id) = 0 THEN 50
+              ELSE ROUND(
+                (COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0)::FLOAT / 
+                 NULLIF(COUNT(DISTINCT t.id), 0)) * 100
+              )
+            END
+          )) AS wellness_score
+        FROM users u
+        LEFT JOIN tasks t ON u.id = t.user_id
+        LEFT JOIN goals g ON u.id = g.user_id
+        LEFT JOIN conversations c ON u.id = c.user_id
+        WHERE u.id = ${user.id}
+      `;
+
       // Try to get tasks data if table exists
       todaysStatsRes = await sql`
         SELECT 
@@ -129,6 +168,18 @@ export async function GET(request: NextRequest) {
       `;
     } catch (error) {
       // If tables don't exist, use default data
+      userStatsRes = [{ 
+        total_tasks_completed: 0, 
+        total_tasks: 0, 
+        tasks_completed_today: 0,
+        goals_achieved: 0, 
+        ai_interactions: 0, 
+        total_focus_minutes: 0,
+        user_level: 1,
+        total_points: 0,
+        current_streak: 0,
+        wellness_score: 50
+      }];
       todaysStatsRes = [{ tasks_completed: 0, total_tasks: 0, focus_minutes: 0, ai_interactions: 0, goals_achieved: 0, productivity_score: 0 }];
       todaysTasksRes = [];
       briefcasesRes = [];
@@ -207,6 +258,20 @@ export async function GET(request: NextRequest) {
       }
     ] : []
 
+    // Get real user stats from database
+    const userStats = (userStatsRes?.[0] as any) || {
+      total_tasks_completed: 0,
+      total_tasks: 0,
+      tasks_completed_today: 0,
+      goals_achieved: 0,
+      ai_interactions: 0,
+      total_focus_minutes: 0,
+      user_level: 1,
+      total_points: 0,
+      current_streak: 0,
+      wellness_score: 50
+    };
+
     const responseData = {
       user: {
         id: dbUser.id,
@@ -214,12 +279,12 @@ export async function GET(request: NextRequest) {
         full_name: dbUser.full_name || user.full_name || null,
         avatar_url: dbUser.avatar_url || user.avatar_url || null,
         subscription_tier: dbUser.subscription_tier || 'free',
-        level: 1, // Default level for all users
-        total_points: 0, // Default points
-        current_streak: 0, // Default streak
-        wellness_score: 50, // Default wellness score
-        focus_minutes: 0, // Default focus minutes
-        onboarding_completed: false, // Default onboarding status
+        level: userStats.user_level, // Real level based on completed tasks
+        total_points: userStats.total_points, // Real points based on achievements
+        current_streak: userStats.current_streak, // Real streak based on activity
+        wellness_score: userStats.wellness_score, // Real wellness score based on completion rate
+        focus_minutes: userStats.total_focus_minutes, // Real focus minutes from tasks
+        onboarding_completed: dbUser.onboarding_completed || false, // Real onboarding status
       },
       todaysStats: todaysStatsRow,
       todaysTasks,
@@ -233,7 +298,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData)
   } catch (error) {
-    logError('Dashboard API error:', error)
+    logError('Dashboard API error:', error as any)
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
