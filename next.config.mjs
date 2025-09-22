@@ -11,8 +11,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Optimized for Vercel deployment
-  // output: 'standalone', // Removed for Vercel
+  // Optimized for AWS Amplify deployment
+  output: 'standalone', // Required for AWS Amplify
   
   // Enable modern React features
   experimental: {

@@ -1,10 +1,10 @@
-# 🚀 SoloSuccess AI - Production Deployment Guide
+# 🚀 SoloSuccess AI - AWS Amplify Production Deployment Guide
 
 ## 📋 Pre-Deployment Checklist
 
 ### ✅ 1. Environment Variables Setup
 
-You need to set up these **CRITICAL** environment variables in your production environment:
+You need to set up these **CRITICAL** environment variables in your AWS Amplify environment:
 
 #### **Required Environment Variables:**
 
@@ -14,8 +14,14 @@ DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 JWT_SECRET=your_secure_jwt_secret_key_at_least_32_characters_long
 
 # App Configuration (CRITICAL)
-NEXT_PUBLIC_APP_URL=https://yourdomain.com
+NEXT_PUBLIC_APP_URL=https://your-app.amplifyapp.com
 NODE_ENV=production
+
+# AWS Configuration (CRITICAL for file storage)
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+AWS_S3_BUCKET_NAME=your-s3-bucket-name
 
 # AI Services (Required for AI features)
 OPENAI_API_KEY=sk-your_openai_api_key_here
@@ -43,65 +49,49 @@ FROM_EMAIL=noreply@yourdomain.com
 2. **Configure DNS** to point to your hosting provider
 3. **Enable SSL/HTTPS** (most hosting providers do this automatically)
 
-## 🎯 Deployment Options
+## 🎯 AWS Amplify Deployment (Recommended)
 
-### Option 1: Vercel (Recommended - Easiest)
+### Step 1: AWS S3 Bucket Setup
 
-1. **Connect to Vercel:**
-   ```bash
-   npm install -g vercel
-   vercel login
-   vercel
-   ```
+1. **Create S3 Bucket:**
+   - Go to AWS S3 Console
+   - Create a new bucket (e.g., `solosuccess-ai-files`)
+   - Enable public read access for uploaded files
+   - Configure CORS policy for web access
 
-2. **Set Environment Variables in Vercel Dashboard:**
-   - Go to your project settings
-   - Add all environment variables listed above
-   - Redeploy
+2. **Create IAM User:**
+   - Go to AWS IAM Console
+   - Create a new user with programmatic access
+   - Attach policy for S3 bucket access
+   - Save Access Key ID and Secret Access Key
 
-3. **Custom Domain:**
-   - Add your domain in Vercel dashboard
-   - Update DNS records as instructed
-
-### Option 2: Google Cloud Run
-
-1. **Build and Deploy:**
-   ```bash
-   # Build the app
-   npm run build
-   
-   # Deploy to Google Cloud Run
-   gcloud run deploy solosuccess-ai \
-     --source . \
-     --platform managed \
-     --region us-central1 \
-     --allow-unauthenticated
-   ```
-
-2. **Set Environment Variables:**
-   ```bash
-   gcloud run services update solosuccess-ai \
-     --set-env-vars="DATABASE_URL=your_db_url,JWT_SECRET=your_jwt_secret,NEXT_PUBLIC_APP_URL=https://yourdomain.com"
-   ```
-
-### Option 3: AWS Amplify
+### Step 2: AWS Amplify Setup
 
 1. **Connect Repository:**
-   - Connect your GitHub repo to AWS Amplify
-   - Build settings will be auto-detected
+   - Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
+   - Click "New app" > "Host web app"
+   - Connect your GitHub repository
+   - Build settings will be auto-detected from `amplify.yml`
 
 2. **Environment Variables:**
-   - Add all required environment variables in Amplify console
+   - Go to App Settings > Environment Variables
+   - Add all required environment variables listed above
+   - Make sure to include AWS credentials and S3 bucket name
+
+3. **Deploy:**
+   - Click "Save and deploy"
+   - Amplify will build and deploy your app automatically
 
 ## 🔧 Production Configuration Updates
 
 I've updated your configuration for production:
 
 ### ✅ Next.js Configuration Updates:
-- ✅ Enabled ESLint and TypeScript error checking for production builds
+- ✅ Configured for AWS Amplify deployment with standalone output
 - ✅ Enabled image optimization for better performance
 - ✅ Security headers are already configured
 - ✅ Bundle optimization is enabled
+- ✅ Replaced Vercel blob storage with AWS S3
 
 ## 🚀 Step-by-Step Deployment Process
 
@@ -121,57 +111,27 @@ I've updated your configuration for production:
 
 ### Step 2: Choose Your Deployment Platform
 
-#### 🎯 **Option A: Vercel (Recommended - Easiest)**
+#### 🎯 **AWS Amplify Deployment (Recommended)**
 
-1. **Install Vercel CLI:**
-   ```bash
-   npm install -g vercel
-   ```
+1. **Prerequisites:**
+   - AWS Account with appropriate permissions
+   - GitHub repository with your code
+   - S3 bucket for file storage
 
 2. **Deploy:**
-   ```bash
-   vercel login
-   vercel --prod
-   ```
+   - Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
+   - Click "New app" > "Host web app"
+   - Connect your GitHub repository
+   - Build settings will be auto-detected from `amplify.yml`
 
 3. **Set Environment Variables:**
-   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-   - Add all variables from `.env.production.example`
-   - Redeploy
+   - Go to App Settings → Environment Variables
+   - Add all variables from `.env.amplify.example`
+   - Include AWS credentials and S3 bucket configuration
 
 4. **Custom Domain:**
-   - Add your domain in Vercel Dashboard
+   - Add your domain in Amplify Console
    - Update DNS records as instructed
-
-#### 🎯 **Option B: Google Cloud Run**
-
-1. **Install Google Cloud CLI:**
-   ```bash
-   # Download from: https://cloud.google.com/sdk/docs/install
-   gcloud auth login
-   gcloud config set project YOUR_PROJECT_ID
-   ```
-
-2. **Deploy:**
-   ```bash
-   gcloud run deploy solosuccess-ai \
-     --source . \
-     --platform managed \
-     --region us-central1 \
-     --allow-unauthenticated \
-     --set-env-vars="DATABASE_URL=your_db_url,JWT_SECRET=your_jwt_secret,NEXT_PUBLIC_APP_URL=https://yourdomain.com,OPENAI_API_KEY=your_openai_key"
-   ```
-
-#### 🎯 **Option C: AWS Amplify**
-
-1. **Connect Repository:**
-   - Go to AWS Amplify Console
-   - Connect your GitHub repository
-   - Build settings will be auto-detected
-
-2. **Environment Variables:**
-   - Add all required environment variables in Amplify console
-   - Deploy
 
 ### Step 3: Database Setup
 

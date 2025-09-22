@@ -2,7 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
-import { put } from '@vercel/blob'
+import { put } from '@/lib/aws-s3'
 
 
 // Force dynamic rendering
@@ -131,10 +131,10 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        // Upload file to Vercel Blob storage
+        // Upload file to AWS S3
         const blob = await put(`briefcase/${user.id}/${fileId}-${file.name}`, file, {
-          access: 'public',
-          contentType: file.type
+          contentType: file.type,
+          public: true
         })
 
         // Insert document metadata into database (without file_data)

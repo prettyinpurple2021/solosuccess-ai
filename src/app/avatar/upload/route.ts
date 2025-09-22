@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { put } from '@/lib/aws-s3';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -13,9 +13,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Request body is required' }, { status: 400 });
   }
 
-  // ⚠️ The below code is for App Router Route Handlers only
+  // Upload to AWS S3
   const blob = await put(filename, request.body, {
-    access: 'public',
+    public: true,
   });
 
   // Here's the code for Pages API Routes:

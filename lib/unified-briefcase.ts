@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { query } from '@/lib/neon/client'
-import { put, del } from '@vercel/blob'
+import { put, del } from '@/lib/aws-s3'
 
 
 export interface UserBriefcase {
@@ -158,11 +158,11 @@ export class UnifiedBriefcaseManager {
     // Delete existing avatar
     await this.deleteItemsByType(userId, 'avatar')
 
-    // Upload to Vercel Blob
+    // Upload to AWS S3
     const fileName = `avatars/${userId}_${Date.now()}.${file.type.split('/')[1]}`
     const blob = await put(fileName, file, {
-      access: 'public',
-      addRandomSuffix: false
+      contentType: file.type,
+      public: true
     })
 
     // Save to briefcase
