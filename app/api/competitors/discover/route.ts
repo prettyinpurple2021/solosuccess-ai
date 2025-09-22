@@ -5,9 +5,14 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy OpenAI client to avoid build-time env requirement
+function getOpenAIClient(): OpenAI | null {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    return null
+  }
+  return new OpenAI({ apiKey })
+}
 
 
 // Force dynamic rendering
@@ -329,6 +334,10 @@ async function discoverCompetitors(
   maxResults: number = 10
 ) {
   try {
+    const client = getOpenAIClient()
+    if (!client) {
+      throw new Error('OPENAI_API_KEY not set; using fallback competitor suggestions')
+    }
     const prompt = `Based on the following business description, identify ${maxResults} potential competitors:
 
 Business Description: ${businessDescription}
@@ -353,7 +362,7 @@ For each competitor, provide:
 
 Return the response as a JSON array of competitor objects. Focus on real, well-known companies in similar markets.`
 
-    const completion = await openai.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
