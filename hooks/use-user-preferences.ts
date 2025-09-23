@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 
 
@@ -30,6 +30,7 @@ export function useUserPreferences(
   const [preferences, setPreferencesState] = useState<Record<string, any>>(options.defaultValues || {})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const loadingRef = useRef(false) // Prevent multiple simultaneous calls
 
   const getAuthHeaders = useCallback(async () => {
     const token = await getToken()
@@ -40,11 +41,15 @@ export function useUserPreferences(
       headers.Authorization = `Bearer ${token}`
     }
     return headers
-  }, [getToken])
+  }, []) // Remove getToken dependency to prevent unnecessary re-renders
 
   // Load preferences from server or fallback to localStorage
   const refreshPreferences = useCallback(async () => {
+    // Prevent multiple simultaneous calls
+    if (loadingRef.current) return
+    
     try {
+      loadingRef.current = true
       setLoading(true)
       setError(null)
 
@@ -95,6 +100,7 @@ export function useUserPreferences(
         setPreferencesState(fallbackPrefs)
       }
     } finally {
+      loadingRef.current = false
       setLoading(false)
     }
   }, [getAuthHeaders, options.defaultValues, options.fallbackToLocalStorage])
@@ -212,10 +218,10 @@ export function useUserPreferences(
     }
   }, [getAuthHeaders, options.fallbackToLocalStorage])
 
-  // Load preferences on mount
+  // Load preferences on mount - only run once to prevent infinite loops
   useEffect(() => {
     refreshPreferences()
-  }, [refreshPreferences])
+  }, []) // Empty dependency array to run only once
 
   return {
     preferences,
