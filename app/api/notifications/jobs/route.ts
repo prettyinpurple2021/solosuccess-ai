@@ -54,8 +54,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = user.email === 'prettyinpurple2021@gmail.com'
-    if (!isAdmin) {
+    const adminEmails = (process.env.ADMIN_EMAILS || 'prettyinpurple2021@gmail.com')
+      .split(',').map(e => e.trim()).filter(Boolean)
+    if (!adminEmails.includes(user.email)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
@@ -101,8 +102,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = user.email === 'prettyinpurple2021@gmail.com'
-    if (!isAdmin) {
+    const adminEmails2 = (process.env.ADMIN_EMAILS || 'prettyinpurple2021@gmail.com')
+      .split(',').map(e => e.trim()).filter(Boolean)
+    if (!adminEmails2.includes(user.email)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
@@ -176,8 +178,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = user.email === 'prettyinpurple2021@gmail.com'
-    if (!isAdmin) {
+    const adminEmails3 = (process.env.ADMIN_EMAILS || 'prettyinpurple2021@gmail.com')
+      .split(',').map(e => e.trim()).filter(Boolean)
+    if (!adminEmails3.includes(user.email)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 

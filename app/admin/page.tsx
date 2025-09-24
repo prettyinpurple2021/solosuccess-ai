@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useAuth } from '@/hooks/use-auth'
 import { motion } from 'framer-motion'
 
 type AdminStatus = {
@@ -33,11 +34,18 @@ type AdminStatus = {
 }
 
 export default function AdminPage() {
+  const { user, loading: authLoading } = useAuth()
   const [data, setData] = useState<AdminStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (authLoading) return
+    if (!user) {
+      setError('Unauthorized')
+      setLoading(false)
+      return
+    }
     const load = async () => {
       try {
         const res = await fetch('/api/admin/status', { cache: 'no-store' })
@@ -53,9 +61,9 @@ export default function AdminPage() {
     load()
     const iv = setInterval(load, 15000)
     return () => clearInterval(iv)
-  }, [])
+  }, [authLoading, user])
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500" />
@@ -123,9 +131,9 @@ export default function AdminPage() {
         <div className="mt-3 text-sm text-gray-600">Last processed: {data.notifications.status.lastProcessedAt ? new Date(data.notifications.status.lastProcessedAt).toLocaleString() : '—'}</div>
         {/* Actions */}
         <div className="mt-4 flex gap-3">
-          <button onClick={async () => { await fetch('/api/notifications/processor', { method: 'POST', body: JSON.stringify({ action: 'start' }) }) }} className="bold-btn">Start</button>
-          <button onClick={async () => { await fetch('/api/notifications/processor', { method: 'POST', body: JSON.stringify({ action: 'stop' }) }) }} className="bold-btn">Stop</button>
-          <button onClick={async () => { await fetch('/api/notifications/jobs/cleanup', { method: 'POST', body: JSON.stringify({ days: 30 }) }) }} className="bold-btn">Cleanup</button>
+          <button onClick={async () => { if (confirm('Are you sure you want to START the notification processor?')) await fetch('/api/notifications/processor', { method: 'POST', body: JSON.stringify({ action: 'start' }) }) }} className="bold-btn">Start</button>
+          <button onClick={async () => { if (confirm('Are you sure you want to STOP the notification processor?')) await fetch('/api/notifications/processor', { method: 'POST', body: JSON.stringify({ action: 'stop' }) }) }} className="bold-btn">Stop</button>
+          <button onClick={async () => { if (confirm('Cleanup old jobs (>30 days)?')) await fetch('/api/notifications/jobs/cleanup', { method: 'POST', body: JSON.stringify({ days: 30 }) }) }} className="bold-btn">Cleanup</button>
         </div>
       </motion.div>
 
@@ -155,8 +163,8 @@ export default function AdminPage() {
         <div className="mt-3 text-sm text-gray-600">Last loop: {data.scraping.lastLoopAt ? new Date(data.scraping.lastLoopAt).toLocaleString() : '—'}</div>
         {/* Actions */}
         <div className="mt-4 flex gap-3">
-          <button onClick={async () => { await fetch('/api/scraping/metrics', { method: 'POST', body: JSON.stringify({ action: 'start' }) }) }} className="bold-btn">Start</button>
-          <button onClick={async () => { await fetch('/api/scraping/metrics', { method: 'POST', body: JSON.stringify({ action: 'stop' }) }) }} className="bold-btn">Stop</button>
+          <button onClick={async () => { if (confirm('Start scraping scheduler?')) await fetch('/api/scraping/metrics', { method: 'POST', body: JSON.stringify({ action: 'start' }) }) }} className="bold-btn">Start</button>
+          <button onClick={async () => { if (confirm('Stop scraping scheduler?')) await fetch('/api/scraping/metrics', { method: 'POST', body: JSON.stringify({ action: 'stop' }) }) }} className="bold-btn">Stop</button>
         </div>
       </motion.div>
     </div>
