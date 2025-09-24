@@ -43,17 +43,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ preferences: {} })
     }
     
-    // Create table if it doesn't exist
-    await sql`create table if not exists user_preferences (
-      id serial primary key,
-      user_id varchar(255) not null,
-      preference_key varchar(100) not null,
-      preference_value jsonb not null,
-      created_at timestamptz default now(),
-      updated_at timestamptz default now(),
-      unique(user_id, preference_key)
-    )`
-    
     if (key) {
       // Get specific preference
       const result = await sql`
@@ -79,6 +68,10 @@ export async function GET(req: NextRequest) {
     }
   } catch (error) {
     logError('Preferences GET error:', error)
+    // If table is missing, return empty preferences instead of 500
+    if ((error as any)?.code === '42P01') {
+      return NextResponse.json({ preferences: {} })
+    }
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
@@ -93,17 +86,6 @@ export async function POST(req: NextRequest) {
     }
     
     const { key, value, preferences } = await req.json().catch(() => ({}))
-    
-    // Create table if it doesn't exist
-    await sql`create table if not exists user_preferences (
-      id serial primary key,
-      user_id varchar(255) not null,
-      preference_key varchar(100) not null,
-      preference_value jsonb not null,
-      created_at timestamptz default now(),
-      updated_at timestamptz default now(),
-      unique(user_id, preference_key)
-    )`
     
     if (preferences) {
       // Bulk update multiple preferences
@@ -149,6 +131,13 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     logError('Preferences POST error:', error)
+    // Neon read-only compute or transaction
+    if ((error as any)?.code === '25006') {
+      return NextResponse.json(
+        { error: 'Database is read-only. Use a writable Neon endpoint to save preferences.' },
+        { status: 503 }
+      )
+    }
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
@@ -177,6 +166,12 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true, deleted: key })
   } catch (error) {
     logError('Preferences DELETE error:', error)
+    if ((error as any)?.code === '25006') {
+      return NextResponse.json(
+        { error: 'Database is read-only. Use a writable Neon endpoint to delete preferences.' },
+        { status: 503 }
+      )
+    }
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

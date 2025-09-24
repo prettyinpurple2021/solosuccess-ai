@@ -78,9 +78,17 @@ async function runMigration() {
       WHERE table_name = 'push_subscriptions'
     `
     
+    // Check if user_preferences table exists
+    const preferencesTableCheck = await sql`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_name = 'user_preferences'
+    `
+    
     console.log(`   file_url column: ${fileUrlCheck.length > 0 ? '✅ Exists' : '❌ Missing'}`)
     console.log(`   user_brand_settings table: ${brandTableCheck.length > 0 ? '✅ Exists' : '❌ Missing'}`)
     console.log(`   push_subscriptions table: ${pushTableCheck.length > 0 ? '✅ Exists' : '❌ Missing'}`)
+    console.log(`   user_preferences table: ${preferencesTableCheck.length > 0 ? '✅ Exists' : '❌ Missing'}`)
     
     // Run migrations
     console.log('\n🔧 Running migrations...')
@@ -179,6 +187,27 @@ async function runMigration() {
         console.log('   ✅ push_subscriptions table recreated with correct types')
       }
     }
+
+    // Create user_preferences table if it doesn't exist
+    if (preferencesTableCheck.length === 0) {
+      console.log('   Creating user_preferences table...')
+      await sql`
+        CREATE TABLE user_preferences (
+          id SERIAL PRIMARY KEY,
+          user_id VARCHAR(255) NOT NULL,
+          preference_key VARCHAR(100) NOT NULL,
+          preference_value JSONB NOT NULL,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW(),
+          UNIQUE(user_id, preference_key)
+        )
+      `
+      await sql`CREATE INDEX IF NOT EXISTS user_preferences_user_id_idx ON user_preferences(user_id)`
+      await sql`CREATE INDEX IF NOT EXISTS user_preferences_pref_key_idx ON user_preferences(preference_key)`
+      console.log('   ✅ user_preferences table created')
+    } else {
+      console.log('   ⏭️  user_preferences table already exists')
+    }
     
     console.log('\n🎉 Migration completed successfully!')
     console.log('\n📋 Summary:')
@@ -186,6 +215,7 @@ async function runMigration() {
     console.log('   ✅ Brand settings table ready')
     console.log('   ✅ Push subscriptions table ready')
     console.log('   ✅ All localStorage dependencies migrated to database')
+    console.log('   ✅ Preferences storage ready')
     
     console.log('\n🔧 Next steps:')
     console.log('   1. Your app is now ready for production!')
