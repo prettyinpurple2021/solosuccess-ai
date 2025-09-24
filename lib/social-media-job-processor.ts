@@ -440,4 +440,4 @@ export class SocialMediaJobProcessor {
 }
 
 // Export singleton instance
-export const socialMediaJobProcessor = new SocialMediaJobProcessor();
+export const socialMediaJobProcessor = new SocialMediaJobProcessor(); // not auto-started; call start() explicitly when needed

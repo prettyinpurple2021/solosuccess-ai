@@ -87,7 +87,11 @@ export class SessionManager {
     this.collaborationHub = hub
     this.messageRouter = router
     this.initializeDefaultTemplates()
-    this.startSessionCleanup()
+    // Avoid background cleanup loops unless explicitly enabled
+    const enableCleanup = (typeof window === 'undefined') && (process.env.ENABLE_SESSION_CLEANUP === 'true')
+    if (enableCleanup) {
+      this.startSessionCleanup()
+    }
   }
 
   /**

@@ -742,4 +742,9 @@ export class ScrapingScheduler {
 }
 
 // Export singleton instance
-export const scrapingScheduler = new ScrapingScheduler(true)
+// Only auto-start when explicitly enabled and on the server
+const shouldAutoStart = typeof window === 'undefined' && (
+  process.env.ENABLE_SCRAPING_SCHEDULER === 'true'
+)
+
+export const scrapingScheduler = new ScrapingScheduler(shouldAutoStart)

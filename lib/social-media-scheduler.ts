@@ -480,4 +480,4 @@ export class SocialMediaScheduler {
 }
 
 // Export singleton instance
-export const socialMediaScheduler = new SocialMediaScheduler();
+export const socialMediaScheduler = new SocialMediaScheduler(); // does not auto-interval; jobs run via processors only

@@ -6,8 +6,8 @@ import { notificationJobQueue } from './notification-job-queue'
 const PROCESSOR_CONFIG = {
   // Check for jobs every 30 seconds
   intervalMs: 30000,
-  // Auto-start processor in production
-  autoStart: process.env.NODE_ENV === 'production',
+  // Auto-start only if explicitly enabled by env and on server
+  autoStart: (process.env.ENABLE_NOTIFICATION_PROCESSOR === 'true'),
   // Enable verbose logging
   enableLogging: true
 }
@@ -84,7 +84,7 @@ export function getProcessorStatus(): { started: boolean, config: typeof PROCESS
 }
 
 // Auto-start in production (with delay to allow environment setup)
-if (PROCESSOR_CONFIG.autoStart && typeof window === 'undefined') {
+if (typeof window === 'undefined' && PROCESSOR_CONFIG.autoStart) {
   // Only run on server-side with a small delay
   setTimeout(() => {
     initializeNotificationProcessor().catch(error => {

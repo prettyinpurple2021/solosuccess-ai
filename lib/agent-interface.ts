@@ -684,6 +684,9 @@ export class AgentInterface {
    */
   private startMessageProcessing(): void {
     // Set up periodic processing of queued messages
+    if (typeof window === 'undefined' && process.env.ENABLE_AGENT_MESSAGE_PUMP !== 'true') {
+      return
+    }
     setInterval(() => {
       if (this.messageQueue.length > 0) {
         this.processMessageQueue()

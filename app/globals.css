@@ -1,3 +1,4 @@
+/* stylelint-disable at-rule-no-unknown */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
 /* stylelint-disable-next-line at-rule-no-unknown */
@@ -151,15 +152,15 @@
   body {
     /* Ensure proper scaling on mobile devices */
     -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
-    
+    text-size-adjust: 100%;
+
     /* Improve touch targets on mobile */
     touch-action: manipulation;
-    
+
     /* Smooth scrolling */
     scroll-behavior: smooth;
-    @apply bg-background text-foreground;
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
     background: linear-gradient(135deg, rgba(182, 33, 255, 0.03) 0%, rgba(24, 255, 255, 0.03) 25%, rgba(255, 31, 175, 0.03) 50%, rgba(24, 255, 255, 0.03) 75%, rgba(182, 33, 255, 0.03) 100%);
     background-size: 400% 400%;
     animation: holographic-shift 20s ease infinite;
@@ -881,7 +882,8 @@
   
   /* Agent avatar styles */
   .agent-avatar {
-    background-color: attr(data-agent-color);
+    /* Tailwind doesn't support attr() for colors; fallback to inline style if provided */
+    background-color: var(--agent-color, #8B5CF6);
   }
 
   /* Mobile-specific improvements */
