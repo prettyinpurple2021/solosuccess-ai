@@ -134,8 +134,8 @@ export class NotificationJobQueue {
 
     logInfo(`Added notification job ${jobId} scheduled for ${job.scheduledTime}`)
 
-    // On-demand start: only on server and if explicitly enabled
-    if (typeof window === 'undefined' && process.env.ENABLE_NOTIFICATION_PROCESSOR_ON_DEMAND === 'true') {
+    // On-demand start for server environments: ensure processor is running when a job is added
+    if (typeof window === 'undefined') {
       try {
         this.startProcessor()
       } catch {}
