@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Authentication
+    // Authentication (admin only)
     const { user, error } = await authenticateRequest()
     if (error || !user) {
       return NextResponse.json(
@@ -31,9 +31,18 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       )
     }
+    const adminEmails = (process.env.ADMIN_EMAILS || 'prettyinpurple2021@gmail.com')
+      .split(',').map(e => e.trim()).filter(Boolean)
+    if (!adminEmails.includes(user.email)) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions' },
+        { status: 403 }
+      )
+    }
 
     // Get system-wide metrics
     const systemMetrics = scrapingScheduler.getMetrics()
+    const status = scrapingScheduler.getStatus()
 
     // Get user-specific job statistics
     const allJobs = Array.from(scrapingScheduler['jobQueue'].values())
@@ -84,6 +93,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         systemMetrics,
+        status,
         userMetrics: {
           ...userMetrics,
           successRate: userSuccessRate,

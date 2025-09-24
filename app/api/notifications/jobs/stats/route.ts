@@ -21,15 +21,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = user.email === 'prettyinpurple2021@gmail.com'
+    const adminEmails = (process.env.ADMIN_EMAILS || 'prettyinpurple2021@gmail.com')
+      .split(',')
+      .map(e => e.trim())
+      .filter(Boolean)
+    const isAdmin = adminEmails.includes(user.email)
     if (!isAdmin) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
     const stats = await notificationJobQueue.getStats()
+    const status = notificationJobQueue.getStatus()
 
     return NextResponse.json({
       stats,
+      status,
       timestamp: new Date().toISOString()
     })
 

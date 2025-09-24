@@ -49,6 +49,7 @@ export class NotificationJobQueue {
   private isProcessing = false
   private idleCyclesWithoutWork = 0
   private readonly IDLE_STOP_CYCLES = 40 // ~20 minutes at 30s interval
+  private lastProcessedAt: Date | null = null
 
   static getInstance(): NotificationJobQueue {
     if (!NotificationJobQueue.instance) {
@@ -202,6 +203,8 @@ export class NotificationJobQueue {
       SET status = 'completed', processed_at = NOW()
       WHERE id = $1
     `, [jobId])
+
+    this.lastProcessedAt = new Date()
   }
 
   /**
@@ -225,6 +228,8 @@ export class NotificationJobQueue {
     } else {
       logError(`Job ${jobId} failed, will retry. Attempt ${job?.attempts || 0}/${job?.max_attempts || 3}`)
     }
+
+    this.lastProcessedAt = new Date()
   }
 
   /**
@@ -443,6 +448,14 @@ export class NotificationJobQueue {
       return jobs.length
     } finally {
       this.isProcessing = false
+    }
+  }
+
+  /** Public status summary for admin */
+  getStatus(): { running: boolean; lastProcessedAt: string | null } {
+    return {
+      running: this.processingInterval !== null,
+      lastProcessedAt: this.lastProcessedAt ? this.lastProcessedAt.toISOString() : null
     }
   }
 

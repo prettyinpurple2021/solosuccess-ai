@@ -101,6 +101,7 @@ export class ScrapingScheduler {
   private processingInterval?: NodeJS.Timeout
   private idleCyclesWithoutWork = 0
   private readonly IDLE_STOP_CYCLES = 40 // ~20 minutes at 30s interval
+  private lastLoopAt: Date | null = null
   private readonly MAX_CONCURRENT_JOBS = 5
   private readonly PROCESSING_INTERVAL = 30000 // 30 seconds
 
@@ -374,6 +375,7 @@ export class ScrapingScheduler {
     this.isRunning = true
     this.processingInterval = setInterval(() => {
       this.processQueue().then(processed => {
+        this.lastLoopAt = new Date()
         if (processed === 0) {
           this.idleCyclesWithoutWork += 1
           if (this.idleCyclesWithoutWork >= this.IDLE_STOP_CYCLES) {
@@ -388,6 +390,15 @@ export class ScrapingScheduler {
     }, this.PROCESSING_INTERVAL)
 
     logInfo('Scraping scheduler started')
+  }
+
+  /** Public status summary for admin */
+  getStatus(): { running: boolean; lastLoopAt: string | null; metrics: QueueMetrics } {
+    return {
+      running: !!this.processingInterval,
+      lastLoopAt: this.lastLoopAt ? this.lastLoopAt.toISOString() : null,
+      metrics: this.getMetrics()
+    }
   }
 
   private stopProcessing(): void {
@@ -741,6 +752,11 @@ export class ScrapingScheduler {
     this.jobQueue.clear()
     this.runningJobs.clear()
     this.jobHistory.clear()
+  }
+
+  /** Public stop method for admin controls */
+  stop(): void {
+    this.stopProcessing()
   }
 
   /**
