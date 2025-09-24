@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       // User submitted survey
       await sql`
         insert into exit_intent_surveys (user_id, role, goal, blocker, email) 
-        values (${userId ?? null}, ${role ?? null}, ${goal ?? null}, ${blocker ?? null}, ${email ?? null})
+        values (${userId || null}, ${role || null}, ${goal || null}, ${blocker || null}, ${email || null})
       `
       
       if (userId) {

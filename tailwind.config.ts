@@ -60,14 +60,18 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // SoloSuccess Brand Colors
+        // SoloSuccess Brand Colors - Updated for Holographic Theme
         SoloSuccess: {
-          purple: '#8B5CF6',
-          pink: '#EC4899',
-          'purple-light': '#A855F7',
-          'pink-light': '#F472B6',
-          'purple-dark': '#7C3AED',
-          'pink-dark': '#DB2777',
+          purple: '#B621FF',
+          cyan: '#18FFFF', 
+          pink: '#FF1FAF',
+          black: '#000000',
+          'purple-light': '#D946EF',
+          'cyan-light': '#67E8F9',
+          'pink-light': '#FF6BB3',
+          'purple-dark': '#9333EA',
+          'cyan-dark': '#0891B2',
+          'pink-dark': '#E91E63',
         },
         // AI Agent Colors
         agent: {
@@ -132,6 +136,33 @@ const config: Config = {
           "0%": { transform: "scale(1)", opacity: "1" },
           "75%, 100%": { transform: "scale(1.2)", opacity: "0" },
         },
+        "holo-shimmer": {
+          "0%": { transform: "translateX(-100%) rotate(45deg)" },
+          "100%": { transform: "translateX(100%) rotate(45deg)" },
+        },
+        "sparkle-twinkle": {
+          "0%, 100%": { opacity: "0", transform: "scale(0.5) rotate(0deg)" },
+          "50%": { opacity: "1", transform: "scale(1) rotate(180deg)" },
+        },
+        "glass-shine": {
+          "0%": { transform: "translateX(-100%) skewX(-15deg)" },
+          "100%": { transform: "translateX(200%) skewX(-15deg)" },
+        },
+        "rainbow-rotate": {
+          "0%": { filter: "hue-rotate(0deg)" },
+          "100%": { filter: "hue-rotate(360deg)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 20px rgba(182, 33, 255, 0.3), 0 0 40px rgba(24, 255, 255, 0.2)" },
+          "50%": { boxShadow: "0 0 40px rgba(255, 31, 175, 0.5), 0 0 80px rgba(182, 33, 255, 0.3)" },
+        },
+        "holographic-shift": {
+          "0%": { backgroundPosition: "0% 0%" },
+          "25%": { backgroundPosition: "100% 0%" },
+          "50%": { backgroundPosition: "100% 100%" },
+          "75%": { backgroundPosition: "0% 100%" },
+          "100%": { backgroundPosition: "0% 0%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -145,16 +176,27 @@ const config: Config = {
         "boss-bounce": "boss-bounce 2s ease-in-out infinite",
         "empowerment-pulse": "empowerment-pulse 3s ease-in-out infinite",
         "success-celebration": "success-celebration 1s ease-out",
+        "holo-shimmer": "holo-shimmer 3s ease-in-out infinite",
+        "sparkle-twinkle": "sparkle-twinkle 2s ease-in-out infinite",
+        "glass-shine": "glass-shine 2.5s ease-in-out infinite",
+        "rainbow-rotate": "rainbow-rotate 4s linear infinite",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "holographic-shift": "holographic-shift 8s ease-in-out infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        // SoloSuccess Gradients
-        'gradient-SoloSuccess': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
-        'gradient-SoloSuccess-light': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
-        'gradient-empowerment': 'linear-gradient(135deg, #6366F1 0%, #EC4899 50%, #F59E0B 100%)',
-        'gradient-boss': 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
-        'gradient-boss-secondary': 'linear-gradient(135deg, #A855F7 0%, #F472B6 100%)',
+        // SoloSuccess Holographic Gradients
+        'gradient-hero': 'linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%)',
+        'gradient-card': 'linear-gradient(120deg, #B621FF 0%, #FF1FAF 100%)',
+        'gradient-SoloSuccess': 'linear-gradient(135deg, #B621FF 0%, #FF1FAF 100%)',
+        'gradient-SoloSuccess-light': 'linear-gradient(135deg, #D946EF 0%, #FF6BB3 100%)',
+        'gradient-empowerment': 'linear-gradient(135deg, #B621FF 0%, #18FFFF 25%, #FF1FAF 50%, #18FFFF 75%, #B621FF 100%)',
+        'gradient-boss': 'linear-gradient(135deg, #B621FF 0%, #18FFFF 25%, #FF1FAF 50%, #000000 75%, #B621FF 100%)',
+        'gradient-boss-secondary': 'linear-gradient(135deg, #D946EF 0%, #67E8F9 50%, #FF6BB3 100%)',
+        'gradient-holographic': 'linear-gradient(135deg, #B621FF 0%, #18FFFF 20%, #FF1FAF 40%, #18FFFF 60%, #B621FF 80%, #FF1FAF 100%)',
+        'gradient-glass': 'linear-gradient(135deg, rgba(182, 33, 255, 0.1) 0%, rgba(24, 255, 255, 0.1) 50%, rgba(255, 31, 175, 0.1) 100%)',
+        'gradient-sparkle': 'conic-gradient(from 0deg, #B621FF, #18FFFF, #FF1FAF, #18FFFF, #B621FF)',
         // AI Agent Gradients
         'gradient-roxy': 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
         'gradient-blaze': 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)',
