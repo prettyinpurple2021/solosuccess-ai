@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { HolographicButton, HolographicCard, GradientText } from '@/components/ui/holographic-button';
+import { SparkleAnimation } from '@/components/ui/sparkle-animation';
 import { 
   Zap, 
   Star, 
@@ -27,9 +29,16 @@ export default function HomePage() {
               SoloSuccess
             </div>
             <div className="flex items-center gap-4">
-              <button className="px-4 py-2 rounded-lg bg-gradient-hero text-white font-bold hover:scale-105 transition-transform">
+              <HolographicButton
+                variant="primary"
+                size="sm"
+                sparkles={true}
+                shine={true}
+                glow={true}
+              >
                 Get Started
-              </button>
+                <Star className="w-4 h-4" />
+              </HolographicButton>
             </div>
           </div>
         </div>
@@ -50,9 +59,11 @@ export default function HomePage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
             >
-              <span className="gradient-text">
-                Your AI Co-founder Awaits
-              </span>
+              <SparkleAnimation intensity="high" size="large" color="rainbow">
+                <GradientText className="text-4xl md:text-6xl lg:text-7xl">
+                  Your AI Co-founder Awaits
+                </GradientText>
+              </SparkleAnimation>
             </motion.h1>
 
             <motion.p
@@ -71,14 +82,17 @@ export default function HomePage() {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-2xl bg-gradient-hero text-white font-bold text-lg shadow-lg hover:shadow-2xl transition-all duration-300 flex items-center gap-2"
+              <HolographicButton
+                variant="primary"
+                size="xl"
+                sparkles={true}
+                shine={true}
+                glow={true}
+                className="text-lg px-8 py-4"
               >
                 Start Your Free Trial
                 <ArrowRight className="w-5 h-5" />
-              </motion.button>
+              </HolographicButton>
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -107,16 +121,19 @@ export default function HomePage() {
                 { number: '99.9%', label: 'Uptime' },
                 { number: '50%', label: 'Faster Growth' }
               ].map((stat, index) => (
-                <motion.div
+                <HolographicCard
                   key={index}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="holo-overlay p-6 rounded-2xl text-center"
+                  sparkles={true}
+                  shine={true}
+                  glow={false}
+                  interactive={true}
+                  className="text-center p-6"
                 >
                   <div className="text-3xl font-bold mb-2">
-                    <span className="gradient-text">{stat.number}</span>
+                    <GradientText className="text-3xl">{stat.number}</GradientText>
                   </div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </motion.div>
+                </HolographicCard>
               ))}
             </motion.div>
           </motion.div>
@@ -134,7 +151,9 @@ export default function HomePage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="gradient-text">Powerful Features</span>
+              <SparkleAnimation intensity="medium" size="medium" color="rainbow">
+                <GradientText className="text-4xl md:text-5xl">Powerful Features</GradientText>
+              </SparkleAnimation>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Everything you need to build, grow, and scale your solo business with AI-powered precision.
@@ -174,31 +193,32 @@ export default function HomePage() {
                 description: 'Enterprise-grade security with 99.9% uptime. Your business data is always safe and accessible.'
               }
             ].map((feature, index) => (
-              <motion.div
+              <HolographicCard
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 * index }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="holo-overlay p-6 rounded-2xl text-center h-full"
+                sparkles={true}
+                shine={true}
+                glow={false}
+                interactive={true}
+                className="text-center p-6 h-full"
               >
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300 }}
                   className="mb-4 flex justify-center text-SoloSuccess-purple"
                 >
-                  {feature.icon}
+                  <SparkleAnimation intensity="medium" size="medium" color="rainbow">
+                    {feature.icon}
+                  </SparkleAnimation>
                 </motion.div>
 
                 <h3 className="text-xl font-bold mb-2">
-                  <span className="gradient-text">{feature.title}</span>
+                  <GradientText className="text-xl">{feature.title}</GradientText>
                 </h3>
                 
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {feature.description}
                 </p>
-              </motion.div>
+              </HolographicCard>
             ))}
           </div>
         </div>
@@ -207,39 +227,48 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-20 relative">
         <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="holo-overlay p-12 rounded-3xl max-w-4xl mx-auto"
+          <HolographicCard
+            sparkles={true}
+            shine={true}
+            glow={true}
+            className="max-w-4xl mx-auto p-12"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="gradient-text">Ready to Transform Your Business?</span>
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of solo founders who've already discovered the power of AI-driven business growth.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-2xl bg-gradient-hero text-white font-bold text-lg shadow-lg hover:shadow-2xl transition-all duration-300 flex items-center gap-2"
-              >
-                Start Your Free Trial
-                <Rocket className="w-5 h-5" />
-              </motion.button>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                <GradientText className="text-4xl md:text-5xl">Ready to Transform Your Business?</GradientText>
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join thousands of solo founders who've already discovered the power of AI-driven business growth.
+              </p>
               
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 text-sm text-muted-foreground"
-              >
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                No credit card required
-              </motion.div>
-            </div>
-          </motion.div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <HolographicButton
+                  variant="primary"
+                  size="lg"
+                  sparkles={true}
+                  shine={true}
+                  glow={true}
+                  className="text-lg"
+                >
+                  Start Your Free Trial
+                  <Rocket className="w-5 h-5" />
+                </HolographicButton>
+                
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
+                >
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  No credit card required
+                </motion.div>
+              </div>
+            </motion.div>
+          </HolographicCard>
         </div>
       </section>
 
@@ -247,7 +276,7 @@ export default function HomePage() {
       <footer className="py-12 border-t border-SoloSuccess-purple/20">
         <div className="container mx-auto px-4 text-center">
           <div className="text-2xl font-bold mb-4">
-            <span className="gradient-text">SoloSuccess</span>
+            <GradientText className="text-2xl">SoloSuccess</GradientText>
           </div>
           <p className="text-muted-foreground text-sm">
             © 2024 SoloSuccess AI. All rights reserved. Made with ✨ and holographic magic.
