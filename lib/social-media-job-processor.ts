@@ -14,6 +14,8 @@ import { eq } from 'drizzle-orm';
 export class SocialMediaJobProcessor {
   private isProcessing = false;
   private processingInterval: NodeJS.Timeout | null = null;
+  private idleCyclesWithoutWork = 0;
+  private readonly IDLE_STOP_CYCLES = 8; // stop after ~2 hours at 15m intervals
 
   /**
    * Start the job processor with specified interval
@@ -30,8 +32,18 @@ export class SocialMediaJobProcessor {
     this.processJobs();
     
     // Set up recurring processing
-    this.processingInterval = setInterval(() => {
-      this.processJobs();
+    this.processingInterval = setInterval(async () => {
+      const processed = await this.processJobs();
+      if (processed === 0) {
+        this.idleCyclesWithoutWork += 1;
+        if (this.idleCyclesWithoutWork >= this.IDLE_STOP_CYCLES) {
+          logInfo('No social jobs for a while; stopping processor to save resources');
+          this.stop();
+          this.idleCyclesWithoutWork = 0;
+        }
+      } else {
+        this.idleCyclesWithoutWork = 0;
+      }
     }, intervalMinutes * 60 * 1000);
   }
 
@@ -49,10 +61,10 @@ export class SocialMediaJobProcessor {
   /**
    * Process all pending social media jobs
    */
-  async processJobs(): Promise<void> {
+  async processJobs(): Promise<number> {
     if (this.isProcessing) {
       logInfo('Social media job processing already in progress, skipping...');
-      return;
+      return 0;
     }
 
     this.isProcessing = true;
@@ -61,6 +73,7 @@ export class SocialMediaJobProcessor {
       logInfo('Starting social media job processing cycle');
       
       // Process pending monitoring jobs
+      const before = Date.now();
       await socialMediaScheduler.processPendingJobs();
       
       // Run analysis on recently collected data
@@ -73,9 +86,11 @@ export class SocialMediaJobProcessor {
       await this.cleanupOldData();
       
       logInfo('Social media job processing cycle completed');
-      
+      const tookMs = Date.now() - before;
+      return tookMs > 1000 ? 1 : 0;
     } catch (error) {
       logError('Error during social media job processing:', error);
+      return 0;
     } finally {
       this.isProcessing = false;
     }

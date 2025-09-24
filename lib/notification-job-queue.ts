@@ -47,6 +47,8 @@ export class NotificationJobQueue {
   private static instance: NotificationJobQueue
   private processingInterval: NodeJS.Timeout | null = null
   private isProcessing = false
+  private idleCyclesWithoutWork = 0
+  private readonly IDLE_STOP_CYCLES = 40 // ~20 minutes at 30s interval
 
   static getInstance(): NotificationJobQueue {
     if (!NotificationJobQueue.instance) {
@@ -131,6 +133,13 @@ export class NotificationJobQueue {
     ])
 
     logInfo(`Added notification job ${jobId} scheduled for ${job.scheduledTime}`)
+
+    // On-demand start: only on server and if explicitly enabled
+    if (typeof window === 'undefined' && process.env.ENABLE_NOTIFICATION_PROCESSOR_ON_DEMAND === 'true') {
+      try {
+        this.startProcessor()
+      } catch {}
+    }
     return jobId
   }
 
@@ -376,7 +385,17 @@ export class NotificationJobQueue {
       }
 
       try {
-        await this.processJobs()
+        const processed = await this.processJobs()
+        if (processed === 0) {
+          this.idleCyclesWithoutWork += 1
+          if (this.idleCyclesWithoutWork >= this.IDLE_STOP_CYCLES) {
+            logInfo('No jobs for a while; stopping notification job processor to save resources')
+            this.stopProcessor()
+            this.idleCyclesWithoutWork = 0
+          }
+        } else {
+          this.idleCyclesWithoutWork = 0
+        }
       } catch (error) {
         logError('Job processing error:', error)
       }
@@ -397,7 +416,7 @@ export class NotificationJobQueue {
   /**
    * Process ready jobs
    */
-  private async processJobs(): Promise<void> {
+  private async processJobs(): Promise<number> {
     if (this.isProcessing) return
 
     this.isProcessing = true
@@ -406,7 +425,7 @@ export class NotificationJobQueue {
       const jobs = await this.getReadyJobs(5) // Process 5 jobs at a time
       
       if (jobs.length === 0) {
-        return
+        return 0
       }
 
       logInfo(`Processing ${jobs.length} notification jobs`)
@@ -421,6 +440,7 @@ export class NotificationJobQueue {
           await this.markJobFailed(job.id, errorMessage)
         }
       }
+      return jobs.length
     } finally {
       this.isProcessing = false
     }

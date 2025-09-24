@@ -99,6 +99,8 @@ export class ScrapingScheduler {
   }
   private isRunning = false
   private processingInterval?: NodeJS.Timeout
+  private idleCyclesWithoutWork = 0
+  private readonly IDLE_STOP_CYCLES = 40 // ~20 minutes at 30s interval
   private readonly MAX_CONCURRENT_JOBS = 5
   private readonly PROCESSING_INTERVAL = 30000 // 30 seconds
 
@@ -371,7 +373,18 @@ export class ScrapingScheduler {
 
     this.isRunning = true
     this.processingInterval = setInterval(() => {
-      this.processQueue()
+      this.processQueue().then(processed => {
+        if (processed === 0) {
+          this.idleCyclesWithoutWork += 1
+          if (this.idleCyclesWithoutWork >= this.IDLE_STOP_CYCLES) {
+            logInfo('No scraping jobs to process for a while; stopping scheduler to save resources')
+            this.stopProcessing()
+            this.idleCyclesWithoutWork = 0
+          }
+        } else {
+          this.idleCyclesWithoutWork = 0
+        }
+      }).catch(error => logError('Error in scheduler loop:', error))
     }, this.PROCESSING_INTERVAL)
 
     logInfo('Scraping scheduler started')
@@ -389,9 +402,9 @@ export class ScrapingScheduler {
     logInfo('Scraping scheduler stopped')
   }
 
-  private async processQueue(): Promise<void> {
+  private async processQueue(): Promise<number> {
     if (this.runningJobs.size >= this.MAX_CONCURRENT_JOBS) {
-      return // Queue is full
+      return 0 // Queue is full
     }
 
     // Get pending jobs that are ready to run
@@ -417,6 +430,7 @@ export class ScrapingScheduler {
         logError(`Error processing job ${job.id}:`, error)
       })
     }
+    return jobsToProcess.length
   }
 
   private async processJob(job: ScrapingJob): Promise<ScrapingJobResult> {
