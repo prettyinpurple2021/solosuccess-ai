@@ -1,3 +1,24 @@
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  if (pathname.startsWith('/admin')) {
+    const hasToken = request.cookies.get('auth_token')?.value
+    if (!hasToken) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/signin'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+  }
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: ['/admin/:path*']
+}
+
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {

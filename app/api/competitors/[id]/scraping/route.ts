@@ -3,6 +3,10 @@ import { NextRequest, NextResponse} from 'next/server'
 import { z} from 'zod'
 import { queueProcessor} from '@/lib/scraping-queue-processor'
 import { authenticateRequest} from '@/lib/auth-server'
+import { getFeatureFlags } from '@/lib/feature-flags'
+import { db } from '@/db'
+import { scrapingJobs } from '@/db/schema'
+import { and, eq, gte } from 'drizzle-orm'
 import { rateLimitByIp} from '@/lib/rate-limit'
 
 
@@ -113,6 +117,17 @@ export async function POST(
     // Parse and validate request body
     const body = await request.json()
     const validatedData = createDefaultJobsSchema.parse(body)
+
+    // Budget guard: enforce per-user hourly cap before bulk creation
+    const flags = getFeatureFlags()
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    const recentJobs = await db
+      .select({ id: scrapingJobs.id })
+      .from(scrapingJobs)
+      .where(and(eq(scrapingJobs.user_id, user.id), gte(scrapingJobs.created_at, oneHourAgo as any)))
+    if (recentJobs.length >= flags.scrapingUserHourlyCap) {
+      return NextResponse.json({ error: `Scraping hourly cap reached (${flags.scrapingUserHourlyCap})` }, { status: 429 })
+    }
 
     // Create default monitoring jobs
     const jobIds = await queueProcessor.createDefaultJobs(

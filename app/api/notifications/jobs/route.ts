@@ -3,7 +3,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'
+import { getFeatureFlags } from '@/lib/feature-flags'
 import { z } from 'zod'
+import { query } from '@/lib/neon/client'
 
 
 // Force dynamic rendering
@@ -61,6 +63,10 @@ export async function GET(request: NextRequest) {
     }
 
     await ensureInitialized()
+    const flags = getFeatureFlags()
+    if (!flags.enableNotifications) {
+      return NextResponse.json({ error: 'Notifications are disabled' }, { status: 403 })
+    }
 
     const url = new URL(request.url)
     const status = url.searchParams.get('status') || undefined
@@ -128,6 +134,17 @@ export async function POST(request: NextRequest) {
         { error: 'Scheduled time must be in the future' },
         { status: 400 }
       )
+    }
+
+    // Enforce daily cap (last 24 hours, DB-accurate)
+    const last24 = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const capRes = await query(
+      `SELECT COUNT(*)::int AS cnt FROM notification_jobs WHERE created_at >= $1`,
+      [last24]
+    )
+    const recentCount = capRes.rows?.[0]?.cnt || 0
+    if (recentCount >= flags.notifDailyCap) {
+      return NextResponse.json({ error: `Daily notifications cap reached (${flags.notifDailyCap}). Try again later.` }, { status: 429 })
     }
 
     const jobId = await notificationJobQueue.addJob({

@@ -36,6 +36,7 @@ type AdminStatus = {
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth()
   const [data, setData] = useState<AdminStatus | null>(null)
+  const [flags, setFlags] = useState<{ enableNotifications: boolean; enableScraping: boolean; notifDailyCap: number; scrapingUserHourlyCap: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,6 +53,8 @@ export default function AdminPage() {
         if (!res.ok) throw new Error('Failed to fetch admin status')
         const json = await res.json()
         setData(json)
+        const fres = await fetch('/api/admin/flags', { cache: 'no-store' })
+        if (fres.ok) setFlags(await fres.json())
       } catch (e: any) {
         setError(e.message)
       } finally {
@@ -71,6 +74,11 @@ export default function AdminPage() {
     )
   }
 
+  if (!user) {
+    if (typeof window !== 'undefined') window.location.href = '/signin'
+    return null
+  }
+
   if (error || !data) {
     return (
       <div className="p-6">
@@ -84,6 +92,54 @@ export default function AdminPage() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Feature Flags */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl p-6 border glass">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold">Feature Flags & Budget</h2>
+        </div>
+        {flags && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-lg p-4 bg-white/60 border space-y-2">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={flags.enableNotifications} onChange={async (e) => {
+                  const updated = { ...flags, enableNotifications: e.target.checked }
+                  setFlags(updated)
+                  await fetch('/api/admin/flags', { method: 'POST', body: JSON.stringify({ enableNotifications: e.target.checked }) })
+                }} />
+                Enable Notifications
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={flags.enableScraping} onChange={async (e) => {
+                  const updated = { ...flags, enableScraping: e.target.checked }
+                  setFlags(updated)
+                  await fetch('/api/admin/flags', { method: 'POST', body: JSON.stringify({ enableScraping: e.target.checked }) })
+                }} />
+                Enable Scraping
+              </label>
+            </div>
+            <div className="rounded-lg p-4 bg-white/60 border space-y-2">
+              <label className="flex items-center gap-2 text-sm">
+                Daily Notif Cap
+                <input type="number" className="border rounded px-2 py-1 w-24" value={flags.notifDailyCap} onChange={async (e) => {
+                  const v = parseInt(e.target.value || '0', 10)
+                  const updated = { ...flags, notifDailyCap: v }
+                  setFlags(updated)
+                  await fetch('/api/admin/flags', { method: 'POST', body: JSON.stringify({ notifDailyCap: v }) })
+                }} />
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                Scrape/User Hourly Cap
+                <input type="number" className="border rounded px-2 py-1 w-24" value={flags.scrapingUserHourlyCap} onChange={async (e) => {
+                  const v = parseInt(e.target.value || '0', 10)
+                  const updated = { ...flags, scrapingUserHourlyCap: v }
+                  setFlags(updated)
+                  await fetch('/api/admin/flags', { method: 'POST', body: JSON.stringify({ scrapingUserHourlyCap: v }) })
+                }} />
+              </label>
+            </div>
+          </div>
+        )}
+      </motion.div>
       {/* Header with holographic overlay */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
         className="relative overflow-hidden rounded-2xl p-6 gradient-empowerment holo-overlay text-white">
@@ -129,6 +185,10 @@ export default function AdminPage() {
           ))}
         </div>
         <div className="mt-3 text-sm text-gray-600">Last processed: {data.notifications.status.lastProcessedAt ? new Date(data.notifications.status.lastProcessedAt).toLocaleString() : '—'}</div>
+        {/* Recent failures */}
+        <div className="mt-4">
+          <RecentFailures />
+        </div>
         {/* Actions */}
         <div className="mt-4 flex gap-3">
           <button onClick={async () => { if (confirm('Are you sure you want to START the notification processor?')) await fetch('/api/notifications/processor', { method: 'POST', body: JSON.stringify({ action: 'start' }) }) }} className="bold-btn">Start</button>
@@ -161,12 +221,90 @@ export default function AdminPage() {
           ))}
         </div>
         <div className="mt-3 text-sm text-gray-600">Last loop: {data.scraping.lastLoopAt ? new Date(data.scraping.lastLoopAt).toLocaleString() : '—'}</div>
+        {/* Recent scraping failures */}
+        <div className="mt-4">
+          <ScrapeFailures />
+        </div>
         {/* Actions */}
         <div className="mt-4 flex gap-3">
           <button onClick={async () => { if (confirm('Start scraping scheduler?')) await fetch('/api/scraping/metrics', { method: 'POST', body: JSON.stringify({ action: 'start' }) }) }} className="bold-btn">Start</button>
           <button onClick={async () => { if (confirm('Stop scraping scheduler?')) await fetch('/api/scraping/metrics', { method: 'POST', body: JSON.stringify({ action: 'stop' }) }) }} className="bold-btn">Stop</button>
         </div>
       </motion.div>
+    </div>
+  )
+}
+
+function RecentFailures() {
+  const [rows, setRows] = useState<any[]>([])
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch('/api/notifications/jobs?status=failed&limit=10&offset=0', { cache: 'no-store' })
+      if (res.ok) {
+        const json = await res.json()
+        setRows(json.jobs || [])
+      }
+    }
+    load()
+  }, [])
+  if (!rows.length) return <div className="text-sm text-gray-500">No recent failures</div>
+  return (
+    <div className="overflow-x-auto rounded-lg border bg-white/60">
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="px-3 py-2 text-left">Job</th>
+            <th className="px-3 py-2 text-left">Error</th>
+            <th className="px-3 py-2 text-left">Processed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id} className="border-t">
+              <td className="px-3 py-2">{r.id}</td>
+              <td className="px-3 py-2 text-red-700">{r.error || '—'}</td>
+              <td className="px-3 py-2">{r.processedAt ? new Date(r.processedAt).toLocaleString() : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function ScrapeFailures() {
+  const [rows, setRows] = useState<any[]>([])
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch('/api/scraping/failures?limit=10', { cache: 'no-store' })
+      if (res.ok) {
+        const json = await res.json()
+        setRows(json.items || [])
+      }
+    }
+    load()
+  }, [])
+  if (!rows.length) return <div className="text-sm text-gray-500">No recent failures</div>
+  return (
+    <div className="overflow-x-auto rounded-lg border bg-white/60">
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="px-3 py-2 text-left">Job</th>
+            <th className="px-3 py-2 text-left">Error</th>
+            <th className="px-3 py-2 text-left">Completed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.jobId} className="border-t">
+              <td className="px-3 py-2">{r.jobId}</td>
+              <td className="px-3 py-2 text-red-700">{r.error || '—'}</td>
+              <td className="px-3 py-2">{r.completedAt ? new Date(r.completedAt).toLocaleString() : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
