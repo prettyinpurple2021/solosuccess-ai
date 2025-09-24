@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { ReactNode, ButtonHTMLAttributes, forwardRef } from 'react';
-import { SparkleAnimation, GlassShine } from './sparkle-animation';
 import { cn } from '@/lib/utils';
 
 interface HolographicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,18 +14,11 @@ interface HolographicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   className?: string;
 }
 
-const buttonVariants = {
-  primary: 'bg-gradient-hero text-white border-0',
-  secondary: 'bg-gradient-card text-white border-0',
-  accent: 'bg-gradient-SoloSuccess text-white border-0',
-  ghost: 'bg-transparent text-SoloSuccess-purple border border-SoloSuccess-purple/20 hover:border-SoloSuccess-purple/40'
-};
-
 const sizeVariants = {
-  sm: 'px-4 py-2 text-sm rounded-lg',
-  md: 'px-6 py-3 text-base rounded-xl',
-  lg: 'px-8 py-4 text-lg rounded-2xl',
-  xl: 'px-12 py-6 text-xl rounded-3xl'
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-base',
+  lg: 'px-8 py-4 text-lg',
+  xl: 'px-12 py-6 text-xl',
 };
 
 export const HolographicButton = forwardRef<HTMLButtonElement, HolographicButtonProps>(
@@ -41,65 +33,59 @@ export const HolographicButton = forwardRef<HTMLButtonElement, HolographicButton
     disabled,
     ...props 
   }, ref) => {
-    const buttonContent = (
+    return (
       <motion.button
         ref={ref}
         disabled={disabled}
         className={cn(
-          'relative font-bold transition-all duration-300 ease-out',
+          'relative font-bold transition-all duration-300 ease-out rounded-2xl',
           'focus:outline-none focus:ring-4 focus:ring-SoloSuccess-purple/30',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          buttonVariants[variant],
+          'text-white shadow-2xl border border-white/20',
+          'backdrop-blur-sm overflow-hidden',
           sizeVariants[size],
-          glow && 'shadow-lg hover:shadow-2xl',
+          glow && 'hover:shadow-[0_0_40px_rgba(182,33,255,0.6)]',
           className
         )}
+        style={{
+          background: 'linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%)',
+          backgroundSize: '200% 200%',
+          animation: 'holographic-shift 6s ease-in-out infinite',
+        }}
         whileHover={!disabled ? { 
           scale: 1.05, 
           y: -2,
-          boxShadow: "0 10px 40px rgba(182, 33, 255, 0.4), 0 0 60px rgba(24, 255, 255, 0.3)"
+          boxShadow: "0 20px 40px rgba(182, 33, 255, 0.4), 0 0 60px rgba(24, 255, 255, 0.3)"
         } : {}}
         whileTap={!disabled ? { scale: 0.98 } : {}}
-        animate={glow ? {
-          boxShadow: [
-            "0 4px 15px rgba(182, 33, 255, 0.3)",
-            "0 8px 30px rgba(24, 255, 255, 0.4)",
-            "0 4px 15px rgba(255, 31, 175, 0.3)"
-          ]
-        } : {}}
-        transition={{
-          boxShadow: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-          scale: { type: "spring", stiffness: 400, damping: 17 }
-        }}
         {...props}
       >
+        {/* Glass shine effect - REAL glass reflection */}
         {shine && (
-          <GlassShine 
-            direction="horizontal" 
-            speed={2.5}
-            className="absolute inset-0 rounded-inherit"
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-100"
+            initial={{ x: '-100%' }}
+            whileHover={{ x: '100%' }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
           />
         )}
         
+        {/* Holographic border glow */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-SoloSuccess-purple via-SoloSuccess-cyan to-SoloSuccess-pink opacity-0 hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm" />
+        
+        {/* Content */}
         <span className="relative z-10 flex items-center justify-center gap-2">
           {children}
         </span>
-
+        
+        {/* Sparkle overlay - DENSE glitter like the reference */}
         {sparkles && (
-          <SparkleAnimation 
-            intensity="medium" 
-            size="small" 
-            color="rainbow"
-            className="absolute inset-0"
-          />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="holo-glitter" />
+          </div>
         )}
-
-        {/* Holographic border effect */}
-        <div className="absolute inset-0 rounded-inherit bg-gradient-to-r from-SoloSuccess-purple via-SoloSuccess-cyan to-SoloSuccess-pink opacity-0 hover:opacity-100 transition-opacity duration-300 blur-sm -z-10" />
       </motion.button>
     );
-
-    return buttonContent;
   }
 );
 
@@ -126,8 +112,8 @@ export function HolographicCard({
     <motion.div
       className={cn(
         'relative holo-overlay p-6',
-        glow && 'glow-pulse',
-        interactive && 'hover-lift cursor-pointer',
+        glow && 'hover:shadow-[0_0_40px_rgba(182,33,255,0.3)]',
+        interactive && 'hover:scale-105 cursor-pointer',
         className
       )}
       whileHover={interactive ? { 
@@ -138,10 +124,11 @@ export function HolographicCard({
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       {shine && (
-        <GlassShine 
-          direction="diagonal" 
-          speed={3}
-          className="absolute inset-0 rounded-2xl"
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100"
+          initial={{ x: '-100%' }}
+          whileHover={{ x: '100%' }}
+          transition={{ duration: 1.5, ease: 'easeInOut' }}
         />
       )}
       
@@ -149,13 +136,11 @@ export function HolographicCard({
         {children}
       </div>
 
+      {/* Sparkle overlay - DENSE glitter like the reference */}
       {sparkles && (
-        <SparkleAnimation 
-          intensity="low" 
-          size="small" 
-          color="rainbow"
-          className="absolute inset-0"
-        />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="holo-glitter" />
+        </div>
       )}
 
       {/* Holographic edge glow */}
@@ -206,19 +191,11 @@ export function HolographicInput({
         />
 
         {shine && (
-          <GlassShine 
-            direction="horizontal" 
-            speed={2}
-            className="absolute inset-0 rounded-xl opacity-0 focus-within:opacity-100 transition-opacity duration-300"
-          />
-        )}
-
-        {sparkles && (
-          <SparkleAnimation 
-            intensity="low" 
-            size="small" 
-            color="purple"
-            className="absolute inset-0 opacity-0 focus-within:opacity-100 transition-opacity duration-300"
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 focus-within:opacity-100"
+            initial={{ x: '-100%' }}
+            whileFocus={{ x: '100%' }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
           />
         )}
 
@@ -253,7 +230,7 @@ export function GradientText({
   return (
     <motion.span
       className={cn(
-        'gradient-text',
+        'gradient-text font-bold',
         animate && 'animate-holographic-shift',
         className
       )}

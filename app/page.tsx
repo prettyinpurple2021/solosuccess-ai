@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { HolographicButton, HolographicCard, GradientText } from '@/components/ui/holographic-button';
-import { SparkleAnimation } from '@/components/ui/sparkle-animation';
+import { SparkleAnimation, HolographicGlitter } from '@/components/ui/sparkle-animation';
 import { 
   Zap, 
   Star, 
@@ -59,11 +59,11 @@ export default function HomePage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
             >
-              <SparkleAnimation intensity="high" size="large" color="rainbow">
+              <HolographicGlitter density="heavy">
                 <GradientText className="text-4xl md:text-6xl lg:text-7xl">
                   Your AI Co-founder Awaits
                 </GradientText>
-              </SparkleAnimation>
+              </HolographicGlitter>
             </motion.h1>
 
             <motion.p
@@ -151,9 +151,9 @@ export default function HomePage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <SparkleAnimation intensity="medium" size="medium" color="rainbow">
+              <HolographicGlitter density="medium">
                 <GradientText className="text-4xl md:text-5xl">Powerful Features</GradientText>
-              </SparkleAnimation>
+              </HolographicGlitter>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Everything you need to build, grow, and scale your solo business with AI-powered precision.
@@ -206,9 +206,9 @@ export default function HomePage() {
                   transition={{ type: "spring", stiffness: 300 }}
                   className="mb-4 flex justify-center text-SoloSuccess-purple"
                 >
-                  <SparkleAnimation intensity="medium" size="medium" color="rainbow">
+                  <HolographicGlitter density="medium">
                     {feature.icon}
-                  </SparkleAnimation>
+                  </HolographicGlitter>
                 </motion.div>
 
                 <h3 className="text-xl font-bold mb-2">
