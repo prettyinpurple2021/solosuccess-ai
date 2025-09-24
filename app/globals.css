@@ -253,62 +253,25 @@
     background: var(--shimmer-dark);
   }
 
-  /* REAL Holographic Glass Morphism - Like the Reference Image */
+  /* Holographic Overlay Effect (exactly as requested) */
   .holo-overlay {
     position: relative;
-    background: rgba(255, 255, 255, 0.15);
-    -webkit-backdrop-filter: blur(25px) saturate(180%) brightness(110%);
-    backdrop-filter: blur(25px) saturate(180%) brightness(110%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 
-      0 20px 40px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-      0 0 0 1px rgba(182, 33, 255, 0.1);
-  }
-
-  .holo-overlay::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      linear-gradient(135deg, 
-        rgba(182, 33, 255, 0.2) 0%, 
-        rgba(24, 255, 255, 0.2) 25%, 
-        rgba(255, 31, 175, 0.2) 50%, 
-        rgba(24, 255, 255, 0.2) 75%, 
-        rgba(182, 33, 255, 0.2) 100%),
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(182, 33, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 40% 60%, rgba(24, 255, 255, 0.1) 0%, transparent 50%);
-    background-size: 400% 400%, 200px 200px, 150px 150px, 180px 180px;
-    animation: holographic-shift 8s ease-in-out infinite, rainbow-shift 12s ease-in-out infinite;
-    pointer-events: none;
     z-index: 1;
+    overflow: hidden;
   }
 
   .holo-overlay::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 70%),
-      radial-gradient(circle at 70% 70%, rgba(255, 31, 175, 0.15) 0%, transparent 70%);
+    inset: 0;
+    background:
+      linear-gradient(120deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(75deg, #B621FF 10%, #18FFFF 50%, #FF1FAF 90%);
+    mix-blend-mode: screen;
+    opacity: 0.8;
     pointer-events: none;
     z-index: 2;
-  }
-
-  .holo-overlay > * {
-    position: relative;
-    z-index: 3;
+    filter: blur(0.5px);
   }
 
   .holo-glitter {
@@ -319,20 +282,13 @@
   .holo-glitter::after {
     content: '';
     position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 300%;
-    height: 300%;
-    background: 
-      radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.9) 1px, transparent 1px),
-      radial-gradient(circle at 35% 35%, rgba(182, 33, 255, 0.7) 1px, transparent 1px),
-      radial-gradient(circle at 55% 15%, rgba(24, 255, 255, 0.8) 1px, transparent 1px),
-      radial-gradient(circle at 75% 35%, rgba(255, 31, 175, 0.7) 1px, transparent 1px),
-      radial-gradient(circle at 95% 55%, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
-      radial-gradient(circle at 15% 75%, rgba(182, 33, 255, 0.5) 1px, transparent 1px),
-      radial-gradient(circle at 35% 95%, rgba(24, 255, 255, 0.6) 1px, transparent 1px),
-      radial-gradient(circle at 55% 75%, rgba(255, 31, 175, 0.5) 1px, transparent 1px);
-    background-size: 40px 40px, 35px 35px, 45px 45px, 30px 30px, 50px 50px, 25px 25px, 40px 40px, 35px 35px;
+    inset: -50% -50% -50% -50%;
+    background:
+      radial-gradient(circle at 25% 25%, rgba(255,255,255,0.9) 1.5px, transparent 2px),
+      radial-gradient(circle at 60% 70%, rgba(182,33,255,0.8) 1px, transparent 2px),
+      radial-gradient(circle at 80% 30%, rgba(24,255,255,0.8) 1px, transparent 2px),
+      radial-gradient(circle at 15% 85%, rgba(255,31,175,0.8) 1px, transparent 2px);
+    background-size: 45px 45px, 35px 35px, 40px 40px, 38px 38px;
     animation: glitter-sparkle 4s linear infinite;
     pointer-events: none;
     z-index: 4;
@@ -385,13 +341,47 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #B621FF 0%, #18FFFF 25%, #FF1FAF 50%, #18FFFF 75%, #B621FF 100%);
+    background: linear-gradient(75deg, #B621FF 20%, #18FFFF 80%, #FF1FAF 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: holographic-shift 8s ease-in-out infinite;
     font-weight: 700;
+  }
+
+  /* Bold card with gradient border and glow */
+  .bold-card {
+    background: white;
+    border: 3px solid transparent;
+    border-image: linear-gradient(135deg,#B621FF,#18FFFF,#FF1FAF) 1;
+    box-shadow: 0 6px 40px 0 #B621FF44, 0 1.5px 8px 0 #18FFFF44;
+    border-radius: 20px;
+    position: relative;
+    padding: 2rem;
+  }
+
+  /* Bold holographic button */
+  .bold-btn {
+    background: linear-gradient(120deg, #B621FF 0%, #18FFFF 100%);
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+    padding: 1em 2em;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px 0 #FF1FAF55;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bold-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,.35), transparent);
+    mix-blend-mode: lighten;
+    pointer-events: none;
   }
 
   .bold-btn {

@@ -59,11 +59,11 @@ export default function HomePage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
             >
-              <HolographicGlitter density="heavy">
-                <GradientText className="text-4xl md:text-6xl lg:text-7xl">
-                  Your AI Co-founder Awaits
-                </GradientText>
-              </HolographicGlitter>
+              <span className="holo-overlay inline-block">
+                <span className="gradient-text text-4xl md:text-6xl lg:text-7xl tracking-wider font-extrabold">
+                  SoloSuccess AI
+                </span>
+              </span>
             </motion.h1>
 
             <motion.p
@@ -82,31 +82,12 @@ export default function HomePage() {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
             >
-              <HolographicButton
-                variant="primary"
-                size="xl"
-                sparkles={true}
-                shine={true}
-                glow={true}
-                className="text-lg px-8 py-4"
-              >
-                Start Your Free Trial
-                <ArrowRight className="w-5 h-5" />
+              <HolographicButton size="xl" className="bold-btn holo-overlay">
+                Get Started Now
               </HolographicButton>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-foreground hover:bg-white/20 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-full bg-gradient-hero flex items-center justify-center">
-                  <Play className="w-5 h-5 text-white ml-1" />
-                </div>
-                <div className="text-left">
-                  <div className="text-sm font-medium">Watch Demo</div>
-                  <div className="text-xs text-muted-foreground">2 minutes</div>
-                </div>
-              </motion.button>
+              <HolographicButton size="lg" className="bold-btn holo-overlay">
+                Explore Features
+              </HolographicButton>
             </motion.div>
 
             {/* Stats */}
@@ -121,19 +102,10 @@ export default function HomePage() {
                 { number: '99.9%', label: 'Uptime' },
                 { number: '50%', label: 'Faster Growth' }
               ].map((stat, index) => (
-                <HolographicCard
-                  key={index}
-                  sparkles={true}
-                  shine={true}
-                  glow={false}
-                  interactive={true}
-                  className="text-center p-6"
-                >
-                  <div className="text-3xl font-bold mb-2">
-                    <GradientText className="text-3xl">{stat.number}</GradientText>
-                  </div>
+                <div key={index} className="bold-card holo-overlay text-center">
+                  <div className="text-3xl font-extrabold mb-2 gradient-text">{stat.number}</div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </HolographicCard>
+                </div>
               ))}
             </motion.div>
           </motion.div>
