@@ -22,6 +22,10 @@ import {
   FileText
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 
 // Types
@@ -58,6 +62,7 @@ interface CollaborationStats {
 }
 
 const CollaborationDashboard: React.FC = () => {
+  const { toast } = useToast()
   const [sessions, setSessions] = useState<CollaborationSession[]>([])
   const [agents, setAgents] = useState<Agent[]>([])
   const [stats, setStats] = useState<CollaborationStats>({
@@ -71,52 +76,158 @@ const CollaborationDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('sessions')
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [error, setError] = useState<string | null>(null)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [newGoal, setNewGoal] = useState('')
+  const [selectedAgentIds, setSelectedAgentIds] = useState<string[]>([])
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<'pause' | 'resume' | 'complete'>('pause')
+  const [confirmSessionId, setConfirmSessionId] = useState<string | null>(null)
+
+  // Helpers
+  const computeStats = (sess: CollaborationSession[], ags: Agent[]) => {
+    const activeSessions = sess.filter(s => s.status === 'active').length
+    const availableAgents = ags.filter(a => a.status === 'available').length
+    const totalMessages = sess.reduce((sum, s) => sum + (s.messageCount || 0), 0)
+    setStats({
+      activeSessions,
+      totalSessions: sess.length,
+      availableAgents,
+      totalMessages,
+      avgSessionDuration: 45
+    })
+  }
 
   // Fetch collaboration data
   useEffect(() => {
+    let cancelled = false
     const fetchData = async () => {
-      setLoading(true)
+      setError(null)
       try {
-        // Fetch sessions
-        const sessionsResponse = await fetch('/api/collaboration/sessions')
+        const [sessionsResponse, agentsResponse] = await Promise.all([
+          fetch('/api/collaboration/sessions', { cache: 'no-store' }),
+          fetch('/api/collaboration/agents', { cache: 'no-store' })
+        ])
+
+        let nextSessions: CollaborationSession[] = []
         if (sessionsResponse.ok) {
           const sessionsData = await sessionsResponse.json()
-          setSessions(sessionsData.data?.sessions || [])
+          nextSessions = sessionsData.data?.sessions || []
         }
 
-        // Fetch agents
-        const agentsResponse = await fetch('/api/collaboration/agents')
+        let nextAgents: Agent[] = []
         if (agentsResponse.ok) {
           const agentsData = await agentsResponse.json()
-          setAgents(agentsData.data?.agents || [])
+          nextAgents = agentsData.data?.agents || []
         }
 
-        // Calculate stats
-        const activeSessions = sessions.filter(s => s.status === 'active').length
-        const availableAgents = agents.filter(a => a.status === 'available').length
-        const totalMessages = sessions.reduce((sum, s) => sum + (s.messageCount || 0), 0)
-
-        setStats({
-          activeSessions,
-          totalSessions: sessions.length,
-          availableAgents,
-          totalMessages,
-          avgSessionDuration: 45 // Mock average in minutes
-        })
-
-      } catch (error) {
-        logError('Error fetching collaboration data:', error)
-      } finally {
-        setLoading(false)
+        if (!cancelled) {
+          setSessions(nextSessions)
+          setAgents(nextAgents)
+          computeStats(nextSessions, nextAgents)
+          setLoading(false)
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setError('Failed to load collaboration data')
+          toast({ title: 'Load failed', description: 'Could not load collaboration data', variant: 'destructive' })
+          setLoading(false)
+        }
       }
     }
 
     fetchData()
-    // Set up polling for real-time updates
-    const interval = setInterval(fetchData, 30000) // Poll every 30 seconds
+    const interval = setInterval(fetchData, 30000)
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [])
 
-    return () => clearInterval(interval)
-  }, [sessions.length, agents.length])
+  // Actions
+  const handleJoinSession = async (sessionId: string) => {
+    try {
+      const res = await fetch(`/api/collaboration/sessions/${sessionId}/control`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'join', agentId: 'assistant' })
+      })
+      if (!res.ok) throw new Error('Failed to join session')
+      toast({ title: 'Joined session', description: 'You have joined the session.' })
+      // Refresh
+      const r = await fetch('/api/collaboration/sessions', { cache: 'no-store' })
+      if (r.ok) {
+        const j = await r.json()
+        setSessions(j.data?.sessions || [])
+      }
+    } catch (e) {
+      toast({ title: 'Join failed', description: 'Could not join session', variant: 'destructive' })
+    }
+  }
+
+  const handlePauseResume = async (sessionId: string, action: 'pause' | 'resume') => {
+    try {
+      const res = await fetch(`/api/collaboration/sessions/${sessionId}/control`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      if (!res.ok) throw new Error('Failed to update session')
+      toast({ title: `Session ${action}d`, description: `Session has been ${action}d.` })
+      // Refresh
+      const r = await fetch('/api/collaboration/sessions', { cache: 'no-store' })
+      if (r.ok) {
+        const j = await r.json()
+        setSessions(j.data?.sessions || [])
+      }
+    } catch (e) {
+      toast({ title: 'Update failed', description: 'Could not update session', variant: 'destructive' })
+    }
+  }
+
+  const handleCompleteSession = async (sessionId: string) => {
+    try {
+      const res = await fetch(`/api/collaboration/sessions/${sessionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed' })
+      })
+      if (!res.ok) throw new Error('Failed to complete session')
+      toast({ title: 'Session completed', description: 'Session marked as completed.' })
+      const r = await fetch('/api/collaboration/sessions', { cache: 'no-store' })
+      if (r.ok) {
+        const j = await r.json()
+        setSessions(j.data?.sessions || [])
+      }
+    } catch (e) {
+      toast({ title: 'Complete failed', description: 'Could not complete session', variant: 'destructive' })
+    }
+  }
+
+  const openConfirm = (sessionId: string, action: 'pause' | 'resume' | 'complete') => {
+    setConfirmSessionId(sessionId)
+    setConfirmAction(action)
+    setConfirmOpen(true)
+  }
+
+  const handleCreateSession = async () => {
+    try {
+      const res = await fetch('/api/collaboration/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal: newGoal || 'New Collaboration Session', requiredAgents: selectedAgentIds })
+      })
+      if (!res.ok) throw new Error('Failed to create session')
+      toast({ title: 'Session created', description: 'New session has been created.' })
+      const r = await fetch('/api/collaboration/sessions', { cache: 'no-store' })
+      if (r.ok) {
+        const j = await r.json()
+        setSessions(j.data?.sessions || [])
+      }
+      setShowCreateDialog(false)
+      setNewGoal('')
+      setSelectedAgentIds([])
+    } catch (e) {
+      toast({ title: 'Create failed', description: 'Could not create session', variant: 'destructive' })
+    }
+  }
 
   // Filter sessions based on search and status
   const filteredSessions = sessions.filter(session => {
@@ -148,8 +259,34 @@ const CollaborationDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-56 bg-gray-100 rounded shimmer mb-2" />
+            <div className="h-4 w-72 bg-gray-100 rounded shimmer" />
+          </div>
+          <div className="h-10 w-36 bg-gray-100 rounded shimmer" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i} className="p-4">
+              <div className="h-6 w-28 bg-gray-100 rounded shimmer mb-2" />
+              <div className="h-5 w-16 bg-gray-100 rounded shimmer" />
+            </Card>
+          ))}
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="skull-loading" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-800">{error}</div>
+        <Button onClick={() => { location.reload() }}>Retry</Button>
       </div>
     )
   }
@@ -164,7 +301,7 @@ const CollaborationDashboard: React.FC = () => {
             Manage and participate in multi-agent collaboration sessions
           </p>
         </div>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center gap-2" onClick={() => setShowCreateDialog(true)}>
           <Plus className="w-4 h-4" />
           New Session
         </Button>
@@ -314,18 +451,19 @@ const CollaborationDashboard: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2 pt-2">
-                    <Button size="sm" className="flex-1">
+                    <Button size="sm" className="flex-1" onClick={() => handleJoinSession(session.id)}>
                       Join Session
                     </Button>
                     {session.status === 'active' ? (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => openConfirm(session.id, 'pause')}>
                         <Pause className="w-4 h-4" />
                       </Button>
                     ) : (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => openConfirm(session.id, 'resume')}>
                         <Play className="w-4 h-4" />
                       </Button>
                     )}
+                    <Button size="sm" variant="outline" onClick={() => openConfirm(session.id, 'complete')}>Complete</Button>
                   </div>
                 </div>
               </Card>
@@ -342,7 +480,7 @@ const CollaborationDashboard: React.FC = () => {
                   : 'Create your first collaboration session to get started'
                 }
               </p>
-              <Button>
+              <Button onClick={() => setShowCreateDialog(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create Session
               </Button>
@@ -417,6 +555,68 @@ const CollaborationDashboard: React.FC = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Create Session Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Session</DialogTitle>
+            <DialogDescription>Define the goal and choose agents to participate.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="goal">Goal</Label>
+              <Input id="goal" value={newGoal} onChange={(e) => setNewGoal(e.target.value)} placeholder="e.g., Research competitor pricing" />
+            </div>
+            <div>
+              <Label>Agents</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 max-h-56 overflow-auto">
+                {agents.map((a) => (
+                  <label key={a.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedAgentIds.includes(a.id)}
+                      onChange={(e) => {
+                        setSelectedAgentIds((prev) => e.target.checked ? [...prev, a.id] : prev.filter((id) => id !== a.id))
+                      }}
+                    />
+                    <span>{a.name} <span className="text-muted-foreground">({a.specialization})</span></span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>Cancel</Button>
+            <Button onClick={handleCreateSession}>Create</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm Action Dialog */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm action</DialogTitle>
+            <DialogDescription>
+              {confirmAction === 'complete' ? 'Mark this session as completed?' : `Are you sure you want to ${confirmAction} this session?`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+            <Button onClick={() => {
+              const id = confirmSessionId
+              setConfirmOpen(false)
+              if (!id) return
+              if (confirmAction === 'complete') {
+                handleCompleteSession(id)
+              } else {
+                handlePauseResume(id, confirmAction)
+              }
+            }}>Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
