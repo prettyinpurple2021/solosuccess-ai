@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json({ status, canShow })
   } catch (error) {
-    logError('Survey status check error:', error)
+    logError('Survey status check error:', { error })
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, action: 'submitted' })
     }
   } catch (error) {
-    logError('Survey submission error:', error)
+    logError('Survey submission error:', { error })
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

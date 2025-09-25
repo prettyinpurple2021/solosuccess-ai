@@ -467,6 +467,8 @@ const SessionManager: React.FC = () => {
                           <button
                             onClick={() => toggleAgent(agentId)}
                             className="ml-1 hover:text-destructive"
+                            title="Remove agent"
+                            aria-label="Remove agent"
                           >
                             <X className="w-3 h-3" />
                           </button>
