@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const { searchParams } = new URL(request.url)
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const BodySchema = z.object({
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     })
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+      return createErrorResponse('Invalid payload', details: parsed.error.flatten(), 400)
     }
     const { title, description, priority, due_date, category } = parsed.data
 

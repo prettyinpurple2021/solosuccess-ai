@@ -5,16 +5,9 @@ import { NextRequest, NextResponse } from "next/server"
 import type { AuthenticatedUser, AuthResult } from "./auth-utils"
 import { headers } from "next/headers"
 import jwt from 'jsonwebtoken'
-import { neon } from '@neondatabase/serverless'
-
-
-function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
-}
+import { getDb } from './database-client'
+import { users } from '@/db/schema'
+import { eq } from 'drizzle-orm'
 
 async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   try {
@@ -49,19 +42,29 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
       return null
     }
 
-    // Get user from database
-    const sql = getSql()
-    const users = await sql`
-      SELECT id, email, full_name, username, date_of_birth, created_at, updated_at
-      FROM users 
-      WHERE id = ${decoded.userId}
-    `
+    // Get user from database using Drizzle ORM
+    const db = getDb()
+    const userResults = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        full_name: users.full_name,
+        username: users.username,
+        date_of_birth: users.date_of_birth,
+        created_at: users.created_at,
+        updated_at: users.updated_at,
+        subscription_tier: users.subscription_tier,
+        subscription_status: users.subscription_status
+      })
+      .from(users)
+      .where(eq(users.id, decoded.userId))
+      .limit(1)
 
-    if (users.length === 0) {
+    if (userResults.length === 0) {
       return null
     }
 
-    const user = users[0]
+    const user = userResults[0]
 
     // Map database user to our AuthenticatedUser shape
     return {

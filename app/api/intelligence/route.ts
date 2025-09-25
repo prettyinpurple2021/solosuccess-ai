@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     // Parse query parameters
@@ -266,13 +266,13 @@ export async function POST(request: NextRequest) {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('intelligence:create', ip, 60_000, 20)
     if (!allowed) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+      return createErrorResponse('Too many requests', 429)
     }
 
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const body = await request.json()

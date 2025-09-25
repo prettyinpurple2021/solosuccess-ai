@@ -28,10 +28,23 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-SoloSuccess-purple/5 via-SoloSuccess-cyan/5 to-SoloSuccess-pink/5 relative overflow-hidden">
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Epic Dark Holographic Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-purple-900/20 to-black">
+        <div className="absolute inset-0 bg-gradient-to-r from-SoloSuccess-purple/10 via-transparent to-SoloSuccess-cyan/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-SoloSuccess-pink/5 to-transparent" />
+      </div>
+      
       {/* Background Glitter Effect */}
       <div className="fixed inset-0 pointer-events-none">
-        <GlitterEffect className="w-full h-full opacity-30" />
+        <GlitterEffect className="w-full h-full opacity-50" />
+      </div>
+      
+      {/* Floating holographic orbs */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-SoloSuccess-purple/20 to-SoloSuccess-pink/20 rounded-full blur-3xl animate-pulse-soft" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-SoloSuccess-cyan/20 to-SoloSuccess-purple/20 rounded-full blur-3xl animate-pulse-soft animation-delay-1s" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-gradient-to-r from-SoloSuccess-pink/15 to-SoloSuccess-cyan/15 rounded-full blur-3xl animate-pulse-soft animation-delay-2s" />
       </div>
 
       {/* Holographic Navigation */}
@@ -64,18 +77,20 @@ export default function HomePage() {
                 ))}
               </nav>
               
-              <HolographicButton
-                variant="primary"
-                size="md"
-                sparkles={true}
-                shine={true}
-                glow={true}
-                className="relative"
-              >
-                <Sparkle className="w-4 h-4" />
-                Get Started
-                <ArrowRight className="w-4 h-4" />
-              </HolographicButton>
+              <Link href="/signup">
+                <HolographicButton
+                  variant="primary"
+                  size="md"
+                  sparkles={true}
+                  shine={true}
+                  glow={true}
+                  className="relative"
+                >
+                  <Sparkle className="w-4 h-4" />
+                  Get Started
+                  <ArrowRight className="w-4 h-4" />
+                </HolographicButton>
+              </Link>
             </div>
           </div>
         </div>
@@ -83,12 +98,6 @@ export default function HomePage() {
 
       {/* Epic Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-SoloSuccess-purple/10 rounded-full blur-3xl animate-pulse-soft" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-SoloSuccess-cyan/10 rounded-full blur-3xl animate-pulse-soft animation-delay-1s" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-SoloSuccess-pink/5 rounded-full blur-3xl animate-pulse-soft animation-delay-2s" />
-        </div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
@@ -133,7 +142,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-12 max-w-4xl mx-auto"
+              className="text-xl md:text-2xl text-white/90 leading-relaxed mb-12 max-w-4xl mx-auto"
             >
               Transform your solo business into a powerhouse with AI agents that work 24/7. 
               <span className="gradient-text font-semibold"> Automate everything, achieve more,</span> 
@@ -147,29 +156,33 @@ export default function HomePage() {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
             >
-              <HolographicButton 
-                size="xl" 
-                variant="primary"
-                sparkles={true}
-                shine={true}
-                glow={true}
-                className="text-lg px-12 py-6 font-boss"
-              >
-                <Rocket className="w-6 h-6" />
-                Start Your Empire
-                <Crown className="w-6 h-6" />
-              </HolographicButton>
+              <Link href="/signup">
+                <HolographicButton 
+                  size="xl" 
+                  variant="primary"
+                  sparkles={true}
+                  shine={true}
+                  glow={true}
+                  className="text-lg px-12 py-6 font-boss"
+                >
+                  <Rocket className="w-6 h-6" />
+                  Start Your Empire
+                  <Crown className="w-6 h-6" />
+                </HolographicButton>
+              </Link>
               
-              <HolographicButton 
-                size="lg" 
-                variant="ghost"
-                sparkles={true}
-                shine={true}
-                className="text-lg px-10 py-4"
-              >
-                <Play className="w-5 h-5" />
-                Watch Demo
-              </HolographicButton>
+              <Link href="/auth-example">
+                <HolographicButton 
+                  size="lg" 
+                  variant="ghost"
+                  sparkles={true}
+                  shine={true}
+                  className="text-lg px-10 py-4"
+                >
+                  <Play className="w-5 h-5" />
+                  Watch Demo
+                </HolographicButton>
+              </Link>
             </motion.div>
 
             {/* Stats Grid */}
@@ -210,7 +223,7 @@ export default function HomePage() {
                     </HolographicGlitter>
                   </div>
                   <div className="text-4xl font-boss mb-2 gradient-text">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
+                  <div className="text-sm text-white/80 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -239,7 +252,7 @@ export default function HomePage() {
               </HolographicGlitter>
             </h2>
             
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
               Our AI-powered platform gives you everything you need to dominate your market and achieve 
               <span className="gradient-text font-semibold"> unprecedented growth</span>
             </p>
@@ -313,7 +326,7 @@ export default function HomePage() {
                     <GradientText className="text-2xl">{feature.title}</GradientText>
                   </h3>
                   
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-white/80 leading-relaxed">
                     {feature.description}
                   </p>
 
@@ -364,47 +377,49 @@ export default function HomePage() {
                   </HolographicGlitter>
                 </h2>
                 
-                <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
                   Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of 
                   <span className="gradient-text font-semibold"> unstoppable productivity</span>.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-                  <HolographicButton
-                    variant="primary"
-                    size="xl"
-                    sparkles={true}
-                    shine={true}
-                    glow={true}
-                    className="text-xl px-16 py-8 font-boss"
-                  >
-                    <Infinity className="w-8 h-8" />
-                    Start for Free
-                    <Rocket className="w-8 h-8" />
-                  </HolographicButton>
+                  <Link href="/signup">
+                    <HolographicButton
+                      variant="primary"
+                      size="xl"
+                      sparkles={true}
+                      shine={true}
+                      glow={true}
+                      className="text-xl px-16 py-8 font-boss"
+                    >
+                      <Infinity className="w-8 h-8" />
+                      Start for Free
+                      <Rocket className="w-8 h-8" />
+                    </HolographicButton>
+                  </Link>
                   
                   <motion.div
                     whileHover={{ scale: 1.05 }}
-                    className="flex items-center gap-3 text-lg text-muted-foreground"
+                    className="flex items-center gap-3 text-lg text-white/80"
                   >
-                    <CheckCircle className="w-6 h-6 text-green-500" />
+                    <CheckCircle className="w-6 h-6 text-green-400" />
                     No credit card required
                     <Sparkle className="w-5 h-5 text-SoloSuccess-purple" />
                   </motion.div>
                 </div>
 
                 {/* Trust indicators */}
-                <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-muted-foreground">
+                <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-white/70">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4" />
+                    <Shield className="w-4 h-4 text-green-400" />
                     <span>Enterprise Security</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4" />
+                    <Trophy className="w-4 h-4 text-yellow-400" />
                     <span>99.9% Uptime</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
+                    <Users className="w-4 h-4 text-blue-400" />
                     <span>50K+ Users</span>
                   </div>
                 </div>
@@ -431,7 +446,7 @@ export default function HomePage() {
                   SoloSuccess
                 </div>
               </motion.div>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-white/80 leading-relaxed">
                 Empowering entrepreneurs with AI-powered productivity tools that transform solo businesses into unstoppable empires.
               </p>
             </div>
@@ -444,7 +459,7 @@ export default function HomePage() {
                   <li key={item}>
                     <Link 
                       href={`#${item.toLowerCase()}`}
-                      className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                      className="text-white/70 hover:gradient-text transition-all duration-300"
                     >
                       {item}
                     </Link>
@@ -461,7 +476,7 @@ export default function HomePage() {
                   <li key={item}>
                     <Link 
                       href={`/${item.toLowerCase()}`}
-                      className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                      className="text-white/70 hover:gradient-text transition-all duration-300"
                     >
                       {item}
                     </Link>
@@ -478,7 +493,7 @@ export default function HomePage() {
                   <li key={item}>
                     <Link 
                       href={`/${item.toLowerCase().replace(' ', '-')}`}
-                      className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                      className="text-white/70 hover:gradient-text transition-all duration-300"
                     >
                       {item}
                     </Link>
@@ -491,7 +506,7 @@ export default function HomePage() {
           {/* Bottom Bar */}
           <div className="border-t border-SoloSuccess-purple/20 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-muted-foreground text-sm">
+              <p className="text-white/60 text-sm">
                 © 2024 SoloSuccess AI. All rights reserved. Made with ✨ and holographic magic.
               </p>
               <div className="flex items-center gap-6 text-sm">
@@ -499,7 +514,7 @@ export default function HomePage() {
                   <Link 
                     key={item}
                     href={`/${item.toLowerCase()}`}
-                    className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                    className="text-white/60 hover:gradient-text transition-all duration-300"
                   >
                     {item}
                   </Link>

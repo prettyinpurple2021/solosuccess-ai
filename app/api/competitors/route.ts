@@ -1,31 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
-import { neon } from '@neondatabase/serverless'
+import { getDb } from '@/lib/database-client'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
-}
+
 
 export async function GET(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitors:list', ip, 60_000, 30)
     if (!allowed) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+      return createErrorResponse('Too many requests', 429)
     }
 
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const url = new URL(request.url)
@@ -36,7 +30,7 @@ export async function GET(request: NextRequest) {
     const status = url.searchParams.get('status')
     const search = url.searchParams.get('search')
     
-    const sql = getSql()
+    const db = getDb()
     const offset = (page - 1) * limit
 
     // Build dynamic query based on filters

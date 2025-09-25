@@ -1,21 +1,16 @@
-import { NextRequest, NextResponse} from 'next/server'
+import { NextRequest, NextResponse} from 'next/server
+import { getDb } from '@/lib/database-client''
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
-}
+
 
 export async function GET(request: NextRequest) {
   try {
-    const sql = getSql()
+    const db = getDb()
     const authHeader = request.headers.get('authorization')
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

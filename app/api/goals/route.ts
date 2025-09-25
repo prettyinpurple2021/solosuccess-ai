@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const { searchParams } = new URL(request.url)
@@ -86,12 +86,12 @@ export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('goals:create', ip, 60_000, 60)
-    if (!allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    if (!allowed) return createErrorResponse('Too many requests', 429)
 
     const { user, error } = await authenticateRequest()
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const BodySchema = z.object({
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     })
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+      return createErrorResponse('Invalid payload', details: parsed.error.flatten(), 400)
     }
     const { title, description, target_date, category, priority } = parsed.data as any
 
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     if (key) {
       const reserved = await reserveIdempotencyKey(client, key)
       if (!reserved) {
-        return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
+        return createErrorResponse('Duplicate request', 409)
       }
     }
     const { rows } = await client.query(

@@ -1,23 +1,14 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
+import { NextRequest, NextResponse} from 'next/server
+import { getDb } from '@/lib/database-client''
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
 
 
-function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
-}
+
 
 // JWT authentication helper
-async function authenticateJWTRequest(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return { user: null, error: 'No authorization header' }
+
     }
 
     const token = authHeader.substring(7)
@@ -50,11 +41,11 @@ export async function GET(request: NextRequest) {
     const { user, error } = await authenticateJWTRequest(request)
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     // Ensure user exists in database
-    const sql = getSql()
+    const db = getDb()
     let userData = await sql`
       SELECT id FROM users WHERE id = ${user.id}
     `
@@ -229,17 +220,17 @@ export async function POST(request: NextRequest) {
     const { user, error } = await authenticateJWTRequest(request)
     
     if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return createErrorResponse('Unauthorized', 401)
     }
 
     const body = await request.json()
     const { title, description, status = 'active', metadata = {} } = body
 
     if (!title) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+      return createErrorResponse('Title is required', 400)
     }
 
-    const sql = getSql()
+    const db = getDb()
 
     // Create new briefcase
     const newBriefcase = await sql`

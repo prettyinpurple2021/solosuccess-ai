@@ -5,11 +5,12 @@ const nextConfig = {
   
   // Production builds should catch errors
   eslint: {
-    // Ignore ESLint during builds to prevent deploy blocks; lint runs in CI
-    ignoreDuringBuilds: true,
+    // Enable ESLint during builds for production readiness
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Enable TypeScript checking for production readiness
+    ignoreBuildErrors: false,
   },
   // Optimized for AWS Amplify deployment
   output: 'standalone', // Required for AWS Amplify
