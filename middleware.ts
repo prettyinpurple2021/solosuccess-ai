@@ -1,27 +1,6 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  if (pathname.startsWith('/admin')) {
-    const hasToken = request.cookies.get('auth_token')?.value
-    if (!hasToken) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/signin'
-      url.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(url)
-    }
-  }
-  return NextResponse.next()
-}
-
-export const config = {
-  matcher: ['/admin/:path*']
-}
-
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public routes that don't require authentication
@@ -56,6 +35,17 @@ export async function middleware(request: NextRequest) {
   // If it's a public route, allow access
   if (isPublicRoute) {
     return NextResponse.next()
+  }
+
+  // Special handling for admin routes - require authentication
+  if (pathname.startsWith('/admin')) {
+    const hasToken = request.cookies.get('auth_token')?.value
+    if (!hasToken) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/signin'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
   }
 
   // For API routes, let them handle their own authentication
