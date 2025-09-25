@@ -1,5 +1,5 @@
 
-// Generic file storage interface - can be implemented with various providers
+// File storage system using Neon database - stores files as BLOB data in PostgreSQL
 export interface FileUploadResult {
   url: string
   pathname: string
@@ -16,6 +16,127 @@ export interface FileStorageProvider {
     size: number
     uploadedAt: Date
   }>>
+}
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
+
+// Neon database storage implementation
+class NeonFileStorage implements FileStorageProvider {
+  private async ensureTablesExist() {
+    const sql = getSql()
+    
+    // Create file storage table if it doesn't exist
+    await sql`
+      CREATE TABLE IF NOT EXISTS file_storage (
+        id SERIAL PRIMARY KEY,
+        pathname VARCHAR(255) UNIQUE NOT NULL,
+        filename VARCHAR(255) NOT NULL,
+        content_type VARCHAR(100) NOT NULL,
+        file_size INTEGER NOT NULL,
+        file_data BYTEA NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
+    
+    // Create index for faster lookups
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_file_storage_pathname 
+      ON file_storage(pathname)
+    `
+  }
+
+  async upload(file: File, pathname: string): Promise<FileUploadResult> {
+    try {
+      await this.ensureTablesExist()
+      
+      const sql = getSql()
+      
+      // Convert file to buffer
+      const arrayBuffer = await file.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      
+      // Store file in database
+      await sql`
+        INSERT INTO file_storage (pathname, filename, content_type, file_size, file_data)
+        VALUES (${pathname}, ${file.name}, ${file.type}, ${file.size}, ${buffer})
+        ON CONFLICT (pathname) DO UPDATE SET
+          filename = EXCLUDED.filename,
+          content_type = EXCLUDED.content_type,
+          file_size = EXCLUDED.file_size,
+          file_data = EXCLUDED.file_data,
+          updated_at = NOW()
+      `
+      
+      // Return a data URL that points to our API endpoint
+      const url = `/api/files/${encodeURIComponent(pathname)}`
+      
+      logInfo(`File uploaded to Neon database: ${pathname}`)
+      
+      return {
+        url,
+        pathname,
+        contentType: file.type,
+        contentDisposition: `attachment; filename="${file.name}"`,
+      }
+    } catch (error) {
+      logError('Error uploading file to Neon:', { error })
+      throw error
+    }
+  }
+
+  async delete(pathname: string): Promise<void> {
+    try {
+      await this.ensureTablesExist()
+      
+      const sql = getSql()
+      
+      await sql`
+        DELETE FROM file_storage WHERE pathname = ${pathname}
+      `
+      
+      logInfo(`File deleted from Neon database: ${pathname}`)
+    } catch (error) {
+      logError('Error deleting file from Neon:', { error })
+      throw error
+    }
+  }
+
+  async list(prefix: string): Promise<Array<{
+    url: string
+    pathname: string
+    size: number
+    uploadedAt: Date
+  }>> {
+    try {
+      await this.ensureTablesExist()
+      
+      const sql = getSql()
+      
+      const files = await sql`
+        SELECT pathname, file_size, created_at
+        FROM file_storage
+        WHERE pathname LIKE ${prefix + '%'}
+        ORDER BY created_at DESC
+      `
+      
+      return files.map(file => ({
+        url: `/api/files/${encodeURIComponent(file.pathname)}`,
+        pathname: file.pathname,
+        size: file.file_size,
+        uploadedAt: file.created_at
+      }))
+    } catch (error) {
+      logError('Error listing files from Neon:', { error })
+      throw error
+    }
+  }
 }
 
 // Default implementation using local storage (for development)
@@ -55,8 +176,12 @@ class LocalFileStorage implements FileStorageProvider {
 
 // Initialize storage provider based on environment
 const getStorageProvider = (): FileStorageProvider => {
-  // You can implement different providers here based on your needs
-  // For example: AWS S3, Cloudinary, etc.
+  // Use Neon storage if DATABASE_URL is available, otherwise local storage
+  if (process.env.DATABASE_URL) {
+    return new NeonFileStorage()
+  }
+  
+  // Fallback to local storage for development
   return new LocalFileStorage()
 }
 
@@ -147,5 +272,3 @@ export const checkFileQuota = async (
     }
   }
 }
-
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'

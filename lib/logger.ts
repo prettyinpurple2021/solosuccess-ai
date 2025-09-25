@@ -82,7 +82,7 @@ class Logger {
     }
 
     // In production, you might want to send logs to an external service
-    // like Sentry, LogRocket, or a custom logging service
+    // like LogRocket, or a custom logging service
     if (!this.isDevelopment && level <= LogLevel.WARN) {
       this.sendToExternalService(entry)
     }
@@ -93,7 +93,6 @@ class Logger {
     // For now, we'll just ensure important logs are properly formatted
     
     // Example integrations:
-    // - Sentry: Sentry.captureException(entry.error)
     // - LogRocket: LogRocket.captureException(entry.error)
     // - Custom API: fetch('/api/logs', { method: 'POST', body: JSON.stringify(entry) })
     

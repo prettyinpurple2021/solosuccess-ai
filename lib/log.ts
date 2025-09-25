@@ -4,7 +4,6 @@
  */
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import * as Sentry from '@sentry/nextjs';
 import { NextRequest } from 'next/server';
 
 
@@ -48,23 +47,10 @@ export function log({
   // Log to console
   logInfo(`JSON.stringify(logEntry)`);
   
-  // For errors, also log to Sentry if available
+  // For errors, you can add external error reporting here if needed
   if (level === 'error' && error instanceof Error) {
-    try {
-      Sentry.captureException(error, {
-        tags: {
-          ...(route && { route }),
-          ...(userId && { userId }),
-        },
-        extra: {
-          ...meta,
-          ...(status && { status }),
-        },
-      });
-    } catch (sentryError) {
-      // Fail silently if Sentry isn't configured
-      logError('Failed to log to Sentry:', sentryError);
-    }
+    // Add your preferred error reporting service here
+    // Example: LogRocket.captureException(error)
   }
 }
 

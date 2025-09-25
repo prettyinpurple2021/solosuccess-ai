@@ -237,7 +237,6 @@
   - [x] Test authentication flow in production
 - [x] **Fix deployment build failures** - COMPLETED (Migrated to Google Cloud Run)
   - [x] Fixed Edge runtime incompatibility with jsonwebtoken
-  - [x] Fixed Sentry configuration warnings
   - [x] Updated Next.js config to use serverExternalPackages instead of deprecated option
 
 ### Medium Priority
@@ -409,10 +408,8 @@
 
 8 Observability — see everything, fix anything
 
-- [x] Add Sentry (`@sentry/nextjs`) setup (client + server)
 - [x] Use structured logs in API routes with context (user_id, route, status)
 - [x] Keep `/api/health` as liveness; add `/api/health/deps` for dependency checks
-- [x] Create proper Next.js instrumentation files for Sentry
 
 9 Data fetching & cache — silky smooth UX
 
@@ -464,7 +461,7 @@
 - ✅ **Implemented critical API routes (tasks, goals, chat, templates, upload)**
 - ✅ **Fixed authentication system integration**
 - ✅ **Updated to-do list with current priorities**
-- ✅ **Added Sentry integration and structured logging**
+- ✅ **Added structured logging system**
 - ✅ **Implemented SWR for data fetching with caching**
 - ✅ **Added Edge runtime support for read-only API routes**
 - ✅ **Created Playwright smoke tests for core flows**

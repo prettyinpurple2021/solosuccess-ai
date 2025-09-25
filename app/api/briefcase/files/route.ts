@@ -2,7 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
-import { put } from '@/lib/aws-s3'
+import { uploadFile } from '@/lib/file-storage'
 
 
 // Force dynamic rendering
@@ -131,11 +131,8 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        // Upload file to AWS S3
-        const blob = await put(`briefcase/${user.id}/${fileId}-${file.name}`, file, {
-          contentType: file.type,
-          public: true
-        })
+        // Upload file
+        const blob = await uploadFile(file, `${fileId}-${file.name}`, user.id)
 
         // Insert document metadata into database (without file_data)
         const result = await sql`

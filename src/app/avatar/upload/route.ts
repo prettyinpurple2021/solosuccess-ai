@@ -1,4 +1,4 @@
-import { put } from '@/lib/aws-s3';
+import { uploadFile } from '@/lib/file-storage';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -13,15 +13,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Request body is required' }, { status: 400 });
   }
 
-  // Upload to AWS S3
-  const blob = await put(filename, request.body, {
-    public: true,
-  });
+  // Upload file
+  const file = new File([request.body], filename);
+  const blob = await uploadFile(file, filename, 'anonymous');
 
-  // Here's the code for Pages API Routes:
-  // const blob = await put(filename, request, {
-  //   access: 'public',
-  // });
 
   return NextResponse.json(blob);
 }

@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { query } from '@/lib/neon/client'
-import { put, del } from '@/lib/aws-s3'
+import { uploadFile, deleteFile } from '@/lib/file-storage'
 
 
 export interface UserBriefcase {
@@ -158,12 +158,9 @@ export class UnifiedBriefcaseManager {
     // Delete existing avatar
     await this.deleteItemsByType(userId, 'avatar')
 
-    // Upload to AWS S3
-    const fileName = `avatars/${userId}_${Date.now()}.${file.type.split('/')[1]}`
-    const blob = await put(fileName, file, {
-      contentType: file.type,
-      public: true
-    })
+    // Upload file
+    const fileName = `avatar_${Date.now()}.${file.type.split('/')[1]}`
+    const blob = await uploadFile(file, fileName, userId)
 
     // Save to briefcase
     const itemId = `avatar_${userId}_${Date.now()}`
@@ -496,7 +493,7 @@ export class UnifiedBriefcaseManager {
     for (const item of items.rows) {
       if (item.blob_url) {
         try {
-          await del(item.blob_url)
+          await deleteFile(item.blob_url)
         } catch (error) {
           logWarn('Failed to delete blob:', error)
         }
@@ -525,7 +522,7 @@ export class UnifiedBriefcaseManager {
     // Delete blob file if exists
     if (result.rows[0].blob_url) {
       try {
-        await del(result.rows[0].blob_url)
+        await deleteFile(result.rows[0].blob_url)
       } catch (error) {
         logWarn('Failed to delete blob:', error)
       }

@@ -20,7 +20,7 @@ const nextConfig = {
   },
   
   // External packages for server components
-  serverExternalPackages: ['@sentry/nextjs'],
+  serverExternalPackages: [],
 
   // Image optimization
   images: {

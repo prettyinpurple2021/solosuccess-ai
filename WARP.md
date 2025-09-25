@@ -251,7 +251,7 @@ STRIPE_SECRET_KEY=<stripe-secret>
 STRIPE_PUBLISHABLE_KEY=<stripe-public>
 
 # Monitoring
-SENTRY_DSN=<sentry-dsn>
+# Add your preferred error monitoring service here
 ```
 
 ### Environment Validation
@@ -274,7 +274,6 @@ const environmentSchema = z.object({
 - **Vercel**: Hosting and serverless functions
 - **Stripe**: Subscription billing and payments
 - **Resend**: Transactional email delivery
-- **Sentry**: Error monitoring and performance tracking
 
 ## Compliance & Security Features
 

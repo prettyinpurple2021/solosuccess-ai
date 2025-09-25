@@ -1,10 +1,10 @@
-# 🚀 SoloSuccess AI - AWS Amplify Production Deployment Guide
+# 🚀 SoloSuccess AI - Production Deployment Guide
 
 ## 📋 Pre-Deployment Checklist
 
 ### ✅ 1. Environment Variables Setup
 
-You need to set up these **CRITICAL** environment variables in your AWS Amplify environment:
+You need to set up these **CRITICAL** environment variables in your hosting environment:
 
 #### **Required Environment Variables:**
 
@@ -14,14 +14,11 @@ DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 JWT_SECRET=your_secure_jwt_secret_key_at_least_32_characters_long
 
 # App Configuration (CRITICAL)
-NEXT_PUBLIC_APP_URL=https://your-app.amplifyapp.com
+NEXT_PUBLIC_APP_URL=https://your-domain.com
 NODE_ENV=production
 
-# AWS Configuration (CRITICAL for file storage)
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your_aws_access_key_id
-AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-AWS_S3_BUCKET_NAME=your-s3-bucket-name
+# File Storage Configuration (Optional - uses local storage by default)
+# You can configure external storage providers if needed
 
 # AI Services (Required for AI features)
 OPENAI_API_KEY=sk-your_openai_api_key_here
@@ -49,49 +46,45 @@ FROM_EMAIL=noreply@yourdomain.com
 2. **Configure DNS** to point to your hosting provider
 3. **Enable SSL/HTTPS** (most hosting providers do this automatically)
 
-## 🎯 AWS Amplify Deployment (Recommended)
+## 🎯 Deployment Options
 
-### Step 1: AWS S3 Bucket Setup
-
-1. **Create S3 Bucket:**
-   - Go to AWS S3 Console
-   - Create a new bucket (e.g., `solosuccess-ai-files`)
-   - Enable public read access for uploaded files
-   - Configure CORS policy for web access
-
-2. **Create IAM User:**
-   - Go to AWS IAM Console
-   - Create a new user with programmatic access
-   - Attach policy for S3 bucket access
-   - Save Access Key ID and Secret Access Key
-
-### Step 2: AWS Amplify Setup
-
+### Option 1: Vercel (Recommended)
 1. **Connect Repository:**
-   - Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
-   - Click "New app" > "Host web app"
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "New Project"
    - Connect your GitHub repository
-   - Build settings will be auto-detected from `amplify.yml`
 
 2. **Environment Variables:**
-   - Go to App Settings > Environment Variables
    - Add all required environment variables listed above
-   - Make sure to include AWS credentials and S3 bucket name
+   - Vercel will automatically detect Next.js configuration
 
 3. **Deploy:**
-   - Click "Save and deploy"
-   - Amplify will build and deploy your app automatically
+   - Click "Deploy"
+   - Vercel will build and deploy your app automatically
+
+### Option 2: Netlify
+1. **Connect Repository:**
+   - Go to [Netlify Dashboard](https://app.netlify.com/)
+   - Click "New site from Git"
+   - Connect your GitHub repository
+
+2. **Build Settings:**
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+
+3. **Environment Variables:**
+   - Add all required environment variables in Site Settings
 
 ## 🔧 Production Configuration Updates
 
 I've updated your configuration for production:
 
 ### ✅ Next.js Configuration Updates:
-- ✅ Configured for AWS Amplify deployment with standalone output
+- ✅ Configured for production deployment with standalone output
 - ✅ Enabled image optimization for better performance
 - ✅ Security headers are already configured
 - ✅ Bundle optimization is enabled
-- ✅ Replaced Vercel blob storage with AWS S3
+- ✅ Uses generic blob storage (local storage by default)
 
 ## 🚀 Step-by-Step Deployment Process
 
@@ -111,26 +104,26 @@ I've updated your configuration for production:
 
 ### Step 2: Choose Your Deployment Platform
 
-#### 🎯 **AWS Amplify Deployment (Recommended)**
+#### 🎯 **Vercel Deployment (Recommended)**
 
 1. **Prerequisites:**
-   - AWS Account with appropriate permissions
+   - Vercel account (free tier available)
    - GitHub repository with your code
-   - S3 bucket for file storage
+   - Neon database for data storage
 
 2. **Deploy:**
-   - Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
-   - Click "New app" > "Host web app"
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "New Project"
    - Connect your GitHub repository
-   - Build settings will be auto-detected from `amplify.yml`
+   - Vercel will auto-detect Next.js configuration
 
 3. **Set Environment Variables:**
-   - Go to App Settings → Environment Variables
-   - Add all variables from `.env.amplify.example`
-   - Include AWS credentials and S3 bucket configuration
+   - Go to Project Settings → Environment Variables
+   - Add all required environment variables
+   - Include your Neon database URL and JWT secret
 
 4. **Custom Domain:**
-   - Add your domain in Amplify Console
+   - Add your domain in Vercel project settings
    - Update DNS records as instructed
 
 ### Step 3: Database Setup
@@ -231,7 +224,6 @@ npm run lint
 ### Recommended Tools:
 - **Vercel Analytics** (if using Vercel)
 - **Google Analytics** (for user tracking)
-- **Sentry** (for error monitoring)
 - **PostHog** (for product analytics)
 
 ## 🎉 Launch Checklist
