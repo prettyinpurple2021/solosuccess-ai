@@ -886,6 +886,15 @@
     background-color: var(--agent-color, #8B5CF6);
   }
 
+  /* Animation delay utilities */
+  .animation-delay-1s {
+    animation-delay: 1s;
+  }
+  
+  .animation-delay-2s {
+    animation-delay: 2s;
+  }
+
   /* Mobile-specific improvements */
   @media (max-width: 768px) {
     /* Ensure buttons are large enough for touch */

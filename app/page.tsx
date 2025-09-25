@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { HolographicButton, HolographicCard, GradientText } from '@/components/ui/holographic-button';
-import { SparkleAnimation, HolographicGlitter } from '@/components/ui/sparkle-animation';
+import { SparkleAnimation, HolographicGlitter, GlitterEffect } from '@/components/ui/sparkle-animation';
+import Link from 'next/link';
 import { 
   Zap, 
   Star, 
@@ -15,97 +16,202 @@ import {
   ArrowRight,
   Play,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Crown,
+  Gem,
+  Wand2,
+  Sparkle,
+  Lightbulb,
+  Trophy,
+  Infinity
 } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-SoloSuccess-purple/5 via-SoloSuccess-cyan/5 to-SoloSuccess-pink/5">
-      {/* Simple Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 holo-overlay backdrop-blur-md border-b border-SoloSuccess-purple/20">
+    <div className="min-h-screen bg-gradient-to-br from-SoloSuccess-purple/5 via-SoloSuccess-cyan/5 to-SoloSuccess-pink/5 relative overflow-hidden">
+      {/* Background Glitter Effect */}
+      <div className="fixed inset-0 pointer-events-none">
+        <GlitterEffect className="w-full h-full opacity-30" />
+      </div>
+
+      {/* Holographic Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 holo-overlay backdrop-blur-xl border-b border-SoloSuccess-purple/30">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="text-2xl font-bold gradient-text">
-              SoloSuccess
-            </div>
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between h-20">
+            <motion.div 
+              className="flex items-center gap-3"
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
+                <Crown className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-3xl font-boss gradient-text">
+                SoloSuccess
+              </div>
+            </motion.div>
+            
+            <div className="flex items-center gap-6">
+              <nav className="hidden md:flex items-center gap-8">
+                {['Features', 'Pricing', 'About', 'Contact'].map((item) => (
+                  <Link 
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="text-sm font-medium hover:gradient-text transition-all duration-300 relative group"
+                  >
+                    {item}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-SoloSuccess-purple to-SoloSuccess-pink group-hover:w-full transition-all duration-300" />
+                  </Link>
+                ))}
+              </nav>
+              
               <HolographicButton
                 variant="primary"
-                size="sm"
+                size="md"
                 sparkles={true}
                 shine={true}
                 glow={true}
+                className="relative"
               >
+                <Sparkle className="w-4 h-4" />
                 Get Started
-                <Star className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" />
               </HolographicButton>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-16 overflow-hidden">
-        <div className="container mx-auto px-4 text-center">
+      {/* Epic Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-SoloSuccess-purple/10 rounded-full blur-3xl animate-pulse-soft" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-SoloSuccess-cyan/10 rounded-full blur-3xl animate-pulse-soft animation-delay-1s" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-SoloSuccess-pink/5 rounded-full blur-3xl animate-pulse-soft animation-delay-2s" />
+        </div>
+
+        <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-4xl mx-auto"
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="max-w-6xl mx-auto"
           >
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full holo-overlay border border-SoloSuccess-purple/30 mb-8"
+            >
+              <Sparkles className="w-5 h-5 text-SoloSuccess-purple" />
+              <span className="text-sm font-medium gradient-text">AI-Powered Business Revolution</span>
+              <Gem className="w-5 h-5 text-SoloSuccess-pink" />
+            </motion.div>
+
+            {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="text-5xl md:text-7xl lg:text-8xl font-boss mb-8 leading-tight"
             >
-              <span className="holo-overlay inline-block">
-                <span className="gradient-text text-4xl md:text-6xl lg:text-7xl tracking-wider font-extrabold">
-                  SoloSuccess AI
+              <div className="relative">
+                <HolographicGlitter density="heavy" className="absolute inset-0" />
+                <span className="gradient-text relative z-10">
+                  Your AI Co-founder
                 </span>
-              </span>
+                <br />
+                <span className="text-4xl md:text-6xl lg:text-7xl gradient-text relative z-10">
+                  Awaits ✨
+                </span>
+              </div>
             </motion.h1>
 
+            {/* Subtitle */}
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8"
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-12 max-w-4xl mx-auto"
             >
-              Transform your solo business into a powerhouse with AI-powered tools, strategic insights, and holographic experiences that make you unstoppable.
+              Transform your solo business into a powerhouse with AI agents that work 24/7. 
+              <span className="gradient-text font-semibold"> Automate everything, achieve more,</span> 
+              and dominate your industry like never before.
             </motion.p>
 
             {/* CTA Buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
             >
-              <HolographicButton size="xl" className="bold-btn holo-overlay">
-                Get Started Now
+              <HolographicButton 
+                size="xl" 
+                variant="primary"
+                sparkles={true}
+                shine={true}
+                glow={true}
+                className="text-lg px-12 py-6 font-boss"
+              >
+                <Rocket className="w-6 h-6" />
+                Start Your Empire
+                <Crown className="w-6 h-6" />
               </HolographicButton>
-              <HolographicButton size="lg" className="bold-btn holo-overlay">
-                Explore Features
+              
+              <HolographicButton 
+                size="lg" 
+                variant="ghost"
+                sparkles={true}
+                shine={true}
+                className="text-lg px-10 py-4"
+              >
+                <Play className="w-5 h-5" />
+                Watch Demo
               </HolographicButton>
             </motion.div>
 
-            {/* Stats */}
+            {/* Stats Grid */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
+              transition={{ delay: 1, duration: 0.8 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto"
             >
               {[
-                { number: '10K+', label: 'Active Users' },
-                { number: '99.9%', label: 'Uptime' },
-                { number: '50%', label: 'Faster Growth' }
+                { 
+                  number: '300%', 
+                  label: 'Productivity Increase',
+                  icon: <TrendingUp className="w-8 h-8" />,
+                  color: 'text-SoloSuccess-purple'
+                },
+                { 
+                  number: '50K+', 
+                  label: 'Active Users',
+                  icon: <Users className="w-8 h-8" />,
+                  color: 'text-SoloSuccess-cyan'
+                },
+                { 
+                  number: '$2M+', 
+                  label: 'Revenue Generated',
+                  icon: <Trophy className="w-8 h-8" />,
+                  color: 'text-SoloSuccess-pink'
+                }
               ].map((stat, index) => (
-                <div key={index} className="bold-card holo-overlay text-center">
-                  <div className="text-3xl font-extrabold mb-2 gradient-text">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </div>
+                <motion.div 
+                  key={index}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="holo-overlay p-8 rounded-2xl text-center relative overflow-hidden"
+                >
+                  <div className={`${stat.color} mb-4 flex justify-center`}>
+                    <HolographicGlitter density="medium">
+                      {stat.icon}
+                    </HolographicGlitter>
+                  </div>
+                  <div className="text-4xl font-boss mb-2 gradient-text">{stat.number}</div>
+                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
+                </motion.div>
               ))}
             </motion.div>
           </motion.div>
@@ -113,146 +219,294 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 relative">
+      <section id="features" className="py-24 relative">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <HolographicGlitter density="medium">
-                <GradientText className="text-4xl md:text-5xl">Powerful Features</GradientText>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-SoloSuccess-purple/10 border border-SoloSuccess-purple/30 mb-6">
+              <Lightbulb className="w-5 h-5 text-SoloSuccess-purple" />
+              <span className="text-sm font-medium text-SoloSuccess-purple">Powerful Features</span>
+            </div>
+            
+            <h2 className="text-5xl md:text-6xl font-boss mb-8">
+              <HolographicGlitter density="heavy">
+                <GradientText className="text-5xl md:text-6xl">Supercharge Your Success</GradientText>
               </HolographicGlitter>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Everything you need to build, grow, and scale your solo business with AI-powered precision.
+            
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+              Our AI-powered platform gives you everything you need to dominate your market and achieve 
+              <span className="gradient-text font-semibold"> unprecedented growth</span>
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: <Brain className="w-8 h-8" />,
+                icon: <Brain className="w-10 h-10" />,
                 title: 'AI Co-founder',
-                description: 'Your intelligent business partner that thinks strategically, plans ahead, and executes flawlessly.'
+                description: 'Your intelligent business partner that thinks strategically, plans ahead, and executes flawlessly. Never work alone again.',
+                color: 'from-SoloSuccess-purple to-SoloSuccess-purple-light'
               },
               {
-                icon: <Zap className="w-8 h-8" />,
-                title: 'Lightning Fast',
-                description: 'Automate workflows and streamline operations with AI-powered tools that work at the speed of thought.'
+                icon: <Zap className="w-10 h-10" />,
+                title: 'Lightning Automation',
+                description: 'Automate workflows and streamline operations with AI-powered tools that work at the speed of thought.',
+                color: 'from-SoloSuccess-cyan to-SoloSuccess-cyan-light'
               },
               {
-                icon: <Target className="w-8 h-8" />,
+                icon: <Target className="w-10 h-10" />,
                 title: 'Strategic Planning',
-                description: 'Make data-driven decisions with AI insights that help you focus on what matters most for growth.'
+                description: 'Make data-driven decisions with AI insights that help you focus on what matters most for explosive growth.',
+                color: 'from-SoloSuccess-pink to-SoloSuccess-pink-light'
               },
               {
-                icon: <Users className="w-8 h-8" />,
-                title: 'Virtual Team',
-                description: 'Get the power of a full team without the overhead. AI assistants handle marketing, sales, and operations.'
+                icon: <Users className="w-10 h-10" />,
+                title: 'Virtual Dream Team',
+                description: 'Get the power of a full team without the overhead. AI assistants handle marketing, sales, and operations 24/7.',
+                color: 'from-SoloSuccess-purple-light to-SoloSuccess-purple'
               },
               {
-                icon: <TrendingUp className="w-8 h-8" />,
+                icon: <TrendingUp className="w-10 h-10" />,
                 title: 'Growth Analytics',
-                description: 'Track your progress with beautiful, holographic dashboards that show exactly where your business is heading.'
+                description: 'Track your progress with beautiful, holographic dashboards that show exactly where your empire is heading.',
+                color: 'from-SoloSuccess-cyan-light to-SoloSuccess-cyan'
               },
               {
-                icon: <Shield className="w-8 h-8" />,
-                title: 'Secure & Reliable',
-                description: 'Enterprise-grade security with 99.9% uptime. Your business data is always safe and accessible.'
+                icon: <Shield className="w-10 h-10" />,
+                title: 'Enterprise Security',
+                description: 'Bank-level security with 99.9% uptime. Your business data is always safe, secure, and accessible.',
+                color: 'from-SoloSuccess-pink-light to-SoloSuccess-pink'
               }
             ].map((feature, index) => (
-              <HolographicCard
+              <motion.div
                 key={index}
-                sparkles={true}
-                shine={true}
-                glow={false}
-                interactive={true}
-                className="text-center p-6 h-full"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                whileHover={{ scale: 1.05, y: -10 }}
               >
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="mb-4 flex justify-center text-SoloSuccess-purple"
+                <HolographicCard
+                  sparkles={true}
+                  shine={true}
+                  glow={true}
+                  interactive={true}
+                  className="text-center p-8 h-full relative overflow-hidden"
                 >
-                  <HolographicGlitter density="medium">
-                    {feature.icon}
-                  </HolographicGlitter>
-                </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: 10 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className={`mb-6 flex justify-center bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}
+                  >
+                    <HolographicGlitter density="heavy">
+                      {feature.icon}
+                    </HolographicGlitter>
+                  </motion.div>
 
-                <h3 className="text-xl font-bold mb-2">
-                  <GradientText className="text-xl">{feature.title}</GradientText>
-                </h3>
-                
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </HolographicCard>
+                  <h3 className="text-2xl font-boss mb-4">
+                    <GradientText className="text-2xl">{feature.title}</GradientText>
+                  </h3>
+                  
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+
+                  {/* Feature glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
+                </HolographicCard>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 relative">
-        <div className="container mx-auto px-4 text-center">
-          <HolographicCard
-            sparkles={true}
-            shine={true}
-            glow={true}
-            className="max-w-4xl mx-auto p-12"
+      <section className="py-24 relative">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6 }}
+            <HolographicCard
+              sparkles={true}
+              shine={true}
+              glow={true}
+              className="max-w-6xl mx-auto p-16 text-center relative overflow-hidden"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                <GradientText className="text-4xl md:text-5xl">Ready to Transform Your Business?</GradientText>
-              </h2>
-              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Join thousands of solo founders who've already discovered the power of AI-driven business growth.
-              </p>
+              {/* Background effects */}
+              <div className="absolute inset-0 bg-gradient-to-r from-SoloSuccess-purple/10 via-SoloSuccess-cyan/10 to-SoloSuccess-pink/10" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-SoloSuccess-purple/20 to-SoloSuccess-pink/20 rounded-full blur-3xl" />
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <HolographicButton
-                  variant="primary"
-                  size="lg"
-                  sparkles={true}
-                  shine={true}
-                  glow={true}
-                  className="text-lg"
-                >
-                  Start Your Free Trial
-                  <Rocket className="w-5 h-5" />
-                </HolographicButton>
-                
+              <div className="relative z-10">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-SoloSuccess-purple/20 border border-SoloSuccess-purple/30 mb-8"
                 >
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  No credit card required
+                  <Crown className="w-6 h-6 text-SoloSuccess-purple" />
+                  <span className="text-sm font-medium gradient-text">Ready to Rule Your Industry?</span>
+                  <Gem className="w-6 h-6 text-SoloSuccess-pink" />
                 </motion.div>
+
+                <h2 className="text-5xl md:text-6xl font-boss mb-8">
+                  <HolographicGlitter density="heavy">
+                    <GradientText className="text-5xl md:text-6xl">Become a SoloSuccess</GradientText>
+                  </HolographicGlitter>
+                </h2>
+                
+                <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+                  Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of 
+                  <span className="gradient-text font-semibold"> unstoppable productivity</span>.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+                  <HolographicButton
+                    variant="primary"
+                    size="xl"
+                    sparkles={true}
+                    shine={true}
+                    glow={true}
+                    className="text-xl px-16 py-8 font-boss"
+                  >
+                    <Infinity className="w-8 h-8" />
+                    Start for Free
+                    <Rocket className="w-8 h-8" />
+                  </HolographicButton>
+                  
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="flex items-center gap-3 text-lg text-muted-foreground"
+                  >
+                    <CheckCircle className="w-6 h-6 text-green-500" />
+                    No credit card required
+                    <Sparkle className="w-5 h-5 text-SoloSuccess-purple" />
+                  </motion.div>
+                </div>
+
+                {/* Trust indicators */}
+                <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
+                    <span>Enterprise Security</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-4 h-4" />
+                    <span>99.9% Uptime</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    <span>50K+ Users</span>
+                  </div>
+                </div>
               </div>
-            </motion.div>
-          </HolographicCard>
+            </HolographicCard>
+          </motion.div>
         </div>
       </section>
 
-      {/* Simple Footer */}
-      <footer className="py-12 border-t border-SoloSuccess-purple/20">
-        <div className="container mx-auto px-4 text-center">
-          <div className="text-2xl font-bold mb-4">
-            <GradientText className="text-2xl">SoloSuccess</GradientText>
+      {/* Holographic Footer */}
+      <footer className="py-16 border-t border-SoloSuccess-purple/20 relative">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <motion.div 
+                className="flex items-center gap-3 mb-6"
+                whileHover={{ scale: 1.05 }}
+              >
+                <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center">
+                  <Crown className="w-7 h-7 text-white" />
+                </div>
+                <div className="text-3xl font-boss gradient-text">
+                  SoloSuccess
+                </div>
+              </motion.div>
+              <p className="text-muted-foreground leading-relaxed">
+                Empowering entrepreneurs with AI-powered productivity tools that transform solo businesses into unstoppable empires.
+              </p>
+            </div>
+
+            {/* Product Links */}
+            <div>
+              <h3 className="font-boss text-lg mb-6 gradient-text">Product</h3>
+              <ul className="space-y-4">
+                {['Features', 'Pricing', 'API', 'Integrations'].map((item) => (
+                  <li key={item}>
+                    <Link 
+                      href={`#${item.toLowerCase()}`}
+                      className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company Links */}
+            <div>
+              <h3 className="font-boss text-lg mb-6 gradient-text">Company</h3>
+              <ul className="space-y-4">
+                {['About', 'Blog', 'Contact', 'Careers'].map((item) => (
+                  <li key={item}>
+                    <Link 
+                      href={`/${item.toLowerCase()}`}
+                      className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <h3 className="font-boss text-lg mb-6 gradient-text">Support</h3>
+              <ul className="space-y-4">
+                {['Help Center', 'Documentation', 'Community', 'Status'].map((item) => (
+                  <li key={item}>
+                    <Link 
+                      href={`/${item.toLowerCase().replace(' ', '-')}`}
+                      className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <p className="text-muted-foreground text-sm">
-            © 2024 SoloSuccess AI. All rights reserved. Made with ✨ and holographic magic.
-          </p>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-SoloSuccess-purple/20 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-muted-foreground text-sm">
+                © 2024 SoloSuccess AI. All rights reserved. Made with ✨ and holographic magic.
+              </p>
+              <div className="flex items-center gap-6 text-sm">
+                {['Privacy', 'Terms', 'Cookies'].map((item) => (
+                  <Link 
+                    key={item}
+                    href={`/${item.toLowerCase()}`}
+                    className="text-muted-foreground hover:gradient-text transition-all duration-300"
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
