@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse} from 'next/server'
-import { getDb } from '@/lib/database-client'
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
 
@@ -30,8 +29,8 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7)
 
     // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
-    if (!decoded || !decoded.userId) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
       return NextResponse.json(
         { error: 'Invalid token' },
         { status: 401 }
@@ -43,7 +42,7 @@ export async function GET(request: NextRequest) {
     const users = await sql`
       SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
       FROM users 
-      WHERE id = ${decoded.userId}
+      WHERE id = ${(decoded as any).userId}
     `
 
     if (users.length === 0) {

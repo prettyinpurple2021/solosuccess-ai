@@ -1,7 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { createErrorResponse } from '@/lib/api-response'
-import { getDb } from '@/lib/database-client'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
 
@@ -20,18 +19,18 @@ async function authenticateJWTRequest(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader?.startsWith('Bearer ')) {
       return { user: null, error: 'Authorization header required' }
     }
 
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string; full_name?: string }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
     
     return { 
       user: {
-        id: decoded.userId,
-        email: decoded.email,
-        full_name: decoded.full_name || null,
+        id: (decoded as any).userId,
+        email: (decoded as any).email,
+        full_name: (decoded as any).full_name || null,
         avatar_url: null,
         subscription_tier: 'free',
         level: 1,
