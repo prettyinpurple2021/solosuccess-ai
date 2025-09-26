@@ -31,13 +31,12 @@ async function authenticateJWTRequest(request: NextRequest) {
       return { user: null, error: 'Invalid token' }
     }
     
-    const decodedPayload = decoded as { userId: string; email: string; full_name?: string }
-    
+    // After type guard, we can safely access properties
     return { 
       user: {
-        id: decodedPayload.userId,
-        email: decodedPayload.email,
-        full_name: decodedPayload.full_name || null,
+        id: (decoded as any).userId,
+        email: (decoded as any).email,
+        full_name: (decoded as any).full_name || null,
         avatar_url: null,
         subscription_tier: 'free',
         level: 1,

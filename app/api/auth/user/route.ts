@@ -37,15 +37,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Type guard ensures decoded has userId property
-    const decodedPayload = decoded as { userId: string }
-
-    // Get user from database
+    // Get user from database (decoded is guaranteed to have userId after type guard)
     const sql = getSql()
     const users = await sql`
       SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
       FROM users 
-      WHERE id = ${decodedPayload.userId}
+      WHERE id = ${(decoded as any).userId}
     `
 
     if (users.length === 0) {
