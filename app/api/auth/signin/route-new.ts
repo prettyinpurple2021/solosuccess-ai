@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import { 
   createSuccessResponse, 
   createErrorResponse, 
@@ -9,7 +8,7 @@ import {
 } from '@/lib/api-response'
 import { getDb } from '@/lib/database-client'
 import { users } from '@/db/schema'
-import { eq, or } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { createToken } from '@/lib/auth-utils'
 
