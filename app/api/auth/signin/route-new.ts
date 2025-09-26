@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       return validation.error
     }
 
-    const { identifier, password, isEmail } = validation.data
+    const { identifier, password, isEmail } = validation.data as z.infer<typeof SigninSchema>
 
     const db = getDb()
 
