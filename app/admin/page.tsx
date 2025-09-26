@@ -55,8 +55,8 @@ export default function AdminPage() {
         setData(json)
         const fres = await fetch('/api/admin/flags', { cache: 'no-store' })
         if (fres.ok) setFlags(await fres.json())
-      } catch (e: any) {
-        setError(e.message)
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred')
       } finally {
         setLoading(false)
       }
@@ -180,7 +180,7 @@ export default function AdminPage() {
           {['pending','processing','completed','failed','cancelled','total'].map((k) => (
             <div key={k} className="rounded-lg p-3 bg-white/60 border">
               <div className="text-xs text-gray-500">{k}</div>
-              <div className="text-xl font-semibold">{fmt((data.notifications.stats as any)[k])}</div>
+              <div className="text-xl font-semibold">{fmt((data.notifications.stats as Record<string, number>)[k])}</div>
             </div>
           ))}
         </div>
@@ -236,7 +236,7 @@ export default function AdminPage() {
 }
 
 function RecentFailures() {
-  const [rows, setRows] = useState<any[]>([])
+  const [rows, setRows] = useState<Array<{ id: string; type: string; status: string; error: string; created_at: string }>>([])
   useEffect(() => {
     const load = async () => {
       const res = await fetch('/api/notifications/jobs?status=failed&limit=10&offset=0', { cache: 'no-store' })
@@ -273,7 +273,7 @@ function RecentFailures() {
 }
 
 function ScrapeFailures() {
-  const [rows, setRows] = useState<any[]>([])
+  const [rows, setRows] = useState<Array<{ id: string; url: string; error: string; created_at: string }>>([])
   useEffect(() => {
     const load = async () => {
       const res = await fetch('/api/scraping/failures?limit=10', { cache: 'no-store' })

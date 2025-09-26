@@ -22,7 +22,7 @@ export default function GlobalError({
               <h1 className="text-xl font-bold">Something went wrong</h1>
             </div>
             <p className="text-gray-600">
-              We've encountered a critical error. Our team has been notified.
+              We&apos;ve encountered a critical error. Our team has been notified.
             </p>
           </div>
           

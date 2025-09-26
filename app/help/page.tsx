@@ -83,7 +83,7 @@ export default function HelpPage() {
     {
       id: "billing-2",
       question: "Do you offer refunds?",
-      answer: "We offer a 30-day money-back guarantee on all paid plans. If you're not completely satisfied with SoloSuccess AI, we'll refund your payment, no questions asked. We're confident you'll love the platform!",
+      answer: "We offer a 30-day money-back guarantee on all paid plans. If you're not completely satisfied with SoloSuccess AI, we'll refund your payment, no questions asked. We're confident you&apos;ll love the platform!",
       category: "Billing"
     },
     {
@@ -369,7 +369,7 @@ export default function HelpPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Still Need Help?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Our boss support team is here to help you succeed. Don't hesitate to reach out - we're always happy to help!
+            Our boss support team is here to help you succeed. Don't hesitate to reach out - we&apos;re always happy to help!
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Link href="/contact">

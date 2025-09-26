@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState} from "react";
 import { Button} from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import { Input} from "@/components/ui/input";
@@ -50,7 +50,7 @@ export default function AccountRecoveryPage() {
             Forgot Your Password?
           </CardTitle>
           <CardDescription>
-            No problem. Enter your email below and we'll send you a link to reset it.
+            No problem. Enter your email below and we&apos;ll send you a link to reset it.
           </CardDescription>
         </CardHeader>
         <CardContent>

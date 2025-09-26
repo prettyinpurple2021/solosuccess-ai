@@ -14,7 +14,7 @@ interface LogEntry {
   level: LogLevel
   message: string
   timestamp: string
-  context?: Record<string, any>
+  context?: Record<string, unknown>
   error?: Error
 }
 
@@ -52,7 +52,7 @@ class Logger {
     return logMessage
   }
 
-  private log(level: LogLevel, message: string, context?: Record<string, any>, error?: Error): void {
+  private log(level: LogLevel, message: string, context?: Record<string, unknown>, error?: Error): void {
     if (!this.shouldLog(level)) return
 
     const entry: LogEntry = {
@@ -105,24 +105,24 @@ class Logger {
     }
   }
 
-  error(message: string, context?: Record<string, any>, error?: Error): void {
+  error(message: string, context?: Record<string, unknown>, error?: Error): void {
     this.log(LogLevel.ERROR, message, context, error)
   }
 
-  warn(message: string, context?: Record<string, any>): void {
+  warn(message: string, context?: Record<string, unknown>): void {
     this.log(LogLevel.WARN, message, context)
   }
 
-  info(message: string, context?: Record<string, any>): void {
+  info(message: string, context?: Record<string, unknown>): void {
     this.log(LogLevel.INFO, message, context)
   }
 
-  debug(message: string, context?: Record<string, any>): void {
+  debug(message: string, context?: Record<string, unknown>): void {
     this.log(LogLevel.DEBUG, message, context)
   }
 
   // Convenience method for API route logging
-  apiLog(method: string, path: string, statusCode: number, duration?: number, context?: Record<string, any>): void {
+  apiLog(method: string, path: string, statusCode: number, duration?: number, context?: Record<string, unknown>): void {
     const message = `${method} ${path} - ${statusCode}${duration ? ` (${duration}ms)` : ''}`
     const level = statusCode >= 500 ? LogLevel.ERROR : statusCode >= 400 ? LogLevel.WARN : LogLevel.INFO
     
@@ -136,7 +136,7 @@ class Logger {
   }
 
   // Convenience method for database operation logging
-  dbLog(operation: string, table: string, duration?: number, context?: Record<string, any>): void {
+  dbLog(operation: string, table: string, duration?: number, context?: Record<string, unknown>): void {
     const message = `DB ${operation} on ${table}${duration ? ` (${duration}ms)` : ''}`
     this.log(LogLevel.DEBUG, message, {
       operation,
@@ -147,7 +147,7 @@ class Logger {
   }
 
   // Convenience method for authentication logging
-  authLog(action: string, userId?: string, success: boolean = true, context?: Record<string, any>): void {
+  authLog(action: string, userId?: string, success: boolean = true, context?: Record<string, unknown>): void {
     const message = `Auth ${action}${userId ? ` for user ${userId}` : ''} - ${success ? 'SUCCESS' : 'FAILED'}`
     const level = success ? LogLevel.INFO : LogLevel.WARN
     
@@ -164,23 +164,30 @@ class Logger {
 export const logger = new Logger()
 
 // Export convenience functions for common use cases
-export const logError = (message: string, context?: Record<string, any>, error?: Error) => 
-  logger.error(message, context, error)
+export const logError = (message: string, contextOrError?: Record<string, unknown> | Error, error?: Error) => {
+  if (contextOrError instanceof Error) {
+    logger.error(message, undefined, contextOrError)
+  } else if (typeof contextOrError === 'object' && contextOrError !== null) {
+    logger.error(message, contextOrError as Record<string, unknown>, error)
+  } else {
+    logger.error(message, undefined, error)
+  }
+}
 
-export const logWarn = (message: string, context?: Record<string, any>) => 
+export const logWarn = (message: string, context?: Record<string, unknown>) => 
   logger.warn(message, context)
 
-export const logInfo = (message: string, context?: Record<string, any>) => 
+export const logInfo = (message: string, context?: Record<string, unknown>) => 
   logger.info(message, context)
 
-export const logDebug = (message: string, context?: Record<string, any>) => 
+export const logDebug = (message: string, context?: Record<string, unknown>) => 
   logger.debug(message, context)
 
-export const logApi = (method: string, path: string, statusCode: number, duration?: number, context?: Record<string, any>) => 
+export const logApi = (method: string, path: string, statusCode: number, duration?: number, context?: Record<string, unknown>) => 
   logger.apiLog(method, path, statusCode, duration, context)
 
-export const logDb = (operation: string, table: string, duration?: number, context?: Record<string, any>) => 
+export const logDb = (operation: string, table: string, duration?: number, context?: Record<string, unknown>) => 
   logger.dbLog(operation, table, duration, context)
 
-export const logAuth = (action: string, userId?: string, success?: boolean, context?: Record<string, any>) => 
+export const logAuth = (action: string, userId?: string, success?: boolean, context?: Record<string, unknown>) => 
   logger.authLog(action, userId, success, context)

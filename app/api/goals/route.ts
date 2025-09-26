@@ -1,5 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
+import { createErrorResponse } from '@/lib/api-response'
 import { createClient} from '@/lib/neon/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
@@ -103,9 +104,9 @@ export async function POST(request: NextRequest) {
     })
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
-      return createErrorResponse('Invalid payload', details: parsed.error.flatten(), 400)
+      return createErrorResponse('Invalid payload', 400, parsed.error.flatten())
     }
-    const { title, description, target_date, category, priority } = parsed.data as any
+    const { title, description, target_date, category, priority } = parsed.data
 
     const client = await createClient()
 

@@ -122,7 +122,7 @@ export default function ContactPage() {
           <motion.div variants={itemVariants}>
             <div className="inline-flex items-center space-x-2 mb-6">
               <Crown className="w-6 h-6 text-yellow-500" />
-              <span className="crown-badge">Let's Connect</span>
+              <span className="crown-badge">Let&apos;s Connect</span>
             </div>
           </motion.div>
           
@@ -132,7 +132,7 @@ export default function ContactPage() {
           
           <motion.p variants={itemVariants} className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
             Ready to rule your empire? Have questions? Need support? The boss is here to help! 
-            Reach out and let's build something amazing together. 🚀
+            Reach out and let&apos;s build something amazing together. 🚀
           </motion.p>
         </div>
       </motion.section>
@@ -192,7 +192,7 @@ export default function ContactPage() {
                     </motion.div>
                     <h3 className="text-2xl font-bold text-gradient mb-2">Message Sent! 🎉</h3>
                     <p className="text-gray-600 dark:text-gray-400">
-                      Thanks for reaching out, boss! We'll get back to you within 24 hours.
+                      Thanks for reaching out, boss! We&apos;ll get back to you within 24 hours.
                     </p>
                   </motion.div>
                 ) : (
@@ -267,7 +267,7 @@ export default function ContactPage() {
                         required
                         value={formData.message}
                         onChange={(e) => handleInputChange("message", e.target.value)}
-                        placeholder="Tell us how we can help you build your empire! Be as detailed as you'd like..."
+                        placeholder="Tell us how we can help you build your empire! Be as detailed as you&apos;d like..."
                         className="glass min-h-[120px]"
                       />
                     </div>
@@ -405,8 +405,8 @@ export default function ContactPage() {
               <h3 className="text-lg font-semibold text-yellow-800">Need Urgent Help?</h3>
             </div>
             <p className="text-yellow-700 max-w-2xl mx-auto">
-              For critical issues affecting your business operations, please mark your message as "Technical Support" 
-              and we'll prioritize your request. We typically respond to urgent matters within 4-6 hours during business days.
+              For critical issues affecting your business operations, please mark your message as &quot;Technical Support&quot; 
+              and we&apos;ll prioritize your request. We typically respond to urgent matters within 4-6 hours during business days.
             </p>
           </BossCard>
         </div>

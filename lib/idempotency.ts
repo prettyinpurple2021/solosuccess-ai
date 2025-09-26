@@ -1,5 +1,5 @@
 type SqlClient = {
-  query: (_text: string, _params?: any[]) => Promise<{ rowCount: number }>
+  query: (_text: string, _params?: unknown[]) => Promise<{ rowCount: number }>
 }
 
 export async function reserveIdempotencyKey(

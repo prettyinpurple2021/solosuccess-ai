@@ -50,7 +50,7 @@ export default function GDPRPage() {
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             Under the General Data Protection Regulation (GDPR), you have specific rights regarding your personal data. 
-            Here's how we protect your privacy and how you can exercise your rights.
+            Here&apos;s how we protect your privacy and how you can exercise your rights.
           </p>
           <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
             <FileText className="w-4 h-4" />
@@ -139,11 +139,11 @@ export default function GDPRPage() {
                         Right to Erasure (Article 17)
                       </h3>
                       <p className="text-gray-600 text-sm mb-3">
-                        Also known as the "right to be forgotten" - you can request deletion of your personal data.
+                        Also known as the "right to be forgotten&quot; - you can request deletion of your personal data.
                       </p>
                       <ul className="text-gray-600 text-sm list-disc list-inside space-y-1">
                         <li>Delete your account and all associated data</li>
-                        <li>Remove data that's no longer necessary</li>
+                        <li>Remove data that&apos;s no longer necessary</li>
                         <li>Withdraw consent for data processing</li>
                       </ul>
                     </div>
@@ -235,7 +235,7 @@ export default function GDPRPage() {
                       <h3 className="font-semibold text-gray-800 mb-2">Identity Verification</h3>
                       <p className="text-gray-600 text-sm">
                         To protect your privacy, we may need to verify your identity before processing certain requests. 
-                        This helps ensure your personal data isn't disclosed to unauthorized parties.
+                        This helps ensure your personal data isn&apos;t disclosed to unauthorized parties.
                       </p>
                     </div>
                   </div>
@@ -258,7 +258,7 @@ export default function GDPRPage() {
                       </h3>
                       <p className="text-gray-600 text-sm">
                         We build privacy protection into every aspect of SoloSuccess AI from the ground up. 
-                        Data protection isn't an afterthought - it's fundamental to how we operate.
+                        Data protection isn't an afterthought - it&apos;s fundamental to how we operate.
                       </p>
                     </div>
 
@@ -269,7 +269,7 @@ export default function GDPRPage() {
                       </h3>
                       <p className="text-gray-600 text-sm">
                         We only collect personal data that is necessary for providing our services. 
-                        We don't collect data "just in case" - every piece of data has a specific purpose.
+                        We don&apos;t collect data "just in case&quot; - every piece of data has a specific purpose.
                       </p>
                     </div>
 
@@ -329,7 +329,7 @@ export default function GDPRPage() {
                   </h2>
                   
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    If you're not satisfied with how we've handled your personal data or your GDPR rights, you have the right to file a complaint with a supervisory authority.
+                    If you're not satisfied with how we&apos;ve handled your personal data or your GDPR rights, you have the right to file a complaint with a supervisory authority.
                   </p>
                   
                   <div className="bg-red-50 p-6 rounded-lg border-l-4 border-red-400">
@@ -339,8 +339,8 @@ export default function GDPRPage() {
                     </p>
                     <ul className="text-gray-600 text-sm list-disc list-inside space-y-1">
                       <li><strong>Germany:</strong> Federal Commissioner for Data Protection and Freedom of Information</li>
-                      <li><strong>France:</strong> Commission Nationale de l'Informatique et des Libertés (CNIL)</li>
-                      <li><strong>UK:</strong> Information Commissioner's Office (ICO)</li>
+                      <li><strong>France:</strong> Commission Nationale de l&apos;Informatique et des Libertés (CNIL)</li>
+                      <li><strong>UK:</strong> Information Commissioner&apos;s Office (ICO)</li>
                       <li><strong>Ireland:</strong> Data Protection Commission (DPC)</li>
                     </ul>
                   </div>

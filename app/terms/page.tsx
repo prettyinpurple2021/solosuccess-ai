@@ -83,10 +83,10 @@ export default function TermsOfServicePage() {
                     Introduction and Acceptance of Terms
                   </h2>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    Welcome to SoloSuccess AI! SoloSuccess AI is an innovative web application designed to be an AI-driven productivity platform for solo entrepreneurs, freelancers, and small business owners. Our purpose is to provide a highly valuable, feature-rich, and production-ready platform that simulates a "virtual team experience," enabling independent professionals to streamline operations, enhance productivity, and scale their businesses without the need for traditional hiring.
+                    Welcome to SoloSuccess AI! SoloSuccess AI is an innovative web application designed to be an AI-driven productivity platform for solo entrepreneurs, freelancers, and small business owners. Our purpose is to provide a highly valuable, feature-rich, and production-ready platform that simulates a "virtual team experience,&quot; enabling independent professionals to streamline operations, enhance productivity, and scale their businesses without the need for traditional hiring.
                   </p>
                   <p className="text-gray-600 leading-relaxed">
-                    By accessing or using the SoloSuccess AI web application and its services (collectively, the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, you may not access or use the Service.
+                    By accessing or using the SoloSuccess AI web application and its services (collectively, the "Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, you may not access or use the Service.
                   </p>
                 </div>
 
@@ -191,7 +191,7 @@ export default function TermsOfServicePage() {
                   <div className="bg-yellow-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-400">
                     <h3 className="font-semibold text-gray-800 mb-2">Ownership:</h3>
                     <p className="text-gray-600 text-sm">
-                      SoloSuccess AI and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof), are owned by SoloSuccess AI, its licensors, or other providers of such material. This includes the distinct brand identity, brand name "SoloSuccess", tagline "Be the Boss. Build Solo. Rule Your Empire.", brand voice (e.g., Confident, Empowering, Rebellious with purpose), brand personality (e.g., Punk Rock meets Girlboss CEO, Energetic, creative, driven), brand aesthetic (e.g., Vibrant Purple, Teal, Hot Pink, paint splatter, shimmer/glitter overlays, cute skulls with bows), and the distinct personalities and roles of the 8 AI Agents (Roxy, Blaze, Echo, Lumi, Vex, Lexi, Nova, Glitch).
+                      SoloSuccess AI and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof), are owned by SoloSuccess AI, its licensors, or other providers of such material. This includes the distinct brand identity, brand name "SoloSuccess", tagline "Be the Boss. Build Solo. Rule Your Empire.&quot;, brand voice (e.g., Confident, Empowering, Rebellious with purpose), brand personality (e.g., Punk Rock meets Girlboss CEO, Energetic, creative, driven), brand aesthetic (e.g., Vibrant Purple, Teal, Hot Pink, paint splatter, shimmer/glitter overlays, cute skulls with bows), and the distinct personalities and roles of the 8 AI Agents (Roxy, Blaze, Echo, Lumi, Vex, Lexi, Nova, Glitch).
                     </p>
                   </div>
 
@@ -269,7 +269,7 @@ export default function TermsOfServicePage() {
                     <p className="text-gray-600 text-sm mb-2">You agree not to:</p>
                     <ul className="text-gray-600 text-sm list-disc list-inside space-y-1">
                       <li>Use the Service in any way that violates any applicable federal, state, local, or international law or regulation.</li>
-                      <li>Engage in any conduct that restricts or inhibits anyone's use or enjoyment of the Service, or which, as determined by us, may harm SoloSuccess AI or users of the Service or expose them to liability.</li>
+                      <li>Engage in any conduct that restricts or inhibits anyone&apos;s use or enjoyment of the Service, or which, as determined by us, may harm SoloSuccess AI or users of the Service or expose them to liability.</li>
                       <li>Introduce any viruses, Trojan horses, worms, logic bombs, or other material that is malicious or technologically harmful.</li>
                       <li>Attempt to gain unauthorized access to, interfere with, damage, or disrupt any parts of the Service, the server on which the Service is stored, or any server, computer, or database connected to the Service.</li>
                     </ul>
@@ -278,7 +278,7 @@ export default function TermsOfServicePage() {
                   <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
                     <h3 className="font-semibold text-gray-800 mb-2">AI Agent Outputs Disclaimer:</h3>
                     <p className="text-gray-600 text-sm">
-                      While AI Agents like Lumi (Legal & Docs Agent) can assist with legal requirements and document generation, their outputs come "with appropriate disclaimers". The information provided by SoloSuccess AI agents is for informational purposes only and does not constitute professional advice (e.g., legal, financial, or technical). You should consult with a qualified professional for advice tailored to your specific situation.
+                      While AI Agents like Lumi (Legal & Docs Agent) can assist with legal requirements and document generation, their outputs come "with appropriate disclaimers&quot;. The information provided by SoloSuccess AI agents is for informational purposes only and does not constitute professional advice (e.g., legal, financial, or technical). You should consult with a qualified professional for advice tailored to your specific situation.
                     </p>
                   </div>
                 </div>
@@ -293,9 +293,9 @@ export default function TermsOfServicePage() {
                   </h2>
                   
                   <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                    <h3 className="font-semibold text-gray-800 mb-2">"As Is" Basis:</h3>
+                    <h3 className="font-semibold text-gray-800 mb-2">"As Is&quot; Basis:</h3>
                     <p className="text-gray-600 text-sm">
-                      Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE" basis, without any warranties of any kind, either express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement. SoloSuccess AI aims for a scalable, resilient, and maintainable architecture, robust data security, and reliable integrations.
+                      Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE&quot; basis, without any warranties of any kind, either express or implied, including, but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement. SoloSuccess AI aims for a scalable, resilient, and maintainable architecture, robust data security, and reliable integrations.
                     </p>
                   </div>
 
@@ -383,7 +383,7 @@ export default function TermsOfServicePage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Empire?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Now that you know the terms, it's time to start your boss journey. Join thousands of entrepreneurs already scaling with SoloSuccess AI.
+            Now that you know the terms, it&apos;s time to start your boss journey. Join thousands of entrepreneurs already scaling with SoloSuccess AI.
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
             <Button

@@ -184,10 +184,10 @@ export class DocumentParser {
             if (cell.value !== null && cell.value !== undefined) {
               if (typeof cell.value === 'object' && 'text' in cell.value) {
                 // Rich text object
-                cellValue = (cell.value as any).text || '';
+                cellValue = (cell.value as { text: string }).text || '';
               } else if (typeof cell.value === 'object' && 'result' in cell.value) {
                 // Formula result
-                cellValue = String((cell.value as any).result || '');
+                cellValue = String((cell.value as { result: unknown }).result || '');
               } else {
                 // Simple value
                 cellValue = String(cell.value);
@@ -292,7 +292,7 @@ export class DocumentParser {
       const rtfContent = buffer.toString('utf-8');
       
       // Basic RTF text extraction (remove RTF control codes)
-      let text = rtfContent
+      const text = rtfContent
         .replace(/\{\\[^}]*\}/g, '') // Remove RTF groups
         .replace(/\\[a-z]+\d*\s?/g, '') // Remove RTF control words
         .replace(/[{}]/g, '') // Remove remaining braces

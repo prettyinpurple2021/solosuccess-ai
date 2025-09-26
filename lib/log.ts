@@ -16,7 +16,7 @@ interface LogParams {
   status?: number;
   userId?: string;
   error?: Error | unknown;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 /**

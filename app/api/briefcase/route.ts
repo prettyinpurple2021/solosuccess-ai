@@ -1,24 +1,42 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server
-import { getDb } from '@/lib/database-client''
+import { NextRequest, NextResponse} from 'next/server'
+import { createErrorResponse } from '@/lib/api-response'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
 
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 
 
 // JWT authentication helper
-
+async function authenticateJWTRequest(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader?.startsWith('Bearer ')) {
+      return { user: null, error: 'Authorization header required' }
     }
 
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
     
+    // Type guard to ensure decoded has required properties
+    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
+      return { user: null, error: 'Invalid token' }
+    }
+    
+    // After type guard, we can safely access properties
     return { 
       user: {
-        id: decoded.userId,
-        email: decoded.email,
-        full_name: decoded.full_name || null,
+        id: (decoded as any).userId,
+        email: (decoded as any).email,
+        full_name: (decoded as any).full_name || null,
         avatar_url: null,
         subscription_tier: 'free',
         level: 1,
@@ -45,8 +63,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Ensure user exists in database
-    const db = getDb()
-    let userData = await sql`
+    const sql = getSql()
+    const userData = await sql`
       SELECT id FROM users WHERE id = ${user.id}
     `
 
@@ -151,7 +169,7 @@ export async function GET(request: NextRequest) {
     const stats = statsResult[0]
 
     // Transform briefcases to match expected format
-    const files = briefcases.map((briefcase: any) => ({
+    const files = briefcases.map((briefcase: { id: number; title: string; description: string; status: string; metadata: unknown; created_at: string; updated_at: string; goal_count: string; task_count: string }) => ({
       id: briefcase.id.toString(),
       name: briefcase.title,
       original_name: briefcase.title,
@@ -230,7 +248,7 @@ export async function POST(request: NextRequest) {
       return createErrorResponse('Title is required', 400)
     }
 
-    const db = getDb()
+    const sql = getSql()
 
     // Create new briefcase
     const newBriefcase = await sql`

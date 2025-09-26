@@ -317,7 +317,7 @@ export default function PricingPage() {
               </GradientText>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Got questions? We've got answers. Here are the most common questions about our pricing and plans.
+              Got questions? We&apos;ve got answers. Here are the most common questions about our pricing and plans.
             </p>
           </motion.div>
 
@@ -373,7 +373,7 @@ export default function PricingPage() {
                 </GradientText>
               </h2>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Join thousands of solo founders who've already transformed their businesses with SoloSuccess AI.
+                Join thousands of solo founders who&apos;ve already transformed their businesses with SoloSuccess AI.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

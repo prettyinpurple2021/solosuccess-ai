@@ -1,7 +1,14 @@
-import { NextRequest, NextResponse} from 'next/server
-import { getDb } from '@/lib/database-client''
+import { NextRequest, NextResponse} from 'next/server'
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -10,7 +17,6 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    const db = getDb()
     const authHeader = request.headers.get('authorization')
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,19 +29,20 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7)
 
     // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
-    if (!decoded || !decoded.userId) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
       return NextResponse.json(
         { error: 'Invalid token' },
         { status: 401 }
       )
     }
 
-    // Get user from database
+    // Get user from database (decoded is guaranteed to have userId after type guard)
+    const sql = getSql()
     const users = await sql`
       SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
       FROM users 
-      WHERE id = ${decoded.userId}
+      WHERE id = ${(decoded as any).userId}
     `
 
     if (users.length === 0) {

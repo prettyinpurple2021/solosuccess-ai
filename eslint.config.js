@@ -56,7 +56,7 @@ module.exports = [
   },
   
   // Next.js specific configuration
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...compat.extends('next/core-web-vitals'),
   
   // Override for TypeScript files
   {

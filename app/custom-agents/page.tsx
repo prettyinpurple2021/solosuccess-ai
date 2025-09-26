@@ -196,7 +196,7 @@ export default function CustomAgentsPage() {
         <CardHeader>
           <CardTitle>Chat with Your AI Agents</CardTitle>
           <CardDescription>
-            Interact with your custom AI agents. They'll automatically collaborate when needed.
+            Interact with your custom AI agents. They&apos;ll automatically collaborate when needed.
           </CardDescription>
         </CardHeader>
         <CardContent className="h-full p-0">

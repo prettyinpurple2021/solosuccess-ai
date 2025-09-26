@@ -202,7 +202,7 @@ export default function FeaturesPage() {
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             Discover all the powerful features that make SoloSuccess AI the ultimate productivity platform 
-            for solo entrepreneurs. From AI agents to automation tools, we've got you covered. 💪
+            for solo entrepreneurs. From AI agents to automation tools, we&apos;ve got you covered. 💪
           </p>
         </div>
       </section>
@@ -352,7 +352,7 @@ export default function FeaturesPage() {
               </div>
 
               <div className="text-center mt-12">
-                <p className="text-gray-600 mb-6">Don't see your tool? We're constantly adding new integrations!</p>
+                <p className="text-gray-600 mb-6">Don't see your tool? We&apos;re constantly adding new integrations!</p>
                 <Link href="/contact">
                   <Button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
                     Request Integration
@@ -421,10 +421,10 @@ export default function FeaturesPage() {
               </Button>
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              "From Overwhelmed to Empire Builder in 30 Days"
+              "From Overwhelmed to Empire Builder in 30 Days&quot;
             </h3>
             <p className="text-gray-600 mb-6">
-              Watch Sarah transform her struggling freelance business into a thriving empire using SoloSuccess AI's complete toolkit.
+              Watch Sarah transform her struggling freelance business into a thriving empire using SoloSuccess AI&apos;s complete toolkit.
             </p>
             <Button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
               Watch Demo Video
@@ -438,7 +438,7 @@ export default function FeaturesPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Empire?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of solo entrepreneurs who've transformed their businesses with SoloSuccess AI. 
+            Join thousands of solo entrepreneurs who&apos;ve transformed their businesses with SoloSuccess AI. 
             Start your journey today and experience the power of having an AI squad! 🚀
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
