@@ -45,7 +45,10 @@ const pricingPlans = [
       { text: 'White-label Options', included: false }
     ],
     ctaText: 'Start Free Trial',
-    onCtaClick: () => console.log('Starter plan selected')
+    onCtaClick: () => {
+      // Handle starter plan selection
+      window.location.href = '/signup?plan=starter'
+    }
   },
   {
     title: 'Pro',
@@ -64,7 +67,10 @@ const pricingPlans = [
       { text: 'White-label Options', included: false }
     ],
     ctaText: 'Go Pro',
-    onCtaClick: () => console.log('Pro plan selected'),
+    onCtaClick: () => {
+      // Handle pro plan selection
+      window.location.href = '/signup?plan=pro'
+    },
     popular: true
   },
   {
@@ -84,7 +90,10 @@ const pricingPlans = [
       { text: 'Multi-region Deployment', included: true }
     ],
     ctaText: 'Contact Sales',
-    onCtaClick: () => console.log('Enterprise plan selected')
+    onCtaClick: () => {
+      // Handle enterprise plan selection
+      window.location.href = '/contact?plan=enterprise'
+    }
   }
 ];
 

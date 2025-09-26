@@ -51,7 +51,8 @@ async function sendNotification(
   if (channels.includes('email')) {
     try {
       // In production, integrate with Resend or similar service
-      console.log(`Sending email notification to ${user.email}:`, {
+      // Log email notification attempt
+      logInfo(`Sending email notification to ${user.email}`, {
         subject: `${alerts.length} New Competitor Alert${alerts.length > 1 ? 's' : ''}`,
         template,
         priority,
@@ -68,7 +69,8 @@ async function sendNotification(
   if (channels.includes('push')) {
     try {
       // In production, integrate with web push or mobile push service
-      console.log(`Sending push notification to user ${user.id}:`, {
+      // Log push notification attempt
+      logInfo(`Sending push notification to user ${user.id}`, {
         title: 'Competitor Alert',
         body: `${alerts.length} new alert${alerts.length > 1 ? 's' : ''} require your attention`,
         priority,
@@ -87,7 +89,8 @@ async function sendNotification(
   if (channels.includes('sms')) {
     try {
       // In production, integrate with Twilio or similar service
-      console.log(`Sending SMS to user ${user.id}:`, {
+      // Log SMS notification attempt
+      logInfo(`Sending SMS to user ${user.id}`, {
         message: `SoloSuccess Alert: ${alerts.length} new competitor alert${alerts.length > 1 ? 's' : ''}. Check your dashboard.`,
         priority,
       })

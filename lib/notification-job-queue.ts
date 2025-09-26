@@ -287,31 +287,33 @@ export class NotificationJobQueue {
     offset: number = 0,
     createdBy?: string
   ): Promise<{ jobs: NotificationJob[], total: number }> {
-    let whereClause = '1=1'
+    const conditions: string[] = []
     const params: any[] = []
     let paramIndex = 1
 
     if (status) {
-      whereClause += ` AND status = $${paramIndex}`
+      conditions.push(`status = $${paramIndex}`)
       params.push(status)
       paramIndex++
     }
 
     if (createdBy) {
-      whereClause += ` AND created_by = $${paramIndex}`
+      conditions.push(`created_by = $${paramIndex}`)
       params.push(createdBy)
       paramIndex++
     }
 
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
     // Get total count
     const countResult = await query(`
-      SELECT COUNT(*) as total FROM notification_jobs WHERE ${whereClause}
+      SELECT COUNT(*) as total FROM notification_jobs ${whereClause}
     `, params)
 
     // Get jobs
     const jobsResult = await query(`
       SELECT * FROM notification_jobs 
-      WHERE ${whereClause}
+      ${whereClause}
       ORDER BY created_at DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `, [...params, limit, offset])
