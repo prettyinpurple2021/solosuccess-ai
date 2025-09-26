@@ -172,7 +172,7 @@ export default function AboutPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">What We Stand For</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These aren't just words on a wall - they're the values that drive every feature we build 
+              These aren&apos;t just words on a wall - they&apos;re the values that drive every feature we build 
               and every decision we make.
             </p>
           </div>
@@ -224,7 +224,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">The Problem We're Solving</h2>
+              <h2 className="text-4xl font-bold text-gray-800 mb-6">The Problem We&apos;re Solving</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-1">
@@ -239,7 +239,7 @@ export default function AboutPage() {
                     <span className="text-red-600 text-sm font-bold">✗</span>
                   </div>
                   <p className="text-gray-600">
-                    Generic productivity tools that don't understand the entrepreneurial mindset
+                    Generic productivity tools that don&apos;t understand the entrepreneurial mindset
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
@@ -247,7 +247,7 @@ export default function AboutPage() {
                     <span className="text-red-600 text-sm font-bold">✗</span>
                   </div>
                   <p className="text-gray-600">
-                    The pressure to "hustle harder" instead of working smarter
+                    The pressure to &quot;hustle harder&quot; instead of working smarter
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
@@ -309,10 +309,10 @@ export default function AboutPage() {
                 <p className="text-purple-600 font-semibold">Founder & Chief Boss Officer</p>
               </div>
               <blockquote className="text-xl text-gray-600 leading-relaxed text-center italic">
-                "I was that solo entrepreneur juggling 15 different tools, working 80-hour weeks, 
+                &quot;I was that solo entrepreneur juggling 15 different tools, working 80-hour weeks, 
                 and still feeling like I was barely keeping my head above water. I knew there had to be a better way. 
-                SoloSuccess AI is the solution I wish I'd had when I started my entrepreneurial journey - 
-                and it's the solution thousands of other solo entrepreneurs needed too."
+                SoloSuccess AI is the solution I wish I&apos;d had when I started my entrepreneurial journey - 
+                and it&apos;s the solution thousands of other solo entrepreneurs needed too.&quot;
               </blockquote>
             </CardContent>
           </Card>
