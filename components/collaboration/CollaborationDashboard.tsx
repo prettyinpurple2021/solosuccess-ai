@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client'
 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+// Removed unused logger imports
 import React, { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,6 @@ import {
   Activity, 
   Plus,
   Search,
-  Filter,
   MoreHorizontal,
   Play,
   Pause,
@@ -127,7 +126,7 @@ const CollaborationDashboard: React.FC = () => {
           computeStats(nextSessions, nextAgents)
           setLoading(false)
         }
-      } catch (e: any) {
+      } catch {
         if (!cancelled) {
           setError('Failed to load collaboration data')
           toast({ title: 'Load failed', description: 'Could not load collaboration data', variant: 'destructive' })
@@ -139,7 +138,7 @@ const CollaborationDashboard: React.FC = () => {
     fetchData()
     const interval = setInterval(fetchData, 30000)
     return () => { cancelled = true; clearInterval(interval) }
-  }, [])
+  }, [toast])
 
   // Actions
   const handleJoinSession = async (sessionId: string) => {
@@ -157,7 +156,7 @@ const CollaborationDashboard: React.FC = () => {
         const j = await r.json()
         setSessions(j.data?.sessions || [])
       }
-    } catch (e) {
+    } catch {
       toast({ title: 'Join failed', description: 'Could not join session', variant: 'destructive' })
     }
   }
@@ -177,7 +176,7 @@ const CollaborationDashboard: React.FC = () => {
         const j = await r.json()
         setSessions(j.data?.sessions || [])
       }
-    } catch (e) {
+    } catch {
       toast({ title: 'Update failed', description: 'Could not update session', variant: 'destructive' })
     }
   }
@@ -196,7 +195,7 @@ const CollaborationDashboard: React.FC = () => {
         const j = await r.json()
         setSessions(j.data?.sessions || [])
       }
-    } catch (e) {
+    } catch {
       toast({ title: 'Complete failed', description: 'Could not complete session', variant: 'destructive' })
     }
   }
@@ -224,7 +223,7 @@ const CollaborationDashboard: React.FC = () => {
       setShowCreateDialog(false)
       setNewGoal('')
       setSelectedAgentIds([])
-    } catch (e) {
+    } catch {
       toast({ title: 'Create failed', description: 'Could not create session', variant: 'destructive' })
     }
   }
@@ -398,12 +397,14 @@ const CollaborationDashboard: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Search sessions"
               />
             </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Filter sessions by status"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
