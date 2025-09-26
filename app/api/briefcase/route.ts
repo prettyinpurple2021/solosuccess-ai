@@ -26,11 +26,18 @@ async function authenticateJWTRequest(request: NextRequest) {
     const token = authHeader.substring(7)
     const decoded = jwt.verify(token, process.env.JWT_SECRET!)
     
+    // Type guard to ensure decoded has required properties
+    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
+      return { user: null, error: 'Invalid token' }
+    }
+    
+    const decodedPayload = decoded as { userId: string; email: string; full_name?: string }
+    
     return { 
       user: {
-        id: (decoded as any).userId,
-        email: (decoded as any).email,
-        full_name: (decoded as any).full_name || null,
+        id: decodedPayload.userId,
+        email: decodedPayload.email,
+        full_name: decodedPayload.full_name || null,
         avatar_url: null,
         subscription_tier: 'free',
         level: 1,
