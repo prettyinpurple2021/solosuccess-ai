@@ -164,7 +164,7 @@ class Logger {
 export const logger = new Logger()
 
 // Export convenience functions for common use cases
-export const logError = (message: string, contextOrError?: Record<string, unknown> | Error | unknown, error?: Error) => {
+export const logError = (message: string, contextOrError?: Record<string, unknown> | Error, error?: Error) => {
   if (contextOrError instanceof Error) {
     logger.error(message, undefined, contextOrError)
   } else if (typeof contextOrError === 'object' && contextOrError !== null) {
