@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return createErrorResponse('Invalid payload', 400, parsed.error.flatten())
     }
-    const { title, description, target_date, category, priority } = parsed.data as any
+    const { title, description, target_date, category, priority } = parsed.data
 
     const client = await createClient()
 

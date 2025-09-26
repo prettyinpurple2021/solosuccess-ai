@@ -18,10 +18,10 @@ export default function OfflinePage() {
             <WifiOff className="w-8 h-8 text-red-600" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            You're Offline! 😱
+            You&apos;re Offline! 😱
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Don't worry, boss! We can't connect to the internet right now, but your SoloSuccess AI platform is still here for you.
+            Don&apos;t worry, boss! We can&apos;t connect to the internet right now, but your SoloSuccess AI platform is still here for you.
           </CardDescription>
         </CardHeader>
         

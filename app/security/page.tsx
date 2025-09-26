@@ -200,7 +200,7 @@ export default function SecurityPage() {
           <h3 className="text-2xl font-bold mb-6">Security Questions or Concerns?</h3>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             Our security team is here to help. Whether you need technical documentation, 
-            want to report a security issue, or have compliance questions - we're here for you.
+            want to report a security issue, or have compliance questions - we&apos;re here for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild className="bg-purple-600 hover:bg-purple-700">

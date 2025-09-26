@@ -12,7 +12,7 @@ export interface NotificationPayload {
   body: string
   icon?: string
   badge?: string
-  data?: any
+  data?: Record<string, unknown>
   actions?: Array<{
     action: string
     title: string
@@ -135,7 +135,7 @@ export class WebPushNotificationManager {
       // Create new subscription
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlB64ToUint8Array(this.VAPID_PUBLIC_KEY) as any
+        applicationServerKey: this.urlB64ToUint8Array(this.VAPID_PUBLIC_KEY)
       })
     }
 
@@ -185,7 +185,7 @@ export class WebPushNotificationManager {
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
         silent: payload.silent
-      } as any)
+      })
     } else {
       // Use service worker notification
       await registration.showNotification(payload.title, {
@@ -197,7 +197,7 @@ export class WebPushNotificationManager {
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
         silent: payload.silent
-      } as any)
+      })
     }
   }
 
@@ -291,7 +291,7 @@ export class WebPushNotificationManager {
         const data = await response.json()
         const stored = data.preferences?.scheduledNotifications
         if (stored && Array.isArray(stored)) {
-          return stored.map((n: any) => ({
+          return stored.map((n: { scheduledTime: string }) => ({
             ...n,
             scheduledTime: new Date(n.scheduledTime)
           }))

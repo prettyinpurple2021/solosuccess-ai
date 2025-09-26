@@ -1,7 +1,6 @@
 "use client"
 
-// @ts-nocheck
-import React, { useEffect, useState} from "react"
+import { useEffect, useState } from 'react'
 
 import Link from "next/link"
 import { ArrowLeft, Crown, Rocket, Heart, Flame, CheckCircle} from "lucide-react"
@@ -111,9 +110,9 @@ export default function AboutPage() {
               <Crown className="w-8 h-8 text-white" />
             </div>
           </div>
-          <Badge className="mb-6 text-lg px-6 py-2 bg-purple-100 text-purple-700 border-purple-200 rounded-full">
+          <div className="mb-6 text-lg px-6 py-2 bg-purple-100 text-purple-700 border-purple-200 rounded-full inline-flex items-center">
             👑 Our Story
-          </Badge>
+          </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Redefining Solo

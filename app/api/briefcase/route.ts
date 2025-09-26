@@ -25,7 +25,7 @@ async function authenticateJWTRequest(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string; full_name?: string }
     
     return { 
       user: {
@@ -58,9 +58,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Ensure user exists in database
-    const db = getDb()
     const sql = getSql()
-    let userData = await sql`
+    const userData = await sql`
       SELECT id FROM users WHERE id = ${user.id}
     `
 
@@ -165,7 +164,7 @@ export async function GET(request: NextRequest) {
     const stats = statsResult[0]
 
     // Transform briefcases to match expected format
-    const files = briefcases.map((briefcase: any) => ({
+    const files = briefcases.map((briefcase: { id: number; title: string; description: string; status: string; metadata: unknown; created_at: string; updated_at: string; goal_count: string; task_count: string }) => ({
       id: briefcase.id.toString(),
       name: briefcase.title,
       original_name: briefcase.title,
@@ -244,7 +243,6 @@ export async function POST(request: NextRequest) {
       return createErrorResponse('Title is required', 400)
     }
 
-    const db = getDb()
     const sql = getSql()
 
     // Create new briefcase

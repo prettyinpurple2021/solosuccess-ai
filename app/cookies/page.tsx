@@ -49,7 +49,7 @@ export default function CookiePolicyPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            We believe in transparency about how we collect and use data. Here's everything you need to know about our cookie usage.
+            We believe in transparency about how we collect and use data. Here&apos;s everything you need to know about our cookie usage.
           </p>
           <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
             <FileText className="w-4 h-4" />
@@ -82,7 +82,7 @@ export default function CookiePolicyPage() {
                   </p>
                   <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
                     <p className="text-gray-600 text-sm">
-                      <strong>Think of cookies like a helpful assistant:</strong> They remember your preferences (like staying logged in) so you don't have to repeat yourself every time you visit.
+                      <strong>Think of cookies like a helpful assistant:</strong> They remember your preferences (like staying logged in) so you don&apos;t have to repeat yourself every time you visit.
                     </p>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function CookiePolicyPage() {
                     <div className="bg-purple-50 p-6 rounded-lg">
                       <h3 className="font-semibold text-gray-800 mb-3">Browser Settings</h3>
                       <p className="text-gray-600 text-sm mb-4">
-                        You can control cookies through your browser settings. Here's how:
+                        You can control cookies through your browser settings. Here&apos;s how:
                       </p>
                       <ul className="text-gray-600 text-sm list-disc list-inside space-y-1">
                         <li><strong>Chrome:</strong> Settings → Privacy and Security → Cookies and other site data</li>
@@ -234,7 +234,7 @@ export default function CookiePolicyPage() {
                     <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-400">
                       <h3 className="font-semibold text-gray-800 mb-2">⚠️ Important Note</h3>
                       <p className="text-gray-600 text-sm">
-                        Disabling certain cookies may affect the functionality of SoloSuccess AI. Essential cookies cannot be disabled as they're required for the service to work properly.
+                        Disabling certain cookies may affect the functionality of SoloSuccess AI. Essential cookies cannot be disabled as they&apos;re required for the service to work properly.
                       </p>
                     </div>
                   </div>
@@ -283,7 +283,7 @@ export default function CookiePolicyPage() {
                   </h2>
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg">
                     <p className="text-gray-600 leading-relaxed mb-4">
-                      If you have any questions about our use of cookies or this Cookie Policy, please don't hesitate to contact us:
+                      If you have any questions about our use of cookies or this Cookie Policy, please don&apos;t hesitate to contact us:
                     </p>
                     <div className="bg-white p-4 rounded-lg border border-purple-200">
                       <p className="text-purple-600 font-semibold">psychedelic.creator@enchantednightmare.com</p>
@@ -295,7 +295,7 @@ export default function CookiePolicyPage() {
                 <div className="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-400">
                   <h3 className="font-semibold text-gray-800 mb-2">Policy Updates</h3>
                   <p className="text-gray-600 text-sm">
-                    We may update this Cookie Policy from time to time. We'll notify you of any significant changes by posting the updated policy on this page and updating the "Last Updated" date at the top.
+                    We may update this Cookie Policy from time to time. We&apos;ll notify you of any significant changes by posting the updated policy on this page and updating the "Last Updated&quot; date at the top.
                   </p>
                 </div>
               </div>

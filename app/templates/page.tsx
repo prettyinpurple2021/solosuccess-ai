@@ -94,7 +94,7 @@ export default function TemplatesPage() {
             More Templates Coming Soon! 🚀
           </h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            We're constantly adding new templates based on community feedback.
+            We&apos;re constantly adding new templates based on community feedback.
             Have a specific template request? Let us know!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

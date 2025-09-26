@@ -35,11 +35,8 @@ module.exports = [
           destructuredArrayIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/no-namespace': 'off',
       
       // General rules
       'no-unused-vars': [
@@ -53,21 +50,13 @@ module.exports = [
       'prefer-const': 'warn',
       
       // React specific rules
-      'react/no-unescaped-entities': 'off',
+      'react/no-unescaped-entities': 'warn',
       'react/jsx-no-undef': 'warn',
-      'react-hooks/exhaustive-deps': 'warn',
-      'react-hooks/rules-of-hooks': 'warn',
-      
-      // Next.js specific rules
-      '@next/next/no-img-element': 'warn',
-      
-      // JSX accessibility rules  
-      'jsx-a11y/alt-text': 'warn',
     },
   },
   
   // Next.js specific configuration
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...compat.extends('next/core-web-vitals'),
   
   // Override for TypeScript files
   {

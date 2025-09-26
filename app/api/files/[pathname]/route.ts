@@ -15,10 +15,10 @@ function getSql() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pathname: string } }
+  { params }: { params: Promise<{ pathname: string }> }
 ) {
   try {
-    const { pathname } = params
+    const { pathname } = await params
     const decodedPathname = decodeURIComponent(pathname)
     
     const sql = getSql()
@@ -56,10 +56,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { pathname: string } }
+  { params }: { params: Promise<{ pathname: string }> }
 ) {
   try {
-    const { pathname } = params
+    const { pathname } = await params
     const decodedPathname = decodeURIComponent(pathname)
     
     const sql = getSql()

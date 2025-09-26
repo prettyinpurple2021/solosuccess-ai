@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Your privacy is our priority. We're committed to protecting your data and being transparent about how we handle your information.
+            Your privacy is our priority. We&apos;re committed to protecting your data and being transparent about how we handle your information.
           </p>
           <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
             <FileText className="w-4 h-4" />
@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
                 {/* Introduction */}
                 <div className="mb-8">
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    This Privacy Policy describes how SoloSuccess AI ("we," "us," or "our") collects, uses, and discloses your information when you use our web application (the "Service"). We are committed to protecting your privacy and handling your data in a transparent and secure manner.
+                    This Privacy Policy describes how SoloSuccess AI ("we," "us," or "our") collects, uses, and discloses your information when you use our web application (the "Service&quot;). We are committed to protecting your privacy and handling your data in a transparent and secure manner.
                   </p>
                 </div>
 
@@ -128,7 +128,7 @@ export default function PrivacyPolicyPage() {
                     <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
                       <h3 className="font-semibold text-gray-800 mb-2">BrandStyler Data:</h3>
                       <p className="text-gray-600 text-sm">
-                        If you create and save "Brand Profiles" using BrandStyler, we collect and store the id, user_id, profile_name, mission, values, color_palette (JSONB), font_combinations (JSONB), tone, target_audience, keywords, creation_date, and last_modified_date for each profile. Our AI agents, such as Echo, may access your Brand Profile to generate on-brand content.
+                        If you create and save "Brand Profiles&quot; using BrandStyler, we collect and store the id, user_id, profile_name, mission, values, color_palette (JSONB), font_combinations (JSONB), tone, target_audience, keywords, creation_date, and last_modified_date for each profile. Our AI agents, such as Echo, may access your Brand Profile to generate on-brand content.
                       </p>
                     </div>
 
@@ -142,7 +142,7 @@ export default function PrivacyPolicyPage() {
                     <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
                       <h3 className="font-semibold text-gray-800 mb-2">User Activity/Burnout Data:</h3>
                       <p className="text-gray-600 text-sm">
-                        SoloSuccess AI includes a "Burnout Shield & Focus Mode" feature. To provide personalized suggestions and assess burnout risk, we may collect specific user activity metrics. This data, including activity_data_id, user_id, type_of_activity (e.g., 'slaylist_completion', 'focus_mode_duration'), timestamp, and relevant_metrics (JSONB), may be stored.
+                        SoloSuccess AI includes a "Burnout Shield & Focus Mode&quot; feature. To provide personalized suggestions and assess burnout risk, we may collect specific user activity metrics. This data, including activity_data_id, user_id, type_of_activity (e.g., 'slaylist_completion', 'focus_mode_duration&apos;), timestamp, and relevant_metrics (JSONB), may be stored.
                       </p>
                     </div>
 
@@ -333,7 +333,7 @@ export default function PrivacyPolicyPage() {
                   </h2>
                   
                   <p className="text-gray-600 leading-relaxed mb-6">
-                    SoloSuccess AI aims to adhere to relevant privacy regulations like GDPR and CCPA. While a conceptual "Guardian AI" platform is envisioned to help SoloSuccess AI's users with their own data privacy compliance (including handling user requests for data access, correction, or deletion for their clients), we also provide mechanisms for our own users to exercise similar rights regarding their data stored within SoloSuccess AI.
+                    SoloSuccess AI aims to adhere to relevant privacy regulations like GDPR and CCPA. While a conceptual "Guardian AI&quot; platform is envisioned to help SoloSuccess AI&apos;s users with their own data privacy compliance (including handling user requests for data access, correction, or deletion for their clients), we also provide mechanisms for our own users to exercise similar rights regarding their data stored within SoloSuccess AI.
                   </p>
 
                   <p className="text-gray-600 leading-relaxed mb-4">
@@ -355,7 +355,7 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     <div className="bg-red-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Erasure ("Right to be Forgotten"):</h3>
+                      <h3 className="font-semibold text-gray-800 mb-2">Erasure ("Right to be Forgotten&quot;):</h3>
                       <p className="text-gray-600 text-sm">You can request that we delete your personal data, subject to certain legal obligations or legitimate business interests.</p>
                     </div>
 
@@ -393,7 +393,7 @@ export default function PrivacyPolicyPage() {
                     </h2>
                     <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
                       <p className="text-gray-600 text-sm mb-2">
-                        Please note that while our Lumi (Legal & Docs Agent) assists with document generation, its output explicitly includes "appropriate disclaimers." This emphasizes that the AI's output is not a substitute for professional legal advice. SoloSuccess AI provides assistance, but users are ultimately responsible for seeking professional advice where necessary.
+                        Please note that while our Lumi (Legal & Docs Agent) assists with document generation, its output explicitly includes "appropriate disclaimers.&quot; This emphasizes that the AI&apos;s output is not a substitute for professional legal advice. SoloSuccess AI provides assistance, but users are ultimately responsible for seeking professional advice where necessary.
                       </p>
                       <p className="text-gray-600 text-sm">
                         We acknowledge ethical considerations such as algorithmic bias, transparency, explainability, and accountability related to AI systems. We are committed to addressing these considerations as our Service evolves.
@@ -407,7 +407,7 @@ export default function PrivacyPolicyPage() {
                       Changes to This Privacy Policy
                     </h2>
                     <p className="text-gray-600 leading-relaxed">
-                      We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective Date" at the top. You are advised to review this Privacy Policy periodically for any changes.
+                      We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective Date&quot; at the top. You are advised to review this Privacy Policy periodically for any changes.
                     </p>
                   </div>
 

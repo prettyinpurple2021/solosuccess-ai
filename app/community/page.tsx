@@ -65,11 +65,11 @@ export default function CommunityComingSoonPage() {
         </div>
       </section>
 
-      {/* What We're Building */}
+      {/* What We&apos;re Building */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">What We're Building</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">What We&apos;re Building</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               A revolutionary social platform designed specifically for entrepreneurs, startups, and small businesses
             </p>
@@ -115,12 +115,12 @@ export default function CommunityComingSoonPage() {
         </div>
       </section>
 
-      {/* Why We're Building It */}
+      {/* Why We&apos;re Building It */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">Why We're Building This</h2>
+              <h2 className="text-4xl font-bold text-gray-800 mb-6">Why We&apos;re Building This</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-1">
@@ -195,7 +195,7 @@ export default function CommunityComingSoonPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Feature Preview</h2>
             <p className="text-xl text-gray-600">
-              Here's what we're building for the ultimate entrepreneur social experience
+              Here&apos;s what we&apos;re building for the ultimate entrepreneur social experience
             </p>
           </div>
 
@@ -277,7 +277,7 @@ export default function CommunityComingSoonPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Development Timeline</h2>
-            <p className="text-xl text-gray-600">Here's what we're working on and when to expect it</p>
+            <p className="text-xl text-gray-600">Here&apos;s what we&apos;re working on and when to expect it</p>
           </div>
           
           <div className="space-y-8">

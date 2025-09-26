@@ -18,7 +18,6 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    const db = getDb()
     const authHeader = request.headers.get('authorization')
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -31,7 +30,7 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7)
 
     // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
     if (!decoded || !decoded.userId) {
       return NextResponse.json(
         { error: 'Invalid token' },
