@@ -1,14 +1,27 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server
-import { getDb } from '@/lib/database-client''
+import { NextRequest, NextResponse} from 'next/server'
+import { createErrorResponse } from '@/lib/api-response'
+import { getDb } from '@/lib/database-client'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
 
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 
 
 // JWT authentication helper
-
+async function authenticateJWTRequest(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { user: null, error: 'Authorization header required' }
     }
 
     const token = authHeader.substring(7)
@@ -46,6 +59,7 @@ export async function GET(request: NextRequest) {
 
     // Ensure user exists in database
     const db = getDb()
+    const sql = getSql()
     let userData = await sql`
       SELECT id FROM users WHERE id = ${user.id}
     `
@@ -231,6 +245,7 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb()
+    const sql = getSql()
 
     // Create new briefcase
     const newBriefcase = await sql`

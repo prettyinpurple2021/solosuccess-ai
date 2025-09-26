@@ -1,7 +1,15 @@
-import { NextRequest, NextResponse} from 'next/server
-import { getDb } from '@/lib/database-client''
+import { NextRequest, NextResponse} from 'next/server'
+import { getDb } from '@/lib/database-client'
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -32,6 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user from database
+    const sql = getSql()
     const users = await sql`
       SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
       FROM users 
