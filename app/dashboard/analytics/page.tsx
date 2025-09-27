@@ -38,7 +38,7 @@ import {
 import { HolographicButton } from '@/components/ui/holographic-button'
 import { HolographicCard } from '@/components/ui/holographic-card'
 import { HolographicLoader } from '@/components/ui/holographic-loader'
-import { AnalyticsDashboard } from '@/components/analytics/analytics-dashboard'
+import AnalyticsDashboard from '@/components/analytics/analytics-dashboard'
 import { CustomReportBuilder } from '@/components/analytics/custom-report-builder'
 import { AdvancedDataVisualization } from '@/components/analytics/advanced-data-visualization'
 import { useAuth } from '@/hooks/use-auth'
