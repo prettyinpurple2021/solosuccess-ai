@@ -733,8 +733,8 @@ export function CustomReportBuilder({
                               <SelectItem value="equals">=</SelectItem>
                               <SelectItem value="not_equals">≠</SelectItem>
                               <SelectItem value="contains">⊃</SelectItem>
-                              <SelectItem value="greater_than">></SelectItem>
-                              <SelectItem value="less_than"><</SelectItem>
+                              <SelectItem value="greater_than">&gt;</SelectItem>
+                              <SelectItem value="less_than">&lt;</SelectItem>
                             </SelectContent>
                           </Select>
                           <Input
