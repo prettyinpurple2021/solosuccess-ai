@@ -1,10 +1,82 @@
-// @ts-nocheck
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { BookOpen, Target, TrendingUp, Award, Clock, Brain, CheckCircle } from 'lucide-react'
-import { Skill, LearningModule, UserProgress, LearningRecommendation } from '@/lib/learning-engine'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { 
+  BookOpen, 
+  Target, 
+  TrendingUp, 
+  Award, 
+  Clock, 
+  Brain, 
+  CheckCircle,
+  Star,
+  Zap,
+  Users,
+  Play,
+  Download,
+  RefreshCw,
+  Sparkles,
+  Crown,
+  Lightbulb,
+  ArrowRight,
+  Calendar,
+  BarChart3,
+  Eye,
+  Trophy,
+  Flame,
+  GraduationCap
+} from 'lucide-react'
+import { HolographicCard } from '@/components/ui/holographic-card'
+import { HolographicButton } from '@/components/ui/holographic-button'
+import { toast } from 'sonner'
+import { logger, logInfo, logError } from '@/lib/logger'
+
+interface Skill {
+  id: string
+  name: string
+  description: string
+  category: string
+  level: number
+  experience_points: number
+}
+
+interface LearningModule {
+  id: string
+  title: string
+  description: string
+  duration_minutes: number
+  difficulty: 'beginner' | 'intermediate' | 'advanced'
+  category: string
+  skills_covered: string[]
+  prerequisites: string[]
+  completion_rate: number
+  rating: number
+}
+
+interface UserProgress {
+  module_id: string
+  completion_percentage: number
+  time_spent: number
+  quiz_scores: { quiz_id: string; score: number }[]
+  exercises_completed: string[]
+  last_accessed: string
+  started_at: string
+}
+
+interface LearningRecommendation {
+  module_id: string
+  priority: 'high' | 'medium' | 'low'
+  reason: string
+  estimated_impact: number
+  prerequisites_met: boolean
+  estimated_completion_time: number
+}
 
 interface SkillGap {
   skill: Skill
@@ -21,212 +93,433 @@ interface LearningAnalytics {
   current_streak: number
   learning_velocity: number
   top_categories: Array<{ category: string; time_spent: number; modules_completed: number }>
+  certifications_earned: number
+  peer_rank: number
+  weekly_goal_progress: number
 }
 
 export default function LearningDashboard() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'skill-gaps' | 'recommendations' | 'progress' | 'analytics'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'skill-gaps' | 'recommendations' | 'progress' | 'analytics' | 'achievements'>('overview')
   const [skillGaps, setSkillGaps] = useState<SkillGap[]>([])
   const [recommendations, setRecommendations] = useState<LearningRecommendation[]>([])
   const [progress, setProgress] = useState<UserProgress[]>([])
   const [analytics, setAnalytics] = useState<LearningAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     loadLearningData()
   }, [])
 
-  const loadLearningData = async () => {
+  const loadLearningData = useCallback(async () => {
     try {
       setLoading(true)
       
-      const [skillGapsRes, recommendationsRes, progressRes, analyticsRes] = await Promise.all([
-        fetch('/api/learning?action=skill-gaps'),
-        fetch('/api/learning?action=recommendations'),
-        fetch('/api/learning?action=progress'),
-        fetch('/api/learning?action=analytics')
-      ])
-
-      if (skillGapsRes.ok) {
-        const data = await skillGapsRes.json()
-        setSkillGaps(data.skill_gaps || [])
+      // Mock data - in production, this would come from API
+      const mockAnalytics: LearningAnalytics = {
+        total_modules_completed: 23,
+        total_time_spent: 1240, // minutes
+        average_quiz_score: 87,
+        skills_improved: 15,
+        current_streak: 12,
+        learning_velocity: 3.2,
+        certifications_earned: 4,
+        peer_rank: 8,
+        weekly_goal_progress: 75,
+        top_categories: [
+          { category: 'Business Strategy', time_spent: 320, modules_completed: 8 },
+          { category: 'Marketing & Sales', time_spent: 280, modules_completed: 6 },
+          { category: 'Financial Management', time_spent: 240, modules_completed: 5 },
+          { category: 'Leadership & Team Building', time_spent: 200, modules_completed: 4 }
+        ]
       }
 
-      if (recommendationsRes.ok) {
-        const data = await recommendationsRes.json()
-        setRecommendations(data || [])
-      }
+      const mockSkillGaps: SkillGap[] = [
+        {
+          skill: {
+            id: '1',
+            name: 'Data Analytics',
+            description: 'Ability to analyze and interpret business data',
+            category: 'Technical Skills',
+            level: 3,
+            experience_points: 750
+          },
+          gap_score: 65,
+          priority: 'high',
+          recommended_modules: [
+            {
+              id: 'mod1',
+              title: 'Introduction to Business Analytics',
+              description: 'Learn the fundamentals of data analysis for business decisions',
+              duration_minutes: 45,
+              difficulty: 'intermediate',
+              category: 'Technical Skills',
+              skills_covered: ['Data Analytics'],
+              prerequisites: [],
+              completion_rate: 0,
+              rating: 4.5
+            }
+          ]
+        },
+        {
+          skill: {
+            id: '2',
+            name: 'Negotiation',
+            description: 'Skills for effective business negotiations',
+            category: 'Soft Skills',
+            level: 4,
+            experience_points: 920
+          },
+          gap_score: 40,
+          priority: 'medium',
+          recommended_modules: [
+            {
+              id: 'mod2',
+              title: 'Advanced Negotiation Techniques',
+              description: 'Master complex negotiation scenarios and strategies',
+              duration_minutes: 60,
+              difficulty: 'advanced',
+              category: 'Soft Skills',
+              skills_covered: ['Negotiation'],
+              prerequisites: ['Basic Negotiation'],
+              completion_rate: 0,
+              rating: 4.8
+            }
+          ]
+        }
+      ]
 
-      if (progressRes.ok) {
-        const data = await progressRes.json()
-        setProgress(data || [])
-      }
+      const mockRecommendations: LearningRecommendation[] = [
+        {
+          module_id: 'mod1',
+          priority: 'high',
+          reason: 'Based on your business goals and current skill gaps',
+          estimated_impact: 85,
+          prerequisites_met: true,
+          estimated_completion_time: 45
+        },
+        {
+          module_id: 'mod2',
+          priority: 'medium',
+          reason: 'Will help improve your leadership capabilities',
+          estimated_impact: 70,
+          prerequisites_met: false,
+          estimated_completion_time: 60
+        }
+      ]
 
-      if (analyticsRes.ok) {
-        const data = await analyticsRes.json()
-        setAnalytics(data)
-      }
+      const mockProgress: UserProgress[] = [
+        {
+          module_id: 'mod3',
+          completion_percentage: 75,
+          time_spent: 35,
+          quiz_scores: [{ quiz_id: 'q1', score: 85 }],
+          exercises_completed: ['ex1', 'ex2'],
+          last_accessed: new Date().toISOString(),
+          started_at: new Date(Date.now() - 86400000).toISOString()
+        }
+      ]
+
+      setAnalytics(mockAnalytics)
+      setSkillGaps(mockSkillGaps)
+      setRecommendations(mockRecommendations)
+      setProgress(mockProgress)
+      
+      logInfo('Learning data loaded successfully')
     } catch (error) {
-      console.error('Error loading learning data:', error)
+      logError('Error loading learning data:', error)
+      toast.error('Failed to load learning data', { icon: '❌' })
     } finally {
       setLoading(false)
     }
+  }, [])
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await loadLearningData()
+    setRefreshing(false)
+    toast.success('Learning data refreshed!', { icon: '✅' })
   }
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: BookOpen },
-    { id: 'skill-gaps', label: 'Skill Gaps', icon: Target },
-    { id: 'recommendations', label: 'Recommendations', icon: TrendingUp },
-    { id: 'progress', label: 'Progress', icon: Award },
-    { id: 'analytics', label: 'Analytics', icon: Brain }
-  ]
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
 
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-white/10 rounded-lg mb-6 w-64"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 bg-white/10 rounded-xl"></div>
-              ))}
-            </div>
-            <div className="h-96 bg-white/10 rounded-xl"></div>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-950 to-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className="text-purple-200">Loading your learning journey...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-950 to-black text-white">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="p-6 space-y-8"
+      >
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-            Learning Center
-          </h1>
-          <p className="text-gray-300 text-lg">
-            Personalized learning paths to accelerate your entrepreneurial journey
-          </p>
-        </motion.div>
-
-        {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          <div className="flex flex-wrap gap-2 p-1 bg-black/20 rounded-xl backdrop-blur-sm">
-            {tabs.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
-                      : 'text-gray-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  <Icon size={18} />
-                  {tab.label}
-                </button>
-              )
-            })}
+        <motion.div variants={itemVariants} className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3">
+              <motion.div
+                animate={{
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-md"
+              >
+                <GraduationCap className="w-6 h-6 text-white" />
+              </motion.div>
+              <div>
+                <h1 className="text-4xl font-bold text-gradient">Learning Center</h1>
+                <p className="text-lg text-purple-200">
+                  Personalized learning paths to accelerate your entrepreneurial journey
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <HolographicButton
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </HolographicButton>
+            <HolographicButton>
+              <Download className="w-4 h-4 mr-2" />
+              Export Progress
+            </HolographicButton>
           </div>
         </motion.div>
 
-        {/* Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {activeTab === 'overview' && <OverviewTab analytics={analytics} />}
-          {activeTab === 'skill-gaps' && <SkillGapsTab skillGaps={skillGaps} />}
-          {activeTab === 'recommendations' && <RecommendationsTab recommendations={recommendations} />}
-          {activeTab === 'progress' && <ProgressTab progress={progress} />}
-          {activeTab === 'analytics' && <AnalyticsTab analytics={analytics} />}
+        {/* Learning Tabs */}
+        <motion.div variants={itemVariants}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-6 bg-purple-900/50 border border-purple-700">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="skill-gaps" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+                <Target className="w-4 h-4 mr-2" />
+                Skill Gaps
+              </TabsTrigger>
+              <TabsTrigger value="recommendations" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Recommendations
+              </TabsTrigger>
+              <TabsTrigger value="progress" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+                <Award className="w-4 h-4 mr-2" />
+                Progress
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="achievements" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
+                <Trophy className="w-4 h-4 mr-2" />
+                Achievements
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6">
+              {analytics && <OverviewTab analytics={analytics} />}
+            </TabsContent>
+
+            {/* Skill Gaps Tab */}
+            <TabsContent value="skill-gaps" className="space-y-6">
+              <SkillGapsTab skillGaps={skillGaps} />
+            </TabsContent>
+
+            {/* Recommendations Tab */}
+            <TabsContent value="recommendations" className="space-y-6">
+              <RecommendationsTab recommendations={recommendations} />
+            </TabsContent>
+
+            {/* Progress Tab */}
+            <TabsContent value="progress" className="space-y-6">
+              <ProgressTab progress={progress} />
+            </TabsContent>
+
+            {/* Analytics Tab */}
+            <TabsContent value="analytics" className="space-y-6">
+              {analytics && <AnalyticsTab analytics={analytics} />}
+            </TabsContent>
+
+            {/* Achievements Tab */}
+            <TabsContent value="achievements" className="space-y-6">
+              <AchievementsTab analytics={analytics} />
+            </TabsContent>
+          </Tabs>
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   )
 }
 
-function OverviewTab({ analytics }: { analytics: LearningAnalytics | null }) {
-  if (!analytics) {
-    return (
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-8 text-center">
-        <BookOpen className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">Welcome to Learning!</h3>
-        <p className="text-gray-300">Start your learning journey by exploring skill gaps and recommendations.</p>
-      </div>
-    )
-  }
-
+function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
   return (
     <div className="space-y-8">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Modules Completed"
-          value={analytics.total_modules_completed}
-          icon={CheckCircle}
-          color="green"
-        />
-        <StatCard
-          title="Time Spent"
-          value={formatTime(analytics.total_time_spent)}
-          icon={Clock}
-          color="blue"
-        />
-        <StatCard
-          title="Current Streak"
-          value={`${analytics.current_streak} days`}
-          icon={TrendingUp}
-          color="purple"
-        />
-        <StatCard
-          title="Skills Improved"
-          value={analytics.skills_improved}
-          icon={Brain}
-          color="pink"
-        />
+        <HolographicCard>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-purple-200">Modules Completed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{analytics.total_modules_completed}</div>
+            <p className="text-xs text-green-400">+3 this week</p>
+          </CardContent>
+        </HolographicCard>
+
+        <HolographicCard>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-purple-200">Learning Streak</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{analytics.current_streak} days</div>
+            <p className="text-xs text-orange-400 flex items-center gap-1">
+              <Flame className="w-3 h-3" />
+              Keep it going!
+            </p>
+          </CardContent>
+        </HolographicCard>
+
+        <HolographicCard>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-purple-200">Skills Improved</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{analytics.skills_improved}</div>
+            <p className="text-xs text-blue-400">Leveling up!</p>
+          </CardContent>
+        </HolographicCard>
+
+        <HolographicCard>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-purple-200">Certifications</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{analytics.certifications_earned}</div>
+            <p className="text-xs text-purple-400">Achievements unlocked</p>
+          </CardContent>
+        </HolographicCard>
       </div>
 
-      {/* Learning Categories */}
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-          <Award className="w-5 h-5 text-yellow-400" />
-          Top Learning Categories
-        </h3>
-        <div className="space-y-3">
-          {analytics.top_categories.map((category, index) => (
-            <div key={category.category} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {index + 1}
-                </div>
-                <span className="text-white font-medium">{category.category}</span>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-300">
-                  {formatTime(category.time_spent)} • {category.modules_completed} modules
-                </div>
-              </div>
+      {/* Learning Progress */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <HolographicCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-green-300" />
+              Weekly Learning Goal
+            </CardTitle>
+            <CardDescription className="text-purple-200">
+              Track your progress towards weekly learning objectives
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-purple-200">Progress</span>
+              <span className="text-white font-medium">{analytics.weekly_goal_progress}%</span>
             </div>
-          ))}
-        </div>
+            <Progress value={analytics.weekly_goal_progress} className="h-3" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-purple-300">3 modules completed</span>
+              <span className="text-purple-300">4 modules target</span>
+            </div>
+          </CardContent>
+        </HolographicCard>
+
+        <HolographicCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="w-5 h-5 text-yellow-300" />
+              Peer Ranking
+            </CardTitle>
+            <CardDescription className="text-purple-200">
+              Your position among other learners
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white mb-2">#{analytics.peer_rank}</div>
+              <p className="text-purple-200">Out of 150 learners</p>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-400" />
+              <span className="text-yellow-400 text-sm">Top 5% performer</span>
+            </div>
+          </CardContent>
+        </HolographicCard>
       </div>
+
+      {/* Top Learning Categories */}
+      <HolographicCard>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-yellow-300" />
+            Top Learning Categories
+          </CardTitle>
+          <CardDescription className="text-purple-200">
+            Your most focused learning areas
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {analytics.top_categories.map((category, index) => (
+              <div key={category.category} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-purple-700">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white">{category.category}</h4>
+                    <p className="text-sm text-purple-200">{category.modules_completed} modules</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-white font-medium">{formatTime(category.time_spent)}</div>
+                  <div className="text-xs text-purple-300">Total time</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </HolographicCard>
     </div>
   )
 }
@@ -234,56 +527,78 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics | null }) {
 function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
   if (skillGaps.length === 0) {
     return (
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-8 text-center">
-        <Target className="w-16 h-16 text-green-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Skill Gaps Detected!</h3>
-        <p className="text-gray-300">You&apos;re doing great! Keep up the excellent work.</p>
-      </div>
+      <HolographicCard>
+        <CardContent className="text-center py-12">
+          <Target className="w-16 h-16 text-green-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Skill Gaps Detected!</h3>
+          <p className="text-purple-200">You're doing great! Keep up the excellent work.</p>
+        </CardContent>
+      </HolographicCard>
     )
   }
 
   return (
     <div className="space-y-6">
-      {skillGaps.map((gap) => (
-        <div key={gap.skill.id} className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-1">{gap.skill.name}</h3>
-              <p className="text-gray-300 text-sm">{gap.skill.description}</p>
-            </div>
-            <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getPriorityColor(gap.priority)}`}>
-              {gap.gap_score}% gap
-            </div>
-          </div>
-          
-          <div className="mb-4">
-            <div className="flex justify-between text-sm text-gray-300 mb-1">
-              <span>Skill Gap</span>
-              <span>{gap.gap_score}%</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-red-500 to-yellow-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${gap.gap_score}%` }}
-              />
-            </div>
-          </div>
-
-          {gap.recommended_modules.length > 0 && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-300 mb-2">Recommended Modules:</h4>
-              <div className="space-y-2">
-                {gap.recommended_modules.slice(0, 3).map((module) => (
-                  <div key={module.id} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
-                    <BookOpen className="w-4 h-4 text-purple-400" />
-                    <span className="text-white text-sm">{module.title}</span>
-                    <span className="text-gray-400 text-xs ml-auto">{module.duration_minutes}m</span>
-                  </div>
-                ))}
+      {skillGaps.map((gap, index) => (
+        <motion.div
+          key={gap.skill.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <HolographicCard>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle className="text-white">{gap.skill.name}</CardTitle>
+                  <CardDescription className="text-purple-200">{gap.skill.description}</CardDescription>
+                </div>
+                <Badge className={getPriorityColor(gap.priority)}>
+                  {gap.gap_score}% gap
+                </Badge>
               </div>
-            </div>
-          )}
-        </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-200">Skill Gap</span>
+                  <span className="text-white">{gap.gap_score}%</span>
+                </div>
+                <Progress value={gap.gap_score} className="h-2" indicatorClassName="bg-gradient-to-r from-red-500 to-yellow-500" />
+              </div>
+
+              {gap.recommended_modules.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-white">Recommended Modules:</h4>
+                  {gap.recommended_modules.map((module) => (
+                    <div key={module.id} className="p-3 bg-white/5 rounded-lg border border-purple-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-medium text-white">{module.title}</h5>
+                        <Badge variant="outline" className="border-purple-600 text-purple-200">
+                          {module.duration_minutes}m
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-purple-200 mb-3">{module.description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-400" />
+                          <span className="text-sm text-white">{module.rating}</span>
+                          <Badge variant="outline" className="border-cyan-600 text-cyan-200">
+                            {module.difficulty}
+                          </Badge>
+                        </div>
+                        <HolographicButton size="sm">
+                          <Play className="w-4 h-4 mr-2" />
+                          Start Learning
+                        </HolographicButton>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </HolographicCard>
+        </motion.div>
       ))}
     </div>
   )
@@ -292,57 +607,69 @@ function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
 function RecommendationsTab({ recommendations }: { recommendations: LearningRecommendation[] }) {
   if (recommendations.length === 0) {
     return (
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-8 text-center">
-        <TrendingUp className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Recommendations Yet</h3>
-        <p className="text-gray-300">Complete a skill assessment to get personalized recommendations.</p>
-      </div>
+      <HolographicCard>
+        <CardContent className="text-center py-12">
+          <TrendingUp className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Recommendations Yet</h3>
+          <p className="text-purple-200">Complete a skill assessment to get personalized recommendations.</p>
+        </CardContent>
+      </HolographicCard>
     )
   }
 
   return (
     <div className="space-y-6">
       {recommendations.map((rec, index) => (
-        <div key={rec.module_id} className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-1">Module #{index + 1}</h3>
-              <p className="text-gray-300 text-sm">{rec.reason}</p>
-            </div>
-            <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getPriorityColor(rec.priority)}`}>
-              {rec.priority} priority
-            </div>
-          </div>
-          
-          <div className="mb-4">
-            <div className="flex justify-between text-sm text-gray-300 mb-1">
-              <span>Estimated Impact</span>
-              <span>{rec.estimated_impact}%</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${rec.estimated_impact}%` }}
-              />
-            </div>
-          </div>
+        <motion.div
+          key={rec.module_id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <HolographicCard>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle className="text-white">Learning Module #{index + 1}</CardTitle>
+                  <CardDescription className="text-purple-200">{rec.reason}</CardDescription>
+                </div>
+                <Badge className={getPriorityColor(rec.priority)}>
+                  {rec.priority} priority
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-200">Estimated Impact</span>
+                  <span className="text-white">{rec.estimated_impact}%</span>
+                </div>
+                <Progress value={rec.estimated_impact} className="h-2" indicatorClassName="bg-gradient-to-r from-blue-500 to-purple-500" />
+              </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {rec.prerequisites_met ? (
-                <CheckCircle className="w-4 h-4 text-green-400" />
-              ) : (
-                <div className="w-4 h-4 border border-yellow-400 rounded-full" />
-              )}
-              <span className="text-sm text-gray-300">
-                {rec.prerequisites_met ? 'Prerequisites met' : 'Prerequisites required'}
-              </span>
-            </div>
-            <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all duration-200">
-              Start Learning
-            </button>
-          </div>
-        </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {rec.prerequisites_met ? (
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <div className="w-4 h-4 border-2 border-yellow-400 rounded-full" />
+                  )}
+                  <span className="text-sm text-purple-200">
+                    {rec.prerequisites_met ? 'Prerequisites met' : 'Prerequisites required'}
+                  </span>
+                </div>
+                <div className="text-sm text-purple-200">
+                  ~{rec.estimated_completion_time}m to complete
+                </div>
+              </div>
+
+              <HolographicButton className="w-full">
+                <Play className="w-4 h-4 mr-2" />
+                Start Learning Module
+              </HolographicButton>
+            </CardContent>
+          </HolographicCard>
+        </motion.div>
       ))}
     </div>
   )
@@ -351,137 +678,267 @@ function RecommendationsTab({ recommendations }: { recommendations: LearningReco
 function ProgressTab({ progress }: { progress: UserProgress[] }) {
   if (progress.length === 0) {
     return (
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-8 text-center">
-        <Award className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Learning Progress Yet</h3>
-        <p className="text-gray-300">Start your first learning module to track your progress.</p>
-      </div>
+      <HolographicCard>
+        <CardContent className="text-center py-12">
+          <Award className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Learning Progress Yet</h3>
+          <p className="text-purple-200">Start your first learning module to track your progress.</p>
+        </CardContent>
+      </HolographicCard>
     )
   }
 
   return (
     <div className="space-y-6">
-      {progress.map((prog) => (
-        <div key={prog.module_id} className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-white">Module: {prog.module_id}</h3>
-            <div className="text-sm text-gray-300">
-              {prog.completion_percentage}% Complete
-            </div>
-          </div>
-          
-          <div className="mb-4">
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${prog.completion_percentage}%` }}
-              />
-            </div>
-          </div>
+      {progress.map((prog, index) => (
+        <motion.div
+          key={prog.module_id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <HolographicCard>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white">Module: {prog.module_id}</CardTitle>
+                <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
+                  {prog.completion_percentage}% Complete
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-purple-200">Progress</span>
+                  <span className="text-white">{prog.completion_percentage}%</span>
+                </div>
+                <Progress value={prog.completion_percentage} className="h-3" indicatorClassName="bg-gradient-to-r from-green-500 to-blue-500" />
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-400" />
-              <span className="text-gray-300">Time Spent: {formatTime(prog.time_spent)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-gray-300">Quizzes: {prog.quiz_scores.length}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-purple-400" />
-              <span className="text-gray-300">Exercises: {prog.exercises_completed.length}</span>
-            </div>
-          </div>
-        </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg">
+                  <Clock className="w-4 h-4 text-blue-400" />
+                  <div>
+                    <div className="text-white font-medium">{formatTime(prog.time_spent)}</div>
+                    <div className="text-purple-300 text-xs">Time Spent</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <div>
+                    <div className="text-white font-medium">{prog.quiz_scores.length}</div>
+                    <div className="text-purple-300 text-xs">Quizzes Taken</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg">
+                  <Zap className="w-4 h-4 text-purple-400" />
+                  <div>
+                    <div className="text-white font-medium">{prog.exercises_completed.length}</div>
+                    <div className="text-purple-300 text-xs">Exercises Done</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-purple-700">
+                <div className="text-sm text-purple-200">
+                  Last accessed: {new Date(prog.last_accessed).toLocaleDateString()}
+                </div>
+                <HolographicButton size="sm">
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                  Continue Learning
+                </HolographicButton>
+              </div>
+            </CardContent>
+          </HolographicCard>
+        </motion.div>
       ))}
     </div>
   )
 }
 
-function AnalyticsTab({ analytics }: { analytics: LearningAnalytics | null }) {
-  if (!analytics) {
-    return (
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-8 text-center">
-        <Brain className="w-16 h-16 text-indigo-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Analytics Data Yet</h3>
-        <p className="text-gray-300">Start learning to see detailed analytics.</p>
-      </div>
-    )
-  }
-
+function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
   return (
     <div className="space-y-8">
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-2">Quiz Performance</h3>
-          <div className="text-3xl font-bold text-blue-400 mb-1">{analytics.average_quiz_score}%</div>
-          <p className="text-gray-300 text-sm">Average Score</p>
-        </div>
+        <HolographicCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-blue-400" />
+              Quiz Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-blue-400 mb-2">{analytics.average_quiz_score}%</div>
+            <p className="text-purple-200 text-sm">Average Score</p>
+            <div className="mt-3">
+              <Progress value={analytics.average_quiz_score} className="h-2" indicatorClassName="bg-blue-500" />
+            </div>
+          </CardContent>
+        </HolographicCard>
         
-        <div className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-2">Learning Velocity</h3>
-          <div className="text-3xl font-bold text-green-400 mb-1">{analytics.learning_velocity}</div>
-          <p className="text-gray-300 text-sm">Modules/Week</p>
-        </div>
+        <HolographicCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-green-400" />
+              Learning Velocity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-400 mb-2">{analytics.learning_velocity}</div>
+            <p className="text-purple-200 text-sm">Modules/Week</p>
+            <div className="mt-3">
+              <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
+                Above Average
+              </Badge>
+            </div>
+          </CardContent>
+        </HolographicCard>
         
-        <div className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-2">Skills Improved</h3>
-          <div className="text-3xl font-bold text-purple-400 mb-1">{analytics.skills_improved}</div>
-          <p className="text-gray-300 text-sm">Total Skills</p>
-        </div>
+        <HolographicCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-purple-400" />
+              Skills Improved
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-purple-400 mb-2">{analytics.skills_improved}</div>
+            <p className="text-purple-200 text-sm">Total Skills</p>
+            <div className="mt-3">
+              <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">
+                Excellent Progress
+              </Badge>
+            </div>
+          </CardContent>
+        </HolographicCard>
       </div>
 
-      {/* Learning Categories Chart */}
-      <div className="bg-black/20 backdrop-blur-sm rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">Learning Distribution</h3>
-        <div className="space-y-4">
-          {analytics.top_categories.map((category, index) => {
-            const totalTime = analytics.top_categories.reduce((sum, c) => sum + c.time_spent, 0)
-            const percentage = totalTime > 0 ? (category.time_spent / totalTime) * 100 : 0
-            
-            return (
-              <div key={category.category} className="flex items-center gap-4">
-                <div className="w-32 text-sm text-gray-300">{category.category}</div>
-                <div className="flex-1 bg-gray-700 rounded-full h-3">
-                  <div 
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${percentage}%` }}
-                  />
+      {/* Learning Distribution */}
+      <HolographicCard>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-cyan-300" />
+            Learning Distribution
+          </CardTitle>
+          <CardDescription className="text-purple-200">
+            Time spent across different learning categories
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {analytics.top_categories.map((category, index) => {
+              const totalTime = analytics.top_categories.reduce((sum, c) => sum + c.time_spent, 0)
+              const percentage = totalTime > 0 ? (category.time_spent / totalTime) * 100 : 0
+              
+              return (
+                <div key={category.category} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-purple-200 font-medium">{category.category}</span>
+                    <span className="text-white text-sm">{formatTime(category.time_spent)}</span>
+                  </div>
+                  <Progress value={percentage} className="h-2" indicatorClassName="bg-gradient-to-r from-cyan-500 to-purple-500" />
+                  <div className="flex justify-between text-xs text-purple-300">
+                    <span>{category.modules_completed} modules</span>
+                    <span>{percentage.toFixed(1)}%</span>
+                  </div>
                 </div>
-                <div className="w-20 text-sm text-gray-300 text-right">
-                  {formatTime(category.time_spent)}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </HolographicCard>
     </div>
   )
 }
 
-function StatCard({ title, value, icon: Icon, color }: { 
-  title: string
-  value: string | number
-  icon: any
-  color: string
-}) {
-  const colorClasses = {
-    green: 'text-green-400 bg-green-400/10 border-green-400/30',
-    blue: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
-    purple: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
-    pink: 'text-pink-400 bg-pink-400/10 border-pink-400/30'
-  }
+function AchievementsTab({ analytics }: { analytics: LearningAnalytics | null }) {
+  const achievements = [
+    {
+      id: '1',
+      title: 'First Steps',
+      description: 'Complete your first learning module',
+      icon: Star,
+      unlocked: true,
+      progress: 100,
+      color: 'text-yellow-400'
+    },
+    {
+      id: '2',
+      title: 'Streak Master',
+      description: 'Maintain a 10-day learning streak',
+      icon: Flame,
+      unlocked: analytics ? analytics.current_streak >= 10 : false,
+      progress: analytics ? Math.min((analytics.current_streak / 10) * 100, 100) : 0,
+      color: 'text-orange-400'
+    },
+    {
+      id: '3',
+      title: 'Knowledge Seeker',
+      description: 'Complete 20 learning modules',
+      icon: BookOpen,
+      unlocked: analytics ? analytics.total_modules_completed >= 20 : false,
+      progress: analytics ? Math.min((analytics.total_modules_completed / 20) * 100, 100) : 0,
+      color: 'text-blue-400'
+    },
+    {
+      id: '4',
+      title: 'Certification Collector',
+      description: 'Earn 5 certifications',
+      icon: Award,
+      unlocked: analytics ? analytics.certifications_earned >= 5 : false,
+      progress: analytics ? Math.min((analytics.certifications_earned / 5) * 100, 100) : 0,
+      color: 'text-purple-400'
+    },
+    {
+      id: '5',
+      title: 'Top Performer',
+      description: 'Achieve top 10% ranking',
+      icon: Trophy,
+      unlocked: analytics ? analytics.peer_rank <= 15 : false,
+      progress: analytics ? Math.min((15 / analytics.peer_rank) * 100, 100) : 0,
+      color: 'text-green-400'
+    }
+  ]
 
   return (
-    <div className="bg-black/20 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-      <div className={`w-12 h-12 rounded-lg border flex items-center justify-center mb-4 ${colorClasses[color as keyof typeof colorClasses]}`}>
-        <Icon className="w-6 h-6" />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {achievements.map((achievement, index) => (
+          <motion.div
+            key={achievement.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <HolographicCard className={achievement.unlocked ? 'ring-2 ring-yellow-400/50' : ''}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center ${achievement.unlocked ? 'animate-pulse' : ''}`}>
+                    <achievement.icon className={`w-6 h-6 ${achievement.unlocked ? achievement.color : 'text-gray-400'}`} />
+                  </div>
+                  {achievement.unlocked && (
+                    <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
+                      Unlocked
+                    </Badge>
+                  )}
+                </div>
+                <CardTitle className="text-white">{achievement.title}</CardTitle>
+                <CardDescription className="text-purple-200">{achievement.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-purple-200">Progress</span>
+                    <span className="text-white">{Math.round(achievement.progress)}%</span>
+                  </div>
+                  <Progress value={achievement.progress} className="h-2" indicatorClassName={achievement.unlocked ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gray-600'} />
+                </div>
+              </CardContent>
+            </HolographicCard>
+          </motion.div>
+        ))}
       </div>
-      <div className="text-2xl font-bold text-white mb-1">{value}</div>
-      <div className="text-gray-300 text-sm">{title}</div>
     </div>
   )
 }
@@ -497,9 +954,9 @@ function formatTime(minutes: number): string {
 
 function getPriorityColor(priority: string) {
   switch (priority) {
-    case 'high': return 'text-red-400 border-red-400/30 bg-red-400/10'
-    case 'medium': return 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10'
-    case 'low': return 'text-green-400 border-green-400/30 bg-green-400/10'
-    default: return 'text-gray-400 border-gray-400/30 bg-gray-400/10'
+    case 'high': return 'bg-red-500/20 text-red-500 border-red-500/30'
+    case 'medium': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+    case 'low': return 'bg-green-500/20 text-green-500 border-green-500/30'
+    default: return 'bg-gray-500/20 text-gray-500 border-gray-500/30'
   }
 }
