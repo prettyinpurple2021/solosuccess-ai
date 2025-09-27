@@ -16,6 +16,8 @@ import {
   CheckCircle, Target, Clock, MessageCircle, Trophy, Crown, Sparkles, Flame, ArrowRight, BarChart3, Plus, Briefcase} from "lucide-react"
 import Link from "next/link"
 import { useSearchParams, useRouter} from "next/navigation"
+import { useIsMobile } from "@/hooks/use-mobile"
+import MobileDashboardEnhanced from "@/components/mobile/mobile-dashboard-enhanced"
 
 
 export default function DashboardPage() {
@@ -26,6 +28,7 @@ export default function DashboardPage() {
   const [showWelcomeDashboard, setShowWelcomeDashboard] = useState(false)
   const searchParams = useSearchParams()
   const _router = useRouter()
+  const isMobile = useIsMobile()
 
   // Track page views and performance
   usePageTracking()
@@ -266,6 +269,33 @@ export default function DashboardPage() {
         ease: easeOut
       }
     }
+  }
+
+  // Render mobile PWA dashboard for mobile devices
+  if (isMobile) {
+    return (
+      <MobileDashboardEnhanced
+        user={{
+          name: data.user.full_name || data.user.email.split('@')[0],
+          email: data.user.email,
+          avatar: data.user.avatar,
+          level: data.user.level,
+          points: data.user.total_points
+        }}
+        dashboardData={{
+          todaysStats: {
+            tasks_completed: data.todaysStats.tasks_completed,
+            total_tasks: data.todaysStats.total_tasks,
+            focus_minutes: data.todaysStats.focus_minutes,
+            ai_interactions: data.todaysStats.ai_interactions,
+            goals_achieved: data.todaysStats.goals_achieved,
+            productivity_score: data.todaysStats.productivity_score
+          },
+          todaysTasks: data.todaysTasks || [],
+          todaysGoals: data.todaysGoals || []
+        }}
+      />
+    )
   }
 
   return (

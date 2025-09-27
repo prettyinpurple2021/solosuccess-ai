@@ -20,8 +20,14 @@ interface TouchGestureProps {
   onDoubleTap?: () => void
   onLongPress?: () => void
   onPinch?: (_scale: number) => void
+  onRefresh?: () => void // Pull to refresh
+  onBack?: () => void // Swipe back gesture
+  onMenu?: () => void // Swipe from edge for menu
   children: React.ReactNode
   className?: string
+  enablePullToRefresh?: boolean
+  enableSwipeBack?: boolean
+  enableEdgeSwipe?: boolean
 }
 
 export function TouchGestureWrapper({
@@ -29,8 +35,14 @@ export function TouchGestureWrapper({
   onDoubleTap,
   onLongPress,
   onPinch: _onPinch,
+  onRefresh,
+  onBack,
+  onMenu,
   children,
   className = "",
+  enablePullToRefresh = true,
+  enableSwipeBack = true,
+  enableEdgeSwipe = true,
 }: TouchGestureProps) {
   const [touchStart, setTouchStart] = useState<{ x: number; y: number; time: number } | null>(null)
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number; time: number } | null>(null)
