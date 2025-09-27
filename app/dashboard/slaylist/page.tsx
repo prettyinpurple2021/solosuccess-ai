@@ -23,7 +23,7 @@ import {
   Mic
 } from "lucide-react"
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
-import VoiceTaskCreator from "@/components/tasks/voice-task-creator"
+import VoiceTaskCreator from "@/components/mobile/voice-task-creator"
 import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
 
 
