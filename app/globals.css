@@ -895,14 +895,80 @@
     animation-delay: 2s;
   }
 
-  /* Form input utilities */
-  .form-input-dark {
-    @apply bg-black/30 border border-purple-800/30 rounded px-3 py-2 text-sm text-gray-300 focus:border-purple-500 focus:outline-none;
-  }
-  
-  .form-input-dark-lg {
-    @apply w-full pl-10 pr-4 py-2 bg-black/30 border border-purple-800/30 rounded-lg text-gray-300 placeholder-gray-500 focus:border-purple-500 focus:outline-none;
-  }
+/* Form input utilities */
+.form-input-dark {
+  @apply bg-black/30 border border-purple-800/30 rounded px-3 py-2 text-sm text-gray-300 focus:border-purple-500 focus:outline-none;
+}
+
+.form-input-dark-lg {
+  @apply w-full pl-10 pr-4 py-2 bg-black/30 border border-purple-800/30 rounded-lg text-gray-300 placeholder-gray-500 focus:border-purple-500 focus:outline-none;
+}
+
+/* Dynamic color utilities */
+.badge-complexity-low {
+  @apply bg-green-500/20 text-green-500;
+}
+
+.badge-complexity-medium {
+  @apply bg-yellow-500/20 text-yellow-500;
+}
+
+.badge-complexity-high {
+  @apply bg-red-500/20 text-red-500;
+}
+
+.badge-status-running {
+  @apply bg-blue-500 text-white;
+}
+
+.badge-status-completed {
+  @apply bg-green-500 text-white;
+}
+
+.badge-status-failed {
+  @apply bg-red-500 text-white;
+}
+
+.badge-status-pending {
+  @apply bg-yellow-500 text-white;
+}
+
+.badge-status-cancelled {
+  @apply bg-gray-500 text-white;
+}
+
+.text-status-running {
+  @apply text-blue-500;
+}
+
+.text-status-completed {
+  @apply text-green-500;
+}
+
+.text-status-failed {
+  @apply text-red-500;
+}
+
+.text-status-pending {
+  @apply text-yellow-500;
+}
+
+.text-status-cancelled {
+  @apply text-gray-500;
+}
+
+/* Log level utilities */
+.badge-log-error {
+  @apply bg-red-500/20 border-red-500 text-red-500;
+}
+
+.badge-log-success {
+  @apply bg-green-500/20 border-green-500 text-green-500;
+}
+
+.badge-log-info {
+  @apply bg-blue-500/20 border-blue-500 text-blue-500;
+}
 
   /* Mobile-specific improvements */
   @media (max-width: 768px) {

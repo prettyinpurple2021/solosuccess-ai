@@ -388,12 +388,10 @@ export function WorkflowExecutionMonitor({
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-3 h-3 rounded-full animate-pulse"
-                  style={{ backgroundColor: statusColor }}
+                  className={`w-3 h-3 rounded-full animate-pulse badge-status-${execution.status}`}
                 />
                 <StatusIcon 
-                  className={`h-5 w-5 ${isRunning ? 'animate-spin' : ''}`}
-                  style={{ color: statusColor }}
+                  className={`h-5 w-5 ${isRunning ? 'animate-spin' : ''} text-status-${execution.status}`}
                 />
                 <div>
                   <CardTitle className="text-lg">{execution.workflowName}</CardTitle>
@@ -406,7 +404,7 @@ export function WorkflowExecutionMonitor({
               <div className="flex items-center gap-2">
                 <Badge 
                   variant="secondary"
-                  style={{ backgroundColor: `${statusColor}20`, color: statusColor }}
+                  className={`badge-status-${execution.status} bg-opacity-20`}
                 >
                   {execution.status}
                 </Badge>
@@ -556,8 +554,7 @@ export function WorkflowExecutionMonitor({
                         {index + 1}
                       </div>
                       <StatusIcon 
-                        className="h-4 w-4" 
-                        style={{ color: statusColor }}
+                        className={`h-4 w-4 text-status-${step.status}`}
                       />
                       <div className="flex-1">
                         <div className="font-medium">{step.name}</div>
@@ -608,15 +605,7 @@ export function WorkflowExecutionMonitor({
                   </span>
                   <Badge 
                     variant="outline" 
-                    className="text-xs min-w-[60px] justify-center"
-                    style={{
-                      backgroundColor: log.level === 'error' ? '#EF444420' : 
-                                     log.level === 'success' ? '#10B98120' : '#3B82F620',
-                      borderColor: log.level === 'error' ? '#EF4444' : 
-                                  log.level === 'success' ? '#10B981' : '#3B82F6',
-                      color: log.level === 'error' ? '#EF4444' : 
-                            log.level === 'success' ? '#10B981' : '#3B82F6'
-                    }}
+                    className={`text-xs min-w-[60px] justify-center badge-log-${log.level}`}
                   >
                     {log.level}
                   </Badge>

@@ -1,29 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { headers } from 'next/headers'
-import { createClient } from '@/lib/supabase/server'
-import { logger, logError, logInfo } from '@/lib/logger'
-import { WorkflowEngine } from '@/lib/workflow-engine'
-import { rateLimiter } from '@/lib/rate-limiter'
+import { authenticateRequest } from '@/lib/auth-server'
+import { logError, logInfo } from '@/lib/logger'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { neon } from '@neondatabase/serverless'
 
-// Initialize workflow engine
-const workflowEngine = new WorkflowEngine()
+const sql = neon(process.env.DATABASE_URL!)
 
 // GET /api/workflows - List user's workflows
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Rate limiting
-    const headersList = headers()
-    const forwardedFor = headersList.get('x-forwarded-for')
-    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown'
-
-    const rateLimitResult = await rateLimiter.checkLimit(ip, 'workflows-list', 100, 3600) // 100 requests per hour
+    const rateLimitResult = await rateLimitByIp(request, { requests: 100, window: 3600 }) // 100 requests per hour
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
@@ -38,118 +32,97 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 
-    // Build query
-    let query = supabase
-      .from('workflows')
-      .select(`
-        *,
-        workflow_executions!inner(count)
-      `)
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
+    // Build query conditions
+    let conditions = [`user_id = $1`]
+    let params: any[] = [user.id]
+    let paramIndex = 2
 
-    // Apply filters
     if (status) {
-      query = query.eq('status', status)
+      conditions.push(`status = $${paramIndex}`)
+      params.push(status)
+      paramIndex++
     }
 
     if (category) {
-      query = query.eq('category', category)
+      conditions.push(`category = $${paramIndex}`)
+      params.push(category)
+      paramIndex++
     }
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+      conditions.push(`(name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`)
+      params.push(`%${search}%`)
+      paramIndex++
     }
 
-    // Apply pagination
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-    query = query.range(from, to)
+    const whereClause = conditions.join(' AND ')
+    const offset = (page - 1) * limit
 
-    const { data: workflows, error: workflowsError } = await query
+    // Get workflows with execution stats
+    const workflows = await sql`
+      SELECT 
+        w.*,
+        COALESCE(stats.total_executions, 0) as total_executions,
+        COALESCE(stats.successful_executions, 0) as successful_executions,
+        COALESCE(stats.failed_executions, 0) as failed_executions,
+        COALESCE(stats.success_rate, 0) as success_rate,
+        COALESCE(stats.average_duration, 0) as average_duration,
+        stats.last_execution
+      FROM workflows w
+      LEFT JOIN (
+        SELECT 
+          workflow_id,
+          COUNT(*) as total_executions,
+          COUNT(*) FILTER (WHERE status = 'completed') as successful_executions,
+          COUNT(*) FILTER (WHERE status = 'failed') as failed_executions,
+          CASE 
+            WHEN COUNT(*) > 0 THEN 
+              ROUND((COUNT(*) FILTER (WHERE status = 'completed')::FLOAT / COUNT(*)) * 100, 2)
+            ELSE 0 
+          END as success_rate,
+          AVG(duration) as average_duration,
+          MAX(started_at) as last_execution
+        FROM workflow_executions 
+        GROUP BY workflow_id
+      ) stats ON w.id = stats.workflow_id
+      WHERE ${sql.unsafe(whereClause, ...params)}
+      ORDER BY w.updated_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `
 
-    if (workflowsError) {
-      logError('Failed to fetch workflows:', workflowsError)
-      return NextResponse.json(
-        { error: 'Failed to fetch workflows' },
-        { status: 500 }
-      )
-    }
-
-    // Get total count for pagination
-    let countQuery = supabase
-      .from('workflows')
-      .select('id', { count: 'exact' })
-      .eq('user_id', user.id)
-
-    if (status) {
-      countQuery = countQuery.eq('status', status)
-    }
-
-    if (category) {
-      countQuery = countQuery.eq('category', category)
-    }
-
-    if (search) {
-      countQuery = countQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
-    }
-
-    const { count, error: countError } = await countQuery
-
-    if (countError) {
-      logError('Failed to count workflows:', countError)
-    }
-
-    // Enhance workflows with execution stats
-    const enhancedWorkflows = await Promise.all(
-      workflows.map(async (workflow) => {
-        const { data: executions, error: execError } = await supabase
-          .from('workflow_executions')
-          .select('status, started_at, completed_at, duration')
-          .eq('workflow_id', workflow.id)
-          .limit(100)
-
-        if (execError) {
-          logError('Failed to fetch execution stats:', execError)
-          return workflow
-        }
-
-        const successfulExecutions = executions.filter(e => e.status === 'completed').length
-        const failedExecutions = executions.filter(e => e.status === 'failed').length
-        const totalExecutions = executions.length
-        const successRate = totalExecutions > 0 ? (successfulExecutions / totalExecutions) * 100 : 0
-        const averageDuration = executions
-          .filter(e => e.duration)
-          .reduce((acc, e) => acc + e.duration, 0) / executions.filter(e => e.duration).length || 0
-
-        return {
-          ...workflow,
-          stats: {
-            totalExecutions,
-            successfulExecutions,
-            failedExecutions,
-            successRate,
-            averageDuration,
-            lastExecution: executions.length > 0 ? executions[0].started_at : null
-          }
-        }
-      })
-    )
+    // Get total count
+    const countResult = await sql`
+      SELECT COUNT(*) as total
+      FROM workflows w
+      WHERE ${sql.unsafe(whereClause, ...params)}
+    `
+    const total = parseInt(countResult[0]?.total || '0')
 
     logInfo('Workflows fetched successfully', {
       userId: user.id,
-      count: enhancedWorkflows.length,
+      count: workflows.length,
       page,
-      limit
+      limit,
+      total
     })
 
     return NextResponse.json({
-      workflows: enhancedWorkflows,
+      workflows: workflows.map(w => ({
+        ...w,
+        stats: {
+          totalExecutions: parseInt(w.total_executions || '0'),
+          successfulExecutions: parseInt(w.successful_executions || '0'),
+          failedExecutions: parseInt(w.failed_executions || '0'),
+          successRate: parseFloat(w.success_rate || '0'),
+          averageDuration: parseFloat(w.average_duration || '0'),
+          lastExecution: w.last_execution
+        }
+      })),
       pagination: {
         page,
         limit,
-        total: count || 0,
-        pages: Math.ceil((count || 0) / limit)
+        total,
+        pages: Math.ceil(total / limit)
       }
     })
 
@@ -165,19 +138,15 @@ export async function GET(request: NextRequest) {
 // POST /api/workflows - Create new workflow
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Rate limiting
-    const headersList = headers()
-    const forwardedFor = headersList.get('x-forwarded-for')
-    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown'
-
-    const rateLimitResult = await rateLimiter.checkLimit(ip, 'workflows-create', 10, 3600) // 10 workflows per hour
+    const rateLimitResult = await rateLimitByIp(request, { requests: 10, window: 3600 }) // 10 workflows per hour
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
@@ -208,92 +177,39 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate workflow structure
-    const validationResult = workflowEngine.validateWorkflow({
-      id: '', // Will be set by database
-      name,
-      description: description || '',
-      version: '1.0.0',
-      status: 'draft',
-      triggerType,
-      triggerConfig: triggerConfig || {},
-      nodes: nodes || [],
-      edges: edges || [],
-      variables: variables || {},
-      settings: {
-        timeout: 300000,
-        retryAttempts: 3,
-        retryDelay: 5000,
-        parallelExecution: true,
-        errorHandling: 'stop',
-        ...settings
-      },
-      metadata: {
-        createdBy: user.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        executionCount: 0,
-        successRate: 0,
-        averageExecutionTime: 0
-      }
-    })
-
-    if (!validationResult.isValid) {
-      return NextResponse.json(
-        { error: 'Invalid workflow structure', details: validationResult.errors },
-        { status: 400 }
-      )
-    }
-
     // Create workflow in database
-    const { data: workflow, error: workflowError } = await supabase
-      .from('workflows')
-      .insert({
-        user_id: user.id,
-        name,
-        description: description || '',
-        version: '1.0.0',
-        status: 'draft',
-        trigger_type: triggerType,
-        trigger_config: triggerConfig || {},
-        nodes: nodes || [],
-        edges: edges || [],
-        variables: variables || {},
-        settings: {
+    const workflow = await sql`
+      INSERT INTO workflows (
+        user_id, name, description, version, status, trigger_type, trigger_config,
+        nodes, edges, variables, settings, category, tags, template_id,
+        created_at, updated_at
+      ) VALUES (
+        ${user.id}, ${name}, ${description || ''}, '1.0.0', 'draft', ${triggerType},
+        ${JSON.stringify(triggerConfig || {})}, ${JSON.stringify(nodes || [])},
+        ${JSON.stringify(edges || [])}, ${JSON.stringify(variables || {})},
+        ${JSON.stringify({
           timeout: 300000,
           retryAttempts: 3,
           retryDelay: 5000,
           parallelExecution: true,
           errorHandling: 'stop',
           ...settings
-        },
-        category: category || 'general',
-        tags: tags || [],
-        template_id: templateId || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-
-    if (workflowError) {
-      logError('Failed to create workflow:', workflowError)
-      return NextResponse.json(
-        { error: 'Failed to create workflow' },
-        { status: 500 }
-      )
-    }
+        })}, ${category || 'general'}, ${JSON.stringify(tags || [])},
+        ${templateId || null}, NOW(), NOW()
+      ) RETURNING *
+    `
 
     // If created from template, increment template usage
     if (templateId) {
-      await supabase
-        .from('workflow_templates')
-        .update({ usage_count: supabase.raw('usage_count + 1') })
-        .eq('id', templateId)
+      await sql`
+        UPDATE workflow_templates 
+        SET usage_count = usage_count + 1 
+        WHERE id = ${templateId}
+      `
     }
 
     logInfo('Workflow created successfully', {
-      workflowId: workflow.id,
+      workflowId: workflow[0].id,
       userId: user.id,
       name,
       templateId
@@ -301,7 +217,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       workflow: {
-        ...workflow,
+        ...workflow[0],
         stats: {
           totalExecutions: 0,
           successfulExecutions: 0,
@@ -325,19 +241,15 @@ export async function POST(request: NextRequest) {
 // PUT /api/workflows - Update workflow
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Rate limiting
-    const headersList = headers()
-    const forwardedFor = headersList.get('x-forwarded-for')
-    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown'
-
-    const rateLimitResult = await rateLimiter.checkLimit(ip, 'workflows-update', 50, 3600) // 50 updates per hour
+    const rateLimitResult = await rateLimitByIp(request, { requests: 50, window: 3600 }) // 50 updates per hour
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
@@ -356,50 +268,50 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check if workflow exists and user owns it
-    const { data: existingWorkflow, error: fetchError } = await supabase
-      .from('workflows')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single()
+    const existingWorkflow = await sql`
+      SELECT * FROM workflows 
+      WHERE id = ${id} AND user_id = ${user.id}
+    `
 
-    if (fetchError || !existingWorkflow) {
+    if (existingWorkflow.length === 0) {
       return NextResponse.json(
         { error: 'Workflow not found' },
         { status: 404 }
       )
     }
 
-    // Validate workflow if structure is being updated
-    if (updates.nodes || updates.edges || updates.triggerType) {
-      const validationResult = workflowEngine.validateWorkflow({
-        ...existingWorkflow,
-        ...updates,
-        updatedAt: new Date()
-      })
+    // Build update query
+    const updateFields: string[] = []
+    const updateParams: any[] = []
+    let paramIndex = 1
 
-      if (!validationResult.isValid) {
-        return NextResponse.json(
-          { error: 'Invalid workflow structure', details: validationResult.errors },
-          { status: 400 }
-        )
+    Object.entries(updates).forEach(([key, value]) => {
+      if (key === 'triggerConfig' || key === 'nodes' || key === 'edges' || key === 'variables' || key === 'settings' || key === 'tags') {
+        updateFields.push(`${key} = $${paramIndex}`)
+        updateParams.push(JSON.stringify(value))
+      } else {
+        updateFields.push(`${key} = $${paramIndex}`)
+        updateParams.push(value)
       }
+      paramIndex++
+    })
+
+    if (updateFields.length === 0) {
+      return NextResponse.json(
+        { error: 'No valid updates provided' },
+        { status: 400 }
+      )
     }
 
     // Update workflow
-    const { data: updatedWorkflow, error: updateError } = await supabase
-      .from('workflows')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single()
+    const updatedWorkflow = await sql`
+      UPDATE workflows 
+      SET ${sql.unsafe(updateFields.join(', '), ...updateParams)}, updated_at = NOW()
+      WHERE id = ${id} AND user_id = ${user.id}
+      RETURNING *
+    `
 
-    if (updateError) {
-      logError('Failed to update workflow:', updateError)
+    if (updatedWorkflow.length === 0) {
       return NextResponse.json(
         { error: 'Failed to update workflow' },
         { status: 500 }
@@ -412,7 +324,7 @@ export async function PUT(request: NextRequest) {
       updates: Object.keys(updates)
     })
 
-    return NextResponse.json({ workflow: updatedWorkflow })
+    return NextResponse.json({ workflow: updatedWorkflow[0] })
 
   } catch (error) {
     logError('Error in PUT /api/workflows:', error)
@@ -426,19 +338,15 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/workflows - Delete workflow
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Authenticate user
+    const { user, error: authError } = await authenticateRequest()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Rate limiting
-    const headersList = headers()
-    const forwardedFor = headersList.get('x-forwarded-for')
-    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown'
-
-    const rateLimitResult = await rateLimiter.checkLimit(ip, 'workflows-delete', 10, 3600) // 10 deletes per hour
+    const rateLimitResult = await rateLimitByIp(request, { requests: 10, window: 3600 }) // 10 deletes per hour
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Rate limit exceeded' },
@@ -457,14 +365,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if workflow exists and user owns it
-    const { data: workflow, error: fetchError } = await supabase
-      .from('workflows')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single()
+    const workflow = await sql`
+      SELECT * FROM workflows 
+      WHERE id = ${id} AND user_id = ${user.id}
+    `
 
-    if (fetchError || !workflow) {
+    if (workflow.length === 0) {
       return NextResponse.json(
         { error: 'Workflow not found' },
         { status: 404 }
@@ -472,15 +378,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if workflow is currently running
-    const { data: runningExecutions, error: execError } = await supabase
-      .from('workflow_executions')
-      .select('id')
-      .eq('workflow_id', id)
-      .eq('status', 'running')
+    const runningExecutions = await sql`
+      SELECT id FROM workflow_executions 
+      WHERE workflow_id = ${id} AND status = 'running'
+    `
 
-    if (execError) {
-      logError('Failed to check running executions:', execError)
-    } else if (runningExecutions && runningExecutions.length > 0) {
+    if (runningExecutions.length > 0) {
       return NextResponse.json(
         { error: 'Cannot delete workflow with running executions' },
         { status: 400 }
@@ -488,24 +391,15 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete workflow (cascade will handle related executions and logs)
-    const { error: deleteError } = await supabase
-      .from('workflows')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id)
-
-    if (deleteError) {
-      logError('Failed to delete workflow:', deleteError)
-      return NextResponse.json(
-        { error: 'Failed to delete workflow' },
-        { status: 500 }
-      )
-    }
+    await sql`
+      DELETE FROM workflows 
+      WHERE id = ${id} AND user_id = ${user.id}
+    `
 
     logInfo('Workflow deleted successfully', {
       workflowId: id,
       userId: user.id,
-      name: workflow.name
+      name: workflow[0].name
     })
 
     return NextResponse.json({ success: true })

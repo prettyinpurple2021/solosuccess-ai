@@ -429,8 +429,7 @@ export function WorkflowTemplates({
                 <CategoryIcon className="h-4 w-4 text-purple-400" />
                 <Badge 
                   variant="secondary" 
-                  className="text-xs capitalize"
-                  style={{ backgroundColor: `${complexityColor}20`, color: complexityColor }}
+                  className={`text-xs capitalize badge-complexity-${template.complexity}`}
                 >
                   {template.complexity}
                 </Badge>
