@@ -135,10 +135,33 @@ export async function GET(request: NextRequest) {
         SELECT 
             COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END),0) AS tasks_completed,
             COUNT(*) AS total_tasks,
-            0 AS focus_minutes,
-            0 AS ai_interactions,
-            0 AS goals_achieved,
-            0 AS productivity_score
+            COALESCE((
+              SELECT SUM(duration_minutes) 
+              FROM focus_sessions 
+              WHERE user_id = ${user.id} 
+                AND DATE(started_at) = CURRENT_DATE
+            ), 0) AS focus_minutes,
+            COALESCE((
+              SELECT COUNT(DISTINCT id) 
+              FROM conversations 
+              WHERE user_id = ${user.id} 
+                AND DATE(last_message_at) = CURRENT_DATE
+            ), 0) AS ai_interactions,
+            COALESCE((
+              SELECT COUNT(DISTINCT g.id) 
+              FROM goals g
+              WHERE g.user_id = ${user.id} 
+                AND g.status = 'completed'
+                AND DATE(g.updated_at) = CURRENT_DATE
+            ), 0) AS goals_achieved,
+            -- Calculate productivity score based on task completion rate
+            CASE 
+              WHEN COUNT(*) = 0 THEN 0
+              ELSE ROUND(
+                (COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END), 0)::FLOAT / 
+                 COUNT(*)) * 100
+              )
+            END AS productivity_score
          FROM tasks 
          WHERE user_id = ${user.id} AND DATE(updated_at) = CURRENT_DATE
       `;
@@ -185,11 +208,79 @@ export async function GET(request: NextRequest) {
       briefcasesRes = [];
     }
     
-    // Default empty data for other tables that might not exist
-    activeGoalsRes = [];
-    conversationsRes = [];
-    achievementsRes = [];
-    weeklyFocusRes = [{ total_minutes: 0, sessions_count: 0, average_session: 0 }];
+    // Try to get goals data if table exists
+    try {
+      activeGoalsRes = await sql`
+        SELECT 
+          g.id, g.title, g.description, g.target_date, g.category, g.status,
+          COALESCE(
+            ROUND(
+              (COUNT(CASE WHEN t.status = 'completed' THEN 1 END)::FLOAT / 
+               NULLIF(COUNT(t.id), 0)) * 100
+            ), 0
+          ) AS progress_percentage,
+          COUNT(t.id) AS tasks_total,
+          COUNT(CASE WHEN t.status = 'completed' THEN 1 END) AS tasks_completed
+        FROM goals g
+        LEFT JOIN tasks t ON g.id = t.goal_id
+        WHERE g.user_id = ${user.id} AND g.status = 'active'
+        GROUP BY g.id, g.title, g.description, g.target_date, g.category, g.status
+        ORDER BY g.updated_at DESC
+        LIMIT 5
+      `;
+    } catch (error) {
+      activeGoalsRes = [];
+    }
+
+    // Try to get conversations data if table exists
+    try {
+      conversationsRes = await sql`
+        SELECT 
+          c.id, c.title, c.last_message_at,
+          a.name, a.display_name, a.accent_color
+        FROM conversations c
+        LEFT JOIN agents a ON c.agent_id = a.id
+        WHERE c.user_id = ${user.id}
+        ORDER BY c.last_message_at DESC
+        LIMIT 5
+      `;
+    } catch (error) {
+      conversationsRes = [];
+    }
+
+    // Try to get achievements data if table exists
+    try {
+      achievementsRes = await sql`
+        SELECT 
+          ua.id, ua.earned_at,
+          a.name, a.title, a.description, a.icon, a.points
+        FROM user_achievements ua
+        LEFT JOIN achievements a ON ua.achievement_id = a.id
+        WHERE ua.user_id = ${user.id}
+        ORDER BY ua.earned_at DESC
+        LIMIT 5
+      `;
+    } catch (error) {
+      achievementsRes = [];
+    }
+
+    // Try to get focus sessions data if table exists
+    try {
+      weeklyFocusRes = await sql`
+        SELECT 
+          COALESCE(SUM(duration_minutes), 0) AS total_minutes,
+          COUNT(*) AS sessions_count,
+          CASE 
+            WHEN COUNT(*) = 0 THEN 0
+            ELSE ROUND(AVG(duration_minutes), 1)
+          END AS average_session
+        FROM focus_sessions 
+        WHERE user_id = ${user.id} 
+          AND started_at >= CURRENT_DATE - INTERVAL '7 days'
+      `;
+    } catch (error) {
+      weeklyFocusRes = [{ total_minutes: 0, sessions_count: 0, average_session: 0 }];
+    }
 
     const todaysStatsRow = todaysStatsRes[0] || {
       tasks_completed: 0,

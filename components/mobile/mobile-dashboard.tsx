@@ -214,7 +214,7 @@ export default function MobileDashboard({
 
   // Handle widget actions
   const handleWidgetAction = (widgetId: string, action: string, data?: any) => {
-    console.log('Widget action:', { widgetId, action, data })
+    logInfo('Widget action triggered', { widgetId, action, data })
     
     switch (action) {
       case 'add_task':
@@ -236,16 +236,16 @@ export default function MobileDashboard({
   }
 
   const handleWidgetReorder = (newWidgets: Widget[]) => {
-    console.log('Widgets reordered:', newWidgets)
+    logInfo('Widgets reordered', { newOrder: newWidgets.map(w => w.id) })
   }
 
   const handleTaskCreate = (task: any) => {
-    console.log('Task created:', task)
+    logInfo('Task created via voice', { taskId: task.id, title: task.title })
     setShowVoiceCreator(false)
   }
 
   const handleSwipe = (gesture: any) => {
-    console.log('Swipe gesture:', gesture)
+    logInfo('Swipe gesture detected', { direction: gesture.direction, velocity: gesture.velocity })
     
     switch (gesture.direction) {
       case 'up':
@@ -270,7 +270,7 @@ export default function MobileDashboard({
 
   const handleLongPress = () => {
     // Show widget reordering mode
-    console.log('Long press - reorder mode')
+    logInfo('Widget reorder mode activated', { method: 'long_press' })
   }
 
   // Online/offline detection

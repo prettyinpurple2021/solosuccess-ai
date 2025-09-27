@@ -150,7 +150,7 @@ export class CompetitiveIntelligenceAutomation {
   ): Promise<void> {
     // This would integrate with notification services
     // For now, we'll log the notification
-    console.log(`Notification triggered for alert ${alert.id} via rule ${rule.id}:`, {
+    logInfo(`Notification triggered for alert ${alert.id} via rule ${rule.id}`, {
       channels,
       alert_title: alert.title,
       competitor: alert.competitor_name,

@@ -78,7 +78,7 @@ export class SimpleTrainingCollector {
       this.interactions = this.interactions.slice(-1000)
     }
 
-    console.log(`Recorded training interaction for ${interaction.agentId}:`, {
+    logInfo(`Recorded training interaction for ${interaction.agentId}`, {
       id,
       userMessage: interaction.userMessage.substring(0, 50) + '...',
       success: interaction.success,
