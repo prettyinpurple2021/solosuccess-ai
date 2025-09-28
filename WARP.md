@@ -9,7 +9,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 ### Tech Stack
 - **Frontend**: Next.js 15 with App Router, React 19, TypeScript
 - **Database**: Neon PostgreSQL with Drizzle ORM
-- **Deployment**: Vercel (serverless functions)
+- **Deployment**: Modern hosting platform (serverless functions)
 - **Styling**: Tailwind CSS with custom purple-to-pink gradient brand
 - **AI**: OpenAI (primary), Anthropic Claude, Google AI via AI SDK
 - **Authentication**: Custom JWT-based auth system
@@ -227,11 +227,11 @@ npm run e2e                # Playwright full user journeys
 
 ## Deployment & Environment
 
-### Vercel Deployment
-- **Platform**: Vercel serverless functions
+### Platform Deployment
+- **Platform**: Modern hosting with serverless functions
 - **Database**: Neon PostgreSQL with connection pooling
 - **Build Command**: `npm run build`
-- **Environment**: Production environment variables via Vercel dashboard
+- **Environment**: Production environment variables via platform dashboard
 
 ### Required Environment Variables
 ```bash
@@ -271,7 +271,7 @@ const environmentSchema = z.object({
 - **Anthropic**: Claude for Echo and Lumi agents  
 - **Google AI**: Gemini for specific use cases
 - **Neon**: PostgreSQL database with connection pooling
-- **Vercel**: Hosting and serverless functions
+- **Platform**: Hosting and serverless functions
 - **Stripe**: Subscription billing and payments
 - **Resend**: Transactional email delivery
 
@@ -288,7 +288,7 @@ const environmentSchema = z.object({
 - **Input Validation**: Zod schemas for all user inputs
 - **Rate Limiting**: Per-user and per-agent request limits
 - **Authentication**: JWT tokens with expiration
-- **Data Protection**: Encryption at rest and in transit via Neon/Vercel
+- **Data Protection**: Encryption at rest and in transit via Neon/platform hosting
 
 ## Key Files Reference
 

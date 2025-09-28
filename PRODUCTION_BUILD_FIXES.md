@@ -144,7 +144,7 @@ Created a comprehensive test script (`scripts/test-database-connection.mjs`) tha
    npm run build
    ```
 
-### For Vercel/Netlify
+### For Modern Hosting Platforms
 
 1. Set the same environment variables in your platform's dashboard
 2. The build process will automatically use the enhanced configuration

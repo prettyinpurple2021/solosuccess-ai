@@ -52,7 +52,7 @@ function scanDirectory(dirPath, relativePath = '') {
       
       if (entry.isDirectory()) {
         // Skip certain directories
-        if (!['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.vercel', '.cache'].includes(entry.name)) {
+        if (!['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.cache'].includes(entry.name)) {
           const subResults = scanDirectory(fullPath, relativeFilePath);
           results.filesWithOldBranding.push(...subResults.filesWithOldBranding);
           results.totalFiles += subResults.totalFiles;
@@ -90,7 +90,6 @@ function checkHighPriorityFiles() {
     'app/page.tsx',
     'next.config.mjs',
     'tailwind.config.ts',
-    'vercel.json'
   ];
   
   console.log('🎯 HIGH PRIORITY FILES CHECK:');

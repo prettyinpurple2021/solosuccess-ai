@@ -88,8 +88,8 @@ npm run dev
 - Check for any console errors
 - Verify user interactions work correctly
 
-### **2. Deploy to Vercel**
-- Your app is now ready for Vercel deployment
+### **2. Deploy to Platform**
+- Your app is now ready for deployment
 - All Google Cloud dependencies removed
 - Optimized for modern hosting
 

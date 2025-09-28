@@ -63,7 +63,7 @@ export async function GET(
       WHERE id = ${fileId}
     `
 
-    // Fetch file from Vercel Blob storage
+    // Fetch file from external storage
     const fileResponse = await fetch(document.file_url)
     
     if (!fileResponse.ok) {

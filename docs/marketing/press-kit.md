@@ -2,7 +2,7 @@
 
 **For Immediate Release**  
 **Contact:** [Your Contact Information]  
-**Website:** https://v0-fork-of-solo-success-ai-platform-bl207i61t.vercel.app
+**Website:** Available for local hosting or deployment on your chosen platform
 
 ---
 
@@ -115,7 +115,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 - Mobile app functionality
 
 ### **Live Demo:**
-- Available at: https://v0-fork-of-solo-success-ai-platform-bl207i61t.vercel.app
+- Available for deployment on your chosen platform
 - Free trial with no credit card required
 - Full access to Launch plan features
 
@@ -190,7 +190,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 - **Title:** Founder & CEO, SoloSuccess AI Platform
 - **Email:** [Your Email]
 - **Phone:** [Your Phone]
-- **Website:** https://v0-fork-of-solo-success-ai-platform-bl207i61t.vercel.app
+- **Website:** Available for local hosting or deployment on your chosen platform
 
 ### **Social Media:**
 - **LinkedIn:** [Your LinkedIn]
@@ -226,7 +226,7 @@ The platform reflects this authentic, empowering approach - every feature is des
 
 **Ready to revolutionize how solo founders build and scale their businesses!** 🚀💜
 
-*For more information, visit https://v0-fork-of-solo-success-ai-platform-bl207i61t.vercel.app*
+*For more information, contact us for platform access*
 
 ---
 
