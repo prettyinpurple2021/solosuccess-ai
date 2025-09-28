@@ -15,6 +15,12 @@ let _db: ReturnType<typeof drizzle> | null = null
  * Uses lazy initialization to avoid build-time database calls
  */
 export function getDb() {
+  // During build time, return a mock client to prevent build failures
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
+    logger.info('Build time detected, returning mock database client')
+    return null as any
+  }
+
   if (!_db) {
     const url = process.env.DATABASE_URL
     if (!url) {

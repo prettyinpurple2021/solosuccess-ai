@@ -3,13 +3,13 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { logError, logInfo } from '@/lib/logger'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
+import { getNeonConnection } from '@/lib/database-utils'
+
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic'
 
 function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
+  return getNeonConnection()
 }
 
 // GET /api/workflows - List user's workflows

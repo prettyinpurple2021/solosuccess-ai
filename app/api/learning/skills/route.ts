@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { logInfo, logError } from '@/lib/logger'
 import jwt from 'jsonwebtoken'
+import { getNeonConnection, safeDbQuery } from '@/lib/database-utils'
+
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic'
 
 function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
+  return getNeonConnection()
 }
 
 export async function GET(request: NextRequest) {
