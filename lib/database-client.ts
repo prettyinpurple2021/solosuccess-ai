@@ -18,7 +18,17 @@ export function getDb() {
   // During build time, return a mock client to prevent build failures
   if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
     logger.info('Build time detected, returning mock database client')
-    return null as any
+    // Type-safe mock client implementing the expected interface
+    const mockDb: ReturnType<typeof drizzle> = {
+      transaction: async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
+        throw new Error('Database transaction is not available during build time')
+      },
+      execute: async (...args: any[]): Promise<any> => {
+        throw new Error('Database execute is not available during build time')
+      },
+      // Add other methods as needed for type safety
+    } as ReturnType<typeof drizzle>;
+    return mockDb;
   }
 
   if (!_db) {
