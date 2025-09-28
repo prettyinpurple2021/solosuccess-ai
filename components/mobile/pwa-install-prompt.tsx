@@ -1,5 +1,4 @@
 "use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
@@ -16,7 +15,6 @@ import {
   CheckCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[]
   readonly userChoice: Promise<{
@@ -25,13 +23,11 @@ interface BeforeInstallPromptEvent extends Event {
   }>
   prompt(): Promise<void>
 }
-
 interface PWAInstallPromptProps {
   className?: string
   onInstall?: () => void
   onDismiss?: () => void
 }
-
 export default function PWAInstallPrompt({ 
   className = "", 
   onInstall, 
@@ -41,7 +37,6 @@ export default function PWAInstallPrompt({
   const [isInstalled, setIsInstalled] = useState(false)
   const [showPrompt, setShowPrompt] = useState(false)
   const [isInstalling, setIsInstalling] = useState(false)
-
   useEffect(() => {
     // Check if app is already installed
     const checkInstalled = () => {
@@ -51,18 +46,15 @@ export default function PWAInstallPrompt({
         return
       }
     }
-
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
-      
       // Show prompt after a delay for better UX
       setTimeout(() => {
         setShowPrompt(true)
       }, 3000)
     }
-
     // Listen for app installed event
     const handleAppInstalled = () => {
       setIsInstalled(true)
@@ -70,41 +62,30 @@ export default function PWAInstallPrompt({
       setDeferredPrompt(null)
       onInstall?.()
     }
-
     checkInstalled()
-    
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
       window.removeEventListener('appinstalled', handleAppInstalled)
     }
   }, [onInstall])
-
   const handleInstall = async () => {
     if (!deferredPrompt) return
-
     setIsInstalling(true)
-    
     try {
       // Show the install prompt
       await deferredPrompt.prompt()
-      
       // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice
-      
       if (outcome === 'accepted') {
-        console.log('User accepted the install prompt')
         setIsInstalled(true)
         setShowPrompt(false)
         onInstall?.()
       } else {
-        console.log('User dismissed the install prompt')
         setShowPrompt(false)
         onDismiss?.()
       }
-      
       // Clear the deferredPrompt
       setDeferredPrompt(null)
     } catch (error) {
@@ -113,17 +94,14 @@ export default function PWAInstallPrompt({
       setIsInstalling(false)
     }
   }
-
   const handleDismiss = () => {
     setShowPrompt(false)
     onDismiss?.()
   }
-
   // Don't show if already installed or no prompt available
   if (isInstalled || !deferredPrompt || !showPrompt) {
     return null
   }
-
   return (
     <AnimatePresence>
       <motion.div
@@ -137,12 +115,10 @@ export default function PWAInstallPrompt({
           {/* Holographic overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-cyan-500/10 opacity-50" />
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500" />
-          
           {/* Sparkle effects */}
           <div className="absolute top-2 right-2">
             <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" />
           </div>
-          
           <CardHeader className="relative pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -158,7 +134,6 @@ export default function PWAInstallPrompt({
                   </CardDescription>
                 </div>
               </div>
-              
               <Button
                 variant="ghost"
                 size="sm"
@@ -169,7 +144,6 @@ export default function PWAInstallPrompt({
               </Button>
             </div>
           </CardHeader>
-          
           <CardContent className="relative space-y-4">
             {/* Benefits */}
             <div className="grid grid-cols-2 gap-3">
@@ -190,7 +164,6 @@ export default function PWAInstallPrompt({
                 <span className="text-gray-700">Push notifications</span>
               </div>
             </div>
-            
             {/* Install button */}
             <Button
               onClick={handleInstall}
@@ -209,7 +182,6 @@ export default function PWAInstallPrompt({
                 </div>
               )}
             </Button>
-            
             <div className="text-xs text-gray-500 text-center">
               💡 Get instant access to your AI business platform
             </div>
@@ -219,12 +191,10 @@ export default function PWAInstallPrompt({
     </AnimatePresence>
   )
 }
-
 // Hook to manage PWA install state
 export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
-
   useEffect(() => {
     const checkInstalled = () => {
       if (window.matchMedia('(display-mode: standalone)').matches || 
@@ -232,31 +202,24 @@ export function usePWAInstall() {
         setIsInstalled(true)
       }
     }
-
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
     }
-
     const handleAppInstalled = () => {
       setIsInstalled(true)
       setDeferredPrompt(null)
     }
-
     checkInstalled()
-    
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
       window.removeEventListener('appinstalled', handleAppInstalled)
     }
   }, [])
-
   const install = async () => {
     if (!deferredPrompt) return false
-
     try {
       await deferredPrompt.prompt()
       const { outcome } = await deferredPrompt.userChoice
@@ -266,7 +229,6 @@ export function usePWAInstall() {
       return false
     }
   }
-
   return {
     canInstall: !!deferredPrompt && !isInstalled,
     isInstalled,

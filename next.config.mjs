@@ -12,14 +12,14 @@ const nextConfig = {
     // Temporarily disable TypeScript errors to allow build to succeed
     ignoreBuildErrors: true,
   },
-  // Optimized for AWS Amplify deployment
-  output: 'standalone', // Required for AWS Amplify
-  
+  // Optimized for CloudFlare Workers deployment with OpenNext
+  output: 'standalone', // Required for OpenNext CloudFlare
+  distDir: '.next',
   // Enable modern React features
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
   },
-  
+
   // External packages for server components
   serverExternalPackages: [],
 

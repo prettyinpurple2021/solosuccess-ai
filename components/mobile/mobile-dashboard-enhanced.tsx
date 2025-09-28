@@ -1,5 +1,4 @@
 "use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MobilePWAProvider, usePWAMobile } from './mobile-pwa-provider'
@@ -24,7 +23,6 @@ import {
   Settings
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
 interface MobileDashboardEnhancedProps {
   user?: {
     name: string
@@ -62,26 +60,21 @@ interface MobileDashboardEnhancedProps {
   }
   className?: string
 }
-
 function MobileDashboardContent({ user, dashboardData, className = "" }: MobileDashboardEnhancedProps) {
   const { isInstalled, isOnline, canInstall, install, refresh } = usePWAMobile()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showQuickActions, setShowQuickActions] = useState(false)
-
   const handleRefresh = async () => {
     setIsRefreshing(true)
     await refresh()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
-
   const handleInstall = async () => {
     const success = await install()
     if (success) {
       // Show success message or navigate
-      console.log('App installed successfully!')
     }
   }
-
   // Quick action items
   const quickActions = [
     {
@@ -125,7 +118,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
       color: 'bg-green-500'
     }
   ]
-
   return (
     <div className={cn("min-h-screen bg-gradient-to-br from-purple-50 to-pink-50", className)}>
       {/* Enhanced Status Bar */}
@@ -157,7 +149,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
               </div>
             </div>
           </div>
-          
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -168,7 +159,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
             >
               <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
             </Button>
-            
             {canInstall && !isInstalled && (
               <Button
                 size="sm"
@@ -182,7 +172,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
           </div>
         </div>
       </div>
-
       {/* Quick Stats Cards */}
       <div className="p-4 space-y-4">
         <div className="grid grid-cols-2 gap-3">
@@ -204,7 +193,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
               />
             </CardContent>
           </Card>
-
           {/* Focus Time */}
           <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
             <CardContent className="p-4">
@@ -222,7 +210,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
               </div>
             </CardContent>
           </Card>
-
           {/* Productivity Score */}
           <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
             <CardContent className="p-4">
@@ -241,7 +228,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
               />
             </CardContent>
           </Card>
-
           {/* AI Interactions */}
           <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-rose-50">
             <CardContent className="p-4">
@@ -260,7 +246,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
             </CardContent>
           </Card>
         </div>
-
         {/* Quick Actions */}
         <Card className="border-2 border-gray-200">
           <CardHeader className="pb-3">
@@ -287,7 +272,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
             </div>
           </CardContent>
         </Card>
-
         {/* Enhanced Mobile Dashboard */}
         <MobileDashboard 
           user={user}
@@ -295,7 +279,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
           className="border-2 border-gray-200"
         />
       </div>
-
       {/* Floating Quick Actions */}
       <AnimatePresence>
         {showQuickActions && (
@@ -328,7 +311,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Floating Action Button */}
       <Button
         size="lg"
@@ -340,7 +322,6 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
     </div>
   )
 }
-
 export default function MobileDashboardEnhanced(props: MobileDashboardEnhancedProps) {
   return (
     <MobilePWAProvider>
@@ -348,6 +329,5 @@ export default function MobileDashboardEnhanced(props: MobileDashboardEnhancedPr
     </MobilePWAProvider>
   )
 }
-
 // Export the hook for use in other components
 export { usePWAMobile } from './mobile-pwa-provider'

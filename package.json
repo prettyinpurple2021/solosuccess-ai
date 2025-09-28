@@ -32,7 +32,11 @@
     "db:studio": "drizzle-kit studio",
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
-    "setup:analytics": "node scripts/setup-analytics.js"
+    "setup:analytics": "node scripts/setup-analytics.js",
+    "build:cf": "opennext build",
+    "deploy:cf": "opennext deploy",
+    "deploy:cf:staging": "opennext deploy --env staging",
+    "dev:cf": "opennext dev"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
@@ -42,6 +46,7 @@
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",
     "@neondatabase/serverless": "^1.0.1",
+    "@opennextjs/cloudflare": "^1.9.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -154,7 +159,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "wrangler": "^4.40.2"
   },
   "overrides": {
     "lucide-react": "^0.542.0",
