@@ -4,11 +4,11 @@ import { neon } from '@neondatabase/serverless'
  * Utility function to get Neon database connection
  * Handles build-time scenarios gracefully
  */
-export function getNeonConnection() {
-  // During build time, return a mock connection to prevent build failures
+export function getNeonConnection(): ReturnType<typeof neon> | null {
+  // During build time, return null to prevent build failures
   if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
     console.log('Build time detected, returning mock Neon connection')
-    return null as any
+    return null
   }
 
   const url = process.env.DATABASE_URL
