@@ -1,4 +1,4 @@
-# 🔄 GitHub Workflows Update for Vercel Migration
+# 🔄 GitHub Workflows Update (ARCHIVED)
 
 ## ✅ What Needs to Be Updated
 

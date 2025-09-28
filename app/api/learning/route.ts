@@ -3,6 +3,9 @@ import { LearningEngine } from '@/lib/learning-engine'
 import { logError } from '@/lib/logger'
 import jwt from 'jsonwebtoken'
 
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')

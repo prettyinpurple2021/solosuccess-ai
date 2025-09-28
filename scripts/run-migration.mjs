@@ -211,7 +211,7 @@ async function runMigration() {
     
     console.log('\n🎉 Migration completed successfully!')
     console.log('\n📋 Summary:')
-    console.log('   ✅ File storage ready for Vercel Blob')
+    console.log('   ✅ File storage ready for external file storage')
     console.log('   ✅ Brand settings table ready')
     console.log('   ✅ Push subscriptions table ready')
     console.log('   ✅ All localStorage dependencies migrated to database')
@@ -219,7 +219,7 @@ async function runMigration() {
     
     console.log('\n🔧 Next steps:')
     console.log('   1. Your app is now ready for production!')
-    console.log('   2. Files will be stored in Vercel Blob instead of database')
+    console.log('   2. Files will be stored externally instead of database')
     console.log('   3. All user data is now stored securely in the database')
     
   } catch (error) {

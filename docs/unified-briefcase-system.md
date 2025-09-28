@@ -8,7 +8,7 @@ The Unified Briefcase System provides a centralized storage solution for all use
 - **Avatar Management**: Profile picture upload with blob storage
 - **Auto-Save**: Automatic saving of chat conversations, template progress, and brand work
 - **Search & Filter**: Full-text search and filtering by content type, tags, and dates
-- **Blob Storage**: Secure file storage using Vercel Blob with automatic cleanup
+- **File Storage**: Secure external file storage with automatic cleanup
 - **Database Integration**: PostgreSQL with optimized indexes and triggers
 - **Real-time Updates**: Debounced auto-saving and instant UI updates
 
@@ -140,7 +140,7 @@ This creates the necessary tables, indexes, and triggers.
 Required environment variables:
 ```env
 DATABASE_URL=your_neon_database_url
-BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
+BLOB_READ_WRITE_TOKEN=your_external_storage_token
 ```
 
 ### Authentication

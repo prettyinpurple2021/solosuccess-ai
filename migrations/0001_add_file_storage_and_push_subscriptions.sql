@@ -1,5 +1,5 @@
 -- Migration: Add file storage and push subscriptions support
--- Description: Replace file_data with file_url for Vercel Blob storage and add push subscriptions table
+-- Description: Replace file_data with file_url for external file storage and add push subscriptions table
 
 -- Add file_url column to documents table (for Vercel Blob storage)
 ALTER TABLE documents 

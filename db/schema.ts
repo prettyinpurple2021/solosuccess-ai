@@ -403,7 +403,7 @@ export const documents = pgTable('documents', {
   file_type: varchar('file_type', { length: 50 }).notNull(),
   mime_type: varchar('mime_type', { length: 100 }).notNull(),
   size: integer('size').notNull(),
-  file_url: varchar('file_url', { length: 1000 }), // URL to file in Vercel Blob storage
+  file_url: varchar('file_url', { length: 1000 }), // URL to file storage
   category: varchar('category', { length: 100 }).default('uncategorized'),
   description: text('description'),
   tags: jsonb('tags').default('[]'),

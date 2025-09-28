@@ -48,19 +48,19 @@ FROM_EMAIL=noreply@yourdomain.com
 
 ## 🎯 Deployment Options
 
-### Option 1: Vercel (Recommended)
+### Option 1: Modern Hosting Platform
 1. **Connect Repository:**
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Go to your hosting platform dashboard
    - Click "New Project"
    - Connect your GitHub repository
 
 2. **Environment Variables:**
    - Add all required environment variables listed above
-   - Vercel will automatically detect Next.js configuration
+   - Platform will automatically detect Next.js configuration
 
 3. **Deploy:**
    - Click "Deploy"
-   - Vercel will build and deploy your app automatically
+   - Platform will build and deploy your app automatically
 
 ### Option 2: Netlify
 1. **Connect Repository:**
@@ -104,15 +104,15 @@ I've updated your configuration for production:
 
 ### Step 2: Choose Your Deployment Platform
 
-#### 🎯 **Vercel Deployment (Recommended)**
+#### 🎯 **Platform Deployment**
 
 1. **Prerequisites:**
-   - Vercel account (free tier available)
+   - Hosting platform account
    - GitHub repository with your code
    - Neon database for data storage
 
 2. **Deploy:**
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Go to your hosting platform dashboard
    - Click "New Project"
    - Connect your GitHub repository
    - Vercel will auto-detect Next.js configuration

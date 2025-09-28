@@ -14,18 +14,15 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 OPENAI_API_KEY=sk-your_openai_api_key_here
 ```
 
-### 2. **Deploy to Vercel (Easiest)**
+### 2. **Deploy to Hosting Platform**
 ```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel login
-vercel --prod
+# Build for production
+npm run build
+npm start
 ```
 
-### 3. **Set Environment Variables in Vercel**
-- Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+### 3. **Set Environment Variables**
+- Configure environment variables in your hosting platform dashboard
 - Add all variables from `.env.local`
 - Redeploy
 
@@ -37,7 +34,7 @@ vercel --prod
 
 ### 5. **Test & Launch!**
 - Test your live site
-- Configure custom domain in Vercel
+- Configure custom domain in your hosting platform
 - You're live! 🎉
 
 ---
@@ -71,7 +68,7 @@ vercel --prod
 
 ## 🎯 Recommended Deployment Path
 
-### **For Beginners: Vercel**
+### **For Beginners: Modern Hosting**
 1. **Easiest setup** - just connect GitHub repo
 2. **Automatic SSL** and CDN
 3. **Built-in analytics** and monitoring
@@ -116,14 +113,14 @@ Before going live, test these:
 
 ## 💰 Estimated Costs
 
-### **Free Tier (Vercel + Neon)**
-- **Vercel**: Free for personal projects
+### **Free Tier (Modern Hosting + Neon)**
+- **Platform hosting**: Many offer free tiers for personal projects
 - **Neon**: Free tier (500MB storage)
 - **OpenAI**: Pay per use (~$5-20/month)
 - **Total**: ~$5-20/month
 
 ### **Production Scale**
-- **Vercel Pro**: $20/month
+- **Professional hosting**: Varies by platform, typically $20-50/month
 - **Neon Pro**: $19/month  
 - **OpenAI**: $50-200/month
 - **Total**: ~$90-240/month

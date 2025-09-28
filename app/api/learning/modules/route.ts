@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { logInfo, logError } from '@/lib/logger'
 import jwt from 'jsonwebtoken'
+import { getNeonConnection, safeDbQuery } from '@/lib/database-utils'
+
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic'
 
 function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
+  return getNeonConnection()
 }
 
 export async function GET(request: NextRequest) {
@@ -24,20 +24,21 @@ export async function GET(request: NextRequest) {
     logInfo('Fetching available learning modules', { userId })
 
     // Try to get modules from database
-    let modules
-    try {
-      const sql = getSql()
-      modules = await sql`
-        SELECT id, title, description, skill_id, content_type, duration_minutes,
-               difficulty, content_url, quiz_questions, exercises
-        FROM learning_modules
-        ORDER BY difficulty, duration_minutes
-      `
-    } catch (error) {
-      // If modules table doesn't exist, return default modules
-      logInfo('Learning modules table not found, returning default modules', { userId })
-      modules = getDefaultModules()
-    }
+    const modules = await safeDbQuery(
+      async () => {
+        const sql = getSql()
+        if (!sql) {
+          throw new Error('Database connection not available')
+        }
+        return await sql`
+          SELECT id, title, description, skill_id, content_type, duration_minutes,
+                 difficulty, content_url, quiz_questions, exercises
+          FROM learning_modules
+          ORDER BY difficulty, duration_minutes
+        `
+      },
+      getDefaultModules() // fallback to default modules
+    )
 
     return NextResponse.json(modules)
   } catch (error) {

@@ -46,7 +46,7 @@ const processableExtensions = [
 // Directories to skip
 const skipDirectories = [
   'node_modules', '.git', '.next', 'dist', 'build', 'coverage', 
-  '.vercel', '.cache', 'tmp', 'temp', 'logs', 'backup-soloboss-*',
+  '.cache', 'tmp', 'temp', 'logs', 'backup-soloboss-*',
   'SoloBoss-Backups'
 ];
 

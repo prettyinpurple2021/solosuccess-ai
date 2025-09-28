@@ -12,6 +12,14 @@ const nextConfig = {
     // Temporarily disable TypeScript errors to allow build to succeed
     ignoreBuildErrors: true,
   },
+  
+  // Environment variables configuration
+  env: {
+    // Ensure critical env vars are available during build
+    DATABASE_URL: process.env.DATABASE_URL,
+    JWT_SECRET: process.env.JWT_SECRET,
+    NODE_ENV: process.env.NODE_ENV,
+  },
   // Optimized for CloudFlare Workers deployment with OpenNext
   output: 'standalone', // Required for OpenNext CloudFlare
   distDir: '.next',
@@ -34,22 +42,33 @@ const nextConfig = {
     unoptimized: false, // Enable optimization for production
   },
 
-  // Bundle optimization (No changes here)
+  // Bundle optimization for memory efficiency
   webpack: (config, { dev, isServer }) => {
-    // ... your existing webpack config remains untouched
+    // Optimize memory usage during build
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
+        maxInitialRequests: 20,
+        maxAsyncRequests: 20,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             chunks: 'all',
+            maxSize: 244000,
           },
           common: {
             name: 'common',
             minChunks: 2,
             chunks: 'all',
+            enforce: true,
+            maxSize: 244000,
+          },
+          framework: {
+            test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+            name: 'framework',
+            chunks: 'all',
+            priority: 40,
             enforce: true,
           },
         },

@@ -13,7 +13,7 @@ Congratulations on joining the most powerful AI platform built specifically for 
 ## 📋 **Quick Setup (5 Minutes)**
 
 ### 1. **Create Your Account**
-- Visit [SoloSuccess AI Platform](https://v0-fork-of-solo-success-ai-platform-bl207i61t.vercel.app)
+- Visit the SoloSuccess AI Platform (hosted locally or on your chosen platform)
 - Click "Sign Up" and create your account
 - Verify your email address
 - Complete your profile setup

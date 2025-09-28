@@ -73,7 +73,6 @@ docs/
 └── solosuccess documents/                      # Legacy documents
     ├── MIGRATION_SUMMARY.md
     ├── FREE_ALTERNATIVES.md
-    └── VERCEL_DEPLOYMENT.md
 ```
 
 ---

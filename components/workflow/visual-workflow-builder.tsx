@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import * as React from 'react'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,42 +9,30 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { 
   Play, 
-  Pause, 
-  Square, 
   Save, 
-  Download, 
-  Upload, 
   Settings, 
-  Eye, 
   Plus, 
   Trash2, 
-  Copy,
   Edit,
   Zap,
   Workflow as WorkflowIcon,
   GitBranch,
-  Clock,
   Mail,
   Brain,
   Webhook,
   Timer,
-  RefreshCw,
-  AlertCircle,
-  CheckCircle,
-  Info,
-  Sparkles,
-  Crown
+  AlertCircle
 } from 'lucide-react'
 import { HolographicButton } from '@/components/ui/holographic-button'
 import { HolographicCard } from '@/components/ui/holographic-card'
 import { HolographicLoader } from '@/components/ui/holographic-loader'
 import { useToast } from '@/hooks/use-toast'
-import { logger, logError, logInfo } from '@/lib/logger'
+import { logError, logInfo } from '@/lib/logger'
 import type { Workflow, WorkflowNode, WorkflowEdge, NodeType } from '@/lib/workflow-engine'
+import './visual-workflow-builder.css'
 
 // Types
 interface WorkflowBuilderProps {
@@ -96,7 +83,7 @@ export function VisualWorkflowBuilder({
   onExecute, 
   className = "" 
 }: WorkflowBuilderProps) {
-  const [workflow, setWorkflow] = useState<Workflow>(initialWorkflow || {
+  const [workflow, setWorkflow] = React.useState<Workflow>(initialWorkflow || {
     id: crypto.randomUUID(),
     name: 'New Workflow',
     description: '',
@@ -124,26 +111,26 @@ export function VisualWorkflowBuilder({
     }
   })
 
-  const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null)
-  const [selectedEdge, setSelectedEdge] = useState<WorkflowEdge | null>(null)
-  const [dragState, setDragState] = useState<DragState>({
+  const [selectedNode, setSelectedNode] = React.useState<WorkflowNode | null>(null)
+  const [selectedEdge, setSelectedEdge] = React.useState<WorkflowEdge | null>(null)
+  const [dragState, setDragState] = React.useState<DragState>({
     isDragging: false,
     dragStart: { x: 0, y: 0 },
     dragOffset: { x: 0, y: 0 }
   })
-  const [isExecuting, setIsExecuting] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [showNodeLibrary, setShowNodeLibrary] = useState(false)
-  const [showWorkflowSettings, setShowWorkflowSettings] = useState(false)
-  const [activeTab, setActiveTab] = useState<'design' | 'settings' | 'variables' | 'preview'>('design')
+  const [isExecuting, setIsExecuting] = React.useState(false)
+  const [isSaving, setIsSaving] = React.useState(false)
+  const [showNodeLibrary, setShowNodeLibrary] = React.useState(false)
+  const [_showWorkflowSettings, _setShowWorkflowSettings] = React.useState(false)
+  const [activeTab, setActiveTab] = React.useState<'design' | 'settings' | 'variables' | 'preview'>('design')
   
   const { toast } = useToast()
-  const canvasRef = useRef<HTMLDivElement>(null)
-  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
+  const canvasRef = React.useRef<HTMLDivElement>(null)
+  const [_canvasOffset, _setCanvasOffset] = React.useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = React.useState(1)
 
   // Mock node types (in real implementation, these would come from workflow engine)
-  const nodeTypes: NodeType[] = [
+  const nodeTypes: NodeType[] = React.useMemo(() => [
     {
       id: 'manual_trigger',
       name: 'Manual Trigger',
@@ -153,7 +140,7 @@ export function VisualWorkflowBuilder({
       color: '#10B981',
       inputs: [],
       outputs: [{ id: 'output', name: 'Trigger', type: 'object', required: true }],
-      configSchema: {} as any,
+      configSchema: {} as unknown,
       execute: async () => ({ triggered: true })
     },
     {
@@ -165,7 +152,7 @@ export function VisualWorkflowBuilder({
       color: '#F59E0B',
       inputs: [{ id: 'input', name: 'Data', type: 'object', required: true }],
       outputs: [{ id: 'output', name: 'Result', type: 'object', required: true }],
-      configSchema: {} as any,
+      configSchema: {} as unknown,
       execute: async () => ({ sent: true })
     },
     {
@@ -177,7 +164,7 @@ export function VisualWorkflowBuilder({
       color: '#EC4899',
       inputs: [{ id: 'input', name: 'Input Data', type: 'object', required: true }],
       outputs: [{ id: 'output', name: 'AI Result', type: 'object', required: true }],
-      configSchema: {} as any,
+      configSchema: {} as unknown,
       execute: async () => ({ result: 'AI task completed' })
     },
     {
@@ -192,7 +179,7 @@ export function VisualWorkflowBuilder({
         { id: 'true', name: 'True', type: 'object', required: true },
         { id: 'false', name: 'False', type: 'object', required: true }
       ],
-      configSchema: {} as any,
+      configSchema: {} as unknown,
       execute: async () => ({ condition: true })
     },
     {
@@ -204,16 +191,16 @@ export function VisualWorkflowBuilder({
       color: '#6B7280',
       inputs: [{ id: 'input', name: 'Input', type: 'object', required: true }],
       outputs: [{ id: 'output', name: 'Output', type: 'object', required: true }],
-      configSchema: {} as any,
+      configSchema: {} as unknown,
       execute: async () => ({ delayed: true })
     }
-  ]
+  ], [])
 
   // Add new node
-  const addNode = useCallback((nodeType: NodeType, position: NodePosition) => {
+  const addNode = React.useCallback((nodeType: NodeType, position: NodePosition) => {
     const newNode: WorkflowNode = {
       id: crypto.randomUUID(),
-      type: nodeType.id as any,
+      type: nodeType.id as 'trigger' | 'action' | 'condition' | 'delay' | 'webhook' | 'ai_task' | 'email' | 'notification',
       name: nodeType.name,
       description: nodeType.description,
       position,
@@ -225,7 +212,7 @@ export function VisualWorkflowBuilder({
       updatedAt: new Date()
     }
 
-    setWorkflow(prev => ({
+    setWorkflow((prev: Workflow) => ({
       ...prev,
       nodes: [...prev.nodes, newNode]
     }))
@@ -235,31 +222,31 @@ export function VisualWorkflowBuilder({
   }, [])
 
   // Update node position
-  const updateNodePosition = useCallback((nodeId: string, position: NodePosition) => {
-    setWorkflow(prev => ({
+  const updateNodePosition = React.useCallback((nodeId: string, position: NodePosition) => {
+    setWorkflow((prev: Workflow) => ({
       ...prev,
-      nodes: prev.nodes.map(node =>
+      nodes: prev.nodes.map((node: WorkflowNode) =>
         node.id === nodeId ? { ...node, position, updatedAt: new Date() } : node
       )
     }))
   }, [])
 
   // Update node config
-  const updateNodeConfig = useCallback((nodeId: string, config: any) => {
-    setWorkflow(prev => ({
+  const _updateNodeConfig = React.useCallback((nodeId: string, config: Record<string, unknown>) => {
+    setWorkflow((prev: Workflow) => ({
       ...prev,
-      nodes: prev.nodes.map(node =>
+      nodes: prev.nodes.map((node: WorkflowNode) =>
         node.id === nodeId ? { ...node, config: { ...node.config, ...config }, updatedAt: new Date() } : node
       )
     }))
   }, [])
 
   // Delete node
-  const deleteNode = useCallback((nodeId: string) => {
-    setWorkflow(prev => ({
+  const deleteNode = React.useCallback((nodeId: string) => {
+    setWorkflow((prev: Workflow) => ({
       ...prev,
-      nodes: prev.nodes.filter(node => node.id !== nodeId),
-      edges: prev.edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId)
+      nodes: prev.nodes.filter((node: WorkflowNode) => node.id !== nodeId),
+      edges: prev.edges.filter((edge: WorkflowEdge) => edge.source !== nodeId && edge.target !== nodeId)
     }))
     
     if (selectedNode?.id === nodeId) {
@@ -270,7 +257,7 @@ export function VisualWorkflowBuilder({
   }, [selectedNode])
 
   // Add edge between nodes
-  const addEdge = useCallback((sourceId: string, targetId: string, sourceHandle?: string, targetHandle?: string) => {
+  const _addEdge = React.useCallback((sourceId: string, targetId: string, sourceHandle?: string, targetHandle?: string) => {
     const newEdge: WorkflowEdge = {
       id: crypto.randomUUID(),
       source: sourceId,
@@ -280,7 +267,7 @@ export function VisualWorkflowBuilder({
       animated: false
     }
 
-    setWorkflow(prev => ({
+    setWorkflow((prev: Workflow) => ({
       ...prev,
       edges: [...prev.edges, newEdge]
     }))
@@ -289,10 +276,10 @@ export function VisualWorkflowBuilder({
   }, [])
 
   // Delete edge
-  const deleteEdge = useCallback((edgeId: string) => {
-    setWorkflow(prev => ({
+  const _deleteEdge = React.useCallback((edgeId: string) => {
+    setWorkflow((prev: Workflow) => ({
       ...prev,
-      edges: prev.edges.filter(edge => edge.id !== edgeId)
+      edges: prev.edges.filter((edge: WorkflowEdge) => edge.id !== edgeId)
     }))
     
     if (selectedEdge?.id === edgeId) {
@@ -303,7 +290,7 @@ export function VisualWorkflowBuilder({
   }, [selectedEdge])
 
   // Save workflow
-  const handleSave = useCallback(async () => {
+  const handleSave = React.useCallback(async () => {
     setIsSaving(true)
     try {
       const updatedWorkflow = {
@@ -325,7 +312,7 @@ export function VisualWorkflowBuilder({
       
       logInfo('Workflow saved', { workflowId: workflow.id, name: workflow.name })
     } catch (error) {
-      logError('Failed to save workflow:', error)
+      logError('Failed to save workflow:', error instanceof Error ? error : new Error(String(error)))
       toast({
         title: 'Save Failed',
         description: 'Failed to save the workflow. Please try again.',
@@ -337,7 +324,7 @@ export function VisualWorkflowBuilder({
   }, [workflow, onSave, toast])
 
   // Execute workflow
-  const handleExecute = useCallback(async () => {
+  const handleExecute = React.useCallback(async () => {
     setIsExecuting(true)
     try {
       onExecute?.(workflow)
@@ -350,7 +337,7 @@ export function VisualWorkflowBuilder({
       
       logInfo('Workflow execution started', { workflowId: workflow.id })
     } catch (error) {
-      logError('Failed to execute workflow:', error)
+      logError('Failed to execute workflow:', error instanceof Error ? error : new Error(String(error)))
       toast({
         title: 'Execution Failed',
         description: 'Failed to start workflow execution',
@@ -362,7 +349,7 @@ export function VisualWorkflowBuilder({
   }, [workflow, onExecute, toast])
 
   // Handle canvas click
-  const handleCanvasClick = useCallback((event: React.MouseEvent) => {
+  const handleCanvasClick = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === canvasRef.current) {
       setSelectedNode(null)
       setSelectedEdge(null)
@@ -370,7 +357,7 @@ export function VisualWorkflowBuilder({
   }, [])
 
   // Handle node drag start
-  const handleNodeDragStart = useCallback((nodeId: string, event: React.MouseEvent) => {
+  const handleNodeDragStart = React.useCallback((nodeId: string, event: React.MouseEvent<HTMLDivElement>) => {
     const node = workflow.nodes.find(n => n.id === nodeId)
     if (!node) return
 
@@ -384,7 +371,7 @@ export function VisualWorkflowBuilder({
   }, [workflow.nodes])
 
   // Handle node drag
-  const handleNodeDrag = useCallback((event: React.MouseEvent) => {
+  const handleNodeDrag = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     if (!dragState.isDragging || !selectedNode) return
 
     const deltaX = event.clientX - dragState.dragStart.x
@@ -399,7 +386,7 @@ export function VisualWorkflowBuilder({
   }, [dragState, selectedNode, zoom, updateNodePosition])
 
   // Handle node drag end
-  const handleNodeDragEnd = useCallback(() => {
+  const handleNodeDragEnd = React.useCallback(() => {
     setDragState({
       isDragging: false,
       dragStart: { x: 0, y: 0 },
@@ -408,10 +395,10 @@ export function VisualWorkflowBuilder({
   }, [])
 
   // Mouse event handlers
-  useEffect(() => {
+  React.useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (dragState.isDragging) {
-        handleNodeDrag(event as any)
+        handleNodeDrag(event as React.MouseEvent<HTMLDivElement>)
       }
     }
 
@@ -433,7 +420,7 @@ export function VisualWorkflowBuilder({
   }, [dragState.isDragging, handleNodeDrag, handleNodeDragEnd])
 
   // Render node
-  const renderNode = useCallback((node: WorkflowNode) => {
+  const renderNode = React.useCallback((node: WorkflowNode) => {
     const nodeType = nodeTypes.find(nt => nt.id === node.type)
     if (!nodeType) return null
 
@@ -452,7 +439,7 @@ export function VisualWorkflowBuilder({
           top: node.position.y,
           transform: `scale(${zoom})`
         }}
-        onMouseDown={(e) => {
+        onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => {
           setSelectedNode(node)
           handleNodeDragStart(node.id, e)
         }}
@@ -460,10 +447,10 @@ export function VisualWorkflowBuilder({
         <HolographicCard className="w-48 p-3">
           <div className="flex items-center gap-2 mb-2">
             <div 
-              className="w-3 h-3 rounded-full" 
+              className="node-color-indicator" 
               style={{ backgroundColor: color }}
             />
-            <IconComponent className="h-4 w-4" style={{ color }} />
+            <IconComponent className="node-icon" style={{ color }} />
             <span className="text-sm font-medium truncate">{node.name}</span>
           </div>
           
@@ -483,7 +470,7 @@ export function VisualWorkflowBuilder({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation()
                   setSelectedNode(node)
                 }}
@@ -494,7 +481,7 @@ export function VisualWorkflowBuilder({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation()
                   deleteNode(node.id)
                 }}
@@ -508,14 +495,14 @@ export function VisualWorkflowBuilder({
           {/* Input ports */}
           {nodeType.inputs.length > 0 && (
             <div className="absolute -left-2 top-1/2 transform -translate-y-1/2">
-              <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white" />
+              <div className="node-port node-port-input" />
             </div>
           )}
 
           {/* Output ports */}
           {nodeType.outputs.length > 0 && (
             <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
-              <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+              <div className="node-port node-port-output" />
             </div>
           )}
         </HolographicCard>
@@ -524,9 +511,9 @@ export function VisualWorkflowBuilder({
   }, [selectedNode, zoom, nodeTypes, handleNodeDragStart, deleteNode])
 
   // Render edge
-  const renderEdge = useCallback((edge: WorkflowEdge) => {
-    const sourceNode = workflow.nodes.find(n => n.id === edge.source)
-    const targetNode = workflow.nodes.find(n => n.id === edge.target)
+  const renderEdge = React.useCallback((edge: WorkflowEdge) => {
+    const sourceNode = workflow.nodes.find((n: WorkflowNode) => n.id === edge.source)
+    const targetNode = workflow.nodes.find((n: WorkflowNode) => n.id === edge.target)
     
     if (!sourceNode || !targetNode) return null
 
@@ -588,7 +575,7 @@ export function VisualWorkflowBuilder({
           <div className="flex items-center gap-2">
             <Input
               value={workflow.name}
-              onChange={(e) => setWorkflow(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWorkflow((prev: Workflow) => ({ ...prev, name: e.target.value }))}
               className="h-8 w-48 text-sm"
               placeholder="Workflow name..."
             />
@@ -611,7 +598,7 @@ export function VisualWorkflowBuilder({
           <HolographicButton
             variant="outline"
             size="sm"
-            onClick={() => setShowWorkflowSettings(true)}
+            onClick={() => _setShowWorkflowSettings(true)}
           >
             <Settings className="h-4 w-4 mr-1" />
             Settings
@@ -649,10 +636,10 @@ export function VisualWorkflowBuilder({
       <div className="flex-1 flex">
         {/* Sidebar */}
         <div className="w-80 border-r border-purple-800/30 bg-black/10 backdrop-blur-sm p-4">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+            <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as 'design' | 'settings' | 'variables' | 'preview')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="design" className="flex items-center gap-1">
-                <Workflow className="h-3 w-3" />
+                <WorkflowIcon className="h-3 w-3" />
                 Design
               </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center gap-1">
@@ -671,7 +658,7 @@ export function VisualWorkflowBuilder({
                     <Textarea
                       id="workflow-description"
                       value={workflow.description}
-                      onChange={(e) => setWorkflow(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setWorkflow((prev: Workflow) => ({ ...prev, description: e.target.value }))}
                       placeholder="Describe your workflow..."
                       rows={3}
                       className="text-sm"
@@ -682,7 +669,7 @@ export function VisualWorkflowBuilder({
                     <Label htmlFor="trigger-type">Trigger Type</Label>
                     <Select
                       value={workflow.triggerType}
-                      onValueChange={(value) => setWorkflow(prev => ({ ...prev, triggerType: value as any }))}
+                      onValueChange={(value: string) => setWorkflow((prev: Workflow) => ({ ...prev, triggerType: value as 'manual' | 'scheduled' | 'webhook' | 'event' | 'ai_trigger' }))}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -709,14 +696,14 @@ export function VisualWorkflowBuilder({
                         <Input
                           id="node-name"
                           value={selectedNode.name}
-                          onChange={(e) => {
-                            setWorkflow(prev => ({
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            setWorkflow((prev: Workflow) => ({
                               ...prev,
-                              nodes: prev.nodes.map(n =>
+                              nodes: prev.nodes.map((n: WorkflowNode) =>
                                 n.id === selectedNode.id ? { ...n, name: e.target.value } : n
                               )
                             }))
-                            setSelectedNode(prev => prev ? { ...prev, name: e.target.value } : null)
+                            setSelectedNode((prev: WorkflowNode | null) => prev ? { ...prev, name: e.target.value } : null)
                           }}
                           className="text-sm"
                         />
@@ -727,14 +714,14 @@ export function VisualWorkflowBuilder({
                         <Textarea
                           id="node-description"
                           value={selectedNode.description || ''}
-                          onChange={(e) => {
-                            setWorkflow(prev => ({
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                            setWorkflow((prev: Workflow) => ({
                               ...prev,
-                              nodes: prev.nodes.map(n =>
+                              nodes: prev.nodes.map((n: WorkflowNode) =>
                                 n.id === selectedNode.id ? { ...n, description: e.target.value } : n
                               )
                             }))
-                            setSelectedNode(prev => prev ? { ...prev, description: e.target.value } : null)
+                            setSelectedNode((prev: WorkflowNode | null) => prev ? { ...prev, description: e.target.value } : null)
                           }}
                           rows={2}
                           className="text-sm"
@@ -784,7 +771,7 @@ export function VisualWorkflowBuilder({
                       id="timeout"
                       type="number"
                       value={workflow.settings.timeout}
-                      onChange={(e) => setWorkflow(prev => ({
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWorkflow((prev: Workflow) => ({
                         ...prev,
                         settings: { ...prev.settings, timeout: parseInt(e.target.value) || 300000 }
                       }))}
@@ -798,7 +785,7 @@ export function VisualWorkflowBuilder({
                       id="retry-attempts"
                       type="number"
                       value={workflow.settings.retryAttempts}
-                      onChange={(e) => setWorkflow(prev => ({
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWorkflow((prev: Workflow) => ({
                         ...prev,
                         settings: { ...prev.settings, retryAttempts: parseInt(e.target.value) || 3 }
                       }))}
@@ -810,7 +797,7 @@ export function VisualWorkflowBuilder({
                     <Label htmlFor="error-handling">Error Handling</Label>
                     <Select
                       value={workflow.settings.errorHandling}
-                      onValueChange={(value) => setWorkflow(prev => ({
+                      onValueChange={(value: string) => setWorkflow((prev: Workflow) => ({
                         ...prev,
                         settings: { ...prev.settings, errorHandling: value as any }
                       }))}
@@ -835,24 +822,14 @@ export function VisualWorkflowBuilder({
         <div className="flex-1 relative overflow-hidden">
           <div
             ref={canvasRef}
-            className="w-full h-full bg-gradient-to-br from-purple-900/20 to-black/40 relative cursor-grab active:cursor-grabbing"
+            className="w-full h-full bg-gradient-to-br from-purple-900/20 to-black/40 relative cursor-grab active:cursor-grabbing canvas-transform"
             onClick={handleCanvasClick}
             style={{
-              transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`,
-              transformOrigin: '0 0'
+              transform: `translate(${_canvasOffset.x}px, ${_canvasOffset.y}px) scale(${zoom})`
             }}
           >
             {/* Grid background */}
-            <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: `
-                  linear-gradient(to right, #8B5CF6 1px, transparent 1px),
-                  linear-gradient(to bottom, #8B5CF6 1px, transparent 1px)
-                `,
-                backgroundSize: '20px 20px'
-              }}
-            />
+            <div className="grid-background" />
 
             {/* Render edges */}
             {workflow.edges.map(renderEdge)}
@@ -864,7 +841,7 @@ export function VisualWorkflowBuilder({
             {workflow.nodes.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <Workflow className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <WorkflowIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-300 mb-2">No Workflow Nodes</h3>
                   <p className="text-gray-500 mb-4">Add nodes to start building your workflow</p>
                   <HolographicButton onClick={() => setShowNodeLibrary(true)}>
@@ -920,11 +897,11 @@ export function VisualWorkflowBuilder({
               >
                 <div className="flex items-center gap-3 mb-2">
                   <div 
-                    className="w-3 h-3 rounded-full" 
+                    className="node-type-color" 
                     style={{ backgroundColor: nodeType.color }}
                   />
-                  {React.createElement(NODE_TYPE_ICONS[nodeType.category as keyof typeof NODE_TYPE_ICONS] || Node, {
-                    className: "h-5 w-5",
+                  {React.createElement(NODE_TYPE_ICONS[nodeType.category as keyof typeof NODE_TYPE_ICONS] || WorkflowIcon, {
+                    className: "node-type-icon",
                     style: { color: nodeType.color }
                   })}
                   <span className="font-medium text-sm">{nodeType.name}</span>
