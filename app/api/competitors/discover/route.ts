@@ -18,6 +18,60 @@ function getOpenAIClient(): OpenAI | null {
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// Mock competitor suggestions for fallback when AI fails
+const MOCK_COMPETITOR_SUGGESTIONS = [
+  {
+    name: 'TechFlow Solutions',
+    domain: 'techflow.com',
+    description: 'Enterprise software solutions for workflow automation',
+    industry: 'Technology',
+    estimatedSize: 'medium',
+    threatLevel: 'high',
+    confidence: 0.85,
+    keyIndicators: ['Similar software focus', 'Enterprise market', 'Workflow automation']
+  },
+  {
+    name: 'BusinessPro Inc',
+    domain: 'businesspro.com',
+    description: 'Business management and productivity solutions',
+    industry: 'Professional Services',
+    estimatedSize: 'large',
+    threatLevel: 'medium',
+    confidence: 0.72,
+    keyIndicators: ['Business management focus', 'Productivity solutions']
+  },
+  {
+    name: 'InnovateTech',
+    domain: 'innovatetech.io',
+    description: 'Cutting-edge technology solutions for modern businesses',
+    industry: 'Technology',
+    estimatedSize: 'small',
+    threatLevel: 'medium',
+    confidence: 0.78,
+    keyIndicators: ['Technology focus', 'Modern business solutions']
+  },
+  {
+    name: 'StartupFlow',
+    domain: 'startupflow.com',
+    description: 'Startup-focused business solutions and tools',
+    industry: 'Technology',
+    estimatedSize: 'startup',
+    threatLevel: 'low',
+    confidence: 0.65,
+    keyIndicators: ['Startup focus', 'Business solutions']
+  },
+  {
+    name: 'EfficiencyMax',
+    domain: 'efficiencymax.com',
+    description: 'Productivity and efficiency solutions for businesses',
+    industry: 'Professional Services',
+    estimatedSize: 'medium',
+    threatLevel: 'medium',
+    confidence: 0.70,
+    keyIndicators: ['Productivity focus', 'Efficiency solutions']
+  }
+]
+
 // Validation schema for discovery request
 const DiscoveryRequestSchema = z.object({
   businessDescription: z.string().min(1, 'Business description is required').max(500),
