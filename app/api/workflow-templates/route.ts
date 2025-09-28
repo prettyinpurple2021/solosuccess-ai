@@ -4,7 +4,13 @@ import { logError, logInfo } from '@/lib/logger'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 // GET /api/workflow-templates - List workflow templates
 export async function GET(request: NextRequest) {
@@ -57,6 +63,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     // Get templates
+    const sql = getSql()
     const templates = await sql`
       SELECT 
         id, name, description, category, tags, featured, usage_count,
@@ -141,6 +148,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create template
+    const sql = getSql()
     const template = await sql`
       INSERT INTO workflow_templates (
         name, description, category, tags, workflow_data, is_public, featured,

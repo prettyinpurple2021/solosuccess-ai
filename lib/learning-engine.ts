@@ -1,7 +1,13 @@
 import { neon } from '@neondatabase/serverless'
-
-const sql = neon(process.env.DATABASE_URL!)
 import { logInfo, logError } from '@/lib/logger'
+
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 export interface Skill {
   id: string
@@ -105,6 +111,7 @@ export class LearningEngine {
       logInfo('Analyzing skill gaps for user', { userId: this.userId })
 
       // Get user's current goals and tasks to understand their focus areas
+      const sql = getSql()
       const userGoals = await sql`
         SELECT g.title, g.description, g.category, g.target_date
         FROM goals g
@@ -208,6 +215,7 @@ export class LearningEngine {
       logInfo('Tracking learning progress', { userId: this.userId, moduleId, progressData })
 
       // Update or insert progress record
+      const sql = getSql()
       await sql`
         INSERT INTO user_learning_progress (
           user_id, module_id, completion_percentage, time_spent, 
@@ -237,6 +245,7 @@ export class LearningEngine {
    */
   async getUserProgress(): Promise<UserProgress[]> {
     try {
+      const sql = getSql()
       const progress = await sql`
         SELECT 
           module_id, completion_percentage, time_spent, last_accessed,
@@ -264,6 +273,7 @@ export class LearningEngine {
    */
   private async getAllSkills(): Promise<Skill[]> {
     try {
+      const sql = getSql()
       const skills = await sql`
         SELECT id, name, category, description, difficulty_level, 
                estimated_duration, prerequisites, learning_objectives
@@ -292,6 +302,7 @@ export class LearningEngine {
    */
   private async getUserSkillAssessments(): Promise<UserSkillAssessment[]> {
     try {
+      const sql = getSql()
       const assessments = await sql`
         SELECT skill_id, current_level, confidence_score, last_assessed, assessment_method
         FROM user_skill_assessments
@@ -316,6 +327,7 @@ export class LearningEngine {
    */
   private async getAvailableModules(): Promise<LearningModule[]> {
     try {
+      const sql = getSql()
       const modules = await sql`
         SELECT id, title, description, skill_id, content_type, duration_minutes,
                difficulty, content_url, quiz_questions, exercises
@@ -439,6 +451,7 @@ export class LearningEngine {
   ): Promise<LearningPath | null> {
     try {
       // Get learning paths that match user's goals
+      const sql = getSql()
       const learningPaths = await sql`
         SELECT id, title, description, target_role, estimated_duration,
                difficulty, skills, modules, prerequisites
@@ -492,6 +505,7 @@ export class LearningEngine {
    */
   private async getModulesForSkill(skillId: string): Promise<LearningModule[]> {
     try {
+      const sql = getSql()
       const modules = await sql`
         SELECT id, title, description, skill_id, content_type, duration_minutes,
                difficulty, content_url, quiz_questions, exercises
@@ -523,6 +537,7 @@ export class LearningEngine {
    */
   private async checkPrerequisites(moduleId: string): Promise<boolean> {
     try {
+      const sql = getSql()
       const learningModule = await sql`
         SELECT prerequisites FROM learning_modules WHERE id = ${moduleId}
       `
@@ -557,6 +572,7 @@ export class LearningEngine {
     try {
       logInfo('Creating skill assessment', { userId: this.userId, skillId, assessmentData })
 
+      const sql = getSql()
       await sql`
         INSERT INTO user_skill_assessments (
           user_id, skill_id, current_level, confidence_score, 
@@ -641,6 +657,7 @@ export class LearningEngine {
    */
   private async calculateLearningStreak(): Promise<number> {
     try {
+      const sql = getSql()
       const learningDays = await sql`
         SELECT DATE(last_accessed) as learning_date
         FROM user_learning_progress
@@ -682,6 +699,7 @@ export class LearningEngine {
    */
   private async calculateLearningVelocity(): Promise<number> {
     try {
+      const sql = getSql()
       const recentProgress = await sql`
         SELECT completion_percentage, last_accessed
         FROM user_learning_progress
@@ -702,6 +720,7 @@ export class LearningEngine {
    */
   private async getTopLearningCategories(): Promise<Array<{ category: string; time_spent: number; modules_completed: number }>> {
     try {
+      const sql = getSql()
       const categories = await sql`
         SELECT 
           s.category,

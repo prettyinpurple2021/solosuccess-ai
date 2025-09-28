@@ -5,7 +5,13 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 
 // Force dynamic rendering
@@ -43,6 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get real projects from database
+    const sql = getSql()
     const projects = await sql`
       SELECT 
         id,
@@ -108,6 +115,7 @@ export async function POST(request: NextRequest) {
     const projectData = ProjectSchema.parse(body)
 
     // Create new project in database
+    const sql = getSql()
     const result = await sql`
       INSERT INTO briefcases (
         user_id,

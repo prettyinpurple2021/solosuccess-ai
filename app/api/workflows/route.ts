@@ -4,7 +4,13 @@ import { logError, logInfo } from '@/lib/logger'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 // GET /api/workflows - List user's workflows
 export async function GET(request: NextRequest) {
@@ -32,33 +38,10 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 
-    // Build query conditions
-    let conditions = [`user_id = $1`]
-    let params: any[] = [user.id]
-    let paramIndex = 2
-
-    if (status) {
-      conditions.push(`status = $${paramIndex}`)
-      params.push(status)
-      paramIndex++
-    }
-
-    if (category) {
-      conditions.push(`category = $${paramIndex}`)
-      params.push(category)
-      paramIndex++
-    }
-
-    if (search) {
-      conditions.push(`(name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`)
-      params.push(`%${search}%`)
-      paramIndex++
-    }
-
-    const whereClause = conditions.join(' AND ')
     const offset = (page - 1) * limit
 
     // Get workflows with execution stats
+    const sql = getSql()
     const workflows = await sql`
       SELECT 
         w.*,
@@ -85,7 +68,10 @@ export async function GET(request: NextRequest) {
         FROM workflow_executions 
         GROUP BY workflow_id
       ) stats ON w.id = stats.workflow_id
-      WHERE ${sql.unsafe(whereClause, ...params)}
+      WHERE w.user_id = ${user.id}
+        ${status ? sql`AND w.status = ${status}` : sql``}
+        ${category ? sql`AND w.category = ${category}` : sql``}
+        ${search ? sql`AND (w.name ILIKE ${`%${search}%`} OR w.description ILIKE ${`%${search}%`})` : sql``}
       ORDER BY w.updated_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `
@@ -94,7 +80,10 @@ export async function GET(request: NextRequest) {
     const countResult = await sql`
       SELECT COUNT(*) as total
       FROM workflows w
-      WHERE ${sql.unsafe(whereClause, ...params)}
+      WHERE w.user_id = ${user.id}
+        ${status ? sql`AND w.status = ${status}` : sql``}
+        ${category ? sql`AND w.category = ${category}` : sql``}
+        ${search ? sql`AND (w.name ILIKE ${`%${search}%`} OR w.description ILIKE ${`%${search}%`})` : sql``}
     `
     const total = parseInt(countResult[0]?.total || '0')
 
@@ -127,7 +116,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    logError('Error in GET /api/workflows:', error)
+    logError('Error in GET /api/workflows:', error instanceof Error ? error : new Error(String(error)))
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -178,6 +167,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create workflow in database
+    const sql = getSql()
     const workflow = await sql`
       INSERT INTO workflows (
         user_id, name, description, version, status, trigger_type, trigger_config,
@@ -230,7 +220,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error) {
-    logError('Error in POST /api/workflows:', error)
+    logError('Error in POST /api/workflows:', error instanceof Error ? error : new Error(String(error)))
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -268,6 +258,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check if workflow exists and user owns it
+    const sql = getSql()
     const existingWorkflow = await sql`
       SELECT * FROM workflows 
       WHERE id = ${id} AND user_id = ${user.id}
@@ -280,33 +271,34 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Build update query
-    const updateFields: string[] = []
-    const updateParams: any[] = []
-    let paramIndex = 1
+    // Check if any valid updates provided
+    const hasUpdates = Object.keys(updates).some(key => 
+      ['name', 'description', 'status', 'triggerType', 'triggerConfig', 'nodes', 'edges', 'variables', 'settings', 'category', 'tags'].includes(key)
+    )
 
-    Object.entries(updates).forEach(([key, value]) => {
-      if (key === 'triggerConfig' || key === 'nodes' || key === 'edges' || key === 'variables' || key === 'settings' || key === 'tags') {
-        updateFields.push(`${key} = $${paramIndex}`)
-        updateParams.push(JSON.stringify(value))
-      } else {
-        updateFields.push(`${key} = $${paramIndex}`)
-        updateParams.push(value)
-      }
-      paramIndex++
-    })
-
-    if (updateFields.length === 0) {
+    if (!hasUpdates) {
       return NextResponse.json(
         { error: 'No valid updates provided' },
         { status: 400 }
       )
     }
 
-    // Update workflow
+    // Update workflow with conditional fields
     const updatedWorkflow = await sql`
       UPDATE workflows 
-      SET ${sql.unsafe(updateFields.join(', '), ...updateParams)}, updated_at = NOW()
+      SET 
+        ${updates.name !== undefined ? sql`name = ${updates.name}` : sql``}
+        ${updates.description !== undefined ? sql`, description = ${updates.description}` : sql``}
+        ${updates.status !== undefined ? sql`, status = ${updates.status}` : sql``}
+        ${updates.triggerType !== undefined ? sql`, trigger_type = ${updates.triggerType}` : sql``}
+        ${updates.triggerConfig !== undefined ? sql`, trigger_config = ${JSON.stringify(updates.triggerConfig)}` : sql``}
+        ${updates.nodes !== undefined ? sql`, nodes = ${JSON.stringify(updates.nodes)}` : sql``}
+        ${updates.edges !== undefined ? sql`, edges = ${JSON.stringify(updates.edges)}` : sql``}
+        ${updates.variables !== undefined ? sql`, variables = ${JSON.stringify(updates.variables)}` : sql``}
+        ${updates.settings !== undefined ? sql`, settings = ${JSON.stringify(updates.settings)}` : sql``}
+        ${updates.category !== undefined ? sql`, category = ${updates.category}` : sql``}
+        ${updates.tags !== undefined ? sql`, tags = ${JSON.stringify(updates.tags)}` : sql``}
+        , updated_at = NOW()
       WHERE id = ${id} AND user_id = ${user.id}
       RETURNING *
     `
@@ -327,7 +319,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ workflow: updatedWorkflow[0] })
 
   } catch (error) {
-    logError('Error in PUT /api/workflows:', error)
+    logError('Error in PUT /api/workflows:', error instanceof Error ? error : new Error(String(error)))
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -365,6 +357,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if workflow exists and user owns it
+    const sql = getSql()
     const workflow = await sql`
       SELECT * FROM workflows 
       WHERE id = ${id} AND user_id = ${user.id}
@@ -405,7 +398,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
 
   } catch (error) {
-    logError('Error in DELETE /api/workflows:', error)
+    logError('Error in DELETE /api/workflows:', error instanceof Error ? error : new Error(String(error)))
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

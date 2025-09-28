@@ -3,7 +3,13 @@ import { neon } from '@neondatabase/serverless'
 import { logInfo, logError } from '@/lib/logger'
 import jwt from 'jsonwebtoken'
 
-const sql = neon(process.env.DATABASE_URL!)
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,6 +26,7 @@ export async function GET(request: NextRequest) {
     // Try to get modules from database
     let modules
     try {
+      const sql = getSql()
       modules = await sql`
         SELECT id, title, description, skill_id, content_type, duration_minutes,
                difficulty, content_url, quiz_questions, exercises

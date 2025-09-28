@@ -4,7 +4,13 @@ import { logError, logInfo } from '@/lib/logger'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 // POST /api/workflows/[id]/execute - Execute workflow
 export async function POST(
@@ -31,6 +37,7 @@ export async function POST(
     const workflowId = params.id
 
     // Get workflow
+    const sql = getSql()
     const workflows = await sql`
       SELECT * FROM workflows 
       WHERE id = ${workflowId} AND user_id = ${user.id}
@@ -134,12 +141,14 @@ export async function GET(
 
     if (executionId) {
       // Get specific execution
+      const sql = getSql()
       executions = await sql`
         SELECT * FROM workflow_executions 
         WHERE id = ${executionId} AND workflow_id = ${workflowId} AND user_id = ${user.id}
       `
     } else {
       // Get recent executions for workflow
+      const sql = getSql()
       executions = await sql`
         SELECT * FROM workflow_executions 
         WHERE workflow_id = ${workflowId} AND user_id = ${user.id}
@@ -188,6 +197,7 @@ async function executeWorkflowAsync(
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // Update execution status to completed
+    const sql = getSql()
     await sql`
       UPDATE workflow_executions 
       SET 
@@ -204,6 +214,7 @@ async function executeWorkflowAsync(
     logError('Workflow execution failed', { executionId, error })
 
     // Update execution status to failed
+    const sql = getSql()
     await sql`
       UPDATE workflow_executions 
       SET 

@@ -4,7 +4,13 @@ import { logError, logInfo } from '@/lib/logger'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
 
-const sql = neon(process.env.DATABASE_URL!)
+function getSql() {
+  const url = process.env.DATABASE_URL
+  if (!url) {
+    throw new Error('DATABASE_URL is not set')
+  }
+  return neon(url)
+}
 
 // POST /api/workflow-templates/[id]/download - Download template
 export async function POST(
@@ -31,6 +37,7 @@ export async function POST(
     const templateId = params.id
 
     // Get template
+    const sql = getSql()
     const templates = await sql`
       SELECT * FROM workflow_templates 
       WHERE id = ${templateId} AND is_public = true
