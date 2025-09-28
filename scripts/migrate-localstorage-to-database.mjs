@@ -100,21 +100,21 @@ async function generateMigrationReport() {
   }
   
   if (dbStatus.hasFileData && dbStatus.hasFileUrl) {
-    console.log('   2. Migrate existing files from database to Vercel Blob:')
-    console.log('      - Files are now stored in Vercel Blob instead of database')
+    console.log('   2. Migrate existing files from database to external storage:')
+    console.log('      - Files are now stored externally instead of database')
     console.log('      - Consider removing file_data column after confirming all files are migrated')
   }
   
   console.log('   3. Update your environment variables:')
   console.log('      - Add BLOB_READ_WRITE_TOKEN to your environment')
-  console.log('      - Ensure Vercel Blob is configured in your project')
+  console.log('      - Ensure external file storage is configured in your project')
   
   console.log('\n✨ localStorage Migration Complete!')
   console.log('   - User preferences: ✅ Using database via /api/preferences')
   console.log('   - Chat messages: ✅ Using database via user preferences')
   console.log('   - Notification settings: ✅ Using database via user preferences')
   console.log('   - Push subscriptions: ✅ Using database via /api/notifications/push-subscriptions')
-  console.log('   - File storage: ✅ Using Vercel Blob storage')
+  console.log('   - File storage: ✅ Using external file storage')
 }
 
 // Main execution
