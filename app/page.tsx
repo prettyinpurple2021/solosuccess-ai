@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { 
   Zap, 
   Star, 
@@ -26,6 +25,7 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
+  // Cache bust: v2.0 - Fixed hydration issues
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Main Content Container */}

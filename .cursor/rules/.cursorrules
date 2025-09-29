@@ -12,8 +12,8 @@ You are working on SoloSuccess AI, a comprehensive AI-powered business platform 
 - **Styling**: Tailwind CSS 3.4.17 with custom design system
 - **Database**: Neon PostgreSQL with Drizzle ORM
 - **Authentication**: JWT with HTTP-only cookies
-- **File Storage**: Vercel Blob
-- **Deployment**: Vercel
+- **File Storage**: To be decided
+- **Deployment**: To be decided
 - **AI Integration**: OpenAI, Anthropic, Google AI SDKs
 
 ### Key Dependencies

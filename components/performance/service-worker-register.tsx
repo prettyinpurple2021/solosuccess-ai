@@ -53,11 +53,22 @@ export function ServiceWorkerRegister() {
   const registerServiceWorker = async () => {
     try {
       if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.register('/sw.js')
+        // Check if service worker is already registered
+        const existingRegistration = await navigator.serviceWorker.getRegistration()
+        if (existingRegistration) {
+          logInfo('Service Worker already registered')
+          return
+        }
+        
+        const registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/'
+        })
         logInfo('Service Worker registered successfully:', registration)
       }
     } catch (error) {
       logError('Service Worker registration failed:', error)
+      // Don't show error to user for service worker issues
+      console.warn('Service Worker registration failed - this is not critical for app functionality')
     }
   }
 

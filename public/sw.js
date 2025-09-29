@@ -1,4 +1,3 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 const CACHE_NAME = 'SoloSuccess-ai-v1'
 const STATIC_CACHE = 'SoloSuccess-static-v1'
 const DYNAMIC_CACHE = 'SoloSuccess-dynamic-v1'
@@ -184,7 +183,7 @@ async function doBackgroundSync() {
       })
     })
   } catch (error) {
-    logError('Background sync failed:', error)
+    console.error('Background sync failed:', error)
   }
 }
 
