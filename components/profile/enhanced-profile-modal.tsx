@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useRef} from "react"
+import { logError } from '@/lib/logger'
 import { Button} from "@/components/ui/button"
 import { Input} from "@/components/ui/input"
 import { Label} from "@/components/ui/label"
@@ -117,7 +118,7 @@ export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProf
         setFormData((prev) => ({ ...prev, avatar_url: avatarUrl }))
       }
     } catch (err) {
-      console.error(err)
+      logError('Avatar upload error:', err)
     } finally {
       setIsUploading(false)
     }
@@ -129,7 +130,7 @@ export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProf
         await removeAvatar()
         setFormData((prev) => ({ ...prev, avatar_url: "" }))
       } catch (err) {
-        console.error(err)
+        logError('Avatar removal error:', err)
       }
     }
   }
@@ -142,7 +143,7 @@ export function EnhancedProfileModal({ _open, onOpenChangeAction }: EnhancedProf
       await updateProfile({ full_name: formData.full_name })
       onOpenChangeAction(false)
     } catch (err) {
-      console.error(err)
+      logError('Profile update error:', err)
     } finally {
       setIsSaving(false)
     }

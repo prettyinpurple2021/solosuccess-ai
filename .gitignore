@@ -752,3 +752,6 @@ backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/backup-s
 backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/app/test-auth/page.tsx
 backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/backup-soloboss-2025-09-10T02-32-11/app/user/page.tsx
 scripts/backup-codebase.mjs
+
+*storybook.log
+storybook-static

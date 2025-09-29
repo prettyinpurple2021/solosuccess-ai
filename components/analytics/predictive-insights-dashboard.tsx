@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { logError } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -129,7 +130,7 @@ export default function PredictiveInsightsDashboard({ className = "" }: Predicti
         throw new Error(result.error || 'Failed to load insights')
       }
     } catch (error) {
-      console.error('Error fetching predictive insights:', error)
+      logError('Error fetching predictive insights:', error)
       setError(error instanceof Error ? error.message : 'Unknown error')
     } finally {
       setLoading(false)
