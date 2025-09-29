@@ -64,7 +64,7 @@ function optimizeImage(inputPath) {
     // Generate WebP versions
     for (const size of sizes) {
       const webpPath = path.join(outputDir, `${name}${size.suffix}.webp`);
-      const command = `npx sharp-cli resize ${size.width} --format webp --quality ${webpQuality} "${inputPath}" --output "${webpPath}"`;
+      const command = `npx sharp-cli resize ${size.width} ${size.width} "${inputPath}" --format webp --quality ${webpQuality} "${webpPath}"`;
       
       try {
         execSync(command, { stdio: 'pipe' });
@@ -77,7 +77,7 @@ function optimizeImage(inputPath) {
     // Generate AVIF versions (for modern browsers)
     for (const size of sizes.slice(0, 2)) { // Only create smaller sizes for AVIF
       const avifPath = path.join(outputDir, `${name}${size.suffix}.avif`);
-      const command = `npx sharp-cli resize ${size.width} --format avif --quality ${avifQuality} "${inputPath}" --output "${avifPath}"`;
+      const command = `npx sharp-cli resize ${size.width} ${size.width} "${inputPath}" --format avif --quality ${avifQuality} "${avifPath}"`;
       
       try {
         execSync(command, { stdio: 'pipe' });
@@ -89,7 +89,7 @@ function optimizeImage(inputPath) {
     
     // Create a fallback WebP version (original size)
     const fallbackWebpPath = path.join(outputDir, `${name}.webp`);
-    const command = `npx sharp-cli --format webp --quality ${webpQuality} "${inputPath}" --output "${fallbackWebpPath}"`;
+    const command = `npx sharp-cli convert --format webp --quality ${webpQuality} "${inputPath}" "${fallbackWebpPath}"`;
     
     try {
       execSync(command, { stdio: 'pipe' });

@@ -38,7 +38,7 @@
     "deploy:cf": "opennext deploy",
     "deploy:cf:staging": "opennext deploy --env staging",
     "dev:cf": "opennext dev",
-    "optimize-images": "node scripts/optimize-images.mjs",
+    "optimize-images": "node scripts/optimize-images-simple.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

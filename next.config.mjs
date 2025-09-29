@@ -24,18 +24,12 @@ const nextConfig = {
   // Enable modern React features
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    // Remove experimental features that might not be supported
-    // optimizeCss: true, // This might not be available in this version
-    // ppr: true, // Requires canary version
   },
 
   // Compression and optimization
   compress: true,
 
-  // SWC minification is enabled by default in Next.js 15
-  // swcMinify: true, // Removed as it's deprecated
-
-  // External packages for server components (valid at root)
+  // External packages for server components
   serverExternalPackages: ['bcryptjs', 'jsonwebtoken'],
 
   // Image optimization
@@ -106,11 +100,6 @@ const nextConfig = {
       }
       config.optimization.usedExports = true
       config.optimization.sideEffects = false
-       // Remove the alias configuration as it's not needed in modern Next.js
-       // config.resolve.alias = {
-       //   ...config.resolve.alias,
-       //   '@': require('path').resolve(__dirname),
-       // }
     }
     if (!isServer) {
       config.resolve.fallback = {
