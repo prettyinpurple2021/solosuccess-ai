@@ -1,0 +1,10 @@
+---
+globs: **/*.{ts,tsx}
+description: Enforce accessibility and reduced motion
+---
+# Accessibility
+
+- Inputs must have associated labels or `aria-label`.
+- Provide alt text for all images.
+- Respect `prefers-reduced-motion`; avoid non-essential animations when enabled.
+- Ensure focus states are visible and keyboard navigation is supported.

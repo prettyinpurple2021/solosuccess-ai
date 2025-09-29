@@ -1,0 +1,12 @@
+---
+globs: app/api/**/*.ts
+description: API routes must be production-ready with auth, validation, and no mock fallbacks
+---
+# API Guidelines
+
+- Auth: Use `authenticateRequest` for protected routes.
+- Rate limiting: Use `rateLimitByIp` where appropriate.
+- Validation: Use `zod` schemas with `safeParse` and return 400 with details on failure.
+- Data: No mock/static/demo data. Do not fall back to placeholders; fail with a 5xx and clear message if dependencies (e.g., API keys) are missing.
+- Security: Use parameterized queries; avoid string interpolation in SQL.
+- Errors: Return typed error payloads; no `console.*` – use project logger.

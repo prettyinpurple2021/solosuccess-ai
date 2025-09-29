@@ -1,4 +1,4 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
@@ -17,60 +17,6 @@ function getOpenAIClient(): OpenAI | null {
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
-
-// Mock competitor suggestions for fallback when AI fails
-const MOCK_COMPETITOR_SUGGESTIONS = [
-  {
-    name: 'TechFlow Solutions',
-    domain: 'techflow.com',
-    description: 'Enterprise software solutions for workflow automation',
-    industry: 'Technology',
-    estimatedSize: 'medium',
-    threatLevel: 'high',
-    confidence: 0.85,
-    keyIndicators: ['Similar software focus', 'Enterprise market', 'Workflow automation']
-  },
-  {
-    name: 'BusinessPro Inc',
-    domain: 'businesspro.com',
-    description: 'Business management and productivity solutions',
-    industry: 'Professional Services',
-    estimatedSize: 'large',
-    threatLevel: 'medium',
-    confidence: 0.72,
-    keyIndicators: ['Business management focus', 'Productivity solutions']
-  },
-  {
-    name: 'InnovateTech',
-    domain: 'innovatetech.io',
-    description: 'Cutting-edge technology solutions for modern businesses',
-    industry: 'Technology',
-    estimatedSize: 'small',
-    threatLevel: 'medium',
-    confidence: 0.78,
-    keyIndicators: ['Technology focus', 'Modern business solutions']
-  },
-  {
-    name: 'StartupFlow',
-    domain: 'startupflow.com',
-    description: 'Startup-focused business solutions and tools',
-    industry: 'Technology',
-    estimatedSize: 'startup',
-    threatLevel: 'low',
-    confidence: 0.65,
-    keyIndicators: ['Startup focus', 'Business solutions']
-  },
-  {
-    name: 'EfficiencyMax',
-    domain: 'efficiencymax.com',
-    description: 'Productivity and efficiency solutions for businesses',
-    industry: 'Professional Services',
-    estimatedSize: 'medium',
-    threatLevel: 'medium',
-    confidence: 0.70,
-    keyIndicators: ['Productivity focus', 'Efficiency solutions']
-  }
-]
 
 // Validation schema for discovery request
 const DiscoveryRequestSchema = z.object({
@@ -390,7 +336,7 @@ async function discoverCompetitors(
   try {
     const client = getOpenAIClient()
     if (!client) {
-      throw new Error('OPENAI_API_KEY not set; using fallback competitor suggestions')
+      throw new Error('OPENAI_API_KEY not configured')
     }
     const prompt = `Based on the following business description, identify ${maxResults} potential competitors:
 
@@ -460,25 +406,7 @@ Return the response as a JSON array of competitor objects. Focus on real, well-k
     }))
   } catch (error) {
     logError('Error in AI competitor discovery:', error)
-    
-    // Fallback to mock data if AI fails
-    return MOCK_COMPETITOR_SUGGESTIONS.slice(0, maxResults).map((comp, index) => ({
-      id: (index + 1).toString(),
-      name: comp.name,
-      domain: comp.domain.replace('https://', ''),
-      description: comp.description,
-      industry: comp.industry,
-      headquarters: 'Unknown',
-      employeeCount: comp.estimatedSize === 'startup' ? 10 : comp.estimatedSize === 'small' ? 50 : comp.estimatedSize === 'medium' ? 200 : 500,
-      fundingStage: 'Series A',
-      threatLevel: comp.threatLevel,
-      matchScore: Math.floor(comp.confidence * 100),
-      matchReasons: comp.keyIndicators,
-      keyProducts: ['Product 1', 'Product 2'],
-      recentNews: ['Recent company news'],
-      socialMediaFollowers: { linkedin: 1000, twitter: 500 },
-      isAlreadyTracked: false
-    }))
+    throw error
   }
 }
 
@@ -508,25 +436,16 @@ export async function POST(request: NextRequest) {
 
     const { businessDescription, targetMarket, keyProducts, maxResults } = parsed.data
 
-    // Discover competitors using multiple data sources
-    const webSuggestions = await discoverCompetitorsFromWeb(
+    // AI-powered competitor discovery (no mock/web fallbacks)
+    const aiSuggestions = await discoverCompetitors(
       businessDescription,
       targetMarket,
       keyProducts,
       maxResults
     )
     
-    // Enhance with AI analysis
-    const aiSuggestions = await discoverCompetitors(
-      businessDescription,
-      targetMarket,
-      keyProducts,
-      Math.max(0, maxResults - webSuggestions.length)
-    )
-    
-    // Combine and deduplicate suggestions
-    const allSuggestions = [...webSuggestions, ...aiSuggestions]
-    const uniqueSuggestions = allSuggestions.filter((suggestion, index, self) => 
+    // Deduplicate suggestions
+    const uniqueSuggestions = aiSuggestions.filter((suggestion, index, self) => 
       index === self.findIndex(s => s.name === suggestion.name && s.domain === suggestion.domain)
     )
     

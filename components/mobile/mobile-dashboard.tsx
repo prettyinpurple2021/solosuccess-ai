@@ -10,6 +10,8 @@ import { TouchGestureWrapper } from './mobile-gestures'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { logInfo } from '@/lib/logger'
+import { useDashboardData } from '@/hooks/use-dashboard-data'
 import { 
   Mic, 
   Plus, 
@@ -91,60 +93,14 @@ export default function MobileDashboard({
   className = "" 
 }: MobileDashboardProps) {
   const isMobile = useIsMobile()
+  const { data: fetchedDashboard, loading: dashboardLoading, error: dashboardError } = useDashboardData()
   const [showVoiceCreator, setShowVoiceCreator] = useState(false)
   const [notifications, setNotifications] = useState(3)
   const [isOnline, setIsOnline] = useState(true)
   const [lastSync, setLastSync] = useState<Date>(new Date())
 
-  // Mock data if not provided
-  const mockData = dashboardData || {
-    todaysStats: {
-      tasks_completed: 8,
-      total_tasks: 12,
-      focus_minutes: 120,
-      ai_interactions: 15,
-      goals_achieved: 2,
-      productivity_score: 85
-    },
-    todaysTasks: [
-      { id: '1', title: 'Review quarterly goals', status: 'completed', priority: 'high' },
-      { id: '2', title: 'Update project timeline', status: 'in_progress', priority: 'medium' },
-      { id: '3', title: 'Call with client', status: 'todo', priority: 'high' },
-      { id: '4', title: 'Prepare presentation', status: 'todo', priority: 'medium' }
-    ],
-    activeGoals: [
-      { id: '1', title: 'Launch new product', progress_percentage: 75, target_date: '2024-03-15' },
-      { id: '2', title: 'Increase revenue by 50%', progress_percentage: 60, target_date: '2024-06-30' }
-    ],
-    recentConversations: [
-      { 
-        id: '1', 
-        title: 'Business Strategy Discussion', 
-        last_message_at: '2024-01-15T10:30:00Z',
-        agent: { name: 'roxy', display_name: 'Roxy', accent_color: '#FF6B9D' }
-      },
-      { 
-        id: '2', 
-        title: 'Marketing Ideas', 
-        last_message_at: '2024-01-15T09:15:00Z',
-        agent: { name: 'blaze', display_name: 'Blaze', accent_color: '#4ECDC4' }
-      }
-    ],
-    insights: [
-      {
-        type: 'productivity',
-        title: 'Great focus session!',
-        description: 'You completed 3 tasks in your last focus session',
-        action: 'Start another session'
-      },
-      {
-        type: 'ai',
-        title: 'AI Insight',
-        description: 'Your productivity is 20% higher in the morning',
-        action: 'Schedule morning tasks'
-      }
-    ]
-  }
+  // Resolve dashboard data from props or real API
+  const resolvedData = dashboardData || fetchedDashboard || null
 
   // Create widgets from data
   const widgets: Widget[] = [
@@ -154,10 +110,10 @@ export default function MobileDashboard({
       title: 'Today\'s Progress',
       priority: 1,
       data: {
-        completion_rate: Math.round((mockData.todaysStats.tasks_completed / mockData.todaysStats.total_tasks) * 100),
-        tasks_completed: mockData.todaysStats.tasks_completed,
-        focus_minutes: mockData.todaysStats.focus_minutes,
-        total_tasks: mockData.todaysStats.total_tasks
+        completion_rate: resolvedData ? Math.round((resolvedData.todaysStats.tasks_completed / Math.max(1, resolvedData.todaysStats.total_tasks)) * 100) : 0,
+        tasks_completed: resolvedData?.todaysStats.tasks_completed || 0,
+        focus_minutes: resolvedData?.todaysStats.focus_minutes || 0,
+        total_tasks: resolvedData?.todaysStats.total_tasks || 0
       }
     },
     {
@@ -165,7 +121,7 @@ export default function MobileDashboard({
       type: 'tasks',
       title: 'Quick Tasks',
       priority: 2,
-      data: mockData.todaysTasks.map(task => ({
+      data: (resolvedData?.todaysTasks || []).map(task => ({
         ...task,
         completed: task.status === 'completed'
       }))
@@ -175,7 +131,7 @@ export default function MobileDashboard({
       type: 'goals',
       title: 'Active Goals',
       priority: 3,
-      data: mockData.activeGoals.map(goal => ({
+      data: (resolvedData?.activeGoals || []).map(goal => ({
         ...goal,
         progress: goal.progress_percentage,
         due_date: goal.target_date
@@ -186,10 +142,10 @@ export default function MobileDashboard({
       type: 'agents',
       title: 'AI Squad',
       priority: 4,
-      data: mockData.recentConversations.map(conv => ({
+      data: (resolvedData?.recentConversations || []).map(conv => ({
         id: conv.id,
         display_name: conv.agent.display_name,
-        has_new_messages: Math.random() > 0.5
+        has_new_messages: false
       }))
     },
     {
@@ -197,7 +153,7 @@ export default function MobileDashboard({
       type: 'insights',
       title: 'AI Insights',
       priority: 5,
-      data: mockData.insights
+      data: resolvedData?.insights || []
     },
     {
       id: 'focus',
@@ -295,7 +251,7 @@ export default function MobileDashboard({
     <div className={cn("min-h-screen bg-gray-50", className)}>
       {/* Mobile Navigation */}
       <MobileNavigation
-        user={user}
+        user={user || (resolvedData ? { name: resolvedData.user.full_name || 'Boss', email: resolvedData.user.email } : undefined)}
         notifications={notifications}
         onNotificationClick={() => setNotifications(0)}
       />
@@ -335,10 +291,12 @@ export default function MobileDashboard({
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-bold">
-                      Welcome back, {user?.name || 'Boss'}! 👑
+                      {dashboardLoading ? 'Loading your dashboard…' : `Welcome back, ${user?.name || resolvedData?.user.full_name || 'Boss'}! 👑`}
                     </h2>
                     <p className="text-sm opacity-90">
-                      Level {user?.level || 1} • {user?.points || 0} points
+                      {dashboardLoading
+                        ? 'Fetching stats…'
+                        : `Level ${user?.level ||  (resolvedData ? resolvedData.user.level : 1)} • ${user?.points || (resolvedData ? resolvedData.user.total_points : 0)} points`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -351,11 +309,25 @@ export default function MobileDashboard({
           </motion.div>
 
           {/* Dashboard Widgets */}
-          <MobileDashboardWidgets
-            widgets={widgets}
-            onWidgetAction={handleWidgetAction}
-            onWidgetReorder={handleWidgetReorder}
-          />
+          {dashboardLoading ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="h-24 bg-gray-200 rounded"></div>
+                    <div className="h-24 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <MobileDashboardWidgets
+              widgets={widgets}
+              onWidgetAction={handleWidgetAction}
+              onWidgetReorder={handleWidgetReorder}
+            />
+          )}
 
           {/* Quick Stats */}
           <motion.div
@@ -369,19 +341,19 @@ export default function MobileDashboard({
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold text-purple-600">
-                      {mockData.todaysStats.tasks_completed}
+                      {resolvedData?.todaysStats.tasks_completed || 0}
                     </div>
                     <div className="text-xs text-gray-600">Tasks Done</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-blue-600">
-                      {mockData.todaysStats.focus_minutes}
+                      {resolvedData?.todaysStats.focus_minutes || 0}
                     </div>
                     <div className="text-xs text-gray-600">Focus Mins</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-green-600">
-                      {mockData.todaysStats.goals_achieved}
+                      {resolvedData?.todaysStats.goals_achieved || 0}
                     </div>
                     <div className="text-xs text-gray-600">Goals Hit</div>
                   </div>

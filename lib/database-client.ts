@@ -15,20 +15,9 @@ let _db: ReturnType<typeof drizzle> | null = null
  * Uses lazy initialization to avoid build-time database calls
  */
 export function getDb() {
-  // During build time, return a mock client to prevent build failures
+  // Prevent DB usage during build
   if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
-    logger.info('Build time detected, returning mock database client')
-    // Type-safe mock client implementing the expected interface
-    const mockDb: ReturnType<typeof drizzle> = {
-      transaction: async <T>(callback: (db: any) => Promise<T>): Promise<T> => {
-        throw new Error('Database transaction is not available during build time')
-      },
-      execute: async (...args: any[]): Promise<any> => {
-        throw new Error('Database execute is not available during build time')
-      },
-      // Add other methods as needed for type safety
-    } as ReturnType<typeof drizzle>;
-    return mockDb;
+    throw new Error('Database client is not available during build time')
   }
 
   if (!_db) {
