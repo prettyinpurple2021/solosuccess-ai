@@ -1,9 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { HolographicButton, HolographicCard, GradientText } from '@/components/ui/holographic-button';
-import { SparkleAnimation, HolographicGlitter, GlitterEffect } from '@/components/ui/sparkle-animation';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { 
   Zap, 
   Star, 
@@ -29,36 +28,38 @@ import {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Main Content Container */}
+      <div className="relative z-10">
       {/* Epic Dark Holographic Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black via-purple-900/20 to-black">
-        <div className="absolute inset-0 bg-gradient-to-r from-SoloSuccess-purple/10 via-transparent to-SoloSuccess-cyan/10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-SoloSuccess-pink/5 to-transparent" />
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-purple-900/20 to-black z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-cyan-500/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent" />
       </div>
       
       {/* Background Glitter Effect */}
-      <div className="fixed inset-0 pointer-events-none">
-        <GlitterEffect className="w-full h-full opacity-50" />
+      <div className="fixed inset-0 pointer-events-none opacity-30 z-0">
+        <div className="w-full h-full bg-gradient-to-r from-purple-500/5 via-cyan-500/5 to-pink-500/5" />
       </div>
       
       {/* Floating holographic orbs */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-SoloSuccess-purple/20 to-SoloSuccess-pink/20 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-SoloSuccess-cyan/20 to-SoloSuccess-purple/20 rounded-full blur-3xl animate-pulse-soft animation-delay-1s" />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-gradient-to-r from-SoloSuccess-pink/15 to-SoloSuccess-cyan/15 rounded-full blur-3xl animate-pulse-soft animation-delay-2s" />
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-gradient-to-r from-pink-500/8 to-cyan-500/8 rounded-full blur-3xl" />
       </div>
 
       {/* Holographic Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 holo-overlay backdrop-blur-xl border-b border-SoloSuccess-purple/30">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-purple-500/30">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <motion.div 
               className="flex items-center gap-3"
               whileHover={{ scale: 1.05 }}
             >
-              <div className="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center">
                 <Crown className="w-6 h-6 text-white" />
               </div>
-              <div className="text-3xl font-boss gradient-text">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 SoloSuccess
               </div>
             </motion.div>
@@ -69,27 +70,20 @@ export default function HomePage() {
                   <Link 
                     key={item}
                     href={`#${item.toLowerCase()}`}
-                    className="text-sm font-medium hover:gradient-text transition-all duration-300 relative group"
+                    className="text-sm font-medium text-white/90 hover:text-purple-400 transition-all duration-300 relative group"
                   >
                     {item}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-SoloSuccess-purple to-SoloSuccess-pink group-hover:w-full transition-all duration-300" />
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300" />
                   </Link>
                 ))}
               </nav>
               
               <Link href="/signup">
-                <HolographicButton
-                  variant="primary"
-                  size="md"
-                  sparkles={true}
-                  shine={true}
-                  glow={true}
-                  className="relative"
-                >
+                <button className="bg-gradient-to-r from-purple-500 via-cyan-500 to-pink-500 hover:from-purple-600 hover:via-cyan-600 hover:to-pink-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-purple-500/25">
                   <Sparkle className="w-4 h-4" />
                   Get Started
                   <ArrowRight className="w-4 h-4" />
-                </HolographicButton>
+                </button>
               </Link>
             </div>
           </div>
@@ -97,25 +91,26 @@ export default function HomePage() {
       </nav>
 
       {/* Epic Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-32 pb-20 overflow-hidden z-10">
 
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="container mx-auto px-4 text-center relative z-20">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
             className="max-w-6xl mx-auto"
           >
+
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full holo-overlay border border-SoloSuccess-purple/30 mb-8"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-purple-500/30 mb-8 shadow-lg"
             >
-              <Sparkles className="w-5 h-5 text-SoloSuccess-purple" />
-              <span className="text-sm font-medium gradient-text">AI-Powered Business Revolution</span>
-              <Gem className="w-5 h-5 text-SoloSuccess-pink" />
+              <Sparkles className="w-5 h-5 text-purple-400" />
+              <span className="text-sm font-medium bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">AI-Powered Business Revolution</span>
+              <Gem className="w-5 h-5 text-pink-400" />
             </motion.div>
 
             {/* Main Heading */}
@@ -123,15 +118,14 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-boss mb-8 leading-tight"
+              className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight"
             >
               <div className="relative">
-                <HolographicGlitter density="heavy" className="absolute inset-0" />
-                <span className="gradient-text relative z-10">
+                <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent relative z-10 animate-pulse">
                   Your AI Co-founder
                 </span>
                 <br />
-                <span className="text-4xl md:text-6xl lg:text-7xl gradient-text relative z-10">
+                <span className="text-4xl md:text-6xl lg:text-7xl bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent relative z-10">
                   Awaits ✨
                 </span>
               </div>
@@ -145,7 +139,7 @@ export default function HomePage() {
               className="text-xl md:text-2xl text-white/90 leading-relaxed mb-12 max-w-4xl mx-auto"
             >
               Transform your solo business into a powerhouse with AI agents that work 24/7. 
-              <span className="gradient-text font-semibold"> Automate everything, achieve more,</span> 
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-semibold"> Automate everything, achieve more,</span> 
               and dominate your industry like never before.
             </motion.p>
 
@@ -157,31 +151,28 @@ export default function HomePage() {
               className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
             >
               <Link href="/signup">
-                <HolographicButton 
-                  size="xl" 
-                  variant="primary"
-                  sparkles={true}
-                  shine={true}
-                  glow={true}
-                  className="text-lg px-12 py-6 font-boss"
+                <motion.button 
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.99 }}
+                  className="bg-gradient-to-r from-purple-500 via-cyan-500 to-pink-500 hover:from-purple-600 hover:via-cyan-600 hover:to-pink-600 text-white px-12 py-6 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center gap-3 shadow-2xl hover:shadow-purple-500/50 relative overflow-hidden"
                 >
                   <Rocket className="w-6 h-6" />
                   Start Your Empire
                   <Crown className="w-6 h-6" />
-                </HolographicButton>
+                  {/* Glass shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
+                </motion.button>
               </Link>
               
               <Link href="/auth-example">
-                <HolographicButton 
-                  size="lg" 
-                  variant="ghost"
-                  sparkles={true}
-                  shine={true}
-                  className="text-lg px-10 py-4"
+                <motion.button 
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.99 }}
+                  className="bg-white/10 backdrop-blur-xl border-2 border-purple-500/50 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-purple-500/25"
                 >
                   <Play className="w-5 h-5" />
                   Watch Demo
-                </HolographicButton>
+                </motion.button>
               </Link>
             </motion.div>
 
@@ -197,33 +188,31 @@ export default function HomePage() {
                   number: '300%', 
                   label: 'Productivity Increase',
                   icon: <TrendingUp className="w-8 h-8" />,
-                  color: 'text-SoloSuccess-purple'
+                  color: 'text-purple-400'
                 },
                 { 
                   number: '50K+', 
                   label: 'Active Users',
                   icon: <Users className="w-8 h-8" />,
-                  color: 'text-SoloSuccess-cyan'
+                  color: 'text-cyan-400'
                 },
                 { 
                   number: '$2M+', 
                   label: 'Revenue Generated',
                   icon: <Trophy className="w-8 h-8" />,
-                  color: 'text-SoloSuccess-pink'
+                  color: 'text-pink-400'
                 }
               ].map((stat, index) => (
                 <motion.div 
                   key={index}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="holo-overlay p-8 rounded-2xl text-center relative overflow-hidden"
+                  className="bg-white/10 backdrop-blur-xl p-8 rounded-2xl text-center relative overflow-hidden border border-white/20 shadow-lg hover:shadow-purple-500/25"
                 >
-                  <div className={`${stat.color} mb-4 flex justify-center`}>
-                    <HolographicGlitter density="medium">
-                      {stat.icon}
-                    </HolographicGlitter>
+                  <div className={`${stat.color} mb-4 flex justify-center text-4xl`}>
+                    {stat.icon}
                   </div>
-                  <div className="text-4xl font-boss mb-2 gradient-text">{stat.number}</div>
-                  <div className="text-sm text-white/80 font-medium">{stat.label}</div>
+                  <div className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{stat.number}</div>
+                  <div className="text-sm text-white/90 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -238,23 +227,21 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="text-center mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-SoloSuccess-purple/10 border border-SoloSuccess-purple/30 mb-6">
-              <Lightbulb className="w-5 h-5 text-SoloSuccess-purple" />
-              <span className="text-sm font-medium text-SoloSuccess-purple">Powerful Features</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 mb-6">
+              <Lightbulb className="w-5 h-5 text-purple-400" />
+              <span className="text-sm font-medium text-purple-400">Powerful Features</span>
             </div>
             
-            <h2 className="text-5xl md:text-6xl font-boss mb-8">
-              <HolographicGlitter density="heavy">
-                <GradientText className="text-5xl md:text-6xl">Supercharge Your Success</GradientText>
-              </HolographicGlitter>
+            <h2 className="text-5xl md:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent text-5xl md:text-6xl">Supercharge Your Success</span>
             </h2>
             
             <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
               Our AI-powered platform gives you everything you need to dominate your market and achieve 
-              <span className="gradient-text font-semibold"> unprecedented growth</span>
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-semibold"> unprecedented growth</span>
             </p>
           </motion.div>
 
@@ -264,37 +251,37 @@ export default function HomePage() {
                 icon: <Brain className="w-10 h-10" />,
                 title: 'AI Co-founder',
                 description: 'Your intelligent business partner that thinks strategically, plans ahead, and executes flawlessly. Never work alone again.',
-                color: 'from-SoloSuccess-purple to-SoloSuccess-purple-light'
+                color: 'from-purple-400 to-purple-300'
               },
               {
                 icon: <Zap className="w-10 h-10" />,
                 title: 'Lightning Automation',
                 description: 'Automate workflows and streamline operations with AI-powered tools that work at the speed of thought.',
-                color: 'from-SoloSuccess-cyan to-SoloSuccess-cyan-light'
+                color: 'from-cyan-400 to-cyan-300'
               },
               {
                 icon: <Target className="w-10 h-10" />,
                 title: 'Strategic Planning',
                 description: 'Make data-driven decisions with AI insights that help you focus on what matters most for explosive growth.',
-                color: 'from-SoloSuccess-pink to-SoloSuccess-pink-light'
+                color: 'from-pink-400 to-pink-300'
               },
               {
                 icon: <Users className="w-10 h-10" />,
                 title: 'Virtual Dream Team',
                 description: 'Get the power of a full team without the overhead. AI assistants handle marketing, sales, and operations 24/7.',
-                color: 'from-SoloSuccess-purple-light to-SoloSuccess-purple'
+                color: 'from-purple-300 to-purple-400'
               },
               {
                 icon: <TrendingUp className="w-10 h-10" />,
                 title: 'Growth Analytics',
                 description: 'Track your progress with beautiful, holographic dashboards that show exactly where your empire is heading.',
-                color: 'from-SoloSuccess-cyan-light to-SoloSuccess-cyan'
+                color: 'from-cyan-300 to-cyan-400'
               },
               {
                 icon: <Shield className="w-10 h-10" />,
                 title: 'Enterprise Security',
                 description: 'Bank-level security with 99.9% uptime. Your business data is always safe, secure, and accessible.',
-                color: 'from-SoloSuccess-pink-light to-SoloSuccess-pink'
+                color: 'from-pink-300 to-pink-400'
               }
             ].map((feature, index) => (
               <motion.div
@@ -302,37 +289,33 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                whileHover={{ scale: 1.05, y: -10 }}
+                transition={{ delay: index * 0.05, duration: 0.4 }}
+                whileHover={{ scale: 1.02, y: -5 }}
               >
-                <HolographicCard
-                  sparkles={true}
-                  shine={true}
-                  glow={true}
-                  interactive={true}
-                  className="text-center p-8 h-full relative overflow-hidden"
+                <motion.div
+                  className="bg-white/10 backdrop-blur-xl text-center p-8 h-full relative overflow-hidden border border-white/20 shadow-lg hover:shadow-purple-500/25 rounded-2xl"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: 10 }}
                     transition={{ type: "spring", stiffness: 300 }}
-                    className={`mb-6 flex justify-center bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}
+                    className={`mb-6 flex justify-center bg-gradient-to-r ${feature.color} bg-clip-text text-transparent text-4xl`}
                   >
-                    <HolographicGlitter density="heavy">
-                      {feature.icon}
-                    </HolographicGlitter>
+                    {feature.icon}
                   </motion.div>
 
-                  <h3 className="text-2xl font-boss mb-4">
-                    <GradientText className="text-2xl">{feature.title}</GradientText>
+                  <h3 className="text-2xl font-bold mb-4">
+                    <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent text-2xl">{feature.title}</span>
                   </h3>
                   
-                  <p className="text-white/80 leading-relaxed">
+                  <p className="text-white/85 leading-relaxed">
                     {feature.description}
                   </p>
 
                   {/* Feature glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
-                </HolographicCard>
+                </motion.div>
               </motion.div>
             ))}
           </div>
@@ -346,17 +329,16 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
           >
-            <HolographicCard
-              sparkles={true}
-              shine={true}
-              glow={true}
-              className="max-w-6xl mx-auto p-16 text-center relative overflow-hidden"
+            <motion.div
+              className="bg-white/10 backdrop-blur-xl max-w-6xl mx-auto p-16 text-center relative overflow-hidden border border-white/20 shadow-2xl rounded-2xl"
+              whileHover={{ scale: 1.01 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
               {/* Background effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-SoloSuccess-purple/10 via-SoloSuccess-cyan/10 to-SoloSuccess-pink/10" />
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-SoloSuccess-purple/20 to-SoloSuccess-pink/20 rounded-full blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-pink-500/10" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl" />
               
               <div className="relative z-10">
                 <motion.div
@@ -364,38 +346,35 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.2, duration: 0.6 }}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-SoloSuccess-purple/20 border border-SoloSuccess-purple/30 mb-8"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-purple-500/20 border border-purple-500/30 mb-8"
                 >
-                  <Crown className="w-6 h-6 text-SoloSuccess-purple" />
-                  <span className="text-sm font-medium gradient-text">Ready to Rule Your Industry?</span>
-                  <Gem className="w-6 h-6 text-SoloSuccess-pink" />
+                  <Crown className="w-6 h-6 text-purple-400" />
+                  <span className="text-sm font-medium bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Ready to Rule Your Industry?</span>
+                  <Gem className="w-6 h-6 text-pink-400" />
                 </motion.div>
 
-                <h2 className="text-5xl md:text-6xl font-boss mb-8">
-                  <HolographicGlitter density="heavy">
-                    <GradientText className="text-5xl md:text-6xl">Become a SoloSuccess</GradientText>
-                  </HolographicGlitter>
+                <h2 className="text-5xl md:text-6xl font-bold mb-8">
+                  <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent text-5xl md:text-6xl">Become a SoloSuccess</span>
                 </h2>
                 
                 <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
                   Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of 
-                  <span className="gradient-text font-semibold"> unstoppable productivity</span>.
+                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-semibold"> unstoppable productivity</span>.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
                   <Link href="/signup">
-                    <HolographicButton
-                      variant="primary"
-                      size="xl"
-                      sparkles={true}
-                      shine={true}
-                      glow={true}
-                      className="text-xl px-16 py-8 font-boss"
+                    <motion.button
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.99 }}
+                      className="bg-gradient-to-r from-purple-500 via-cyan-500 to-pink-500 hover:from-purple-600 hover:via-cyan-600 hover:to-pink-600 text-white px-16 py-8 rounded-2xl font-bold text-xl transition-all duration-300 flex items-center gap-3 shadow-2xl hover:shadow-purple-500/50 relative overflow-hidden"
                     >
                       <Infinity className="w-8 h-8" />
                       Start for Free
                       <Rocket className="w-8 h-8" />
-                    </HolographicButton>
+                      {/* Glass shine effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
+                    </motion.button>
                   </Link>
                   
                   <motion.div
@@ -404,7 +383,7 @@ export default function HomePage() {
                   >
                     <CheckCircle className="w-6 h-6 text-green-400" />
                     No credit card required
-                    <Sparkle className="w-5 h-5 text-SoloSuccess-purple" />
+                    <Sparkle className="w-5 h-5 text-purple-400" />
                   </motion.div>
                 </div>
 
@@ -424,13 +403,13 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-            </HolographicCard>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Holographic Footer */}
-      <footer className="py-16 border-t border-SoloSuccess-purple/20 relative">
+      <footer className="py-16 border-t border-purple-500/20 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
@@ -439,12 +418,12 @@ export default function HomePage() {
                 className="flex items-center gap-3 mb-6"
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="w-12 h-12 rounded-xl gradient-hero flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center">
                   <Crown className="w-7 h-7 text-white" />
                 </div>
-                <div className="text-3xl font-boss gradient-text">
-                  SoloSuccess
-                </div>
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                SoloSuccess
+              </div>
               </motion.div>
               <p className="text-white/80 leading-relaxed">
                 Empowering entrepreneurs with AI-powered productivity tools that transform solo businesses into unstoppable empires.
@@ -453,13 +432,13 @@ export default function HomePage() {
 
             {/* Product Links */}
             <div>
-              <h3 className="font-boss text-lg mb-6 gradient-text">Product</h3>
+              <h3 className="font-bold text-lg mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Product</h3>
               <ul className="space-y-4">
                 {['Features', 'Pricing', 'API', 'Integrations'].map((item) => (
                   <li key={item}>
                     <Link 
                       href={`#${item.toLowerCase()}`}
-                      className="text-white/70 hover:gradient-text transition-all duration-300"
+                      className="text-white/85 hover:text-purple-400 transition-all duration-300"
                     >
                       {item}
                     </Link>
@@ -470,13 +449,13 @@ export default function HomePage() {
 
             {/* Company Links */}
             <div>
-              <h3 className="font-boss text-lg mb-6 gradient-text">Company</h3>
+              <h3 className="font-bold text-lg mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Company</h3>
               <ul className="space-y-4">
                 {['About', 'Blog', 'Contact', 'Careers'].map((item) => (
                   <li key={item}>
                     <Link 
                       href={`/${item.toLowerCase()}`}
-                      className="text-white/70 hover:gradient-text transition-all duration-300"
+                      className="text-white/85 hover:text-purple-400 transition-all duration-300"
                     >
                       {item}
                     </Link>
@@ -487,13 +466,13 @@ export default function HomePage() {
 
             {/* Support Links */}
             <div>
-              <h3 className="font-boss text-lg mb-6 gradient-text">Support</h3>
+              <h3 className="font-bold text-lg mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Support</h3>
               <ul className="space-y-4">
                 {['Help Center', 'Documentation', 'Community', 'Status'].map((item) => (
                   <li key={item}>
                     <Link 
                       href={`/${item.toLowerCase().replace(' ', '-')}`}
-                      className="text-white/70 hover:gradient-text transition-all duration-300"
+                      className="text-white/85 hover:text-purple-400 transition-all duration-300"
                     >
                       {item}
                     </Link>
@@ -504,9 +483,9 @@ export default function HomePage() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="border-t border-SoloSuccess-purple/20 pt-8">
+          <div className="border-t border-purple-500/20 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-white/60 text-sm">
+              <p className="text-white/75 text-sm">
                 © 2024 SoloSuccess AI. All rights reserved. Made with ✨ and holographic magic.
               </p>
               <div className="flex items-center gap-6 text-sm">
@@ -514,7 +493,7 @@ export default function HomePage() {
                   <Link 
                     key={item}
                     href={`/${item.toLowerCase()}`}
-                    className="text-white/60 hover:gradient-text transition-all duration-300"
+                    className="text-white/75 hover:text-purple-400 transition-all duration-300"
                   >
                     {item}
                   </Link>
@@ -524,6 +503,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

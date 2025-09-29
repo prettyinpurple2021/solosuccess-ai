@@ -18,11 +18,13 @@ const nextConfig = {
     // Ensure critical env vars are available during build
     DATABASE_URL: process.env.DATABASE_URL,
     JWT_SECRET: process.env.JWT_SECRET,
-    NODE_ENV: process.env.NODE_ENV,
+    // NODE_ENV removed to fix error!
   },
-  // Optimized for CloudFlare Workers deployment with OpenNext
-  output: 'standalone', // Required for OpenNext CloudFlare
+
+  // Optimized for Cloudflare Workers deployment with OpenNext
+  output: 'standalone', // Required for OpenNext Cloudflare
   distDir: '.next',
+  
   // Enable modern React features
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
@@ -158,4 +160,3 @@ const nextConfig = {
 }
 
 export default nextConfig;
-
