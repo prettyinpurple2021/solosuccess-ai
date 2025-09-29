@@ -1088,6 +1088,71 @@ export const notificationJobs = pgTable('notification_jobs', {
   processed_at: timestamp('processed_at'),
 });
 
+// User Sessions table for cookie-based auth
+export const userSessions = pgTable('user_sessions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  refresh_token: varchar('refresh_token', { length: 500 }).notNull().unique(),
+  device_fingerprint: varchar('device_fingerprint', { length: 255 }).notNull(),
+  device_name: varchar('device_name', { length: 255 }),
+  device_type: varchar('device_type', { length: 50 }),
+  ip_address: varchar('ip_address', { length: 45 }),
+  user_agent: text('user_agent'),
+  is_remember_me: boolean('is_remember_me').default(false),
+  remember_me_expires_at: timestamp('remember_me_expires_at'),
+  last_activity: timestamp('last_activity').defaultNow(),
+  expires_at: timestamp('expires_at').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('user_sessions_user_id_idx').on(table.user_id),
+  refreshTokenIdx: index('user_sessions_refresh_token_idx').on(table.refresh_token),
+  deviceFingerprintIdx: index('user_sessions_device_fingerprint_idx').on(table.device_fingerprint),
+  expiresAtIdx: index('user_sessions_expires_at_idx').on(table.expires_at),
+  lastActivityIdx: index('user_sessions_last_activity_idx').on(table.last_activity),
+}));
+
+// User 2FA/MFA settings table
+export const userMfaSettings = pgTable('user_mfa_settings', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  totp_secret: varchar('totp_secret', { length: 255 }),
+  totp_enabled: boolean('totp_enabled').default(false),
+  totp_backup_codes: jsonb('totp_backup_codes').default('[]'),
+  webauthn_enabled: boolean('webauthn_enabled').default(false),
+  webauthn_credentials: jsonb('webauthn_credentials').default('[]'),
+  recovery_codes: jsonb('recovery_codes').default('[]'),
+  mfa_required: boolean('mfa_required').default(false),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('user_mfa_settings_user_id_idx').on(table.user_id),
+  totpEnabledIdx: index('user_mfa_settings_totp_enabled_idx').on(table.totp_enabled),
+  webauthnEnabledIdx: index('user_mfa_settings_webauthn_enabled_idx').on(table.webauthn_enabled),
+}));
+
+// Device approvals table
+export const deviceApprovals = pgTable('device_approvals', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  device_fingerprint: varchar('device_fingerprint', { length: 255 }).notNull(),
+  device_name: varchar('device_name', { length: 255 }),
+  device_type: varchar('device_type', { length: 50 }),
+  ip_address: varchar('ip_address', { length: 45 }),
+  user_agent: text('user_agent'),
+  is_approved: boolean('is_approved').default(false),
+  approved_at: timestamp('approved_at'),
+  approved_by: varchar('approved_by', { length: 255 }).references(() => users.id),
+  expires_at: timestamp('expires_at'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('device_approvals_user_id_idx').on(table.user_id),
+  deviceFingerprintIdx: index('device_approvals_device_fingerprint_idx').on(table.device_fingerprint),
+  isApprovedIdx: index('device_approvals_is_approved_idx').on(table.is_approved),
+  expiresAtIdx: index('device_approvals_expires_at_idx').on(table.expires_at),
+}));
+
 export const workflowRelations = relations(workflows, ({ one, many }) => ({
   user: one(users, {
     fields: [workflows.user_id],

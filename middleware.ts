@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public routes that don't require authentication
@@ -19,6 +20,8 @@ export function middleware(request: NextRequest) {
     '/gdpr',
     '/blog',
     '/landing',
+    '/auth/2fa',
+    '/auth/sessions',
     '/api/auth',
     '/api/health',
     '/manifest.json',
@@ -37,25 +40,46 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Special handling for admin routes - require authentication
-  if (pathname.startsWith('/admin')) {
-    const hasToken = request.cookies.get('auth_token')?.value
-    if (!hasToken) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/signin'
-      url.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(url)
-    }
-  }
-
   // For API routes, let them handle their own authentication
   if (pathname.startsWith('/api/')) {
     return NextResponse.next()
   }
 
-  // For all other routes, allow access (client-side auth will handle redirects)
-  // The client-side authentication will handle redirecting to signin if needed
-  return NextResponse.next()
+  // Check authentication using Better Auth
+  try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    })
+
+    if (!session) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/signin'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+
+    // Check if user needs 2FA verification
+    if (session.user.twoFactorEnabled && !session.user.twoFactorVerified) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/2fa'
+      return NextResponse.redirect(url)
+    }
+
+    // Check if user needs device approval
+    if (session.user.requiresDeviceApproval && !session.user.deviceApproved) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/device-approval'
+      return NextResponse.redirect(url)
+    }
+
+    return NextResponse.next()
+  } catch (error) {
+    // If there's an error checking the session, redirect to signin
+    const url = request.nextUrl.clone()
+    url.pathname = '/signin'
+    url.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(url)
+  }
 }
 
 export const config = {
