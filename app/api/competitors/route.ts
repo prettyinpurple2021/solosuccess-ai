@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { getDb } from '@/lib/database-client'
+import { createErrorResponse } from '@/lib/api-response'
+import { logError } from '@/lib/logger'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -34,28 +36,38 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     // Build dynamic query based on filters
-    let whereConditions = [`user_id = '${user.id}'`]
+    let whereConditions = [`user_id = $1`]
+    let params = [user.id]
+    let paramIndex = 2
     
     if (threatLevel && threatLevel !== 'all') {
-      whereConditions.push(`threat_level = '${threatLevel}'`)
+      whereConditions.push(`threat_level = $${paramIndex}`)
+      params.push(threatLevel)
+      paramIndex++
     }
     
     if (industry && industry !== 'all') {
-      whereConditions.push(`industry ILIKE '%${industry}%'`)
+      whereConditions.push(`industry ILIKE $${paramIndex}`)
+      params.push(`%${industry}%`)
+      paramIndex++
     }
     
     if (status && status !== 'all') {
-      whereConditions.push(`monitoring_status = '${status}'`)
+      whereConditions.push(`monitoring_status = $${paramIndex}`)
+      params.push(status)
+      paramIndex++
     }
     
     if (search) {
-      whereConditions.push(`(name ILIKE '%${search}%' OR domain ILIKE '%${search}%' OR description ILIKE '%${search}%')`)
+      whereConditions.push(`(name ILIKE $${paramIndex} OR domain ILIKE $${paramIndex + 1} OR description ILIKE $${paramIndex + 2})`)
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`)
+      paramIndex += 3
     }
 
     const whereClause = whereConditions.join(' AND ')
 
     // Get competitors with pagination
-    const competitors = await sql`
+    const competitors = await db.query(`
       SELECT 
         id,
         name,
@@ -73,7 +85,7 @@ export async function GET(request: NextRequest) {
         created_at,
         updated_at
       FROM competitor_profiles 
-      WHERE ${sql.unsafe(whereClause)}
+      WHERE ${whereClause}
       ORDER BY 
         CASE threat_level 
           WHEN 'critical' THEN 4 
@@ -82,15 +94,15 @@ export async function GET(request: NextRequest) {
           WHEN 'low' THEN 1 
         END DESC,
         created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `, [...params, limit, offset])
 
     // Get total count
-    const countResult = await sql`
+    const countResult = await db.query(`
       SELECT COUNT(*) as total
       FROM competitor_profiles 
-      WHERE ${sql.unsafe(whereClause)}
-    `
+      WHERE ${whereClause}
+    `, params)
 
     const total = parseInt(countResult[0]?.total || '0')
 
@@ -125,7 +137,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching competitors:', error)
+    logError('Error fetching competitors:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitors' },
       { status: 500 }

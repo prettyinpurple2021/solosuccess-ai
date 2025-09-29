@@ -87,30 +87,82 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback to mock data if AI service fails or is not available
-    const mockLogos = [
+    // Fallback to programmatically generated SVG logos
+    const generateSVGLogo = (brandName: string, style: string, colors: { bg: string; text: string; accent: string }) => {
+      const initials = brandName.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
+      
+      let svgContent = ''
+      switch (style) {
+        case 'modern':
+          svgContent = `
+            <svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:${colors.accent};stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:${colors.bg};stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="300" height="100" fill="${colors.bg}" rx="8"/>
+              <circle cx="50" cy="50" r="30" fill="url(#grad1)"/>
+              <text x="50" y="57" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20" font-weight="bold">${initials}</text>
+              <text x="100" y="40" fill="${colors.text}" font-family="Arial, sans-serif" font-size="24" font-weight="bold">${brandName}</text>
+              <text x="100" y="60" fill="${colors.text}" font-family="Arial, sans-serif" font-size="12" opacity="0.7">BRAND</text>
+            </svg>
+          `
+          break
+        case 'elegant':
+          svgContent = `
+            <svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+              <rect width="300" height="100" fill="${colors.bg}"/>
+              <rect x="20" y="20" width="60" height="60" fill="none" stroke="${colors.accent}" stroke-width="2" rx="4"/>
+              <text x="50" y="58" text-anchor="middle" fill="${colors.accent}" font-family="serif" font-size="24" font-weight="bold">${initials}</text>
+              <text x="100" y="45" fill="${colors.text}" font-family="serif" font-size="28" font-weight="300">${brandName}</text>
+              <line x1="100" y1="55" x2="280" y2="55" stroke="${colors.accent}" stroke-width="1"/>
+            </svg>
+          `
+          break
+        case 'bold':
+        default:
+          svgContent = `
+            <svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+              <rect width="300" height="100" fill="${colors.bg}"/>
+              <rect x="20" y="25" width="50" height="50" fill="${colors.accent}" rx="8"/>
+              <text x="45" y="58" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">${initials}</text>
+              <text x="90" y="45" fill="${colors.text}" font-family="Arial, sans-serif" font-size="22" font-weight="900">${brandName.toUpperCase()}</text>
+              <rect x="90" y="55" width="180" height="3" fill="${colors.accent}"/>
+            </svg>
+          `
+      }
+      
+      return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`
+    }
+
+    const fallbackLogos = [
       {
         id: 1,
-        url: 'https://via.placeholder.com/300x100/8E24AA/FFFFFF?text=' + encodeURIComponent(brandName),
-        style: style || 'modern',
-        description: 'Modern logo design'
+        url: generateSVGLogo(brandName, 'modern', { bg: '#f8fafc', text: '#1e293b', accent: '#3b82f6' }),
+        style: 'modern',
+        description: 'Modern logo design',
+        generated: true
       },
       {
         id: 2,
-        url: 'https://via.placeholder.com/300x100/E1BEE7/000000?text=' + encodeURIComponent(brandName),
-        style: style || 'elegant',
-        description: 'Elegant logo design'
+        url: generateSVGLogo(brandName, 'elegant', { bg: '#fefefe', text: '#374151', accent: '#7c3aed' }),
+        style: 'elegant', 
+        description: 'Elegant logo design',
+        generated: true
       },
       {
         id: 3,
-        url: 'https://via.placeholder.com/300x100/FF4081/FFFFFF?text=' + encodeURIComponent(brandName),
-        style: style || 'bold',
-        description: 'Bold logo design'
+        url: generateSVGLogo(brandName, 'bold', { bg: '#0f172a', text: '#ffffff', accent: '#ef4444' }),
+        style: 'bold',
+        description: 'Bold logo design', 
+        generated: true
       }
     ]
 
     return NextResponse.json({ 
-      logos: mockLogos,
+      logos: fallbackLogos,
       isFallback: true,
       fallbackReason: process.env.OPENAI_API_KEY ? 'AI service temporarily unavailable' : 'OpenAI API key not configured'
     }, { status: 200 })

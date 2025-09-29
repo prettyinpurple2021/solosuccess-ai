@@ -1,12 +1,10 @@
-// @ts-nocheck
 'use client'
 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import React, { useState, useEffect, useRef } from 'react'
-import { Search, Crown, Heart, Sparkles, MessageCircle, Palette, FileText, Star, User, Zap } from 'lucide-react'
-import Link from 'next/link'
+import { logError } from '@/lib/logger'
+import React, { useState, useEffect } from 'react'
+import { Search, Crown, Heart, Sparkles, MessageCircle, Palette, FileText, Star, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 
 
 interface SearchResult {

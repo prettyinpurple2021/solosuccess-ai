@@ -533,24 +533,36 @@ export async function POST(request: NextRequest) {
     const suggestions = uniqueSuggestions.slice(0, maxResults)
 
     // Add suggested monitoring configuration based on competitor characteristics
-    const enrichedSuggestions = suggestions.map(suggestion => ({
-      ...suggestion,
-      suggestedMonitoringConfig: {
-        websiteMonitoring: true,
-        socialMediaMonitoring: suggestion.estimatedSize !== 'large', // Large companies have less social media activity
-        newsMonitoring: suggestion.threatLevel === 'critical' || suggestion.threatLevel === 'high',
-        jobPostingMonitoring: suggestion.estimatedSize === 'startup' || suggestion.estimatedSize === 'small',
-        appStoreMonitoring: suggestion.industry.toLowerCase().includes('technology'),
-        monitoringFrequency: suggestion.threatLevel === 'critical' ? 'daily' : 'weekly',
-        alertThresholds: {
-          pricing: true,
-          productLaunches: true,
-          hiring: suggestion.estimatedSize !== 'large',
-          funding: suggestion.estimatedSize === 'startup',
-          partnerships: suggestion.threatLevel === 'critical' || suggestion.threatLevel === 'high',
+    const enrichedSuggestions = suggestions.map(suggestion => {
+      // Determine company size based on employee count
+      const getCompanySize = (employeeCount: number) => {
+        if (employeeCount < 50) return 'startup'
+        if (employeeCount < 200) return 'small'
+        if (employeeCount < 1000) return 'medium'
+        return 'large'
+      }
+      
+      const companySize = getCompanySize(suggestion.employeeCount || 50)
+      
+      return {
+        ...suggestion,
+        suggestedMonitoringConfig: {
+          websiteMonitoring: true,
+          socialMediaMonitoring: companySize !== 'large', // Large companies have less social media activity
+          newsMonitoring: suggestion.threatLevel === 'critical' || suggestion.threatLevel === 'high',
+          jobPostingMonitoring: companySize === 'startup' || companySize === 'small',
+          appStoreMonitoring: suggestion.industry.toLowerCase().includes('technology'),
+          monitoringFrequency: suggestion.threatLevel === 'critical' ? 'daily' : 'weekly',
+          alertThresholds: {
+            pricing: true,
+            productLaunches: true,
+            hiring: companySize !== 'large',
+            funding: companySize === 'startup',
+            partnerships: suggestion.threatLevel === 'critical' || suggestion.threatLevel === 'high',
+          }
         }
       }
-    }))
+    })
 
     return NextResponse.json({
       suggestions: enrichedSuggestions,

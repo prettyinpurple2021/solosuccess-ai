@@ -27,21 +27,44 @@ const nextConfig = {
   
   // Enable modern React features
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // Enable modern bundling optimizations
+    optimizeCss: true,
+    // Enable server components optimization
+    serverComponentsExternalPackages: ['bcryptjs', 'jsonwebtoken'],
+    // Enable partial prerendering for better performance
+    ppr: true,
   },
+
+  // Compression and optimization
+  compress: true,
+  
+  // Enable SWC minification for better performance
+  swcMinify: true,
 
   // External packages for server components
   serverExternalPackages: [],
 
   // Image optimization
   images: {
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000, // 1 year cache
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     unoptimized: false, // Enable optimization for production
+    // Enable quality optimization
+    quality: 80,
+    // Enable progressive loading for better UX
+    loader: 'default',
+    // Enable responsive images
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
 
   // Bundle optimization for memory efficiency
@@ -50,21 +73,25 @@ const nextConfig = {
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
-        maxInitialRequests: 20,
-        maxAsyncRequests: 20,
+        maxInitialRequests: 30,
+        maxAsyncRequests: 30,
+        minSize: 20000,
+        maxSize: 200000,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             chunks: 'all',
-            maxSize: 244000,
+            priority: 10,
+            reuseExistingChunk: true,
           },
           common: {
             name: 'common',
             minChunks: 2,
             chunks: 'all',
+            priority: 5,
+            reuseExistingChunk: true,
             enforce: true,
-            maxSize: 244000,
           },
           framework: {
             test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
@@ -72,8 +99,33 @@ const nextConfig = {
             chunks: 'all',
             priority: 40,
             enforce: true,
+            reuseExistingChunk: true,
+          },
+          ui: {
+            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
+            name: 'ui',
+            chunks: 'all',
+            priority: 30,
+            reuseExistingChunk: true,
+          },
+          animations: {
+            test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+            name: 'animations',
+            chunks: 'all',
+            priority: 25,
+            reuseExistingChunk: true,
           },
         },
+      }
+      
+      // Enable tree shaking and dead code elimination
+      config.optimization.usedExports = true
+      config.optimization.sideEffects = false
+      
+      // Optimize module resolution
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@': require('path').resolve(__dirname),
       }
     }
     if (!isServer) {

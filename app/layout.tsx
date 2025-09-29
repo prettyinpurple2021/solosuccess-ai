@@ -22,13 +22,20 @@ const fontSans = FontSans({
 })
 
 export const metadata = {
-  title: 'SoloSuccess AI — AI Co-founder for Solo Founders',
+  title: {
+    default: 'SoloSuccess AI — AI Co-founder for Solo Founders',
+    template: '%s | SoloSuccess AI'
+  },
   description: 'AI Business Co-pilot and Virtual Team for Founders. Solopreneur Operating System with AI Business Assistant, Startup AI Platform, and Founder AI Tools to scale a one-person business.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'SoloSuccess AI',
+  },
+  metadataBase: new URL('https://solobossai.fun'),
+  alternates: {
+    canonical: '/',
   },
   keywords: [
     'AI Co-founder',
@@ -70,11 +77,23 @@ export const metadata = {
     type: 'website',
     url: 'https://solobossai.fun',
     siteName: 'SoloSuccess AI',
+    images: [
+      {
+        url: '/images/soloboss-hero-silhouette.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'SoloSuccess AI - AI Co-founder Platform',
+      },
+    ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SoloSuccess AI — Founder AI Tools',
     description: 'AI Business Assistant, Workflow Automation AI, and AI-powered Productivity for solo founders.',
+    images: ['/images/soloboss-hero-silhouette.jpg'],
+    creator: '@solosuccessai',
+    site: '@solosuccessai',
   },
   other: {
     'mobile-web-app-capable': 'yes',
@@ -103,7 +122,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Optimize font loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Optimize image loading */}
         <link rel="preload" href="/images/soloboss-hero-silhouette.jpg" as="image" />
+        
         {/* Search engine verification placeholders */}
         <meta name="google-site-verification" content="CHANGE_ME" />
         <meta name="msvalidate.01" content="CHANGE_ME" />
@@ -153,6 +178,9 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
         )}
       >
         <link rel="canonical" href="https://solobossai.fun/" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         <Script 
           id="ld-org" 
           type="application/ld+json" 

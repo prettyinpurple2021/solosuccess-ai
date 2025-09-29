@@ -96,7 +96,7 @@ export default function AcceleratorPlanPage() {
               <CardContent>
                 <ul className="space-y-4 mb-8">
                   {[
-                    'Access to 5 AI agents (Nova, Echo, Atlas, Luna, Phoenix)',
+                    'Access to 5 AI agents (Nova, Echo, Vex, Lumi, Glitch)',
                     '100 AI conversations per day',
                     'Advanced automation workflows',
                     'Priority email support',

@@ -43,15 +43,11 @@ export const HolographicButton = forwardRef<HTMLButtonElement, HolographicButton
           'disabled:opacity-50 disabled:cursor-not-allowed',
           'text-white shadow-2xl border border-white/20',
           'backdrop-blur-sm overflow-hidden',
+          'bg-gradient-to-br from-[#B621FF] via-[#18FFFF] to-[#FF1FAF] bg-[length:200%_200%] animate-holographic-shift',
           sizeVariants[size],
           glow && 'hover:shadow-[0_0_40px_rgba(182,33,255,0.6)]',
           className
         )}
-        style={{
-          background: 'linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%)',
-          backgroundSize: '200% 200%',
-          animation: 'holographic-shift 6s ease-in-out infinite',
-        }}
         whileHover={!disabled ? { 
           scale: 1.05, 
           y: -2,

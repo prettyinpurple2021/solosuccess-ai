@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logError('Signup error:', error)
-    console.error('Error details:', {
+    logError('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       name: error instanceof Error ? error.name : undefined

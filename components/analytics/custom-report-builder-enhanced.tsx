@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
+import { logError } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -263,7 +264,7 @@ export default function CustomReportBuilderEnhanced({
         }))
       })
     } catch (error) {
-      console.error('Error generating preview:', error)
+      logError('Error generating preview:', error)
     } finally {
       setLoading(false)
     }

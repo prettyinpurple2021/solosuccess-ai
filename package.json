@@ -37,7 +37,8 @@
     "build:cf": "opennext build",
     "deploy:cf": "opennext deploy",
     "deploy:cf:staging": "opennext deploy --env staging",
-    "dev:cf": "opennext dev"
+    "dev:cf": "opennext dev",
+    "optimize-images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",

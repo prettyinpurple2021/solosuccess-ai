@@ -68,7 +68,7 @@ export function ServiceWorkerRegister() {
     } catch (error) {
       logError('Service Worker registration failed:', error)
       // Don't show error to user for service worker issues
-      console.warn('Service Worker registration failed - this is not critical for app functionality')
+      logWarn('Service Worker registration failed - this is not critical for app functionality')
     }
   }
 

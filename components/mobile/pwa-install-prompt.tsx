@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { logError } from '@/lib/logger'
 import { 
   Download, 
   X, 
@@ -89,7 +90,7 @@ export default function PWAInstallPrompt({
       // Clear the deferredPrompt
       setDeferredPrompt(null)
     } catch (error) {
-      console.error('Error during installation:', error)
+      logError('Error during installation:', error)
     } finally {
       setIsInstalling(false)
     }
@@ -225,7 +226,7 @@ export function usePWAInstall() {
       const { outcome } = await deferredPrompt.userChoice
       return outcome === 'accepted'
     } catch (error) {
-      console.error('Installation failed:', error)
+      logError('Installation failed:', error)
       return false
     }
   }

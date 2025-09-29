@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 import { z } from 'zod'
 import { neon } from '@neondatabase/serverless'
 
@@ -173,7 +174,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error fetching competitor:', error)
+    logError('Error fetching competitor:', error)
     return NextResponse.json(
       { error: 'Failed to fetch competitor' },
       { status: 500 }
@@ -312,7 +313,7 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Error updating competitor:', error)
+    logError('Error updating competitor:', error)
     return NextResponse.json(
       { error: 'Failed to update competitor' },
       { status: 500 }
@@ -365,7 +366,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Error deleting competitor:', error)
+    logError('Error deleting competitor:', error)
     return NextResponse.json(
       { error: 'Failed to delete competitor' },
       { status: 500 }

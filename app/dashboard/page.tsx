@@ -1,7 +1,7 @@
 "use client"
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { useState, useEffect} from "react"
+import { useState, useEffect, useMemo, useCallback} from "react"
 import { useDashboardData} from "@/hooks/use-dashboard-data"
 import { useAuth} from "@/hooks/use-auth"
 import { useAnalytics, usePageTracking, usePerformanceTracking} from "@/hooks/use-analytics"
@@ -18,6 +18,13 @@ import Link from "next/link"
 import { useSearchParams, useRouter} from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileDashboardEnhanced from "@/components/mobile/mobile-dashboard-enhanced"
+
+// Add metadata for SEO
+export const metadata = {
+  title: 'Dashboard - SoloSuccess AI',
+  description: 'Your AI-powered business dashboard. Track tasks, goals, and productivity with AI insights.',
+  robots: 'noindex, nofollow', // Dashboard is private
+}
 
 
 export default function DashboardPage() {
@@ -66,7 +73,7 @@ export default function DashboardPage() {
     }
   }, [data, track])
 
-  const handleOnboardingComplete = async (onboardingData: unknown) => {
+  const handleOnboardingComplete = useCallback(async (onboardingData: unknown) => {
     try {
       // Save onboarding data to user profile
       const response = await fetch('/api/profile', {
@@ -107,7 +114,7 @@ export default function DashboardPage() {
         details: error instanceof Error ? error.message : 'Unknown error'
       })
     }
-  }
+  }, [track])
 
   const handleOnboardingSkip = () => {
     logInfo('Dashboard - Onboarding skip called')
@@ -179,6 +186,7 @@ export default function DashboardPage() {
                 onClick={() => window.location.reload()}
                 variant="empowerment"
                 crown
+                aria-label="Reload dashboard page"
               >
                 Try Again
               </BossButton>
@@ -249,7 +257,7 @@ export default function DashboardPage() {
 
   const { user: dashboardUser, todaysStats, todaysTasks, activeGoals, recentConversations, recentBriefcases, insights } = data
 
-  const containerVariants = {
+  const containerVariants = useMemo(() => ({
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -257,9 +265,9 @@ export default function DashboardPage() {
         staggerChildren: 0.1
       }
     }
-  }
+  }), [])
 
-  const itemVariants = {
+  const itemVariants = useMemo(() => ({
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -269,7 +277,7 @@ export default function DashboardPage() {
         ease: easeOut
       }
     }
-  }
+  }), [])
 
   // Render mobile PWA dashboard for mobile devices
   if (isMobile) {
@@ -299,7 +307,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen gradient-background p-6">
+    <main className="min-h-screen gradient-background p-6" role="main">
       <EnhancedOnboarding 
         open={showOnboarding} 
         onComplete={handleOnboardingComplete}
@@ -357,7 +365,9 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Today's Stats */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <section aria-labelledby="stats-heading">
+          <h2 id="stats-heading" className="sr-only">Today's Statistics</h2>
+          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <StatsCard
             title="Tasks Completed"
             value={`${todaysStats.tasks_completed}/${todaysStats.total_tasks}`}
@@ -385,12 +395,15 @@ export default function DashboardPage() {
             icon={<BarChart3 className="w-6 h-6 text-white" />}
             trend={{ value: 5, isPositive: true }}
           />
-        </motion.div>
+          </motion.div>
+        </section>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Today's Tasks */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
+          <section aria-labelledby="tasks-heading" className="lg:col-span-2">
+            <h2 id="tasks-heading" className="sr-only">Today's Tasks</h2>
+            <motion.div variants={itemVariants}>
             <EmpowermentCard>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
@@ -458,10 +471,13 @@ export default function DashboardPage() {
                 )}
               </div>
             </EmpowermentCard>
-          </motion.div>
+            </motion.div>
+          </section>
 
           {/* Active Goals */}
-          <motion.div variants={itemVariants}>
+          <section aria-labelledby="goals-heading">
+            <h2 id="goals-heading" className="sr-only">Active Goals</h2>
+            <motion.div variants={itemVariants}>
             <EmpowermentCard>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
@@ -516,13 +532,16 @@ export default function DashboardPage() {
                 )}
               </div>
             </EmpowermentCard>
-          </motion.div>
+            </motion.div>
+          </section>
         </div>
 
         {/* Recent Conversations & Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Conversations */}
-          <motion.div variants={itemVariants}>
+        <section aria-labelledby="conversations-heading">
+          <h2 id="conversations-heading" className="sr-only">Recent Conversations and Insights</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Conversations */}
+            <motion.div variants={itemVariants}>
             <BossCard variant="default">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
@@ -574,10 +593,10 @@ export default function DashboardPage() {
                 )}
               </div>
             </BossCard>
-          </motion.div>
+            </motion.div>
 
-          {/* Insights */}
-          <motion.div variants={itemVariants}>
+            {/* Insights */}
+            <motion.div variants={itemVariants}>
             <BossCard variant="success">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
@@ -619,12 +638,15 @@ export default function DashboardPage() {
                 )}
               </div>
             </BossCard>
-          </motion.div>
+            </motion.div>
+          </div>
+        </section>
 
-          {/* Briefcase Section */}
+        {/* Briefcase Section */}
+        <section aria-labelledby="briefcase-heading">
+          <h2 id="briefcase-heading" className="sr-only">Recent Briefcases</h2>
           <motion.div
             variants={itemVariants}
-            className="col-span-1 lg:col-span-2"
           >
             <BossCard variant="default">
               <div className="flex items-center justify-between mb-6">
@@ -696,8 +718,8 @@ export default function DashboardPage() {
               </div>
             </BossCard>
           </motion.div>
-        </div>
+        </section>
       </motion.div>
-    </div>
+    </main>
   )
 }
