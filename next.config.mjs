@@ -2,63 +2,51 @@
 const nextConfig = {
   // Fix workspace root warning
   outputFileTracingRoot: process.cwd(),
-  
+
   // Production builds should catch errors
   eslint: {
-    // Temporarily allow build to succeed while we fix linting issues
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Temporarily disable TypeScript errors to allow build to succeed
     ignoreBuildErrors: true,
   },
-  
+
   // Environment variables configuration
   env: {
-    // Ensure critical env vars are available during build
     DATABASE_URL: process.env.DATABASE_URL,
     JWT_SECRET: process.env.JWT_SECRET,
-    // NODE_ENV removed to fix error!
   },
 
   // Optimized for Cloudflare Workers deployment with OpenNext
-  output: 'standalone', // Required for OpenNext Cloudflare
+  output: 'standalone',
   distDir: '.next',
-  
+
   // Enable modern React features
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    // Enable modern bundling optimizations
     optimizeCss: true,
-    // Enable server components optimization
-    serverComponentsExternalPackages: ['bcryptjs', 'jsonwebtoken'],
-    // Enable partial prerendering for better performance
     ppr: true,
   },
 
   // Compression and optimization
   compress: true,
-  
+
   // Enable SWC minification for better performance
   swcMinify: true,
 
-  // External packages for server components
-  serverExternalPackages: [],
+  // External packages for server components (valid at root)
+  serverExternalPackages: ['bcryptjs', 'jsonwebtoken'],
 
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000, // 1 year cache
+    minimumCacheTTL: 31536000,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: false, // Enable optimization for production
-    // Enable quality optimization
-    quality: 80,
-    // Enable progressive loading for better UX
+    unoptimized: false,
     loader: 'default',
-    // Enable responsive images
     remotePatterns: [
       {
         protocol: 'https',
@@ -69,7 +57,6 @@ const nextConfig = {
 
   // Bundle optimization for memory efficiency
   webpack: (config, { dev, isServer }) => {
-    // Optimize memory usage during build
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
@@ -117,12 +104,8 @@ const nextConfig = {
           },
         },
       }
-      
-      // Enable tree shaking and dead code elimination
       config.optimization.usedExports = true
       config.optimization.sideEffects = false
-      
-      // Optimize module resolution
       config.resolve.alias = {
         ...config.resolve.alias,
         '@': require('path').resolve(__dirname),
@@ -169,9 +152,7 @@ const nextConfig = {
     return config
   },
 
-  // Headers for security and caching (No changes here)
   async headers() {
-    // ... your existing headers config remains untouched
     return [
       {
         source: '/:path*.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)',
@@ -203,7 +184,6 @@ const nextConfig = {
     ]
   },
 
-  // Redirects for better UX (No changes here)
   async redirects() {
     return [
       // ... your existing redirects config remains untouched

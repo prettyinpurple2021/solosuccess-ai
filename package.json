@@ -38,7 +38,9 @@
     "deploy:cf": "opennext deploy",
     "deploy:cf:staging": "opennext deploy --env staging",
     "dev:cf": "opennext dev",
-    "optimize-images": "node scripts/optimize-images.mjs"
+    "optimize-images": "node scripts/optimize-images.mjs",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
@@ -134,8 +136,14 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.1.1",
     "@eslint/eslintrc": "^3.3.1",
     "@jest/globals": "latest",
+    "@storybook/addon-a11y": "^9.1.8",
+    "@storybook/addon-docs": "^9.1.8",
+    "@storybook/addon-onboarding": "^9.1.8",
+    "@storybook/addon-vitest": "^9.1.8",
+    "@storybook/nextjs": "^9.1.8",
     "@tsconfig/node20": "^20.1.6",
     "@types/cheerio": "^0.22.35",
     "@types/eslint": "^8.56.12",
