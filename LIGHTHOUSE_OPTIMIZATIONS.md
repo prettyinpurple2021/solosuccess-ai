@@ -14,10 +14,10 @@ This document outlines the comprehensive optimizations implemented to improve th
   - Enabled tree shaking and dead code elimination
 
 - **Modern Build Features**:
-  - Enabled CSS optimization (`optimizeCss: true`)
-  - Enabled SWC minification (`swcMinify: true`)
+  - Enabled package import optimization (`optimizePackageImports`)
   - Enabled compression (`compress: true`)
-  - Enabled partial prerendering (`ppr: true`)
+  - Removed deprecated `swcMinify` (enabled by default in Next.js 15)
+  - Removed experimental features requiring canary versions
 
 - **Image Optimization**:
   - Prioritized AVIF format over WebP for better compression

@@ -19,12 +19,8 @@ import { useSearchParams, useRouter} from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileDashboardEnhanced from "@/components/mobile/mobile-dashboard-enhanced"
 
-// Add metadata for SEO
-export const metadata = {
-  title: 'Dashboard - SoloSuccess AI',
-  description: 'Your AI-powered business dashboard. Track tasks, goals, and productivity with AI insights.',
-  robots: 'noindex, nofollow', // Dashboard is private
-}
+// Note: Metadata cannot be exported from client components
+// SEO metadata is handled in the layout.tsx file
 
 
 export default function DashboardPage() {
