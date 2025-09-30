@@ -46,7 +46,7 @@
     "@ai-sdk/anthropic": "latest",
     "@ai-sdk/google": "^0.0.54",
     "@ai-sdk/openai": "^2.0.32",
-    "@cloudflare/next-on-pages": "^1.12.0",
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@emotion/is-prop-valid": "^1.4.0",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",

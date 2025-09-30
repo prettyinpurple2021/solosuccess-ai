@@ -22,11 +22,6 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-boss' })
 
-// In your className for the <body> or <html> tag
-<html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable}`}>
-  ...
-</html>
-
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -131,7 +126,7 @@ export default function RootLayout({
   // GA4 is injected manually; no env var needed
   
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable}`} suppressHydrationWarning>
       <head>
         {/* Optimize font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -185,7 +180,10 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          fontSans.variable,
+          inter.variable,
+          jetbrains.variable,
+          orbitron.variable
         )}
       >
         <link rel="canonical" href="https://solobossai.fun/" />
