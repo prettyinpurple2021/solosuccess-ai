@@ -15,6 +15,17 @@ import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
+import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google'
+
+// Configure the fonts
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
+const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-boss' })
+
+// In your className for the <body> or <html> tag
+<html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable}`}>
+  ...
+</html>
 
 const fontSans = FontSans({
   subsets: ["latin"],

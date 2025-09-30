@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 
-export async function middleware(request: NextRequest) {
+// Simplified middleware to avoid Edge runtime issues
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public routes that don't require authentication
   const publicRoutes = [
     '/',
-    '/signin',
+    '/signin', 
     '/signup',
-    '/forgot-password',
     '/about',
     '/features',
     '/pricing',
@@ -20,8 +19,6 @@ export async function middleware(request: NextRequest) {
     '/gdpr',
     '/blog',
     '/landing',
-    '/auth/2fa',
-    '/auth/sessions',
     '/api/auth',
     '/api/health',
     '/manifest.json',
@@ -35,51 +32,22 @@ export async function middleware(request: NextRequest) {
     pathname === route || pathname.startsWith(route + '/')
   )
 
-  // If it's a public route, allow access
-  if (isPublicRoute) {
+  // Always allow public routes and API routes
+  if (isPublicRoute || pathname.startsWith('/api/')) {
     return NextResponse.next()
   }
 
-  // For API routes, let them handle their own authentication
-  if (pathname.startsWith('/api/')) {
-    return NextResponse.next()
-  }
-
-  // Check authentication using Better Auth
-  try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    })
-
-    if (!session) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/signin'
-      url.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(url)
-    }
-
-    // Check if user needs 2FA verification
-    if (session.user.twoFactorEnabled && !session.user.twoFactorVerified) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/auth/2fa'
-      return NextResponse.redirect(url)
-    }
-
-    // Check if user needs device approval
-    if (session.user.requiresDeviceApproval && !session.user.deviceApproved) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/auth/device-approval'
-      return NextResponse.redirect(url)
-    }
-
-    return NextResponse.next()
-  } catch (error) {
-    // If there's an error checking the session, redirect to signin
+  // For protected routes, check for auth session in cookies
+  const authCookie = request.cookies.get('better-auth.session-token')
+  
+  if (!authCookie) {
     const url = request.nextUrl.clone()
     url.pathname = '/signin'
     url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
+
+  return NextResponse.next()
 }
 
 export const config = {
