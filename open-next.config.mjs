@@ -17,23 +17,22 @@ const config = {
   },
   // Exclude large packages from server bundle - comprehensive list for 25MB limit
   serverExternalPackages: [
-    'bcryptjs', 'jsonwebtoken', 'pg', 'better-auth', 'drizzle-orm', '@neondatabase/serverless',
-    'pdf-parse', 'mammoth', 'exceljs', 'cheerio', 'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@google/generative-ai',
-    'sharp', 'canvas', 'puppeteer', 'playwright', 'jsdom', 'node-fetch', 'axios',
-    'lodash', 'moment', 'uuid', 'crypto-js', 'bcrypt', 'jose',
-    'next-auth', '@next-auth/core', '@next-auth/providers',
-    'pg-native', 'sqlite3', 'mysql2', 'oracledb', 'tedious', 'pg-query-stream',
-    'typeorm', 'prisma', '@prisma/client', 'mongoose', 'sequelize',
-    'ws', 'socket.io', 'express', 'koa', 'fastify', 'hapi',
-    'nodemailer', 'sendgrid', 'mailgun', 'aws-sdk', '@aws-sdk/client-s3',
-    'redis', 'ioredis', 'bull', 'agenda', 'node-cron',
-    'winston', 'pino', 'bunyan', 'debug', 'chalk',
-    'yup', 'joi', 'ajv', 'class-validator', 'express-validator',
-    'multer', 'formidable', 'busboy', 'file-type',
-    'image-size', 'probe-image-size', 'gm', 'imagemagick',
-    '@anthropic-ai/sdk', 'google-auth-library', 'googleapis',
-    'stripe', 'paypal-rest-sdk', 'braintree',
-    'twilio', 'node-telegram-bot-api', 'discord.js'
+    // Core auth and database (heaviest)
+    'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'better-auth', 'drizzle-orm', 'drizzle-kit',
+    // AI SDK packages (very heavy)
+    'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@google/generative-ai', 'ai',
+    // File processing (heavy)
+    'pdf-parse', 'mammoth', 'exceljs', 'cheerio', 'node-html-parser', 'sharp',
+    // Browser automation and testing (extremely heavy)
+    'playwright', 'puppeteer', '@vitest/browser', '@vitest/coverage-v8', 'vitest', 'storybook',
+    // Build and bundling tools (heavy)
+    'webpack-bundle-analyzer', 'webpack', 'eslint', '@typescript-eslint/eslint-plugin', '@typescript-eslint/parser',
+    // Payment processing
+    'stripe', 'resend',
+    // Development tools
+    'nodemon', 'concurrently', 'dotenv-cli', 'ts-jest', 'jest', '@jest/globals',
+    // Large UI libraries that might have server components
+    'framer-motion', 'recharts'
   ],
   // Enable tree shaking and minification
   minify: true,

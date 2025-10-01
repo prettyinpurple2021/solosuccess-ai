@@ -27,29 +27,39 @@ const nextConfig = {
   output: 'standalone',
   distDir: '.next',
 
-  // Enable modern React features
+  // Enable modern React features and aggressive optimizations
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'recharts', 'framer-motion'],
+    // Enable more aggressive code splitting
+    esmExternals: 'loose',
+    serverComponentsExternalPackages: [
+      'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'better-auth', 'drizzle-orm',
+      'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', 'ai',
+      'pdf-parse', 'mammoth', 'exceljs', 'playwright', 'cheerio'
+    ],
   },
 
   // Compression and optimization
   compress: true,
 
-  // External packages for server components - focus on large npm packages only
+  // External packages for server components - strategic list focusing on actual heavy dependencies
   serverExternalPackages: [
-    'bcryptjs', 'jsonwebtoken', 'pg', 'better-auth', 'drizzle-orm',
-    'pdf-parse', 'mammoth', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@ai-sdk/core', 'ai',
-    'sharp', 'canvas', 'puppeteer', 'playwright', 'cheerio', 'jsdom', 'node-fetch', 'axios',
-    'lodash', 'moment', 'uuid', 'crypto-js', 'bcrypt', 'jose',
-    'pg-native', 'sqlite3', 'mysql2', 'oracledb', 'tedious', 'pg-query-stream',
-    'typeorm', 'prisma', '@prisma/client', 'mongoose', 'sequelize',
-    'ws', 'socket.io', 'express', 'koa', 'fastify', 'hapi',
-    'nodemailer', 'sendgrid', 'mailgun', 'aws-sdk', '@aws-sdk/client-s3',
-    'redis', 'ioredis', 'bull', 'agenda', 'node-cron',
-    'winston', 'pino', 'bunyan', 'debug', 'chalk',
-    'yup', 'joi', 'ajv', 'class-validator', 'express-validator',
-    'multer', 'formidable', 'busboy', 'file-type',
-    'image-size', 'probe-image-size', 'gm', 'imagemagick'
+    // Core auth and database (heaviest)
+    'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'better-auth', 'drizzle-orm', 'drizzle-kit',
+    // AI SDK packages (very heavy)
+    'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@google/generative-ai', 'ai',
+    // File processing (heavy)
+    'pdf-parse', 'mammoth', 'exceljs', 'cheerio', 'node-html-parser', 'sharp',
+    // Browser automation and testing (extremely heavy)
+    'playwright', 'puppeteer', '@vitest/browser', '@vitest/coverage-v8', 'vitest', 'storybook',
+    // Build and bundling tools (heavy)
+    'webpack-bundle-analyzer', 'webpack', 'eslint', '@typescript-eslint/eslint-plugin', '@typescript-eslint/parser',
+    // Payment processing
+    'stripe', 'resend',
+    // Development tools
+    'nodemon', 'concurrently', 'dotenv-cli', 'ts-jest', 'jest', '@jest/globals',
+    // Large UI libraries that might have server components
+    'framer-motion', 'recharts'
   ],
 
   // Image optimization
@@ -79,22 +89,67 @@ const nextConfig = {
     
     // Server-side optimizations for Cloudflare Pages bundle size limit
     if (isServer) {
+      // Ignore heavy packages that might be imported
       config.plugins.push(
         new webpack.IgnorePlugin({
-          resourceRegExp: /^(sharp|canvas|puppeteer|playwright|pg-native)$/,
+          resourceRegExp: /^(sharp|canvas|puppeteer|playwright|pg-native|storybook|vitest|jest)$/,
+        }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@storybook\/.*$/,
+        }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@vitest\/.*$/,
+        }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@jest\/.*$/,
         }),
         new webpack.IgnorePlugin({
           resourceRegExp: /^aws-sdk$/,
         }),
         new webpack.IgnorePlugin({
           resourceRegExp: /^@aws-sdk\/.*$/,
+        }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^webpack-bundle-analyzer$/,
         })
       );
       
-      // Aggressive tree shaking for server bundle
-      config.optimization.usedExports = true;
-      config.optimization.sideEffects = false;
-      config.optimization.minimize = true;
+      // Aggressive tree shaking and optimization for server bundle
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+        minimize: true,
+        providedExports: true,
+        // Aggressive code splitting for server
+        splitChunks: {
+          chunks: 'all',
+          minSize: 0,
+          maxSize: 200000,
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 20,
+              maxSize: 150000,
+            }
+          }
+        }
+      };
+      
+      // Additional externals for server bundle
+      config.externals = [
+        ...config.externals,
+        'playwright',
+        'puppeteer', 
+        'storybook',
+        '@storybook/core',
+        'vitest',
+        'jest',
+        'webpack-bundle-analyzer',
+        'eslint'
+      ];
     }
     
     if (!dev && !isServer) {
