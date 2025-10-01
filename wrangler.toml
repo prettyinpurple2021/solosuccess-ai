@@ -5,15 +5,14 @@ compatibility_flags = ["nodejs_compat"]
 # Required for Cloudflare Pages
 pages_build_output_dir = ".vercel/output/static"
 
-[build]
-command = "npm run build:cf"
-
+# Production environment configuration
 [env.production]
 name = "solosuccess-ai-platform"
-
-[env.staging]
-name = "solosuccess-ai-platform-staging"
-
-# Environment variables (you'll need to set these in CloudFlare dashboard)
-[vars]
+[env.production.vars]
 NODE_ENV = "production"
+
+# Preview environment configuration (replaces staging)
+[env.preview]
+name = "solosuccess-ai-platform-preview"
+[env.preview.vars]
+NODE_ENV = "preview"

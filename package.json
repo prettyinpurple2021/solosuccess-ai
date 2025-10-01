@@ -37,7 +37,7 @@
     "build:cf": "cross-env SKIP_DB_CHECK=true next build && npx @cloudflare/next-on-pages",
     "preview:cf": "npm run build:cf && npx wrangler pages dev .vercel/output/static",
     "deploy:cf": "npm run build:cf && npx wrangler pages deploy .vercel/output/static",
-    "deploy:cf:staging": "npm run build:cf && npx wrangler pages deploy .vercel/output/static --env staging",
+    "deploy:cf:preview": "npm run build:cf && npx wrangler pages deploy .vercel/output/static --env preview",
     "optimize-images": "node scripts/optimize-images-simple.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
