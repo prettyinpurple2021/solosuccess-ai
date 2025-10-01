@@ -1,3 +1,9 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Fix workspace root warning
@@ -51,6 +57,12 @@ const nextConfig = {
 
   // Bundle optimization for memory efficiency
   webpack: (config, { dev, isServer }) => {
+    // Add path alias resolution for Cloudflare build environment
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': __dirname,
+    }
+    
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
