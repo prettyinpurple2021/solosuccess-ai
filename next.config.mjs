@@ -35,8 +35,24 @@ const nextConfig = {
   // Compression and optimization
   compress: true,
 
-  // External packages for server components
-  serverExternalPackages: ['bcryptjs', 'jsonwebtoken', 'pg', 'better-auth', 'drizzle-orm'],
+  // External packages for server components - extensive list for Cloudflare Pages 25MB limit
+  serverExternalPackages: [
+    'bcryptjs', 'jsonwebtoken', 'pg', 'better-auth', 'drizzle-orm',
+    'pdf-parse', 'mammoth', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@ai-sdk/core', 'ai',
+    'sharp', 'canvas', 'puppeteer', 'playwright', 'cheerio', 'jsdom', 'node-fetch', 'axios',
+    'lodash', 'moment', 'date-fns', 'uuid', 'crypto', 'fs', 'path', 'os', 'util', 'stream',
+    'buffer', 'events', 'url', 'querystring', 'http', 'https', 'net', 'tls', 'zlib',
+    'crypto-js', 'bcrypt', 'jose', 'next-auth', '@next-auth/core', '@next-auth/providers',
+    'pg-native', 'sqlite3', 'mysql2', 'oracledb', 'tedious', 'pg-query-stream',
+    'typeorm', 'prisma', '@prisma/client', 'mongoose', 'sequelize',
+    'ws', 'socket.io', 'express', 'koa', 'fastify', 'hapi',
+    'nodemailer', 'sendgrid', 'mailgun', 'aws-sdk', '@aws-sdk/client-s3',
+    'redis', 'ioredis', 'bull', 'agenda', 'node-cron',
+    'winston', 'pino', 'bunyan', 'debug', 'chalk',
+    'yup', 'joi', 'ajv', 'class-validator', 'express-validator',
+    'multer', 'formidable', 'busboy', 'file-type',
+    'image-size', 'probe-image-size', 'gm', 'imagemagick'
+  ],
 
   // Image optimization
   images: {
@@ -56,11 +72,31 @@ const nextConfig = {
   },
 
   // Bundle optimization for memory efficiency
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
     // Add path alias resolution for Cloudflare build environment
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': __dirname,
+    }
+    
+    // Server-side optimizations for Cloudflare Pages bundle size limit
+    if (isServer) {
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^(sharp|canvas|puppeteer|playwright|pg-native)$/,
+        }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^aws-sdk$/,
+        }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^@aws-sdk\/.*$/,
+        })
+      );
+      
+      // Aggressive tree shaking for server bundle
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
+      config.optimization.minimize = true;
     }
     
     if (!dev && !isServer) {
