@@ -1,4 +1,6 @@
-export default function BurnoutPage() {
+export const dynamic = 'force-dynamic';
+
+export default function BurnoutPreventionPage() {
   return (
     <div style={{ 
       padding: '20px',
