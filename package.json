@@ -134,6 +134,7 @@
     "uuid": "^9.0.1",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
+    "wrangler": "^4.40.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -176,8 +177,7 @@
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "wrangler": "^4.40.2"
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "overrides": {
     "lucide-react": "^0.542.0",
