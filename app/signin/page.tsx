@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Mail, Lock, Github, Chrome } from "lucide-react"
+import { Loader2, Mail, Lock, Github } from "lucide-react"
 
 // Disable static generation for auth pages
 export const dynamic = 'force-dynamic'
@@ -49,7 +49,7 @@ export default function SignInPage() {
     }
   }
 
-  const handleSocialSignIn = async (provider: "google" | "github") => {
+  const handleSocialSignIn = async (provider: "github") => {
     setIsLoading(true)
     setError("")
 
@@ -157,26 +157,16 @@ export default function SignInPage() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleSocialSignIn("google")}
-                disabled={isLoading}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <Chrome className="w-4 h-4 mr-2" />
-                Google
-              </Button>
+            <div className="mt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => handleSocialSignIn("github")}
                 disabled={isLoading}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
               >
                 <Github className="w-4 h-4 mr-2" />
-                GitHub
+                Continue with GitHub
               </Button>
             </div>
           </div>

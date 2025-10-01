@@ -18,9 +18,7 @@ DATABASE_URL=your-neon-database-url
 BETTER_AUTH_SECRET=your-secret-key-32-chars
 BETTER_AUTH_URL=https://yourdomain.com
 
-# OAuth Providers
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+# GitHub OAuth Provider
 GITHUB_CLIENT_ID=your-github-client-id  
 GITHUB_CLIENT_SECRET=your-github-client-secret
 
@@ -126,7 +124,7 @@ Set all production values in Cloudflare Pages → Settings → Environment Varia
 
 ### Authentication Issues  
 - Verify `BETTER_AUTH_URL` matches your domain
-- Check OAuth callback URLs in Google/GitHub
+- Check OAuth callback URLs in GitHub
 - Ensure database tables exist (`npm run setup-neon-db`)
 
 ### Custom Domain Not Working
