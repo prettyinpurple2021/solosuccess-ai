@@ -16,7 +16,15 @@ interface AuthContextType {
   getToken: () => Promise<string | null>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+// Lazy context creation to prevent build errors
+let AuthContext: React.Context<AuthContextType | undefined> | undefined
+
+function getAuthContext() {
+  if (!AuthContext) {
+    AuthContext = createContext<AuthContextType | undefined>(undefined)
+  }
+  return AuthContext
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -184,15 +192,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getToken,
   }
 
+  const Context = getAuthContext()
   return (
-    <AuthContext.Provider value={value}>
+    <Context.Provider value={value}>
       {children}
-    </AuthContext.Provider>
+    </Context.Provider>
   )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const Context = getAuthContext()
+  const context = useContext(Context)
   if (context === undefined) {
     // During static generation or when used outside AuthProvider, return default values
     if (typeof window === 'undefined') {

@@ -34,7 +34,15 @@ interface ChatContextValue {
   setIsLoading: (loading: boolean) => void
 }
 
-const ChatContext = createContext<ChatContextValue | undefined>(undefined)
+// Lazy context creation to prevent build errors
+let ChatContext: React.Context<ChatContextValue | undefined> | undefined
+
+function getChatContext() {
+  if (!ChatContext) {
+    ChatContext = createContext<ChatContextValue | undefined>(undefined)
+  }
+  return ChatContext
+}
 
 const AI_AGENTS: Agent[] = [
   {
@@ -266,8 +274,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setIsLoading
   }
 
+  const Context = getChatContext()
   return (
-    <ChatContext.Provider value={contextValue}>
+    <Context.Provider value={contextValue}>
       {children}
       <FloatingChatButton
         agents={AI_AGENTS}
@@ -275,12 +284,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
       />
-    </ChatContext.Provider>
+    </Context.Provider>
   )
 }
 
 export const useChat = () => {
-  const context = useContext(ChatContext)
+  const Context = getChatContext()
+  const context = useContext(Context)
   if (context === undefined) {
     throw new Error('useChat must be used within a ChatProvider')
   }

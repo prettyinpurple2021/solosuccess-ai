@@ -24,7 +24,15 @@ interface AccessibilityContextType {
   setFocusVisible: (visible: boolean) => void
 }
 
-const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined)
+// Lazy context creation to prevent build errors
+let AccessibilityContext: React.Context<AccessibilityContextType | undefined> | undefined
+
+function getAccessibilityContext() {
+  if (!AccessibilityContext) {
+    AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined)
+  }
+  return AccessibilityContext
+}
 
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
   const { preferences, setPreference, loading } = useUserPreferences({
@@ -99,8 +107,9 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   const toggleReducedMotion = () => setReducedMotion(!reducedMotion)
   const toggleScreenReader = () => setScreenReader(!screenReader)
 
+  const Context = getAccessibilityContext()
   return (
-    <AccessibilityContext.Provider value={{
+    <Context.Provider value={{
       highContrast,
       toggleHighContrast,
       reducedMotion,
@@ -113,12 +122,13 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       setFocusVisible
     }}>
       {children}
-    </AccessibilityContext.Provider>
+    </Context.Provider>
   )
 }
 
 export function useAccessibility() {
-  const context = useContext(AccessibilityContext)
+  const Context = getAccessibilityContext()
+  const context = useContext(Context)
   if (context === undefined) {
     throw new Error("useAccessibility must be used within an AccessibilityProvider")
   }
