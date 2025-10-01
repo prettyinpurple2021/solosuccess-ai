@@ -57,8 +57,7 @@ const nextConfig = {
     'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
     'sonner', 'vaul', 'input-otp', 'embla-carousel-react', 'react-day-picker',
     'react-resizable-panels', 'swr', 'web-push', 'robots-parser', 'js-yaml',
-    'uuid', 'node-fetch', 'flags', 'glob', 'buffer', 'crypto-browserify',
-    'stream-browserify', 'dotenv', 'cross-env', 'postcss', 'tailwindcss',
+    'uuid', 'node-fetch', 'flags', 'glob', 'dotenv', 'cross-env', 'postcss', 'tailwindcss',
     'tailwindcss-animate', 'autoprefixer', 'tsx', 'ts-node', 'wrangler'
   ],
 
@@ -114,28 +113,13 @@ const nextConfig = {
         })
       );
       
-      // Aggressive tree shaking and optimization for server bundle
+      // Conservative tree shaking for server bundle to prevent browser globals
       config.optimization = {
         ...config.optimization,
         usedExports: true,
         sideEffects: false,
         minimize: true,
         providedExports: true,
-        // Aggressive code splitting for server
-        splitChunks: {
-          chunks: 'all',
-          minSize: 0,
-          maxSize: 200000,
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 20,
-              maxSize: 150000,
-            }
-          }
-        }
       };
       
       // Additional externals for server bundle
@@ -211,44 +195,7 @@ const nextConfig = {
         'lodash': false,
       }
     }
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-        stream: false,
-        url: false,
-        zlib: false,
-        http: false,
-        https: false,
-        http2: false,
-        dns: false,
-        assert: false,
-        os: false,
-        path: false,
-        util: false,
-        buffer: false,
-        events: false,
-        querystring: false,
-        punycode: false,
-        string_decoder: false,
-        timers: false,
-        constants: false,
-        domain: false,
-        cluster: false,
-        child_process: false,
-        worker_threads: false,
-        perf_hooks: false,
-        v8: false,
-        vm: false,
-        inspector: false,
-        async_hooks: false,
-        module: false,
-        process: false,
-      }
-    }
+    // Removed problematic browser fallbacks that can cause 'self is not defined' errors
     return config
   },
 

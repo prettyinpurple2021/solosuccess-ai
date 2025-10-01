@@ -37,8 +37,7 @@ const config = {
     'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
     'sonner', 'vaul', 'input-otp', 'embla-carousel-react', 'react-day-picker',
     'react-resizable-panels', 'swr', 'web-push', 'robots-parser', 'js-yaml',
-    'uuid', 'node-fetch', 'flags', 'glob', 'buffer', 'crypto-browserify',
-    'stream-browserify', 'dotenv', 'cross-env', 'postcss', 'tailwindcss',
+    'uuid', 'node-fetch', 'flags', 'glob', 'dotenv', 'cross-env', 'postcss', 'tailwindcss',
     'tailwindcss-animate', 'autoprefixer', 'tsx', 'ts-node', 'wrangler'
   ],
   // Enable tree shaking and minification
