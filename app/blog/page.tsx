@@ -7,7 +7,7 @@ import { Button} from "@/components/ui/button"
 import { Card, CardContent} from "@/components/ui/card"
 import { Badge} from "@/components/ui/badge"
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function BlogComingSoonPage() {
   const [email, setEmail] = useState("")

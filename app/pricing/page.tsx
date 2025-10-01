@@ -19,7 +19,7 @@ import {
   Rocket
 } from 'lucide-react';
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 const navigationItems = [
   { label: 'Home', href: '/' },

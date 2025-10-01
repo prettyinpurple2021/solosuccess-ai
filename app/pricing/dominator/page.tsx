@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
 }
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function DominatorPlanPage() {
   const productSchema = {

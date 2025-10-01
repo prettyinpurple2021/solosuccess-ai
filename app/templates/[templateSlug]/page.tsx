@@ -7,7 +7,7 @@ import templateData from '@/data/templates.json';
 // Force dynamic rendering to prevent auth issues during static generation
 export const dynamic = 'force-dynamic'
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Helper function to find template in JSON data
 function findTemplateInJson(slug: string) {

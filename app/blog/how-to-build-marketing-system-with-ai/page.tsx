@@ -4,7 +4,7 @@ import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, Megaphone } from "lucide-react"
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function HowToBuildMarketingSystemWithAIPage() {
   const howTo = {

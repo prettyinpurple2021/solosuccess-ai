@@ -2,8 +2,8 @@ name = "solosuccess-ai"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Required for Cloudflare Pages
-pages_build_output_dir = ".vercel/output/static"
+# OpenNext output directory for Cloudflare Pages
+pages_build_output_dir = ".open-next/output"
 
 # Production environment configuration
 [env.production]

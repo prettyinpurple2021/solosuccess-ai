@@ -72,7 +72,7 @@ interface CompetitorFormData {
   }
 }
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function EditCompetitorPage() {
   const params = useParams()

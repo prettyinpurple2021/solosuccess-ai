@@ -1,6 +1,6 @@
 import { EmpowermentCard} from "@/components/ui/boss-card"
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function StackHandlerPage() {
   return (

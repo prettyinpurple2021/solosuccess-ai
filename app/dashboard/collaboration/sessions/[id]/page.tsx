@@ -28,7 +28,7 @@ interface SessionData {
   userId: number
 }
 
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
