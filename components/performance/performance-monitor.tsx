@@ -4,7 +4,8 @@ import { useEffect, useState} from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card'
 import { Badge} from '@/components/ui/badge'
 import { Progress} from '@/components/ui/progress'
-import { Activity, Zap, Clock, TrendingUp} from 'lucide-react'
+import { Button} from '@/components/ui/button'
+import { Activity, Zap, Clock, TrendingUp, X} from 'lucide-react'
 
 interface PerformanceMetrics {
   fcp: number // First Contentful Paint
@@ -18,6 +19,7 @@ interface PerformanceMetrics {
 export function PerformanceMonitor() {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [isClosed, setIsClosed] = useState(false)
 
   useEffect(() => {
     // Only show in development or when explicitly enabled
@@ -71,7 +73,7 @@ export function PerformanceMonitor() {
     }
   }, [])
 
-  if (!isVisible || !metrics) return null
+  if (!isVisible || !metrics || isClosed) return null
 
   const getScore = (value: number, thresholds: { good: number; poor: number }) => {
     if (value <= thresholds.good) return 'good'
@@ -95,10 +97,20 @@ export function PerformanceMonitor() {
   return (
     <Card className="fixed bottom-4 right-4 w-80 z-50 bg-white/95 backdrop-blur-sm border-2">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Activity className="w-4 h-4" />
-          Performance Monitor
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Activity className="w-4 h-4" />
+            Performance Monitor
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsClosed(true)}
+            className="h-6 w-6 p-0 hover:bg-gray-100"
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
         <CardDescription className="text-xs">
           Core Web Vitals & Performance Metrics
         </CardDescription>
