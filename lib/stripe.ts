@@ -4,7 +4,22 @@ let stripeInstance: import('stripe').default | null = null
 
 async function loadStripe() {
   if (!Stripe) {
-    Stripe = (await import('stripe')).default
+    try {
+      // Try to load real Stripe
+      const stripeModule = await import('stripe').catch(() => null)
+      if (stripeModule) {
+        Stripe = stripeModule.default
+      } else {
+        // Fall back to stub if Stripe can't be loaded
+        const StubStripe = (await import('./stripe-stub')).default
+        Stripe = StubStripe as any
+      }
+    } catch (error) {
+      console.error('Failed to load Stripe module, using stub:', error)
+      // Fall back to stub
+      const StubStripe = (await import('./stripe-stub')).default
+      Stripe = StubStripe as any
+    }
   }
   return Stripe
 }
@@ -17,6 +32,9 @@ async function getStripeInstance() {
   
   if (!stripeInstance) {
     const StripeClass = await loadStripe()
+    if (!StripeClass) {
+      return null
+    }
     stripeInstance = new StripeClass(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-08-27.basil',
       typescript: true,
