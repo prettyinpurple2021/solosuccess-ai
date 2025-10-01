@@ -20,7 +20,7 @@ const config = {
     'bcryptjs', 'jsonwebtoken', 'pg', 'better-auth', 'drizzle-orm', '@neondatabase/serverless',
     'pdf-parse', 'mammoth', 'exceljs', 'cheerio', 'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@google/generative-ai',
     'sharp', 'canvas', 'puppeteer', 'playwright', 'jsdom', 'node-fetch', 'axios',
-    'lodash', 'moment', 'date-fns', 'uuid', 'crypto-js', 'bcrypt', 'jose',
+    'lodash', 'moment', 'uuid', 'crypto-js', 'bcrypt', 'jose',
     'next-auth', '@next-auth/core', '@next-auth/providers',
     'pg-native', 'sqlite3', 'mysql2', 'oracledb', 'tedious', 'pg-query-stream',
     'typeorm', 'prisma', '@prisma/client', 'mongoose', 'sequelize',
