@@ -5,20 +5,12 @@ let stripeInstance: import('stripe').default | null = null
 async function loadStripe() {
   if (!Stripe) {
     try {
-      // Try to load real Stripe
-      const stripeModule = await import('stripe').catch(() => null)
-      if (stripeModule) {
-        Stripe = stripeModule.default
-      } else {
-        // Fall back to stub if Stripe can't be loaded
-        const StubStripe = (await import('./stripe-stub')).default
-        Stripe = StubStripe as any
-      }
+      // Load Stripe dynamically
+      const stripeModule = await import('stripe')
+      Stripe = stripeModule.default
     } catch (error) {
-      console.error('Failed to load Stripe module, using stub:', error)
-      // Fall back to stub
-      const StubStripe = (await import('./stripe-stub')).default
-      Stripe = StubStripe as any
+      console.error('Failed to load Stripe module:', error)
+      return null
     }
   }
   return Stripe
