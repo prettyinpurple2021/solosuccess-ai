@@ -1,20 +1,15 @@
 import { betterAuth } from "better-auth"
 
 // Edge runtime compatible Better Auth configuration  
-// Using connection string directly to avoid build-time database initialization
 export const auth = betterAuth({
   database: {
-    provider: "postgresql",
+    provider: "postgresql" as const,
     url: process.env.DATABASE_URL || "",
   },
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
     requireEmailVerification: false,
-    sendResetPassword: async ({ user, url }) => {
-      // TODO: Implement email sending
-      console.log(`Reset password for ${user.email}: ${url}`)
-    },
   },
   socialProviders: {
     github: {

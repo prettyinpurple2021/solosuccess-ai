@@ -1,7 +1,12 @@
 name = "solosuccess-ai"
-main = ".opennext/worker.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
+
+# Required for Cloudflare Pages
+pages_build_output_dir = ".vercel/output/static"
+
+[build]
+command = "npm run build:cf"
 
 [env.production]
 name = "solosuccess-ai-platform"
