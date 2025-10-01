@@ -29,7 +29,7 @@ const nextConfig = {
 
   // Enable modern React features and aggressive optimizations
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'recharts', 'framer-motion'],
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
 
   // Compression and optimization
@@ -51,14 +51,15 @@ const nextConfig = {
     'stripe', 'resend',
     // Development tools
     'nodemon', 'concurrently', 'dotenv-cli', 'ts-jest', 'jest', '@jest/globals',
-    // Large UI libraries that might have server components
-    'framer-motion', 'recharts',
+    // Large UI libraries that might have server components (removed conflicting packages)
     // Additional heavy packages for final size reduction
-    'next-themes', 'react-hook-form', '@hookform/resolvers', 'zod', 'date-fns',
-    'lucide-react', 'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
+    'next-themes', 'react-hook-form', '@hookform/resolvers', 'zod',
+    'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
     'sonner', 'vaul', 'input-otp', 'embla-carousel-react', 'react-day-picker',
     'react-resizable-panels', 'swr', 'web-push', 'robots-parser', 'js-yaml',
-    'uuid', 'node-fetch', 'flags', 'glob'
+    'uuid', 'node-fetch', 'flags', 'glob', 'buffer', 'crypto-browserify',
+    'stream-browserify', 'dotenv', 'cross-env', 'postcss', 'tailwindcss',
+    'tailwindcss-animate', 'autoprefixer', 'tsx', 'ts-node', 'wrangler'
   ],
 
   // Image optimization
