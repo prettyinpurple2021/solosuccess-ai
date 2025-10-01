@@ -184,6 +184,7 @@
     "lucide-react": "^0.542.0",
     "react-is": "19.1.1",
     "@swc/helpers": "0.5.17",
-    "esbuild": "^0.25.4"
+    "esbuild": "^0.25.4",
+    "cookie": "^1.0.2"
   }
 }
