@@ -203,7 +203,7 @@ function resolveCdnInvalidation(value = "dummy") {
   return typeof value === "function" ? value : () => value;
 }
 
-// node_modules/@opennextjs/cloudflare/node_modules/@opennextjs/aws/dist/utils/error.js
+// node_modules/@opennextjs/aws/dist/utils/error.js
 var IgnorableError = class extends Error {
   constructor(message) {
     super(message);
@@ -221,7 +221,7 @@ function isOpenNextError(e) {
   }
 }
 
-// node_modules/@opennextjs/cloudflare/node_modules/@opennextjs/aws/dist/adapters/logger.js
+// node_modules/@opennextjs/aws/dist/adapters/logger.js
 function debug(...args) {
   if (globalThis.openNextDebug) {
     console.log(...args);
@@ -298,7 +298,7 @@ var R2IncrementalCache = class {
     const r2 = getCloudflareContext().env[BINDING_NAME];
     if (!r2)
       throw new IgnorableError("No R2 bucket");
-    debugCache(`Get ${key}`);
+    debugCache("R2IncrementalCache", `get ${key}`);
     try {
       const r2Object = await r2.get(this.getR2Key(key, cacheType));
       if (!r2Object)
@@ -316,7 +316,7 @@ var R2IncrementalCache = class {
     const r2 = getCloudflareContext().env[BINDING_NAME];
     if (!r2)
       throw new IgnorableError("No R2 bucket");
-    debugCache(`Set ${key}`);
+    debugCache("R2IncrementalCache", `set ${key}`);
     try {
       await r2.put(this.getR2Key(key, cacheType), JSON.stringify(value));
     } catch (e) {
@@ -327,7 +327,7 @@ var R2IncrementalCache = class {
     const r2 = getCloudflareContext().env[BINDING_NAME];
     if (!r2)
       throw new IgnorableError("No R2 bucket");
-    debugCache(`Delete ${key}`);
+    debugCache("R2IncrementalCache", `delete ${key}`);
     try {
       await r2.delete(this.getR2Key(key));
     } catch (e) {
