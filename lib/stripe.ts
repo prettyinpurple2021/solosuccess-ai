@@ -1,12 +1,52 @@
-import Stripe from 'stripe'
+// Lazy import Stripe to prevent bundling issues with Cloudflare
+let Stripe: typeof import('stripe').default | null = null
+let stripeInstance: import('stripe').default | null = null
+
+async function loadStripe() {
+  if (!Stripe) {
+    try {
+      // Load Stripe dynamically
+      const stripeModule = await import('stripe')
+      Stripe = stripeModule.default
+    } catch (error) {
+      console.error('Failed to load Stripe module:', error)
+      return null
+    }
+  }
+  return Stripe
+}
 
 // Initialize Stripe only when the secret key is available
-export const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+async function getStripeInstance() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return null
+  }
+  
+  if (!stripeInstance) {
+    const StripeClass = await loadStripe()
+    if (!StripeClass) {
+      return null
+    }
+    stripeInstance = new StripeClass(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-08-27.basil',
       typescript: true,
     })
-  : null
+  }
+  
+  return stripeInstance
+}
+
+// Export a getter function instead of the instance directly
+export async function getStripe() {
+  return await getStripeInstance()
+}
+
+// For backwards compatibility, export a proxy that lazily loads Stripe
+export const stripe = new Proxy({} as import('stripe').default, {
+  get(target, prop) {
+    throw new Error('Use await getStripe() instead of accessing stripe directly')
+  }
+})
 
 // Helper function to check if Stripe is configured
 export function isStripeConfigured(): boolean {
@@ -172,7 +212,8 @@ export async function createStripeCustomer(
   email: string,
   name?: string,
   metadata?: Record<string, string>
-): Promise<Stripe.Customer> {
+): Promise<import('stripe').Stripe.Customer> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
@@ -194,7 +235,8 @@ export async function createCheckoutSession(
   successUrl: string,
   cancelUrl: string,
   metadata?: Record<string, string>
-): Promise<Stripe.Checkout.Session> {
+): Promise<import('stripe').Stripe.Checkout.Session> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
@@ -228,7 +270,8 @@ export async function createCheckoutSession(
 export async function createBillingPortalSession(
   customerId: string,
   returnUrl: string
-): Promise<Stripe.BillingPortal.Session> {
+): Promise<import('stripe').Stripe.BillingPortal.Session> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
@@ -242,7 +285,8 @@ export async function createBillingPortalSession(
 // Get Stripe subscription
 export async function getStripeSubscription(
   subscriptionId: string
-): Promise<Stripe.Subscription> {
+): Promise<import('stripe').Stripe.Subscription> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
@@ -254,7 +298,8 @@ export async function getStripeSubscription(
 export async function cancelStripeSubscription(
   subscriptionId: string,
   immediately: boolean = false
-): Promise<Stripe.Subscription> {
+): Promise<import('stripe').Stripe.Subscription> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
@@ -272,7 +317,8 @@ export async function cancelStripeSubscription(
 export async function updateStripeSubscription(
   subscriptionId: string,
   newPriceId: string
-): Promise<Stripe.Subscription> {
+): Promise<import('stripe').Stripe.Subscription> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
@@ -293,18 +339,20 @@ export async function updateStripeSubscription(
 // Get Stripe customer
 export async function getStripeCustomer(
   customerId: string
-): Promise<Stripe.Customer> {
+): Promise<import('stripe').Stripe.Customer> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }
   
-  return await stripe.customers.retrieve(customerId) as Stripe.Customer
+  return await stripe.customers.retrieve(customerId) as import('stripe').Stripe.Customer
 }
 
 // List Stripe subscriptions for customer
 export async function listStripeSubscriptions(
   customerId: string
-): Promise<Stripe.Subscription[]> {
+): Promise<import('stripe').Stripe.Subscription[]> {
+  const stripe = await getStripe()
   if (!stripe) {
     throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
   }

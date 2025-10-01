@@ -1,5 +1,7 @@
 "use client"
 
+
+export const dynamic = 'force-dynamic'
 // No React hooks needed for this component
 import { Button} from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"

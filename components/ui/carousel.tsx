@@ -30,10 +30,18 @@ type CarouselContextProps = {
   canScrollNext: boolean
 } & CarouselProps
 
-const CarouselContext = React.createContext<CarouselContextProps | null>(null)
+// Lazy context creation to prevent build errors
+let CarouselContextInstance: React.Context<CarouselContextProps | null> | undefined
+
+function getCarouselContext() {
+  if (!CarouselContextInstance) {
+    CarouselContextInstance = React.createContext<CarouselContextProps | null>(null)
+  }
+  return CarouselContextInstance
+}
 
 function useCarousel() {
-  const context = React.useContext(CarouselContext)
+  const context = React.useContext(getCarouselContext())
 
   if (!context) {
     throw new Error("useCarousel must be used within a <Carousel />")
@@ -120,8 +128,9 @@ const Carousel = React.forwardRef<
       }
     }, [api, onSelect])
 
+    const Context = getCarouselContext()
     return (
-      <CarouselContext.Provider
+      <Context.Provider
         value={{
           carouselRef,
           api: api,
@@ -144,7 +153,7 @@ const Carousel = React.forwardRef<
         >
           {children}
         </div>
-      </CarouselContext.Provider>
+      </Context.Provider>
     )
   }
 )

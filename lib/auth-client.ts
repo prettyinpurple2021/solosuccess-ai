@@ -12,7 +12,9 @@ export const authClient = createAuthClient({
     // Two Factor Authentication client
     twoFactorClient({
       onTwoFactorRedirect: () => {
-        window.location.href = "/auth/2fa"
+        if (typeof window !== 'undefined') {
+          window.location.href = "/auth/2fa"
+        }
       },
     }),
     // Passkey/WebAuthn client
@@ -24,4 +26,4 @@ export const authClient = createAuthClient({
   ],
 })
 
-export const { signIn, signUp, signOut, useSession, getSession } = authClient
+export const { signIn, signUp, signOut, useSession, getSession, useUser } = authClient

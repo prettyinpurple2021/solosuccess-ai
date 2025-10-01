@@ -1,5 +1,7 @@
 "use client"
 
+
+export const dynamic = 'force-dynamic'
 import React from 'react'
 import { WorkflowDashboard } from '@/components/workflow/workflow-dashboard'
 
