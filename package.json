@@ -2,6 +2,7 @@
   "name": "SoloSuccess-ai-platform",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "packageManager": "npm@10.0.0",
   "scripts": {
     "build": "cross-env NODE_OPTIONS='--max-old-space-size=12288' next build",
