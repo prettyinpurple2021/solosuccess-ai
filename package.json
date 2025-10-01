@@ -34,7 +34,7 @@
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
     "setup:analytics": "node scripts/setup-analytics.js",
-    "build:cf": "cross-env SKIP_DB_CHECK=true @opennextjs/cloudflare build",
+    "build:cf": "cross-env SKIP_DB_CHECK=true npx @opennextjs/cloudflare build",
     "preview:cf": "npm run build:cf && npx wrangler pages dev .open-next/output",
     "deploy:cf": "npm run build:cf && npx wrangler pages deploy .open-next/output",
     "deploy:cf:preview": "npm run build:cf && npx wrangler pages deploy .open-next/output --env preview",
