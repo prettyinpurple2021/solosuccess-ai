@@ -2,7 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
-import { stripe, createBillingPortalSession} from '@/lib/stripe'
+import { createBillingPortalSession} from '@/lib/stripe'
 
 
 

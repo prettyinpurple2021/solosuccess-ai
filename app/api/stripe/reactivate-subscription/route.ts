@@ -2,7 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
-import { stripe} from '@/lib/stripe'
+import { getStripe} from '@/lib/stripe'
 import { getUserSubscription, updateUserSubscription} from '@/lib/stripe-db-utils'
 
 
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Reactivate subscription in Stripe
+    const stripe = await getStripe()
     if (!stripe) {
       return NextResponse.json(
         { error: 'Stripe not configured' },

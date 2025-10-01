@@ -342,7 +342,23 @@ var r2_incremental_cache_default = new R2IncrementalCache();
 
 // open-next.config.ts
 var open_next_config_default = defineCloudflareConfig({
-  incrementalCache: r2_incremental_cache_default
+  incrementalCache: r2_incremental_cache_default,
+  // Explicitly mark packages as external to prevent bundling issues
+  esbuild: {
+    external: [
+      "stripe",
+      "resend",
+      "@neondatabase/serverless",
+      "pg",
+      "bcryptjs",
+      "better-auth",
+      "drizzle-orm",
+      "openai",
+      "@ai-sdk/openai",
+      "@ai-sdk/anthropic",
+      "@ai-sdk/google"
+    ]
+  }
 });
 export {
   open_next_config_default as default

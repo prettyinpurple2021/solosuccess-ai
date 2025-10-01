@@ -1,8 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
-import { stripe, STRIPE_WEBHOOK_EVENTS} from '@/lib/stripe'
+import { getStripe, STRIPE_WEBHOOK_EVENTS} from '@/lib/stripe'
 import { headers} from 'next/headers'
-import Stripe from 'stripe'
 
 import {
   getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId} from '@/lib/stripe-db-utils'
@@ -16,7 +15,16 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text()
+    
+    // Get Stripe instance
+    const stripe = await getStripe()
     const signature = (await headers()).get('stripe-signature')
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Stripe not configured' },
+        { status: 500 }
+      )
+    }
 
     if (!signature) {
       return NextResponse.json(
@@ -30,14 +38,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify webhook signature
-    if (!stripe) {
-      return NextResponse.json(
-        { error: 'Stripe not configured' },
-        { status: 500 }
-      )
-    }
     
-    let event: Stripe.Event
+    let event: import('stripe').Stripe.Event
     try {
       event = stripe.webhooks.constructEvent(
         body,
@@ -55,15 +57,15 @@ export async function POST(request: NextRequest) {
     // Handle the event
     switch (event.type) {
       case STRIPE_WEBHOOK_EVENTS.CUSTOMER_SUBSCRIPTION_CREATED:
-        await handleSubscriptionCreated(event.data.object as Stripe.Subscription)
+        await handleSubscriptionCreated(event.data.object as import('stripe').Stripe.Subscription)
         break
 
       case STRIPE_WEBHOOK_EVENTS.CUSTOMER_SUBSCRIPTION_UPDATED:
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription)
+        await handleSubscriptionUpdated(event.data.object as import('stripe').Stripe.Subscription)
         break
 
       case STRIPE_WEBHOOK_EVENTS.CUSTOMER_SUBSCRIPTION_DELETED:
-        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription)
+        await handleSubscriptionDeleted(event.data.object as import('stripe').Stripe.Subscription)
         break
 
       case STRIPE_WEBHOOK_EVENTS.INVOICE_PAYMENT_SUCCEEDED:
@@ -98,7 +100,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle subscription created
-async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
+async function handleSubscriptionCreated(subscription: import('stripe').Stripe.Subscription) {
   try {
     const customerId = subscription.customer as string
     const priceId = subscription.items.data[0].price.id
@@ -135,7 +137,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
 }
 
 // Handle subscription updated
-async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+async function handleSubscriptionUpdated(subscription: import('stripe').Stripe.Subscription) {
   try {
     const customerId = subscription.customer as string
     const priceId = subscription.items.data[0].price.id
@@ -170,7 +172,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 }
 
 // Handle subscription deleted
-async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+async function handleSubscriptionDeleted(subscription: import('stripe').Stripe.Subscription) {
   try {
     const customerId = subscription.customer as string
 

@@ -2,7 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { getUserSubscription, hasActiveSubscription} from '@/lib/stripe-db-utils'
-import { stripe} from '@/lib/stripe'
+import { getStripe} from '@/lib/stripe'
 
 
 
@@ -35,9 +35,12 @@ export async function GET(_request: NextRequest) {
 
     // If user has a Stripe subscription, get additional details from Stripe
     let stripeSubscription = null
-    if (subscription.stripe_subscription_id && stripe) {
+    if (subscription.stripe_subscription_id) {
       try {
-        stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id)
+        const stripe = await getStripe()
+        if (stripe) {
+          stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id)
+        }
       } catch (error) {
         logError('Error fetching Stripe subscription:', error)
         // Continue without Stripe data

@@ -6,6 +6,10 @@ const config = {
       converter: "edge",
       // Optimize bundle size for Cloudflare Pages 25MB limit
       experimentalBundledNextServer: true,
+      // Custom esbuild configuration to handle Stripe
+      experimentalBundleOptions: {
+        external: ['stripe'],
+      }
     },
   },
   middleware: {
