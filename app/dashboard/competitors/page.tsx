@@ -1,5 +1,7 @@
 "use client"
 
+
+export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from "react"
 import { motion, easeOut} from "framer-motion"

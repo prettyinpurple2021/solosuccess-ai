@@ -1,5 +1,7 @@
 "use client"
 
+
+export const dynamic = 'force-dynamic'
 import { logError, logInfo } from '@/lib/logger'
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'

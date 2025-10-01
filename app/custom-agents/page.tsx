@@ -1,5 +1,7 @@
 "use client"
 
+
+export const dynamic = 'force-dynamic'
 import React from "react"
 import { CustomAgentChat} from "@/components/custom-agents/custom-agent-chat"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"

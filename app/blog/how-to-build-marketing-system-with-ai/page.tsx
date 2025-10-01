@@ -1,5 +1,7 @@
 "use client"
 
+
+export const dynamic = 'force-dynamic'
 import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, Megaphone } from "lucide-react"

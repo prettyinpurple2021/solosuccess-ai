@@ -1,9 +1,24 @@
-import { auth } from "@/lib/auth"
+import { getAuth } from "@/lib/auth"
 import { toNextJsHandler } from "better-auth/next-js"
 
-const handler = toNextJsHandler(auth)
+// Lazy initialization - handler is created at runtime, not build time
+let handler: ReturnType<typeof toNextJsHandler> | null = null
 
+function getHandler() {
+  if (!handler) {
+    handler = toNextJsHandler(getAuth())
+  }
+  return handler
+}
 
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
-export { handler as GET, handler as POST }
+export const GET = async (req: Request) => {
+  const h = getHandler()
+  return h.GET(req)
+}
+
+export const POST = async (req: Request) => {
+  const h = getHandler()
+  return h.POST(req)
+}
