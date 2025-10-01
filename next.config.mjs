@@ -36,7 +36,7 @@ const nextConfig = {
   compress: true,
 
   // External packages for server components
-  serverExternalPackages: ['bcryptjs', 'jsonwebtoken'],
+  serverExternalPackages: ['bcryptjs', 'jsonwebtoken', 'pg', 'better-auth', 'drizzle-orm'],
 
   // Image optimization
   images: {
@@ -112,6 +112,15 @@ const nextConfig = {
       }
       config.optimization.usedExports = true
       config.optimization.sideEffects = false
+      
+      // Additional bundle size optimizations for Cloudflare Pages
+      config.optimization.minimize = true
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Replace heavy packages with lighter alternatives where possible
+        'moment': false,
+        'lodash': false,
+      }
     }
     if (!isServer) {
       config.resolve.fallback = {
