@@ -32,7 +32,13 @@ const config = {
     // Development tools
     'nodemon', 'concurrently', 'dotenv-cli', 'ts-jest', 'jest', '@jest/globals',
     // Large UI libraries that might have server components
-    'framer-motion', 'recharts'
+    'framer-motion', 'recharts',
+    // Additional heavy packages for final size reduction
+    'next-themes', 'react-hook-form', '@hookform/resolvers', 'zod', 'date-fns',
+    'lucide-react', 'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
+    'sonner', 'vaul', 'input-otp', 'embla-carousel-react', 'react-day-picker',
+    'react-resizable-panels', 'swr', 'web-push', 'robots-parser', 'js-yaml',
+    'uuid', 'node-fetch', 'flags', 'glob'
   ],
   // Enable tree shaking and minification
   minify: true,

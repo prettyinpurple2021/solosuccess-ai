@@ -30,19 +30,12 @@ const nextConfig = {
   // Enable modern React features and aggressive optimizations
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'recharts', 'framer-motion'],
-    // Enable more aggressive code splitting
-    esmExternals: 'loose',
-    serverComponentsExternalPackages: [
-      'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'better-auth', 'drizzle-orm',
-      'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', 'ai',
-      'pdf-parse', 'mammoth', 'exceljs', 'playwright', 'cheerio'
-    ],
   },
 
   // Compression and optimization
   compress: true,
 
-  // External packages for server components - strategic list focusing on actual heavy dependencies
+  // External packages for server components - final aggressive list to get under 25MB
   serverExternalPackages: [
     // Core auth and database (heaviest)
     'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'better-auth', 'drizzle-orm', 'drizzle-kit',
@@ -59,7 +52,13 @@ const nextConfig = {
     // Development tools
     'nodemon', 'concurrently', 'dotenv-cli', 'ts-jest', 'jest', '@jest/globals',
     // Large UI libraries that might have server components
-    'framer-motion', 'recharts'
+    'framer-motion', 'recharts',
+    // Additional heavy packages for final size reduction
+    'next-themes', 'react-hook-form', '@hookform/resolvers', 'zod', 'date-fns',
+    'lucide-react', 'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
+    'sonner', 'vaul', 'input-otp', 'embla-carousel-react', 'react-day-picker',
+    'react-resizable-panels', 'swr', 'web-push', 'robots-parser', 'js-yaml',
+    'uuid', 'node-fetch', 'flags', 'glob'
   ],
 
   // Image optimization
