@@ -17,7 +17,7 @@ export function ServiceWorkerRegister() {
 
   useEffect(() => {
     // Check if service worker is supported
-    if ('serviceWorker' in navigator) {
+    if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
       setIsSupported(true)
       registerServiceWorker()
     }
@@ -47,7 +47,9 @@ export function ServiceWorkerRegister() {
 
   useEffect(() => {
     // Fire-and-forget sitemap ping after deploy in browser context
-    fetch('/api/ping-search', { method: 'POST' }).catch(() => {})
+    if (process.env.NODE_ENV === 'production') {
+      fetch('/api/ping-search', { method: 'POST' }).catch(() => {})
+    }
   }, [])
 
   const registerServiceWorker = async () => {

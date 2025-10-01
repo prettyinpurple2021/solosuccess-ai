@@ -1,4 +1,7 @@
 import { betterAuth } from "better-auth"
+import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { getDb } from "./database-client"
+import { authSchema } from "./auth-schema"
 import type { BetterAuthOptions } from "better-auth"
 
 // Lazy initialization to prevent database connection during build
@@ -6,10 +9,10 @@ let _auth: ReturnType<typeof betterAuth> | null = null
 
 // Auth configuration
 const authConfig: BetterAuthOptions = {
-  database: {
-    provider: "postgresql" as const,
-    url: process.env.DATABASE_URL || "",
-  },
+  database: drizzleAdapter(getDb(), {
+    provider: "pg",
+    schema: authSchema
+  }),
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,

@@ -60,6 +60,11 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  // Bypass Next.js internal assets and dev hot updates
+  if (url.pathname.startsWith('/_next/') || url.pathname.includes('hot-update') || url.pathname.endsWith('.map')) {
+    return
+  }
+
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(handleApiRequest(request))
