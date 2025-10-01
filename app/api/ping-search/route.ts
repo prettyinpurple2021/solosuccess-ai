@@ -5,6 +5,9 @@ const ENDPOINTS = {
   bing: 'https://www.bing.com/ping?sitemap=',
 }
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function POST() {
   const sitemapUrl = 'https://solobossai.fun/sitemap.xml'
   try {

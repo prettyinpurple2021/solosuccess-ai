@@ -6,6 +6,10 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 function buildPolicy(type: 'privacy'|'terms'|'cookies', data: any): string {
   const now = new Date().toLocaleDateString()
   if (type === 'privacy') {

@@ -32,6 +32,10 @@ const UpdateSessionSchema = z.object({
   completionSummary: z.string().optional()
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * GET /api/collaboration/sessions/[id]
  * Get details of a specific collaboration session

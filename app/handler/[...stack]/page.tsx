@@ -1,5 +1,7 @@
 import { EmpowermentCard} from "@/components/ui/boss-card"
 
+export const runtime = 'edge'
+
 export default function StackHandlerPage() {
   return (
     <div className="min-h-screen gradient-background p-6">

@@ -5,6 +5,10 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { neon } from '@neondatabase/serverless'
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 function getSql() {
   const url = process.env.DATABASE_URL
   if (!url) {

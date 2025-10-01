@@ -7,6 +7,8 @@ import templateData from '@/data/templates.json';
 // Force dynamic rendering to prevent auth issues during static generation
 export const dynamic = 'force-dynamic'
 
+export const runtime = 'edge'
+
 // Helper function to find template in JSON data
 function findTemplateInJson(slug: string) {
   for (const category of templateData) {
@@ -23,35 +25,8 @@ function findTemplateInJson(slug: string) {
   return null;
 }
 
-// Static params for all available templates
-export function generateStaticParams() {
-  const templateSlugs = [
-    'decision-dashboard',
-    'vision-board-generator',
-    'quarterly-biz-review',
-    'delegation-list-builder',
-    'i-hate-this-tracker',
-    'freebie-funnel-builder',
-    'dm-sales-script-generator',
-    'offer-comparison-matrix',
-    'live-launch-tracker',
-    'upsell-flow-builder',
-    'pre-mortem-template',
-    'reverse-engineer-role-models',
-    'big-leap-planner',
-    'offer-naming-generator',
-    'founder-feelings-tracker',
-    'brag-bank-template',
-    'ai-collab-planner',
-    'pr-pitch-template',
-    'viral-hook-generator',
-    'values-aligned-biz-filter'
-  ];
-
-  return templateSlugs.map((slug) => ({
-    templateSlug: slug,
-  }));
-}
+// Note: generateStaticParams removed to make compatible with Edge Runtime
+// All templates will be rendered dynamically
 
 type TemplatePageProps = {
   params: Promise<{

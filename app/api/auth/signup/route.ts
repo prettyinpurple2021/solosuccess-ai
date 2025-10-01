@@ -3,8 +3,16 @@ import { NextRequest, NextResponse} from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { neon} from '@neondatabase/serverless'
-import { randomUUID} from 'crypto'
+// Use Web Crypto API for Edge Runtime compatibility
+function generateUUID() {
+  return crypto.randomUUID()
+}
 
+
+
+// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
+// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -50,7 +58,7 @@ export async function POST(request: NextRequest) {
     const dateOfBirth = metadata?.date_of_birth || null
 
     // Create user in database
-    const _userId = randomUUID()
+    const _userId = generateUUID()
     const newUsers = await sql`
       INSERT INTO users (id, email, password_hash, full_name, username, date_of_birth, subscription_tier, subscription_status, cancel_at_period_end, created_at, updated_at)
       VALUES (${_userId}, ${email.toLowerCase()}, ${passwordHash}, ${fullName}, ${usernameValue}, ${dateOfBirth}, 'launch', 'active', false, NOW(), NOW())

@@ -50,6 +50,10 @@ const SessionResponseSchema = z.object({
   })
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * POST /api/collaboration/sessions
  * Create a new collaboration session

@@ -8,6 +8,10 @@ import { GoogleGenerativeAI} from '@google/generative-ai'
 // Initialize Google AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

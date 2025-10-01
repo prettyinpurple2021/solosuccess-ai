@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   },
 }
 
+export const runtime = 'edge'
+
 export default function AcceleratorPlanPage() {
   const productSchema = {
     '@context': 'https://schema.org',

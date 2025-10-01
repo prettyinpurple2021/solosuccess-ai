@@ -30,6 +30,10 @@ const IntelligenceQuerySchema = z.object({
   limit: z.number().int().min(1).max(100).default(20),
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

@@ -54,6 +54,8 @@ interface Insight {
   timestamp: string
 }
 
+export const runtime = 'edge'
+
 export default function CompetitorDetailPage() {
   const params = useParams()
   const router = useRouter()

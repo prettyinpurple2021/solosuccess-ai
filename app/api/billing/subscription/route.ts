@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { getClient} from '@/lib/neon/client'
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId')
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })

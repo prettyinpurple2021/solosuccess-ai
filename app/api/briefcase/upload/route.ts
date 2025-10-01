@@ -26,6 +26,10 @@ const ALLOWED_FILE_TYPES = {
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 function getFileTypeFromMime(mimeType: string): string {
   for (const [mime, extensions] of Object.entries(ALLOWED_FILE_TYPES)) {
     if (mimeType.startsWith(mime)) {

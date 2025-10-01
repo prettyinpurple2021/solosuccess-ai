@@ -58,6 +58,10 @@ const SessionControlSchema = z.discriminatedUnion('action', [
   TransferSessionSchema
 ])
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * POST /api/collaboration/sessions/[id]/control
  * Perform session control operations

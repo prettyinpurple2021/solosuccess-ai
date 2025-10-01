@@ -13,6 +13,10 @@ const agentBriefingRequestSchema = z.object({
   participatingAgents: z.array(z.string()).optional() // For collaborative briefings
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

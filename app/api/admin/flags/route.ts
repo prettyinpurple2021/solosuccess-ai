@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { getFeatureFlags, updateFeatureFlags } from '@/lib/feature-flags'
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export const dynamic = 'force-dynamic'
 
 export async function GET(_req: NextRequest) {

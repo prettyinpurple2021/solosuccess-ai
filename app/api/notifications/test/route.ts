@@ -13,6 +13,10 @@ const testNotificationSchema = z.object({
   config: z.record(z.any()).optional(),
 });
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

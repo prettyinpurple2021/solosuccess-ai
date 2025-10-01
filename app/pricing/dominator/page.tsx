@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   },
 }
 
+export const runtime = 'edge'
+
 export default function DominatorPlanPage() {
   const productSchema = {
     '@context': 'https://schema.org',

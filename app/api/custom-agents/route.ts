@@ -8,6 +8,9 @@ import { SecurityMiddleware} from "@/lib/custom-ai-agents/security/security-midd
 const userCollaborationSystems = new Map<string, AgentCollaborationSystem>()
 const securityMiddleware = new SecurityMiddleware()
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function POST(request: NextRequest) {
   try {
     const { message, agentId, context, stream = false } = await request.json()

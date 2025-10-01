@@ -4,6 +4,8 @@ import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, Bot } from "lucide-react"
 
+export const runtime = 'edge'
+
 export default function HowToAutomateRevenueWorkflowsPage() {
   const howTo = {
     "@context": "https://schema.org",

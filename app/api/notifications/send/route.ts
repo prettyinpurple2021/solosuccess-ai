@@ -8,6 +8,11 @@ import { z } from 'zod'
 import webpush from 'web-push'
 
 
+
+// Temporarily disabled Edge Runtime due to web-push library Node.js dependencies
+// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

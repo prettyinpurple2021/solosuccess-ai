@@ -10,6 +10,10 @@ import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempo
 // DELETE /api/templates/:id → delete a saved user template
 const IdParamSchema = z.object({ id: z.string().regex(/^\d+$/) })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function DELETE(
   _request: Request,
   context: unknown

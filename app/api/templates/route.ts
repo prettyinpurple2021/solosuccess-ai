@@ -9,7 +9,9 @@ import { info, error as logError} from '@/lib/log'
 export const dynamic = 'force-dynamic'
 
 // Edge runtime disabled because jsonwebtoken is not compatible with Edge
-// export const runtime = 'edge'
+// // Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
+// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function GET(request: NextRequest) {
   const route = '/api/templates'

@@ -28,6 +28,8 @@ interface SessionData {
   userId: number
 }
 
+export const runtime = 'edge'
+
 export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [session, setSession] = useState<SessionData | null>(null)

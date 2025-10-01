@@ -3,6 +3,11 @@ import { LearningEngine } from '@/lib/learning-engine'
 import { logError } from '@/lib/logger'
 import jwt from 'jsonwebtoken'
 
+
+// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
+// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 // Force dynamic rendering to prevent build-time execution
 export const dynamic = 'force-dynamic'
 

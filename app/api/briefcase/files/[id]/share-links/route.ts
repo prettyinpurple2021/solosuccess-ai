@@ -6,6 +6,11 @@ import { v4 as uuidv4} from 'uuid'
 import bcrypt from 'bcryptjs'
 
 
+
+// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
+// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

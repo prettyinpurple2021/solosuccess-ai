@@ -19,6 +19,8 @@ import {
   Rocket
 } from 'lucide-react';
 
+export const runtime = 'edge'
+
 const navigationItems = [
   { label: 'Home', href: '/' },
   { label: 'Features', href: '/#features', sparkles: true },

@@ -6,6 +6,9 @@ import { AgentCollaborationSystem} from "@/lib/custom-ai-agents/agent-collaborat
 // Store collaboration systems per user (in production, use Redis or database)
 const userCollaborationSystems = new Map<string, AgentCollaborationSystem>()
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function POST(request: NextRequest) {
   try {
     // For now, use a default user ID. In production, implement proper authentication

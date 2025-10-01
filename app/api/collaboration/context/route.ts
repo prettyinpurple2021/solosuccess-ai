@@ -47,6 +47,10 @@ const ContextQuerySchema = z.object({
   limit: z.number().min(1).max(1000).default(100)
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * POST /api/collaboration/context
  * Store context information

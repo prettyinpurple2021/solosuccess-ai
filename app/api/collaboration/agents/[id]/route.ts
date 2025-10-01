@@ -24,6 +24,10 @@ const ExecuteCapabilitySchema = z.object({
   context: z.record(z.any()).optional()
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * GET /api/collaboration/agents/[id]
  * Get details of a specific AI agent

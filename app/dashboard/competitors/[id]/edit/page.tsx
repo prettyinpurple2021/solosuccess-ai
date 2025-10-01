@@ -72,6 +72,8 @@ interface CompetitorFormData {
   }
 }
 
+export const runtime = 'edge'
+
 export default function EditCompetitorPage() {
   const params = useParams()
   const router = useRouter()

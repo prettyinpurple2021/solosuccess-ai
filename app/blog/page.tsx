@@ -7,6 +7,8 @@ import { Button} from "@/components/ui/button"
 import { Card, CardContent} from "@/components/ui/card"
 import { Badge} from "@/components/ui/badge"
 
+export const runtime = 'edge'
+
 export default function BlogComingSoonPage() {
   const [email, setEmail] = useState("")
   const [submitting, setSubmitting] = useState(false)

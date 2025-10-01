@@ -12,6 +12,10 @@ import { verifyAuth } from '@/lib/auth-server'
 // Initialize collaboration hub
 const collaborationHub = new CollaborationHub()
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * GET /api/collaboration/agents
  * List all available AI agents

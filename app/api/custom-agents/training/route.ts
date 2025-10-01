@@ -5,6 +5,9 @@ import { PerformanceAnalytics} from "@/lib/custom-ai-agents/training/performance
 import { FineTuningPipeline} from "@/lib/custom-ai-agents/training/fine-tuning-pipeline"
 
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

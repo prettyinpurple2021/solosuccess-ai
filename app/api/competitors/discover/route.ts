@@ -5,6 +5,10 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import OpenAI from 'openai'
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 // Lazy OpenAI client to avoid build-time env requirement
 function getOpenAIClient(): OpenAI | null {
   const apiKey = process.env.OPENAI_API_KEY

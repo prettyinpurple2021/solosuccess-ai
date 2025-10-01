@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { AUTH_COOKIE_OPTIONS} from '@/lib/auth-utils'
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 /**
  * Handles user logout by clearing authentication cookies
  * @route DELETE /api/auth/logout

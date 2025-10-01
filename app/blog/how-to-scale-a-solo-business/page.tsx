@@ -4,6 +4,8 @@ import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, ListChecks } from "lucide-react"
 
+export const runtime = 'edge'
+
 export default function HowToScaleSoloBusinessPage() {
   const howTo = {
     "@context": "https://schema.org",

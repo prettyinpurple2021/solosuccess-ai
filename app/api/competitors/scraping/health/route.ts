@@ -6,6 +6,10 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

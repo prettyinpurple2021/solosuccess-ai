@@ -46,6 +46,10 @@ const AlertUpdateSchema = z.object({
   isArchived: z.boolean().optional(),
 })
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

@@ -10,6 +10,10 @@ const updateAlertSchema = z.object({
   action: z.enum(['mark_read', 'archive']),
 });
 
+
+// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

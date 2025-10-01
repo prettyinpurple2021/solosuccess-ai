@@ -7,6 +7,9 @@ import { SecurityMiddleware} from '@/lib/custom-ai-agents/security/security-midd
 const securityManager = AgentSecurityManager.getInstance()
 const _securityMiddleware = new SecurityMiddleware()
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)

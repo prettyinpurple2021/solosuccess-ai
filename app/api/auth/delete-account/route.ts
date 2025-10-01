@@ -6,6 +6,9 @@ import { users} from '@/db/schema'
 import { eq} from 'drizzle-orm'
 
 
+
+// Edge Runtime disabled due to Node.js dependency incompatibility
+
 export async function DELETE(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
