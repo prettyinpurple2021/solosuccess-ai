@@ -103,12 +103,6 @@ const nextConfig = {
           resourceRegExp: /^@jest\/.*$/,
         }),
         new webpack.IgnorePlugin({
-          resourceRegExp: /^aws-sdk$/,
-        }),
-        new webpack.IgnorePlugin({
-          resourceRegExp: /^@aws-sdk\/.*$/,
-        }),
-        new webpack.IgnorePlugin({
           resourceRegExp: /^webpack-bundle-analyzer$/,
         })
       );
@@ -116,8 +110,6 @@ const nextConfig = {
       // Conservative tree shaking for server bundle to prevent browser globals
       config.optimization = {
         ...config.optimization,
-        usedExports: true,
-        sideEffects: false,
         minimize: true,
         providedExports: true,
       };
@@ -183,8 +175,6 @@ const nextConfig = {
           },
         },
       }
-      config.optimization.usedExports = true
-      config.optimization.sideEffects = false
       
       // Additional bundle size optimizations for Cloudflare Pages
       config.optimization.minimize = true

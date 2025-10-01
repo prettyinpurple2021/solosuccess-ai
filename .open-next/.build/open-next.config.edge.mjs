@@ -203,7 +203,7 @@ function resolveCdnInvalidation(value = "dummy") {
   return typeof value === "function" ? value : () => value;
 }
 
-// node_modules/@opennextjs/aws/dist/utils/error.js
+// node_modules/@opennextjs/cloudflare/node_modules/@opennextjs/aws/dist/utils/error.js
 var IgnorableError = class extends Error {
   constructor(message) {
     super(message);
@@ -221,7 +221,7 @@ function isOpenNextError(e) {
   }
 }
 
-// node_modules/@opennextjs/aws/dist/adapters/logger.js
+// node_modules/@opennextjs/cloudflare/node_modules/@opennextjs/aws/dist/adapters/logger.js
 function debug(...args) {
   if (globalThis.openNextDebug) {
     console.log(...args);
