@@ -2,6 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
+import { getAuth } from '@/lib/auth'
 
 
 
@@ -20,13 +21,44 @@ function getSql() {
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// JWT authentication helper
-async function authenticateJWTRequest(request: NextRequest) {
+// Combined authentication helper (JWT + Better Auth)
+async function authenticateRequest(request: NextRequest) {
   try {
+    // First, try Better Auth session
+    try {
+      const auth = getAuth()
+      const session = await auth.api.getSession({
+        headers: request.headers
+      })
+      
+      if (session?.user) {
+        logInfo('Dashboard API: Better Auth session found', { userId: session.user.id })
+        return { 
+          user: {
+            id: session.user.id,
+            email: session.user.email,
+            full_name: session.user.name || null,
+            avatar_url: session.user.image || null,
+            subscription_tier: 'free',
+            level: 1,
+            total_points: 0,
+            current_streak: 0,
+            wellness_score: 50,
+            focus_minutes: 0,
+            onboarding_completed: false
+          }, 
+          error: null 
+        }
+      }
+    } catch (authError) {
+      logDebug('Dashboard API: Better Auth session check failed, trying JWT')
+    }
+    
+    // Fallback to JWT authentication
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      logError('Dashboard API: No authorization header found')
-      return { user: null, error: 'No authorization header' }
+      logError('Dashboard API: No authorization header or Better Auth session found')
+      return { user: null, error: 'No authorization found' }
     }
 
     const token = authHeader.substring(7)
@@ -56,15 +88,15 @@ async function authenticateJWTRequest(request: NextRequest) {
       error: null 
     }
   } catch (error) {
-    logError('Dashboard API: JWT authentication error:', error as any)
-    return { user: null, error: 'Invalid token' }
+    logError('Dashboard API: Authentication error:', error as any)
+    return { user: null, error: 'Authentication failed' }
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate the request using JWT
-    const { user, error } = await authenticateJWTRequest(request)
+    // Authenticate the request (Better Auth + JWT fallback)
+    const { user, error } = await authenticateRequest(request)
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

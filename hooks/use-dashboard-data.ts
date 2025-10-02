@@ -103,20 +103,45 @@ export function useDashboardData() {
       setLoading(true)
       setError(null)
       
-      // Get the JWT token from localStorage
-      const token = localStorage.getItem('authToken')
+      // Try to get JWT token from localStorage first (for custom auth)
+      let token = localStorage.getItem('authToken')
+      
+      // If no JWT token, try to get Better Auth session
+      if (!token) {
+        // Check if we have a Better Auth session by making a request to get session info
+        const sessionResponse = await fetch('/api/auth/session', {
+          method: 'GET',
+          credentials: 'include', // Include cookies for Better Auth
+        })
+        
+        if (sessionResponse.ok) {
+          const sessionData = await sessionResponse.json()
+          if (sessionData.user) {
+            // We have a Better Auth session, continue without JWT token
+            token = 'better-auth-session'
+          }
+        }
+      }
+      
       if (!token) {
         setError('No authentication token found. Please sign in again.')
         setLoading(false)
         return
       }
       
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      
+      // Only add Authorization header if we have a JWT token
+      if (token !== 'better-auth-session') {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      
       const response = await fetch('/api/dashboard', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers,
+        credentials: 'include', // Include cookies for Better Auth
         // Add cache busting to ensure fresh data
         cache: 'no-cache',
       })

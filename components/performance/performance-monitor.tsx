@@ -94,6 +94,11 @@ export function PerformanceMonitor() {
   const fidScore = getScore(metrics.fid, { good: 100, poor: 300 })
   const clsScore = getScore(metrics.cls, { good: 0.1, poor: 0.25 })
 
+  // Don't render if closed or not visible
+  if (isClosed || !isVisible) {
+    return null
+  }
+
   return (
     <Card className="fixed bottom-4 right-4 w-80 z-50 bg-white/95 backdrop-blur-sm border-2">
       <CardHeader className="pb-2">
