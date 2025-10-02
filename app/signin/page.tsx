@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +20,8 @@ export default function SignInPage() {
   const [error, setError] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,7 +33,7 @@ export default function SignInPage() {
         email,
         password,
         rememberMe,
-        callbackURL: "/dashboard",
+        callbackURL: redirectTo,
       })
 
       if (signInError) {
@@ -40,7 +42,8 @@ export default function SignInPage() {
       }
 
       if (data) {
-        router.push("/dashboard")
+        // Force a hard redirect to ensure cookies are properly set
+        window.location.href = redirectTo
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")
@@ -56,7 +59,7 @@ export default function SignInPage() {
     try {
       await authClient.signIn.social({
         provider,
-        callbackURL: "/dashboard",
+        callbackURL: redirectTo,
       })
     } catch (err) {
       setError("Failed to sign in with " + provider)
