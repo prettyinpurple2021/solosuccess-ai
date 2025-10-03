@@ -15,8 +15,13 @@ let _db: ReturnType<typeof drizzle> | null = null
  * Uses lazy initialization to avoid build-time database calls
  */
 export function getDb() {
-  // Prevent DB usage during build
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
+  // Prevent DB usage during build - check multiple build indicators
+  const isBuildTime = 
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.SKIP_DB_CHECK === 'true' ||
+    (typeof window === 'undefined' && !process.env.DATABASE_URL)
+
+  if (isBuildTime && !process.env.DATABASE_URL) {
     throw new Error('Database client is not available during build time')
   }
 
