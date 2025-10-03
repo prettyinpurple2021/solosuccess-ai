@@ -306,7 +306,7 @@ export const scrapingJobResults = pgTable('scraping_job_results', {
 // Competitive Opportunities table
 export const competitiveOpportunities = pgTable('competitive_opportunities', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   competitor_id: uuid('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
   intelligence_id: uuid('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
   opportunity_type: varchar('opportunity_type', { length: 50 }).notNull(),
@@ -320,7 +320,7 @@ export const competitiveOpportunities = pgTable('competitive_opportunities', {
   evidence: jsonb('evidence').default('[]'),
   recommendations: jsonb('recommendations').default('[]'),
   status: varchar('status', { length: 50 }).default('identified'),
-  assigned_to: uuid('assigned_to').references(() => users.id, { onDelete: 'set null' }),
+  assigned_to: varchar('assigned_to', { length: 255 }).references(() => users.id, { onDelete: 'set null' }),
   implementation_notes: text('implementation_notes'),
   roi_estimate: decimal('roi_estimate', { precision: 10, scale: 2 }),
   actual_roi: decimal('actual_roi', { precision: 10, scale: 2 }),
@@ -347,7 +347,7 @@ export const competitiveOpportunities = pgTable('competitive_opportunities', {
 export const opportunityActions = pgTable('opportunity_actions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   opportunity_id: varchar('opportunity_id', { length: 255 }).notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   action_type: varchar('action_type', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
@@ -375,7 +375,7 @@ export const opportunityActions = pgTable('opportunity_actions', {
 export const opportunityMetrics = pgTable('opportunity_metrics', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   opportunity_id: varchar('opportunity_id', { length: 255 }).notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   metric_name: varchar('metric_name', { length: 100 }).notNull(),
   metric_type: varchar('metric_type', { length: 50 }).notNull(),
   baseline_value: decimal('baseline_value', { precision: 15, scale: 4 }),
@@ -819,7 +819,7 @@ export const documentActivityRelations = relations(documentActivity, ({ one }) =
 // User Brand Settings table
 export const userBrandSettings = pgTable('user_brand_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   company_name: varchar('company_name', { length: 255 }),
   tagline: varchar('tagline', { length: 500 }),
   description: text('description'),
@@ -849,7 +849,7 @@ export const userBrandSettingsRelations = relations(userBrandSettings, ({ one })
 // Push Subscriptions table
 export const pushSubscriptions = pgTable('push_subscriptions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   endpoint: varchar('endpoint', { length: 1000 }).notNull(),
   p256dh_key: varchar('p256dh_key', { length: 500 }).notNull(),
   auth_key: varchar('auth_key', { length: 500 }).notNull(),

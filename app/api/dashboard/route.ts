@@ -105,23 +105,63 @@ export async function GET(request: NextRequest) {
     // Get user data from database or create if doesn't exist
     const sql = getSql()
     
-    // First, try to get existing user data
+    // Convert Better Auth string ID to UUID format for database compatibility
+    let dbUserId = user.id
+    if (user.id && !user.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      // Convert Better Auth string ID to a deterministic UUID
+      const crypto = require('crypto')
+      const hash = crypto.createHash('md5').update(user.id).digest('hex')
+      dbUserId = `${hash.substring(0,8)}-${hash.substring(8,12)}-${hash.substring(12,16)}-${hash.substring(16,20)}-${hash.substring(20,32)}`
+    }
+
+    // First, try to get existing user data by ID
     let userData = await sql`
       SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
       FROM users 
-      WHERE id = ${user.id}
+      WHERE id = ${dbUserId}
     `
 
     let dbUser = userData[0]
 
-    // If user doesn't exist in database, create them
-    if (!dbUser) {
-      const newUser = await sql`
-        INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, subscription_status, cancel_at_period_end, is_verified, created_at, updated_at)
-        VALUES (${user.id}, ${user.email}, ${user.full_name}, ${user.avatar_url}, 'launch', 'active', false, false, NOW(), NOW())
-        RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
+    // If not found by ID, try by email (Better Auth might have different ID format)
+    if (!dbUser && user.email) {
+      const emailUserData = await sql`
+        SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
+        FROM users 
+        WHERE email = ${user.email}
       `
-      dbUser = newUser[0]
+      dbUser = emailUserData[0]
+      if (dbUser) {
+        // Update the dbUserId to match the existing user's ID
+        dbUserId = dbUser.id
+        logInfo('Found user by email, updating dbUserId', { oldId: user.id, newId: dbUserId, email: user.email })
+      }
+    }
+
+    // If user doesn't exist in database, create them (with conflict handling)
+    if (!dbUser) {
+      try {
+        const newUser = await sql`
+          INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, subscription_status, cancel_at_period_end, is_verified, created_at, updated_at)
+          VALUES (${dbUserId}, ${user.email}, ${user.full_name}, ${user.avatar_url}, 'launch', 'active', false, false, NOW(), NOW())
+          RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
+        `
+        dbUser = newUser[0]
+      } catch (insertError: any) {
+        // Handle duplicate key constraint - user might have been created by another request
+        if (insertError?.code === '23505' && insertError?.constraint === 'users_email_key') {
+          logInfo('User already exists, fetching existing user', { email: user.email })
+          // Fetch the existing user
+          const existingUser = await sql`
+            SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
+            FROM users 
+            WHERE email = ${user.email}
+          `
+          dbUser = existingUser[0]
+        } else {
+          throw insertError // Re-throw if it's a different error
+        }
+      }
     }
 
     // Get basic data from existing tables (simplified for now)
@@ -146,7 +186,7 @@ export async function GET(request: NextRequest) {
           COALESCE((
             SELECT COUNT(DISTINCT DATE(updated_at))
             FROM tasks 
-            WHERE user_id = ${user.id} 
+            WHERE user_id = ${dbUserId} 
               AND status = 'completed' 
               AND updated_at >= CURRENT_DATE - INTERVAL '30 days'
           ), 0) AS current_streak,
@@ -164,7 +204,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN tasks t ON u.id = t.user_id
         LEFT JOIN goals g ON u.id = g.user_id
         LEFT JOIN conversations c ON u.id = c.user_id
-        WHERE u.id = ${user.id}
+        WHERE u.id = ${dbUserId}
       `;
 
       // Try to get tasks data if table exists
@@ -175,13 +215,13 @@ export async function GET(request: NextRequest) {
             COALESCE((
               SELECT SUM(duration_minutes) 
               FROM focus_sessions 
-              WHERE user_id = ${user.id} 
+              WHERE user_id = ${dbUserId} 
                 AND DATE(started_at) = CURRENT_DATE
             ), 0) AS focus_minutes,
             COALESCE((
               SELECT COUNT(DISTINCT id) 
               FROM conversations 
-              WHERE user_id = ${user.id} 
+              WHERE user_id = ${dbUserId} 
                 AND DATE(last_message_at) = CURRENT_DATE
             ), 0) AS ai_interactions,
             COALESCE((
@@ -200,13 +240,13 @@ export async function GET(request: NextRequest) {
               )
             END AS productivity_score
          FROM tasks 
-         WHERE user_id = ${user.id} AND DATE(updated_at) = CURRENT_DATE
+         WHERE user_id = ${dbUserId} AND DATE(updated_at) = CURRENT_DATE
       `;
       
       todaysTasksRes = await sql`
         SELECT id, title, description, status, priority, due_date
            FROM tasks
-          WHERE user_id = ${user.id}
+          WHERE user_id = ${dbUserId}
           ORDER BY COALESCE(due_date, NOW()) ASC
           LIMIT 10
       `;
@@ -221,7 +261,7 @@ export async function GET(request: NextRequest) {
         FROM briefcases b
         LEFT JOIN goals g ON b.id = g.briefcase_id
         LEFT JOIN tasks t ON b.id = t.briefcase_id
-        WHERE b.user_id = ${user.id}
+        WHERE b.user_id = ${dbUserId}
         GROUP BY b.id, b.title, b.description, b.status, b.metadata, b.created_at, b.updated_at
         ORDER BY b.updated_at DESC
         LIMIT 6

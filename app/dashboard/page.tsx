@@ -39,38 +39,30 @@ export default function DashboardPage() {
   usePageTracking()
   usePerformanceTracking()
 
-  // Check if onboarding should be shown
-  useEffect(() => {
-    if (data && !data.user.onboarding_completed) {
-      // Show welcome dashboard first, then onboarding
-      setShowWelcomeDashboard(true)
+  // Animation variants - moved to top to avoid hooks order violation
+  const containerVariants = useMemo(() => ({
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
     }
-  }, [data])
+  }), [])
 
-  // Support query param trigger (?onboarding=1) for reliability
-  useEffect(() => {
-    const onboardingFlag = searchParams?.get('onboarding')
-    if (onboardingFlag === '1') {
-      setShowWelcomeDashboard(false)
-      setShowOnboarding(true)
-      // Clean the param from URL without full reload
-      const url = new URL(window.location.href)
-      url.searchParams.delete('onboarding')
-      window.history.replaceState({}, '', url.toString())
+  const itemVariants = useMemo(() => ({
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: easeOut
+      }
     }
-  }, [searchParams])
+  }), [])
 
-  // Track dashboard view
-  useEffect(() => {
-    if (data) {
-      track('dashboard_viewed', {
-        userLevel: data.user.level,
-        totalPoints: data.user.total_points,
-        streak: data.user.current_streak
-      })
-    }
-  }, [data, track])
-
+  // Callback functions - moved to top to avoid hooks order violation
   const handleOnboardingComplete = useCallback(async (onboardingData: unknown) => {
     try {
       // Save onboarding data to user profile
@@ -127,6 +119,38 @@ export default function DashboardPage() {
   const handleSkipWelcome = () => {
     setShowWelcomeDashboard(false)
   }
+
+  // Check if onboarding should be shown
+  useEffect(() => {
+    if (data && !data.user.onboarding_completed) {
+      // Show welcome dashboard first, then onboarding
+      setShowWelcomeDashboard(true)
+    }
+  }, [data])
+
+  // Support query param trigger (?onboarding=1) for reliability
+  useEffect(() => {
+    const onboardingFlag = searchParams?.get('onboarding')
+    if (onboardingFlag === '1') {
+      setShowWelcomeDashboard(false)
+      setShowOnboarding(true)
+      // Clean the param from URL without full reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('onboarding')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
+
+  // Track dashboard view
+  useEffect(() => {
+    if (data) {
+      track('dashboard_viewed', {
+        userLevel: data.user.level,
+        totalPoints: data.user.total_points,
+        streak: data.user.current_streak
+      })
+    }
+  }, [data, track])
 
   // Show welcome dashboard for first-time users
   if (showWelcomeDashboard && data) {
@@ -254,28 +278,6 @@ export default function DashboardPage() {
   }
 
   const { user: dashboardUser, todaysStats, todaysTasks, activeGoals, recentConversations, recentBriefcases, insights } = data
-
-  const containerVariants = useMemo(() => ({
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  }), [])
-
-  const itemVariants = useMemo(() => ({
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: easeOut
-      }
-    }
-  }), [])
 
   // Render mobile PWA dashboard for mobile devices
   if (isMobile) {

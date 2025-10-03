@@ -76,16 +76,23 @@ export async function POST(req: NextRequest) {
     const sql = getSql()
     const userId = getUserIdFromToken(req)
     
-    // Create tables if they don't exist
-    await sql`create table if not exists exit_intent_surveys (
-      id serial primary key,
-      user_id varchar(255),
-      role varchar(120),
-      goal text,
-      blocker text,
-      email varchar(255),
-      created_at timestamptz default now()
-    )`
+    logDebug('Survey submission data:', { role, goal, blocker, email, action, userId })
+    
+    // Create tables if they don't exist - with proper error handling
+    try {
+      await sql`create table if not exists exit_intent_surveys (
+        id serial primary key,
+        user_id varchar(255),
+        role varchar(120),
+        goal text,
+        blocker text,
+        email varchar(255),
+        created_at timestamptz default now()
+      )`
+    } catch (tableError) {
+      logError('Error creating exit_intent_surveys table:', tableError)
+      // If table creation fails, try to continue anyway
+    }
     
     await sql`create table if not exists user_survey_status (
       id serial primary key,
@@ -109,10 +116,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, action: 'dismissed' })
     } else {
       // User submitted survey
-      await sql`
-        insert into exit_intent_surveys (user_id, role, goal, blocker, email) 
-        values (${userId || null}, ${role || null}, ${goal || null}, ${blocker || null}, ${email || null})
-      `
+      try {
+        await sql`
+          insert into exit_intent_surveys (user_id, role, goal, blocker, email) 
+          values (${userId || null}, ${role || null}, ${goal || null}, ${blocker || null}, ${email || null})
+        `
+        logDebug('Survey data inserted successfully')
+      } catch (insertError) {
+        logError('Error inserting survey data:', insertError)
+        // Continue with status update even if survey data insert fails
+      }
       
       if (userId) {
         await sql`

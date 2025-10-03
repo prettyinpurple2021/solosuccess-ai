@@ -1,4 +1,3 @@
-// @ts-nocheck
 import "./globals.css"
 import type { ReactNode } from 'react'
 import { Inter as FontSans} from "next/font/google"
@@ -138,44 +137,7 @@ export default function RootLayout({
         {/* Search engine verification placeholders */}
         <meta name="google-site-verification" content="CHANGE_ME" />
         <meta name="msvalidate.01" content="CHANGE_ME" />
-        {/* Google Tag Manager */}
-        <Script 
-          id="gtm-base" 
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-MPXM3ZZT');`
-          }}
-        />
-        {/* Google tag (gtag.js) - exact snippet per instructions */}
-        <Script
-          id="ga4-gtag-src"
-          src="https://www.googletagmanager.com/gtag/js?id=G-W174T4ZFNF"
-          strategy="afterInteractive"
-        />
-        <Script 
-          id="ga4-gtag-init" 
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);} 
-  gtag('js', new Date());
-
-  gtag('config', 'G-W174T4ZFNF');`
-          }}
-        />
-        {/* Metricool Tracking */}
-        <Script 
-          id="metricool-tracking" 
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"c3b56672bacfe8e1e7f2c4938b5d7e46"})});`
-          }}
-        />
+        {/* Analytics scripts moved to afterInteractive to prevent chunk loading issues */}
       </head>
       <body
         className={cn(
@@ -190,51 +152,42 @@ j=d.createElement(s),dl=l!='dataLayer'?('&l='+l):'';j.async=true;j.src=
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        {/* Structured Data */}
         <Script 
           id="ld-org" 
           type="application/ld+json" 
           strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'SoloSuccess AI',
-              url: 'https://solobossai.fun/',
-              logo: 'https://solobossai.fun/images/logo.png',
-              sameAs: [
-                'https://twitter.com/solosuccessai',
-                'https://www.linkedin.com/company/solosuccessai'
-              ]
-            })
-          }}
+        >
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'SoloSuccess AI',
+            url: 'https://solobossai.fun/',
+            logo: 'https://solobossai.fun/images/logo.png',
+            sameAs: [
+              'https://twitter.com/solosuccessai',
+              'https://www.linkedin.com/company/solosuccessai'
+            ]
+          })}
+        </Script>
+        
+        {/* Analytics Scripts - Load after page is interactive */}
+        <Script
+          id="ga4-gtag-src"
+          src="https://www.googletagmanager.com/gtag/js?id=G-W174T4ZFNF"
+          strategy="afterInteractive"
         />
         <Script 
-          id="ld-software" 
-          type="application/ld+json" 
+          id="ga4-gtag-init" 
           strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: 'SoloSuccess AI',
-              applicationCategory: 'BusinessApplication',
-              operatingSystem: 'Web',
-              url: 'https://solobossai.fun/',
-              description: 'AI Co-founder and AI Business Co-pilot for solo founders. Virtual Team for Founders with Solopreneur Operating System.',
-              offers: {
-                '@type': 'Offer',
-                price: 0,
-                priceCurrency: 'USD'
-              }
-            })
-          }}
-        />
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html:
-              '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MPXM3ZZT" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
-          }}
-        />
+        >
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);} 
+            gtag('js', new Date());
+            gtag('config', 'G-W174T4ZFNF');
+          `}
+        </Script>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
