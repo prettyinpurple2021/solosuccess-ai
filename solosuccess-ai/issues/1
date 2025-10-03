@@ -1,0 +1,27 @@
+### Description
+The GitHub Actions job for Test and Upload Coverage is failing with exit code 1. The logs indicate a Node.js module loading error:
+
+```
+at Module.load (node:internal/modules/cjs/loader:1266:32)
+at Module._load (node:internal/modules/cjs/loader:1091:12)
+at Module.require (node:internal/modules/cjs/loader:1289:19)
+at require (node:internal/modules/helpers:182:18)
+##[error]Process completed with exit code 1.
+```
+
+### Job Reference
+- [Failing Job (ref: 0c9a9863468f00ad7065bfadeee77018de496811)](https://github.com/prettyinpurple2021/solosuccess-ai/actions/runs/18233696410/job/51922927422)
+
+### Steps to Investigate
+1. Review the job log for specific error messages.
+2. Check for missing or incorrect require/import statements in the codebase.
+3. Ensure all dependencies are correctly listed in `package.json`.
+4. Run `npm install` locally and verify all modules load without errors.
+5. Ensure module paths/names are correct and match the case sensitivity.
+
+### Suggested Fix
+- Update dependencies and verify locally before pushing.
+- If you need help locating the failing `require` statement, share your main test/startup file or specify which script is run in your workflow.
+
+---
+Please investigate and resolve this issue so the workflow can run successfully.
