@@ -15,10 +15,9 @@ Create these secrets in Cloudflare Dashboard:
 ```bash
 # Required for production
 DATABASE_URL=your-neon-database-url
-BETTER_AUTH_SECRET=your-secret-key-32-chars
-BETTER_AUTH_URL=https://yourdomain.com
+JWT_SECRET=your-secret-key-minimum-32-chars
 
-# GitHub OAuth Provider
+# GitHub OAuth Provider (Optional)
 GITHUB_CLIENT_ID=your-github-client-id  
 GITHUB_CLIENT_SECRET=your-github-client-secret
 
@@ -76,8 +75,8 @@ npm run deploy:cf
 
 3. **Update Environment Variables:**
    ```bash
-   BETTER_AUTH_URL=https://yourdomain.com
    NEXT_PUBLIC_APP_URL=https://yourdomain.com
+   JWT_SECRET=your-production-jwt-secret-32-chars-minimum
    ```
 
 ### Step 5: Verify Deployment
@@ -108,8 +107,8 @@ npm run db:verify
 ### Local Development (.env)
 ```env
 DATABASE_URL=your-neon-dev-database-url  
-BETTER_AUTH_SECRET=local-dev-secret-key
-BETTER_AUTH_URL=http://localhost:3000
+JWT_SECRET=local-dev-secret-key-minimum-32-characters
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### Production (Cloudflare Dashboard)
@@ -123,8 +122,8 @@ Set all production values in Cloudflare Pages → Settings → Environment Varia
 - Run `npm run build` first to test locally
 
 ### Authentication Issues  
-- Verify `BETTER_AUTH_URL` matches your domain
-- Check OAuth callback URLs in GitHub
+- Verify `JWT_SECRET` is set and at least 32 characters
+- Check that authentication cookies are being set properly
 - Ensure database tables exist (`npm run setup-neon-db`)
 
 ### Custom Domain Not Working
@@ -152,6 +151,6 @@ Your app will be production-ready with:
 - ✅ Custom domain with SSL
 - ✅ Global CDN via Cloudflare
 - ✅ Serverless API routes
-- ✅ Better Auth authentication
+- ✅ JWT-based authentication
 - ✅ Neon PostgreSQL database
 - ✅ 99.9% uptime SLA

@@ -38,7 +38,7 @@ const nextConfig = {
   // External packages for server components - final aggressive list to get under 25MB
   serverExternalPackages: [
     // Core auth and database (heaviest)
-    'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'better-auth', 'drizzle-orm', 'drizzle-kit',
+    'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'drizzle-orm', 'drizzle-kit',
     // AI SDK packages (very heavy)
     'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@google/generative-ai', 'ai',
     // File processing (heavy)

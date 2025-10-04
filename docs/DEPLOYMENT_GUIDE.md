@@ -7,7 +7,7 @@
 - **Frontend**: Next.js 15 with App Router
 - **Deployment**: Cloudflare Pages
 - **Database**: Neon PostgreSQL
-- **Authentication**: Better Auth
+- **Authentication**: JWT-based (Custom)
 - **Styling**: Tailwind CSS with Holographic Design System
 - **Component Library**: Storybook
 - **Build Tool**: OpenNext for Cloudflare compatibility
@@ -20,11 +20,11 @@
 # Database
 DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 
-# Better Auth
-BETTER_AUTH_SECRET=your_secure_secret_key_here
-BETTER_AUTH_URL=https://your-domain.com
+# JWT Authentication
+JWT_SECRET=your_secure_secret_key_minimum_32_characters
+NEXT_PUBLIC_APP_URL=https://your-domain.com
 
-# GitHub OAuth (for Better Auth)
+# GitHub OAuth (Optional)
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 
@@ -78,17 +78,14 @@ npm run deploy:cf
 
 ### 1. Database Connection
 
-The project uses Neon PostgreSQL with Better Auth:
+The project uses Neon PostgreSQL with JWT authentication:
 
 ```typescript
-// lib/auth.ts
-const authConfig: BetterAuthOptions = {
-  database: {
-    provider: "postgresql" as const,
-    url: process.env.DATABASE_URL || "",
-  },
-  // ... other config
-}
+// lib/auth-server.ts
+import jwt from 'jsonwebtoken'
+
+// JWT-based authentication with secure session management
+const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET!)
 ```
 
 ### 2. Database Scripts
@@ -104,29 +101,28 @@ npm run migrate
 npm run db:verify
 ```
 
-## 🔐 Better Auth Configuration
+## 🔐 JWT Authentication Configuration
 
 ### 1. Current Setup
 
-Better Auth is configured with:
+JWT-based authentication is configured with:
 - Email/Password authentication
-- GitHub OAuth integration
+- GitHub OAuth integration (optional)
 - 7-day session expiry
-- Secure session management
+- Secure HTTP-only cookies
+- LocalStorage token backup
 
 ### 2. Client Configuration
 
 ```typescript
 // lib/auth-client.ts
-export const authClient = createAuthClient({
-  baseURL: process.env.BETTER_AUTH_URL,
-  plugins: [
-    twoFactorClient(),
-    passkeyClient(),
-    emailOTPClient(),
-    multiSessionClient(),
-  ],
-})
+export async function signIn(email: string, password: string) {
+  const response = await fetch('/api/auth/signin', {
+    method: 'POST',
+    body: JSON.stringify({ identifier: email, password, isEmail: true }),
+  })
+  // ... handles JWT token storage
+}
 ```
 
 ## 📚 Storybook Setup
@@ -180,7 +176,7 @@ import { HolographicButton } from '@/components/ui/holographic-button'
 ## 🧹 Cleanup Status
 
 ### ✅ Preserved
-- Core authentication system (Better Auth)
+- Core authentication system (JWT-based)
 - Database schema and utilities
 - Holographic design system
 - Essential API routes
@@ -188,6 +184,8 @@ import { HolographicButton } from '@/components/ui/holographic-button'
 - Storybook setup
 
 ### 🗑️ Cleaned Up
+- Better Auth dependencies (migrated to JWT)
+- Better Auth configuration files
 - Outdated documentation moved to archive
 - Unused scripts and utilities
 - Redundant configuration files
@@ -195,9 +193,10 @@ import { HolographicButton } from '@/components/ui/holographic-button'
 
 ## 🚀 Deployment Checklist
 
-- [ ] Environment variables configured
+- [ ] Environment variables configured (DATABASE_URL, JWT_SECRET)
 - [ ] Database connected and migrated
-- [ ] Better Auth configured with OAuth providers
+- [ ] JWT authentication tested
+- [ ] GitHub OAuth configured (optional)
 - [ ] Cloudflare Pages connected
 - [ ] Build process tested
 - [ ] Holographic design system verified
@@ -207,11 +206,11 @@ import { HolographicButton } from '@/components/ui/holographic-button'
 ## 📞 Support
 
 If you encounter issues:
-1. Check environment variables
+1. Check environment variables (especially JWT_SECRET)
 2. Verify database connection
 3. Test build process locally
 4. Check Cloudflare Pages logs
-5. Verify Better Auth configuration
+5. Verify JWT authentication is working
 
 ---
 
