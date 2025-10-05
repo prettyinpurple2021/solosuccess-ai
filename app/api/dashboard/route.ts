@@ -2,12 +2,9 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { neon} from '@neondatabase/serverless'
 import jwt from 'jsonwebtoken'
-import { getAuth } from '@/lib/auth'
-
 
 
 // Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
@@ -21,47 +18,25 @@ function getSql() {
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// Combined authentication helper (JWT + Better Auth)
+// JWT authentication helper
 async function authenticateRequest(request: NextRequest) {
   try {
-    // First, try Better Auth session
-    try {
-      const auth = getAuth()
-      const session = await auth.api.getSession({
-        headers: request.headers
-      })
-      
-      if (session?.user) {
-        logInfo('Dashboard API: Better Auth session found', { userId: session.user.id })
-        return { 
-          user: {
-            id: session.user.id,
-            email: session.user.email,
-            full_name: session.user.name || null,
-            avatar_url: session.user.image || null,
-            subscription_tier: 'free',
-            level: 1,
-            total_points: 0,
-            current_streak: 0,
-            wellness_score: 50,
-            focus_minutes: 0,
-            onboarding_completed: false
-          }, 
-          error: null 
-        }
-      }
-    } catch (authError) {
-      logDebug('Dashboard API: Better Auth session check failed, trying JWT')
+    // Get token from Authorization header or cookie
+    const authHeader = request.headers.get('authorization')
+    const cookieToken = request.cookies.get('auth_token')?.value
+    
+    let token: string | null = null
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7)
+    } else if (cookieToken) {
+      token = cookieToken
     }
     
-    // Fallback to JWT authentication
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      logError('Dashboard API: No authorization header or Better Auth session found')
+    if (!token) {
+      logError('Dashboard API: No authorization token found')
       return { user: null, error: 'No authorization found' }
     }
-
-    const token = authHeader.substring(7)
     
     if (!process.env.JWT_SECRET) {
       logError('Dashboard API: JWT_SECRET is not set')
@@ -95,7 +70,7 @@ async function authenticateRequest(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate the request (Better Auth + JWT fallback)
+    // Authenticate the request (JWT)
     const { user, error } = await authenticateRequest(request)
     
     if (error || !user) {
@@ -105,14 +80,8 @@ export async function GET(request: NextRequest) {
     // Get user data from database or create if doesn't exist
     const sql = getSql()
     
-    // Convert Better Auth string ID to UUID format for database compatibility
+    // Use the user ID directly
     let dbUserId = user.id
-    if (user.id && !user.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-      // Convert Better Auth string ID to a deterministic UUID
-      const crypto = require('crypto')
-      const hash = crypto.createHash('md5').update(user.id).digest('hex')
-      dbUserId = `${hash.substring(0,8)}-${hash.substring(8,12)}-${hash.substring(12,16)}-${hash.substring(16,20)}-${hash.substring(20,32)}`
-    }
 
     // First, try to get existing user data by ID
     let userData = await sql`
@@ -123,7 +92,7 @@ export async function GET(request: NextRequest) {
 
     let dbUser = userData[0]
 
-    // If not found by ID, try by email (Better Auth might have different ID format)
+    // If not found by ID, try by email
     if (!dbUser && user.email) {
       const emailUserData = await sql`
         SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, is_verified, created_at, updated_at
