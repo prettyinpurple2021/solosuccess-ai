@@ -66,15 +66,23 @@ grep '"type"' package.json
 ##### Option 1: Rename jest.config.js to jest.config.cjs (Recommended)
 This tells Node.js to treat the file as CommonJS:
 ```bash
-# Rename the file to use .cjs extension
+# Rename the configuration files to use .cjs extension
 mv jest.config.js jest.config.cjs
+mv jest.teardown.js jest.teardown.cjs
 
-# Update any references to the config file if needed
-# Jest automatically looks for jest.config.cjs
+# Update the reference in jest.config.cjs
+# Change line 20 from:
+#   globalTeardown: '<rootDir>/jest.teardown.js',
+# To:
+#   globalTeardown: '<rootDir>/jest.teardown.cjs',
 ```
 
-##### Option 2: Convert jest.config.js to ES Module Syntax
-Convert the configuration to use ES module syntax:
+Jest automatically looks for `jest.config.cjs` when using ES modules.
+
+##### Option 2: Convert jest.config.js and jest.teardown.js to ES Module Syntax
+Convert both configuration files to use ES module syntax:
+
+**jest.config.js** (ES Module syntax):
 ```javascript
 // jest.config.js (ES Module syntax)
 import nextJest from 'next/jest';
@@ -99,6 +107,62 @@ const customJestConfig = {
 export default createJestConfig(customJestConfig);
 ```
 
+**jest.teardown.js** (ES Module syntax):
+```javascript
+/**
+ * Jest global teardown
+ * Ensures all resources are cleaned up after tests complete
+ */
+
+export default async () => {
+  // Clean up any singleton instances that might be keeping the process alive
+  try {
+    // Force cleanup of any remaining timers
+    const { clearAllTimers } = await import('@jest/environment');
+    if (clearAllTimers) {
+      clearAllTimers();
+    }
+  } catch (error) {
+    // Jest environment might not be available
+  }
+
+  // Clean up any database connections
+  try {
+    // If database client exists, close connections
+    const { db } = await import('./db/index.js');
+    if (db && typeof db.end === 'function') {
+      await db.end();
+    }
+  } catch (error) {
+    // Database might be mocked or not available
+  }
+
+  // Clean up any fetch mocks
+  try {
+    if (global.fetch && global.fetch.mockRestore) {
+      global.fetch.mockRestore();
+    }
+  } catch (error) {
+    // Fetch might not be mocked
+  }
+
+  // Force garbage collection if available
+  if (global.gc) {
+    global.gc();
+  }
+
+  // Give a small delay to ensure all cleanup operations complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+};
+```
+
+**Note**: When using ES modules with Jest, you may need to use the `--experimental-vm-modules` flag:
+```json
+// In package.json, update the test scripts:
+"test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+"coverage:ci": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage --runInBand"
+```
+
 ##### Option 3: Update Workflow to Use --legacy-peer-deps
 Modify `.github/workflows/coverage.yml` line 22 to match other workflows:
 ```yaml
@@ -119,8 +183,9 @@ npm install <module-name>
 - Example: Change `require('utils/helper')` to `require('./utils/helper')` or `import { helper } from '@/utils/helper'`
 
 #### Additional Files to Check:
-- `jest.teardown.js` - May also need to be renamed to `.cjs` or converted to ES module syntax
+- **`jest.teardown.js`** - ⚠️ **ALSO AFFECTED**: This file uses `module.exports` and `require()` (lines 6, 10, 21) and will have the same issue. It should be renamed to `jest.teardown.cjs` or converted to ES module syntax.
 - Any other `.js` configuration files in the root directory that use `require()`
+- Check if `jest.config.cjs` (after renaming) correctly references `jest.teardown.cjs` on line 20
 
 #### Testing the Fix:
 After implementing a solution, test locally:
