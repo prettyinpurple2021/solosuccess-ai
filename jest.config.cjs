@@ -17,7 +17,7 @@ const customJestConfig = {
   forceExit: true,
   detectOpenHandles: true,
   // Global teardown to clean up any remaining resources
-  globalTeardown: '<rootDir>/jest.teardown.js',
+  globalTeardown: '<rootDir>/jest.teardown.cjs',
 }
 
 module.exports = createJestConfig(customJestConfig)
