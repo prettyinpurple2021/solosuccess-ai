@@ -1,0 +1,20 @@
+{
+  "name": "solosuccess-google-ai-worker",
+  "version": "1.0.0",
+  "description": "Google AI processing worker for SoloSuccess AI",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:preview": "wrangler deploy --env preview",
+    "deploy:production": "wrangler deploy --env production"
+  },
+  "dependencies": {
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241011.0",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.40.2"
+  }
+}

@@ -18,6 +18,15 @@ CUSTOM_DOMAINS = "solobossai.fun"
 NEXT_PUBLIC_PERFORMANCE_MONITOR = "false"
 NEXT_PUBLIC_DISABLE_EXIT_INTENT = "true"
 
+# Service bindings to AI workers
+[[env.production.services]]
+binding = "OPENAI_WORKER"
+service = "solosuccess-openai-worker-production"
+
+[[env.production.services]]
+binding = "GOOGLE_AI_WORKER"
+service = "solosuccess-google-ai-worker-production"
+
 # All production secrets should be set via: wrangler pages secret put SECRET_NAME --env production
 # Examples:
 # wrangler pages secret put DATABASE_URL --env production
@@ -42,5 +51,14 @@ NODE_ENV = "preview"
 NEXT_PUBLIC_PERFORMANCE_MONITOR = "false"
 NEXT_PUBLIC_DISABLE_EXIT_INTENT = "true"
 FROM_EMAIL = "noreply@solobossai.fun"
+
+# Service bindings to AI workers
+[[env.preview.services]]
+binding = "OPENAI_WORKER"
+service = "solosuccess-openai-worker-preview"
+
+[[env.preview.services]]
+binding = "GOOGLE_AI_WORKER"
+service = "solosuccess-google-ai-worker-preview"
 
 # Preview secrets should be set via: wrangler pages secret put SECRET_NAME --env preview
