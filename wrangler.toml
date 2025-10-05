@@ -1,18 +1,47 @@
 name = "solosuccess-ai"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
-# OpenNext output directory for Cloudflare Pages
+# Main worker for Cloudflare Pages Functions
 pages_build_output_dir = ".open-next"
 
 # Production environment configuration
 [env.production]
-name = "solosuccess-ai-platform"
+name = "solosuccess-ai-production"
+route = { pattern = "solobossai.fun/*", zone_id = "35ceda285ec132207d99f0489d60c82e" }
+
 [env.production.vars]
 NODE_ENV = "production"
+NEXT_PUBLIC_APP_URL = "https://solobossai.fun"
+NEXT_PUBLIC_SITE_URL = "https://solobossai.fun"
+FROM_EMAIL = "noreply@solobossai.fun"
+CUSTOM_DOMAINS = "solobossai.fun"
+NEXT_PUBLIC_PERFORMANCE_MONITOR = "false"
+NEXT_PUBLIC_DISABLE_EXIT_INTENT = "true"
 
-# Preview environment configuration (replaces staging)
+# All production secrets should be set via: wrangler pages secret put SECRET_NAME --env production
+# Examples:
+# wrangler pages secret put DATABASE_URL --env production
+# wrangler pages secret put JWT_SECRET --env production
+# wrangler pages secret put BETTER_AUTH_SECRET --env production
+# wrangler pages secret put GITHUB_CLIENT_SECRET --env production
+# wrangler pages secret put RESEND_API_KEY --env production
+# wrangler pages secret put OPENAI_API_KEY --env production
+# wrangler pages secret put ANTHROPIC_API_KEY --env production
+# wrangler pages secret put GOOGLE_AI_API_KEY --env production
+# wrangler pages secret put STRIPE_SECRET_KEY --env production
+# wrangler pages secret put STRIPE_WEBHOOK_SECRET --env production
+# wrangler pages secret put SENTRY_DSN --env production
+# wrangler pages secret put CLOUDFLARE_API_TOKEN --env production
+
+# Preview environment configuration
 [env.preview]
-name = "solosuccess-ai-platform-preview"
+name = "solosuccess-ai-preview"
+
 [env.preview.vars]
 NODE_ENV = "preview"
+NEXT_PUBLIC_PERFORMANCE_MONITOR = "false"
+NEXT_PUBLIC_DISABLE_EXIT_INTENT = "true"
+FROM_EMAIL = "noreply@solobossai.fun"
+
+# Preview secrets should be set via: wrangler pages secret put SECRET_NAME --env preview
