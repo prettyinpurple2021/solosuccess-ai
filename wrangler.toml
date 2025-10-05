@@ -8,7 +8,6 @@ pages_build_output_dir = ".open-next"
 # Production environment configuration
 [env.production]
 name = "solosuccess-ai-production"
-route = { pattern = "solobossai.fun/*", zone_id = "35ceda285ec132207d99f0489d60c82e" }
 
 [env.production.vars]
 NODE_ENV = "production"
