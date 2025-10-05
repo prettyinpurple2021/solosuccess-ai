@@ -343,9 +343,11 @@ var r2_incremental_cache_default = new R2IncrementalCache();
 // open-next.config.ts
 var open_next_config_default = defineCloudflareConfig({
   incrementalCache: r2_incremental_cache_default,
-  // Explicitly mark packages as external to prevent bundling issues
+  // Aggressive bundle optimization - focus on size reduction
   esbuild: {
+    // Mark heavy packages as external to prevent bundling
     external: [
+      // Core heavy packages (most impactful)
       "stripe",
       "resend",
       "@neondatabase/serverless",
@@ -353,11 +355,53 @@ var open_next_config_default = defineCloudflareConfig({
       "bcryptjs",
       "better-auth",
       "drizzle-orm",
+      "drizzle-kit",
+      // AI packages (very heavy - major contributors to bundle size)
       "openai",
       "@ai-sdk/openai",
       "@ai-sdk/anthropic",
-      "@ai-sdk/google"
-    ]
+      "@ai-sdk/google",
+      "@google/generative-ai",
+      "ai",
+      // File processing (heavy)
+      "pdf-parse",
+      "mammoth",
+      "exceljs",
+      "cheerio",
+      "sharp",
+      "node-html-parser",
+      // Testing/dev tools (should not be in production)
+      "playwright",
+      "puppeteer",
+      "vitest",
+      "jest",
+      "storybook",
+      "webpack-bundle-analyzer",
+      // Additional potentially heavy deps
+      "jsonwebtoken",
+      "web-push",
+      // Large frameworks/libraries
+      "framer-motion",
+      "recharts",
+      "react-hook-form",
+      "@hookform/resolvers",
+      "zod"
+    ],
+    // Enable maximum compression
+    minify: true,
+    treeShaking: true,
+    // Target modern edge runtime for smaller polyfills
+    target: ["es2022"],
+    format: "esm",
+    // Aggressive minification options
+    minifySyntax: true,
+    minifyWhitespace: true,
+    minifyIdentifiers: true,
+    // Drop console statements in production
+    drop: ["console", "debugger"],
+    // Additional size optimizations
+    mangleProps: /^_/,
+    legalComments: "none"
   }
 });
 export {

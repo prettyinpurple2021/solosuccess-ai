@@ -29,7 +29,19 @@ const nextConfig = {
 
   // Enable modern React features and aggressive optimizations
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    optimizePackageImports: [
+      'lucide-react', 
+      '@radix-ui/react-icons',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-dropdown-menu',
+      'framer-motion',
+      'recharts'
+    ],
+    // Use edge runtime for smaller bundles on Cloudflare
+    runtime: 'experimental-edge',
+    // Enable webpack build worker
+    webpackBuildWorker: true,
   },
 
   // Compression and optimization
@@ -61,21 +73,12 @@ const nextConfig = {
     'tailwindcss-animate', 'autoprefixer', 'tsx', 'ts-node', 'wrangler'
   ],
 
-  // Image optimization
+  // Disable image optimization for smaller bundles on Cloudflare
   images: {
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000,
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: false,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    unoptimized: true,
+    domains: [],
+    deviceSizes: [],
+    imageSizes: [],
   },
 
   // Bundle optimization for memory efficiency

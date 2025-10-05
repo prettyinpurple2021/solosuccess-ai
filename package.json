@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "packageManager": "npm@10.0.0",
+  "sideEffects": false,
   "scripts": {
     "build": "cross-env NODE_OPTIONS='--max-old-space-size=12288' next build",
     "build:production": "node scripts/deploy-build.mjs",
@@ -35,7 +36,7 @@
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
     "setup:analytics": "node scripts/setup-analytics.js",
-    "build:cf": "node scripts/patch-stripe.js && cross-env SKIP_DB_CHECK=true npx @opennextjs/cloudflare build",
+    "build:cf": "node scripts/patch-stripe.js && cross-env SKIP_DB_CHECK=true OPEN_NEXT_FORCE_NON_EMPTY_FUNCTIONS=true OPEN_NEXT_BUNDLE_SPLITTING=true npx @opennextjs/cloudflare build",
     "preview:cf": "npm run build:cf && npx wrangler pages dev .open-next/output",
     "deploy:cf": "npm run build:cf && npx wrangler pages deploy .open-next/output",
     "deploy:cf:preview": "npm run build:cf && npx wrangler pages deploy .open-next/output --env preview",
