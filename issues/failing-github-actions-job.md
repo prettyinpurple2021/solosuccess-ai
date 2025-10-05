@@ -1,17 +1,213 @@
-### Issue: Failing GitHub Actions Job in Test and Upload Coverage Workflow
+### Issue: Node.js Module Loading Error in Test and Upload Coverage Workflow
 
 #### Description:
-The GitHub Actions job for Test and Upload Coverage is failing with an exit code 1. The failure log indicates a Node.js module loading error, specifically referencing `Module.load`, `Module._load`, and `Module.require`. This suggests that there may be a missing or misconfigured dependency.
+The GitHub Actions workflow for "Test and Upload Coverage" (`.github/workflows/coverage.yml`) is failing with a **Node.js ES Module error**. The root cause is that `jest.config.js` uses CommonJS syntax (`require()` and `module.exports`), but the project is configured as an ES module in `package.json` with `"type": "module"`.
 
-#### Steps to Investigate:
-1. Review the failing job log for specific error messages.
-2. Check for missing or incorrect require/import statements in the codebase.
-3. Verify that all dependencies are correctly listed in `package.json`.
-4. Ensure that `npm install` completes successfully without errors.
+#### Error Details:
+```
+ReferenceError: require is not defined in ES module scope, you can use import instead
+This file is being treated as an ES module because it has a '.js' file extension and 
+'/home/runner/work/solosuccess-ai/solosuccess-ai/package.json' contains "type": "module". 
+To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+    at file:///home/runner/work/solosuccess-ai/solosuccess-ai/jest.config.js:1:18
+```
 
-#### Failing Job Details:
-- Job Link: [View Failing Job](https://github.com/prettyinpurple2021/solosuccess-ai/actions/runs/18233696410/job/51922927422)
-- Reference Commit: `0c9a9863468f00ad7065bfadeee77018de496811`
+#### Failing Workflow Step:
+- **Workflow File**: `.github/workflows/coverage.yml`
+- **Failing Step**: Step 5 - "Run tests with coverage" (`npm run coverage:ci`)
+- **Latest Job Run**: [View Job #51984067733](https://github.com/prettyinpurple2021/solosuccess-ai/actions/runs/18258884835/job/51984067733#step:5:21)
+- **Commit**: `bd689a6778d39c9ac96c040e32da7f8041f4dfbf`
 
-#### Suggested Next Steps:
-- Investigate the above points and update the necessary files or configurations to resolve the issue.
+#### Root Cause Analysis:
+1. **Package Configuration**: `package.json` line 5 declares `"type": "module"`, making all `.js` files use ES module syntax
+2. **Jest Configuration**: `jest.config.js` line 1 uses `const nextJest = require('next/jest')` (CommonJS syntax)
+3. **Conflict**: Node.js cannot use `require()` in an ES module context
+
+#### Steps to Investigate and Fix:
+
+##### 1. Check the Failing Workflow File
+Examine `.github/workflows/coverage.yml` for the failing step:
+```bash
+# View the workflow configuration
+cat .github/workflows/coverage.yml
+```
+
+The failing command on line 25 is:
+```yaml
+- name: Run tests with coverage
+  run: npm run coverage:ci
+```
+
+##### 2. Verify Dependencies Installation
+Check that all required dependencies in `package.json` are installed:
+```bash
+# Install all dependencies (with legacy peer deps flag if needed)
+npm install
+
+# Or for CI environments (clean install)
+npm ci
+
+# Verify jest and related packages are installed
+npm list jest next @jest/globals ts-jest
+```
+
+##### 3. Confirm Module Import/Require Paths
+Verify that local file and module paths are correct:
+```bash
+# Check jest configuration exists and review its syntax
+cat jest.config.js
+
+# Check package.json type field
+grep '"type"' package.json
+```
+
+#### Recommended Solutions:
+
+##### Option 1: Rename jest.config.js to jest.config.cjs (Recommended)
+This tells Node.js to treat the file as CommonJS:
+```bash
+# Rename the configuration files to use .cjs extension
+mv jest.config.js jest.config.cjs
+mv jest.teardown.js jest.teardown.cjs
+
+# Update the reference in jest.config.cjs
+# Change line 20 from:
+#   globalTeardown: '<rootDir>/jest.teardown.js',
+# To:
+#   globalTeardown: '<rootDir>/jest.teardown.cjs',
+```
+
+Jest automatically looks for `jest.config.cjs` when using ES modules.
+
+##### Option 2: Convert jest.config.js and jest.teardown.js to ES Module Syntax
+Convert both configuration files to use ES module syntax:
+
+**jest.config.js** (ES Module syntax):
+```javascript
+// jest.config.js (ES Module syntax)
+import nextJest from 'next/jest';
+
+const createJestConfig = nextJest({ dir: './' });
+
+/** @type {import('jest').Config} */
+const customJestConfig = {
+  testEnvironment: 'node',
+  testPathIgnorePatterns: ['/node_modules/', '/tests/'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+  },
+  coverageDirectory: 'coverage',
+  coverageReporters: ['lcov', 'json-summary', 'clover', 'text', 'text-summary'],
+  testTimeout: 30000,
+  forceExit: true,
+  detectOpenHandles: true,
+  globalTeardown: '<rootDir>/jest.teardown.js',
+};
+
+export default createJestConfig(customJestConfig);
+```
+
+**jest.teardown.js** (ES Module syntax):
+```javascript
+/**
+ * Jest global teardown
+ * Ensures all resources are cleaned up after tests complete
+ */
+
+export default async () => {
+  // Clean up any singleton instances that might be keeping the process alive
+  try {
+    // Force cleanup of any remaining timers
+    const { clearAllTimers } = await import('@jest/environment');
+    if (clearAllTimers) {
+      clearAllTimers();
+    }
+  } catch (error) {
+    // Jest environment might not be available
+  }
+
+  // Clean up any database connections
+  try {
+    // If database client exists, close connections
+    const { db } = await import('./db/index.js');
+    if (db && typeof db.end === 'function') {
+      await db.end();
+    }
+  } catch (error) {
+    // Database might be mocked or not available
+  }
+
+  // Clean up any fetch mocks
+  try {
+    if (global.fetch && global.fetch.mockRestore) {
+      global.fetch.mockRestore();
+    }
+  } catch (error) {
+    // Fetch might not be mocked
+  }
+
+  // Force garbage collection if available
+  if (global.gc) {
+    global.gc();
+  }
+
+  // Give a small delay to ensure all cleanup operations complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+};
+```
+
+**Note**: When using ES modules with Jest, you may need to use the `--experimental-vm-modules` flag:
+```json
+// In package.json, update the test scripts:
+"test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+"coverage:ci": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage --runInBand"
+```
+
+##### Option 3: Update Workflow to Use --legacy-peer-deps
+Modify `.github/workflows/coverage.yml` line 22 to match other workflows:
+```yaml
+- name: Install dependencies
+  run: npm ci --legacy-peer-deps
+```
+
+#### Code Suggestions:
+
+**Add missing dependencies** (if any are found missing after running `npm list`):
+```bash
+npm install <module-name>
+```
+
+**Fix require paths for local files** (if any are using incorrect paths):
+- Use `@/` prefix for absolute imports (already configured in tsconfig.json)
+- Ensure relative paths start with `./` or `../`
+- Example: Change `require('utils/helper')` to `require('./utils/helper')` or `import { helper } from '@/utils/helper'`
+
+#### Additional Files to Check:
+- **`jest.teardown.js`** - ⚠️ **ALSO AFFECTED**: This file uses `module.exports` and `require()` (lines 6, 10, 21) and will have the same issue. It should be renamed to `jest.teardown.cjs` or converted to ES module syntax.
+- Any other `.js` configuration files in the root directory that use `require()`
+- Check if `jest.config.cjs` (after renaming) correctly references `jest.teardown.cjs` on line 20
+
+#### Testing the Fix:
+After implementing a solution, test locally:
+```bash
+# Run the exact command that fails in CI
+npm run coverage:ci
+
+# Or run jest directly
+npx jest --coverage --runInBand
+
+# Test regular jest command
+npm test
+```
+
+#### Related Documentation:
+- [Node.js ES Modules Documentation](https://nodejs.org/api/esm.html)
+- [Jest Configuration - ES Modules](https://jestjs.io/docs/ecmascript-modules)
+- [Next.js Jest Setup](https://nextjs.org/docs/app/building-your-application/testing/jest)
+
+#### Previous Job References:
+- Original Issue: [View Failing Job](https://github.com/prettyinpurple2021/solosuccess-ai/actions/runs/18233696410/job/51922927422)
+- Latest Failure: [View Job #51984067733](https://github.com/prettyinpurple2021/solosuccess-ai/actions/runs/18258884835/job/51984067733#step:5:21)
+
+#### Priority: HIGH
+This issue blocks all test coverage reporting in CI/CD pipeline.
