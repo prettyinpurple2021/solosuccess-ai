@@ -248,7 +248,7 @@ echo $DATABASE_URL
 
 ### 🧪 Testing Patterns
 
-- **Jest Configuration**: `jest.config.js` with Next.js integration
+- **Jest Configuration**: `jest.config.cjs` with Next.js integration
 - **Test Location**: Tests in `__tests__/` directories alongside components
 - **API Testing**: `scripts/api-testing.js` currently broken due to module resolution
 - **E2E**: Playwright configuration in `playwright.config.ts`
@@ -277,7 +277,7 @@ npm run smoke             # Quick test but requires running server
 | `package.json` | Dependencies and scripts | ✅ Working |
 | `next.config.mjs` | Next.js configuration | ✅ Working |
 | `drizzle.config.ts` | Database configuration | ✅ Working |
-| `jest.config.js` | Test configuration | ✅ Working |
+| `jest.config.cjs` | Test configuration | ✅ Working |
 | `playwright.config.ts` | E2E test configuration | ✅ Working |
 | `.github/workflows/ci.yml` | CI/CD pipeline | ✅ Working |
 
@@ -410,7 +410,7 @@ const env = environmentSchema.parse(process.env);
 - **Tailwind**: `tailwind.config.ts` - Design system configuration
 - **TypeScript**: `tsconfig.json` - Strict type checking enabled
 - **Next.js**: `next.config.mjs` - App Router and Sentry integration
-- **Testing**: `jest.config.js`, `playwright.config.ts`
+- **Testing**: `jest.config.cjs`, `playwright.config.ts`
 
 ## Deployment & Production Workflows
 
@@ -914,7 +914,7 @@ const newBadges = gamificationEngine.checkCompetitiveBadges();
 
 ### 🧪 **Testing Architecture**
 
-- **Unit Tests**: Jest configuration in `jest.config.js` with Next.js integration
+- **Unit Tests**: Jest configuration in `jest.config.cjs` with Next.js integration
 - **API Testing**: `scripts/api-testing.js` - Comprehensive endpoint validation
 - **E2E Tests**: Playwright setup in `playwright.config.ts` for full user journeys
 - **Smoke Tests**: `scripts/smoke-auth.mjs` - Quick health checks and auth validation
@@ -1021,7 +1021,7 @@ Remember: Always test agent personality consistency, competitive context integra
 ├── package.json               # Dependencies and npm scripts
 ├── next.config.mjs           # Next.js configuration
 ├── drizzle.config.ts         # Database configuration
-├── jest.config.js            # Test configuration
+├── jest.config.cjs           # Test configuration
 ├── playwright.config.ts      # E2E test configuration
 └── tailwind.config.ts        # Tailwind CSS configuration
 ```
