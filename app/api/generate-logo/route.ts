@@ -4,6 +4,13 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 
+// Type for Cloudflare service bindings
+interface Env {
+  OPENAI_WORKER: {
+    fetch: (request: Request) => Promise<Response>
+  }
+}
+
 
 
 // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
@@ -51,42 +58,36 @@ export async function POST(request: NextRequest) {
     }
     const { brandName, style } = parsed.data
 
-    // Generate real logos using OpenAI DALL-E if API key is available
-    if (process.env.OPENAI_API_KEY) {
+    // Generate logos using OpenAI Worker
+    const env = process.env as unknown as Env
+    const openaiWorker = env.OPENAI_WORKER
+
+    if (openaiWorker) {
       try {
-        const openai = require('openai')
-        const client = new openai.OpenAI({
-          apiKey: process.env.OPENAI_API_KEY,
+        // Create request to OpenAI worker
+        const workerRequest = new Request('https://worker/generate-logo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            brandName,
+            style: style || 'modern'
+          })
         })
 
-        // Generate multiple logo variations
-        const logoPromises = [
-          generateLogoWithOpenAI(client, brandName, style || 'modern', 'clean and professional'),
-          generateLogoWithOpenAI(client, brandName, style || 'elegant', 'sophisticated and refined'),
-          generateLogoWithOpenAI(client, brandName, style || 'bold', 'dynamic and impactful')
-        ]
+        // Call the worker
+        const workerResponse = await openaiWorker.fetch(workerRequest)
 
-        const logoResults = await Promise.allSettled(logoPromises)
-        
-        const logos = logoResults
-          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-          .map((result, index) => ({
-            id: index + 1,
-            url: result.value.url,
-            style: [style || 'modern', style || 'elegant', style || 'bold'][index],
-            description: ['Modern logo design', 'Elegant logo design', 'Bold logo design'][index],
-            generated: true
-          }))
-
-        if (logos.length > 0) {
-          return NextResponse.json({ 
-            logos,
-            isFallback: false,
-            generatedBy: 'OpenAI DALL-E'
-          }, { status: 200 })
+        if (workerResponse.ok) {
+          const result = await workerResponse.json()
+          return NextResponse.json(result, { status: 200 })
+        } else {
+          const errorText = await workerResponse.text()
+          logError('OpenAI Worker logo generation failed:', errorText)
         }
       } catch (aiError) {
-        logError('OpenAI logo generation failed:', aiError as any)
+        logError('OpenAI Worker communication failed:', aiError as any)
         // Fall through to fallback
       }
     }

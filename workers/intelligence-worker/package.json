@@ -1,0 +1,18 @@
+{
+  "name": "solosuccess-intelligence-worker",
+  "version": "1.0.0",
+  "description": "Intelligence Worker for SoloSuccess AI - Handles Anthropic AI and document processing",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler deploy --env preview"
+  },
+  "dependencies": {
+    "hono": "^3.12.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "wrangler": "^3.21.0"
+  }
+}

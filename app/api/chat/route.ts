@@ -2,11 +2,16 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
-import { streamText} from 'ai'
-import { openai} from '@ai-sdk/openai'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
+
+// Type for Cloudflare service bindings
+interface Env {
+  OPENAI_WORKER: {
+    fetch: (request: Request) => Promise<Response>
+  }
+}
 
 
 
@@ -104,33 +109,48 @@ export async function POST(request: NextRequest) {
       [user.id, agentId || 'general', message]
     )
 
-    // Stream AI response with competitive intelligence context
+    // Call OpenAI Worker via service binding
     const systemPrompt = `${agentPersonality} You are helping a SoloSuccess AI user. Be helpful, professional, and use frameworks when appropriate.${competitiveContextString}`
     
-    const result = await streamText({
-      model: openai('gpt-4o'),
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt
-        },
-        {
-          role: 'user',
-          content: message
+    // Get the service binding from the environment
+    const env = process.env as unknown as Env
+    const openaiWorker = env.OPENAI_WORKER
+
+    if (!openaiWorker) {
+      logError('OpenAI Worker service binding not found')
+      return NextResponse.json({ error: 'AI service temporarily unavailable' }, { status: 503 })
+    }
+
+    // Create request to OpenAI worker
+    const workerRequest = new Request('https://worker/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+        agentId,
+        systemPrompt,
+        user: {
+          id: user.id,
+          email: user.email
         }
-      ],
-      temperature: 0.7,
-      maxOutputTokens: 1500, // Updated for AI SDK v5
+      })
     })
 
-    // Update conversation with response
-    const response = await result.text
-    await client.query(
-      'UPDATE conversations SET response = $1 WHERE id = $2',
-      [response, conversation.id]
-    )
+    // Call the worker
+    const workerResponse = await openaiWorker.fetch(workerRequest)
 
-    return result.toTextStreamResponse()
+    if (!workerResponse.ok) {
+      const errorText = await workerResponse.text()
+      logError('OpenAI Worker error:', errorText)
+      return NextResponse.json({ error: 'AI processing failed' }, { status: 500 })
+    }
+
+    // The worker returns a streaming response, pass it through
+    return new Response(workerResponse.body, {
+      headers: workerResponse.headers
+    })
   } catch (error) {
     logError('Error in chat:', error)
     return NextResponse.json(
