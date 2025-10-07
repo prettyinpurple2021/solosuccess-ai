@@ -52,16 +52,30 @@ class Logger {
     }
     const formattedMessage = this.formatLogEntry(entry)
     // Use appropriate console method based on log level
-    switch (level) {
-      case LogLevel.ERROR:
-        console.error(formattedMessage)
-        break
-      case LogLevel.WARN:
-        break
-      case LogLevel.INFO:
-        break
-      case LogLevel.DEBUG:
-        break
+    // Only log to console in development or for critical errors
+    if (this.isDevelopment || level === LogLevel.ERROR) {
+      switch (level) {
+        case LogLevel.ERROR:
+          if (typeof console !== 'undefined' && console.error) {
+            console.error(formattedMessage)
+          }
+          break
+        case LogLevel.WARN:
+          if (typeof console !== 'undefined' && console.warn) {
+            console.warn(formattedMessage)
+          }
+          break
+        case LogLevel.INFO:
+          if (typeof console !== 'undefined' && console.info) {
+            console.info(formattedMessage)
+          }
+          break
+        case LogLevel.DEBUG:
+          if (typeof console !== 'undefined' && console.debug) {
+            console.debug(formattedMessage)
+          }
+          break
+      }
     }
     // In production, you might want to send logs to an external service
     // like LogRocket, or a custom logging service
@@ -80,7 +94,10 @@ class Logger {
       // For now, we'll just ensure the log is properly handled
     } catch (logError) {
       // Don't let logging errors break the application
-      console.error('Failed to send log to external service:', logError)
+      // In production, we avoid console.error - could be sent to error tracking service
+      if (this.isDevelopment && typeof console !== 'undefined' && console.error) {
+        console.error('Failed to send log to external service:', logError)
+      }
     }
   }
   error(message: string, context?: Record<string, unknown>, error?: Error): void {

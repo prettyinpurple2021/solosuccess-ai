@@ -92,9 +92,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback to programmatically generated SVG logos
+    // Enhanced fallback to programmatically generated SVG logos
     const generateSVGLogo = (brandName: string, style: string, colors: { bg: string; text: string; accent: string }) => {
-      const initials = brandName.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
+      // Generate initials safely
+      const words = brandName.trim().split(/\s+/).filter(word => word.length > 0)
+      const initials = words.length > 1 
+        ? words.slice(0, 2).map(word => word[0]).join('').toUpperCase()
+        : brandName.slice(0, 2).toUpperCase()
       
       let svgContent = ''
       switch (style) {
@@ -142,34 +146,49 @@ export async function POST(request: NextRequest) {
       return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`
     }
 
-    const fallbackLogos = [
-      {
-        id: 1,
-        url: generateSVGLogo(brandName, 'modern', { bg: '#f8fafc', text: '#1e293b', accent: '#3b82f6' }),
-        style: 'modern',
-        description: 'Modern logo design',
-        generated: true
-      },
-      {
-        id: 2,
-        url: generateSVGLogo(brandName, 'elegant', { bg: '#fefefe', text: '#374151', accent: '#7c3aed' }),
-        style: 'elegant', 
-        description: 'Elegant logo design',
-        generated: true
-      },
-      {
-        id: 3,
-        url: generateSVGLogo(brandName, 'bold', { bg: '#0f172a', text: '#ffffff', accent: '#ef4444' }),
-        style: 'bold',
-        description: 'Bold logo design', 
-        generated: true
-      }
+    // Generate multiple professional logo variations
+    const colorSchemes = [
+      { name: 'Professional Blue', bg: '#f8fafc', text: '#1e293b', accent: '#3b82f6' },
+      { name: 'Creative Purple', bg: '#fefefe', text: '#374151', accent: '#7c3aed' },
+      { name: 'Bold Red', bg: '#0f172a', text: '#ffffff', accent: '#ef4444' },
+      { name: 'Nature Green', bg: '#f0fdf4', text: '#166534', accent: '#22c55e' },
+      { name: 'Warm Orange', bg: '#fff7ed', text: '#9a3412', accent: '#ea580c' }
     ]
+    
+    const styles = ['modern', 'elegant', 'bold']
+    
+    const fallbackLogos = colorSchemes.slice(0, 5).map((colorScheme, index) => {
+      const logoStyle = styles[index % styles.length] || 'modern'
+      return {
+        id: index + 1,
+        url: generateSVGLogo(brandName, logoStyle, colorScheme),
+        style: logoStyle,
+        description: `${colorScheme.name} ${logoStyle} design`,
+        colorScheme: colorScheme.name,
+        generated: true,
+        downloadable: true
+      }
+    })
 
+    logInfo('Generated fallback SVG logos', { 
+      brandName, 
+      style, 
+      logoCount: fallbackLogos.length,
+      reason: process.env.OPENAI_API_KEY ? 'AI service temporarily unavailable' : 'OpenAI API key not configured'
+    })
+    
     return NextResponse.json({ 
+      success: true,
       logos: fallbackLogos,
       isFallback: true,
-      fallbackReason: process.env.OPENAI_API_KEY ? 'AI service temporarily unavailable' : 'OpenAI API key not configured'
+      fallbackReason: process.env.OPENAI_API_KEY ? 'AI service temporarily unavailable' : 'OpenAI API key not configured',
+      message: `Generated ${fallbackLogos.length} professional logo variations for ${brandName}`,
+      metadata: {
+        brandName,
+        requestedStyle: style || 'modern',
+        generatedAt: new Date().toISOString(),
+        totalVariations: fallbackLogos.length
+      }
     }, { status: 200 })
   } catch (error) {
     logError('Error generating logos:', error as any)

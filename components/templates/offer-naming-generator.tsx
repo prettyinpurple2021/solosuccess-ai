@@ -10,6 +10,7 @@ import { Badge} from '@/components/ui/badge';
 import { useState} from 'react';
 import { useTemplateSave} from '@/hooks/use-template-save';
 import { Save, Sparkles, Plus, Trash2} from 'lucide-react';
+import { logError } from '@/lib/logger';
 
 interface NameOption {
   name: string;
@@ -68,7 +69,13 @@ export function OfferNamingGenerator() {
         throw new Error('Invalid response format');
       }
     } catch (error) {
-      console.error('Error generating names:', error);
+      logError('Error generating offer names', {
+        productDescription,
+        targetAudience,
+        tone,
+        pricePoint,
+        industry
+      }, error instanceof Error ? error : new Error(String(error)));
       
       // Fallback to sample names
       const fallbackNames: NameOption[] = [

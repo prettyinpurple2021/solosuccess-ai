@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import { useState} from 'react';
 import { useTemplateSave} from '@/hooks/use-template-save';
 import { Save, MessageSquare, Copy} from 'lucide-react';
+import { logError } from '@/lib/logger';
 
 export function DmSalesScriptGenerator() {
   const [persona, setPersona] = useState('');
@@ -64,7 +65,13 @@ export function DmSalesScriptGenerator() {
         throw new Error('Invalid response format');
       }
     } catch (error) {
-      console.error('Error generating scripts:', error);
+      logError('Error generating DM sales scripts', { 
+        persona, 
+        offerDetails, 
+        platform, 
+        tone, 
+        industry 
+      }, error instanceof Error ? error : new Error(String(error)));
       
       // Fallback to sample scripts
       const fallbackScripts = [

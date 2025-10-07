@@ -44,7 +44,7 @@ export function useAnalytics(): AnalyticsHook {
         track('user_logout', {
           sessionDuration,
           timestamp: new Date().toISOString()
-        }).catch(console.error)
+        }).catch(error => logError('Error tracking user logout', {}, error))
       }
     }
   }, [user])

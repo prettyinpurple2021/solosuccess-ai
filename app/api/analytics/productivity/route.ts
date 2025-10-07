@@ -83,6 +83,10 @@ export async function GET(request: NextRequest) {
       WHERE user_id = ${user.id} AND started_at >= ${startDate.toISOString()}
     `
 
+    // Get weekly trends (compare with previous period)
+    const previousStartDate = new Date(startDate)
+    previousStartDate.setDate(previousStartDate.getDate() - (range === 'week' ? 7 : range === 'month' ? 30 : 90))
+
     // Get focus session trends
     const previousFocusSessions = await sql`
       SELECT 
@@ -118,10 +122,6 @@ export async function GET(request: NextRequest) {
     const focusTrend = previousFocusData.total_minutes > 0 
       ? Math.round(((focusData.total_minutes / Math.max(focusData.total_sessions, 1)) - (previousFocusData.total_minutes / Math.max(previousFocusData.total_sessions, 1))) * 100)
       : 0
-
-    // Get weekly trends (compare with previous period)
-    const previousStartDate = new Date(startDate)
-    previousStartDate.setDate(previousStartDate.getDate() - (range === 'week' ? 7 : range === 'month' ? 30 : 90))
     
     const previousTasks = await sql`
       SELECT 
@@ -235,5 +235,193 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logError('Analytics error:', error)
     return NextResponse.json({ error: 'Failed to fetch analytics data' }, { status: 500 })
+  }
+}
+
+// POST endpoint for tracking focus sessions
+export async function POST(request: NextRequest) {
+  try {
+    const { user, error } = await authenticateRequest()
+    
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { action, sessionData } = body
+    
+    const sql = getSql()
+    
+    if (action === 'start_focus_session') {
+      // Start a new focus session
+      const { planned_duration_minutes, task_id, session_type = 'focus' } = sessionData
+      
+      const result = await sql`
+        INSERT INTO focus_sessions (
+          user_id, 
+          planned_duration_minutes, 
+          task_id, 
+          session_type, 
+          started_at, 
+          status
+        ) VALUES (
+          ${user.id}, 
+          ${planned_duration_minutes || 25}, 
+          ${task_id || null}, 
+          ${session_type}, 
+          NOW(), 
+          'active'
+        )
+        RETURNING id, started_at
+      `
+      
+      return NextResponse.json({ 
+        success: true, 
+        session: result[0],
+        message: 'Focus session started successfully'
+      })
+    }
+    
+    if (action === 'end_focus_session') {
+      // End an existing focus session
+      const { session_id, actual_duration_minutes, completed = false, notes } = sessionData
+      
+      const result = await sql`
+        UPDATE focus_sessions 
+        SET 
+          duration_minutes = ${actual_duration_minutes},
+          completed_at = NOW(),
+          status = ${completed ? 'completed' : 'interrupted'},
+          notes = ${notes || null},
+          updated_at = NOW()
+        WHERE id = ${session_id} AND user_id = ${user.id}
+        RETURNING *
+      `
+      
+      if (result.length === 0) {
+        return NextResponse.json({ error: 'Focus session not found' }, { status: 404 })
+      }
+      
+      // Update productivity insights based on completed session
+      await updateProductivityInsights(user.id, result[0], sql)
+      
+      return NextResponse.json({ 
+        success: true, 
+        session: result[0],
+        message: 'Focus session ended successfully'
+      })
+    }
+    
+    if (action === 'track_distraction') {
+      // Track a distraction during focus session
+      const { session_id, distraction_type, description, timestamp } = sessionData
+      
+      await sql`
+        INSERT INTO focus_session_distractions (
+          session_id,
+          distraction_type,
+          description,
+          occurred_at
+        ) VALUES (
+          ${session_id},
+          ${distraction_type},
+          ${description || null},
+          ${timestamp ? new Date(timestamp) : new Date()}
+        )
+      `
+      
+      return NextResponse.json({ 
+        success: true,
+        message: 'Distraction tracked successfully'
+      })
+    }
+    
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    
+  } catch (error) {
+    logError('Focus session tracking error:', error)
+    return NextResponse.json({ error: 'Failed to track focus session' }, { status: 500 })
+  }
+}
+
+// Helper function to update productivity insights
+async function updateProductivityInsights(userId: string, session: any, sql: any) {
+  try {
+    const completionRate = session.status === 'completed' ? 1 : 0
+    const efficiencyScore = session.duration_minutes / session.planned_duration_minutes
+    
+    // Get recent sessions for trend analysis
+    const recentSessions = await sql`
+      SELECT AVG(duration_minutes) as avg_duration, COUNT(*) as session_count
+      FROM focus_sessions 
+      WHERE user_id = ${userId} 
+        AND completed_at >= NOW() - INTERVAL '7 days'
+        AND status = 'completed'
+    `
+    
+    const insights = {
+      session_completion_rate: completionRate,
+      efficiency_score: Math.min(efficiencyScore, 2), // Cap at 200%
+      avg_session_duration: recentSessions[0]?.avg_duration || session.duration_minutes,
+      weekly_session_count: recentSessions[0]?.session_count || 0,
+      session_date: new Date().toISOString().split('T')[0]
+    }
+    
+    // Store or update productivity insight
+    await sql`
+      INSERT INTO productivity_insights (
+        user_id,
+        date,
+        insight_type,
+        metrics,
+        created_at
+      ) VALUES (
+        ${userId},
+        CURRENT_DATE,
+        'focus_session_analysis',
+        ${JSON.stringify(insights)},
+        NOW()
+      )
+      ON CONFLICT (user_id, date, insight_type) 
+      DO UPDATE SET 
+        metrics = ${JSON.stringify(insights)},
+        updated_at = NOW()
+    `
+    
+    // Generate recommendations based on performance
+    const recommendations = []
+    if (efficiencyScore < 0.8) {
+      recommendations.push('Consider breaking tasks into smaller chunks')
+      recommendations.push('Try the Pomodoro Technique with 25-minute sessions')
+    }
+    if (completionRate === 0) {
+      recommendations.push('Identify and eliminate common distractions')
+      recommendations.push('Start with shorter focus sessions to build momentum')
+    }
+    
+    if (recommendations.length > 0) {
+      await sql`
+        INSERT INTO productivity_insights (
+          user_id,
+          date,
+          insight_type,
+          metrics,
+          created_at
+        ) VALUES (
+          ${userId},
+          CURRENT_DATE,
+          'recommendations',
+          ${JSON.stringify({ recommendations })},
+          NOW()
+        )
+        ON CONFLICT (user_id, date, insight_type) 
+        DO UPDATE SET 
+          metrics = ${JSON.stringify({ recommendations })},
+          updated_at = NOW()
+      `
+    }
+  } catch (error) {
+    logError('Error updating productivity insights:', error)
+    // Don't throw - this is a secondary operation
   }
 }

@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTemplateSave } from '@/hooks/use-template-save';
 import { Save, Zap, Copy, Plus, Trash2 } from 'lucide-react';
+import { logError } from '@/lib/logger';
 
 interface HookOption {
   hook: string;
@@ -87,7 +88,13 @@ export function ViralHookGenerator() {
         throw new Error('Invalid response format');
       }
     } catch (error) {
-      console.error('Error generating hooks:', error);
+      logError('Error generating viral hooks', {
+        contentIdea,
+        targetAudience,
+        desiredVibe,
+        platform,
+        contentType
+      }, error instanceof Error ? error : new Error(String(error)));
       
       // Fallback to sample hooks
       const fallbackHooks: HookOption[] = [

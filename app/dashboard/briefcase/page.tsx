@@ -69,7 +69,7 @@ export default function BriefcasePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set())
+  // Note: selectedDocuments removed - not implemented in current UI
 
   // Helper function to map folder colors to Tailwind classes
   const getFolderColorClass = (color: string) => {
@@ -419,9 +419,7 @@ export default function BriefcasePage() {
             : "space-y-2"
           }>
             {filteredDocuments.map(doc => (
-              <Card key={doc.id} className={`cursor-pointer hover:shadow-md transition-shadow ${
-                selectedDocuments.has(doc.id) ? 'ring-2 ring-blue-500' : ''
-              }`}>
+              <Card key={doc.id} className="cursor-pointer hover:shadow-md transition-shadow">
                 <CardContent className={viewMode === 'grid' ? 'p-4' : 'p-3'}>
                   {viewMode === 'grid' ? (
                     <div className="space-y-3">

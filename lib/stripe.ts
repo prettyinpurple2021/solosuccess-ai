@@ -1,4 +1,6 @@
 // Lazy import Stripe to prevent bundling issues with Cloudflare
+import { logError } from '@/lib/logger';
+
 let Stripe: typeof import('stripe').default | null = null
 let stripeInstance: import('stripe').default | null = null
 
@@ -9,7 +11,7 @@ async function loadStripe() {
       const stripeModule = await import('stripe')
       Stripe = stripeModule.default
     } catch (error) {
-      console.error('Failed to load Stripe module:', error)
+      logError('Failed to load Stripe module', {}, error instanceof Error ? error : new Error(String(error)))
       return null
     }
   }

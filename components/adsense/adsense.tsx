@@ -37,18 +37,18 @@ export default function AdSense({ clientId }: AdSenseProps) {
 
   // Don't render AdSense if no client ID is provided
   if (!clientId) {
-    console.warn(
-      'AdSense: NEXT_PUBLIC_ADSENSE_CLIENT_ID is not configured. ' +
-      'Please set this environment variable to enable AdSense.'
-    );
+    logWarn('AdSense client ID not configured', {
+      message: 'NEXT_PUBLIC_ADSENSE_CLIENT_ID is not configured. Please set this environment variable to enable AdSense.'
+    });
     return null;
   }
 
   // Validate client ID format
   if (!clientId.startsWith('ca-pub-')) {
-    console.error(
-      'AdSense: Invalid client ID format. Expected format: ca-pub-XXXXXXXXXXXXXXXX'
-    );
+    logError('Invalid AdSense client ID format', {
+      clientId,
+      expected: 'ca-pub-XXXXXXXXXXXXXXXX format'
+    });
     return null;
   }
 
