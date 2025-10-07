@@ -16,5 +16,5 @@ name = "solosuccess-competitor-worker-preview"
 NODE_ENV = "preview"
 
 # Competitor Intelligence Worker secrets (to be set via wrangler secret put)
-# wrangler secret put SERP_API_KEY --env production
-# wrangler secret put CRUNCHBASE_API_KEY --env production
+# wrangler secret put SERPER_API_KEY --env production
+# Note: Using Serper API (serper.dev) for Google search data + Wikidata for company information
