@@ -356,18 +356,7 @@ var open_next_config_default = defineCloudflareConfig({
       "better-auth",
       "drizzle-orm",
       "drizzle-kit",
-      // AI packages (very heavy - major contributors to bundle size)
-      "openai",
-      "@ai-sdk/openai",
-      "@ai-sdk/anthropic",
-      "@ai-sdk/google",
-      "@google/generative-ai",
-      "ai",
-      // File processing (heavy)
-      "pdf-parse",
-      "mammoth",
-      "exceljs",
-      "cheerio",
+      // Heavy processing libraries (moved to workers or removed)
       "sharp",
       "node-html-parser",
       // Testing/dev tools (should not be in production)

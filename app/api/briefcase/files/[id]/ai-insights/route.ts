@@ -2,11 +2,13 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
-import { GoogleGenerativeAI} from '@google/generative-ai'
 
-
-// Initialize Google AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
+// Type for Cloudflare service bindings
+interface Env {
+  GOOGLE_AI_WORKER: {
+    fetch: (request: Request) => Promise<Response>
+  }
+}
 
 
 // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
@@ -77,8 +79,38 @@ export async function POST(
       ? content.substring(0, maxContentLength) + '...'
       : content
 
-    // Generate AI insights
-    const insights = await generateDocumentInsights(truncatedContent, document.name, document.mime_type)
+    // Generate AI insights using Google AI Worker
+    const env = process.env as unknown as Env
+    const googleAiWorker = env.GOOGLE_AI_WORKER
+
+    if (!googleAiWorker) {
+      return NextResponse.json({ error: 'AI analysis service temporarily unavailable' }, { status: 503 })
+    }
+
+    // Create request to Google AI worker
+    const workerRequest = new Request('https://worker/analyze-document', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: truncatedContent,
+        fileName: document.name,
+        mimeType: document.mime_type
+      })
+    })
+
+    // Call the worker
+    const workerResponse = await googleAiWorker.fetch(workerRequest)
+
+    if (!workerResponse.ok) {
+      const errorText = await workerResponse.text()
+      logError('Google AI Worker error:', errorText)
+      return NextResponse.json({ error: 'Failed to generate AI insights' }, { status: 500 })
+    }
+
+    const workerResult = await workerResponse.json()
+    const insights = workerResult.insights
 
     // Save insights to database
     await client.query(`
@@ -122,106 +154,3 @@ export async function POST(
   }
 }
 
-async function generateDocumentInsights(content: string, fileName: string, mimeType: string) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
-
-  const prompt = `
-Analyze the following document and provide comprehensive insights:
-
-Document: ${fileName}
-Type: ${mimeType}
-Content:
-${content}
-
-Please provide a JSON response with the following structure:
-{
-  "summary": "A concise 2-3 sentence summary of the document",
-  "keyPoints": ["Key point 1", "Key point 2", "Key point 3"],
-  "topics": [
-    {"name": "Topic name", "confidence": 0.95, "relevance": "high/medium/low"}
-  ],
-  "entities": [
-    {"name": "Entity name", "type": "person/organization/location/etc", "relevance": 0.9}
-  ],
-  "sentiment": {
-    "overall": "positive/negative/neutral",
-    "score": 0.8,
-    "breakdown": {
-      "positive": 60,
-      "negative": 20,
-      "neutral": 20
-    },
-    "emotions": {
-      "joy": 0.3,
-      "sadness": 0.1,
-      "anger": 0.05,
-      "fear": 0.1,
-      "surprise": 0.15
-    }
-  },
-  "categories": [
-    {"category": "Business", "confidence": 0.9, "reasoning": "Contains business terminology and concepts"}
-  ],
-  "suggestedTags": [
-    {"name": "tag1", "confidence": 0.95},
-    {"name": "tag2", "confidence": 0.85}
-  ],
-  "readingTime": 5,
-  "complexity": "low/medium/high",
-  "wordCount": 1500
-}
-
-Focus on accuracy and provide realistic confidence scores. For sentiment analysis, consider the overall tone and emotional content.
-`
-
-  try {
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
-    
-    // Try to parse JSON response
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0])
-    } else {
-      // Fallback if JSON parsing fails
-      return {
-        summary: text.substring(0, 200) + '...',
-        keyPoints: ['AI analysis completed'],
-        topics: [{ name: 'General', confidence: 0.5, relevance: 'medium' }],
-        entities: [],
-        sentiment: {
-          overall: 'neutral',
-          score: 0.5,
-          breakdown: { positive: 33, negative: 33, neutral: 34 },
-          emotions: { joy: 0.2, sadness: 0.2, anger: 0.1, fear: 0.1, surprise: 0.1 }
-        },
-        categories: [{ category: 'General', confidence: 0.5, reasoning: 'AI analysis' }],
-        suggestedTags: [{ name: 'ai-analyzed', confidence: 1.0 }],
-        readingTime: Math.ceil(content.length / 200),
-        complexity: 'medium',
-        wordCount: content.split(/\s+/).length
-      }
-    }
-  } catch (error) {
-    logError('AI generation error:', error)
-    // Return basic insights if AI fails
-    return {
-      summary: `Document analysis for ${fileName}`,
-      keyPoints: ['Document processed'],
-      topics: [{ name: 'General', confidence: 0.5, relevance: 'medium' }],
-      entities: [],
-      sentiment: {
-        overall: 'neutral',
-        score: 0.5,
-        breakdown: { positive: 33, negative: 33, neutral: 34 },
-        emotions: { joy: 0.2, sadness: 0.2, anger: 0.1, fear: 0.1, surprise: 0.1 }
-      },
-      categories: [{ category: 'General', confidence: 0.5, reasoning: 'Fallback analysis' }],
-      suggestedTags: [{ name: 'processed', confidence: 1.0 }],
-      readingTime: Math.ceil(content.length / 200),
-      complexity: 'medium',
-      wordCount: content.split(/\s+/).length
-    }
-  }
-}
