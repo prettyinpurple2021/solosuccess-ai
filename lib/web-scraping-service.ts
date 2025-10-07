@@ -607,16 +607,79 @@ export class WebScrapingService {
   }
 
   private extractPricingData(html: string, url: string): PricingData | null {
-    // TODO: Implement simplified pricing extraction without cheerio
-    // For now, return null as this requires complex DOM parsing
-    logWarn('Pricing extraction temporarily disabled - requires worker-based processing')
-    return null
+    try {
+      const plans: PricingPlan[] = []
+      
+      // Find all pricing plan divs using regex
+      // Match <div class="pricing-plan [optional classes]">...</div>
+      const pricingPlanRegex = /<div[^>]*class="[^"]*pricing-plan[^"]*"[^>]*>([\s\S]*?)<\/div>\s*(?=<div[^>]*class="[^"]*pricing-plan|<\/body|$)/gi
+      
+      let planMatch
+      while ((planMatch = pricingPlanRegex.exec(html)) !== null) {
+        const planHtml = planMatch[0]
+        const planContent = planMatch[1]
+        
+        // Extract plan name from <h3> tag
+        const nameMatch = planContent.match(/<h3[^>]*>([^<]+)<\/h3>/i)
+        const name = nameMatch ? nameMatch[1].trim() : ''
+        
+        // Extract price from .price div
+        const priceMatch = planContent.match(/<div[^>]*class="[^"]*price[^"]*"[^>]*>([^<]+)<\/div>/i)
+        const priceText = priceMatch ? priceMatch[1].trim() : ''
+        const price = this.extractPrice(priceText)
+        
+        // Extract features from <ul> list
+        const features: string[] = []
+        const ulMatch = planContent.match(/<ul[^>]*>([\s\S]*?)<\/ul>/i)
+        if (ulMatch) {
+          const ulContent = ulMatch[1]
+          const featureRegex = /<li[^>]*>([^<]+)<\/li>/gi
+          let featureMatch
+          while ((featureMatch = featureRegex.exec(ulContent)) !== null) {
+            features.push(featureMatch[1].trim())
+          }
+        }
+        
+        // Check if this plan is popular (has "popular" class)
+        const isPopular = /class="[^"]*\bpopular\b[^"]*"/.test(planHtml)
+        
+        // Detect interval from price text
+        const interval = this.detectInterval(priceText)
+        
+        if (name && price !== null) {
+          plans.push({
+            name,
+            price,
+            interval,
+            features,
+            isPopular,
+          })
+        }
+      }
+      
+      if (plans.length === 0) {
+        return null
+      }
+      
+      const currency = this.detectCurrency(html)
+      
+      return {
+        url,
+        plans,
+        currency,
+        lastUpdated: new Date(),
+      }
+    } catch (error) {
+      logError('Error extracting pricing data:', error)
+      return null
+    }
   }
 
   private extractPrice(priceText: string): number | null {
-    const match = priceText.match(/[\d,]+\.?\d*/g)
-    if (match) {
-      return parseFloat(match[0].replace(/,/g, ''))
+    // Extract price from formats like "$9.99/month", "$19.99", etc.
+    const priceMatch = priceText.match(/\$([\d.,]+)/)
+    if (priceMatch) {
+      return parseFloat(priceMatch[1].replace(/,/g, ''))
     }
     return null
   }
