@@ -29,56 +29,56 @@ const AnalysisRequestSchema = z.object({
   focusAreas: z.array(z.enum(['marketing', 'strategic', 'product', 'pricing', 'technical', 'opportunity', 'threat'])).optional(),
 })
 
-// Production AI analysis service
+// Fallback AI analysis service during migration
 async function performIntelligenceAnalysis(
   intelligenceEntries: any[],
   analysisType: string,
   agentIds?: string[],
   focusAreas?: string[]
 ): Promise<AnalysisResult[]> {
-  const { getTeamMemberConfig } = await import('@/lib/ai-config')
+  logWarn('Intelligence analysis temporarily using fallback response during migration')
+  
   const agents = agentIds && agentIds.length ? agentIds : ['echo', 'lexi', 'nova', 'blaze']
-
   const results: AnalysisResult[] = []
-  for (const agentId of agents) {
-    const { model, systemPrompt } = getTeamMemberConfig(agentId)
-    const prompt = `You are ${agentId}. Analyze the following competitive intelligence entries and return JSON with fields: insights[], recommendations[], confidence (0-1). Focus areas: ${focusAreas?.join(', ') || 'general'}. Analysis type: ${analysisType}. Entries:
-${JSON.stringify(intelligenceEntries.slice(0, 20)).slice(0, 12000)}`
-
-    try {
-      const ai = await (model as any).generate({
-        model: (model as any).modelId || model,
-        input: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompt }
-        ],
-        maxTokens: 1200,
-        temperature: 0.3
-      })
-      const text = (ai?.outputText || ai?.text || '').toString()
-      let parsed: any = {}
-      try { parsed = JSON.parse(text) } catch { parsed = {} }
-
-      const insights = Array.isArray(parsed.insights) ? parsed.insights : []
-      const recommendations = Array.isArray(parsed.recommendations) ? parsed.recommendations : []
-      const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : 0.7
-
-      if (insights.length || recommendations.length) {
-        results.push({
-          agentId,
-          analysisType,
-          insights,
-          recommendations,
-          confidence,
-          analyzedAt: new Date(),
-        })
-      }
-    } catch (e) {
-      // Skip on provider errors, continue other agents
-      continue
-    }
+  
+  // Return fallback analysis results
+  for (const agentId of agents.slice(0, 2)) { // Limit to 2 agents for fallback
+    results.push({
+      agentId,
+      analysisType,
+      insights: [
+        {
+          id: `fallback-insight-${Date.now()}-${agentId}`,
+          type: 'competitive',
+          title: `${agentId.charAt(0).toUpperCase() + agentId.slice(1)} Analysis Pending`,
+          description: 'Intelligence analysis is temporarily disabled during migration to worker-based system',
+          significance: 'medium',
+          confidence: 0.5,
+          evidence: ['System migration in progress'],
+          implications: ['Full analysis will be available after worker integration'],
+          relatedCompetitors: [],
+          tags: ['fallback', 'migration']
+        }
+      ],
+      recommendations: [
+        {
+          id: `fallback-rec-${Date.now()}-${agentId}`,
+          type: 'strategic',
+          title: 'System Migration Notice',
+          description: 'Intelligence analysis system is being migrated to worker-based architecture for better performance',
+          priority: 'medium',
+          estimatedEffort: 'TBD',
+          potentialImpact: 'System restoration',
+          timeline: 'Migration in progress',
+          actionItems: ['Wait for system migration completion'],
+          rationale: 'Improving system architecture and performance'
+        }
+      ],
+      confidence: 0.5,
+      analyzedAt: new Date(),
+    })
   }
-
+  
   return results
 }
 

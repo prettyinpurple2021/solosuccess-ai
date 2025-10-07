@@ -34,12 +34,8 @@ const nextConfig = {
       '@radix-ui/react-icons',
       '@radix-ui/react-dialog',
       '@radix-ui/react-popover',
-      '@radix-ui/react-dropdown-menu',
-      'framer-motion',
-      'recharts'
+      '@radix-ui/react-dropdown-menu'
     ],
-    // Use edge runtime for smaller bundles on Cloudflare
-    runtime: 'experimental-edge',
     // Enable webpack build worker
     webpackBuildWorker: true,
   },
@@ -47,11 +43,11 @@ const nextConfig = {
   // Compression and optimization
   compress: true,
 
-  // External packages for server components - final aggressive list to get under 25MB
+  // External packages for server components - aggressive list to get under 25MB
   serverExternalPackages: [
     // Core auth and database (heaviest)
     'bcryptjs', 'jsonwebtoken', 'pg', '@neondatabase/serverless', 'drizzle-orm', 'drizzle-kit',
-    // AI SDK packages (very heavy)
+    // AI SDK packages (very heavy - these should now be externalized)
     'openai', '@ai-sdk/openai', '@ai-sdk/anthropic', '@ai-sdk/google', '@google/generative-ai', 'ai',
     // File processing (heavy)
     'pdf-parse', 'mammoth', 'exceljs', 'cheerio', 'node-html-parser', 'sharp',
@@ -63,12 +59,10 @@ const nextConfig = {
     'stripe', 'resend',
     // Development tools
     'nodemon', 'concurrently', 'dotenv-cli', 'ts-jest', 'jest', '@jest/globals',
-    // Large UI libraries that might have server components (removed conflicting packages)
-    // Additional heavy packages for final size reduction
-    'next-themes', 'react-hook-form', '@hookform/resolvers', 'zod',
-    'class-variance-authority', 'tailwind-merge', 'clsx', 'cmdk',
-    'sonner', 'vaul', 'input-otp', 'embla-carousel-react', 'react-day-picker',
-    'react-resizable-panels', 'swr', 'web-push', 'robots-parser', 'js-yaml',
+    // Large libraries to externalize
+    'jose',
+    // Additional heavy packages
+    'web-push', 'robots-parser', 'js-yaml', 'buffer', 'crypto-browserify', 'stream-browserify',
     'uuid', 'node-fetch', 'flags', 'glob', 'dotenv', 'cross-env', 'postcss', 'tailwindcss',
     'tailwindcss-animate', 'autoprefixer', 'tsx', 'ts-node', 'wrangler'
   ],
@@ -117,18 +111,21 @@ const nextConfig = {
         providedExports: true,
       };
       
-      // Additional externals for server bundle
+      // Aggressive externals for server bundle to reduce size
       config.externals = [
         ...config.externals,
-        'playwright',
-        'puppeteer', 
-        'storybook',
-        '@storybook/core',
-        'vitest',
-        'jest',
-        'webpack-bundle-analyzer',
-        'eslint'
+        // Heavy dev/test packages
+        'playwright', 'puppeteer', 'storybook', '@storybook/core', 'vitest', 'jest', 'webpack-bundle-analyzer', 'eslint',
+        // Heavy AI packages that should use workers
+        'openai', '@google/generative-ai', '@ai-sdk/openai', '@ai-sdk/google', '@ai-sdk/anthropic',
+        // Other heavy packages
+        'sharp', 'canvas', 'pdf-parse', 'mammoth', 'exceljs',
+        // Large UI libraries
       ];
+      
+      // Further minimize server bundle
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
     }
     
     if (!dev && !isServer) {

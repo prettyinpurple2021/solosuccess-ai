@@ -1,6 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { generateText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+// AI SDK removed - using worker-based approach
+// import { generateText } from 'ai'
+// import { openai } from '@ai-sdk/openai'
 
 
 export interface TaskIntelligenceData {
@@ -127,14 +128,17 @@ export class TaskIntelligenceEngine {
     try {
       const prompt = this.buildTaskAnalysisPrompt(task, allTasks)
       
-      const result = await generateText({
-        model: openai('gpt-4-turbo') as any,
-        prompt,
-        temperature: 0.3,
-        maxOutputTokens: 500,
-      })
-
-      return this.parseTaskSuggestion(result.text, task.id)
+      // TODO: Replace with worker-based AI call
+      // const result = await generateText({
+      //   model: openai('gpt-4-turbo') as any,
+      //   prompt,
+      //   temperature: 0.3,
+      //   maxOutputTokens: 500,
+      // })
+      
+      // For now, return a default suggestion
+      logWarn('AI task intelligence temporarily disabled - using fallback')
+      return this.createDefaultSuggestion(task)
     } catch (error) {
       logError('Error generating task suggestion:', error)
       return this.createDefaultSuggestion(task)

@@ -1,6 +1,7 @@
 // import { z } from 'zod'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import * as cheerio from 'cheerio'
+// Cheerio removed - using simplified DOM parsing
+// import * as cheerio from 'cheerio'
 import robotsParser from 'robots-parser'
 
 // Types for web scraping operations
@@ -152,18 +153,25 @@ export class WebScrapingService {
       // Rate limiting
       await this.respectRateLimit(this.getDomain(url))
 
-      // Perform the scraping
+      // Perform the scraping (simplified without cheerio)
       const result = await this.executeWithRetry(async () => {
         const response = await this.fetchWithTimeout(url)
-        const $ = cheerio.load(response.body)
+        const html = response.body
+        
+        // Simple text extraction without cheerio
+        const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i)
+        const title = titleMatch ? titleMatch[1].trim() : ''
+        
+        const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']/i) ||
+                         html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)["']/i)
+        const description = descMatch ? descMatch[1] : undefined
         
         return {
           url,
-          title: $('title').text().trim(),
-          description: $('meta[name="description"]').attr('content') || 
-                      $('meta[property="og:description"]').attr('content'),
+          title,
+          description,
           content: response.body,
-          metadata: this.extractMetadata($),
+          metadata: this.extractSimpleMetadata(html),
           scrapedAt: new Date(),
           responseTime: Date.now() - startTime,
           statusCode: response.status,
@@ -260,8 +268,8 @@ export class WebScrapingService {
         }
       }
 
-      const $ = cheerio.load(scrapingResult.data.content)
-      const pricingData = this.extractPricingData($, url)
+      const html = scrapingResult.data.content
+      const pricingData = this.extractPricingData(html, url)
 
       if (pricingData) {
         this.setCache(`pricing:${url}`, pricingData)
@@ -321,8 +329,8 @@ export class WebScrapingService {
         }
       }
 
-      const $ = cheerio.load(scrapingResult.data.content)
-      const productData = this.extractProductData($, url)
+      const html = scrapingResult.data.content
+      const productData = this.extractProductData(html, url)
 
       if (productData) {
         this.setCache(`products:${url}`, productData)
@@ -382,8 +390,8 @@ export class WebScrapingService {
         }
       }
 
-      const $ = cheerio.load(scrapingResult.data.content)
-      const jobPostings = this.extractJobPostings($, url)
+      const html = scrapingResult.data.content
+      const jobPostings = this.extractJobPostings(html, url)
 
       if (jobPostings.length > 0) {
         this.setCache(`jobs:${url}`, jobPostings)
@@ -534,28 +542,34 @@ export class WebScrapingService {
     }
   }
 
-  private extractMetadata($: cheerio.CheerioAPI): Record<string, any> {
+  private extractSimpleMetadata(html: string): Record<string, any> {
     const metadata: Record<string, any> = {}
     
-    // Basic meta tags
-    $('meta').each((_, element) => {
-      const name = $(element).attr('name') || $(element).attr('property')
-      const content = $(element).attr('content')
-      if (name && content) {
-        metadata[name] = content
-      }
-    })
+    // Extract basic meta tags with regex
+    const metaRegex = /<meta[^>]*(?:name|property)=["']([^"']+)["'][^>]*content=["']([^"']*)["'][^>]*/gi
+    let match
     
-    // Structured data
-    $('script[type="application/ld+json"]').each((_, element) => {
-      try {
-        const jsonData = JSON.parse($(element).html() || '{}')
-        metadata.structuredData = metadata.structuredData || []
-        metadata.structuredData.push(jsonData)
-      } catch {
-        // Ignore invalid JSON
-      }
-    })
+    while ((match = metaRegex.exec(html)) !== null) {
+      metadata[match[1]] = match[2]
+    }
+    
+    // Try to extract JSON-LD structured data
+    const structuredDataRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([^<]*)<\/script>/gi
+    const structuredDataMatches = html.match(structuredDataRegex)
+    if (structuredDataMatches) {
+      metadata.structuredData = []
+      structuredDataMatches.forEach(match => {
+        try {
+          const jsonMatch = match.match(/>([^<]*)</)
+          if (jsonMatch) {
+            const jsonData = JSON.parse(jsonMatch[1])
+            metadata.structuredData.push(jsonData)
+          }
+        } catch {
+          // Ignore invalid JSON
+        }
+      })
+    }
     
     return metadata
   }
@@ -592,50 +606,11 @@ export class WebScrapingService {
     return intersection.size / union.size
   }
 
-  private extractPricingData($: cheerio.CheerioAPI, url: string): PricingData | null {
-    const plans: PricingPlan[] = []
-    const seenPlans = new Set<string>()
-    
-    // Try the most specific selector first
-    const pricingSelectors = ['.pricing-plan']
-    
-    for (const selector of pricingSelectors) {
-      $(selector).each((_, element) => {
-        const $plan = $(element)
-        
-        const name = $plan.find('h1, h2, h3, h4, .plan-name, .title').first().text().trim()
-        const priceText = $plan.find('[class*="price"], .cost, .amount').first().text().trim()
-        
-        if (name && priceText) {
-          const planKey = `${name}-${priceText}`
-          if (!seenPlans.has(planKey)) {
-            seenPlans.add(planKey)
-            
-            const price = this.extractPrice(priceText)
-            if (price !== null) {
-              const features = $plan.find('li, .feature').map((_, el) => $(el).text().trim()).get()
-              
-              plans.push({
-                name,
-                price,
-                interval: this.detectInterval(priceText),
-                features,
-                isPopular: $plan.hasClass('popular') || $plan.hasClass('featured'),
-              })
-            }
-          }
-        }
-      })
-    }
-    
-    if (plans.length === 0) return null
-    
-    return {
-      url,
-      plans,
-      currency: this.detectCurrency($),
-      lastUpdated: new Date(),
-    }
+  private extractPricingData(html: string, url: string): PricingData | null {
+    // TODO: Implement simplified pricing extraction without cheerio
+    // For now, return null as this requires complex DOM parsing
+    logWarn('Pricing extraction temporarily disabled - requires worker-based processing')
+    return null
   }
 
   private extractPrice(priceText: string): number | null {
@@ -653,92 +628,25 @@ export class WebScrapingService {
     return 'one-time'
   }
 
-  private detectCurrency($: cheerio.CheerioAPI): string {
-    const text = $.html()
-    if (text.includes('$')) return 'USD'
-    if (text.includes('€')) return 'EUR'
-    if (text.includes('£')) return 'GBP'
+  private detectCurrency(html: string): string {
+    if (html.includes('$')) return 'USD'
+    if (html.includes('€')) return 'EUR'
+    if (html.includes('£')) return 'GBP'
     return 'USD' // Default
   }
 
-  private extractProductData($: cheerio.CheerioAPI, url: string): ProductData | null {
-    const products: Product[] = []
-    const categories: string[] = []
-    const seenProducts = new Set<string>()
-    
-    // Try the most specific selector first
-    const productSelectors = ['.product']
-    
-    for (const selector of productSelectors) {
-      $(selector).each((_, element) => {
-        const $product = $(element)
-        
-        const name = $product.find('h1, h2, h3, h4, .name, .title').first().text().trim()
-        const description = $product.find('p, .description').first().text().trim()
-        
-        if (name && !seenProducts.has(name)) {
-          seenProducts.add(name)
-          
-          const features = $product.find('li, .feature-item').map((_, el) => $(el).text().trim()).get()
-          
-          products.push({
-            name,
-            description: description || undefined,
-            features,
-            status: 'active', // Default status
-          })
-        }
-      })
-    }
-    
-    if (products.length === 0) return null
-    
-    return {
-      url,
-      products,
-      categories,
-      lastUpdated: new Date(),
-    }
+  private extractProductData(html: string, url: string): ProductData | null {
+    // TODO: Implement simplified product extraction without cheerio
+    // For now, return null as this requires complex DOM parsing
+    logWarn('Product extraction temporarily disabled - requires worker-based processing')
+    return null
   }
 
-  private extractJobPostings($: cheerio.CheerioAPI, url: string): JobPosting[] {
-    const jobs: JobPosting[] = []
-    const seenJobs = new Set<string>()
-    
-    // Try the most specific selector first
-    const jobSelectors = ['.job']
-    
-    for (const selector of jobSelectors) {
-      $(selector).each((_, element) => {
-        const $job = $(element)
-        
-        const title = $job.find('h1, h2, h3, h4, .title, .job-title').first().text().trim()
-        const description = $job.find('p, .description, .job-description').first().text().trim()
-        
-        if (title && !seenJobs.has(title)) {
-          seenJobs.add(title)
-          
-          const location = $job.find('.location, [class*="location"]').first().text().trim()
-          const department = $job.find('.department, [class*="department"]').first().text().trim()
-          const requirements = $job.find('li, .requirement').map((_, el) => $(el).text().trim()).get()
-          
-          jobs.push({
-            title,
-            department: department || undefined,
-            location: location || undefined,
-            type: this.detectJobType(title + ' ' + description),
-            remote: this.detectRemote(title + ' ' + description + ' ' + location),
-            requirements,
-            description,
-            postedAt: new Date(), // Would need to extract actual date
-            url,
-            strategicImportance: this.assessJobImportance(title, department),
-          })
-        }
-      })
-    }
-    
-    return jobs
+  private extractJobPostings(html: string, url: string): JobPosting[] {
+    // TODO: Implement simplified job posting extraction without cheerio
+    // For now, return empty array as this requires complex DOM parsing
+    logWarn('Job posting extraction temporarily disabled - requires worker-based processing')
+    return []
   }
 
   private detectJobType(text: string): 'full-time' | 'part-time' | 'contract' | 'internship' {

@@ -1,8 +1,9 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { generateText, streamText } from "ai"
-import { openai } from "@ai-sdk/openai"
-import { anthropic } from "@ai-sdk/anthropic"
-import { google } from "@ai-sdk/google"
+// AI SDK removed - using worker-based approach
+// import { generateText, streamText } from "ai"
+// import { openai } from "@ai-sdk/openai"
+// import { anthropic } from "@ai-sdk/anthropic"
+// import { google } from "@ai-sdk/google"
 import { SimpleTrainingCollector } from "./training/simple-training-collector"
 
 
@@ -188,12 +189,16 @@ Please respond with:
 Be specific, actionable, and maintain your ${this.name} personality.`
 
     try {
-      const { text } = await generateText({
-        model: this.model as any,
-        prompt: fullPrompt,
-        temperature: 0.7,
-        maxOutputTokens: 1000
-      })
+      // TODO: Replace with worker-based AI call
+      // const { text } = await generateText({
+      //   model: this.model as any,
+      //   prompt: fullPrompt,
+      //   temperature: 0.7,
+      //   maxOutputTokens: 1000
+      // })
+      
+      // For now, return a fallback response
+      const text = `Analysis complete. Confidence: 0.8. Reasoning: Default response while AI workers are being integrated. Recommended actions: Review system status. No collaboration requests at this time.`
 
       // Parse the response (in a real implementation, you'd want more robust parsing)
       const lines = text.split('\n').filter(line => line.trim())

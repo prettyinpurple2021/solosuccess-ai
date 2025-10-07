@@ -1,105 +1,62 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from "next/server"
-import { AgentCollaborationSystem} from "@/lib/custom-ai-agents/agent-collaboration-system"
-import { SecurityMiddleware} from "@/lib/custom-ai-agents/security/security-middleware"
+// Heavy AI dependencies temporarily disabled
+// import { AgentCollaborationSystem} from "@/lib/custom-ai-agents/agent-collaboration-system"
+// import { SecurityMiddleware} from "@/lib/custom-ai-agents/security/security-middleware"
 
 
-// Store collaboration systems per user (in production, use Redis or database)
-const userCollaborationSystems = new Map<string, AgentCollaborationSystem>()
-const securityMiddleware = new SecurityMiddleware()
+// Temporarily disabled - will be replaced with worker-based system
+// const userCollaborationSystems = new Map<string, AgentCollaborationSystem>()
+// const securityMiddleware = new SecurityMiddleware()
 
 
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, agentId, context, stream = false } = await request.json()
+    logWarn('Custom agents temporarily disabled - using fallback response')
+    
+    const { message, agentId = 'roxy', context, stream = false } = await request.json()
 
     if (!message) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
-    // Process security checks
-    const securityResult = await securityMiddleware.processRequest(
-      request,
-      agentId || "roxy",
-      "processRequest",
-      "agent_chat"
-    )
-
-    if (!securityResult.success) {
-      return securityResult.response || NextResponse.json(
-        { error: securityResult.error },
-        { status: 500 }
-      )
+    // Fallback response while AI workers are being integrated
+    const fallbackResponse = {
+      success: true,
+      primaryResponse: {
+        content: `I'm ${agentId} and I've received your message: "${message}". The custom agent system is currently being migrated to use workers for better performance. This is a temporary fallback response.`,
+        confidence: 0.5,
+        reasoning: 'Custom agents system temporarily disabled during migration to worker-based architecture',
+        suggestedActions: ['Check back later when worker integration is complete']
+      },
+      collaborationResponses: [],
+      workflow: null,
+      insights: {
+        totalCollaborations: 0,
+        successfulCollaborations: 0,
+        agentRelationships: {},
+        workflowStats: { total: 0, completed: 0, failed: 0 }
+      }
     }
-
-    const securityContext = securityResult.context!
-    const userId = securityContext.userId
-
-    // Get or create collaboration system for user
-    let collaborationSystem = userCollaborationSystems.get(userId)
-    if (!collaborationSystem) {
-      collaborationSystem = new AgentCollaborationSystem(userId)
-      userCollaborationSystems.set(userId, collaborationSystem)
-    }
-
-    // Process request with custom agents
-    const result = await collaborationSystem.processRequest(
-      message,
-      { ...context, securityContext },
-      agentId
-    )
 
     if (stream) {
-      // Create a streaming response
       const encoder = new TextEncoder()
       const stream = new ReadableStream({
         start(controller) {
-          // Send primary response
-          const primaryData = {
+          const data = {
             type: "primary_response",
-            agentId: agentId || "roxy",
-            content: result.primaryResponse.content,
-            confidence: result.primaryResponse.confidence,
-            reasoning: result.primaryResponse.reasoning,
-            suggestedActions: result.primaryResponse.suggestedActions
+            agentId,
+            content: fallbackResponse.primaryResponse.content,
+            confidence: fallbackResponse.primaryResponse.confidence,
+            reasoning: fallbackResponse.primaryResponse.reasoning,
+            suggestedActions: fallbackResponse.primaryResponse.suggestedActions
           }
           
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(primaryData)}\n\n`)
+            encoder.encode(`data: ${JSON.stringify(data)}\n\n`)
           )
-
-          // Send collaboration responses
-          for (const [index, response] of result.collaborationResponses.entries()) {
-            const collabData = {
-              type: "collaboration_response",
-              index,
-              content: response.content,
-              confidence: response.confidence,
-              reasoning: response.reasoning
-            }
-            
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify(collabData)}\n\n`)
-            )
-          }
-
-          // Send workflow if created
-          if (result.workflow) {
-            const workflowData = {
-              type: "workflow_created",
-              workflowId: result.workflow.id,
-              name: result.workflow.name,
-              steps: result.workflow.steps.length
-            }
-            
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify(workflowData)}\n\n`)
-            )
-          }
-
-          // End stream
           controller.enqueue(encoder.encode("data: [DONE]\n\n"))
           controller.close()
         }
@@ -114,14 +71,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Return complete response
-    return NextResponse.json({
-      success: true,
-      primaryResponse: result.primaryResponse,
-      collaborationResponses: result.collaborationResponses,
-      workflow: result.workflow,
-      insights: collaborationSystem.getCollaborationInsights()
-    })
+    return NextResponse.json(fallbackResponse)
 
   } catch (error) {
     logError("Error in custom agents API:", error)
@@ -134,50 +84,32 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // For now, use a default user ID. In production, implement proper authentication
-    const userId = "default-user"
-
+    logWarn('Custom agents GET temporarily disabled - using fallback response')
+    
     const { searchParams } = new URL(request.url)
     const action = searchParams.get("action")
 
-    const collaborationSystem = userCollaborationSystems.get(userId)
-    if (!collaborationSystem) {
-      return NextResponse.json({ 
-        agents: [],
-        workflows: [],
-        insights: {
-          totalCollaborations: 0,
-          successfulCollaborations: 0,
-          agentRelationships: {},
-          workflowStats: { total: 0, completed: 0, failed: 0 }
-        }
-      })
+    // Fallback data while system is being migrated
+    const fallbackData = {
+      agents: [],
+      workflows: [],
+      insights: {
+        totalCollaborations: 0,
+        successfulCollaborations: 0,
+        agentRelationships: {},
+        workflowStats: { total: 0, completed: 0, failed: 0 }
+      }
     }
 
     switch (action) {
       case "agents":
-        const agents = Array.from(collaborationSystem.getAllAgents().entries()).map(([id, agent]) => ({
-          id,
-          name: agent.name,
-          capabilities: agent.capabilities,
-          memory: agent.getMemory()
-        }))
-        return NextResponse.json({ agents })
-
+        return NextResponse.json({ agents: fallbackData.agents })
       case "workflows":
-        const workflows = Array.from(collaborationSystem.getAllWorkflows().values())
-        return NextResponse.json({ workflows })
-
+        return NextResponse.json({ workflows: fallbackData.workflows })
       case "insights":
-        const insights = collaborationSystem.getCollaborationInsights()
-        return NextResponse.json({ insights })
-
+        return NextResponse.json({ insights: fallbackData.insights })
       default:
-        return NextResponse.json({
-          agents: Array.from(collaborationSystem.getAllAgents().keys()),
-          workflows: Array.from(collaborationSystem.getAllWorkflows().keys()),
-          insights: collaborationSystem.getCollaborationInsights()
-        })
+        return NextResponse.json(fallbackData)
     }
 
   } catch (error) {

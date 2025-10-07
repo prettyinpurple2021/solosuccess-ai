@@ -2,8 +2,9 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { db } from '@/db'
 import { competitorProfiles, intelligenceData, competitorAlerts } from '@/db/schema'
 import { eq, desc, gte, and, sql } from 'drizzle-orm'
-import { generateObject } from 'ai'
-import { openai } from '@/lib/ai-config'
+// AI SDK removed - using worker-based approach
+// import { generateObject } from 'ai'
+// import { openai } from '@/lib/ai-config'
 import { z } from 'zod'
 
 

@@ -2,7 +2,6 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
-import { GoogleGenerativeAI} from '@google/generative-ai'
 
 
 // Suggestion type definition
@@ -14,7 +13,6 @@ type Suggestion = {
   text?: string
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
 
 
 // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
@@ -103,10 +101,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ suggestions })
     }
 
-    // AI-powered semantic suggestions
+    // AI-powered semantic suggestions using worker
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
-      
       const context = {
         userDocuments: documents.slice(0, 20).map(doc => ({
           name: doc.name,
@@ -119,47 +115,35 @@ export async function POST(request: NextRequest) {
         availableCategories: categories.map(c => c.category)
       }
 
-      const prompt = `
-You are an AI assistant helping a user search through their document collection. Based on their search query and their existing documents, suggest 3-5 relevant search queries that might help them find what they're looking for.
+      const requestBody = {
+        query: query,
+        context: context,
+        task: 'search_suggestions'
+      };
 
-User's search query: "${query}"
+      // Get worker environment from Cloudflare
+      const env = process.env as any;
+      const googleAIWorker = env.GOOGLE_AI_WORKER;
+      
+      if (googleAIWorker) {
+        // Call Google AI worker
+        const response = await googleAIWorker.fetch('https://worker/analyze-document', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
 
-User's document context:
-- Recent documents: ${JSON.stringify(context.userDocuments, null, 2)}
-- Available tags: ${context.availableTags.join(', ')}
-- Available categories: ${context.availableCategories.join(', ')}
-
-Please suggest 3-5 alternative search queries that:
-1. Are semantically related to their query
-2. Use terms from their actual document collection
-3. Include specific tags, categories, or file types when relevant
-4. Are concise and actionable
-
-Return your suggestions as a JSON array with this format:
-[
-  {
-    "query": "suggested search term",
-    "label": "Human-readable description of why this suggestion is relevant",
-    "type": "semantic"
-  }
-]
-
-Focus on practical, specific suggestions that will help them find their documents.
-`
-
-      const result = await model.generateContent(prompt)
-      const response = await result.response
-      const text = response.text()
-
-      // Try to parse AI response
-      try {
-        const aiSuggestions: Suggestion[] = JSON.parse(text)
-        if (Array.isArray(aiSuggestions)) {
-          suggestions.push(...aiSuggestions)
+        if (response.ok) {
+          const result = await response.json();
+          
+          if (result.success && Array.isArray(result.suggestions)) {
+            suggestions.push(...result.suggestions);
+          }
         }
-      } catch (parseError) {
-        logError('Failed to parse AI suggestions:', parseError)
-        // Fallback to basic suggestions if AI parsing fails
+      } else {
+        logWarn('Google AI worker not available for suggestions');
       }
     } catch (aiError) {
       logError('AI suggestion generation failed:', aiError)

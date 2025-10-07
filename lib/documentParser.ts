@@ -1,9 +1,10 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import pdf from 'pdf-parse';
-import mammoth from 'mammoth';
-import * as ExcelJS from 'exceljs';
-import * as cheerio from 'cheerio';
-import { parse } from 'node-html-parser';
+// Heavy parsing libraries removed - using simplified approach or worker
+// import pdf from 'pdf-parse';
+// import mammoth from 'mammoth';
+// import * as ExcelJS from 'exceljs';
+// import * as cheerio from 'cheerio';
+// import { parse } from 'node-html-parser';
 
 
 export interface ParseResult {
@@ -113,134 +114,62 @@ export class DocumentParser {
   }
 
   private static async parsePDF(buffer: Buffer): Promise<ParseResult> {
-    try {
-      const data = await pdf(buffer);
-      
-      const content = data.text.substring(0, this.MAX_CONTENT_LENGTH);
-      const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-      
-      return {
-        content,
-        metadata: {
-          pageCount: data.numpages,
-          wordCount,
-          title: data.info?.Title,
-          author: data.info?.Author,
-          createdDate: data.info?.CreationDate,
-          modifiedDate: data.info?.ModDate,
-        },
-        success: true
-      };
-    } catch (error) {
-      return {
-        content: '',
-        success: false,
-        error: `PDF parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      };
-    }
+    // TODO: Implement with worker-based PDF parsing
+    return {
+      content: '[PDF Content - Processing with worker not yet implemented]',
+      metadata: {
+        wordCount: 0,
+        pageCount: 1
+      },
+      success: false,
+      error: 'PDF parsing temporarily disabled - will use worker-based processing'
+    };
   }
 
   private static async parseWordDocx(buffer: Buffer): Promise<ParseResult> {
-    try {
-      const result = await mammoth.extractRawText({ buffer });
-      
-      const content = result.value.substring(0, this.MAX_CONTENT_LENGTH);
-      const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-      
-      return {
-        content,
-        metadata: {
-          wordCount,
-        },
-        success: true
-      };
-    } catch (error) {
-      return {
-        content: '',
-        success: false,
-        error: `Word document parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      };
-    }
+    // TODO: Implement with worker-based Word parsing
+    return {
+      content: '[Word Document Content - Processing with worker not yet implemented]',
+      metadata: { wordCount: 0 },
+      success: false,
+      error: 'Word document parsing temporarily disabled - will use worker-based processing'
+    };
   }
 
   private static async parseExcel(buffer: Buffer, fileName: string): Promise<ParseResult> {
-    try {
-      const workbook = new ExcelJS.Workbook();
-      const arrayBuffer = buffer instanceof Uint8Array
-        ? buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
-        : (buffer as unknown as Uint8Array).buffer;
-      await workbook.xlsx.load(arrayBuffer as ArrayBuffer);
-      let allText = '';
-      
-      // Extract text from all worksheets
-      workbook.eachSheet((worksheet, sheetId) => {
-        allText += `Sheet: ${worksheet.name}\n`;
-        
-        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-          const rowValues: string[] = [];
-          row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
-            // Get cell value as string, handling different types
-            let cellValue = '';
-            if (cell.value !== null && cell.value !== undefined) {
-              if (typeof cell.value === 'object' && 'text' in cell.value) {
-                // Rich text object
-                cellValue = (cell.value as { text: string }).text || '';
-              } else if (typeof cell.value === 'object' && 'result' in cell.value) {
-                // Formula result
-                cellValue = String((cell.value as { result: unknown }).result || '');
-              } else {
-                // Simple value
-                cellValue = String(cell.value);
-              }
-            }
-            rowValues.push(cellValue);
-          });
-          allText += rowValues.join(',') + '\n';
-        });
-        
-        allText += '\n';
-      });
-      
-      const content = allText.substring(0, this.MAX_CONTENT_LENGTH);
-      const wordCount = content.split(/\s+/).filter((word: string) => word.length > 0).length;
-      
-      return {
-        content,
-        metadata: {
-          wordCount,
-        },
-        success: true
-      };
-    } catch (error) {
-      return {
-        content: '',
-        success: false,
-        error: `Excel parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      };
-    }
+    // TODO: Implement with worker-based Excel parsing
+    return {
+      content: '[Excel Content - Processing with worker not yet implemented]',
+      metadata: { wordCount: 0 },
+      success: false,
+      error: 'Excel parsing temporarily disabled - will use worker-based processing'
+    };
   }
 
   private static async parseHTML(buffer: Buffer): Promise<ParseResult> {
     try {
       const html = buffer.toString('utf-8');
-      const $ = cheerio.load(html);
       
-      // Remove script and style elements
-      $('script, style').remove();
-      
-      // Extract text content
-      const textContent = $.text();
-      const content = textContent.replace(/\s+/g, ' ').trim().substring(0, this.MAX_CONTENT_LENGTH);
+      // Simple HTML text extraction without cheerio
+      let content = html
+        .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove scripts
+        .replace(/<style[^>]*>.*?<\/style>/gi, '') // Remove styles
+        .replace(/<[^>]*>/g, ' ') // Remove HTML tags
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim()
+        .substring(0, this.MAX_CONTENT_LENGTH);
+        
       const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
       
-      // Try to extract title
-      const title = $('title').text() || $('h1').first().text();
+      // Extract title with regex
+      const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+      const title = titleMatch ? titleMatch[1].trim() : undefined;
       
       return {
         content,
         metadata: {
           wordCount,
-          title: title || undefined,
+          title,
         },
         success: true
       };

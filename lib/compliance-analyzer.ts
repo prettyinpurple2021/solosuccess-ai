@@ -1,32 +1,16 @@
-import * as cheerio from 'cheerio'
+// Cheerio removed - using simplified text analysis
+// import * as cheerio from 'cheerio'
 
 export function analyze(html: string) {
-  const $ = cheerio.load(html)
-  const title = $('title').first().text().trim()
-  const text = $('body').text().toLowerCase()
-  const hasPrivacyPolicy = $('a[href*="privacy"]').length > 0 || text.includes('privacy policy')
-  const hasCookieBanner = $('[id*="cookie"], [class*="cookie"]').length > 0 || text.includes('cookie')
-
-  // More specific selectors for forms
-  const hasNewsletter =
-    $('form').filter((i, el) => {
-      const formHtml = $(el).html()?.toLowerCase() || ''
-      const formText = $(el).text().toLowerCase()
-      return formHtml.includes('email') && (formText.includes('subscribe') || formText.includes('newsletter'))
-    }).length > 0 || text.includes('newsletter')
-
-  const hasContactForm =
-    $('form').filter((i, el) => {
-      const formHtml = $(el).html()?.toLowerCase() || ''
-      return (
-        formHtml.includes('email') &&
-        ($(el).find('textarea').length > 0 ||
-          $(el).find('input[name*="message"], input[name*="comment"], input[name*="query"]').length > 0 ||
-          $(el).text().toLowerCase().includes('contact'))
-      )
-    }).length > 0
-
-  const hasAnalytics = $('script[src*="google-analytics"], script:contains("gtag")').length > 0
+  // Simplified analysis without cheerio to reduce bundle size
+  const text = html.toLowerCase()
+  const title = extractTitle(html)
+  
+  const hasPrivacyPolicy = text.includes('privacy policy') || text.includes('privacy')
+  const hasCookieBanner = text.includes('cookie') && (text.includes('accept') || text.includes('consent'))
+  const hasNewsletter = text.includes('newsletter') || (text.includes('subscribe') && text.includes('email'))
+  const hasContactForm = text.includes('contact') && text.includes('form')
+  const hasAnalytics = text.includes('google-analytics') || text.includes('gtag')
 
   const dataCollectionPoints: string[] = []
   if (hasContactForm) dataCollectionPoints.push('Contact Form')
@@ -61,4 +45,9 @@ export function analyze(html: string) {
     consent_mechanisms: consentMechanisms,
     trust_score: trustScore,
   }
+}
+
+function extractTitle(html: string): string {
+  const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i)
+  return titleMatch ? titleMatch[1].trim() : ''
 }

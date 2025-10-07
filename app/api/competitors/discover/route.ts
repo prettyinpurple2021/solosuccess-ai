@@ -3,20 +3,11 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
-import OpenAI from 'openai'
 
 
 // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
-// Lazy OpenAI client to avoid build-time env requirement
-function getOpenAIClient(): OpenAI | null {
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    return null
-  }
-  return new OpenAI({ apiKey })
-}
 
 
 // Force dynamic rendering
@@ -330,7 +321,7 @@ async function simulateSocialMediaSearch(searchTerms: string[]) {
   return competitors
 }
 
-// AI-powered competitor discovery using OpenAI
+// AI-powered competitor discovery using OpenAI worker
 async function discoverCompetitors(
   businessDescription: string,
   targetMarket?: string,
@@ -338,60 +329,42 @@ async function discoverCompetitors(
   maxResults: number = 10
 ) {
   try {
-    const client = getOpenAIClient()
-    if (!client) {
-      throw new Error('OPENAI_API_KEY not configured')
-    }
-    const prompt = `Based on the following business description, identify ${maxResults} potential competitors:
+    const requestBody = {
+      businessDescription,
+      targetMarket: targetMarket || 'Not specified',
+      keyProducts: keyProducts || 'Not specified',
+      maxResults
+    };
 
-Business Description: ${businessDescription}
-Target Market: ${targetMarket || 'Not specified'}
-Key Products: ${keyProducts || 'Not specified'}
-
-For each competitor, provide:
-- name: Company name
-- domain: Website domain (without https://)
-- description: Brief company description
-- industry: Industry category
-- headquarters: City, State/Country
-- employeeCount: Estimated employee count
-- fundingStage: Current funding stage (Seed, Series A, Series B, Series C, or Self-funded)
-- threatLevel: Threat level (low, medium, high, critical)
-- matchScore: Match score (0-100)
-- matchReasons: Array of reasons why this is a competitor
-- keyProducts: Array of their main products/services
-- recentNews: Array of recent company news/developments
-- socialMediaFollowers: Object with linkedin and twitter follower counts
-- isAlreadyTracked: Always false
-
-Return the response as a JSON array of competitor objects. Focus on real, well-known companies in similar markets.`
-
-    const completion = await client.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: "You are a business intelligence expert who identifies competitors for companies. Always return valid JSON arrays with realistic competitor data."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000,
-    })
-
-    const responseText = completion.choices[0]?.message?.content
-    if (!responseText) {
-      throw new Error('No response from AI')
+    // Get worker environment from Cloudflare
+    const env = process.env as any;
+    const openaiWorker = env.OPENAI_WORKER;
+    
+    if (!openaiWorker) {
+      throw new Error('OpenAI worker not configured');
     }
 
-    // Parse the JSON response
-    const suggestions = JSON.parse(responseText)
+    // Call OpenAI worker
+    const response = await openaiWorker.fetch('https://worker/competitor-discovery', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Worker request failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    if (!result.success || !Array.isArray(result.competitors)) {
+      throw new Error('Invalid response from worker');
+    }
     
     // Ensure all suggestions have required fields
-    return suggestions.map((suggestion: any, index: number) => ({
+    return result.competitors.map((suggestion: any, index: number) => ({
       id: (index + 1).toString(),
       name: suggestion.name || `Competitor ${index + 1}`,
       domain: suggestion.domain || `competitor${index + 1}.com`,

@@ -1,6 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug } from '@/lib/logger'
-import { generateText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+// AI SDK removed - using worker-based approach
+// import { generateText } from 'ai'
+// import { openai } from '@ai-sdk/openai'
 
 // Types for predictive analytics
 export interface PredictiveInsight {
@@ -150,13 +151,24 @@ class PredictiveAnalyticsEngine {
         Format as JSON with: type, title, description, confidence, impact, category, timeframe, data, recommendations, actionable, priority
       `
 
-      const result = await generateText({
-        model: openai('gpt-4-turbo'),
-        prompt,
-        temperature: 0.3,
-      })
-
-      const analysis = JSON.parse(result.text)
+      // TODO: Replace with worker-based AI call
+      // const result = await generateText({
+      //   model: openai('gpt-4-turbo'),
+      //   prompt,
+      //   temperature: 0.3,
+      // })
+      
+      // For now, return a fallback analysis
+      const analysis = {
+        title: 'Productivity Analysis (Fallback)',
+        description: 'Basic productivity assessment while AI integration is in progress',
+        confidence: 65,
+        impact: 'medium',
+        data: { current: userData.productivityScore || 0 },
+        recommendations: ['Continue tracking your progress', 'Focus on completing high-priority tasks'],
+        actionable: true,
+        priority: 5
+      }
       
       return {
         id: `productivity_${Date.now()}`,

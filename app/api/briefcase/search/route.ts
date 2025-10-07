@@ -2,7 +2,6 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
-import { GoogleGenerativeAI} from '@google/generative-ai'
 
 
 // Type for document search results from database
@@ -16,8 +15,6 @@ interface DocumentSearchResult {
   ai_insights: any
 }
 
-// Initialize Google AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '')
 
 
 // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
@@ -242,7 +239,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Perform semantic search using AI
+// Perform semantic search using AI worker
 async function performSemanticSearch(query: string, userId: string, client: any) {
   try {
     // Get user's documents for semantic analysis
@@ -257,8 +254,6 @@ async function performSemanticSearch(query: string, userId: string, client: any)
     if (documents.length === 0) {
       return []
     }
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
     
     const context = documents.map((doc: DocumentSearchResult) => ({
       id: doc.id,
@@ -270,43 +265,41 @@ async function performSemanticSearch(query: string, userId: string, client: any)
       aiInsights: doc.ai_insights
     }))
 
-    const prompt = `
-You are an AI assistant helping to find relevant documents based on a semantic search query.
+    const requestBody = {
+      query: query,
+      documents: context,
+      task: 'semantic_search'
+    };
 
-User's search query: "${query}"
+    // Get worker environment from Cloudflare
+    const env = process.env as any;
+    const googleAIWorker = env.GOOGLE_AI_WORKER;
+    
+    if (!googleAIWorker) {
+      logWarn('Google AI worker not available, skipping semantic search');
+      return [];
+    }
 
-Available documents:
-${JSON.stringify(context, null, 2)}
+    // Call Google AI worker
+    const response = await googleAIWorker.fetch('https://worker/analyze-document', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
 
-Please analyze the search query and return the IDs of the most relevant documents. Consider:
-1. Semantic meaning and context
-2. Document content, tags, and categories
-3. File types and descriptions
-4. Any AI insights available
+    if (!response.ok) {
+      throw new Error(`Worker request failed: ${response.status}`);
+    }
 
-Return a JSON array with this format:
-[
-  {
-    "id": "document_id",
-    "relevance_score": 0.95,
-    "reason": "Brief explanation of why this document is relevant"
-  }
-]
-
-Return only the most relevant documents (max 20), ordered by relevance score (highest first).
-Focus on semantic relevance rather than exact keyword matches.
-`
-
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
-
-    // Parse AI response
-    const aiResults = JSON.parse(text)
-    if (Array.isArray(aiResults)) {
-      return aiResults
-        .filter(result => result.id && result.relevance_score > 0.3)
-        .sort((a, b) => b.relevance_score - a.relevance_score)
+    const result = await response.json();
+    
+    // Parse worker response
+    if (result.success && Array.isArray(result.relevantDocuments)) {
+      return result.relevantDocuments
+        .filter((doc: any) => doc.id && doc.relevance_score > 0.3)
+        .sort((a: any, b: any) => b.relevance_score - a.relevance_score)
         .slice(0, 20)
     }
 

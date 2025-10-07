@@ -1,6 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { generateText } from "ai"
-import { getTeamMemberConfig } from "./ai-config"
+// AI SDK removed - using worker-based approach
+// import { generateText } from "ai"
+// import { getTeamMemberConfig } from "./ai-config"
 import { db } from '@/db'
 import { intelligenceData, competitorProfiles } from '@/db/schema'
 import { eq, and, gte, desc } from 'drizzle-orm'
@@ -244,88 +245,56 @@ export interface CompetitivePositioning {
 /**
  * Blaze Growth Intelligence Service
  * Analyzes competitor pricing strategies and growth patterns
+ * 
+ * TEMPORARILY DISABLED - Using fallback responses during worker migration
  */
 export class BlazeGrowthIntelligence {
-  private blazeConfig = getTeamMemberConfig('blaze')
+  // private blazeConfig = getTeamMemberConfig('blaze')
 
   /**
    * Analyze competitor pricing strategies and changes
+   * FALLBACK: Returns basic analysis while AI workers are being integrated
    */
   async analyzePricingStrategy(competitorId: number, intelligenceData: IntelligenceData[]): Promise<PricingStrategyAnalysis> {
     try {
-      // Filter pricing-related intelligence data
-      const pricingData = intelligenceData.filter(data => 
-        data.dataType.includes('pricing') || 
-        data.extractedData.topics.some(topic => 
-          topic.toLowerCase().includes('price') || 
-          topic.toLowerCase().includes('cost') ||
-          topic.toLowerCase().includes('subscription') ||
-          topic.toLowerCase().includes('plan')
-        )
-      )
-
-      // Get competitor profile for context
-      const competitor = await db.select()
-        .from(competitorProfiles)
-        .where(eq(competitorProfiles.id, competitorId))
-        .limit(1)
-
-      if (!competitor.length) {
-        throw new Error(`Competitor ${competitorId} not found`)
-      }
-
-      const competitorProfile = competitor[0]
-
-      // Analyze pricing data with Blaze
-      const analysisPrompt = `
-        As Blaze, the Growth Strategist, analyze the pricing strategy for competitor "${competitorProfile.name}".
-        
-        Competitor Context:
-        - Industry: ${competitorProfile.industry}
-        - Company Size: ${competitorProfile.employee_count} employees
-        - Funding Stage: ${competitorProfile.funding_stage}
-        - Threat Level: ${competitorProfile.threat_level}
-        
-        Pricing Intelligence Data:
-        ${pricingData.map(data => `
-        - Source: ${(data as any).sourceType || (data as any).source_type} (${(data as any).sourceUrl || (data as any).source_url})
-        - Content: ${JSON.stringify(((data as any).extractedData || (data as any).extracted_data)?.content)}
-        - Key Insights: ${(((data as any).extractedData || (data as any).extracted_data)?.keyInsights || []).join(', ')}
-        `).join('\n')}
-        
-        Provide a comprehensive pricing strategy analysis including:
-        1. Pricing model identification (subscription, one-time, freemium, etc.)
-        2. Price points and tiers analysis
-        3. Recent pricing changes and their impact
-        4. Competitive positioning in the market
-        5. Pricing gaps and opportunities
-        6. Strategic recommendations for competitive response
-        
-        Format your response as a detailed JSON analysis.
-      `
-
-      const response = await generateText({
-        model: this.blazeConfig.model as any,
-        messages: [
+      logWarn('Blaze pricing strategy analysis temporarily using fallback response')
+      
+      // Return a basic fallback analysis
+      return {
+        competitorId,
+        pricingModel: {
+          type: 'subscription',
+          currency: 'USD',
+          hasFreeTier: false,
+          hasTrial: true,
+          trialDuration: 14
+        },
+        pricePoints: [
           {
-            role: 'system',
-            content: this.blazeConfig.systemPrompt
-          },
-          {
-            role: 'user',
-            content: analysisPrompt
+            tier: 'Basic',
+            price: 29,
+            currency: 'USD',
+            billingCycle: 'monthly',
+            features: ['Basic features'],
+            limitations: ['Limited usage'],
+            targetSegment: 'Small business'
           }
         ],
-        temperature: 0.7,
-        maxOutputTokens: 2000
-      })
-
-      // Parse and structure the analysis
-      const analysis = this.parsePricingAnalysis(response.text, competitorId)
-      
-      return analysis
+        pricingTiers: [],
+        pricingChanges: [],
+        competitivePricing: {
+          marketPosition: 'mid_market',
+          priceAdvantage: 0,
+          valueProposition: 'Standard market offering',
+          pricingGaps: [],
+          recommendedActions: []
+        },
+        pricingStrategy: 'Pricing analysis temporarily disabled - using fallback data',
+        marketPositioning: 'Analysis pending migration to worker-based system',
+        analyzedAt: new Date()
+      }
     } catch (error) {
-      logError('Error analyzing pricing strategy:', error)
+      logError('Error in fallback pricing strategy analysis:', error)
       throw error
     }
   }
@@ -764,6 +733,100 @@ export class BlazeGrowthIntelligence {
       },
       analyzedAt: new Date()
     };
+  }
+
+  /**
+   * Analyze competitor growth strategy
+   * FALLBACK: Returns basic analysis while AI workers are being integrated
+   */
+  async analyzeGrowthStrategy(competitorId: number, intelligenceData: IntelligenceData[]): Promise<GrowthPatternAnalysis> {
+    logWarn('Blaze growth strategy analysis temporarily using fallback response')
+    return {
+      competitorId,
+      growthMetrics: [],
+      expansionPatterns: [],
+      customerAcquisition: {
+        channels: [],
+        costTrends: [],
+        conversionRates: [],
+        retentionMetrics: [],
+        competitiveAdvantages: []
+      },
+      revenueGrowth: {
+        growthRate: 0,
+        revenueStreams: [],
+        seasonality: [],
+        predictedGrowth: [],
+        riskFactors: ['Analysis temporarily disabled']
+      },
+      marketExpansion: {
+        currentMarkets: [],
+        targetMarkets: [],
+        expansionStrategy: 'Growth analysis pending migration to worker-based system',
+        barriers: [],
+        opportunities: [],
+        timeline: '12 months'
+      },
+      competitivePositioning: {
+        marketShare: 0,
+        position: 'challenger',
+        strengths: [],
+        weaknesses: [],
+        opportunities: [],
+        threats: []
+      },
+      analyzedAt: new Date()
+    }
+  }
+
+  /**
+   * Build market positioning recommendations
+   * FALLBACK: Returns basic recommendations while AI workers are being integrated
+   */
+  async buildMarketPositioningRecommendations(competitorIds: number[], context: any): Promise<GrowthRecommendation[]> {
+    logWarn('Blaze market positioning recommendations temporarily using fallback response')
+    return [{
+      id: `blaze-rec-positioning-${Date.now()}`,
+      type: 'strategic',
+      title: 'Market Positioning Analysis',
+      description: 'Market positioning analysis is temporarily disabled during migration to worker-based system',
+      priority: 'medium',
+      estimatedEffort: 'TBD',
+      potentialImpact: 'Analysis pending',
+      timeline: 'TBD',
+      actionItems: ['System migration in progress'],
+      growthAction: 'market_positioning',
+      revenueImpact: 'TBD',
+      marketTiming: 'short_term',
+      investmentRequired: 'TBD',
+      riskAssessment: 'Analysis pending',
+      successMetrics: ['System restoration']
+    }]
+  }
+
+  /**
+   * Generate revenue optimization suggestions
+   * FALLBACK: Returns basic suggestions while AI workers are being integrated
+   */
+  async generateRevenueOptimizationSuggestions(competitorId: number, pricingAnalysis: any): Promise<GrowthRecommendation[]> {
+    logWarn('Blaze revenue optimization suggestions temporarily using fallback response')
+    return [{
+      id: `blaze-rec-revenue-${competitorId}-${Date.now()}`,
+      type: 'offensive',
+      title: 'Revenue Optimization Analysis',
+      description: 'Revenue optimization analysis is temporarily disabled during migration to worker-based system',
+      priority: 'high',
+      estimatedEffort: 'TBD',
+      potentialImpact: 'Analysis pending',
+      timeline: 'TBD',
+      actionItems: ['System migration in progress'],
+      growthAction: 'revenue_optimization',
+      revenueImpact: 'TBD',
+      marketTiming: 'medium_term',
+      investmentRequired: 'TBD',
+      riskAssessment: 'Analysis pending',
+      successMetrics: ['System restoration']
+    }]
   }
 }
 

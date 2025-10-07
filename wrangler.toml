@@ -27,6 +27,14 @@ service = "solosuccess-openai-worker-production"
 binding = "GOOGLE_AI_WORKER"
 service = "solosuccess-google-ai-worker-production"
 
+[[env.production.services]]
+binding = "COMPETITOR_WORKER"
+service = "solosuccess-competitor-worker-production"
+
+[[env.production.services]]
+binding = "INTELLIGENCE_WORKER"
+service = "solosuccess-intelligence-worker-production"
+
 # All production secrets should be set via: wrangler pages secret put SECRET_NAME --env production
 # Examples:
 # wrangler pages secret put DATABASE_URL --env production
@@ -60,5 +68,13 @@ service = "solosuccess-openai-worker-preview"
 [[env.preview.services]]
 binding = "GOOGLE_AI_WORKER"
 service = "solosuccess-google-ai-worker-preview"
+
+[[env.preview.services]]
+binding = "COMPETITOR_WORKER"
+service = "solosuccess-competitor-worker-preview"
+
+[[env.preview.services]]
+binding = "INTELLIGENCE_WORKER"
+service = "solosuccess-intelligence-worker-preview"
 
 # Preview secrets should be set via: wrangler pages secret put SECRET_NAME --env preview
