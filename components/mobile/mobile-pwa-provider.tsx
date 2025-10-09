@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { logError } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import PWAInstallPrompt from './pwa-install-prompt'
 import OfflineDataManager from './offline-data-manager'
@@ -98,7 +99,7 @@ export function MobilePWAProvider({ children, className = "" }: MobilePWAProvide
       const { outcome } = await deferredPrompt.userChoice
       return outcome === 'accepted'
     } catch (error) {
-      console.error('Installation failed:', error)
+      logError('Installation failed', error as any)
       return false
     }
   }

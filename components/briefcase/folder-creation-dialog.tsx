@@ -121,15 +121,15 @@ export default function FolderCreationDialog({
                 <SelectContent>
                   <SelectItem value="__root__">Root Level</SelectItem>
                   {availableFolders.map((folder) => (
-                    <SelectItem key={folder.id} value={folder.id}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
-                        />
-                        {folder.name}
-                      </div>
-                    </SelectItem>
+                  <SelectItem key={folder.id} value={folder.id}>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full border border-gray-200"
+                        aria-hidden="true"
+                      />
+                      {folder.name}
+                    </div>
+                  </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -153,7 +153,7 @@ export default function FolderCreationDialog({
                       ? 'border-gray-900 scale-110' 
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  style={{ backgroundColor: `var(--bg-color-${Math.random().toString(36).substr(2, 9)})`}}
+                  style={{ backgroundColor: colorOption.value }}
                   title={colorOption.name}
                 />
               ))}

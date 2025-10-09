@@ -55,6 +55,8 @@ export default [
         },
       ],
       'prefer-const': 'warn',
+      // Disallow console in application code; allow in logger and config files
+      'no-console': ['error', { allow: [] }],
       
       // React specific rules
       'react/no-unescaped-entities': 'warn',
@@ -70,6 +72,13 @@ export default [
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+    },
+  },
+  // Allow console in the logger utility and config/build scripts
+  {
+    files: ['lib/logger.ts', '*.config.*', 'next.config.*', 'postcss.config.*', 'tailwind.config.*', 'vitest.config.*', 'jest.*', 'scripts/**'],
+    rules: {
+      'no-console': 'off',
     },
   },
   

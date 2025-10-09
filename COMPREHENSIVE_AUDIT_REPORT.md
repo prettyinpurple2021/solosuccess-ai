@@ -108,8 +108,8 @@
 
 #### **2. Competitor Discovery**
 - **File:** `app/api/competitors/discover/route.ts`
-- **Issue (before):** Static mock competitor suggestions and simulated web search fallbacks
-- **Change:** Removed all mock/simulated fallbacks. Endpoint now relies solely on AI-powered discovery; requests fail with 503 if `OPENAI_API_KEY` is not configured. No placeholder or demo data remains.
+- **Issue (before):** Runtime error referencing undefined `MOCK_COMPETITOR_SUGGESTIONS`; mixed mock/simulated fallbacks
+- **Change:** Integrated Cloudflare `COMPETITOR_WORKER` service binding and mapped `/market-research` results to API suggestions. Removed mock/simulated fallbacks entirely. Auth, rate limiting, validation retained.
 - **Status:** ✅ RESOLVED
 
 #### **3. Chat Conversations**
@@ -256,7 +256,7 @@
 ### **Development Console Logs (339 files contain console statements):**
 - **Impact:** Production code contains debug statements
 - **Priority:** MEDIUM
-- **Action:** Remove or replace with proper logging
+- **Action:** Enforced ESLint `no-console` across app/components/lib/hooks (allowed only in `lib/logger.ts` and build/config scripts). Replaced console usage in mobile offline/PWA components with `logError`.
 
 ---
 

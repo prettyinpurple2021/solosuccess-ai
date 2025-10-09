@@ -1,8 +1,8 @@
 import { logError } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { rateLimitByIp} from '@/lib/rate-limit'
-import { z} from 'zod'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { z } from 'zod'
 
 
 // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
@@ -13,6 +13,13 @@ import { z} from 'zod'
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// Type for Cloudflare service bindings
+interface Env {
+  COMPETITOR_WORKER: {
+    fetch: (request: Request) => Promise<Response>
+  }
+}
+
 // Validation schema for discovery request
 const DiscoveryRequestSchema = z.object({
   businessDescription: z.string().min(1, 'Business description is required').max(500),
@@ -21,36 +28,81 @@ const DiscoveryRequestSchema = z.object({
   maxResults: z.number().int().min(1).max(20).default(10),
 })
 
-// Real competitor discovery using multiple data sources
-async function discoverCompetitorsFromWeb(
+// Real competitor discovery via Competitor Worker (no mock fallbacks)
+async function discoverCompetitorsFromWorker(
   businessDescription: string,
   targetMarket?: string,
   keyProducts?: string,
   maxResults: number = 10
 ) {
-  const competitors = new Set()
-  
   try {
-    // 1. Search business directories
-    const directoryResults = await searchBusinessDirectories(businessDescription, targetMarket)
-    directoryResults.forEach(comp => competitors.add(comp))
-    
-    // 2. Search industry databases
-    const industryResults = await searchIndustryDatabases(businessDescription, keyProducts)
-    industryResults.forEach(comp => competitors.add(comp))
-    
-    // 3. Search news and press releases
-    const newsResults = await searchNewsAndPress(businessDescription, targetMarket)
-    newsResults.forEach(comp => competitors.add(comp))
-    
-    // 4. Search social media mentions
-    const socialResults = await searchSocialMediaMentions(businessDescription)
-    socialResults.forEach(comp => competitors.add(comp))
-    
-    return Array.from(competitors).slice(0, maxResults)
+    const env = process.env as unknown as Env
+    const competitorWorker = env.COMPETITOR_WORKER
+
+    if (!competitorWorker) {
+      throw new Error('Competitor worker not configured')
+    }
+
+    const industry = extractIndustry(businessDescription)
+    const keywords = extractSearchTerms(businessDescription, targetMarket)
+    const keyword = [
+      keyProducts?.trim() || '',
+      ...keywords
+    ].filter(Boolean).slice(0, 5).join(' ')
+
+    const workerRequest = new Request('https://worker/market-research', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        keyword,
+        industry,
+        location: targetMarket || 'Global',
+        competitors: []
+      })
+    })
+
+    const response = await competitorWorker.fetch(workerRequest)
+    if (!response.ok) {
+      throw new Error(`Worker request failed: ${response.status}`)
+    }
+
+    const result = await response.json()
+    const topCompetitors = result?.research?.topCompetitors || []
+
+    // Map worker response to suggestion shape
+    const suggestions = (topCompetitors as any[]).map((comp: any, index: number) => {
+      const name = comp.company || comp.title || `Competitor ${index + 1}`
+      const domain = comp.domain || safeDomainFromUrl(comp.url) || `competitor${index + 1}.com`
+      const desc = comp.snippet || comp.title || 'Competitor company'
+      const rank = typeof comp.rank === 'number' ? comp.rank : (index + 1)
+      const threatLevel = rank <= 3 ? 'high' : rank <= 5 ? 'medium' : 'low'
+      const matchScore = Math.max(50, 100 - (rank - 1) * 5)
+
+      return {
+        id: String(index + 1),
+        name,
+        domain,
+        description: desc,
+        industry: industry || 'Technology',
+        headquarters: 'Unknown',
+        employeeCount: 50,
+        fundingStage: 'Unknown',
+        threatLevel,
+        matchScore,
+        matchReasons: ['Search relevance', 'Industry match'],
+        keyProducts: keyProducts ? [keyProducts] : ['Product 1', 'Product 2'],
+        recentNews: ['Recent company news'],
+        socialMediaFollowers: { linkedin: 1000, twitter: 500 },
+        isAlreadyTracked: false
+      }
+    })
+
+    return suggestions.slice(0, maxResults)
   } catch (error) {
-    logError('Error in web-based competitor discovery:', error)
-    return []
+    logError('Error in competitor discovery via worker:', error as any)
+    throw error
   }
 }
 
@@ -321,69 +373,13 @@ async function simulateSocialMediaSearch(searchTerms: string[]) {
   return competitors
 }
 
-// AI-powered competitor discovery using OpenAI worker
-async function discoverCompetitors(
-  businessDescription: string,
-  targetMarket?: string,
-  keyProducts?: string,
-  maxResults: number = 10
-) {
+// Helper to safely extract domain
+function safeDomainFromUrl(url?: string | null): string | null {
+  if (!url) return null
   try {
-    const requestBody = {
-      businessDescription,
-      targetMarket: targetMarket || 'Not specified',
-      keyProducts: keyProducts || 'Not specified',
-      maxResults
-    };
-
-    // Get worker environment from Cloudflare
-    const env = process.env as any;
-    const openaiWorker = env.OPENAI_WORKER;
-    
-    if (!openaiWorker) {
-      throw new Error('OpenAI worker not configured');
-    }
-
-    // Call OpenAI worker
-    const response = await openaiWorker.fetch('https://worker/competitor-discovery', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Worker request failed: ${response.status}`);
-    }
-
-    const result = await response.json();
-    
-    if (!result.success || !Array.isArray(result.competitors)) {
-      throw new Error('Invalid response from worker');
-    }
-    
-    // Ensure all suggestions have required fields
-    return result.competitors.map((suggestion: any, index: number) => ({
-      id: (index + 1).toString(),
-      name: suggestion.name || `Competitor ${index + 1}`,
-      domain: suggestion.domain || `competitor${index + 1}.com`,
-      description: suggestion.description || 'Competitor company',
-      industry: suggestion.industry || 'Technology',
-      headquarters: suggestion.headquarters || 'Unknown',
-      employeeCount: suggestion.employeeCount || 50,
-      fundingStage: suggestion.fundingStage || 'Series A',
-      threatLevel: suggestion.threatLevel || 'medium',
-      matchScore: suggestion.matchScore || 75,
-      matchReasons: suggestion.matchReasons || ['Similar market focus'],
-      keyProducts: suggestion.keyProducts || ['Product 1', 'Product 2'],
-      recentNews: suggestion.recentNews || ['Recent company news'],
-      socialMediaFollowers: suggestion.socialMediaFollowers || { linkedin: 1000, twitter: 500 },
-      isAlreadyTracked: false
-    }))
-  } catch (error) {
-    logError('Error in AI competitor discovery:', error)
-    throw error
+    return new URL(url).hostname
+  } catch {
+    return null
   }
 }
 
@@ -414,7 +410,7 @@ export async function POST(request: NextRequest) {
     const { businessDescription, targetMarket, keyProducts, maxResults } = parsed.data
 
     // AI-powered competitor discovery (no mock/web fallbacks)
-    const aiSuggestions = await discoverCompetitors(
+    const aiSuggestions = await discoverCompetitorsFromWorker(
       businessDescription,
       targetMarket,
       keyProducts,

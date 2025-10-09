@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { logError } from '@/lib/logger'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -102,7 +103,7 @@ export default function OfflineDataManager({
         }))
       }
     } catch (error) {
-      console.error('Failed to load pending actions:', error)
+      logError('Failed to load pending actions', error as any)
     }
   }, [])
 
@@ -165,7 +166,7 @@ export default function OfflineDataManager({
         pendingActions: prev.pendingActions + 1 
       }))
     } catch (error) {
-      console.error('Failed to add pending action:', error)
+      logError('Failed to add pending action', error as any)
     }
   }, [openIndexedDB])
 
@@ -200,7 +201,7 @@ export default function OfflineDataManager({
             syncProgress: (completedActions / totalActions) * 100 
           }))
         } catch (error) {
-          console.error(`Failed to sync action ${action.id}:`, error)
+          logError(`Failed to sync action ${action.id}`, error as any)
           errors.push(`${action.type} ${action.resource}: ${error}`)
           
           // Increment retry count
@@ -274,7 +275,7 @@ export default function OfflineDataManager({
 
       setPendingActions(prev => prev.filter(action => action.id !== id))
     } catch (error) {
-      console.error('Failed to remove pending action:', error)
+      logError('Failed to remove pending action', error as any)
     }
   }
 
@@ -295,7 +296,7 @@ export default function OfflineDataManager({
         })
       }
     } catch (error) {
-      console.error('Failed to update pending action retries:', error)
+      logError('Failed to update pending action retries', error as any)
     }
   }
 
@@ -319,7 +320,7 @@ export default function OfflineDataManager({
         request.onerror = () => reject(request.error)
       })
     } catch (error) {
-      console.error('Failed to cache data:', error)
+      logError('Failed to cache data', error as any)
     }
   }, [openIndexedDB])
 
@@ -336,7 +337,7 @@ export default function OfflineDataManager({
         request.onerror = () => reject(request.error)
       })
     } catch (error) {
-      console.error('Failed to get cached data:', error)
+      logError('Failed to get cached data', error as any)
       return null
     }
   }, [openIndexedDB])
