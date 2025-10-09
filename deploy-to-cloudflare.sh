@@ -41,7 +41,7 @@ print_header() {
 
 # Check if wrangler is installed
 if ! command -v wrangler &> /dev/null; then
-    print_error "Wrangler CLI is not installed. Installing..."
+    print_error "Wrangler CLI not found. Installing..."
     npm install -g wrangler
 fi
 
