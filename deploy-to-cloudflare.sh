@@ -5,8 +5,14 @@
 
 set -e  # Exit on any error
 
+# Configuration variables
+CUSTOM_DOMAIN="solobossai.fun"
+PROJECT_NAME="solosuccess-ai-production"
+ENVIRONMENT="production"
+BUILD_OUTPUT_DIR=".open-next"
+
 echo "🌟 Starting SoloSuccess AI deployment to Cloudflare Pages..."
-echo "🔗 Custom Domain: solobossai.fun"
+echo "🔗 Custom Domain: ${CUSTOM_DOMAIN}"
 echo ""
 
 # Colors for output
@@ -39,8 +45,59 @@ print_header() {
     echo -e "${PURPLE}=== $1 ===${NC}"
 }
 
+# Function to deploy a worker with error handling
+deploy_worker() {
+    local worker_name="$1"
+    local worker_dir="workers/${worker_name}"
+    
+    if [ -d "$worker_dir" ]; then
+        print_status "Deploying ${worker_name} Worker..."
+        
+        # Store current directory
+        local original_dir=$(pwd)
+        
+        # Change to worker directory and deploy
+        cd "$worker_dir"
+        
+        if wrangler deploy --env "$ENVIRONMENT"; then
+            cd "$original_dir"
+            print_success "${worker_name} Worker deployed successfully"
+            return 0
+        else
+            cd "$original_dir"
+            print_error "Failed to deploy ${worker_name} Worker"
+            return 1
+        fi
+    else
+        print_warning "${worker_name} Worker directory not found, skipping..."
+        return 0
+    fi
+}
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to verify deployment
+verify_deployment() {
+    local url="$1"
+    print_status "Checking if the application is accessible at ${url}..."
+    
+    # Wait a moment for deployment to propagate
+    sleep 10
+    
+    if curl -f -s "$url" > /dev/null; then
+        print_success "✅ Application is accessible at ${url}!"
+        return 0
+    else
+        print_warning "⚠️  Application may still be propagating at ${url}"
+        return 1
+    fi
+}
+
 # Check if wrangler is installed
-if ! command -v wrangler &> /dev/null; then
+if ! command_exists wrangler; then
     print_error "Wrangler CLI not found. Installing..."
     npm install -g wrangler
 fi
@@ -67,21 +124,19 @@ else
 fi
 
 # Check if build output exists
-if [ ! -d ".open-next" ]; then
-    print_error "Build output directory .open-next not found!"
+if [ ! -d "$BUILD_OUTPUT_DIR" ]; then
+    print_error "Build output directory $BUILD_OUTPUT_DIR not found!"
     exit 1
 fi
 
-print_success "Build output verified in .open-next directory"
+print_success "Build output verified in $BUILD_OUTPUT_DIR directory"
 
 # Deploy to Cloudflare Pages
 print_header "Deploying to Cloudflare Pages"
-print_status "Deploying to production environment..."
+print_status "Deploying to $ENVIRONMENT environment..."
 
 # Deploy the built application
-wrangler pages deploy .open-next --project-name=solosuccess-ai-production --env=production
-
-if [ $? -eq 0 ]; then
+if wrangler pages deploy "$BUILD_OUTPUT_DIR" --project-name="$PROJECT_NAME" --env="$ENVIRONMENT"; then
     print_success "Deployment to Cloudflare Pages completed!"
 else
     print_error "Deployment failed. Please check the errors above."
@@ -91,55 +146,17 @@ fi
 # Deploy AI Workers
 print_header "Deploying AI Workers"
 
-# Deploy OpenAI Worker
-if [ -d "workers/openai-worker" ]; then
-    print_status "Deploying OpenAI Worker..."
-    cd workers/openai-worker
-    wrangler deploy --env production
-    cd ../..
-    print_success "OpenAI Worker deployed"
-fi
+# List of workers to deploy
+WORKERS=("openai-worker" "google-ai-worker" "competitor-worker" "intelligence-worker")
 
-# Deploy Google AI Worker
-if [ -d "workers/google-ai-worker" ]; then
-    print_status "Deploying Google AI Worker..."
-    cd workers/google-ai-worker
-    wrangler deploy --env production
-    cd ../..
-    print_success "Google AI Worker deployed"
-fi
-
-# Deploy Competitor Worker
-if [ -d "workers/competitor-worker" ]; then
-    print_status "Deploying Competitor Worker..."
-    cd workers/competitor-worker
-    wrangler deploy --env production
-    cd ../..
-    print_success "Competitor Worker deployed"
-fi
-
-# Deploy Intelligence Worker
-if [ -d "workers/intelligence-worker" ]; then
-    print_status "Deploying Intelligence Worker..."
-    cd workers/intelligence-worker
-    wrangler deploy --env production
-    cd ../..
-    print_success "Intelligence Worker deployed"
-fi
+# Deploy each worker using the reusable function
+for worker in "${WORKERS[@]}"; do
+    deploy_worker "$worker"
+done
 
 # Verify deployment
 print_header "Verifying Deployment"
-print_status "Checking if the application is accessible..."
-
-# Wait a moment for deployment to propagate
-sleep 10
-
-# Test the health endpoint
-if curl -f -s https://solobossai.fun/api/health > /dev/null; then
-    print_success "✅ Health check passed - Application is accessible!"
-else
-    print_warning "⚠️  Health check failed - Application may still be propagating"
-fi
+verify_deployment "https://${CUSTOM_DOMAIN}/api/health"
 
 # Final success message
 print_header "Deployment Complete! 🎉"

@@ -1,34 +1,32 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
+import { logger, logAuth } from '@/lib/logger'
+import { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { neon} from '@neondatabase/serverless'
-
-
+import { 
+  getSql, 
+  createErrorResponse, 
+  createSuccessResponse, 
+  parseRequestBody, 
+  executeQuery,
+  withApiHandler 
+} from '@/lib/api-utils'
 
 // Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
 
-function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
+export const POST = withApiHandler(async (request: NextRequest) => {
+  const sql = getSql()
+  
+  // Parse and validate request body
+  const { data: body, error: parseError } = await parseRequestBody(
+    request, 
+    ['identifier', 'password']
+  )
+  
+  if (parseError) {
+    return createErrorResponse('Email/username and password are required', 400)
   }
-  return neon(url)
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const sql = getSql()
-    const { identifier, password, isEmail } = await request.json()
-
-    if (!identifier || !password) {
-      return NextResponse.json(
-        { error: 'Email/username and password are required' },
-        { status: 400 }
-      )
-    }
+  
+  const { identifier, password, isEmail } = body
 
     // Get user from database - check both email and username
     let users
