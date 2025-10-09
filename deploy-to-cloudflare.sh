@@ -45,7 +45,7 @@ print_header() {
     echo -e "${PURPLE}=== $1 ===${NC}"
 }
 
-# Function to deploy a worker with error handling
+# Function to deploy a worker with proper error handling
 deploy_worker() {
     local worker_name="$1"
     local worker_dir="workers/${worker_name}"
@@ -56,16 +56,29 @@ deploy_worker() {
         # Store current directory
         local original_dir=$(pwd)
         
-        # Change to worker directory and deploy
-        cd "$worker_dir"
+        # Change to worker directory
+        cd "$worker_dir" || {
+            print_error "Failed to change to ${worker_dir} directory"
+            return 1
+        }
         
+        # Deploy with proper error handling
         if wrangler deploy --env "$ENVIRONMENT"; then
-            cd "$original_dir"
+            # Only change back if deployment succeeded
+            cd "$original_dir" || {
+                print_error "Failed to return to original directory after successful deployment"
+                return 1
+            }
             print_success "${worker_name} Worker deployed successfully"
             return 0
         else
-            cd "$original_dir"
-            print_error "Failed to deploy ${worker_name} Worker"
+            # Capture deployment failure, then change back
+            local deploy_exit_code=$?
+            cd "$original_dir" || {
+                print_error "Failed to return to original directory AND deployment failed"
+                return 1
+            }
+            print_error "Failed to deploy ${worker_name} Worker (exit code: ${deploy_exit_code})"
             return 1
         fi
     else
@@ -149,10 +162,23 @@ print_header "Deploying AI Workers"
 # List of workers to deploy
 WORKERS=("openai-worker" "google-ai-worker" "competitor-worker" "intelligence-worker")
 
+# Track deployment failures
+failed_workers=()
+
 # Deploy each worker using the reusable function
 for worker in "${WORKERS[@]}"; do
-    deploy_worker "$worker"
+    if ! deploy_worker "$worker"; then
+        failed_workers+=("$worker")
+    fi
 done
+
+# Report on failed deployments
+if [ ${#failed_workers[@]} -gt 0 ]; then
+    print_warning "Some workers failed to deploy: ${failed_workers[*]}"
+    print_warning "Main application deployment will continue, but some features may not work properly"
+else
+    print_success "All AI workers deployed successfully"
+fi
 
 # Verify deployment
 print_header "Verifying Deployment"
