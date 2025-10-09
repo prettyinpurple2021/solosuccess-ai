@@ -1,7 +1,6 @@
 // import { z } from 'zod'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-// Cheerio removed - using simplified DOM parsing
-// import * as cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 import robotsParser from 'robots-parser'
 
 // Types for web scraping operations
@@ -699,17 +698,116 @@ export class WebScrapingService {
   }
 
   private extractProductData(html: string, url: string): ProductData | null {
-    // TODO: Implement simplified product extraction without cheerio
-    // For now, return null as this requires complex DOM parsing
-    logWarn('Product extraction temporarily disabled - requires worker-based processing')
-    return null
+    try {
+      const $ = cheerio.load(html)
+      const products: Product[] = []
+      
+      // Find all elements with class "product"
+      $('.product').each((_, element) => {
+        const $product = $(element)
+        
+        // Extract name from h2 tag
+        const name = $product.find('h2').text().trim()
+        
+        // Extract description from .description class
+        const description = $product.find('.description').text().trim()
+        
+        // Extract features from ul li tags
+        const features: string[] = []
+        $product.find('ul li').each((_, li) => {
+          const feature = $(li).text().trim()
+          if (feature) {
+            features.push(feature)
+          }
+        })
+        
+        // Only add product if it has a name
+        if (name) {
+          products.push({
+            name,
+            description: description || undefined,
+            features,
+            status: 'active', // Default status
+            category: undefined, // Could be extracted if available
+            launchedAt: undefined, // Could be extracted if available
+          })
+        }
+      })
+      
+      if (products.length === 0) {
+        return null
+      }
+      
+      return {
+        url,
+        products,
+        categories: [], // Could extract categories if needed
+        lastUpdated: new Date(),
+      }
+    } catch (error) {
+      logError('Error extracting product data:', error)
+      return null
+    }
   }
 
   private extractJobPostings(html: string, url: string): JobPosting[] {
-    // TODO: Implement simplified job posting extraction without cheerio
-    // For now, return empty array as this requires complex DOM parsing
-    logWarn('Job posting extraction temporarily disabled - requires worker-based processing')
-    return []
+    try {
+      const $ = cheerio.load(html)
+      const jobPostings: JobPosting[] = []
+      
+      // Find all elements with class "job"
+      $('.job').each((_, element) => {
+        const $job = $(element)
+        
+        // Extract job title from h3.job-title or h3
+        const title = $job.find('h3.job-title, h3').first().text().trim()
+        
+        // Extract location
+        const location = $job.find('.location').text().trim()
+        
+        // Extract department
+        const department = $job.find('.department').text().trim()
+        
+        // Extract description
+        const description = $job.find('.job-description, p').first().text().trim()
+        
+        // Extract requirements from ul li
+        const requirements: string[] = []
+        $job.find('ul li').each((_, li) => {
+          const requirement = $(li).text().trim()
+          if (requirement) {
+            requirements.push(requirement)
+          }
+        })
+        
+        // Determine job type and remote status
+        const fullJobText = $job.text().toLowerCase()
+        const type = this.detectJobType(fullJobText)
+        const remote = this.detectRemote(fullJobText)
+        const strategicImportance = this.assessJobImportance(title, department)
+        
+        // Only add job if it has a title
+        if (title) {
+          jobPostings.push({
+            title,
+            department: department || undefined,
+            location: location || undefined,
+            type,
+            remote,
+            requirements,
+            description,
+            postedAt: new Date(), // Default to current date
+            url,
+            strategicImportance,
+          })
+        }
+      })
+      
+      return jobPostings
+    } catch (error) {
+      logError('Error extracting job postings:', error)
+      return []
+    }
   }
 
   private detectJobType(text: string): 'full-time' | 'part-time' | 'contract' | 'internship' {

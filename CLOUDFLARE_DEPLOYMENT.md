@@ -137,7 +137,7 @@ wrangler login
 
 # Build and deploy
 npm run build:cf
-npx wrangler pages deploy .open-next/output --project-name=your-project-name
+npx wrangler pages deploy .open-next --project-name=your-project-name
 ```
 
 ---
