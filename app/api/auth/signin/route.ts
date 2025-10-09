@@ -1,5 +1,5 @@
 import { logger, logAuth } from '@/lib/logger'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { 
@@ -13,20 +13,17 @@ import {
 
 // Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
 
-export const POST = withApiHandler(async (request: NextRequest) => {
-  const sql = getSql()
-  
-  // Parse and validate request body
-  const { data: body, error: parseError } = await parseRequestBody(
-    request, 
-    ['identifier', 'password']
-  )
-  
-  if (parseError) {
-    return createErrorResponse('Email/username and password are required', 400)
-  }
-  
-  const { identifier, password, isEmail } = body
+export async function POST(request: NextRequest) {
+  try {
+    const sql = getSql()
+    const { identifier, password, isEmail } = await request.json()
+
+    if (!identifier || !password) {
+      return NextResponse.json(
+        { error: 'Email/username and password are required' },
+        { status: 400 }
+      )
+    }
 
     // Get user from database - check both email and username
     let users

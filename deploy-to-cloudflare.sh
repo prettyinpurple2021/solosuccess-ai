@@ -10,6 +10,8 @@ CUSTOM_DOMAIN="solobossai.fun"
 PROJECT_NAME="solosuccess-ai-production"
 ENVIRONMENT="production"
 BUILD_OUTPUT_DIR=".open-next"
+# Correct deployment directory as per package.json and documentation
+DEPLOY_OUTPUT_DIR=".open-next"
 
 echo "🌟 Starting SoloSuccess AI deployment to Cloudflare Pages..."
 echo "🔗 Custom Domain: ${CUSTOM_DOMAIN}"
@@ -148,8 +150,18 @@ print_success "Build output verified in $BUILD_OUTPUT_DIR directory"
 print_header "Deploying to Cloudflare Pages"
 print_status "Deploying to $ENVIRONMENT environment..."
 
+# Determine correct deployment directory
+# Check if .open-next/output exists (newer OpenNext versions)
+if [ -d "$BUILD_OUTPUT_DIR/output" ]; then
+    ACTUAL_DEPLOY_DIR="$BUILD_OUTPUT_DIR/output"
+    print_status "Using OpenNext output directory: $ACTUAL_DEPLOY_DIR"
+else
+    ACTUAL_DEPLOY_DIR="$BUILD_OUTPUT_DIR"
+    print_status "Using build directory: $ACTUAL_DEPLOY_DIR"
+fi
+
 # Deploy the built application
-if wrangler pages deploy "$BUILD_OUTPUT_DIR" --project-name="$PROJECT_NAME" --env="$ENVIRONMENT"; then
+if wrangler pages deploy "$ACTUAL_DEPLOY_DIR" --project-name="$PROJECT_NAME" --env="$ENVIRONMENT"; then
     print_success "Deployment to Cloudflare Pages completed!"
 else
     print_error "Deployment failed. Please check the errors above."
