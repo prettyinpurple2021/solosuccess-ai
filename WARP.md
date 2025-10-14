@@ -7,42 +7,76 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 **SoloSuccess AI** is a comprehensive AI-powered productivity platform with 8 specialized AI agents, built on Next.js 15 with App Router, Neon PostgreSQL, and TypeScript. The core architecture follows a **multi-agent personality system** with **decision frameworks** and **compliance automation**.
 
 ### Tech Stack
-- **Frontend**: Next.js 15 with App Router, React 19, TypeScript
-- **Database**: Neon PostgreSQL with Drizzle ORM
-- **Deployment**: Modern hosting platform (serverless functions)
-- **Styling**: Tailwind CSS with custom purple-to-pink gradient brand
+- **Frontend**: Next.js 15.5.2 with App Router, React 19, TypeScript
+- **Database**: Neon PostgreSQL with Drizzle ORM (preferred over Supabase)
+- **Deployment**: Cloudflare Pages with OpenNext, Google Cloud Run
+- **Styling**: Tailwind CSS 3.4.17 with custom purple-to-pink gradient brand
 - **AI**: OpenAI (primary), Anthropic Claude, Google AI via AI SDK
-- **Authentication**: Custom JWT-based auth system
+- **Authentication**: JWT-based custom auth with HTTP-only cookies
 - **Payments**: Stripe integration
 - **Email**: Resend for transactional emails
+- **Package Manager**: npm with `--legacy-peer-deps` flag required
 
 ## Development Commands
 
+### Initial Setup
 ```bash
-# Development
-npm run dev              # Start development server
-npm run build           # Production build
-npm run typecheck       # TypeScript validation
-npm run lint            # ESLint checks
+# Install dependencies (requires --legacy-peer-deps flag)
+npm ci --legacy-peer-deps
 
-# Database Operations
-npm run db:generate      # Generate Drizzle migrations
-npm run db:push         # Apply migrations to Neon database
-npm run db:studio       # Open Drizzle Studio
+# Create environment file from example
+cp .env.example .env.local  # Edit with actual values
 
-# Testing
-npm test                # Jest unit tests
-npm run test:coverage   # Jest with coverage
-npm run e2e             # Playwright E2E tests
-npm run test:api        # API endpoint validation
-
-# Database Setup Scripts
+# Database setup
 npm run setup-neon-db          # Initialize Neon database
 npm run setup-briefcase        # Setup file storage tables
 npm run setup-templates        # Setup template system
 npm run setup-compliance       # Setup compliance tables
 npm run db:verify              # Verify database setup
 ```
+
+### Daily Development
+```bash
+# Development
+npm run dev              # Start development server (~2s startup)
+npm run build           # Production build (64s+ - NEVER CANCEL, set 120s+ timeout)
+npm run build:production # Deploy build script
+npm run start           # Start production server
+npm run typecheck       # TypeScript validation (React 19 warnings expected)
+npm run lint            # ESLint checks (warnings OK, not blocking)
+
+# Database Operations
+npm run db:generate      # Generate Drizzle migrations (run before db:push)
+npm run db:push         # Apply migrations to Neon database
+npm run db:studio       # Open Drizzle Studio
+npm run migrate         # Run migration scripts
+npm run db:run-sql      # Execute SQL file
+
+# Testing (Set 180s+ timeout for test commands)
+npm test                # Jest unit tests (108s+, 5/6 suites pass)
+npm run test:coverage   # Jest with coverage reports
+npm run coverage:ci     # CI coverage with runInBand
+npm run e2e             # Playwright E2E tests (install browsers first)
+npm run test:api        # API endpoint validation (currently broken)
+npm run smoke           # Quick auth flow verification
+
+# Storybook
+npm run storybook       # Start Storybook dev server on port 6006
+npm run build-storybook # Build Storybook for production
+
+# Cloudflare Deployment
+npm run build:cf        # Build for Cloudflare Pages
+npm run preview:cf      # Preview Cloudflare build locally
+npm run deploy:cf       # Deploy to Cloudflare
+npm run deploy:cf:preview # Deploy to preview environment
+```
+
+### Critical Build Notes
+- **NEVER CANCEL** build or test commands - they take significant time
+- Build: 64+ seconds (timeout: 120+ seconds minimum)
+- Tests: 108+ seconds (timeout: 180+ seconds minimum)
+- Dependencies: 27+ seconds (timeout: 60+ seconds minimum)
+- React 19 TypeScript errors are expected but don't block builds
 
 ## AI Agent System Architecture
 
@@ -123,6 +157,28 @@ export function getDb() {
 2. Run `npm run db:generate` (creates migration files)
 3. Run `npm run db:push` (applies to Neon database)
 4. **Never edit migrations directly** - always use drizzle-kit
+
+## Critical Code Quality & Security Rules
+
+### Production-Ready Code Only
+- **NO mock data, placeholders, disabled code, demos, or TODO comments**
+- **NO console.log statements** in production code
+- **NO unused imports or variables** - clean up immediately
+- **NO duplicate code** - check for existing implementations first
+- **NO placeholder URLs** - use real API endpoints and data
+
+### Security Requirements
+- **Authentication required** - every API route must check JWT tokens
+- **Input validation** - use Zod schemas for all user inputs
+- **SQL injection protection** - always use parameterized queries with Drizzle
+- **Environment variables** - never expose sensitive data in client code
+- **HTTPS only** - all external requests must use HTTPS
+
+### Code Quality Standards
+- **TypeScript strict mode** - no `any` types, use proper typing
+- **Accessibility compliance** - form labels, ARIA attributes, keyboard navigation
+- **Responsive design** - mobile-first Tailwind approach
+- **Error handling** - proper error boundaries and API error responses
 
 ## API Routes & Chat System
 
@@ -233,6 +289,12 @@ npm run e2e                # Playwright full user journeys
 - **Build Command**: `npm run build`
 - **Environment**: Production environment variables via platform dashboard
 
+### Cloudflare Pages Deployment
+- **Build Command**: `npm run build:cf`
+- **Preview Command**: `npm run preview:cf`
+- **Deploy Command**: `npm run deploy:cf`
+- **Environment**: Uses OpenNext adapter for Cloudflare Pages compatibility
+
 ### Required Environment Variables
 ```bash
 # Core
@@ -252,6 +314,17 @@ STRIPE_PUBLISHABLE_KEY=<stripe-public>
 
 # Monitoring
 # Add your preferred error monitoring service here
+```
+
+### Minimum Environment for Build Success
+```bash
+# These minimal values allow builds to complete
+DATABASE_URL=postgresql://user:pass@host:5432/database
+OPENAI_API_KEY=test-key
+NEXT_PUBLIC_STACK_PROJECT_ID=test-project
+NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=test-key
+STACK_SECRET_SERVER_KEY=test-key
+JWT_SECRET=fake-jwt-secret-for-testing-32-chars
 ```
 
 ### Environment Validation
