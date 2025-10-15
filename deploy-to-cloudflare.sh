@@ -7,7 +7,7 @@ set -e  # Exit on any error
 
 # Configuration variables
 CUSTOM_DOMAIN="solobossai.fun"
-PROJECT_NAME="solosuccess-ai-production"
+PROJECT_NAME="solosuccess-ai"
 ENVIRONMENT="production"
 BUILD_OUTPUT_DIR=".open-next"
 # Correct deployment directory as per package.json and documentation
@@ -211,7 +211,7 @@ echo "   4. Test file uploads and briefcase functionality"
 echo "   5. Verify payment processing (if applicable)"
 echo ""
 echo -e "${BLUE}🛠️  Useful Commands:${NC}"
-echo "   • View logs: wrangler pages deployment tail --project-name=solosuccess-ai-production"
+echo "   • View logs: wrangler pages deployment tail --project-name=solosuccess-ai"
 echo "   • Update secrets: wrangler pages secret put SECRET_NAME --env production"
 echo "   • Check status: curl https://solobossai.fun/api/health"
 echo ""
