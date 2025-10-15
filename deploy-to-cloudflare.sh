@@ -161,7 +161,8 @@ else
 fi
 
 # Deploy the built application
-if wrangler pages deploy "$ACTUAL_DEPLOY_DIR" --project-name="$PROJECT_NAME" --env="$ENVIRONMENT"; then
+# For production deployments, we don't need to specify branch - it defaults to production
+if wrangler pages deploy "$ACTUAL_DEPLOY_DIR" --project-name="$PROJECT_NAME"; then
     print_success "Deployment to Cloudflare Pages completed!"
 else
     print_error "Deployment failed. Please check the errors above."
