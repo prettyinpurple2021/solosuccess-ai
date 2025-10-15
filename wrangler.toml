@@ -2,11 +2,7 @@ name = "solosuccess-ai"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Observability configuration (wrangler v3.88.0^)
-[observability.logs]
-enabled = true
-
-# Main worker for Cloudflare Pages Functions
+# Pages build configuration
 pages_build_output_dir = ".open-next"
 
 # Production environment configuration
