@@ -33,6 +33,10 @@ npm run setup-briefcase        # Setup file storage tables
 npm run setup-templates        # Setup template system
 npm run setup-compliance       # Setup compliance tables
 npm run db:verify              # Verify database setup
+npm run setup:analytics        # Setup analytics infrastructure
+npm run setup:workers          # Setup multi-worker development
+npm run deploy:workers         # Deploy Cloudflare workers
+npm run optimize-images        # Optimize images for production
 ```
 
 ### Daily Development
@@ -59,6 +63,8 @@ npm run coverage:ci     # CI coverage with runInBand
 npm run e2e             # Playwright E2E tests (install browsers first)
 npm run test:api        # API endpoint validation (currently broken)
 npm run smoke           # Quick auth flow verification
+npm run test:user          # User testing plan validation
+npm run test:ux            # UX testing automation
 
 # Storybook
 npm run storybook       # Start Storybook dev server on port 6006
@@ -69,14 +75,16 @@ npm run build:cf        # Build for Cloudflare Pages
 npm run preview:cf      # Preview Cloudflare build locally
 npm run deploy:cf       # Deploy to Cloudflare
 npm run deploy:cf:preview # Deploy to preview environment
+npm run dev:multi          # Multi-worker development mode
 ```
 
 ### Critical Build Notes
 - **NEVER CANCEL** build or test commands - they take significant time
-- Build: 64+ seconds (timeout: 120+ seconds minimum)
-- Tests: 108+ seconds (timeout: 180+ seconds minimum)
+- Build: 6 minutes 31 seconds (timeout: 8+ minutes minimum)
+- Tests: 29 seconds (timeout: 60+ seconds minimum)
 - Dependencies: 27+ seconds (timeout: 60+ seconds minimum)
 - React 19 TypeScript errors are expected but don't block builds
+- All tests currently pass: 6 suites, 60 tests total
 
 ## AI Agent System Architecture
 
@@ -162,7 +170,7 @@ export function getDb() {
 
 ### Production-Ready Code Only
 - **NO mock data, placeholders, disabled code, demos, or TODO comments**
-- **NO console.log statements** in production code
+- **NO console.log statements** in production code - use `@/lib/logger` instead
 - **NO unused imports or variables** - clean up immediately
 - **NO duplicate code** - check for existing implementations first
 - **NO placeholder URLs** - use real API endpoints and data
@@ -176,9 +184,11 @@ export function getDb() {
 
 ### Code Quality Standards
 - **TypeScript strict mode** - no `any` types, use proper typing
-- **Accessibility compliance** - form labels, ARIA attributes, keyboard navigation
+- **Accessibility compliance** - form labels, ARIA attributes, keyboard navigation, alt text for images
+- **Respect user preferences** - honor `prefers-reduced-motion` for animations
 - **Responsive design** - mobile-first Tailwind approach
 - **Error handling** - proper error boundaries and API error responses
+- **Structured logging** - use `@/lib/logger` instead of console methods
 
 ## API Routes & Chat System
 
@@ -231,9 +241,17 @@ app/
 ### Design System
 - **Brand Colors**: Purple-to-pink gradients (`from-pink-500 to-purple-500`)
 - **Agent Colors**: Each agent has unique accent color for UI consistency
+- **Holographic Components**: HolographicButton, HolographicCard, HolographicNav, HolographicPricingCard
 - **Typography**: Consistent heading/body text patterns
-- **Animations**: Framer Motion for smooth transitions
+- **Animations**: Framer Motion for smooth transitions, holographic effects in `app/globals.css`
 - **Responsive**: Mobile-first Tailwind breakpoints
+
+### Holographic Design System Integration
+- **Component Library**: `components/ui/holographic-*.tsx` - HolographicButton, HolographicCard, etc.
+- **Global Effects**: `app/globals.css` contains holographic animations (glass-shine, holo-shimmer)
+- **Tailwind Extensions**: Custom holographic gradients and animations in `tailwind.config.ts`
+- **Usage Pattern**: Import holographic components, apply sparkles/shine/glow props for enhanced effects
+- **Color Tokens**: Primary Purple (#B621FF), Cyan (#18FFFF), Pink (#FF1FAF) defined in design system
 
 ## Gamification System
 
@@ -280,6 +298,16 @@ npm run e2e                # Playwright full user journeys
 - Unit tests: `__tests__/` directories alongside components
 - API tests: `scripts/api-testing.js` for endpoint validation
 - E2E tests: `tests/` directory with Playwright configuration
+
+## CI/CD & Development Workflow
+
+### GitHub Actions Pipeline
+- **CI Workflow**: `.github/workflows/ci.yml` - lint-typecheck → unit-tests → build → e2e-tests
+- **Node.js Version**: 20 (specified in CI configuration)
+- **Required Environment Variables**: Minimal set for CI builds (see ci.yml)
+- **Security Scanning**: npm audit with high-level threshold
+- **Test Requirements**: Playwright browsers installed with `--with-deps`
+- **Build Dependencies**: Requires `--legacy-peer-deps` flag for npm operations
 
 ## Deployment & Environment
 
@@ -358,10 +386,22 @@ const environmentSchema = z.object({
 - **Risk Assessment**: Legal risk evaluation and mitigation
 
 ### Security Patterns
-- **Input Validation**: Zod schemas for all user inputs
-- **Rate Limiting**: Per-user and per-agent request limits
-- **Authentication**: JWT tokens with expiration
+- **Authentication Implementation**: JWT-based with `lib/auth-server.ts` - supports Bearer tokens and HTTP-only cookies
+- **Input Validation**: Zod schemas for all user inputs with safeParse validation
+- **Rate Limiting**: Implemented via middleware (currently disabled in development)
+- **API Protection**: All protected routes use `authenticateRequest()` function
+- **Middleware Configuration**: Route protection defined in `middleware.ts` with public/protected route lists
 - **Data Protection**: Encryption at rest and in transit via Neon/platform hosting
+
+### JWT Authentication Pattern
+```typescript
+// API routes should follow this pattern
+const { user, error } = await authenticateRequest()
+if (error || !user) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+}
+// Proceed with authenticated user
+```
 
 ## Key Files Reference
 
