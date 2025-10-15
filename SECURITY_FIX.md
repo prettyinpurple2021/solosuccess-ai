@@ -12,7 +12,7 @@ All vulnerabilities are in **transitive dependencies** that are not directly man
 
 1. **Hono Framework** (6 vulnerabilities - 5 moderate, 1 low)
    - Body Limit Middleware Bypass (2 instances)
-   - CSRF Middleware Bypass (2 instances) 
+   - CSRF Middleware Bypass (2 instances)
    - Restricted Directory Traversal vulnerability
    - CSRF bypass via crafted Content-Type header
 
