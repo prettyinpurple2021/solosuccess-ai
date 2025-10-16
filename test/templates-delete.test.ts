@@ -40,7 +40,7 @@ describe('DELETE /api/templates/[id]', () => {
   it('returns 404 when template does not belong to user (rowCount 0)', async () => {
     authenticateRequest.mockResolvedValue({ user: { id: 'user-1' }, error: null })
     const queryMock = jest.fn().mockResolvedValue({ rowCount: 0 })
-    getDb.mockReturnValue({ execute: queryMock })
+    getDb.mockReturnValue(queryMock)
 
     const res = (await DELETE(new Request('http://localhost'), makeContext('999'))) as NextResponse
     expect(res.status).toBe(404)
@@ -57,7 +57,7 @@ describe('DELETE /api/templates/[id]', () => {
   it('returns 204 when owned template is deleted (rowCount 1)', async () => {
     authenticateRequest.mockResolvedValue({ user: { id: 'user-2' }, error: null })
     const queryMock = jest.fn().mockResolvedValue({ rowCount: 1 })
-    getDb.mockReturnValue({ execute: queryMock })
+    getDb.mockReturnValue(queryMock)
 
     const res = (await DELETE(new Request('http://localhost'), makeContext('42'))) as NextResponse
     expect(res.status).toBe(204)

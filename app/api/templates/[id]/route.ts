@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb} from '@/lib/database-client'
 import { z} from 'zod'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
@@ -35,7 +35,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = await createClient()
+    const client = getDb()
 
     const key = getIdempotencyKeyFromRequest(req)
     if (key) {
