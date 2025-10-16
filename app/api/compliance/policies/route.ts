@@ -1,14 +1,6 @@
-import { NextRequest, NextResponse} from 'next/server'
-import { Pool} from 'pg'
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-})
-
-
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+import { NextRequest, NextResponse } from 'next/server'
+import { getSql } from '@/lib/api-utils'
+export const runtime = 'edge'
 
 function buildPolicy(type: 'privacy'|'terms'|'cookies', data: any): string {
   const now = new Date().toLocaleDateString()
@@ -44,52 +36,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const client = await pool.connect()
-    try {
-      // Save input policy data
-      const pdRes = await client.query(
-        `INSERT INTO policy_data (
-            user_id, business_name, website_url, business_type, data_collected, third_party_services,
-            data_retention_period, user_rights, contact_email, jurisdiction
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-         RETURNING id`,
-        [
-          userId,
-          businessName,
-          websiteUrl,
-          businessType || null,
-          dataCollected,
-          thirdPartyServices,
-          dataRetentionPeriod || null,
-          userRights,
-          contactEmail,
-          jurisdiction,
-        ]
+    const sql = getSql()
+    const inserted = await sql`
+      INSERT INTO policy_data (
+        user_id, business_name, website_url, business_type, data_collected, third_party_services,
+        data_retention_period, user_rights, contact_email, jurisdiction
+      ) VALUES (
+        ${userId}, ${businessName}, ${websiteUrl}, ${businessType || null}, ${JSON.stringify(dataCollected)}, ${JSON.stringify(thirdPartyServices)},
+        ${dataRetentionPeriod || null}, ${JSON.stringify(userRights)}, ${contactEmail}, ${jurisdiction}
       )
+      RETURNING id
+    `
 
-      const generated: any[] = []
-      for (const type of policyTypes as ('privacy'|'terms'|'cookies')[]) {
-        const content = buildPolicy(type, {
-          businessName,
-          websiteUrl,
-          dataCollected,
-          contactEmail,
-          jurisdiction,
-        })
-        const res = await client.query(
-          `INSERT INTO generated_policies (
-            user_id, business_name, website_url, policy_type, content, compliance_level, jurisdictions
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7)
-          RETURNING id, version, generated_at`,
-          [userId, businessName, websiteUrl, type, content, 'standard', [jurisdiction]]
+    const generated: any[] = []
+    for (const type of policyTypes as ('privacy'|'terms'|'cookies')[]) {
+      const content = buildPolicy(type, {
+        businessName,
+        websiteUrl,
+        dataCollected,
+        contactEmail,
+        jurisdiction,
+      })
+      const res = await sql`
+        INSERT INTO generated_policies (
+          user_id, business_name, website_url, policy_type, content, compliance_level, jurisdictions
+        ) VALUES (
+          ${userId}, ${businessName}, ${websiteUrl}, ${type}, ${content}, 'standard', ${JSON.stringify([jurisdiction])}
         )
-        generated.push({ id: res.rows[0].id, type, version: res.rows[0].version, generated_at: res.rows[0].generated_at })
-      }
-
-      return NextResponse.json({ policy_data_id: pdRes.rows[0].id, generated })
-    } finally {
-      client.release()
+        RETURNING id, version, generated_at
+      `
+      generated.push({ id: res[0].id, type, version: res[0].version, generated_at: res[0].generated_at })
     }
+
+    return NextResponse.json({ policy_data_id: inserted[0].id, generated })
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Policy generation failed' }, { status: 500 })
   }

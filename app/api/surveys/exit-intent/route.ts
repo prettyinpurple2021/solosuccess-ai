@@ -1,13 +1,14 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
 
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -27,7 +28,8 @@ function getUserIdFromToken(request: NextRequest): string | null {
       return null
     }
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload: decoded } = await jose.jwtVerify(token, secret)
     return decoded?.userId || null
   } catch {
     return null

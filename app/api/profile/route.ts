@@ -4,13 +4,14 @@ import { createClient} from '@/lib/neon/server'
 import { z} from 'zod'
 import { info, error as logError} from '@/lib/log'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 // Edge runtime disabled because jsonwebtoken is not compatible with Edge
-// // Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+// // // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // GET current user's profile
 export async function GET(request: NextRequest) {

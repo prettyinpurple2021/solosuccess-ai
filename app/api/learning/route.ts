@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { LearningEngine } from '@/lib/learning-engine'
 import { logError } from '@/lib/logger'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 
-
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
-// Force dynamic rendering to prevent build-time execution
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
@@ -18,7 +14,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload: decoded } = await jose.jwtVerify(token, secret)
     const userId = decoded.user_id
 
     const { searchParams } = new URL(request.url)
@@ -59,7 +56,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload: decoded } = await jose.jwtVerify(token, secret)
     const userId = decoded.user_id
 
     const body = await request.json()

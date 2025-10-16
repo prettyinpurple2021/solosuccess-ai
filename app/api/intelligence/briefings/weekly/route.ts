@@ -5,13 +5,15 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { intelligenceBriefingService} from '@/lib/intelligence-briefing-system'
 import { z} from 'zod'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 
 const weeklyBriefingSchema = z.object({
   competitorIds: z.array(z.string()).optional()
 })
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function POST(request: NextRequest) {

@@ -5,11 +5,12 @@ import { createClient} from '@/lib/neon/server'
 import { v4 as uuidv4} from 'uuid'
 import bcrypt from 'bcryptjs'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function GET(
   request: NextRequest,

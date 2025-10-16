@@ -5,6 +5,9 @@ import { createClient } from '@/lib/neon/server'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 
 // Input validation schema
 const TaskIntelligenceRequestSchema = z.object({
@@ -39,7 +42,6 @@ const TaskIntelligenceRequestSchema = z.object({
 })
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function POST(request: NextRequest) {

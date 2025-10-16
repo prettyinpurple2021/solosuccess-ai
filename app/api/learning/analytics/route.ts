@@ -7,8 +7,10 @@ import { getDb } from '@/lib/database-client'
 import { users, tasks, goals, chatConversations, focusSessions } from '@/db/schema'
 import { eq, and, gte, desc, count, avg } from 'drizzle-orm'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export const dynamic = 'force-dynamic'

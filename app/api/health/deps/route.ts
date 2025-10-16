@@ -1,10 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextResponse} from 'next/server';
-import { createClient} from '@/lib/neon/server';
-
-
-// Use Node runtime for database access
-export const runtime = 'nodejs';
+import { neon } from '@neondatabase/serverless'
+export const runtime = 'edge';
 
 export async function GET() {
   const checks = {
@@ -14,13 +11,13 @@ export async function GET() {
   };
   
   try {
-    // Check database connection
+    // Check database connection (Edge-safe via Neon HTTP)
     try {
-      const client = await createClient();
-      const { rows: _rows } = await client.query('SELECT NOW() as time');
-      checks.database = { 
-        status: 'ok'
-      };
+      const url = process.env.DATABASE_URL
+      if (!url) throw new Error('DATABASE_URL not set')
+      const sql = neon(url)
+      await sql`SELECT NOW() as time`
+      checks.database = { status: 'ok' }
     } catch (dbError) {
       logError('Database check error:', dbError);
       checks.database = {

@@ -1,10 +1,9 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/neon/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
 
-export const runtime = 'nodejs'
+export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 function getSql() {
@@ -42,14 +41,46 @@ export async function GET(
   }
 }
 
-// Handle ID-based file serving from documents table
+// Convert base64 string to Uint8Array (Edge-safe)
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binaryString = atob(base64)
+  const len = binaryString.length
+  const bytes = new Uint8Array(len)
+  for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i)
+  return bytes
+}
+
+// Normalize various binary formats (hex string from bytea, ArrayBuffer, Uint8Array) to Uint8Array
+function normalizeBinary(data: unknown): Uint8Array {
+  if (data instanceof Uint8Array) return data
+  if (data instanceof ArrayBuffer) return new Uint8Array(data)
+  if (typeof data === 'string') {
+    // Handle Postgres bytea hex format "\\x..."
+    if (data.startsWith('\\x') || data.startsWith('\\X')) {
+      const hex = data.slice(2)
+      const bytes = new Uint8Array(hex.length / 2)
+      for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16)
+      }
+      return bytes
+    }
+    // Assume base64 otherwise
+    return base64ToUint8Array(data)
+  }
+  if (data && typeof data === 'object' && 'data' in (data as any)) {
+    const arr = (data as any).data as number[]
+    return new Uint8Array(arr)
+  }
+  throw new Error('Unsupported binary format from database')
+}
+
+// Handle ID-based file serving from documents table (Edge-safe via Neon HTTP)
 async function handleIdBasedFile(id: string) {
   try {
-    const client = await createClient()
-    const { rows } = await client.query(
-      'SELECT id, content_type, content, filename FROM documents WHERE id = $1',
-      [id]
-    )
+    const sql = getSql()
+    const rows = await sql`
+      SELECT id, content_type, content, filename FROM documents WHERE id = ${id}
+    `
 
     if (rows.length === 0) {
       return new NextResponse('Not found', { status: 404 })
@@ -58,12 +89,12 @@ async function handleIdBasedFile(id: string) {
     const file = rows[0] as {
       id: string
       content_type: string
-      content: string
+      content: unknown
       filename: string
     }
 
-    const buffer = Buffer.from(file.content, 'base64')
-    return new NextResponse(buffer, {
+    const bytes = normalizeBinary(file.content)
+    return new NextResponse(bytes, {
       status: 200,
       headers: {
         'Content-Type': file.content_type,
@@ -97,9 +128,9 @@ async function handlePathnameBasedFile(pathname: string) {
     const file = result[0]
     
     // Convert buffer back to response
-    const buffer = Buffer.from(file.file_data)
+    const bytes = normalizeBinary(file.file_data)
     
-    return new NextResponse(buffer, {
+    return new NextResponse(bytes, {
       status: 200,
       headers: {
         'Content-Type': file.content_type,

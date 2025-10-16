@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { logInfo, logError } from '@/lib/logger'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { getNeonConnection, safeDbQuery } from '@/lib/database-utils'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering to prevent build-time execution
 export const dynamic = 'force-dynamic'
@@ -23,7 +24,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload: decoded } = await jose.jwtVerify(token, secret)
     const userId = decoded.user_id
 
     logInfo('Fetching available learning modules', { userId })

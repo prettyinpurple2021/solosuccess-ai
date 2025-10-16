@@ -1,7 +1,10 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { unifiedBriefcase } from '@/lib/unified-briefcase'
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
 
 // JWT authentication helper
@@ -13,7 +16,8 @@ async function authenticateJWTRequest(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload: decoded } = await jose.jwtVerify(token, secret)
     
     return { 
       user: {
@@ -30,9 +34,7 @@ async function authenticateJWTRequest(request: NextRequest) {
 }
 
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function POST(request: NextRequest) {
   try {

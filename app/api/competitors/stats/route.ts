@@ -6,8 +6,10 @@ import { db} from '@/db'
 import { competitors, competitorAlerts, competitorActivities} from '@/db/schema'
 import { eq, count, desc, gte, sql} from 'drizzle-orm'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering

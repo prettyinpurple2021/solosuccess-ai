@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { neon } from '@neondatabase/serverless'
 import { z} from 'zod'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
 import { info, error as logError} from '@/lib/log'
@@ -8,10 +8,7 @@ import { info, error as logError} from '@/lib/log'
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// Edge runtime disabled because jsonwebtoken is not compatible with Edge
-// // Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+export const runtime = 'edge'
 
 export async function GET(request: NextRequest) {
   const route = '/api/templates'
@@ -27,14 +24,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = await createClient()
-    
-    // Get user's saved templates (map Neon schema: name/content/description → expected fields)
-    const { rows } = await client.query(
-      `SELECT id, name, content, description, created_at, updated_at 
-         FROM user_templates WHERE user_id = $1 ORDER BY created_at DESC`,
-      [user.id]
-    )
+    const url = process.env.DATABASE_URL
+    if (!url) return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 })
+    const sql = neon(url)
+    const rows = await sql`
+      SELECT id, name, content, description, created_at, updated_at 
+      FROM user_templates WHERE user_id = ${user.id} ORDER BY created_at DESC
+    `
 
     const userTemplates = rows.map((r) => {
       let parsed: any
@@ -127,7 +123,9 @@ export async function POST(request: NextRequest) {
     }
     const { templateSlug, templateData, description } = parse.data
 
-    const client = await createClient()
+    const url = process.env.DATABASE_URL
+    if (!url) return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 })
+    const sql = neon(url)
 
     // Idempotency support
     const key = getIdempotencyKeyFromRequest(request)
@@ -146,11 +144,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
       }
     }
-    await client.query(
-      `INSERT INTO user_templates (user_id, name, content, description)
-       VALUES ($1, $2, $3, $4)`,
-      [user.id, templateSlug, JSON.stringify(templateData), description || '']
-    )
+    await sql`
+      INSERT INTO user_templates (user_id, name, content, description)
+      VALUES (${user.id}, ${templateSlug}, ${JSON.stringify(templateData)}, ${description || ''})
+    `
 
     info('Template saved successfully', { 
       route, 

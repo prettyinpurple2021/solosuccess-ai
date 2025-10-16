@@ -2,14 +2,13 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import '@/lib/server-polyfills'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { neon } from '@neondatabase/serverless'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
 
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+export const runtime = 'edge'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -65,26 +64,27 @@ export async function POST(request: NextRequest) {
 
     // Convert file to base64 for storage
     const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const base64Data = buffer.toString('base64')
+    // Base64-encode using Web APIs for Edge
+    const base64Data = btoa(String.fromCharCode(...new Uint8Array(bytes)))
 
     // Save file metadata to database
-    const client = await createClient()
+    const url = process.env.DATABASE_URL
+    if (!url) return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 })
+    const sql = neon(url)
 
     // Idempotency support: use provided key
     const key = getIdempotencyKeyFromRequest(request)
     if (key) {
-      const reserved = await reserveIdempotencyKey(client, key)
+      const reserved = await reserveIdempotencyKey(sql as any, key)
       if (!reserved) {
         return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
       }
     }
-    const { rows } = await client.query(
-      `INSERT INTO documents (user_id, filename, content_type, file_size, content, category)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, filename, content_type, file_size, category, created_at`,
-      [user.id, file.name, file.type, file.size, base64Data, category]
-    )
+    const rows = await sql`
+      INSERT INTO documents (user_id, filename, content_type, file_size, content, category)
+      VALUES (${user.id}, ${file.name}, ${file.type}, ${file.size}, ${base64Data}, ${category})
+      RETURNING id, filename, content_type, file_size, category, created_at
+    `
 
     return NextResponse.json({ 
       file: rows[0],
@@ -107,11 +107,12 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = await createClient()
-    const { rows: files } = await client.query(
-      'SELECT id, filename, content_type, file_size, category, created_at FROM documents WHERE user_id = $1 ORDER BY created_at DESC',
-      [user.id]
-    )
+    const url = process.env.DATABASE_URL
+    if (!url) return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 })
+    const sql = neon(url)
+    const files = await sql`
+      SELECT id, filename, content_type, file_size, category, created_at FROM documents WHERE user_id = ${user.id} ORDER BY created_at DESC
+    `
 
     return NextResponse.json({ files })
   } catch (error) {

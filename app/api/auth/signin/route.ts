@@ -1,8 +1,11 @@
 import { logger, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { 
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
   getSql, 
   createErrorResponse, 
   createSuccessResponse, 
@@ -11,7 +14,6 @@ import {
   withApiHandler 
 } from '@/lib/api-utils'
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
 
 export async function POST(request: NextRequest) {
   try {

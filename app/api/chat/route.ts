@@ -6,6 +6,9 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 // Type for Cloudflare service bindings
 interface Env {
   OPENAI_WORKER: {
@@ -15,7 +18,6 @@ interface Env {
 
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering

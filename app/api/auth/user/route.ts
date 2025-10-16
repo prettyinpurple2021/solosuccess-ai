@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse} from 'next/server'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { neon} from '@neondatabase/serverless'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -33,21 +34,26 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7)
 
-    // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
+    // Verify JWT token using jose (Edge-compatible)
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured')
+    }
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    
+    if (!payload || !payload.userId) {
       return NextResponse.json(
         { error: 'Invalid token' },
         { status: 401 }
       )
     }
 
-    // Get user from database (decoded is guaranteed to have userId after type guard)
+    // Get user from database
     const sql = getSql()
     const users = await sql`
       SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
       FROM users 
-      WHERE id = ${(decoded as any).userId}
+      WHERE id = ${payload.userId as string}
     `
 
     if (users.length === 0) {

@@ -29,3 +29,26 @@ export function getIdempotencyKeyFromRequest(req: Request): string | null {
 }
 
 
+// Edge-safe Neon variant for idempotency using SQL template tag
+export async function reserveIdempotencyKeyNeon(
+  sql: any,
+  key: string
+): Promise<boolean> {
+  // Ensure table exists (safe to run repeatedly)
+  await sql`
+    CREATE TABLE IF NOT EXISTS idempotency_keys (
+      key text PRIMARY KEY,
+      created_at timestamptz DEFAULT now()
+    )
+  `
+
+  const rows = await sql`
+    INSERT INTO idempotency_keys(key) VALUES(${key})
+    ON CONFLICT (key) DO NOTHING
+    RETURNING key
+  `
+
+  return rows.length === 1
+}
+
+

@@ -5,8 +5,10 @@ import { getDb } from '@/lib/database-client'
 import { createErrorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
+
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering

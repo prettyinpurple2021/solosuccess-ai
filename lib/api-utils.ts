@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { logger, logError, logAuth } from '@/lib/logger'
 
 /**
@@ -53,7 +53,7 @@ export function createSuccessResponse(
 }
 
 /**
- * JWT authentication utility
+ * JWT authentication utility (Edge-compatible with jose)
  * Eliminates duplication across protected routes
  */
 export async function authenticateRequest(request: NextRequest) {
@@ -70,27 +70,29 @@ export async function authenticateRequest(request: NextRequest) {
       throw new Error('JWT_SECRET is not configured')
     }
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    // Use jose for Edge-compatible JWT verification
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
     
-    // Type guard to ensure decoded has required properties
-    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
+    // Type guard to ensure payload has required properties
+    if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
       return { user: null, error: 'Invalid token' }
     }
     
-    logAuth('User authenticated successfully', { userId: (decoded as any).userId })
+    logAuth('User authenticated successfully', { userId: payload.userId as string })
     
     // Return standardized user object
     return { 
       user: {
-        id: (decoded as any).userId,
-        email: (decoded as any).email,
-        full_name: (decoded as any).full_name || null,
-        avatar_url: (decoded as any).avatar_url || null,
-        subscription_tier: (decoded as any).subscription_tier || 'free',
-        level: (decoded as any).level || 1,
-        total_points: (decoded as any).total_points || 0,
-        current_streak: (decoded as any).current_streak || 0,
-        wellness_score: (decoded as any).wellness_score || 50,
+        id: payload.userId as string,
+        email: (payload.email as string) || '',
+        full_name: (payload.full_name as string) || null,
+        avatar_url: (payload.avatar_url as string) || null,
+        subscription_tier: (payload.subscription_tier as string) || 'free',
+        level: (payload.level as number) || 1,
+        total_points: (payload.total_points as number) || 0,
+        current_streak: (payload.current_streak as number) || 0,
+        wellness_score: (payload.wellness_score as number) || 50,
       },
       error: null
     }

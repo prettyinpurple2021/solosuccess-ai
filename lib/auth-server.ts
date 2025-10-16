@@ -4,7 +4,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse } from "next/server"
 import type { AuthenticatedUser, AuthResult } from "./auth-utils"
 import { headers } from "next/headers"
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { getDb } from './database-client'
 import { users } from '@/db/schema'
 import { eq } from 'drizzle-orm'
@@ -36,9 +36,16 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
     if (!token) {
       return null
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured')
+    }
+
+    // Use jose for Edge-compatible JWT verification
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
     
-    if (!decoded || !decoded.userId) {
+    if (!payload || !payload.userId) {
       return null
     }
 
@@ -57,7 +64,7 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
         subscription_status: users.subscription_status
       })
       .from(users)
-      .where(eq(users.id, decoded.userId))
+      .where(eq(users.id, payload.userId as string))
       .limit(1)
 
     if (userResults.length === 0) {

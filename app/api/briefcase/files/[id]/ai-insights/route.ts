@@ -3,6 +3,9 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { createClient} from '@/lib/neon/server'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 // Type for Cloudflare service bindings
 interface Env {
   GOOGLE_AI_WORKER: {
@@ -11,7 +14,6 @@ interface Env {
 }
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function POST(

@@ -8,6 +8,9 @@ import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
 
 import type { 
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
   AlertSeverity,
   ActionItem,
   Recommendation
@@ -47,7 +50,6 @@ const AlertUpdateSchema = z.object({
 })
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function GET(

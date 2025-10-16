@@ -5,13 +5,15 @@ import { rateLimitByIp} from '@/lib/rate-limit';
 import { alertSystem} from '@/lib/competitor-alert-system';
 import { z} from 'zod';
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 
 const updateAlertSchema = z.object({
   action: z.enum(['mark_read', 'archive']),
 });
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function PATCH(

@@ -1,10 +1,12 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { neon} from '@neondatabase/serverless'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
@@ -43,7 +45,8 @@ async function authenticateRequest(request: NextRequest) {
       return { user: null, error: 'JWT secret not configured' }
     }
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as any
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const { payload: decoded } = await jose.jwtVerify(token, secret)
     logInfo('Dashboard API: JWT token verified successfully', { userId: decoded.userId })
     
     return { 

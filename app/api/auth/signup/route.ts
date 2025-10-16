@@ -1,8 +1,11 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { neon} from '@neondatabase/serverless'
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 // Use Web Crypto API for Edge Runtime compatibility
 function generateUUID() {
   return crypto.randomUUID()
@@ -10,9 +13,7 @@ function generateUUID() {
 
 
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
   const url = process.env.DATABASE_URL

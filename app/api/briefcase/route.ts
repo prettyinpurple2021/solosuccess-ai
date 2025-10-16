@@ -2,12 +2,13 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { createErrorResponse } from '@/lib/api-response'
 import { neon} from '@neondatabase/serverless'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
   const url = process.env.DATABASE_URL
@@ -19,7 +20,7 @@ function getSql() {
 
 
 
-// JWT authentication helper
+// JWT authentication helper using jose (Edge-compatible)
 async function authenticateJWTRequest(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
@@ -29,19 +30,25 @@ async function authenticateJWTRequest(request: NextRequest) {
     }
 
     const token = authHeader.substring(7)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
     
-    // Type guard to ensure decoded has required properties
-    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured')
+    }
+
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    
+    // Type guard to ensure payload has required properties
+    if (!payload || !payload.userId) {
       return { user: null, error: 'Invalid token' }
     }
     
     // After type guard, we can safely access properties
     return { 
       user: {
-        id: (decoded as any).userId,
-        email: (decoded as any).email,
-        full_name: (decoded as any).full_name || null,
+        id: payload.userId as string,
+        email: (payload.email as string) || '',
+        full_name: (payload.full_name as string) || null,
         avatar_url: null,
         subscription_tier: 'free',
         level: 1,

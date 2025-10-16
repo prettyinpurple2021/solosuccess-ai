@@ -8,6 +8,9 @@ import { z} from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray} from 'drizzle-orm'
 
 import type { IntelligenceData,
+
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
   IntelligenceFilters,
   SourceType,
   ImportanceLevel,
@@ -16,7 +19,6 @@ import type { IntelligenceData,
  } from '@/lib/competitor-intelligence-types'
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering

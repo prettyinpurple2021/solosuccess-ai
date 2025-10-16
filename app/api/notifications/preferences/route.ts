@@ -6,6 +6,9 @@ import { notificationDelivery, NotificationPreferences} from '@/lib/notification
 import { AlertType} from '@/lib/competitor-alert-system';
 import { z} from 'zod';
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 
 const notificationChannelSchema = z.object({
   id: z.string(),
@@ -33,7 +36,6 @@ const notificationPreferencesSchema = z.object({
 });
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function GET(request: NextRequest) {

@@ -7,11 +7,13 @@ import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
 import webpush from 'web-push'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 
 
 // Temporarily disabled Edge Runtime due to web-push library Node.js dependencies
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

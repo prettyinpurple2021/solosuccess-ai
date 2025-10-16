@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse} from 'next/server'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { neon} from '@neondatabase/serverless'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
 
-// Removed Edge Runtime due to Node.js dependencies (jsonwebtoken, bcrypt, fs, etc.)
-// // Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
-// Edge Runtime disabled due to Node.js dependency incompatibility
+
+// // Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -18,15 +19,20 @@ function getSql() {
   return neon(url)
 }
 
-// Helper function to verify JWT token
-function verifyToken(authHeader: string | null) {
+// Helper function to verify JWT token using jose (Edge-compatible)
+async function verifyToken(authHeader: string | null) {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null
   }
   
   const token = authHeader.substring(7)
   try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as any
+    if (!process.env.JWT_SECRET) {
+      return null
+    }
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload
   } catch {
     return null
   }
@@ -36,7 +42,7 @@ function verifyToken(authHeader: string | null) {
 export async function GET(request: NextRequest) {
   try {
     const sql = getSql()
-    const decoded = verifyToken(request.headers.get('authorization'))
+    const decoded = await verifyToken(request.headers.get('authorization'))
     if (!decoded || !decoded.userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -65,7 +71,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const sql = getSql()
-    const decoded = verifyToken(request.headers.get('authorization'))
+    const decoded = await verifyToken(request.headers.get('authorization'))
     if (!decoded || !decoded.userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },

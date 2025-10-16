@@ -6,12 +6,14 @@ import { z} from 'zod'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
 
+// Edge runtime enabled after refactoring to jose and Neon HTTP
+export const runtime = 'edge'
+
 
 // DELETE /api/templates/:id → delete a saved user template
 const IdParamSchema = z.object({ id: z.string().regex(/^\d+$/) })
 
 
-// Removed Edge Runtime due to Node.js dependencies (JWT, auth, fs, crypto, etc.)
 // Edge Runtime disabled due to Node.js dependency incompatibility
 
 export async function DELETE(

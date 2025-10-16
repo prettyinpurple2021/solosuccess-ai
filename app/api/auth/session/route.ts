@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import * as jose from 'jose'
 import { neon } from '@neondatabase/serverless'
 
 function getSql() {
@@ -38,9 +38,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-    if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
+    // Verify JWT token using jose (Edge-compatible)
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured')
+    }
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    
+    if (!payload || !payload.userId) {
       return NextResponse.json(
         { user: null, session: null },
         { status: 200 }
@@ -54,7 +59,7 @@ export async function GET(request: NextRequest) {
              stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, 
              cancel_at_period_end, created_at, avatar_url
       FROM users 
-      WHERE id = ${(decoded as any).userId}
+      WHERE id = ${payload.userId as string}
     `
 
     if (users.length === 0) {

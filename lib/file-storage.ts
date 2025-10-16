@@ -58,14 +58,14 @@ class NeonFileStorage implements FileStorageProvider {
       
       const sql = getSql()
       
-      // Convert file to buffer
+      // Convert file to Uint8Array (Edge-compatible, no Buffer)
       const arrayBuffer = await file.arrayBuffer()
-      const buffer = Buffer.from(arrayBuffer)
+      const uint8Array = new Uint8Array(arrayBuffer)
       
       // Store file in database
       await sql`
         INSERT INTO file_storage (pathname, filename, content_type, file_size, file_data)
-        VALUES (${pathname}, ${file.name}, ${file.type}, ${file.size}, ${buffer})
+        VALUES (${pathname}, ${file.name}, ${file.type}, ${file.size}, ${uint8Array})
         ON CONFLICT (pathname) DO UPDATE SET
           filename = EXCLUDED.filename,
           content_type = EXCLUDED.content_type,
