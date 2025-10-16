@@ -32,6 +32,10 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           echo "Running database migrations..."
+          if [ -z "$DATABASE_URL" ]; then
+            echo "❌ DATABASE_URL secret not found. Please add it in repository settings."
+            exit 1
+          fi
           npx drizzle-kit push:pg
           echo "Migrations completed successfully"
 
