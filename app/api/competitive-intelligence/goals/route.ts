@@ -4,7 +4,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligence-integration'
 import { db} from '@/db'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const competitorId = searchParams.get('competitor_id')
     const goalId = searchParams.get('goal_id')
     
-    const client = await createClient()
+    const db = getDb()
 
     
     if (goalId) {

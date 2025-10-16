@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
     const { brandName, tagline, description, industry, colors, typography, logoData, logoStyle } = parsed.data
 
-    const client = await createClient()
+    const db = getDb()
 
     const key = getIdempotencyKeyFromRequest(request)
     if (key) {

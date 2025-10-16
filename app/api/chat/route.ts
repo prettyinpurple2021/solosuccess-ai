@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Ensure user exists in database
-    const client = await createClient()
+    const db = getDb()
     let { rows: userData } = await client.query(
       'SELECT id FROM users WHERE id = $1',
       [user.id]

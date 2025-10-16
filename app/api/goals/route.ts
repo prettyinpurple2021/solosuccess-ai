@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { createErrorResponse } from '@/lib/api-response'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const includeCompetitive = searchParams.get('include_competitive') === 'true'
 
-    const client = await createClient()
+    const db = getDb()
     
     let query = `
       SELECT g.*,
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
     const { title, description, target_date, category, priority } = parsed.data
 
-    const client = await createClient()
+    const db = getDb()
 
     // Idempotency support
     const key = getIdempotencyKeyFromRequest(request)

@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import bcrypt from 'bcryptjs'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -17,7 +17,7 @@ export async function GET(
   try {
     const contextParams = await context.params
     const { shareId } = contextParams
-    const client = await createClient()
+    const db = getDb()
 
     // Get share link details
     const { rows: [shareLink] } = await client.query(`
@@ -106,7 +106,7 @@ export async function POST(
     const contextParams = await context.params
     const { shareId } = contextParams
     const { password, action } = await request.json()
-    const client = await createClient()
+    const db = getDb()
 
     // Get share link details
     const { rows: [shareLink] } = await client.query(`

@@ -5,7 +5,7 @@ import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { getFeatureFlags } from '@/lib/feature-flags'
 import { z } from 'zod'
-import { query } from '@/lib/neon/client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'

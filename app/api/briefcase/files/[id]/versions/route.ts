@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -23,7 +23,7 @@ export async function GET(
     const params = await context.params
     const { id } = params
     const documentId = id
-    const client = await createClient()
+    const db = getDb()
 
     // Verify document ownership
     const { rows: [document] } = await client.query(`
@@ -91,7 +91,7 @@ export async function POST(
     const { id } = params
     const documentId = id
     const { changelog } = await request.json()
-    const client = await createClient()
+    const db = getDb()
 
     // Verify document ownership
     const { rows: [document] } = await client.query(`

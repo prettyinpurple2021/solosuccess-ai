@@ -4,7 +4,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligence-integration'
 import { db} from '@/db'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const goalId = searchParams.get('goal_id')
     const competitorId = searchParams.get('competitor_id')
 
-    const client = await createClient()
+    const db = getDb()
     
     let query = `
       SELECT t.*, g.title as goal_title, cp.name as competitor_name
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
     
-    const client = await createClient()
+    const db = getDb()
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-milestones:create', ip, 60_000, 20)
@@ -154,7 +154,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
     
-    const client = await createClient()
+    const db = getDb()
 
     const body = await request.json()
     const BodySchema = z.object({

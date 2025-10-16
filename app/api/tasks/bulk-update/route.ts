@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
     const { ids, status, priority } = parsed.data
 
-    const client = await createClient()
+    const db = getDb()
     const fields: string[] = []
     const values: any[] = []
 

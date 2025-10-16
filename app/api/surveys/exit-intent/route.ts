@@ -21,7 +21,7 @@ function getSql() {
   return neon(url)
 }
 
-function getUserIdFromToken(request: NextRequest): string | null {
+async function getUserIdFromToken(request: NextRequest): Promise<string | null> {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -39,7 +39,7 @@ function getUserIdFromToken(request: NextRequest): string | null {
 export async function GET(req: NextRequest) {
   try {
     const sql = getSql()
-    const userId = getUserIdFromToken(req)
+    const userId = await getUserIdFromToken(req)
     
     // Create table if it doesn't exist
     await sql`create table if not exists user_survey_status (
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
   try {
     const { role, goal, blocker, email, action } = await req.json().catch(() => ({}))
     const sql = getSql()
-    const userId = getUserIdFromToken(req)
+    const userId = await getUserIdFromToken(req)
     
     logDebug('Survey submission data:', { role, goal, blocker, email, action, userId })
     

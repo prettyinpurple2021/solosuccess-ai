@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { v4 as uuidv4} from 'uuid'
 import { headers} from 'next/headers'
 
@@ -70,7 +70,7 @@ async function saveFile(params: {
   const fileId = uuidv4()
   const fileBuffer = await file.arrayBuffer()
   const fileData = Buffer.from(fileBuffer)
-  const client = await createClient()
+  const db = getDb()
   const parsedTags = tags ? JSON.parse(tags) : []
 
   const { rows: [document] } = await client.query(`

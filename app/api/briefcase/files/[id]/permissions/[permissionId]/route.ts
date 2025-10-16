@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -29,7 +29,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Role is required' }, { status: 400 })
     }
 
-    const client = await createClient()
+    const db = getDb()
 
     // Verify document ownership
     const { rows: [document] } = await client.query(`
@@ -93,7 +93,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = await createClient()
+    const db = getDb()
 
     // Verify document ownership
     const { rows: [document] } = await client.query(`

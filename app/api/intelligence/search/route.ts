@@ -7,11 +7,12 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray, ilike, sql} from 'drizzle-orm'
 
-import type { IntelligenceData,
-
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
-  SourceType, 
+
+import type { 
+  IntelligenceData,
+  SourceType,
   ImportanceLevel,
   ExtractedData,
   AnalysisResult

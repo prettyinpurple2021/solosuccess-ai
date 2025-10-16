@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { z} from 'zod'
 import { info, error as logError} from '@/lib/log'
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = await createClient()
+    const db = getDb()
     const { rows } = await client.query(
       `SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status,
               stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end,
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
     }
     const { full_name, avatar_url, onboarding_completed, onboarding_data } = parsed.data
 
-    const client = await createClient()
+    const db = getDb()
     const { rows } = await client.query(
       `UPDATE users
           SET full_name = COALESCE($1, full_name),

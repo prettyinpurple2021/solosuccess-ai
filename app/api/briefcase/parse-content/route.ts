@@ -3,7 +3,7 @@ import '@/lib/server-polyfills'
 import { NextRequest, NextResponse} from 'next/server';
 import { DocumentParser} from '@/lib/documentParser';
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Load file securely from DB (Neon) instead of filesystem
-    const client = await createClient()
+    const db = getDb()
     const { rows: [document] } = await client.query(
       `SELECT id, user_id, mime_type, original_name, name, file_data
        FROM documents

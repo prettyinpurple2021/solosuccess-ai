@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     const { id } = params
     const body = await request.json()
 
-    const client = await createClient()
+    const db = getDb()
     // Ensure ownership
     const { rows: [doc] } = await client.query(`SELECT id FROM documents WHERE id = $1 AND user_id = $2`, [id, user.id])
     if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -54,7 +54,7 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
     const params = await context.params
     const { id } = params
 
-    const client = await createClient()
+    const db = getDb()
     // Ensure ownership
     const { rows: [doc] } = await client.query(`SELECT id, size, folder_id FROM documents WHERE id = $1 AND user_id = $2`, [id, user.id])
     if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -88,7 +88,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
     const params = await context.params
     const { id } = params
 
-    const client = await createClient()
+    const db = getDb()
     const { rows: [r] } = await client.query(`
       SELECT d.*, f.name AS folder_name, f.color AS folder_color
       FROM documents d

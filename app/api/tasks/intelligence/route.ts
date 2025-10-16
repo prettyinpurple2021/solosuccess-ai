@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
-import { createClient } from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Log usage for analytics in Postgres (Neon)
-    const client = await createClient()
+    const db = getDb()
     await client.query(
       'INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at) VALUES ($1, $2, $3, $4, $5)',
       [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date().toISOString()]
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's recent AI usage stats from Postgres (Neon)
-    const client = await createClient()
+    const db = getDb()
     const { rows: usageStats } = await client.query(
       'SELECT * FROM ai_usage_logs WHERE user_id = $1 AND feature = $2 ORDER BY created_at DESC LIMIT 10',
       [user.id, 'task_intelligence']

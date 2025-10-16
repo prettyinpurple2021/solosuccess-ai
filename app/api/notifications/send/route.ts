@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/neon/client'
+import { getSql } from '@/lib/api-utils'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { notificationJobQueue } from '@/lib/notification-job-queue'

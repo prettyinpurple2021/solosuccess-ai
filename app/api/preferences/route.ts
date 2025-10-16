@@ -21,7 +21,7 @@ function getSql() {
   return neon(url)
 }
 
-function getUserIdFromToken(request: NextRequest): string | null {
+async function getUserIdFromToken(request: NextRequest): Promise<string | null> {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -39,7 +39,7 @@ function getUserIdFromToken(request: NextRequest): string | null {
 export async function GET(req: NextRequest) {
   try {
     const sql = getSql()
-    const userId = getUserIdFromToken(req)
+    const userId = await getUserIdFromToken(req)
     
     // Get specific preference key from query params
     const url = new URL(req.url)
@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const sql = getSql()
-    const userId = getUserIdFromToken(req)
+    const userId = await getUserIdFromToken(req)
     
     if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const sql = getSql()
-    const userId = getUserIdFromToken(req)
+    const userId = await getUserIdFromToken(req)
     
     if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })

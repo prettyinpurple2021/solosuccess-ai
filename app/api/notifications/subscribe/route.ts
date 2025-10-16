@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/neon/client'
+import { getSql } from '@/lib/api-utils'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     `)
 
     // Insert or update subscription
-    const result = await query(`
+    const result = await getSql().query(`
       INSERT INTO push_subscriptions (
         user_id, endpoint, expiration_time, p256dh_key, auth_key, 
         user_agent, created_at, updated_at, last_used_at, is_active

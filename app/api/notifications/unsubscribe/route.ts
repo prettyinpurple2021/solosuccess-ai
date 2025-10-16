@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/neon/client'
+import { getSql } from '@/lib/api-utils'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     const now = new Date()
 
     // Mark subscription as inactive instead of deleting it (for audit purposes)
-    const result = await query(`
+    const result = await getSql().query(`
       UPDATE push_subscriptions 
       SET 
         is_active = false,
@@ -110,7 +110,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete all subscriptions for the user (complete cleanup)
-    const result = await query(`
+    const result = await getSql().query(`
       DELETE FROM push_subscriptions 
       WHERE user_id = $1
       RETURNING COUNT(*) as deleted_count

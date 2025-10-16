@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { v4 as uuidv4} from 'uuid'
 import bcrypt from 'bcryptjs'
 
@@ -25,7 +25,7 @@ export async function GET(
     const params = await context.params
     const { id } = params
     const documentId = id
-    const client = await createClient()
+    const db = getDb()
 
     // Verify document ownership
     const { rows: [document] } = await client.query(`
@@ -96,7 +96,7 @@ export async function POST(
       return NextResponse.json({ error: 'Permissions are required' }, { status: 400 })
     }
 
-    const client = await createClient()
+    const db = getDb()
 
     // Verify document ownership
     const { rows: [document] } = await client.query(`

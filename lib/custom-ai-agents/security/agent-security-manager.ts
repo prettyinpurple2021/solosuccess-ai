@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { createClient } from "@/lib/neon/server"
+import { getDb } from "@/lib/database-client"
 
 
 export interface AgentPermission {
@@ -58,8 +58,8 @@ export class AgentSecurityManager {
   }
 
   private async getDb() {
-    const pool = await createClient()
-    return pool
+    const db = getDb()
+    return db
   }
 
   // Authentication and Authorization

@@ -2,10 +2,10 @@ import { logger, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import * as jose from 'jose'
-import { 
-
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
+
+import { 
   getSql, 
   createErrorResponse, 
   createSuccessResponse, 
@@ -72,15 +72,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email,
-        username: user.username 
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
-    )
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const token = await new jose.SignJWT({ 
+      userId: user.id, 
+      email: user.email,
+      username: user.username 
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('7d')
+      .sign(secret)
 
     // Return user data (without password)
     const userData = {

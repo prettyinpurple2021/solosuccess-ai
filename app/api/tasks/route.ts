@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { createErrorResponse } from '@/lib/api-response'
-import { createClient} from '@/lib/neon/server'
+import { getDb } from '@/lib/database-client'
 import { authenticateRequest} from '@/lib/auth-server'
 import { z} from 'zod'
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const includeCompetitive = searchParams.get('include_competitive') === 'true'
     const competitiveOnly = searchParams.get('competitive_only') === 'true'
 
-    const client = await createClient()
+    const db = getDb()
     
     let query = `
       SELECT t.*, 
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     }
     const { title, description, priority, due_date, category } = parsed.data
 
-    const client = await createClient()
+    const db = getDb()
     const { rows } = await client.query(
       `INSERT INTO tasks (user_id, title, description, priority, due_date, category, status)
        VALUES ($1, $2, $3, $4, $5, $6, 'pending')
