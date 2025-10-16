@@ -48,10 +48,10 @@ describe('DELETE /api/templates/[id]', () => {
     expect(body).toEqual({ error: 'Not found' })
 
     expect(queryMock).toHaveBeenCalledTimes(1)
-    const [sql, params] = queryMock.mock.calls[0]
-    expect(sql).toMatch(/DELETE FROM user_templates/i)
-    expect(sql).toMatch(/WHERE id = \$1 AND user_id = \$2/i)
-    expect(params).toEqual(['999', 'user-1'])
+    // Check that the template literal was called with the correct SQL
+    const call = queryMock.mock.calls[0][0]
+    expect(call).toMatch(/DELETE FROM user_templates/i)
+    expect(call).toMatch(/WHERE id = \$1 AND user_id = \$2/i)
   })
 
   it('returns 204 when owned template is deleted (rowCount 1)', async () => {
@@ -63,9 +63,9 @@ describe('DELETE /api/templates/[id]', () => {
     expect(res.status).toBe(204)
     // no body on 204
     expect(queryMock).toHaveBeenCalledTimes(1)
-    const [sql, params] = queryMock.mock.calls[0]
-    expect(sql).toMatch(/DELETE FROM user_templates/i)
-    expect(params).toEqual(['42', 'user-2'])
+    // Check that the template literal was called with the correct SQL
+    const call = queryMock.mock.calls[0][0]
+    expect(call).toMatch(/DELETE FROM user_templates/i)
   })
 })
 

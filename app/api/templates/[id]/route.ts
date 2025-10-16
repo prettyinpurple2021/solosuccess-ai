@@ -35,21 +35,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = getDb()
+    const sql = getDb()
 
     const key = getIdempotencyKeyFromRequest(req)
     if (key) {
-      const reserved = await reserveIdempotencyKey(client, `tpl-del:${id}:${user.id}:${key}`)
+      const reserved = await reserveIdempotencyKey(sql, `tpl-del:${id}:${user.id}:${key}`)
       if (!reserved) {
         return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
       }
     }
-    const { rowCount } = await client.query(
-      'DELETE FROM user_templates WHERE id = $1 AND user_id = $2',
-      [id, user.id]
-    )
+    const result = await sql`
+      DELETE FROM user_templates WHERE id = ${id} AND user_id = ${user.id}
+    `
 
-    if (rowCount === 0) {
+    if (result.rowCount === 0) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
