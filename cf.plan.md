@@ -156,14 +156,14 @@ Docs: https://developers.cloudflare.com/workflows/
 
 ## To-dos
 
-- [ ] Remove nodejs runtime flags; set edge runtime in all routes
-- [ ] Refactor all Node pg usages to Drizzle+Neon HTTP client
-- [ ] Standardize on lib/database-client.ts and remove lib/neon/*
-- [ ] Add @cloudflare/next-on-pages and scripts build:cf, preview:cf
-- [ ] Configure Pages build, output dirs, functions, compatibility date
-- [ ] Configure DATABASE_URL and secrets in Pages project settings
-- [ ] Set security headers and safe cache-control in app routes
-- [ ] Ensure structured logging via lib/logger; remove console.*
+- [x] Remove nodejs runtime flags; set edge runtime in all routes (154 files updated)
+- [x] Refactor all Node pg usages to Drizzle+Neon HTTP client (jose for JWT)
+- [x] Standardize on lib/database-client.ts and remove lib/neon/* (deleted Node pg clients)
+- [x] Add @cloudflare/next-on-pages and scripts build:cf, preview:cf (already present)
+- [x] Configure Pages build, output dirs, functions, compatibility date (wrangler.toml updated)
+- [x] Set security headers and safe cache-control in middleware (CSP, HSTS, X-Frame-Options, etc.)
+- [x] Ensure structured logging via lib/logger; remove console.* (only 5 acceptable uses in background tasks)
+- [ ] Configure DATABASE_URL and secrets in Pages project settings (see CLOUDFLARE_PAGES_CONFIG.md)
 - [ ] Add CI step to run Drizzle migrations against Neon
 - [ ] Run preview build and validate SSR/API/DB connectivity
 - [ ] Plan separate Worker with Workflows for long-running jobs

@@ -1,9 +1,9 @@
 name = "solosuccess-ai"
-compatibility_date = "2024-12-01"
+compatibility_date = "2025-08-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Pages build configuration
-pages_build_output_dir = ".open-next"
+# Pages build configuration (using @cloudflare/next-on-pages)
+pages_build_output_dir = ".vercel/output"
 
 # Production environment configuration
 [env.production]
