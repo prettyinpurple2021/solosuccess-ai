@@ -4,16 +4,16 @@ jest.mock('@/lib/auth-server', () => ({
   authenticateRequest: jest.fn(),
 }))
 
-jest.mock('@/lib/neon/server', () => ({
-  createClient: jest.fn(),
+jest.mock('@/lib/database-client', () => ({
+  getDb: jest.fn(),
 }))
 
 describe('DELETE /api/templates/[id]', () => {
   const { authenticateRequest } = jest.requireMock('@/lib/auth-server') as {
     authenticateRequest: jest.Mock
   }
-  const { createClient } = jest.requireMock('@/lib/neon/server') as {
-    createClient: jest.Mock
+  const { getDb } = jest.requireMock('@/lib/database-client') as {
+    getDb: jest.Mock
   }
 
   // Import after mocks are set up so the route uses the mocked modules
@@ -34,13 +34,13 @@ describe('DELETE /api/templates/[id]', () => {
     expect(res.status).toBe(401)
     const body = await res.json()
     expect(body).toEqual({ error: 'Unauthorized' })
-    expect(createClient).not.toHaveBeenCalled()
+    expect(getDb).not.toHaveBeenCalled()
   })
 
   it('returns 404 when template does not belong to user (rowCount 0)', async () => {
     authenticateRequest.mockResolvedValue({ user: { id: 'user-1' }, error: null })
     const queryMock = jest.fn().mockResolvedValue({ rowCount: 0 })
-    createClient.mockResolvedValue({ query: queryMock })
+    getDb.mockReturnValue({ execute: queryMock })
 
     const res = (await DELETE(new Request('http://localhost'), makeContext('999'))) as NextResponse
     expect(res.status).toBe(404)
@@ -57,7 +57,7 @@ describe('DELETE /api/templates/[id]', () => {
   it('returns 204 when owned template is deleted (rowCount 1)', async () => {
     authenticateRequest.mockResolvedValue({ user: { id: 'user-2' }, error: null })
     const queryMock = jest.fn().mockResolvedValue({ rowCount: 1 })
-    createClient.mockResolvedValue({ query: queryMock })
+    getDb.mockReturnValue({ execute: queryMock })
 
     const res = (await DELETE(new Request('http://localhost'), makeContext('42'))) as NextResponse
     expect(res.status).toBe(204)
