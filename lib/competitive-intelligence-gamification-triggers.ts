@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { CompetitiveIntelligenceGamification } from './competitive-intelligence-gamification'
-import { createClient } from '@/lib/neon/client'
+import { getDb } from '@/lib/database-client'
 
 
 export class CompetitiveIntelligenceGamificationTriggers {
@@ -36,8 +36,8 @@ export class CompetitiveIntelligenceGamificationTriggers {
       await this.triggerGamificationEvent(userId, 'alert_processed', 1)
       
       // Check if this was a high-priority alert for bonus points
-      const client = await createClient()
-      const { rows: alertRows } = await client.query(
+      const db = getDb()
+      const { rows: alertRows } = await db.query(
         'SELECT severity FROM competitor_alerts WHERE id = $1 AND user_id = $2',
         [alertId, userId]
       )
@@ -73,8 +73,8 @@ export class CompetitiveIntelligenceGamificationTriggers {
       await this.triggerGamificationEvent(userId, 'competitive_task_completed', 1)
       
       // Check if this was a high-priority task for bonus points
-      const client = await createClient()
-      const { rows: taskRows } = await client.query(
+      const db = getDb()
+      const { rows: taskRows } = await db.query(
         'SELECT priority FROM tasks WHERE id = $1 AND user_id = $2',
         [taskId, userId]
       )
@@ -144,10 +144,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async checkIntelligenceStreaks(userId: string): Promise<void> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get intelligence gathering activity for the last 30 days
-      const { rows: activityRows } = await client.query(
+      const { rows: activityRows } = await db.query(
         `SELECT DATE(collected_at) as activity_date, COUNT(*) as intelligence_count
          FROM intelligence_data 
          WHERE user_id = $1 
@@ -173,7 +173,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
       }
       
       // Update streak in competitive stats
-      await client.query(
+      await db.query(
         'UPDATE user_competitive_stats SET intelligence_streaks = $1 WHERE user_id = $2',
         [currentStreak, userId]
       )
@@ -192,16 +192,16 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async awardBonusPoints(userId: string, points: number, reason: string): Promise<void> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Update competitive advantage points
-      await client.query(
+      await db.query(
         'UPDATE user_competitive_stats SET competitive_advantage_points = competitive_advantage_points + $1 WHERE user_id = $2',
         [points, userId]
       )
       
       // Update user total points
-      await client.query(
+      await db.query(
         'UPDATE users SET total_points = total_points + $1 WHERE id = $2',
         [points, userId]
       )
@@ -217,7 +217,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async generateTeamChallenge(userIds: string[]): Promise<string> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       const challengeId = `team_challenge_${Date.now()}`
       const challengeData = {
@@ -235,7 +235,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
       
       // Create challenge for each team member
       for (const userId of userIds) {
-        await client.query(
+        await db.query(
           `INSERT INTO competitive_challenges (
             id, user_id, title, description, objectives, total_points, expires_at
           ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
@@ -263,10 +263,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async updateLeaderboards(): Promise<void> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Update global competitive intelligence leaderboard
-      await client.query(`
+      await db.query(`
         INSERT INTO competitive_leaderboard (
           user_id, competitive_advantage_points, market_victories, intelligence_gathered, last_updated
         )
@@ -285,7 +285,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
       `)
       
       // Update rankings
-      await client.query(`
+      await db.query(`
         WITH ranked_users AS (
           SELECT 
             user_id,
@@ -339,7 +339,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
       
       // Fallback: Direct database update for critical stats
       try {
-        const client = await createClient()
+        const db = getDb()
         const statUpdates = this.getStatUpdates(activityType, value)
         
         if (Object.keys(statUpdates).length > 0) {
@@ -349,7 +349,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
             updated_at = NOW()
             WHERE user_id = $1
           `
-          await client.query(updateQuery, [userId, ...Object.values(statUpdates)])
+          await db.query(updateQuery, [userId, ...Object.values(statUpdates)])
         }
       } catch (fallbackError) {
         logError('Fallback gamification update failed:', fallbackError)

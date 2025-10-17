@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { Achievement, UserStats, GamificationEngine } from './gamification-system'
-import { createClient } from '@/lib/neon/client'
+import { getDb } from '@/lib/database-client'
 
 export interface CompetitiveIntelligenceStats {
   competitors_monitored: number
@@ -405,13 +405,13 @@ export class CompetitiveIntelligenceGamification extends GamificationEngine {
     percentile: number
   }> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get user's competitive advantage points
       const userPoints = this.competitiveStats.competitive_advantage_points
       
       // Count users with higher points
-      const { rows: higherUsers } = await client.query(
+      const { rows: higherUsers } = await db.query(
         `SELECT COUNT(*) as count 
          FROM users u
          JOIN user_competitive_stats ucs ON u.id = ucs.user_id
@@ -420,7 +420,7 @@ export class CompetitiveIntelligenceGamification extends GamificationEngine {
       )
       
       // Count total users with competitive stats
-      const { rows: totalUsers } = await client.query(
+      const { rows: totalUsers } = await db.query(
         `SELECT COUNT(*) as count 
          FROM users u
          JOIN user_competitive_stats ucs ON u.id = ucs.user_id`

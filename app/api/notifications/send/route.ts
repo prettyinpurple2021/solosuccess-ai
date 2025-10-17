@@ -7,8 +7,8 @@ import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
 import webpush from 'web-push'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility (web-push library)
+// export const runtime = 'edge'
 
 
 
@@ -208,7 +208,8 @@ export async function POST(request: NextRequest) {
       subscriptionsParams = [user.id]
     }
 
-    const subscriptionsResult = await query(subscriptionsQuery, subscriptionsParams)
+    const sql = getSql()
+    const subscriptionsResult = await sql.query(subscriptionsQuery, subscriptionsParams)
     const subscriptions = subscriptionsResult.rows
 
     if (subscriptions.length === 0) {
@@ -263,7 +264,7 @@ export async function POST(request: NextRequest) {
         await webpush.sendNotification(pushSubscription, JSON.stringify(payload))
         
         // Update last_used_at
-        await query(`
+        await sql.query(`
           UPDATE push_subscriptions 
           SET last_used_at = NOW() 
           WHERE id = $1
@@ -280,7 +281,7 @@ export async function POST(request: NextRequest) {
         
         // If subscription is invalid, mark it as inactive
         if (error.statusCode === 410 || error.statusCode === 404) {
-          await query(`
+          await sql.query(`
             UPDATE push_subscriptions 
             SET is_active = false, updated_at = NOW() 
             WHERE id = $1
@@ -305,7 +306,7 @@ export async function POST(request: NextRequest) {
     `
     
     // Create notification_logs table if it doesn't exist
-    await query(`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS notification_logs (
         id SERIAL PRIMARY KEY,
         sent_by VARCHAR(255),
@@ -319,7 +320,7 @@ export async function POST(request: NextRequest) {
       )
     `)
 
-    await query(notificationLogQuery, [
+    await sql.query(notificationLogQuery, [
       user?.id || 'system',
       notification.title,
       notification.body,

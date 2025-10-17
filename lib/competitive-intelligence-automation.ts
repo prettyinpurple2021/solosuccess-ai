@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { CompetitiveIntelligenceIntegration } from './competitive-intelligence-integration'
-import { createClient } from '@/lib/neon/client'
+import { getDb } from '@/lib/database-client'
 
 
 export interface AutomationRule {
@@ -32,10 +32,10 @@ export class CompetitiveIntelligenceAutomation {
    */
   static async processAlert(alertId: number, userId: string): Promise<void> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get the alert details
-      const { rows: alertRows } = await client.query(
+      const { rows: alertRows } = await db.query(
         `SELECT ca.*, cp.threat_level, cp.name as competitor_name
          FROM competitor_alerts ca
          JOIN competitor_profiles cp ON ca.competitor_id = cp.id
@@ -111,8 +111,8 @@ export class CompetitiveIntelligenceAutomation {
         
         if (taskId && actions.assign_to_goal) {
           // Assign task to specific goal
-          const client = await createClient()
-          await client.query(
+          const db = getDb()
+          await db.query(
             'UPDATE tasks SET goal_id = $1 WHERE id = $2 AND user_id = $3',
             [actions.assign_to_goal, taskId, userId]
           )
@@ -120,8 +120,8 @@ export class CompetitiveIntelligenceAutomation {
         
         if (taskId && actions.priority_override) {
           // Override task priority
-          const client = await createClient()
-          await client.query(
+          const db = getDb()
+          await db.query(
             'UPDATE tasks SET priority = $1 WHERE id = $2 AND user_id = $3',
             [actions.priority_override, taskId, userId]
           )
@@ -235,10 +235,10 @@ export class CompetitiveIntelligenceAutomation {
    */
   static async createBenchmarkingGoals(competitorId: number, userId: string): Promise<number[]> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get competitor information
-      const { rows: competitorRows } = await client.query(
+      const { rows: competitorRows } = await db.query(
         'SELECT name, industry, threat_level FROM competitor_profiles WHERE id = $1 AND user_id = $2',
         [competitorId, userId]
       )
@@ -254,7 +254,7 @@ export class CompetitiveIntelligenceAutomation {
       const goalTemplates = this.getBenchmarkingGoalTemplates(competitor)
       
       for (const template of goalTemplates) {
-        const { rows: goalRows } = await client.query(
+        const { rows: goalRows } = await db.query(
           `INSERT INTO goals (
             user_id, title, description, category, priority, status,
             ai_suggestions

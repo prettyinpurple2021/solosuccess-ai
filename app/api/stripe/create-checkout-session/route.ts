@@ -8,7 +8,8 @@ import { updateUserStripeCustomerId} from '@/lib/stripe-db-utils'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility (Stripe library)
+// export const runtime = 'edge'
 
 
 

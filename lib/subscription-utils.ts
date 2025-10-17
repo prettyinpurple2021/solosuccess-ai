@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { query } from '@/lib/neon/client'
+import { getSql } from '@/lib/api-utils'
 
 
 export interface SubscriptionInfo {
@@ -21,7 +21,7 @@ export interface SubscriptionInfo {
  */
 export async function getUserSubscription(userId: string): Promise<SubscriptionInfo> {
   try {
-    const result = await query(
+    const result = await getSql().query(
       'SELECT subscription_tier, subscription_status FROM users WHERE id = $1',
       [userId]
     )

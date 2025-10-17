@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { createClient } from '@/lib/neon/client'
+import { getDb } from '@/lib/database-client'
 
 
 export interface CompetitiveIntelligenceContext {
@@ -89,10 +89,10 @@ export class CompetitiveIntelligenceContextService {
    */
   static async getCompetitiveContext(userId: string, agentId?: string): Promise<CompetitiveIntelligenceContext> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get active competitors with recent activity
-      const { rows: competitors } = await client.query(
+      const { rows: competitors } = await db.query(
         `SELECT cp.id, cp.name, cp.threat_level, cp.market_position,
                 COUNT(id.id) as recent_intelligence_count,
                 COUNT(ca.id) as recent_alerts_count
@@ -109,7 +109,7 @@ export class CompetitiveIntelligenceContextService {
       )
       
       // Get recent alerts (last 7 days)
-      const { rows: recent_alerts } = await client.query(
+      const { rows: recent_alerts } = await db.query(
         `SELECT ca.id, ca.title, ca.severity, ca.alert_type, ca.created_at,
                 cp.name as competitor_name
          FROM competitor_alerts ca
@@ -122,7 +122,7 @@ export class CompetitiveIntelligenceContextService {
       )
       
       // Get competitive opportunities
-      const { rows: opportunities } = await client.query(
+      const { rows: opportunities } = await db.query(
         `SELECT co.id, co.title, co.impact, co.opportunity_type,
                 cp.name as competitor_name
          FROM competitive_opportunities co
@@ -135,7 +135,7 @@ export class CompetitiveIntelligenceContextService {
       )
       
       // Get competitive tasks
-      const { rows: competitive_tasks } = await client.query(
+      const { rows: competitive_tasks } = await db.query(
         `SELECT t.id, t.title, t.status, t.priority,
                 cp.name as competitor_name
          FROM tasks t
@@ -155,7 +155,7 @@ export class CompetitiveIntelligenceContextService {
       // Enhance competitors with recent activities
       const enhancedCompetitors = await Promise.all(
         competitors.map(async (competitor: { id: number; name: string; threat_level: string; market_position: any }) => {
-          const { rows: activities } = await client.query(
+          const { rows: activities } = await db.query(
             `SELECT data_type, importance, collected_at
              FROM intelligence_data
              WHERE competitor_id = $1 AND user_id = $2
@@ -200,10 +200,10 @@ export class CompetitiveIntelligenceContextService {
    */
   private static async generateMarketInsights(userId: string): Promise<any[]> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get recent high-importance intelligence
-      const { rows: intelligence } = await client.query(
+      const { rows: intelligence } = await db.query(
         `SELECT id.data_type, id.analysis_results, cp.name as competitor_name
          FROM intelligence_data id
          JOIN competitor_profiles cp ON id.competitor_id = cp.id

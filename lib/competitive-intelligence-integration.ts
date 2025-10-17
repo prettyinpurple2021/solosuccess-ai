@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { createClient } from '@/lib/neon/client'
+import { getDb } from '@/lib/database-client'
 import type { CompetitorAlert, CompetitiveOpportunity } from '@/lib/types'
 
 
@@ -125,7 +125,7 @@ export class CompetitiveIntelligenceIntegration {
    */
   static async createTaskFromAlert(alert: CompetitorAlert, userId: string): Promise<number | null> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Find matching task template
       const template = COMPETITIVE_TASK_TEMPLATES.find(t => 
@@ -138,7 +138,7 @@ export class CompetitiveIntelligenceIntegration {
       }
       
       // Get competitor name for template substitution
-      const { rows: competitorRows } = await client.query(
+      const { rows: competitorRows } = await db.query(
         'SELECT name FROM competitor_profiles WHERE id = $1',
         [alert.competitor_id]
       )
@@ -149,7 +149,7 @@ export class CompetitiveIntelligenceIntegration {
       const taskTitle = template.taskTemplate.title.replace('{competitor}', competitorName)
       const taskDescription = template.taskTemplate.description.replace(/{competitor}/g, competitorName)
       
-      const { rows: taskRows } = await client.query(
+      const { rows: taskRows } = await db.query(
         `INSERT INTO tasks (
           user_id, title, description, category, priority, 
           estimated_minutes, tags, ai_suggestions, status
@@ -188,10 +188,10 @@ export class CompetitiveIntelligenceIntegration {
     userId: string
   ): Promise<CompetitiveGoalContext | null> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get competitor information
-      const { rows: competitorRows } = await client.query(
+      const { rows: competitorRows } = await db.query(
         'SELECT name, threat_level, market_position FROM competitor_profiles WHERE id = $1 AND user_id = $2',
         [competitorId, userId]
       )
@@ -203,7 +203,7 @@ export class CompetitiveIntelligenceIntegration {
       const competitor = competitorRows[0]
       
       // Get recent intelligence for benchmarking
-      const { rows: intelligenceRows } = await client.query(
+      const { rows: intelligenceRows } = await db.query(
         `SELECT data_type, extracted_data, analysis_results 
          FROM intelligence_data 
          WHERE competitor_id = $1 AND user_id = $2 
@@ -226,7 +226,7 @@ export class CompetitiveIntelligenceIntegration {
       }
       
       // Update goal with competitive context
-      await client.query(
+      await db.query(
         `UPDATE goals 
          SET ai_suggestions = COALESCE(ai_suggestions, '{}')::jsonb || $1::jsonb
          WHERE id = $2 AND user_id = $3`,
@@ -264,10 +264,10 @@ export class CompetitiveIntelligenceIntegration {
     userId: string
   ): Promise<number | null> {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Create a task that represents the competitive milestone
-      const { rows: taskRows } = await client.query(
+      const { rows: taskRows } = await db.query(
         `INSERT INTO tasks (
           user_id, goal_id, title, description, category, priority,
           due_date, tags, ai_suggestions, status
@@ -304,10 +304,10 @@ export class CompetitiveIntelligenceIntegration {
    */
   static async getCompetitiveProgress(goalId: number, userId: string) {
     try {
-      const client = await createClient()
+      const db = getDb()
       
       // Get goal with competitive context
-      const { rows: goalRows } = await client.query(
+      const { rows: goalRows } = await db.query(
         'SELECT title, description, ai_suggestions FROM goals WHERE id = $1 AND user_id = $2',
         [goalId, userId]
       )
@@ -324,7 +324,7 @@ export class CompetitiveIntelligenceIntegration {
       }
       
       // Get competitive milestone tasks
-      const { rows: milestoneRows } = await client.query(
+      const { rows: milestoneRows } = await db.query(
         `SELECT id, title, description, status, ai_suggestions, completed_at
          FROM tasks 
          WHERE goal_id = $1 AND user_id = $2 
@@ -334,7 +334,7 @@ export class CompetitiveIntelligenceIntegration {
       )
       
       // Get recent competitive intelligence updates
-      const { rows: recentIntelligence } = await client.query(
+      const { rows: recentIntelligence } = await db.query(
         `SELECT id.data_type, id.importance, id.collected_at, cp.name as competitor_name
          FROM intelligence_data id
          JOIN competitor_profiles cp ON cp.id = id.competitor_id

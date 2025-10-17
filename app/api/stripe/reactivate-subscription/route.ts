@@ -6,7 +6,8 @@ import { getStripe} from '@/lib/stripe'
 import { getUserSubscription, updateUserSubscription} from '@/lib/stripe-db-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Edge Runtime disabled due to Node.js dependency incompatibility (Stripe library)
+// export const runtime = 'edge'
 
 
 

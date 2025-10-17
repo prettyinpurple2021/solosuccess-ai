@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { query } from '@/lib/neon/client'
+import { getSql } from '@/lib/api-utils'
 import { uploadFile, deleteFile } from '@/lib/file-storage'
 
 
@@ -104,7 +104,7 @@ export class UnifiedBriefcaseManager {
    */
   async getDefaultBriefcase(userId: string): Promise<UserBriefcase> {
     // Check if user has a default briefcase
-    const result = await query(`
+    const result = await getSql().query(`
       SELECT * FROM user_briefcases 
       WHERE user_id = $1 AND is_default = true
       LIMIT 1
@@ -451,7 +451,7 @@ export class UnifiedBriefcaseManager {
    * Get user's current avatar
    */
   async getUserAvatar(userId: string): Promise<BriefcaseItem | null> {
-    const result = await query(`
+    const result = await getSql().query(`
       SELECT * FROM briefcase_items 
       WHERE user_id = $1 AND type = 'avatar'
       ORDER BY created_at DESC
@@ -512,7 +512,7 @@ export class UnifiedBriefcaseManager {
    */
   async deleteItem(userId: string, itemId: string): Promise<boolean> {
     // Get item details for blob cleanup
-    const result = await query(`
+    const result = await getSql().query(`
       SELECT blob_url FROM briefcase_items 
       WHERE id = $1 AND user_id = $2
     `, [itemId, userId])
