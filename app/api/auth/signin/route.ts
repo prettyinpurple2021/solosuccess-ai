@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import * as jose from 'jose'
 // Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 import { 
   getSql, 
