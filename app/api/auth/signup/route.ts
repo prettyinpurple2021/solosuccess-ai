@@ -5,7 +5,7 @@ import * as jose from 'jose'
 import { neon} from '@neondatabase/serverless'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 // Use Web Crypto API for Edge Runtime compatibility
 function generateUUID() {
   return crypto.randomUUID()
