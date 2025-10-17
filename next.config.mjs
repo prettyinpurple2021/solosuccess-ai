@@ -23,8 +23,8 @@ const nextConfig = {
     JWT_SECRET: process.env.JWT_SECRET,
   },
 
-  // Optimized for Cloudflare Workers deployment with OpenNext
-  output: "standalone",
+  // Optimized for Vercel deployment
+  // output: "standalone", // Disabled for Vercel deployment
   distDir: ".next",
 
   // Enable modern React features and aggressive optimizations
