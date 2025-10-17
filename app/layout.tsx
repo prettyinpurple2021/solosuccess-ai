@@ -38,7 +38,7 @@ export const metadata = {
     statusBarStyle: 'default',
     title: 'SoloSuccess AI',
   },
-  metadataBase: new URL('https://solobossai.fun'),
+  metadataBase: new URL('https://www.solosuccessai.fun'),
   alternates: {
     canonical: '/',
   },
@@ -80,7 +80,7 @@ export const metadata = {
     title: 'SoloSuccess AI — AI Co-founder for Solo Founders',
     description: 'Virtual Team for Founders. AI Business Co-pilot and Solopreneur OS to automate workflows, streamline operations, and scale a solo business.',
     type: 'website',
-    url: 'https://solobossai.fun',
+    url: 'https://www.solosuccessai.fun',
     siteName: 'SoloSuccess AI',
     images: [
       {
@@ -148,7 +148,7 @@ export default function RootLayout({
           orbitron.variable
         )}
       >
-        <link rel="canonical" href="https://solobossai.fun/" />
+        <link rel="canonical" href="https://www.solosuccessai.fun/" />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
@@ -162,8 +162,8 @@ export default function RootLayout({
             '@context': 'https://schema.org',
             '@type': 'Organization',
             name: 'SoloSuccess AI',
-            url: 'https://solobossai.fun/',
-            logo: 'https://solobossai.fun/images/logo.png',
+            url: 'https://www.solosuccessai.fun/',
+            logo: 'https://www.solosuccessai.fun/images/logo.png',
             sameAs: [
               'https://twitter.com/solosuccessai',
               'https://www.linkedin.com/company/solosuccessai'

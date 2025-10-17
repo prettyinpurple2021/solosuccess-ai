@@ -4,6 +4,6 @@ export default function robots() {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://solosuccess.ai/sitemap.xml',
+    sitemap: 'https://www.solosuccessai.fun/sitemap.xml',
   }
 }

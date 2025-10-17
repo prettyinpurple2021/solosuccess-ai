@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { authClient } from "@/lib/auth-client"
+// Switched from external auth client to internal API for reliability in production
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -29,22 +29,23 @@ export default function SignInPage() {
     setError("")
 
     try {
-      const { data, error: signInError } = await authClient.signIn.email({
-        email,
-        password,
-        rememberMe,
-        callbackURL: redirectTo,
+      const isEmail = email.includes('@')
+      const identifier = isEmail ? email : email.toLowerCase()
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password, isEmail }),
       })
-
-      if (signInError) {
-        setError(signInError.message)
+      const contentType = res.headers.get('content-type') || ''
+      const body = contentType.includes('application/json') ? await res.json() : null
+      if (!res.ok) {
+        setError(body?.error || 'Sign in failed')
         return
       }
-
-      if (data) {
-        // Force a hard redirect to ensure cookies are properly set
-        window.location.href = redirectTo
+      if (typeof window !== 'undefined') {
+        if (body?.token) localStorage.setItem('authToken', body.token)
       }
+      window.location.href = redirectTo
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")
     } finally {
@@ -91,6 +92,7 @@ export default function SignInPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                autoComplete="email"
                 required
               />
             </div>
@@ -106,6 +108,7 @@ export default function SignInPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                autoComplete="current-password"
                 required
               />
             </div>
