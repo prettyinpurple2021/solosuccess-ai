@@ -1,629 +1,495 @@
 "use client"
 
-
-export const dynamic = 'force-dynamic'
-import React, { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import Link from "next/link"
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { HolographicCard } from "@/components/ui/holographic-card"
-import { HolographicButton } from "@/components/ui/holographic-button"
-import { Progress } from "@/components/ui/progress"
-import { toast } from "sonner"
-import templateData from "@/data/templates.json"
-import {
-  FileText,
-  Search,
-  Filter,
-  Star,
-  Clock,
-  Users,
-  Zap,
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { 
+  FileText, 
+  Search, 
+  Clock, 
+  Users, 
+  Zap, 
+  Target, 
+  Briefcase, 
+  TrendingUp,
+  Lightbulb,
   Crown,
   Sparkles,
-  Plus,
-  Bookmark,
-  TrendingUp,
-  Target,
-  Lightbulb,
-  UserCog,
-  ArrowRight,
-  Lock,
-  CheckCircle,
-  Loader2,
   Eye,
   Download,
-  Share2,
-  Edit,
-  Trash2,
-  Copy
+  Copy,
+  CheckCircle,
+  Star
 } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+import { logger, logInfo } from "@/lib/logger"
+import { useSmartTips } from "@/hooks/use-smart-tips"
 
-type Template = {
+interface Template {
   id: string
   title: string
   description: string
-  slug: string
-  isInteractive: boolean
-  requiredRole: string
   category: string
+  tier: "launch" | "accelerator" | "dominator"
   estimatedTime: string
   difficulty: "beginner" | "intermediate" | "advanced"
-  popularity: number
   tags: string[]
-  isAiPowered: boolean
-  lastUpdated: string
-}
-
-type SavedTemplate = {
-  id: string
-  title: string
-  template_slug: string
-  created_at: string
-  updated_at: string
-  progress: number
-  isFavorite: boolean
-}
-
-type UserSubscription = {
-  tier: "free_launchpad" | "pro_accelerator" | "empire_dominator"
-  hasAccess: boolean
-}
-
-const SUBSCRIPTION_TIERS = {
-  free_launchpad: { name: "Free Launchpad", color: "bg-blue-500", icon: Target },
-  pro_accelerator: { name: "Pro Accelerator", color: "bg-purple-500", icon: Zap },
-  empire_dominator: { name: "Empire Dominator", color: "bg-gradient-to-r from-purple-500 to-pink-500", icon: Crown }
-}
-
-const DIFFICULTY_COLORS = {
-  beginner: "bg-green-500",
-  intermediate: "bg-yellow-500", 
-  advanced: "bg-red-500"
+  preview: string
+  content: any
+  usageCount: number
+  rating: number
+  isPremium: boolean
+  isNew: boolean
+  isPopular: boolean
 }
 
 export default function TemplatesDashboard() {
-  const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [search, setSearch] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all")
-  const [selectedTier, setSelectedTier] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState("browse")
-  const [userSubscription, setUserSubscription] = useState<UserSubscription>({ tier: "free_launchpad", hasAccess: false })
-  const [generating, setGenerating] = useState(false)
+  const { user } = useAuth()
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [selectedTier, setSelectedTier] = useState("all")
+  const [usedTemplates, setUsedTemplates] = useState<Set<string>>(new Set())
 
-  // Flatten template data for easier filtering
-  const allTemplates: Template[] = templateData.flatMap(category => 
-    category.templates.map(template => ({
-      ...template,
-      category: category.category,
-      estimatedTime: getEstimatedTime(template.slug),
-      difficulty: getDifficulty(template.slug),
-      popularity: Math.floor(Math.random() * 100),
-      tags: getTags(template.slug),
-      isAiPowered: template.isInteractive,
-      lastUpdated: "2024-01-15"
-    }))
-  )
+  // Smart tips configuration for templates
+  const smartTipsConfig = {
+    enabled: true,
+    triggers: [
+      {
+        condition: () => {
+          // Show tip if user hasn't used any templates yet
+          return usedTemplates.size === 0 && templates.length > 0
+        },
+        tipId: 'template-discovery',
+        delay: 10000,
+        cooldown: 15 * 60 * 1000 // 15 minutes
+      }
+    ]
+  }
 
-  const categories = ["all", ...Array.from(new Set(allTemplates.map(t => t.category)))]
+  useSmartTips(smartTipsConfig)
+
+  // Mock templates data - in production, this would come from your API
+  const mockTemplates: Template[] = [
+    {
+      id: "business-plan",
+      title: "Business Plan Template",
+      description: "Complete business plan with market analysis, financial projections, and growth strategy",
+      category: "business",
+      tier: "launch",
+      estimatedTime: "2-3 hours",
+      difficulty: "intermediate",
+      tags: ["business", "planning", "strategy"],
+      preview: "Executive Summary, Market Analysis, Financial Projections, Marketing Strategy...",
+      content: {},
+      usageCount: 1250,
+      rating: 4.8,
+      isPremium: false,
+      isNew: false,
+      isPopular: true
+    },
+    {
+      id: "content-calendar",
+      title: "Content Calendar Template",
+      description: "Social media and content planning calendar with posting schedules",
+      category: "marketing",
+      tier: "launch",
+      estimatedTime: "30 minutes",
+      difficulty: "beginner",
+      tags: ["content", "social-media", "planning"],
+      preview: "Monthly calendar, content themes, posting schedule, engagement tracking...",
+      content: {},
+      usageCount: 890,
+      rating: 4.6,
+      isPremium: false,
+      isNew: false,
+      isPopular: true
+    },
+    {
+      id: "saas-metrics",
+      title: "SaaS Metrics Dashboard",
+      description: "Comprehensive SaaS KPIs and metrics tracking template",
+      category: "analytics",
+      tier: "accelerator",
+      estimatedTime: "1 hour",
+      difficulty: "intermediate",
+      tags: ["saas", "metrics", "kpis", "analytics"],
+      preview: "MRR, Churn Rate, CAC, LTV, User Growth, Revenue Tracking...",
+      content: {},
+      usageCount: 450,
+      rating: 4.9,
+      isPremium: true,
+      isNew: false,
+      isPopular: false
+    },
+    {
+      id: "product-roadmap",
+      title: "Product Roadmap Template",
+      description: "Strategic product development roadmap with feature prioritization",
+      category: "product",
+      tier: "dominator",
+      estimatedTime: "3-4 hours",
+      difficulty: "advanced",
+      tags: ["product", "roadmap", "strategy", "features"],
+      preview: "Vision, Goals, Features, Timeline, Resources, Risk Assessment...",
+      content: {},
+      usageCount: 320,
+      rating: 4.7,
+      isPremium: true,
+      isNew: true,
+      isPopular: false
+    },
+    {
+      id: "customer-interview",
+      title: "Customer Interview Guide",
+      description: "Structured customer interview questions and analysis framework",
+      category: "research",
+      tier: "launch",
+      estimatedTime: "45 minutes",
+      difficulty: "beginner",
+      tags: ["customer", "research", "interviews", "feedback"],
+      preview: "Pre-interview prep, Question framework, Analysis template, Action items...",
+      content: {},
+      usageCount: 670,
+      rating: 4.5,
+      isPremium: false,
+      isNew: false,
+      isPopular: false
+    },
+    {
+      id: "fundraising-pitch",
+      title: "Fundraising Pitch Deck",
+      description: "Investor pitch deck template with financial models and growth projections",
+      category: "fundraising",
+      tier: "dominator",
+      estimatedTime: "4-5 hours",
+      difficulty: "advanced",
+      tags: ["fundraising", "pitch", "investors", "financial"],
+      preview: "Problem, Solution, Market, Business Model, Financials, Team, Ask...",
+      content: {},
+      usageCount: 180,
+      rating: 4.9,
+      isPremium: true,
+      isNew: false,
+      isPopular: false
+    }
+  ]
+
+  const categories = [
+    { id: "all", label: "All Templates", icon: FileText },
+    { id: "business", label: "Business", icon: Briefcase },
+    { id: "marketing", label: "Marketing", icon: TrendingUp },
+    { id: "product", label: "Product", icon: Target },
+    { id: "analytics", label: "Analytics", icon: Zap },
+    { id: "research", label: "Research", icon: Lightbulb },
+    { id: "fundraising", label: "Fundraising", icon: Crown }
+  ]
+
+  const tiers = [
+    { id: "all", label: "All Tiers", color: "bg-gray-100" },
+    { id: "launch", label: "Launch", color: "bg-green-100 text-green-800" },
+    { id: "accelerator", label: "Accelerator", color: "bg-blue-100 text-blue-800" },
+    { id: "dominator", label: "Dominator", color: "bg-purple-100 text-purple-800" }
+  ]
 
   useEffect(() => {
-    loadUserData()
+    setTemplates(mockTemplates)
+    setFilteredTemplates(mockTemplates)
+    
+    // Load used templates from localStorage
+    const used = localStorage.getItem('used-templates')
+    if (used) {
+      setUsedTemplates(new Set(JSON.parse(used)))
+    }
   }, [])
 
-  const loadUserData = async () => {
-      try {
-        setLoading(true)
-      
-      // Load saved templates
-      const templatesRes = await fetch("/api/templates", {
-          headers: {
-            ...(typeof window !== "undefined" && localStorage.getItem("authToken")
-              ? { Authorization: `Bearer ${localStorage.getItem("authToken")}` }
-              : {}),
-          },
-        })
-      
-      if (templatesRes.ok) {
-        const templatesData = await templatesRes.json()
-        setSavedTemplates(templatesData.userTemplates || [])
-      }
+  useEffect(() => {
+    let filtered = templates
 
-      // Load user subscription (mock for now)
-      setUserSubscription({ tier: "pro_accelerator", hasAccess: true })
-      
-      } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load data")
-      } finally {
-        setLoading(false)
-      }
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter((template: Template) =>
+        template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
     }
 
-  const hasAccess = (template: Template) => {
-    const tierOrder = { free_launchpad: 1, pro_accelerator: 2, empire_dominator: 3 }
-    const userTierLevel = tierOrder[userSubscription.tier]
-    const requiredTierLevel = tierOrder[template.requiredRole as keyof typeof tierOrder]
-    return userTierLevel >= requiredTierLevel
-  }
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((template: Template) => template.category === selectedCategory)
+    }
 
-  const filteredTemplates = allTemplates.filter(template => {
-    const matchesSearch = template.title.toLowerCase().includes(search.toLowerCase()) ||
-                         template.description.toLowerCase().includes(search.toLowerCase()) ||
-                         template.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+    // Filter by tier
+    if (selectedTier !== "all") {
+      filtered = filtered.filter((template: Template) => template.tier === selectedTier)
+    }
+
+    setFilteredTemplates(filtered)
+  }, [templates, searchQuery, selectedCategory, selectedTier])
+
+  const handleUseTemplate = (template: Template) => {
+    logInfo('Using template:', { templateId: template.id })
     
-    const matchesCategory = selectedCategory === "all" || template.category === selectedCategory
-    const matchesDifficulty = selectedDifficulty === "all" || template.difficulty === selectedDifficulty
-    const matchesTier = selectedTier === "all" || template.requiredRole === selectedTier
+    // Track usage
+    const newUsedTemplates = new Set(usedTemplates)
+    newUsedTemplates.add(template.id)
+    setUsedTemplates(newUsedTemplates)
+    localStorage.setItem('used-templates', JSON.stringify(Array.from(newUsedTemplates)))
+    
+    // In production, this would:
+    // 1. Check user's subscription tier
+    // 2. Apply template to user's workspace
+    // 3. Track usage analytics
+    // 4. Redirect to appropriate page
+    
+    // For now, show success message
+    alert(`Template "${template.title}" has been applied to your workspace!`)
+  }
 
-    return matchesSearch && matchesCategory && matchesDifficulty && matchesTier
-  })
-
-  const generateCustomTemplate = async () => {
-    setGenerating(true)
-    try {
-      // Mock AI template generation
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      toast.success("Custom template generated!", { icon: "✨" })
-    } catch (error) {
-      toast.error("Failed to generate template", { icon: "❌" })
-    } finally {
-      setGenerating(false)
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case "launch": return <Sparkles className="h-4 w-4" />
+      case "accelerator": return <Zap className="h-4 w-4" />
+      case "dominator": return <Crown className="h-4 w-4" />
+      default: return <FileText className="h-4 w-4" />
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-950 to-black text-white flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-400" />
-          <p className="text-purple-200">Loading your template dashboard...</p>
-        </div>
-      </div>
-    )
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "beginner": return "bg-green-100 text-green-800"
+      case "intermediate": return "bg-yellow-100 text-yellow-800"
+      case "advanced": return "bg-red-100 text-red-800"
+      default: return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const userTier = user?.subscription_tier || "launch"
+  const canAccessTemplate = (template: Template) => {
+    if (template.tier === "launch") return true
+    if (template.tier === "accelerator" && (userTier === "accelerator" || userTier === "dominator")) return true
+    if (template.tier === "dominator" && userTier === "dominator") return true
+    return false
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 to-black text-white">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="container mx-auto p-6 space-y-8"
-      >
+    <div className="min-h-screen gradient-background p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-between"
-        >
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-md"
-              >
-                <FileText className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h1 className="text-4xl font-bold text-gradient">Template Studio</h1>
-                <p className="text-lg text-purple-200">
-                  AI-powered templates to accelerate your business growth
-                </p>
-              </div>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-bold boss-heading mb-2">
+                Template Library 📚
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Professional templates to accelerate your business growth
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-sm border border-gray-300">
+                {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <HolographicButton
-              variant="outline"
-              size="sm"
-              onClick={generateCustomTemplate}
-              disabled={generating}
-            >
-              {generating ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4 mr-2" />
-              )}
-              Generate Custom
-            </HolographicButton>
-      </div>
-        </motion.div>
 
-        {/* Subscription Status */}
-        <HolographicCard>
-          <CardContent className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${SUBSCRIPTION_TIERS[userSubscription.tier].color}`}>
-                {React.createElement(SUBSCRIPTION_TIERS[userSubscription.tier].icon, { className: "w-4 h-4 text-white" })}
-              </div>
-              <div>
-                <h3 className="font-semibold text-white">{SUBSCRIPTION_TIERS[userSubscription.tier].name}</h3>
-                <p className="text-sm text-purple-200">Access to {userSubscription.tier === "free_launchpad" ? "basic" : userSubscription.tier === "pro_accelerator" ? "premium" : "all"} templates</p>
-              </div>
+          {/* Search and Filters */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search templates..."
+                value={searchQuery}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            {userSubscription.tier !== "empire_dominator" && (
-              <HolographicButton variant="outline" size="sm">
-                <Crown className="w-4 h-4 mr-2" />
-                Upgrade
-              </HolographicButton>
-            )}
-          </CardContent>
-        </HolographicCard>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full md:w-48">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(category => (
+                  <SelectItem key={category.id} value={category.id}>
+                    <div className="flex items-center gap-2">
+                      <category.icon className="h-4 w-4" />
+                      {category.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedTier} onValueChange={setSelectedTier}>
+              <SelectTrigger className="w-full md:w-48">
+                <SelectValue placeholder="Tier" />
+              </SelectTrigger>
+              <SelectContent>
+                {tiers.map(tier => (
+                  <SelectItem key={tier.id} value={tier.id}>
+                    <div className="flex items-center gap-2">
+                      {tier.id !== "all" && getTierIcon(tier.id)}
+                      {tier.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-purple-900/50 border border-purple-700">
-            <TabsTrigger value="browse" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
-              <Eye className="w-4 h-4 mr-2" />
-              Browse Templates
-            </TabsTrigger>
-            <TabsTrigger value="saved" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
-              <Bookmark className="w-4 h-4 mr-2" />
-              My Templates
-            </TabsTrigger>
-            <TabsTrigger value="favorites" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
-              <Star className="w-4 h-4 mr-2" />
-              Favorites
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="browse" className="space-y-6">
-            {/* Filters */}
-            <HolographicCard>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 w-4 h-4 text-purple-400" />
-                    <Input
-                      placeholder="Search templates..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="pl-10 bg-white/5 border-purple-700 text-white placeholder:text-purple-300"
-                    />
+        {/* Templates Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTemplates.map((template: Template) => {
+            const hasAccess = canAccessTemplate(template)
+            const isUsed = usedTemplates.has(template.id)
+            
+            return (
+              <Card key={template.id} className="boss-card hover:shadow-lg transition-all duration-200">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {getTierIcon(template.tier)}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
+                        {template.difficulty}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {template.isNew && <span className="px-2 py-1 rounded-full text-xs border border-gray-300">New</span>}
+                      {template.isPopular && <span className="px-2 py-1 rounded-full text-xs border border-gray-300">Popular</span>}
+                      {template.isPremium && <span className="px-2 py-1 rounded-full text-xs border border-gray-300">Premium</span>}
+                    </div>
                   </div>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="bg-white/5 border-purple-700 text-white">
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-purple-900 text-white border-purple-700">
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category === "all" ? "All Categories" : category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                    <SelectTrigger className="bg-white/5 border-purple-700 text-white">
-                      <SelectValue placeholder="Difficulty" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-purple-900 text-white border-purple-700">
-                      <SelectItem value="all">All Levels</SelectItem>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={selectedTier} onValueChange={setSelectedTier}>
-                    <SelectTrigger className="bg-white/5 border-purple-700 text-white">
-                      <SelectValue placeholder="Subscription Tier" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-purple-900 text-white border-purple-700">
-                      <SelectItem value="all">All Tiers</SelectItem>
-                      <SelectItem value="free_launchpad">Free Launchpad</SelectItem>
-                      <SelectItem value="pro_accelerator">Pro Accelerator</SelectItem>
-                      <SelectItem value="empire_dominator">Empire Dominator</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </HolographicCard>
+                  <CardTitle className="text-lg">{template.title}</CardTitle>
+                  <CardDescription className="text-sm">
+                    {template.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {template.estimatedTime}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      {template.usageCount.toLocaleString()}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3" />
+                      {template.rating}
+                    </div>
+                  </div>
 
-            {/* Templates Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTemplates.map((template, index) => (
-                <motion.div
-                  key={template.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <HolographicCard className={`h-full ${!hasAccess(template) ? 'opacity-60' : ''}`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2">
-                          <CardTitle className="text-lg text-white flex items-center gap-2">
-                            {template.title}
-                            {template.isAiPowered && (
-                              <Sparkles className="w-4 h-4 text-cyan-400" />
-                            )}
-                          </CardTitle>
-                          <CardDescription className="text-purple-200 text-sm">
+                  <div className="flex flex-wrap gap-1">
+                    {template.tags.slice(0, 3).map((tag: string) => (
+                      <span key={tag} className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                        {tag}
+                      </span>
+                    ))}
+                    {template.tags.length > 3 && (
+                      <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                        +{template.tags.length - 3}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <Eye className="h-4 w-4 mr-2" />
+                          Preview
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>{template.title}</DialogTitle>
+                          <DialogDescription>
                             {template.description}
-                          </CardDescription>
-                        </div>
-                        {!hasAccess(template) && (
-                          <Lock className="w-5 h-5 text-yellow-400" />
-                        )}
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {/* Template Info */}
-                      <div className="flex items-center gap-2 text-xs text-purple-300">
-                        <Clock className="w-3 h-3" />
-                        <span>{template.estimatedTime}</span>
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-white ${DIFFICULTY_COLORS[template.difficulty]} border-0`}
-                        >
-                          {template.difficulty}
-                        </Badge>
-                      </div>
-
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-1">
-                        {template.tags.slice(0, 3).map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs text-purple-300 border-purple-700">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Subscription Tier */}
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          variant="secondary" 
-                          className={`${SUBSCRIPTION_TIERS[template.requiredRole as keyof typeof SUBSCRIPTION_TIERS].color} text-white border-0 text-xs`}
-                        >
-                          {SUBSCRIPTION_TIERS[template.requiredRole as keyof typeof SUBSCRIPTION_TIERS].name}
-                        </Badge>
-                        <div className="flex items-center gap-1 text-xs text-purple-300">
-                          <Star className="w-3 h-3" />
-                          <span>{template.popularity}%</span>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex gap-2">
-                        {hasAccess(template) ? (
-                          <>
-                            <HolographicButton size="sm" className="flex-1" asChild>
-                              <Link href={`/templates/${template.slug}`}>
-                                <ArrowRight className="w-3 h-3 mr-1" />
-                                Use Template
-                              </Link>
-                            </HolographicButton>
-                            <Button variant="outline" size="sm" className="text-purple-200 border-purple-700">
-                              <Star className="w-3 h-3" />
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="p-4 bg-muted rounded-lg">
+                            <h4 className="font-medium mb-2">Template Preview:</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {template.preview}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>⏱️ {template.estimatedTime}</span>
+                              <span>👥 {template.usageCount.toLocaleString()} uses</span>
+                              <span>⭐ {template.rating}</span>
+                            </div>
+                            <Button
+                              onClick={() => handleUseTemplate(template)}
+                              disabled={!hasAccess}
+                              className="punk-button text-white"
+                            >
+                              {isUsed ? (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Used
+                                </>
+                              ) : (
+                                <>
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Use Template
+                                </>
+                              )}
                             </Button>
-                          </>
-                        ) : (
-                          <HolographicButton size="sm" className="flex-1" variant="outline">
-                            <Lock className="w-3 h-3 mr-1" />
-                            Upgrade Required
-                          </HolographicButton>
-                        )}
-                      </div>
-                    </CardContent>
-                  </HolographicCard>
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="saved" className="space-y-6">
-            {savedTemplates.length === 0 ? (
-              <HolographicCard>
-                <CardContent className="py-16 text-center">
-                  <FileText className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No saved templates yet</h3>
-                  <p className="text-purple-200 mb-6">Start exploring templates and save your favorites for quick access.</p>
-                  <HolographicButton asChild>
-                    <Link href="/templates">Browse Templates</Link>
-                  </HolographicButton>
-                </CardContent>
-              </HolographicCard>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {savedTemplates.map((template, index) => (
-                  <motion.div
-                    key={template.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <HolographicCard>
-              <CardHeader>
-                        <CardTitle className="text-lg text-white">{template.title}</CardTitle>
-                        <CardDescription className="text-purple-200">
-                          Progress: {template.progress}%
-                        </CardDescription>
-              </CardHeader>
-                      <CardContent className="space-y-4">
-                        <Progress value={template.progress} className="h-2" />
-                        <div className="flex items-center justify-between text-xs text-purple-300">
-                          <span>Updated {new Date(template.updated_at).toLocaleDateString()}</span>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="sm" className="text-purple-200 hover:text-white">
-                              <Eye className="w-3 h-3" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-purple-200 hover:text-white">
-                              <Edit className="w-3 h-3" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-purple-200 hover:text-white">
-                              <Trash2 className="w-3 h-3" />
-                </Button>
                           </div>
                         </div>
-                        <HolographicButton size="sm" className="w-full" asChild>
-                          <Link href={`/templates/${template.template_slug}`}>
-                            Continue Working
-                          </Link>
-                        </HolographicButton>
-              </CardContent>
-                    </HolographicCard>
-                  </motion.div>
-          ))}
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Button
+                      onClick={() => handleUseTemplate(template)}
+                      disabled={!hasAccess}
+                      size="sm"
+                      className="flex-1"
+                    >
+                      {isUsed ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Used
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Use
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {!hasAccess && (
+                    <div className="text-xs text-muted-foreground text-center">
+                      Upgrade to {template.tier} plan to access this template
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
-      )}
-          </TabsContent>
 
-          <TabsContent value="favorites" className="space-y-6">
-            <HolographicCard>
-              <CardContent className="py-16 text-center">
-                <Star className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">No favorites yet</h3>
-                <p className="text-purple-200 mb-6">Star templates you love to find them quickly here.</p>
-                <HolographicButton asChild>
-                  <Link href="/templates">Browse Templates</Link>
-                </HolographicButton>
-              </CardContent>
-            </HolographicCard>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <HolographicCard>
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-cyan-300" />
-                    Templates Used
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white">{savedTemplates.length}</div>
-                  <p className="text-sm text-purple-200">This month</p>
-                </CardContent>
-              </HolographicCard>
-
-              <HolographicCard>
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-green-300" />
-                    Time Saved
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white">24h</div>
-                  <p className="text-sm text-purple-200">Estimated</p>
-                </CardContent>
-              </HolographicCard>
-
-              <HolographicCard>
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-pink-300" />
-                    Completion Rate
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-white">87%</div>
-                  <p className="text-sm text-purple-200">Average</p>
-                </CardContent>
-              </HolographicCard>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </motion.div>
+        {filteredTemplates.length === 0 && (
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">No templates found</h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
-}
-
-// Helper functions
-function getEstimatedTime(slug: string): string {
-  const timeMap: Record<string, string> = {
-    "decision-dashboard": "15 min",
-    "vision-board-generator": "30 min",
-    "quarterly-biz-review": "45 min",
-    "delegation-list-builder": "20 min",
-    "i-hate-this-tracker": "10 min",
-    "freebie-funnel-builder": "60 min",
-    "dm-sales-script-generator": "25 min",
-    "offer-comparison-matrix": "35 min",
-    "live-launch-tracker": "90 min",
-    "upsell-flow-builder": "40 min",
-    "pre-mortem-template": "30 min",
-    "reverse-engineer-role-models": "25 min",
-    "big-leap-planner": "50 min",
-    "offer-naming-generator": "20 min",
-    "founder-feelings-tracker": "15 min",
-    "brag-bank-template": "20 min",
-    "ai-collab-planner": "35 min",
-    "pr-pitch-template": "25 min",
-    "viral-hook-generator": "15 min",
-    "values-aligned-biz-filter": "20 min"
-  }
-  return timeMap[slug] || "30 min"
-}
-
-function getDifficulty(slug: string): "beginner" | "intermediate" | "advanced" {
-  const difficultyMap: Record<string, "beginner" | "intermediate" | "advanced"> = {
-    "decision-dashboard": "beginner",
-    "vision-board-generator": "beginner",
-    "quarterly-biz-review": "intermediate",
-    "delegation-list-builder": "intermediate",
-    "i-hate-this-tracker": "beginner",
-    "freebie-funnel-builder": "advanced",
-    "dm-sales-script-generator": "intermediate",
-    "offer-comparison-matrix": "intermediate",
-    "live-launch-tracker": "advanced",
-    "upsell-flow-builder": "advanced",
-    "pre-mortem-template": "intermediate",
-    "reverse-engineer-role-models": "beginner",
-    "big-leap-planner": "advanced",
-    "offer-naming-generator": "beginner",
-    "founder-feelings-tracker": "beginner",
-    "brag-bank-template": "beginner",
-    "ai-collab-planner": "intermediate",
-    "pr-pitch-template": "intermediate",
-    "viral-hook-generator": "beginner",
-    "values-aligned-biz-filter": "beginner"
-  }
-  return difficultyMap[slug] || "intermediate"
-}
-
-function getTags(slug: string): string[] {
-  const tagMap: Record<string, string[]> = {
-    "decision-dashboard": ["decision-making", "planning", "analysis"],
-    "vision-board-generator": ["vision", "goals", "visual"],
-    "quarterly-biz-review": ["review", "metrics", "reflection"],
-    "delegation-list-builder": ["delegation", "productivity", "automation"],
-    "i-hate-this-tracker": ["burnout", "productivity", "wellness"],
-    "freebie-funnel-builder": ["funnel", "lead-gen", "marketing"],
-    "dm-sales-script-generator": ["sales", "scripts", "social-media"],
-    "offer-comparison-matrix": ["pricing", "comparison", "packages"],
-    "live-launch-tracker": ["launch", "marketing", "campaign"],
-    "upsell-flow-builder": ["upsell", "sales", "conversion"],
-    "pre-mortem-template": ["planning", "risk", "strategy"],
-    "reverse-engineer-role-models": ["learning", "analysis", "role-models"],
-    "big-leap-planner": ["planning", "big-decisions", "strategy"],
-    "offer-naming-generator": ["naming", "branding", "ai-powered"],
-    "founder-feelings-tracker": ["wellness", "tracking", "mental-health"],
-    "brag-bank-template": ["testimonials", "social-proof", "content"],
-    "ai-collab-planner": ["collaboration", "content", "networking"],
-    "pr-pitch-template": ["pr", "media", "pitching"],
-    "viral-hook-generator": ["content", "viral", "social-media"],
-    "values-aligned-biz-filter": ["values", "decision-making", "alignment"]
-  }
-  return tagMap[slug] || ["business", "template"]
 }

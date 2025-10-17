@@ -301,5 +301,15 @@ export const SMART_TIPS: Record<string, SmartTip> = {
     icon: Lightbulb,
     dismissible: true,
     autoHide: 10000
+  },
+  'template-discovery': {
+    id: 'template-discovery',
+    title: '📚 Pro Tip: Start with Templates',
+    description: 'Templates can save you hours of work! Try the Business Plan or Content Calendar templates to get started quickly.',
+    category: 'productivity',
+    priority: 'medium',
+    icon: FileText,
+    dismissible: true,
+    autoHide: 12000
   }
 }

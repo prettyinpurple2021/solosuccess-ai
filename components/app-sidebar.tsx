@@ -50,7 +50,7 @@ const data = {
     },
     {
       title: "Templates",
-      url: "/templates",
+      url: "/dashboard/templates",
       icon: FileText,
     },
     {
