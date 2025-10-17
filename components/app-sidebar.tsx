@@ -10,6 +10,7 @@ import { NavUser} from "@/components/nav-user"
 import { TeamSwitcher} from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail} from "@/components/ui/sidebar"
 import { useAuth} from "@/hooks/use-auth"
+import { TipSettingsButton} from "@/components/ui/tip-settings-button"
 
 // Production data - will be fetched from user's actual teams
 const data = {
@@ -90,6 +91,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects />
       </SidebarContent>
       <SidebarFooter>
+        <div className="p-2">
+          <TipSettingsButton />
+        </div>
         <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />

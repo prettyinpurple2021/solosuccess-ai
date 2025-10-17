@@ -44,9 +44,14 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   useEffect(() => {
     logInfo('Open prop changed:', open)
     if (!open) {
-      logInfo('Modal was closed externally!')
+      logInfo('Modal was closed externally! Current state:', {
+        currentStep,
+        selectedPersonality,
+        selectedGoals,
+        selectedAgents
+      })
     }
-  }, [open])
+  }, [open, currentStep, selectedPersonality, selectedGoals, selectedAgents])
 
   const welcomeSteps = [
     {
@@ -163,6 +168,10 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                   setSelectedPersonality(style.id)
                   logInfo('Personality set to:', style.id)
                 }}
+                onMouseDown={(e) => {
+                  // Prevent any potential focus/blur issues
+                  e.preventDefault()
+                }}
               >
                 <div className="flex items-center space-x-4">
                   <div className="text-3xl">{style.emoji}</div>
@@ -218,7 +227,12 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
+                  logInfo('Goal card clicked:', goal.id)
                   toggleGoal(goal.id)
+                }}
+                onMouseDown={(e) => {
+                  // Prevent any potential focus/blur issues
+                  e.preventDefault()
                 }}
               >
                 <div className="flex items-center space-x-4">
@@ -304,7 +318,12 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
+                  logInfo('Agent card clicked:', agent.id)
                   toggleAgent(agent.id)
+                }}
+                onMouseDown={(e) => {
+                  // Prevent any potential focus/blur issues
+                  e.preventDefault()
                 }}
               >
                 <div className="flex items-start space-x-4">
@@ -594,14 +613,27 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={(e) => e.target === e.currentTarget && logInfo('Backdrop clicked but prevented')}>
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" 
+      onClick={(e) => {
+        // Only close if clicking the backdrop itself, not child elements
+        if (e.target === e.currentTarget) {
+          logInfo('Backdrop clicked - preventing close to avoid accidental dismissal')
+          // Don't close the modal on backdrop click during onboarding
+          return
+        }
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3 }}
         className="w-full max-w-4xl max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          // Prevent any clicks inside the modal from bubbling up
+          e.stopPropagation()
+        }}
       >
         <Card className="boss-card border-2 border-purple-200 shadow-2xl">
           <CardHeader className="pb-4">

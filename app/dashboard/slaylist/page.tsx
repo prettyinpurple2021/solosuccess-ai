@@ -27,6 +27,7 @@ import {
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
 import VoiceTaskCreator from "@/components/mobile/voice-task-creator"
 import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
+import { useSmartTips, TRIGGER_CONDITIONS } from "@/hooks/use-smart-tips"
 
 
 interface Goal {
@@ -61,6 +62,33 @@ export default function SlaylistPage() {
   const [showTaskDialog, setShowTaskDialog] = useState(false)
   const [showVoiceTaskDialog, setShowVoiceTaskDialog] = useState(false)
   const [_selectedGoal, _setSelectedGoal] = useState<Goal | null>(null)
+
+  // Smart tips configuration for goals and tasks
+  const smartTipsConfig = {
+    enabled: true,
+    triggers: [
+      {
+        condition: TRIGGER_CONDITIONS.goalCreationStruggle,
+        tipId: 'goal-creation-struggle',
+        delay: 3000,
+        cooldown: 5 * 60 * 1000 // 5 minutes
+      },
+      {
+        condition: TRIGGER_CONDITIONS.taskOverwhelm,
+        tipId: 'task-overwhelm',
+        delay: 2000,
+        cooldown: 10 * 60 * 1000 // 10 minutes
+      },
+      {
+        condition: TRIGGER_CONDITIONS.taskCreationStruggle,
+        tipId: 'task-creation-struggle',
+        delay: 3000,
+        cooldown: 5 * 60 * 1000 // 5 minutes
+      }
+    ]
+  }
+
+  useSmartTips(smartTipsConfig)
   
   // Form states
   const [goalForm, setGoalForm] = useState({
@@ -315,6 +343,7 @@ export default function SlaylistPage() {
                   <Label htmlFor="goal-title">Title</Label>
                   <Input
                     id="goal-title"
+                    data-goal-input
                     value={goalForm.title}
                     onChange={(e) => setGoalForm({...goalForm, title: e.target.value})}
                     placeholder="Enter goal title"
@@ -391,6 +420,7 @@ export default function SlaylistPage() {
                   <Label htmlFor="task-title">Title</Label>
                   <Input
                     id="task-title"
+                    data-task-input
                     value={taskForm.title}
                     onChange={(e) => setTaskForm({...taskForm, title: e.target.value})}
                     placeholder="Enter task title"

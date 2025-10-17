@@ -13,6 +13,7 @@ import ExitIntentSurvey from "@/components/marketing/exit-intent-survey"
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
+import { SmartTipManager } from "@/components/ui/smart-tip"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google'
 
@@ -206,6 +207,7 @@ export default function RootLayout({
                 {/* Ensure this client component that calls useAuth is inside AuthProvider */}
                 <ServiceWorkerRegister />
                 <ExitIntentSurvey />
+                <SmartTipManager />
               </AccessibilityProvider>
             </AuthProvider>
           </StackAuthProvider>

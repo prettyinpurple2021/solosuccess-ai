@@ -6,6 +6,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { useState, useEffect, useMemo, useCallback} from "react"
 import { useDashboardData} from "@/hooks/use-dashboard-data"
 import { useAuth} from "@/hooks/use-auth"
+import { useSmartTips, TRIGGER_CONDITIONS } from "@/hooks/use-smart-tips"
 import { useAnalytics, usePageTracking, usePerformanceTracking} from "@/hooks/use-analytics"
 import { EnhancedOnboarding} from "@/components/onboarding/enhanced-onboarding"
 import { WelcomeDashboard} from "@/components/onboarding/welcome-dashboard"
@@ -31,6 +32,27 @@ export default function DashboardPage() {
   const { track } = useAnalytics()
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showWelcomeDashboard, setShowWelcomeDashboard] = useState(false)
+
+  // Smart tips configuration
+  const smartTipsConfig = {
+    enabled: true,
+    triggers: [
+      {
+        condition: TRIGGER_CONDITIONS.navigationConfusion,
+        tipId: 'navigation-confusion',
+        delay: 5000,
+        cooldown: 10 * 60 * 1000 // 10 minutes
+      },
+      {
+        condition: TRIGGER_CONDITIONS.featureDiscovery,
+        tipId: 'feature-discovery',
+        delay: 15000,
+        cooldown: 15 * 60 * 1000 // 15 minutes
+      }
+    ]
+  }
+
+  useSmartTips(smartTipsConfig)
   const searchParams = useSearchParams()
   const _router = useRouter()
   const isMobile = useIsMobile()
