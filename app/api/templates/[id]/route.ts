@@ -5,6 +5,7 @@ import { getDb} from '@/lib/database-client'
 import { z} from 'zod'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
+import { sql} from 'drizzle-orm'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -35,18 +36,18 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const sql = getDb()
+    const db = getDb()
 
     const key = getIdempotencyKeyFromRequest(req)
     if (key) {
-      const reserved = await reserveIdempotencyKey(sql, `tpl-del:${id}:${user.id}:${key}`)
+      const reserved = await reserveIdempotencyKey(db, `tpl-del:${id}:${user.id}:${key}`)
       if (!reserved) {
         return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
       }
     }
-    const result = await sql`
+    const result = await db.execute(sql`
       DELETE FROM user_templates WHERE id = ${id} AND user_id = ${user.id}
-    `
+    `)
 
     if (result.rowCount === 0) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
