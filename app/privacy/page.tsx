@@ -1,481 +1,357 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
+
 import Link from "next/link"
-import { ArrowLeft, Crown, Shield, FileText, Lock, Eye, Database} from "lucide-react"
-import { Button} from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import { Badge} from "@/components/ui/badge"
-import { Separator} from "@/components/ui/separator"
+import { motion } from "framer-motion"
+import { 
+  ArrowLeft, 
+  Crown, 
+  Shield, 
+  FileText, 
+  Lock, 
+  Eye, 
+  Database,
+  Target,
+  Users,
+  Zap,
+  CheckCircle,
+  AlertTriangle,
+  ArrowRight,
+  Star
+} from "lucide-react"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-                <div className="text-2xl">👑</div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloSuccess AI
-                </span>
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full">
-                Start Building Empire
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
+              
+              <div className="flex items-center gap-4">
+                <Link href="/signin">
+                  <TacticalButton variant="outline" size="sm">
+                    Sign In
+                  </TacticalButton>
+                </Link>
+                <Link href="/signup">
+                  <TacticalButton size="sm">
+                    Get Started
+                  </TacticalButton>
+                </Link>
+              </div>
             </div>
           </div>
-          <Badge className="mb-6 text-lg px-6 py-2 bg-purple-100 text-purple-700 border-purple-200 rounded-full">
-            🔒 Data Protection
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Privacy Policy
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Your privacy is our priority. We&apos;re committed to protecting your data and being transparent about how we handle your information.
-          </p>
-          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-            <FileText className="w-4 h-4" />
-            <span>Effective Date: July 30, 2025</span>
+        </nav>
+
+        {/* Hero Section */}
+        <section className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-4xl mx-auto"
+            >
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Elite Security Protocol
+                </span>
+              </div>
+              
+              <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Privacy <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Policy</span>
+              </h1>
+              
+              <p className="text-xl text-military-storm-grey mb-8 max-w-3xl mx-auto leading-relaxed">
+                Your data security is our mission. Learn how we protect your business intelligence 
+                with military-grade privacy protocols and elite data protection standards.
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-4">
+                <TacticalButton size="lg" className="group">
+                  Read Full Policy
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </TacticalButton>
+                <TacticalButton variant="outline" size="lg">
+                  Contact Security Team
+                </TacticalButton>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Privacy Policy Content */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-              <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <Crown className="w-6 h-6 text-purple-600" />
-                SoloSuccess AI Privacy Policy
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="prose prose-lg max-w-none">
-                
-                {/* Introduction */}
-                <div className="mb-8">
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    This Privacy Policy describes how SoloSuccess AI ("we," "us," or "our") collects, uses, and discloses your information when you use our web application (the "Service&quot;). We are committed to protecting your privacy and handling your data in a transparent and secure manner.
-                  </p>
-                </div>
-
-                <Separator className="my-8" />
-
-                {/* Section 1 */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">1</span>
-                    Information We Collect
-                  </h2>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    We collect various types of information to provide and improve our Service, manage subscriptions, and enhance user productivity.
-                  </p>
-                  
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                      <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                        <Database className="w-4 h-4" />
-                        User Account and Profile Data:
-                      </h3>
-                      <p className="text-gray-600 text-sm">
-                        When you register for an account, we collect your email address and a password. We also create a user profile that stores a unique user ID, your name, subscription tier, Clerk customer ID, and the timestamp of your last update. You can view and edit basic profile information within your account settings.
-                      </p>
-                    </div>
-
-                    <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
-                      <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                        <Lock className="w-4 h-4" />
-                        Subscription and Payment Data:
-                      </h3>
-                      <p className="text-gray-600 text-sm">
-                        We display subscription plan information for marketing purposes, including tier details (Launch, Accelerator, Dominator) and their respective features. No payment processing occurs on this platform. All users currently have access to Launch tier features, with higher tier information displayed for demonstration purposes only.
-                      </p>
-                    </div>
-
-                    <div className="bg-pink-50 p-4 rounded-lg border-l-4 border-pink-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">SlayList Generator Data:</h3>
-                      <p className="text-gray-600 text-sm">
-                        If you use our SlayList Generator, we collect information related to your goals and tasks. This includes the id, user_id, title, status, and created_at for your long-term goals, and the id, goal_id, user_id, title, status, priority, and due_date for individual tasks. Our Lexi AI agent may process your goal data to provide task suggestions.
-                      </p>
-                    </div>
-
-                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">Briefcase Data:</h3>
-                      <p className="text-gray-600 text-sm">
-                        When you upload files to your Briefcase, we store metadata about these files, such as storage_object_path, name, file_type, size, upload_date, and last_modified_date. The actual file content is stored securely in our database. We also manage sharing permissions (viewer, editor, owner) for your files.
-                      </p>
-                    </div>
-
-                    <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">BrandStyler Data:</h3>
-                      <p className="text-gray-600 text-sm">
-                        If you create and save "Brand Profiles&quot; using BrandStyler, we collect and store the id, user_id, profile_name, mission, values, color_palette (JSONB), font_combinations (JSONB), tone, target_audience, keywords, creation_date, and last_modified_date for each profile. Our AI agents, such as Echo, may access your Brand Profile to generate on-brand content.
-                      </p>
-                    </div>
-
-                    <div className="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">AI Agent Interaction Data:</h3>
-                      <p className="text-gray-600 text-sm">
-                        We process user requests sent to our AI agents (e.g., topic input for Echo). AI-generated content (e.g., social media captions, insights nudges) is returned to you and may be saved (e.g., to your Briefcase). We also collect user feedback on AI-generated suggestions to refine our models.
-                      </p>
-                    </div>
-
-                    <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">User Activity/Burnout Data:</h3>
-                      <p className="text-gray-600 text-sm">
-                        SoloSuccess AI includes a "Burnout Shield & Focus Mode&quot; feature. To provide personalized suggestions and assess burnout risk, we may collect specific user activity metrics. This data, including activity_data_id, user_id, type_of_activity (e.g., 'slaylist_completion', 'focus_mode_duration&apos;), timestamp, and relevant_metrics (JSONB), may be stored.
-                      </p>
-                    </div>
-
-                    <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">Notification Preferences:</h3>
-                      <p className="text-gray-600 text-sm">
-                        You can set your notification preferences, which are stored in our system, including user_notification_preferences_id, user_id, event_type, and delivery_method_preferences. Notifications themselves are also stored.
-                      </p>
-                    </div>
+        {/* Security Overview */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Elite Security Standards
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                Military-grade protection for your most valuable business data
+              </p>
+            </div>
+            
+            <TacticalGrid className="max-w-6xl mx-auto">
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                    <Shield className="w-8 h-8 text-white" />
                   </div>
-                </div>
-
-                <Separator className="my-8" />
-
-                {/* Section 2 */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">2</span>
-                    How We Use Your Information
-                  </h2>
-                  
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    We use the information we collect for the following purposes:
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">End-to-End Encryption</h3>
+                  <p className="text-military-storm-grey leading-relaxed">
+                    All data is encrypted using AES-256 encryption both in transit and at rest. 
+                    Your business intelligence is protected with military-grade security.
                   </p>
-
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <ul className="space-y-3 text-gray-600">
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To provide, operate, and maintain our Service.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To process your transactions and manage your subscriptions.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To personalize your experience and deliver relevant content and features.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To enable and enhance the functionality of our AI agents and features like SlayList Generator, Briefcase, and BrandStyler.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To analyze usage trends and improve the performance and design of our Service.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To develop new features and services.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To communicate with you, including sending important updates, notifications, and promotional materials (where you have opted in).</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To provide customer support.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To monitor and prevent fraudulent activity and ensure the security of our Service.</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>To comply with legal obligations.</span>
-                      </li>
-                    </ul>
+                </GlassCard>
+              </TacticalGridItem>
+              
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                    <Lock className="w-8 h-8 text-white" />
                   </div>
-                </div>
-
-                <Separator className="my-8" />
-
-                {/* Section 3 */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">3</span>
-                    Data Storage and Security Measures
-                  </h2>
-                  
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    We prioritize robust data security and privacy.
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">Zero-Knowledge Architecture</h3>
+                  <p className="text-military-storm-grey leading-relaxed">
+                    We cannot access your encrypted data. Only you hold the keys to your business 
+                    intelligence and strategic information.
                   </p>
-
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Technology Stack:</h3>
-                      <p className="text-gray-600 text-sm">
-                        Our primary backend and database are powered by Neon (PostgreSQL), chosen for its scalability, reliability, and security features. We handle user registration, login, authentication, and authorization using JWTs with SSR support. File storage is managed through our secure database system.
-                      </p>
-                    </div>
-
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Data Encryption:</h3>
-                      <p className="text-gray-600 text-sm">
-                        Data is encrypted in transit using HTTPS (TLS 1.2 or higher). Data at rest is also encrypted, as Neon PostgreSQL provides encryption at rest.
-                      </p>
-                    </div>
-
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Access Control and Authorization:</h3>
-                      <div className="space-y-2 text-gray-600 text-sm">
-                        <p><strong>Row Level Security (RLS):</strong> RLS is enabled on all tables containing user data (e.g., goals, tasks, profiles). Policies ensure that users can only access their own data unless explicitly shared.</p>
-                        <p><strong>User Role Management:</strong> We manage user access levels based on their subscription tier, assigning features (e.g., AI agent access, chat retention) based on the subscribed plan. Feature gating ensures users on lower tiers are informed if a feature requires a higher tier.</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-yellow-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Input Validation:</h3>
-                      <p className="text-gray-600 text-sm">
-                        All incoming requests, especially those with a request body, undergo input validation using a Zod schema. This helps prevent vulnerabilities like SQL injection and cross-site scripting (XSS).
-                      </p>
-                    </div>
-
-                    <div className="bg-pink-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">No Payment Processing:</h3>
-                      <p className="text-gray-600 text-sm">
-                        This platform does not process payments or collect financial information. All pricing information is displayed for marketing and demonstration purposes only.
-                      </p>
-                    </div>
-
-                    <div className="bg-teal-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">API Security:</h3>
-                      <p className="text-gray-600 text-sm">
-                        Our API endpoints include proper authentication and authorization checks. We also emphasize the secure management of API keys and credentials for third-party services.
-                      </p>
-                    </div>
+                </GlassCard>
+              </TacticalGridItem>
+              
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                    <Database className="w-8 h-8 text-white" />
                   </div>
-                </div>
-
-                <Separator className="my-8" />
-
-                {/* Section 4 */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">4</span>
-                    Third-Party Integrations and Data Sharing
-                  </h2>
-                  
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    We integrate with key third-party services essential for our functionality. We share your data with these third parties only as necessary to provide our Service:
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">Secure Infrastructure</h3>
+                  <p className="text-military-storm-grey leading-relaxed">
+                    Our infrastructure is built on enterprise-grade cloud platforms with 
+                    SOC 2 Type II compliance and regular security audits.
                   </p>
-
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">Google Vertex AI:</h3>
-                      <p className="text-gray-600 text-sm">
-                        We use Google Vertex AI to power our AI Agent suite (e.g., Roxy, Blaze, Echo, Lumi, Vex, Lexi, Nova, Glitch) and for BrandStyler asset generation. User input and relevant data may be sent to Vertex AI models for processing, and AI-generated content is returned to you.
-                      </p>
-                    </div>
-
-                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-                                              <h3 className="font-semibold text-gray-800 mb-2">Subscription Display:</h3>
-                        <p className="text-gray-600 text-sm">
-                          We display subscription tier information (Launch, Accelerator, Dominator) for marketing purposes. No actual billing or payment processing occurs on this platform.
-                        </p>
-                    </div>
-
-                    <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">Netlify:</h3>
-                      <p className="text-gray-600 text-sm">
-                        Our application is deployed on Netlify, which handles secure hosting, automated deployments, and environment management.
-                      </p>
-                    </div>
-
-                    <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
-                      <h3 className="font-semibold text-gray-800 mb-2">Google Calendar:</h3>
-                      <p className="text-gray-600 text-sm">
-                        If you choose to integrate Google Calendar for features like Focus Mode scheduling, we will, with your explicit consent via an OAuth flow, access your Google Calendar to read events and potentially add events.
-                      </p>
-                    </div>
+                </GlassCard>
+              </TacticalGridItem>
+              
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                    <Eye className="w-8 h-8 text-white" />
                   </div>
-
-                  <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-400 mt-6">
-                    <p className="text-gray-600 text-sm">
-                      We do not sell, rent, or trade your personal information with third parties for their marketing purposes. We may share anonymized or aggregated data that does not identify you personally for analytical or business purposes.
-                    </p>
-                  </div>
-                </div>
-
-                <Separator className="my-8" />
-
-                {/* Section 5 */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">5</span>
-                    Your Rights and Choices
-                  </h2>
-                  
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    SoloSuccess AI aims to adhere to relevant privacy regulations like GDPR and CCPA. While a conceptual "Guardian AI&quot; platform is envisioned to help SoloSuccess AI&apos;s users with their own data privacy compliance (including handling user requests for data access, correction, or deletion for their clients), we also provide mechanisms for our own users to exercise similar rights regarding their data stored within SoloSuccess AI.
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">Privacy by Design</h3>
+                  <p className="text-military-storm-grey leading-relaxed">
+                    Privacy is built into every aspect of our platform. We collect only what's 
+                    necessary and never sell your data to third parties.
                   </p>
+                </GlassCard>
+              </TacticalGridItem>
+            </TacticalGrid>
+          </div>
+        </section>
 
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    You have the following rights regarding your personal data:
-                  </p>
-
-                  <div className="grid gap-4">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                        <Eye className="w-4 h-4" />
-                        Access:
-                      </h3>
-                      <p className="text-gray-600 text-sm">You can request access to the personal data we hold about you.</p>
-                    </div>
-
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Correction/Rectification:</h3>
-                      <p className="text-gray-600 text-sm">You can request that we correct any inaccurate or incomplete personal data we hold about you.</p>
-                    </div>
-
-                    <div className="bg-red-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Erasure ("Right to be Forgotten&quot;):</h3>
-                      <p className="text-gray-600 text-sm">You can request that we delete your personal data, subject to certain legal obligations or legitimate business interests.</p>
-                    </div>
-
-                    <div className="bg-yellow-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Restriction of Processing:</h3>
-                      <p className="text-gray-600 text-sm">You can request that we restrict the processing of your personal data in certain circumstances.</p>
-                    </div>
-
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Data Portability:</h3>
-                      <p className="text-gray-600 text-sm">You can request to receive your personal data in a structured, commonly used, and machine-readable format.</p>
-                    </div>
-
-                    <div className="bg-orange-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-800 mb-2">Objection:</h3>
-                      <p className="text-gray-600 text-sm">You can object to the processing of your personal data in certain circumstances, including for direct marketing.</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg mt-6">
-                    <p className="text-gray-600 text-sm">
-                      To exercise any of these rights, please contact us using the contact information provided below. We will respond to your request in accordance with applicable data protection laws.
-                    </p>
-                  </div>
-                </div>
-
-                <Separator className="my-8" />
-
-                {/* Sections 6-8 */}
+        {/* Data Collection */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                  Data Collection & Usage
+                </h2>
+                <p className="text-xl text-military-storm-grey">
+                  Transparent information about how we handle your data
+                </p>
+              </div>
+              
+              <GlassCard className="p-12">
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">6</span>
-                      Disclaimers and Limitations
-                    </h2>
-                    <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
-                      <p className="text-gray-600 text-sm mb-2">
-                        Please note that while our Lumi (Legal & Docs Agent) assists with document generation, its output explicitly includes "appropriate disclaimers.&quot; This emphasizes that the AI&apos;s output is not a substitute for professional legal advice. SoloSuccess AI provides assistance, but users are ultimately responsible for seeking professional advice where necessary.
-                      </p>
-                      <p className="text-gray-600 text-sm">
-                        We acknowledge ethical considerations such as algorithmic bias, transparency, explainability, and accountability related to AI systems. We are committed to addressing these considerations as our Service evolves.
-                      </p>
+                    <h3 className="font-heading text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                      <CheckCircle className="w-6 h-6 text-green-400" />
+                      Information We Collect
+                    </h3>
+                    <div className="space-y-4 text-military-storm-grey">
+                      <p><strong className="text-white">Account Information:</strong> Name, email, and business details to provide personalized service</p>
+                      <p><strong className="text-white">Usage Data:</strong> How you interact with our platform to improve your experience</p>
+                      <p><strong className="text-white">Business Intelligence:</strong> Your business data to provide AI-powered insights and recommendations</p>
+                      <p><strong className="text-white">Technical Data:</strong> Device information and usage patterns for security and optimization</p>
                     </div>
                   </div>
-
+                  
+                  <SergeantDivider />
+                  
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">7</span>
-                      Changes to This Privacy Policy
-                    </h2>
-                    <p className="text-gray-600 leading-relaxed">
-                      We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Effective Date&quot; at the top. You are advised to review this Privacy Policy periodically for any changes.
-                    </p>
+                    <h3 className="font-heading text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                      <Target className="w-6 h-6 text-military-hot-pink" />
+                      How We Use Your Data
+                    </h3>
+                    <div className="space-y-4 text-military-storm-grey">
+                      <p><strong className="text-white">Service Delivery:</strong> To provide and improve our AI-powered business tools</p>
+                      <p><strong className="text-white">Personalization:</strong> To customize your experience and recommendations</p>
+                      <p><strong className="text-white">Security:</strong> To protect your account and detect unauthorized access</p>
+                      <p><strong className="text-white">Communication:</strong> To send important updates and support messages</p>
+                    </div>
                   </div>
-
+                  
+                  <SergeantDivider />
+                  
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">8</span>
-                      Contact Us
-                    </h2>
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg">
-                      <p className="text-gray-600 leading-relaxed mb-4">
-                        If you have any questions or concerns about this Privacy Policy, please contact us:
-                      </p>
-                      
-                      <div className="space-y-4">
-                        <div className="bg-white p-4 rounded-lg border border-purple-200">
-                          <h4 className="font-semibold text-gray-800 mb-2">Email:</h4>
-                          <p className="text-purple-600 font-semibold">psychedelic.creator@enchantednightmare.com</p>
-                        </div>
-                        
-                        <div className="bg-white p-4 rounded-lg border border-purple-200">
-                          <h4 className="font-semibold text-gray-800 mb-2">Home Office:</h4>
-                          <div className="text-gray-600 space-y-1">
-                            <p className="font-semibold">SoloSuccess AI</p>
-                            <p>Virtual</p>
-                            <p>Albany, GA</p>
-                            <p>United States</p>
-                          </div>
-                        </div>
-                      </div>
+                    <h3 className="font-heading text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                      <Shield className="w-6 h-6 text-military-hot-pink" />
+                      Data Protection Rights
+                    </h3>
+                    <div className="space-y-4 text-military-storm-grey">
+                      <p><strong className="text-white">Access:</strong> Request a copy of all data we have about you</p>
+                      <p><strong className="text-white">Correction:</strong> Update or correct any inaccurate information</p>
+                      <p><strong className="text-white">Deletion:</strong> Request deletion of your personal data</p>
+                      <p><strong className="text-white">Portability:</strong> Export your data in a machine-readable format</p>
                     </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Your Privacy, Our Priority</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Ready to build your empire with confidence? Your data is safe with us as you scale your business with SoloSuccess AI.
-          </p>
-          <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-            <Link href="/">
-              <Button
-                size="lg"
-                className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
-              >
-                Start Building Empire
-              </Button>
-            </Link>
-            <Link href="/terms">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200 bg-transparent"
-              >
-                View Terms of Service
-              </Button>
-            </Link>
+              </GlassCard>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Compliance */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Elite Compliance Standards
+              </h2>
+              <p className="text-xl text-military-storm-grey">
+                Meeting the highest international privacy and security standards
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              <GlassCard className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-heading text-xl font-bold text-white mb-2">GDPR Compliant</h3>
+                <p className="text-military-storm-grey text-sm">Full compliance with European data protection regulations</p>
+              </GlassCard>
+              
+              <GlassCard className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-heading text-xl font-bold text-white mb-2">SOC 2 Type II</h3>
+                <p className="text-military-storm-grey text-sm">Audited security controls and operational procedures</p>
+              </GlassCard>
+              
+              <GlassCard className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Lock className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-heading text-xl font-bold text-white mb-2">CCPA Compliant</h3>
+                <p className="text-military-storm-grey text-sm">California Consumer Privacy Act compliance</p>
+              </GlassCard>
+              
+              <GlassCard className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Star className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-heading text-xl font-bold text-white mb-2">ISO 27001</h3>
+                <p className="text-military-storm-grey text-sm">International information security management standard</p>
+              </GlassCard>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact & Updates */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <GlassCard className="max-w-4xl mx-auto p-12 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Shield className="w-10 h-10 text-white" />
+                </div>
+                
+                <h2 className="font-heading text-4xl font-bold text-white mb-6">
+                  Privacy Questions?
+                </h2>
+                
+                <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
+                  Our elite security team is available to answer any questions about our 
+                  privacy practices and data protection measures.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Link href="/contact">
+                    <TacticalButton size="lg" className="group">
+                      Contact Security Team
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </TacticalButton>
+                  </Link>
+                  <Link href="/help">
+                    <TacticalButton variant="outline" size="lg">
+                      View Help Center
+                    </TacticalButton>
+                  </Link>
+                </div>
+                
+                <div className="mt-8 pt-8 border-t border-military-hot-pink/30">
+                  <p className="text-military-storm-grey text-sm">
+                    Last updated: {new Date().toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                </div>
+              </motion.div>
+            </GlassCard>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-12 border-t border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center gap-3 mb-4 md:mb-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-heading text-lg font-bold text-white">SoloSuccess AI</span>
+              </div>
+              
+              <div className="flex items-center gap-6 text-military-storm-grey">
+                <Link href="/terms" className="hover:text-military-hot-pink transition-colors">Terms</Link>
+                <Link href="/contact" className="hover:text-military-hot-pink transition-colors">Contact</Link>
+                <Link href="/about" className="hover:text-military-hot-pink transition-colors">About</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </CamoBackground>
     </div>
   )
-} 
+}

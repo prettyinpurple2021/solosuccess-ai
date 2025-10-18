@@ -1,15 +1,41 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
+
 import Link from "next/link"
 import React, { useState } from "react"
-import { ArrowLeft, Crown, Calendar, BookOpen, Sparkles, Bell, Mail} from "lucide-react"
-import { Button} from "@/components/ui/button"
-import { Card, CardContent} from "@/components/ui/card"
-import { Badge} from "@/components/ui/badge"
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
+import { motion } from "framer-motion"
+import { 
+  ArrowLeft, 
+  Crown, 
+  Calendar, 
+  BookOpen, 
+  Sparkles, 
+  Bell, 
+  Mail,
+  Target,
+  Users,
+  Zap,
+  ArrowRight,
+  Star,
+  TrendingUp,
+  Brain,
+  Shield,
+  Trophy,
+  Clock,
+  Tag
+} from "lucide-react"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
+import { Input } from "@/components/ui/input"
 
 export default function BlogComingSoonPage() {
   const [email, setEmail] = useState("")
@@ -28,268 +54,405 @@ export default function BlogComingSoonPage() {
         body: JSON.stringify({ email, source: 'blog_hero' }),
       })
       if (res.ok) {
-        setMessage("You're on the list! 🎉")
+        setMessage("Mission briefing subscribed! Check your email for confirmation.")
         setEmail("")
       } else {
-        const data = await res.json().catch(() => ({}))
-        setMessage(data.error || 'Something went wrong. Try again.')
+        setMessage("Transmission failed. Please try again.")
       }
-    } catch {
-      setMessage('Network error. Please try again.')
+    } catch (error) {
+      setMessage("Communication error. Please try again.")
     } finally {
       setSubmitting(false)
     }
   }
 
+  const blogPosts = [
+    {
+      id: "ai-business-automation",
+      title: "How to Automate Your Revenue Workflows with AI",
+      excerpt: "Discover the tactical advantages of AI-powered business automation and how to implement revenue-generating workflows that work 24/7.",
+      author: "SoloSuccess Command",
+      date: "2024-01-15",
+      readTime: "8 min read",
+      category: "Automation",
+      featured: true,
+      tags: ["AI", "Automation", "Revenue", "Workflows"]
+    },
+    {
+      id: "marketing-system-ai",
+      title: "Building a Marketing System with AI",
+      excerpt: "Learn how to create a military-grade marketing system that generates leads and converts prospects using AI-powered strategies.",
+      author: "SoloSuccess Command",
+      date: "2024-01-10",
+      readTime: "12 min read",
+      category: "Marketing",
+      featured: false,
+      tags: ["Marketing", "AI", "Lead Generation", "Conversion"]
+    },
+    {
+      id: "scale-solo-business",
+      title: "How to Scale a Solo Business to 7 Figures",
+      excerpt: "Elite strategies for scaling your solo business from startup to market-dominating empire using AI and automation.",
+      author: "SoloSuccess Command",
+      date: "2024-01-05",
+      readTime: "15 min read",
+      category: "Scaling",
+      featured: false,
+      tags: ["Scaling", "Business Growth", "Strategy", "Leadership"]
+    }
+  ]
+
+  const categories = ["All", "Automation", "Marketing", "Scaling", "AI", "Strategy", "Leadership"]
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-                <div className="text-2xl">👑</div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloSuccess AI
-                </span>
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full">
-                Start Building Empire
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <BookOpen className="w-8 h-8 text-white" />
+              
+              <div className="flex items-center gap-4">
+                <Link href="/signin">
+                  <TacticalButton variant="outline" size="sm">
+                    Sign In
+                  </TacticalButton>
+                </Link>
+                <Link href="/signup">
+                  <TacticalButton size="sm">
+                    Get Started
+                  </TacticalButton>
+                </Link>
+              </div>
             </div>
           </div>
-          <Badge className="mb-6 text-lg px-6 py-2 bg-purple-100 text-purple-700 border-purple-200 rounded-full">
-            📝 Boss Blog Coming Soon
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              The Boss Blog
-            </span>
-            <br />
-            <span className="text-gray-600 text-3xl md:text-4xl">is Almost Here!</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Actionable playbooks on <strong>Business Automation</strong>, <strong>Strategic Planning Tools</strong>, and how to
-            <strong> Streamline Operations</strong> as a <strong>Solo Founder</strong>, <strong>Solopreneur</strong>, or
-            <strong> Small Business Owner</strong>. We cover <strong>AI-powered Productivity</strong> for
-            <strong> Freelancers</strong>, <strong>Consultants</strong>, and the <strong>Individual Creator</strong>.
-          </p>
-          
-          {/* Launch Date */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-2xl max-w-md mx-auto mb-8">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Calendar className="w-6 h-6" />
-              <span className="text-lg font-semibold">Official Launch Date</span>
-            </div>
-            <div className="text-3xl font-bold">September 1, 2025</div>
-          </div>
+        </nav>
 
-          {/* Hero Newsletter */}
-          <form onSubmit={submitNewsletter} className="max-w-xl mx-auto flex flex-col sm:flex-row gap-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email to get updates"
-              required
-              className="flex-1 rounded-lg border border-purple-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
-            />
-            <Button type="submit" disabled={submitting || !email} className="px-6">
-              {submitting ? 'Subscribing…' : 'Subscribe'}
-            </Button>
-          </form>
-          {message && <div className="text-sm text-gray-700 mt-2">{message}</div>}
-        </div>
-      </section>
-
-      {/* What to Expect */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">What to Expect</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Learn how to <strong>Scale a Solo Business</strong>, <strong>Reduce Context Switching</strong>, and
-              <strong> Overcome Decision Fatigue</strong> with practical systems and founder‑friendly frameworks.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="border-purple-200 hover:border-purple-300 transition-colors">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
-                  <Sparkles className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Empire Building Strategies</h3>
-                <p className="text-gray-600">
-                  Deep dives on <strong>How to Grow a Business Alone</strong> using automation, delegation to AI, and sustainable pace.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-purple-200 hover:border-purple-300 transition-colors">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
-                  <Crown className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">AI Productivity Hacks</h3>
-                <p className="text-gray-600">
-                  Practical <strong>Workflow Automation AI</strong> tutorials, <strong>AI Executive Assistant</strong> routines, and
-                  <strong> Business Intelligence Tools</strong> you can copy‑paste.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-purple-200 hover:border-purple-300 transition-colors">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
-                  <BookOpen className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Marketing & Growth Systems</h3>
-                <p className="text-gray-600">
-                  Systems for <strong>Automated Content Creation</strong>, <strong>AI for Social Media</strong>, and
-                  <strong> AI Marketing Assistant</strong> + <strong>AI Sales Strategist</strong> playbooks.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Get Notified */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">Be the First to Know</h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Want to be notified when the Boss Blog launches? Join our newsletter and be the first to read our empire-building content!
-          </p>
-          
-          <Card className="max-w-2xl mx-auto shadow-lg border-0">
-            <CardContent className="p-8">
+        {/* Hero Section */}
+        <section className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-4xl mx-auto"
+            >
               <div className="flex items-center justify-center gap-2 mb-6">
-                <Bell className="w-6 h-6 text-purple-600" />
-                <h3 className="text-2xl font-bold text-gray-800">Launch Notification</h3>
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Elite Intelligence Briefings
+                </span>
               </div>
               
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
-                <p className="text-gray-600 mb-4">
-                  You&apos;ll automatically get notified about the Boss Blog launch when you subscribe to our newsletter below! 
-                  Plus, you&apos;ll get exclusive early access to our best content.
-                </p>
-                <div className="flex items-center justify-center gap-2 text-purple-600 font-semibold">
-                  <Mail className="w-5 h-5" />
-                  <span>Newsletter subscribers get first access! 👇</span>
+              <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Intelligence</span>
+              </h1>
+              
+              <p className="text-xl text-military-storm-grey mb-8 max-w-3xl mx-auto leading-relaxed">
+                Elite strategies, proven tactics, and cutting-edge insights for solo entrepreneurs 
+                who refuse to settle for mediocrity. Learn from the best, dominate your market.
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-4">
+                <TacticalButton size="lg" className="group">
+                  Explore Intelligence
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </TacticalButton>
+                <TacticalButton variant="outline" size="lg">
+                  Subscribe to Briefings
+                </TacticalButton>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Newsletter Signup */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <GlassCard className="max-w-4xl mx-auto p-12">
+              <div className="text-center">
+                <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Bell className="w-10 h-10 text-white" />
                 </div>
+                
+                <h2 className="font-heading text-4xl font-bold text-white mb-6">
+                  Elite Intelligence Briefings
+                </h2>
+                
+                <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
+                  Get exclusive tactical insights, proven strategies, and elite business intelligence 
+                  delivered directly to your command center.
+                </p>
+                
+                <form onSubmit={submitNewsletter} className="max-w-md mx-auto">
+                  <div className="flex gap-4">
+                    <Input
+                      type="email"
+                      placeholder="Enter your tactical email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1 bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                      required
+                    />
+                    <TacticalButton 
+                      type="submit" 
+                      disabled={submitting}
+                      className="group"
+                    >
+                      {submitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Transmitting...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Subscribe
+                        </>
+                      )}
+                    </TacticalButton>
+                  </div>
+                  
+                  {message && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`mt-4 text-sm ${message.includes('subscribed') ? 'text-green-400' : 'text-red-400'}`}
+                    >
+                      {message}
+                    </motion.p>
+                  )}
+                </form>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Blog Preview Topics */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Sneak Peek: Upcoming Topics</h2>
-            <p className="text-xl text-gray-600">
-              Here&apos;s what we&apos;re already working on for you, boss! 📝
-            </p>
+            </GlassCard>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                &quot;From Solo to Squad: Building Your First AI Team&quot;
-              </h3>
-              <p className="text-gray-600 text-sm">
-                A complete guide to getting started with AI agents and building your virtual team from scratch.
-              </p>
-              <div className="mt-3 text-sm">
-                <span className="text-gray-500 mr-2">Related:</span>
-                <Link href="/blog/how-to-scale-a-solo-business" className="text-purple-600 underline">Scale a Solo Business</Link>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                &quot;The Anti-Hustle Manifesto: Building Without Burning Out&quot;
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Why the &quot;hustle till you die&quot; mentality is killing entrepreneurs and how to build sustainably.
+        {/* Featured Content */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Elite Intelligence Reports
+              </h2>
+              <p className="text-xl text-military-storm-grey">
+                Tactical insights from the front lines of business domination
               </p>
             </div>
-
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                &quot;Revenue Automation: 5 AI Systems That Made Me $100K&quot;
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Real case study of revenue-generating automation systems you can implement today.
-              </p>
-              <div className="mt-3 text-sm">
-                <span className="text-gray-500 mr-2">Related:</span>
-                <Link href="/blog/how-to-automate-revenue-workflows" className="text-purple-600 underline">Automate Revenue Workflows</Link>
-              </div>
+            
+            {/* Featured Post */}
+            <div className="max-w-6xl mx-auto mb-16">
+              {blogPosts.filter(post => post.featured).map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <GlassCard className="p-12 group cursor-pointer hover:scale-105 transition-transform">
+                    <div className="flex items-start gap-8">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-6">
+                          <span className="px-3 py-1 bg-military-hot-pink/20 text-military-hot-pink text-sm font-tactical uppercase tracking-wider rounded-full">
+                            Featured Intelligence
+                          </span>
+                          <div className="flex items-center gap-2 text-military-storm-grey">
+                            <Clock className="w-4 h-4" />
+                            <span className="text-sm">{post.readTime}</span>
+                          </div>
+                        </div>
+                        
+                        <h3 className="font-heading text-3xl font-bold text-white mb-4 group-hover:text-military-hot-pink transition-colors">
+                          {post.title}
+                        </h3>
+                        
+                        <p className="text-lg text-military-storm-grey mb-6 leading-relaxed">
+                          {post.excerpt}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-military-storm-grey" />
+                              <span className="text-military-storm-grey text-sm">{post.author}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4 text-military-storm-grey" />
+                              <span className="text-military-storm-grey text-sm">{new Date(post.date).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                          
+                          <TacticalButton variant="outline" className="group">
+                            Read Intelligence
+                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          </TacticalButton>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 mt-6">
+                          {post.tags.map((tag, tagIndex) => (
+                            <span 
+                              key={tagIndex}
+                              className="px-2 py-1 bg-military-tactical/50 text-military-storm-grey text-xs rounded-full"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </motion.div>
+              ))}
             </div>
+            
+            {/* Other Posts */}
+            <TacticalGrid className="max-w-6xl mx-auto">
+              {blogPosts.filter(post => !post.featured).map((post, index) => (
+                <TacticalGridItem key={post.id}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <GlassCard className="h-full p-8 group cursor-pointer hover:scale-105 transition-transform">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="px-2 py-1 bg-military-hot-pink/20 text-military-hot-pink text-xs font-tactical uppercase tracking-wider rounded-full">
+                          {post.category}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-military-storm-grey" />
+                          <span className="text-military-storm-grey text-xs">{post.readTime}</span>
+                        </div>
+                      </div>
+                      
+                      <h3 className="font-heading text-xl font-bold text-white mb-4 group-hover:text-military-hot-pink transition-colors">
+                        {post.title}
+                      </h3>
+                      
+                      <p className="text-military-storm-grey mb-6 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-military-storm-grey text-sm">
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(post.date).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <TacticalButton variant="outline" size="sm" className="group">
+                          Read
+                          <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+                        </TacticalButton>
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                </TacticalGridItem>
+              ))}
+            </TacticalGrid>
+          </div>
+        </section>
 
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                &quot;The Solo Entrepreneur&apos;s Guide to Mental Health&quot;
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Practical strategies for maintaining mental wellness while building your empire.
+        {/* Categories */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Intelligence Categories
+              </h2>
+              <p className="text-xl text-military-storm-grey">
+                Explore tactical insights by specialization
               </p>
-              <div className="mt-3 text-sm">
-                <span className="text-gray-500 mr-2">Related:</span>
-                <Link href="/blog/how-to-build-marketing-system-with-ai" className="text-purple-600 underline">AI Marketing System</Link>
-              </div>
+            </div>
+            
+            <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+              {categories.map((category, index) => (
+                <TacticalButton
+                  key={category}
+                  variant={category === "All" ? "default" : "outline"}
+                  size="sm"
+                  className="group"
+                >
+                  {category}
+                  {category !== "All" && (
+                    <span className="ml-2 px-2 py-1 bg-military-hot-pink/20 text-military-hot-pink text-xs rounded-full">
+                      {Math.floor(Math.random() * 10) + 1}
+                    </span>
+                  )}
+                </TacticalButton>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Building?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            While you wait for the Boss Blog, start building your empire with SoloSuccess AI today!
-          </p>
-          <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-            <Link href="/">
-              <Button
-                size="lg"
-                className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
+        {/* CTA Section */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <GlassCard className="max-w-4xl mx-auto p-12 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
               >
-                Start Your Empire
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200 bg-transparent"
-              >
-                Get Updates
-              </Button>
-            </Link>
+                <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <BookOpen className="w-10 h-10 text-white" />
+                </div>
+                
+                <h2 className="font-heading text-4xl font-bold text-white mb-6">
+                  Ready to Dominate Your Market?
+                </h2>
+                
+                <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
+                  Stop reading about success and start building it. Get access to the same 
+                  AI-powered tools and strategies used by elite entrepreneurs.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Link href="/signup">
+                    <TacticalButton size="lg" className="group">
+                      Start Your Mission
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </TacticalButton>
+                  </Link>
+                  <Link href="/pricing">
+                    <TacticalButton variant="outline" size="lg">
+                      View Plans
+                    </TacticalButton>
+                  </Link>
+                </div>
+              </motion.div>
+            </GlassCard>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-12 border-t border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center gap-3 mb-4 md:mb-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-heading text-lg font-bold text-white">SoloSuccess AI</span>
+              </div>
+              
+              <div className="flex items-center gap-6 text-military-storm-grey">
+                <Link href="/privacy" className="hover:text-military-hot-pink transition-colors">Privacy</Link>
+                <Link href="/terms" className="hover:text-military-hot-pink transition-colors">Terms</Link>
+                <Link href="/contact" className="hover:text-military-hot-pink transition-colors">Contact</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </CamoBackground>
     </div>
   )
-} 
+}
