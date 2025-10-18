@@ -1,14 +1,9 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicButton } from '@/components/ui/holographic-button'
 import { 
   ArrowLeft, 
   Sparkles, 
@@ -22,283 +17,484 @@ import {
   ArrowRight,
   Play,
   Download,
-  Eye
+  Eye,
+  Target,
+  Shield,
+  Brain,
+  Briefcase,
+  Calendar,
+  MessageCircle,
+  Palette,
+  Focus,
+  Rocket,
+  Trophy,
+  Sword,
+  Gem,
+  Infinity,
+  Flame,
+  Award
 } from 'lucide-react'
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
 import templateData from '@/data/templates.json'
 
 type TemplateCategory = {
   id: string
-  category: string
-  icon: string
+  name: string
   description: string
-  templates: Array<{
-    id: string
-    title: string
-    description: string
-    slug: string
-    isInteractive: boolean
-    requiredRole: string
-  }>
+  icon: string
+  color: string
+  templates: Template[]
+}
+
+type Template = {
+  id: string
+  title: string
+  description: string
+  category: string
+  difficulty: 'beginner' | 'intermediate' | 'advanced'
+  estimatedTime: string
+  tags: string[]
+  isAiGenerated?: boolean
+  generatedAt?: string
+  generatedBy?: string
+  aiInsights?: string[]
+  recommendations?: string[]
 }
 
 export default function TemplatesPage() {
-  const categories = templateData as TemplateCategory[]
+  const categories: TemplateCategory[] = [
+    {
+      id: 'business-planning',
+      name: 'Business Planning',
+      description: 'Strategic templates for business development and planning',
+      icon: 'Target',
+      color: 'from-military-hot-pink to-military-blush-pink',
+      templates: templateData.filter(t => t.category === 'business-planning')
+    },
+    {
+      id: 'marketing',
+      name: 'Marketing & Sales',
+      description: 'Templates for marketing campaigns and sales strategies',
+      icon: 'TrendingUp',
+      color: 'from-military-hot-pink to-military-blush-pink',
+      templates: templateData.filter(t => t.category === 'marketing')
+    },
+    {
+      id: 'operations',
+      name: 'Operations',
+      description: 'Templates for operational efficiency and workflow management',
+      icon: 'Briefcase',
+      color: 'from-military-hot-pink to-military-blush-pink',
+      templates: templateData.filter(t => t.category === 'operations')
+    },
+    {
+      id: 'content',
+      name: 'Content Creation',
+      description: 'Templates for content strategy and creation',
+      icon: 'Sparkles',
+      color: 'from-military-hot-pink to-military-blush-pink',
+      templates: templateData.filter(t => t.category === 'content')
+    }
+  ]
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'text-green-400'
+      case 'intermediate': return 'text-yellow-400'
+      case 'advanced': return 'text-red-400'
+      default: return 'text-military-storm-grey'
+    }
+  }
+
+  const getDifficultyIcon = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return <Target className="w-4 h-4" />
+      case 'intermediate': return <Shield className="w-4 h-4" />
+      case 'advanced': return <Sword className="w-4 h-4" />
+      default: return <Target className="w-4 h-4" />
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 to-black text-white">
-      <nav className="border-b border-purple-800 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center gap-2 text-purple-300 hover:text-white transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-semibold">Back to Home</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-purple-300 hover:text-white transition-colors">
-                Dashboard
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              <Link href="/pricing" className="text-purple-300 hover:text-white transition-colors">
-                Pricing
-              </Link>
-              <HolographicButton size="sm">
-                <Crown className="w-4 h-4 mr-2" />
-                Get Started
-              </HolographicButton>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/50 to-pink-900/50"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <motion.div
-              animate={{
-                rotate: [0, 10, -10, 0],
-                scale: [1, 1.1, 1]
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="inline-block mb-6"
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                <Sparkles className="w-10 h-10 text-white" />
+              
+              <div className="flex items-center gap-4">
+                <Link href="/dashboard">
+                  <TacticalButton variant="outline" size="sm">
+                    Dashboard
+                  </TacticalButton>
+                </Link>
+                <Link href="/signup">
+                  <TacticalButton size="sm">
+                    Get Started
+                  </TacticalButton>
+                </Link>
               </div>
-            </motion.div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-gradient">
-              AI-Powered Boss Templates
-            </h1>
-            <p className="text-xl md:text-2xl text-purple-100 mb-8 max-w-4xl mx-auto leading-relaxed">
-              Transform your solo business into an empire with our curated collection of AI-enhanced templates. 
-              From business planning to marketing strategies - everything you need to scale faster! 🚀
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-lg px-4 py-2">
-                <Crown className="w-4 h-4 mr-2" /> 50+ Premium Templates
-              </Badge>
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-lg px-4 py-2">
-                <Zap className="w-4 h-4 mr-2" /> AI-Powered Generation
-              </Badge>
-              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-lg px-4 py-2">
-                <TrendingUp className="w-4 h-4 mr-2" /> Updated Weekly
-              </Badge>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <HolographicButton size="lg" className="text-lg px-8 py-4">
-                <Play className="w-5 h-5 mr-2" />
-                See Templates in Action
-              </HolographicButton>
-              <HolographicButton variant="outline" size="lg" className="text-lg px-8 py-4">
-                <Download className="w-5 h-5 mr-2" />
-                Download Free Sample
-              </HolographicButton>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Features Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl font-bold mb-6 text-gradient">Why Solo Entrepreneurs Love Our Templates</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <HolographicCard>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">AI-Powered Intelligence</h3>
-                <p className="text-purple-200">Our templates use AI to adapt to your industry, stage, and specific needs</p>
-              </CardContent>
-            </HolographicCard>
-            <HolographicCard>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Save 10+ Hours Weekly</h3>
-                <p className="text-purple-200">Skip the research and planning - jump straight into execution</p>
-              </CardContent>
-            </HolographicCard>
-            <HolographicCard>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Proven Results</h3>
-                <p className="text-purple-200">Used by 10,000+ entrepreneurs who&apos;ve grown their businesses 3x faster</p>
-              </CardContent>
-            </HolographicCard>
           </div>
-        </motion.div>
+        </nav>
 
-        {/* Template Categories Showcase */}
-        <div className="space-y-12">
-          {categories.slice(0, 2).map((category, index) => (
+        {/* Hero Section */}
+        <div className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
             <motion.div
-              key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
             >
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-bold text-white">{category.category}</h2>
-                  <p className="text-purple-200">{category.description}</p>
-                </div>
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Elite Template Arsenal
+                </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {category.templates.slice(0, 3).map((template, templateIndex) => (
-                  <motion.div
-                    key={templateIndex}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: templateIndex * 0.1 }}
-                  >
-                    <HolographicCard className="h-full group">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <CardTitle className="text-lg text-white group-hover:text-cyan-300 transition-colors">
-                            {template.title}
-                          </CardTitle>
-                          <Badge 
-                            variant="secondary" 
-                            className="bg-purple-700 text-white text-xs"
-                          >
-                            {template.requiredRole === 'free_launchpad' ? 'Free' : 
-                             template.requiredRole === 'pro_accelerator' ? 'Pro' : 'Premium'}
-                          </Badge>
-                        </div>
-                        <CardDescription className="text-purple-200 text-sm">
-                          {template.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-center gap-4 text-xs text-purple-300">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>15-30 min</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            <span>1,200+ users</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3" />
-                            <span>4.9/5</span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <HolographicButton size="sm" className="flex-1">
-                            <Eye className="w-3 h-3 mr-1" />
-                            Preview
-                          </HolographicButton>
-                          <Button variant="outline" size="sm" className="text-purple-200 border-purple-700">
-                            <Star className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </HolographicCard>
-                  </motion.div>
-                ))}
-              </div>
-              {category.templates.length > 3 && (
-                <div className="text-center mt-6">
-                  <HolographicButton variant="outline">
-                    View All {category.templates.length} Templates
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </HolographicButton>
-                </div>
-              )}
+              
+              <h1 className="font-heading text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Templates</span>
+              </h1>
+              
+              <p className="text-2xl text-military-storm-grey max-w-3xl mx-auto mb-8 leading-relaxed">
+                Deploy battle-tested templates for every aspect of your business. 
+                From strategic planning to content creation, dominate your goals with proven frameworks.
+              </p>
+              
+              <TacticalButton size="lg" className="group">
+                <Rocket className="w-5 h-5 mr-2" />
+                Deploy Templates
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </TacticalButton>
             </motion.div>
-          ))}
+          </div>
         </div>
 
-        {/* Call to Action Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mt-24 text-center"
-        >
-          <div className="bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-2xl p-12 border border-purple-700">
-            <h2 className="text-4xl font-bold mb-6 text-gradient">
-              Ready to Accelerate Your Business? 🚀
-            </h2>
-            <p className="text-xl text-purple-200 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Join thousands of solo entrepreneurs who&apos;ve already transformed their businesses 
-              with our AI-powered templates. Start your empire-building journey today!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <div className="flex items-center gap-2 text-purple-300">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>50+ Premium Templates</span>
-              </div>
-              <div className="flex items-center gap-2 text-purple-300">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>AI-Powered Customization</span>
-              </div>
-              <div className="flex items-center gap-2 text-purple-300">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>24/7 Support</span>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <HolographicButton size="lg" className="text-lg px-8 py-4" asChild>
-                <Link href="/pricing">
-                  <Crown className="w-5 h-5 mr-2" />
-                  Start Your Free Trial
-                </Link>
-              </HolographicButton>
-              <HolographicButton variant="outline" size="lg" className="text-lg px-8 py-4" asChild>
-                <Link href="/dashboard">
-                  <Eye className="w-5 h-5 mr-2" />
-                  View All Templates
-                </Link>
-              </HolographicButton>
+        {/* Template Categories */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-heading text-5xl font-bold text-white mb-6">
+                Template <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Categories</span>
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                Organized by tactical function for maximum efficiency
+              </p>
+            </motion.div>
+
+            <TacticalGrid className="max-w-7xl mx-auto">
+              {categories.map((category, index) => (
+                <TacticalGridItem key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <GlassCard className="h-full p-8">
+                      <div className="text-center mb-6">
+                        <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center`}>
+                          {category.icon === 'Target' && <Target className="w-10 h-10 text-white" />}
+                          {category.icon === 'TrendingUp' && <TrendingUp className="w-10 h-10 text-white" />}
+                          {category.icon === 'Briefcase' && <Briefcase className="w-10 h-10 text-white" />}
+                          {category.icon === 'Sparkles' && <Sparkles className="w-10 h-10 text-white" />}
+                        </div>
+                        
+                        <h3 className="font-heading text-2xl font-bold text-white mb-2">{category.name}</h3>
+                        <p className="text-military-storm-grey mb-4">{category.description}</p>
+                        
+                        <div className="flex items-center justify-center gap-2 mb-6">
+                          <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                            {category.templates.length} Templates
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {category.templates.slice(0, 3).map((template, templateIndex) => (
+                          <div key={templateIndex} className="flex items-center gap-3 p-3 bg-military-tactical/20 rounded-lg">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">{templateIndex + 1}</span>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-white font-medium text-sm">{template.title}</h4>
+                              <p className="text-military-storm-grey text-xs">{template.description}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {getDifficultyIcon(template.difficulty)}
+                              <span className={`text-xs ${getDifficultyColor(template.difficulty)}`}>
+                                {template.difficulty}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {category.templates.length > 3 && (
+                          <div className="text-center">
+                            <span className="text-military-storm-grey text-sm">
+                              +{category.templates.length - 3} more templates
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                </TacticalGridItem>
+              ))}
+            </TacticalGrid>
+          </div>
+        </div>
+
+        {/* Featured Templates */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-heading text-5xl font-bold text-white mb-6">
+                Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Templates</span>
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                Battle-tested templates used by successful entrepreneurs
+              </p>
+            </motion.div>
+
+            <div className="max-w-6xl mx-auto">
+              <TacticalGrid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {templateData.slice(0, 6).map((template, index) => (
+                  <TacticalGridItem key={index}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <GlassCard className="h-full p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            {getDifficultyIcon(template.difficulty)}
+                            <span className={`text-sm font-tactical uppercase tracking-wider ${getDifficultyColor(template.difficulty)}`}>
+                              {template.difficulty}
+                            </span>
+                          </div>
+                          
+                          {template.isAiGenerated && (
+                            <div className="flex items-center gap-1">
+                              <Sparkles className="w-4 h-4 text-military-hot-pink" />
+                              <span className="text-military-hot-pink text-xs font-tactical uppercase">AI</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <h3 className="font-heading text-xl font-bold text-white mb-3">{template.title}</h3>
+                        <p className="text-military-storm-grey mb-4 text-sm leading-relaxed">{template.description}</p>
+                        
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-military-storm-grey" />
+                            <span className="text-military-storm-grey text-sm">{template.estimatedTime}</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-military-storm-grey text-sm">4.8</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {template.tags.slice(0, 3).map((tag, tagIndex) => (
+                            <span key={tagIndex} className="px-2 py-1 bg-military-hot-pink/20 text-military-hot-pink text-xs rounded-full">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <TacticalButton size="sm" className="flex-1">
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Template
+                          </TacticalButton>
+                          <TacticalButton variant="outline" size="sm">
+                            <Download className="w-4 h-4" />
+                          </TacticalButton>
+                        </div>
+                      </GlassCard>
+                    </motion.div>
+                  </TacticalGridItem>
+                ))}
+              </TacticalGrid>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+
+        {/* AI-Generated Templates */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-heading text-5xl font-bold text-white mb-6">
+                AI-Generated <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Templates</span>
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                Custom templates generated by our elite AI agents for your specific needs
+              </p>
+            </motion.div>
+
+            <div className="max-w-4xl mx-auto">
+              <GlassCard className="p-8">
+                <div className="text-center mb-8">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                    <Brain className="w-10 h-10 text-white" />
+                  </div>
+                  
+                  <h3 className="font-heading text-3xl font-bold text-white mb-4">
+                    Custom Template Generation
+                  </h3>
+                  
+                  <p className="text-xl text-military-storm-grey mb-8 leading-relaxed">
+                    Our AI agents can create personalized templates based on your industry, 
+                    business stage, and specific requirements. Get templates tailored to your exact needs.
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <h4 className="font-heading text-xl font-bold text-white mb-4">AI Capabilities:</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <span className="text-military-storm-grey">Industry-specific templates</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <span className="text-military-storm-grey">Custom business stage adaptation</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <span className="text-military-storm-grey">Personalized content generation</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <span className="text-military-storm-grey">Real-time template optimization</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="font-heading text-xl font-bold text-white mb-4">Generation Process:</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-military-hot-pink/20 flex items-center justify-center">
+                          <span className="text-military-hot-pink font-bold text-xs">1</span>
+                        </div>
+                        <span className="text-military-storm-grey text-sm">Define your requirements</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-military-hot-pink/20 flex items-center justify-center">
+                          <span className="text-military-hot-pink font-bold text-xs">2</span>
+                        </div>
+                        <span className="text-military-storm-grey text-sm">AI analyzes your needs</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-military-hot-pink/20 flex items-center justify-center">
+                          <span className="text-military-hot-pink font-bold text-xs">3</span>
+                        </div>
+                        <span className="text-military-storm-grey text-sm">Generate custom template</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-military-hot-pink/20 flex items-center justify-center">
+                          <span className="text-military-hot-pink font-bold text-xs">4</span>
+                        </div>
+                        <span className="text-military-storm-grey text-sm">Deploy and customize</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-center mt-8">
+                  <TacticalButton size="lg" className="group">
+                    <Brain className="w-5 h-5 mr-2" />
+                    Generate Custom Template
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </TacticalButton>
+                </div>
+              </GlassCard>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <GlassCard className="max-w-4xl mx-auto p-12">
+                <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Rocket className="w-10 h-10 text-white" />
+                </div>
+                
+                <h2 className="font-heading text-4xl font-bold text-white mb-6">
+                  Ready to Deploy Your Template Arsenal?
+                </h2>
+                
+                <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
+                  Access hundreds of battle-tested templates and generate custom ones with AI. 
+                  Your business success starts with the right frameworks.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  <TacticalButton size="lg" className="group">
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Access Templates
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </TacticalButton>
+                  
+                  <Link href="/pricing">
+                    <TacticalButton variant="outline" size="lg">
+                      View Plans
+                    </TacticalButton>
+                  </Link>
+                </div>
+              </GlassCard>
+            </motion.div>
+          </div>
+        </div>
+      </CamoBackground>
     </div>
   )
 }
-
-
