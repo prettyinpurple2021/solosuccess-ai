@@ -1,6 +1,5 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect, useMemo, useCallback} from "react"
@@ -11,20 +10,42 @@ import { useAnalytics, usePageTracking, usePerformanceTracking} from "@/hooks/us
 import { EnhancedOnboarding} from "@/components/onboarding/enhanced-onboarding"
 import { WelcomeDashboard} from "@/components/onboarding/welcome-dashboard"
 import { Loading} from "@/components/ui/loading"
-import { BossCard, EmpowermentCard, StatsCard} from "@/components/ui/boss-card"
-import { BossButton, ZapButton} from "@/components/ui/boss-button"
-import { Progress} from "@/components/ui/progress"
 import { motion, easeOut} from "framer-motion"
 import { 
-  CheckCircle, Target, Clock, MessageCircle, Trophy, Crown, Sparkles, Flame, ArrowRight, BarChart3, Plus, Briefcase} from "lucide-react"
+  CheckCircle, 
+  Target, 
+  Clock, 
+  MessageCircle, 
+  Trophy, 
+  Crown, 
+  Sparkles, 
+  Flame, 
+  ArrowRight, 
+  BarChart3, 
+  Plus, 
+  Briefcase,
+  Shield,
+  Zap,
+  TrendingUp,
+  Users,
+  Award
+} from "lucide-react"
 import Link from "next/link"
 import { useSearchParams, useRouter} from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileDashboardEnhanced from "@/components/mobile/mobile-dashboard-enhanced"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid
+} from '@/components/military'
 
 // Note: Metadata cannot be exported from client components
 // SEO metadata is handled in the layout.tsx file
-
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -187,7 +208,10 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen gradient-background p-6">
+      <div className="min-h-screen bg-military-midnight">
+        <CamoBackground />
+        <TacticalGrid />
+        
         <EnhancedOnboarding 
           open={showOnboarding} 
           onComplete={handleOnboardingComplete}
@@ -195,11 +219,17 @@ export default function DashboardPage() {
         />
         
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loading 
-            variant="boss" 
-            size="lg" 
-            text="Loading your empire..."
-          />
+          <GlassCard className="p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-white animate-pulse" />
+            </div>
+            <h2 className="text-xl font-heading font-bold text-military-glass-white mb-2">
+              Loading Command Center...
+            </h2>
+            <p className="text-military-storm-grey">
+              Preparing your tactical dashboard
+            </p>
+          </GlassCard>
         </div>
       </div>
     )
@@ -207,35 +237,34 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen gradient-background p-6">
+      <div className="min-h-screen bg-military-midnight">
+        <CamoBackground />
+        <TacticalGrid />
+        
         <EnhancedOnboarding 
           open={showOnboarding} 
           onComplete={handleOnboardingComplete}
           onSkip={handleOnboardingSkip}
         />
         
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <EmpowermentCard className="max-w-md">
-            <div className="text-center space-y-4">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="mx-auto w-16 h-16 gradient-danger rounded-full flex items-center justify-center"
-              >
-                <Flame className="w-8 h-8 text-white" />
-              </motion.div>
-              <h2 className="text-2xl font-bold text-gradient">Error Loading Dashboard</h2>
-              <p className="text-gray-600 dark:text-gray-400">{error}</p>
-              <BossButton 
-                onClick={() => window.location.reload()}
-                variant="empowerment"
-                crown
-                aria-label="Reload dashboard page"
-              >
-                Try Again
-              </BossButton>
+        <div className="flex items-center justify-center min-h-[60vh] p-4">
+          <GlassCard className="max-w-md p-8 text-center" glow>
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Flame className="w-8 h-8 text-white" />
             </div>
-          </EmpowermentCard>
+            <h2 className="text-2xl font-heading font-bold text-military-glass-white mb-2">
+              Mission Critical Error
+            </h2>
+            <p className="text-military-storm-grey mb-6">{error}</p>
+            <TacticalButton 
+              onClick={() => window.location.reload()}
+              variant="primary"
+              className="w-full"
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Retry Mission
+            </TacticalButton>
+          </GlassCard>
         </div>
       </div>
     )
@@ -243,57 +272,44 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen gradient-background p-6">
+      <div className="min-h-screen bg-military-midnight">
+        <CamoBackground />
+        <TacticalGrid />
+        
         <EnhancedOnboarding 
           open={showOnboarding} 
           onComplete={handleOnboardingComplete}
           onSkip={handleOnboardingSkip}
         />
         
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <EmpowermentCard className="max-w-md">
-            <div className="text-center space-y-6">
-              <motion.div
-                animate={{ 
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-                className="mx-auto w-20 h-20 gradient-empowerment rounded-full flex items-center justify-center"
-              >
-                <Crown className="w-10 h-10 text-white" />
-              </motion.div>
-              <div>
-                <h2 className="text-2xl font-bold text-gradient mb-2">Welcome to SoloSuccess AI</h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">Get started by creating your first goal or task.</p>
-                <div className="space-y-3">
-                  <Link href="/dashboard/slaylist">
-                    <BossButton 
-                      variant="empowerment" 
-                      crown 
-                      fullWidth
-                      icon={<Target className="w-4 h-4" />}
-                    >
-                      Create Goal
-                    </BossButton>
-                  </Link>
-                  <Link href="/dashboard/agents">
-                    <BossButton 
-                      variant="primary" 
-                      fullWidth
-                      icon={<MessageCircle className="w-4 h-4" />}
-                    >
-                      Chat with AI
-                    </BossButton>
-                  </Link>
-                </div>
-              </div>
+        <div className="flex items-center justify-center min-h-[60vh] p-4">
+          <GlassCard className="max-w-md p-8 text-center" glow>
+            <RankStars rank="Commander" size="large" className="justify-center mb-4" />
+            <h2 className="text-2xl font-heading font-bold text-military-glass-white mb-2">
+              Welcome to SoloSuccess AI
+            </h2>
+            <p className="text-military-storm-grey mb-6">Begin your tactical mission</p>
+            <div className="space-y-3">
+              <Link href="/dashboard/slaylist">
+                <TacticalButton 
+                  variant="primary" 
+                  className="w-full"
+                  icon={<Target className="w-4 h-4" />}
+                >
+                  Create Mission
+                </TacticalButton>
+              </Link>
+              <Link href="/dashboard/agents">
+                <TacticalButton 
+                  variant="secondary" 
+                  className="w-full"
+                  icon={<MessageCircle className="w-4 h-4" />}
+                >
+                  Contact Command
+                </TacticalButton>
+              </Link>
             </div>
-          </EmpowermentCard>
+          </GlassCard>
         </div>
       </div>
     )
@@ -329,7 +345,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen gradient-background p-6" role="main">
+    <main className="min-h-screen bg-military-midnight" role="main">
+      <CamoBackground />
+      <TacticalGrid />
+      
       <EnhancedOnboarding 
         open={showOnboarding} 
         onComplete={handleOnboardingComplete}
@@ -340,7 +359,7 @@ export default function DashboardPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-8"
+        className="p-6 space-y-8"
       >
         {/* Welcome Header */}
         <motion.div variants={itemVariants} className="flex items-center justify-between">
@@ -356,33 +375,27 @@ export default function DashboardPage() {
                   repeat: Infinity, 
                   ease: "easeInOut" 
                 }}
-                className="w-12 h-12 gradient-empowerment rounded-full flex items-center justify-center"
+                className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center"
               >
                 <Crown className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h1 className="text-4xl font-bold text-gradient">
+                <h1 className="text-4xl font-heading font-bold text-military-glass-white">
                   Welcome back, {data.user.full_name || data.user.email.split('@')[0]}! 👑
                 </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  Here&apos;s what&apos;s happening with your empire today
+                <p className="text-lg text-military-storm-grey">
+                  Command center status report
                 </p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="crown-badge"
-            >
+            <StatsBadge variant="warning" size="lg">
               Level {data.user.level}
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="px-4 py-2 gradient-success rounded-full text-white font-bold"
-            >
+            </StatsBadge>
+            <StatsBadge variant="success" size="lg">
               {data.user.total_points} pts
-            </motion.div>
+            </StatsBadge>
           </div>
         </motion.div>
 
@@ -390,33 +403,65 @@ export default function DashboardPage() {
         <section aria-labelledby="stats-heading">
           <h2 id="stats-heading" className="sr-only">Today's Statistics</h2>
           <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatsCard
-            title="Tasks Completed"
-            value={`${todaysStats.tasks_completed}/${todaysStats.total_tasks}`}
-            icon={<CheckCircle className="w-6 h-6 text-white" />}
-            trend={{ value: 15, isPositive: true }}
-          />
-          
-          <StatsCard
-            title="Focus Time"
-            value={`${todaysStats.focus_minutes}m`}
-            icon={<Clock className="w-6 h-6 text-white" />}
-            trend={{ value: 8, isPositive: true }}
-          />
-          
-          <StatsCard
-            title="AI Interactions"
-            value={todaysStats.ai_interactions}
-            icon={<MessageCircle className="w-6 h-6 text-white" />}
-            trend={{ value: 12, isPositive: true }}
-          />
-          
-          <StatsCard
-            title="Productivity Score"
-            value={`${todaysStats.productivity_score}%`}
-            icon={<BarChart3 className="w-6 h-6 text-white" />}
-            trend={{ value: 5, isPositive: true }}
-          />
+            <GlassCard className="p-6" glow>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <StatsBadge variant="success" size="sm">
+                  +15%
+                </StatsBadge>
+              </div>
+              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+                {todaysStats.tasks_completed}/{todaysStats.total_tasks}
+              </h3>
+              <p className="text-military-storm-grey text-sm">Tasks Completed</p>
+            </GlassCard>
+            
+            <GlassCard className="p-6" glow>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <StatsBadge variant="success" size="sm">
+                  +8%
+                </StatsBadge>
+              </div>
+              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+                {todaysStats.focus_minutes}m
+              </h3>
+              <p className="text-military-storm-grey text-sm">Focus Time</p>
+            </GlassCard>
+            
+            <GlassCard className="p-6" glow>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-white" />
+                </div>
+                <StatsBadge variant="success" size="sm">
+                  +12%
+                </StatsBadge>
+              </div>
+              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+                {todaysStats.ai_interactions}
+              </h3>
+              <p className="text-military-storm-grey text-sm">AI Interactions</p>
+            </GlassCard>
+            
+            <GlassCard className="p-6" glow>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <StatsBadge variant="success" size="sm">
+                  +5%
+                </StatsBadge>
+              </div>
+              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+                {todaysStats.productivity_score}%
+              </h3>
+              <p className="text-military-storm-grey text-sm">Productivity Score</p>
+            </GlassCard>
           </motion.div>
         </section>
 
@@ -426,73 +471,71 @@ export default function DashboardPage() {
           <section aria-labelledby="tasks-heading" className="lg:col-span-2">
             <h2 id="tasks-heading" className="sr-only">Today's Tasks</h2>
             <motion.div variants={itemVariants}>
-            <EmpowermentCard>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
-                  <Target className="w-6 h-6" />
-                  <span>Today&apos;s Tasks</span>
-                </h2>
-                <ZapButton size="sm">
-                  View All
-                </ZapButton>
-              </div>
-              
-              <div className="space-y-4">
-                {todaysTasks.length > 0 ? (
-                  todaysTasks.map((task, index) => (
-                    <motion.div
-                      key={task.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center justify-between p-4 glass rounded-xl hover-lift"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <motion.div
-                          whileHover={{ scale: 1.2 }}
-                          className={`w-3 h-3 rounded-full ${
-                            task.status === 'completed' ? 'bg-green-500' : 'bg-yellow-500'
-                          }`}
-                        />
-                        <div>
-                          <p className="font-medium">{task.title}</p>
-                          {task.goal && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Goal: {task.goal.title}
-                            </p>
+              <GlassCard className="p-6" glow>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
+                    <Target className="w-6 h-6 text-military-hot-pink" />
+                    <span>Today's Missions</span>
+                  </h2>
+                  <TacticalButton variant="secondary" size="sm">
+                    View All
+                  </TacticalButton>
+                </div>
+                
+                <div className="space-y-4">
+                  {todaysTasks.length > 0 ? (
+                    todaysTasks.map((task, index) => (
+                      <motion.div
+                        key={task.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-center justify-between p-4 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <motion.div
+                            whileHover={{ scale: 1.2 }}
+                            className={`w-3 h-3 rounded-full ${
+                              task.status === 'completed' ? 'bg-military-hot-pink' : 'bg-military-storm-grey'
+                            }`}
+                          />
+                          <div>
+                            <p className="font-medium text-military-glass-white">{task.title}</p>
+                            {task.goal && (
+                              <p className="text-sm text-military-storm-grey">
+                                Goal: {task.goal.title}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <StatsBadge 
+                            variant={task.priority === 'high' ? 'error' : task.priority === 'medium' ? 'warning' : 'success'} 
+                            size="sm"
+                          >
+                            {task.priority}
+                          </StatsBadge>
+                          {task.status === 'completed' && (
+                            <CheckCircle className="w-5 h-5 text-military-hot-pink" />
                           )}
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                          task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {task.priority}
-                        </span>
-                        {task.status === 'completed' && (
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                        )}
-                      </div>
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400">No tasks for today</p>
-                    <BossButton 
-                      variant="primary" 
-                      size="sm" 
-                      className="mt-4"
-                      icon={<Plus className="w-4 h-4" />}
-                    >
-                      Add Task
-                    </BossButton>
-                  </div>
-                )}
-              </div>
-            </EmpowermentCard>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Target className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
+                      <p className="text-military-storm-grey mb-4">No missions for today</p>
+                      <TacticalButton 
+                        variant="primary" 
+                        size="sm"
+                        icon={<Plus className="w-4 h-4" />}
+                      >
+                        Add Mission
+                      </TacticalButton>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
             </motion.div>
           </section>
 
@@ -500,60 +543,61 @@ export default function DashboardPage() {
           <section aria-labelledby="goals-heading">
             <h2 id="goals-heading" className="sr-only">Active Goals</h2>
             <motion.div variants={itemVariants}>
-            <EmpowermentCard>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
-                  <Trophy className="w-6 h-6" />
-                  <span>Active Goals</span>
-                </h2>
-                <BossButton size="sm" variant="primary">
-                  View All
-                </BossButton>
-              </div>
-              
-              <div className="space-y-4">
-                {activeGoals.length > 0 ? (
-                  activeGoals.map((goal, index) => (
-                    <motion.div
-                      key={goal.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 glass rounded-xl"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold">{goal.title}</h3>
-                        <span className="text-sm font-bold text-gradient">
-                          {goal.progress_percentage}%
-                        </span>
-                      </div>
-                      <Progress 
-                        value={goal.progress_percentage} 
-                        className="h-2 gradient-primary"
-                      />
-                      {goal.target_date && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                          Due: {new Date(goal.target_date).toLocaleDateString()}
-                        </p>
-                      )}
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400">No active goals</p>
-                    <BossButton 
-                      variant="empowerment" 
-                      size="sm" 
-                      className="mt-4"
-                      crown
-                    >
-                      Create Goal
-                    </BossButton>
-                  </div>
-                )}
-              </div>
-            </EmpowermentCard>
+              <GlassCard className="p-6" glow>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
+                    <Trophy className="w-6 h-6 text-military-hot-pink" />
+                    <span>Active Objectives</span>
+                  </h2>
+                  <TacticalButton size="sm" variant="primary">
+                    View All
+                  </TacticalButton>
+                </div>
+                
+                <div className="space-y-4">
+                  {activeGoals.length > 0 ? (
+                    activeGoals.map((goal, index) => (
+                      <motion.div
+                        key={goal.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="p-4 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-military-glass-white">{goal.title}</h3>
+                          <span className="text-sm font-bold text-military-hot-pink">
+                            {goal.progress_percentage}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-military-gunmetal/30 rounded-full h-2 mb-2">
+                          <div 
+                            className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${goal.progress_percentage}%` }}
+                          />
+                        </div>
+                        {goal.target_date && (
+                          <p className="text-xs text-military-storm-grey">
+                            Due: {new Date(goal.target_date).toLocaleDateString()}
+                          </p>
+                        )}
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Trophy className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
+                      <p className="text-military-storm-grey mb-4">No active objectives</p>
+                      <TacticalButton 
+                        variant="primary" 
+                        size="sm"
+                        icon={<Crown className="w-4 h-4" />}
+                      >
+                        Create Objective
+                      </TacticalButton>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
             </motion.div>
           </section>
         </div>
@@ -564,102 +608,101 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Conversations */}
             <motion.div variants={itemVariants}>
-            <BossCard variant="default">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
-                  <MessageCircle className="w-6 h-6" />
-                  <span>Recent AI Chats</span>
-                </h2>
-                <BossButton size="sm" variant="primary">
-                  View All
-                </BossButton>
-              </div>
-              
-              <div className="space-y-3">
-                {recentConversations.length > 0 ? (
-                  recentConversations.map((conversation, index) => (
-                    <motion.div
-                      key={conversation.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center space-x-3 p-3 glass rounded-lg hover-lift cursor-pointer"
-                    >
-                      <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
-                        data-agent-color={conversation.agent.accent_color}
+              <GlassCard className="p-6" glow>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
+                    <MessageCircle className="w-6 h-6 text-military-hot-pink" />
+                    <span>Recent Intel</span>
+                  </h2>
+                  <TacticalButton size="sm" variant="primary">
+                    View All
+                  </TacticalButton>
+                </div>
+                
+                <div className="space-y-3">
+                  {recentConversations.length > 0 ? (
+                    recentConversations.map((conversation, index) => (
+                      <motion.div
+                        key={conversation.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-center space-x-3 p-3 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all cursor-pointer"
                       >
-                        {conversation.agent.display_name.charAt(0)}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{conversation.agent.display_name}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {new Date(conversation.last_message_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-gray-400" />
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400">No recent conversations</p>
-                    <BossButton 
-                      variant="primary" 
-                      size="sm" 
-                      className="mt-4"
-                    >
-                      Start Chat
-                    </BossButton>
-                  </div>
-                )}
-              </div>
-            </BossCard>
+                        <div 
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                          style={{ backgroundColor: conversation.agent.accent_color }}
+                        >
+                          {conversation.agent.display_name.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-military-glass-white">{conversation.agent.display_name}</p>
+                          <p className="text-sm text-military-storm-grey">
+                            {new Date(conversation.last_message_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-military-storm-grey" />
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <MessageCircle className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
+                      <p className="text-military-storm-grey mb-4">No recent intel</p>
+                      <TacticalButton 
+                        variant="primary" 
+                        size="sm"
+                      >
+                        Start Communication
+                      </TacticalButton>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
             </motion.div>
 
             {/* Insights */}
             <motion.div variants={itemVariants}>
-            <BossCard variant="success">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
-                  <Sparkles className="w-6 h-6" />
-                  <span>AI Insights</span>
-                </h2>
-                <BossButton size="sm" variant="success">
-                  View All
-                </BossButton>
-              </div>
-              
-              <div className="space-y-4">
-                {insights.length > 0 ? (
-                  insights.map((insight, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 glass rounded-xl"
-                    >
-                      <h3 className="font-semibold mb-2">{insight.title}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {insight.description}
+              <GlassCard className="p-6" glow>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
+                    <Sparkles className="w-6 h-6 text-military-hot-pink" />
+                    <span>AI Intelligence</span>
+                  </h2>
+                  <TacticalButton size="sm" variant="primary">
+                    View All
+                  </TacticalButton>
+                </div>
+                
+                <div className="space-y-4">
+                  {insights.length > 0 ? (
+                    insights.map((insight, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="p-4 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg"
+                      >
+                        <h3 className="font-semibold text-military-glass-white mb-2">{insight.title}</h3>
+                        <p className="text-sm text-military-storm-grey mb-3">
+                          {insight.description}
+                        </p>
+                        <TacticalButton size="sm" variant="primary">
+                          {insight.action}
+                        </TacticalButton>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Sparkles className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
+                      <p className="text-military-storm-grey mb-2">No intelligence yet</p>
+                      <p className="text-sm text-military-storm-grey">
+                        Complete more missions to get AI insights
                       </p>
-                      <BossButton size="sm" variant="primary">
-                        {insight.action}
-                      </BossButton>
-                    </motion.div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <Sparkles className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400">No insights yet</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Complete more tasks to get AI insights
-                    </p>
-                  </div>
-                )}
-              </div>
-            </BossCard>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
             </motion.div>
           </div>
         </section>
@@ -667,19 +710,17 @@ export default function DashboardPage() {
         {/* Briefcase Section */}
         <section aria-labelledby="briefcase-heading">
           <h2 id="briefcase-heading" className="sr-only">Recent Briefcases</h2>
-          <motion.div
-            variants={itemVariants}
-          >
-            <BossCard variant="default">
+          <motion.div variants={itemVariants}>
+            <GlassCard className="p-6" glow>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
-                  <Briefcase className="w-6 h-6" />
-                  <span>Recent Briefcases</span>
+                <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
+                  <Briefcase className="w-6 h-6 text-military-hot-pink" />
+                  <span>Mission Briefcases</span>
                 </h2>
                 <Link href="/dashboard/briefcase">
-                  <BossButton size="sm" variant="primary">
+                  <TacticalButton size="sm" variant="primary">
                     View All
-                  </BossButton>
+                  </TacticalButton>
                 </Link>
               </div>
               
@@ -691,54 +732,51 @@ export default function DashboardPage() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-center space-x-3 p-3 glass rounded-lg hover-lift cursor-pointer"
+                      className="flex items-center space-x-3 p-3 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all cursor-pointer"
                     >
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gradient-to-r from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
                         <Briefcase className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium">{briefcase.title}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {briefcase.goal_count} goals • {briefcase.task_count} tasks
+                        <p className="font-medium text-military-glass-white">{briefcase.title}</p>
+                        <p className="text-sm text-military-storm-grey">
+                          {briefcase.goal_count} objectives • {briefcase.task_count} missions
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-military-storm-grey">
                           Updated {new Date(briefcase.updated_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          briefcase.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : briefcase.status === 'completed'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <StatsBadge 
+                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'info' : 'secondary'} 
+                          size="sm"
+                        >
                           {briefcase.status}
-                        </span>
-                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                        </StatsBadge>
+                        <ArrowRight className="w-4 h-4 text-military-storm-grey" />
                       </div>
                     </motion.div>
                   ))
                 ) : (
                   <div className="text-center py-8">
-                    <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">No briefcases yet</p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Create your first briefcase to organize your projects and goals
+                    <Briefcase className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
+                    <p className="text-military-storm-grey mb-2">No briefcases yet</p>
+                    <p className="text-sm text-military-storm-grey mb-4">
+                      Create your first briefcase to organize your missions and objectives
                     </p>
                     <Link href="/dashboard/briefcase">
-                      <BossButton 
+                      <TacticalButton 
                         variant="primary" 
                         size="sm"
                         icon={<Plus className="w-4 h-4" />}
                       >
                         Create Briefcase
-                      </BossButton>
+                      </TacticalButton>
                     </Link>
                   </div>
                 )}
               </div>
-            </BossCard>
+            </GlassCard>
           </motion.div>
         </section>
       </motion.div>

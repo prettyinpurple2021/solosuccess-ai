@@ -3,14 +3,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
+import OpenAI from 'openai'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export const dynamic = 'force-dynamic'
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 const brandAnalysisSchema = z.object({
   companyName: z.string().min(1),
@@ -64,30 +67,110 @@ export async function POST(request: NextRequest) {
 
 async function analyzeBrandWithAI(brandData: any) {
   try {
-    // Mock AI analysis - in production, this would use OpenAI or similar
-    const completeness = calculateCompleteness(brandData)
-    const strengths = identifyStrengths(brandData)
-    const improvements = identifyImprovements(brandData, completeness)
-    const recommendations = generateRecommendations(brandData, completeness)
+    if (!process.env.OPENAI_API_KEY) {
+      // Fallback to rule-based analysis if AI is not available
+      return generateFallbackAnalysis(brandData)
+    }
 
-    return {
-      completeness,
-      strengths,
-      improvements,
-      recommendations,
-      competitiveAnalysis: {
-        similarBrands: ['Brand A', 'Brand B', 'Brand C'],
-        differentiation: [
-          'Unique value proposition',
-          'Strong brand personality',
-          'Clear target audience'
-        ],
-        marketPosition: 'Innovative and professional'
+    // Create comprehensive prompt for AI brand analysis
+    const prompt = `Analyze this brand data and provide a comprehensive brand analysis:
+
+Company: ${brandData.companyName}
+Tagline: ${brandData.tagline || 'Not provided'}
+Description: ${brandData.description || 'Not provided'}
+Industry: ${brandData.industry || 'Not specified'}
+Target Audience: ${brandData.targetAudience || 'Not defined'}
+Brand Personality: ${brandData.brandPersonality?.join(', ') || 'Not defined'}
+Color Palette: Primary: ${brandData.colorPalette?.primary || 'Not set'}, Secondary: ${brandData.colorPalette?.secondary || 'Not set'}, Accent: ${brandData.colorPalette?.accent || 'Not set'}
+Typography: Primary: ${brandData.typography?.primary || 'Not set'}, Secondary: ${brandData.typography?.secondary || 'Not set'}
+
+Please provide a comprehensive brand analysis including:
+
+1. **Completeness Score** (0-100): Rate how complete the brand foundation is
+2. **Strengths**: List 3-5 key strengths of the current brand
+3. **Improvements**: List 3-5 specific areas for improvement
+4. **Recommendations**: List 3-5 actionable recommendations
+5. **Competitive Analysis**: 
+   - Similar brands in the market
+   - Key differentiation opportunities
+   - Market positioning assessment
+
+Format your response as JSON with the following structure:
+{
+  "completeness": 85,
+  "strengths": ["strength1", "strength2", "strength3"],
+  "improvements": ["improvement1", "improvement2", "improvement3"],
+  "recommendations": ["recommendation1", "recommendation2", "recommendation3"],
+  "competitiveAnalysis": {
+    "similarBrands": ["brand1", "brand2", "brand3"],
+    "differentiation": ["differentiator1", "differentiator2", "differentiator3"],
+    "marketPosition": "positioning statement"
+  }
+}`
+
+    // Call OpenAI API
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert brand strategist and marketing consultant. Analyze brand data and provide actionable insights for brand development. Always provide specific, implementable recommendations."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 1500,
+      temperature: 0.7,
+    })
+
+    const aiResponse = completion.choices[0]?.message?.content || ''
+    
+    // Parse AI response
+    try {
+      const analysis = JSON.parse(aiResponse)
+      return {
+        completeness: analysis.completeness || calculateCompleteness(brandData),
+        strengths: analysis.strengths || identifyStrengths(brandData),
+        improvements: analysis.improvements || identifyImprovements(brandData, analysis.completeness || 0),
+        recommendations: analysis.recommendations || generateRecommendations(brandData, analysis.completeness || 0),
+        competitiveAnalysis: analysis.competitiveAnalysis || {
+          similarBrands: ['Industry Leader A', 'Competitor B', 'Emerging Brand C'],
+          differentiation: ['Unique value proposition', 'Strong brand personality', 'Clear target audience'],
+          marketPosition: 'Innovative and professional'
+        }
       }
+    } catch (parseError) {
+      logError('Error parsing AI response:', parseError)
+      return generateFallbackAnalysis(brandData)
     }
   } catch (error) {
     logError('Error in AI brand analysis:', error)
-    throw error
+    return generateFallbackAnalysis(brandData)
+  }
+}
+
+function generateFallbackAnalysis(brandData: any) {
+  const completeness = calculateCompleteness(brandData)
+  const strengths = identifyStrengths(brandData)
+  const improvements = identifyImprovements(brandData, completeness)
+  const recommendations = generateRecommendations(brandData, completeness)
+
+  return {
+    completeness,
+    strengths,
+    improvements,
+    recommendations,
+    competitiveAnalysis: {
+      similarBrands: ['Industry Leader A', 'Competitor B', 'Emerging Brand C'],
+      differentiation: [
+        'Unique value proposition',
+        'Strong brand personality',
+        'Clear target audience'
+      ],
+      marketPosition: 'Innovative and professional'
+    }
   }
 }
 
