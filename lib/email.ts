@@ -65,6 +65,63 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
   }
 }
 
+export const sendPasswordResetEmail = async (email: string, name: string, resetToken: string) => {
+  try {
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://solobossai.fun'}/reset-password?token=${resetToken}`
+    
+    const { data, error } = await resend.emails.send({
+      from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@solobossai.fun>",
+      to: [email],
+      subject: "Reset Your Password - SoloSuccess AI 🔐",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #8B5CF6; font-size: 28px; margin-bottom: 10px;">Password Reset Request 🔐</h1>
+            <p style="color: #6B7280; font-size: 16px;">We received a request to reset your password</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%); padding: 30px; border-radius: 12px; color: white; text-align: center; margin-bottom: 30px;">
+            <h2 style="margin: 0 0 15px 0; font-size: 24px;">Hey ${name}! 👋</h2>
+            <p style="margin: 0; font-size: 18px; opacity: 0.9;">No worries, it happens to the best of us! Click the button below to reset your password.</p>
+          </div>
+          
+          <div style="text-align: center; margin-bottom: 30px;">
+            <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%); color: white; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 16px;">
+              🔑 Reset My Password
+            </a>
+          </div>
+          
+          <div style="background: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3 style="color: #374151; font-size: 18px; margin-bottom: 10px;">⚠️ Important Security Information</h3>
+            <ul style="color: #6B7280; font-size: 14px; line-height: 1.6; margin: 0; padding-left: 20px;">
+              <li style="margin-bottom: 8px;">This link will expire in 1 hour for security</li>
+              <li style="margin-bottom: 8px;">If you didn't request this reset, please ignore this email</li>
+              <li style="margin-bottom: 8px;">Your password won't change until you click the link above</li>
+            </ul>
+          </div>
+          
+          <div style="border-top: 1px solid #E5E7EB; padding-top: 20px; text-align: center;">
+            <p style="color: #9CA3AF; font-size: 14px; margin: 0;">
+              If the button doesn't work, copy and paste this link into your browser:<br>
+              <a href="${resetUrl}" style="color: #8B5CF6; word-break: break-all;">${resetUrl}</a>
+            </p>
+          </div>
+        </div>
+      `,
+    })
+
+    if (error) {
+      logError("Error sending password reset email:", error)
+      return { success: false, error }
+    }
+
+    return { success: true, data }
+  } catch (error) {
+    logError("Error sending password reset email:", error)
+    return { success: false, error }
+  }
+}
+
 export const sendSubscriptionConfirmation = async (email: string, name: string, planName: string, amount: number) => {
   try {
     const { data, error } = await resend.emails.send({

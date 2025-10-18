@@ -67,19 +67,32 @@ export default function ResetPasswordPage() {
     setError("");
 
     try {
-      // Here you would call your backend API to reset the password with the token
-      // For demonstration, we'll simulate a successful request
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token,
+          password 
+        }),
+      });
 
-      setMessage("Your password has been successfully reset! You can now sign in.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to reset password');
+      }
+
+      setMessage(data.message || "Your password has been successfully reset! You can now sign in.");
       
       // Redirect to sign-in page after a delay
       setTimeout(() => {
         router.push("/signin");
       }, 3000);
 
-    } catch {
-      setError("Failed to reset password. The link may have expired. Please try again.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Failed to reset password. The link may have expired. Please try again.");
     }
 
     setLoading(false);

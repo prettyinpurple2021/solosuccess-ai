@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+const React = require("react")
+const { useState, useEffect } = React
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -48,12 +49,12 @@ interface Template {
 
 export default function TemplatesDashboard() {
   const { user } = useAuth()
-  const [templates, setTemplates] = useState<Template[]>([])
-  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([])
+  const [templates, setTemplates] = useState([])
+  const [filteredTemplates, setFilteredTemplates] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedTier, setSelectedTier] = useState("all")
-  const [usedTemplates, setUsedTemplates] = useState<Set<string>>(new Set())
+  const [usedTemplates, setUsedTemplates] = useState(new Set())
 
   // Smart tips configuration for templates
   const smartTipsConfig = {

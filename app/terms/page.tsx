@@ -163,17 +163,17 @@ export default function TermsOfServicePage() {
                   <div className="bg-gray-50 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-800 mb-2">Subscription Plans:</h3>
                     <p className="text-gray-600 text-sm mb-2">
-                      The system displays subscription tiers for marketing purposes: Launch ($0), Accelerator ($19/$190), and Dominator ($29/$290) plans with different feature sets.
+                      The platform offers subscription tiers: Launch ($0), Accelerator ($19/month or $190/year), and Dominator ($29/month or $290/year) plans with different feature sets and AI agent access levels.
                     </p>
                     <p className="text-gray-600 text-sm">
-                      Payment processing has been removed from this platform. The pricing page serves as a marketing tool to display available service tiers and their respective features.
+                      Payment processing is handled securely through Stripe. All subscriptions are billed automatically on a monthly or annual basis depending on your selection. You can upgrade, downgrade, or cancel your subscription at any time through your account settings.
                     </p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <h3 className="font-semibold text-gray-800 mb-2">Feature Access:</h3>
                     <p className="text-gray-600 text-sm">
-                      The system displays features available at different subscription tiers for informational purposes. All users currently have access to the Launch tier features. Feature gating serves as a demonstration of potential premium functionalities.
+                      Access to features and AI agents is strictly enforced based on your subscription tier. Launch tier users have access to 2 AI agents and 5 daily conversations. Accelerator users get 5 agents and 100 daily conversations. Dominator users have unlimited access to all 8 agents with no conversation limits. Usage limits reset daily and are tracked in real-time.
                     </p>
                   </div>
                 </div>

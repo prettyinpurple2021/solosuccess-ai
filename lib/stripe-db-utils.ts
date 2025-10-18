@@ -130,11 +130,26 @@ export async function updateUserStripeCustomerId(userId: string, customerId: str
 
 // Get subscription tier from price ID
 export function getSubscriptionTierFromPriceId(priceId: string): string {
-  if (priceId.includes('accelerator')) {
+  // Match exact Stripe price IDs from lib/stripe.ts
+  const acceleratorPrices = ['price_1S46LyPpYfwm37m7M5nOAYW7', 'price_1S46LyPpYfwm37m7lyRhudBs']
+  const dominatorPrices = ['price_1S46P6PpYfwm37m76hqohIw0', 'price_1S46PXPpYfwm37m7yVhLS7j2']
+  const launchPrice = 'price_1S46IjPpYfwm37m7EKFi7H4C'
+  
+  if (acceleratorPrices.includes(priceId)) {
     return 'accelerator'
-  } else if (priceId.includes('dominator')) {
+  } else if (dominatorPrices.includes(priceId)) {
+    return 'dominator'
+  } else if (priceId === launchPrice) {
+    return 'launch'
+  }
+  
+  // Fallback: check if price ID contains tier name
+  if (priceId.toLowerCase().includes('accelerator')) {
+    return 'accelerator'
+  } else if (priceId.toLowerCase().includes('dominator')) {
     return 'dominator'
   }
+  
   return 'launch'
 }
 

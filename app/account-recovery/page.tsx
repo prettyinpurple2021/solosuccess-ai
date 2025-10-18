@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState} from "react";
+import { useState } from "react";
 import { Button} from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import { Input} from "@/components/ui/input";
@@ -31,14 +31,24 @@ export default function AccountRecoveryPage() {
     }
 
     try {
-      // Here you would typically call your backend API to handle the password reset request
-      // For demonstration, we'll simulate a successful request
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-      setMessage("If an account with this email exists, a password reset link has been sent.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send reset email');
+      }
+
+      setMessage(data.message || "If an account with this email exists, a password reset link has been sent.");
       setEmail(""); // Clear the input field
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An unexpected error occurred. Please try again.");
     }
 
     setLoading(false);
@@ -65,7 +75,7 @@ export default function AccountRecoveryPage() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e: any) => setEmail(e.target.value)}
                   placeholder="you@your-empire.com"
                   required
                   className="pl-10"

@@ -1,57 +1,54 @@
-import { sign, verify } from "jsonwebtoken"
-
-export interface AuthenticatedUser {
-  id: string
-  email: string
-  full_name?: string
-  name?: string
-  username?: string
-  avatar_url?: string
-  created_at?: string
-  updated_at?: string
-  subscription_tier?: string
-  subscription_status?: string
-  stripe_customer_id?: string
-  stripe_subscription_id?: string
-  current_period_start?: Date
-  current_period_end?: Date
-  cancel_at_period_end?: boolean
-}
-
-export interface AuthResult {
-  user: AuthenticatedUser | null
-  error: string | null
-}
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+import { NextRequest } from 'next/server'
+import { verify } from 'jsonwebtoken'
+import { logError } from '@/lib/logger'
 
 /**
- * Standard cookie options for authentication tokens
- * Used for consistency across all auth-related routes
+ * Extract user ID from JWT session token
  */
-export const AUTH_COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  maxAge: 7 * 24 * 60 * 60, // 7 days
-  path: '/',
-}
-
-/**
- * Creates a JWT token for authentication
- */
-export function createToken(userId: string, email: string): string {
-  return sign({ userId, email }, JWT_SECRET, { expiresIn: '7d' })
-}
-
-/**
- * Verifies a JWT token and returns the decoded payload
- */
-export function verifyToken(token: string): { userId: string; email: string } | null {
+export async function getUserIdFromSession(request: NextRequest): Promise<string | null> {
   try {
-    const decoded = verify(token, JWT_SECRET) as { userId: string; email: string }
-    return decoded
-  } catch {
+    // Try to get session token from Authorization header or cookie
+    const authHeader = request.headers.get('authorization')
+    let token: string | undefined
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7)
+    } else {
+      // Try to get from cookie
+      const cookies = request.cookies
+      token = cookies.get('session')?.value
+    }
+    
+    if (!token) {
+      return null
+    }
+    
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) {
+      logError('JWT_SECRET is not configured')
+      return null
+    }
+    
+    // Verify and decode JWT
+    const decoded = verify(token, jwtSecret) as { userId: string }
+    return decoded.userId || null
+  } catch (error) {
+    logError('Error extracting user ID from session:', error)
     return null
   }
+}
+
+/**
+ * Extract user ID from request (supports both JWT and simple user ID header)
+ */
+export async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
+  // First try JWT session
+  const userId = await getUserIdFromSession(request)
+  if (userId) return userId
+  
+  // Fallback to user-id header (for development/testing)
+  const userIdHeader = request.headers.get('x-user-id')
+  if (userIdHeader) return userIdHeader
+  
+  return null
 }

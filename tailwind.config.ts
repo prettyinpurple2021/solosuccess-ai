@@ -73,6 +73,18 @@ const config: Config = {
           'cyan-dark': '#0891B2',
           'pink-dark': '#E91E63',
         },
+        // Military Glassmorphic Design System Colors
+        military: {
+          'hot-pink': '#FF71B5',
+          'blush-pink': '#FFB3D9',
+          'dusty-rose': '#F7BAC8',
+          'gunmetal': '#5D5C61',
+          'storm-grey': '#B2B2B2',
+          'charcoal': '#454547',
+          'midnight': '#18181A',
+          'tactical': '#232325',
+          'glass-white': '#FAFAFA',
+        },
         // AI Agent Colors
         agent: {
           roxy: '#6366F1',     // Executive Assistant
@@ -154,7 +166,10 @@ const config: Config = {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
         // ✨ NEW: Add the custom 'boss' font family here
-        boss: ["Orbitron", "sans-serif"], 
+        boss: ["Orbitron", "sans-serif"],
+        // Military Design System Fonts
+        heading: ["Orbitron", "Rajdhani", "sans-serif"],
+        tactical: ["Chakra Petch", "Rajdhani", "monospace"],
       },
       // ... (your other extensions like spacing, maxWidth, zIndex are fine)
     },

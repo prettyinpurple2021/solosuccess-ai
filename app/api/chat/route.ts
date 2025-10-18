@@ -5,6 +5,8 @@ import { getDb } from '@/lib/database-client'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
+import { gateConversation, gateAgentAccess } from '@/lib/feature-gate-middleware'
+import { incrementConversationCount, trackAgentAccess } from '@/lib/usage-tracking'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -45,6 +47,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
     }
     const { message, agentId } = parsed.data
+
+    // Check conversation limit (feature gating)
+    const conversationGate = await gateConversation(user.id)
+    if (!conversationGate.allowed) {
+      return NextResponse.json(
+        {
+          error: conversationGate.error,
+          upgradeRequired: conversationGate.upgradeRequired,
+          limit: conversationGate.limit
+        },
+        { status: 403 }
+      )
+    }
+
+    // Check agent access if specific agent requested
+    if (agentId) {
+      const agentGate = await gateAgentAccess(user.id, agentId)
+      if (!agentGate.allowed) {
+        return NextResponse.json(
+          {
+            error: agentGate.error,
+            upgradeRequired: agentGate.upgradeRequired,
+            limit: agentGate.limit
+          },
+          { status: 403 }
+        )
+      }
+      
+      // Track agent access
+      await trackAgentAccess(user.id, agentId)
+    }
+
+    // Increment conversation count
+    await incrementConversationCount(user.id)
 
     // Get competitive intelligence context
     const competitiveContext = await CompetitiveIntelligenceContextService.getCompetitiveContext(user.id, agentId)

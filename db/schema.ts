@@ -553,6 +553,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   competitorActivities: many(competitorActivities),
   chatConversations: many(chatConversations),
   chatMessages: many(chatMessages),
+  passwordResetTokens: many(passwordResetTokens),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
@@ -1112,6 +1113,23 @@ export const userSessions = pgTable('user_sessions', {
   lastActivityIdx: index('user_sessions_last_activity_idx').on(table.last_activity),
 }));
 
+// Password reset tokens table
+export const passwordResetTokens = pgTable('password_reset_tokens', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token: varchar('token', { length: 255 }).notNull().unique(),
+  expires_at: timestamp('expires_at').notNull(),
+  used_at: timestamp('used_at'),
+  ip_address: varchar('ip_address', { length: 45 }),
+  user_agent: text('user_agent'),
+  created_at: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('password_reset_tokens_user_id_idx').on(table.user_id),
+  tokenIdx: index('password_reset_tokens_token_idx').on(table.token),
+  expiresAtIdx: index('password_reset_tokens_expires_at_idx').on(table.expires_at),
+  usedAtIdx: index('password_reset_tokens_used_at_idx').on(table.used_at),
+}));
+
 // User 2FA/MFA settings table
 export const userMfaSettings = pgTable('user_mfa_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -1219,5 +1237,12 @@ export const focusSessionRelations = relations(focusSessions, ({ one }) => ({
   task: one(tasks, {
     fields: [focusSessions.task_id],
     references: [tasks.id],
+  }),
+}));
+
+export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResetTokens.user_id],
+    references: [users.id],
   }),
 }));
