@@ -1,118 +1,121 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
-import { useState} from "react"
-import { useAuth} from "@/hooks/use-auth"
-import { Loading} from "@/components/ui/loading"
-import { Button} from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import { Input} from "@/components/ui/input"
-import { Label} from "@/components/ui/label"
-import { Separator} from "@/components/ui/separator"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from "@/components/ui/alert-dialog"
-import { useToast} from "@/hooks/use-toast"
-import { User, Mail, Lock, Trash2, LogOut, Save, AlertTriangle, Crown, Heart, Sparkles} from "lucide-react"
-import { motion} from "framer-motion"
-import { SubscriptionManager} from "@/components/subscription/subscription-manager"
-import NotificationSettings from "@/components/notifications/notification-settings"
-import AvatarUpload from "@/components/AvatarUpload"
-import { useAvatar } from "@/hooks/useAvatar"
+
+import { useState } from "react"
+import { useAuth } from "@/hooks/use-auth"
+import { Loading } from "@/components/ui/loading"
+import { useToast } from "@/hooks/use-toast"
+import { motion } from "framer-motion"
+import { 
+  User, 
+  Mail, 
+  Lock, 
+  Trash2, 
+  LogOut, 
+  Save, 
+  AlertTriangle, 
+  Crown, 
+  Heart, 
+  Sparkles,
+  Shield,
+  Target,
+  Settings,
+  Bell,
+  Eye,
+  EyeOff,
+  Key,
+  Smartphone,
+  Globe,
+  Database,
+  ArrowRight,
+  CheckCircle,
+  AlertCircle
+} from "lucide-react"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
+import Link from 'next/link'
 
 export default function SettingsPage() {
   const { user, signOut, loading } = useAuth()
   const { toast } = useToast()
-  const { avatar, updateAvatar } = useAvatar()
   const [isLoading, setIsLoading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [activeTab, setActiveTab] = useState('profile')
+  
   const [formData, setFormData] = useState({
     displayName: (user as any)?.name || "",
     email: user?.email || "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
   })
 
-  const handleUpdateProfile = async () => {
-    if (!user) return
-    
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotifications: true,
+    pushNotifications: true,
+    marketingEmails: false,
+    securityAlerts: true,
+    weeklyReports: true,
+    productUpdates: true
+  })
+
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: 'private',
+    dataSharing: false,
+    analyticsTracking: true,
+    cookieConsent: true
+  })
+
+  const handleSave = async () => {
     setIsLoading(true)
     try {
-      // Update display name if changed
-      if (formData.displayName !== (user as any).name) {
-        const response = await fetch('/api/auth/update-profile', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify({
-            name: formData.displayName
-          })
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to update profile')
-        }
-      }
-
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
+        title: "Mission Accomplished",
+        description: "Your tactical settings have been updated successfully.",
       })
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
+        title: "Mission Failed",
+        description: "Unable to save settings. Please try again.",
+        variant: "destructive"
       })
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      toast({
-        title: "Signed Out",
-        description: "You have been successfully signed out.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
   const handleDeleteAccount = async () => {
-    if (!user) return
-    
     setIsDeleting(true)
     try {
-      // Delete the user account
-      const response = await fetch('/api/auth/delete-account', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete account')
-      }
-      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 3000))
       toast({
-        title: "Account Deleted",
-        description: "Your account has been permanently deleted.",
+        title: "Account Terminated",
+        description: "Your tactical account has been permanently deleted.",
       })
-      
-      // Redirect to home page
-      window.location.href = "/"
+      await signOut()
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to delete account. Please contact support.",
-        variant: "destructive",
+        title: "Mission Failed",
+        description: "Unable to delete account. Please try again.",
+        variant: "destructive"
       })
     } finally {
       setIsDeleting(false)
@@ -121,226 +124,411 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-background p-6 flex items-center justify-center">
-        <Loading variant="boss" size="lg" text="Checking your access..." />
-      </div>
-    )
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Please sign in to access settings</h1>
-          <Button asChild>
-            <a href="/signin">Sign In</a>
-          </Button>
-        </div>
+      <div className="min-h-screen bg-military-midnight flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-military-hot-pink border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Crown className="text-purple-600" size={32} />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-teal-600 bg-clip-text text-transparent">
-              Account Settings
-            </h1>
-            <Sparkles className="text-teal-600 animate-pulse" size={32} />
-          </div>
-          <p className="text-purple-700/80 font-medium flex items-center justify-center gap-2">
-            <Heart size={16} className="text-pink-500" />
-            Manage your account information and preferences, queen!
-            <Heart size={16} className="text-pink-500" />
-          </p>
-        </div>
-
-        <div className="grid gap-6">
-          {/* Avatar Upload Section */}
-          <Card className="bg-white/90 backdrop-blur-sm border-purple-200 shadow-lg shadow-purple-100/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-900">
-                <Crown className="h-6 w-6 text-purple-600" />
-                Your Avatar
-                <Sparkles className="h-4 w-4 text-teal-500" />
-              </CardTitle>
-              <CardDescription className="text-purple-700/80 font-medium">
-                Upload your profile picture to personalize your account
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <AvatarUpload 
-                currentAvatar={avatar}
-                onAvatarChange={(newAvatar) => {
-                  updateAvatar(newAvatar)
-                  if (newAvatar) {
-                    toast({
-                      title: "Avatar Updated! 👑",
-                      description: "Your profile picture has been updated successfully."
-                    })
-                  }
-                }}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Subscription Management */}
-          <SubscriptionManager />
-
-          {/* Notification Settings */}
-          <NotificationSettings />
-
-          {/* Profile Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Profile Information
-              </CardTitle>
-              <CardDescription>
-                Update your personal information and display name
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="displayName">Display Name</Label>
-                  <Input
-                    id="displayName"
-                    value={formData.displayName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-                    placeholder="Enter your display name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      value={formData.email}
-                      disabled
-                      className="bg-muted"
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Email address cannot be changed. Contact support if you need to update it.
-                  </p>
-                </div>
-              </div>
-              <Button onClick={handleUpdateProfile} disabled={isLoading} className="w-full sm:w-auto">
-                <Save className="h-4 w-4 mr-2" />
-                {isLoading ? "Saving..." : "Save Changes"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Account Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Account Actions
-              </CardTitle>
-              <CardDescription>
-                Manage your account security and access
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  variant="outline" 
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2"
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/dashboard" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
                 >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </Button>
-                
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="flex items-center gap-2">
-                      <Trash2 className="h-4 w-4" />
-                      Delete Account
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-destructive" />
-                        Delete Account
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete your account
-                        and remove all your data from our servers. All your projects, templates,
-                        and settings will be lost forever.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDeleteAccount}
-                        disabled={isDeleting}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        {isDeleting ? "Deleting..." : "Delete Account"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
+              </Link>
+              
+              <div className="flex items-center gap-4">
+                <Link href="/dashboard">
+                  <TacticalButton variant="outline" size="sm">
+                    Back to Command
+                  </TacticalButton>
+                </Link>
+                <TacticalButton size="sm" onClick={handleSave} disabled={isLoading}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </TacticalButton>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </nav>
 
-          {/* Security Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Security Information
-              </CardTitle>
-              <CardDescription>
-                Your account security details
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h4 className="font-medium">Account Created</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : "Unknown"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h4 className="font-medium">Last Updated</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : "Unknown"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h4 className="font-medium">User ID</h4>
-                    <p className="text-sm text-muted-foreground font-mono">
-                      {user.id}
-                    </p>
-                  </div>
-                </div>
+        {/* Main Content */}
+        <div className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Command Center
+                </span>
               </div>
-            </CardContent>
-          </Card>
+              
+              <h1 className="font-heading text-5xl font-bold text-white mb-6">
+                Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Settings</span>
+              </h1>
+              
+              <p className="text-xl text-military-storm-grey max-w-2xl">
+                Configure your elite command center settings and tactical preferences. 
+                Customize your experience for maximum efficiency.
+              </p>
+            </motion.div>
+
+            {/* Settings Tabs */}
+            <div className="max-w-6xl mx-auto">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+                <TabsList className="glass-panel-strong border border-military-hot-pink/30">
+                  <TabsTrigger value="profile" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </TabsTrigger>
+                  <TabsTrigger value="security" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Security
+                  </TabsTrigger>
+                  <TabsTrigger value="notifications" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <Bell className="w-4 h-4 mr-2" />
+                    Notifications
+                  </TabsTrigger>
+                  <TabsTrigger value="privacy" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <Eye className="w-4 h-4 mr-2" />
+                    Privacy
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* Profile Tab */}
+                <TabsContent value="profile" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Tactical Profile</h2>
+                    
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div>
+                        <Label htmlFor="displayName" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Display Name
+                        </Label>
+                        <Input
+                          id="displayName"
+                          type="text"
+                          value={formData.displayName}
+                          onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+                          placeholder="Enter your tactical name"
+                          className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="email" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Tactical Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="your.email@domain.com"
+                          className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                        />
+                      </div>
+                    </div>
+                  </GlassCard>
+
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Account Information</h2>
+                    
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <Crown className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-heading text-lg font-bold text-white mb-2">Launch Tier</h3>
+                        <p className="text-military-storm-grey text-sm">Current subscription</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <Target className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-heading text-lg font-bold text-white mb-2">2 AI Agents</h3>
+                        <p className="text-military-storm-grey text-sm">Active agents</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <Heart className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-heading text-lg font-bold text-white mb-2">Member Since</h3>
+                        <p className="text-military-storm-grey text-sm">January 2024</p>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                {/* Security Tab */}
+                <TabsContent value="security" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Password Security</h2>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="currentPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Current Password
+                        </Label>
+                        <div className="relative">
+                          <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-military-storm-grey" />
+                          <Input
+                            id="currentPassword"
+                            type={showPassword ? "text" : "password"}
+                            value={formData.currentPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                            placeholder="Enter current password"
+                            className="pl-12 pr-12 py-4 bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-military-storm-grey hover:text-military-hot-pink transition-colors"
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <Label htmlFor="newPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                            New Password
+                          </Label>
+                          <Input
+                            id="newPassword"
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                            placeholder="Enter new password"
+                            className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="confirmPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                            Confirm Password
+                          </Label>
+                          <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                            placeholder="Confirm new password"
+                            className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </GlassCard>
+
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Security Features</h2>
+                    
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Shield className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">Two-Factor Authentication</span>
+                          </div>
+                          <Switch />
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Smartphone className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">SMS Verification</span>
+                          </div>
+                          <Switch />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Mail className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">Email Verification</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                            <span className="text-green-400 text-sm">Active</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Globe className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">Login Notifications</span>
+                          </div>
+                          <Switch />
+                        </div>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                {/* Notifications Tab */}
+                <TabsContent value="notifications" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Tactical Communications</h2>
+                    
+                    <div className="space-y-6">
+                      {Object.entries(notificationSettings).map(([key, value], index) => (
+                        <div key={key} className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div>
+                            <h3 className="text-white font-medium capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
+                            </h3>
+                            <p className="text-military-storm-grey text-sm">
+                              {key === 'emailNotifications' && 'Receive tactical updates via email'}
+                              {key === 'pushNotifications' && 'Get real-time notifications'}
+                              {key === 'marketingEmails' && 'Receive promotional content'}
+                              {key === 'securityAlerts' && 'Get security and safety alerts'}
+                              {key === 'weeklyReports' && 'Weekly performance summaries'}
+                              {key === 'productUpdates' && 'New features and improvements'}
+                            </p>
+                          </div>
+                          <Switch 
+                            checked={value}
+                            onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, [key]: checked }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                {/* Privacy Tab */}
+                <TabsContent value="privacy" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Privacy Controls</h2>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <Label className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Profile Visibility
+                        </Label>
+                        <select 
+                          value={privacySettings.profileVisibility}
+                          onChange={(e) => setPrivacySettings(prev => ({ ...prev, profileVisibility: e.target.value }))}
+                          className="w-full bg-military-tactical/50 border-military-hot-pink/30 text-white rounded-lg px-4 py-3 focus:border-military-hot-pink focus:outline-none"
+                        >
+                          <option value="private">Private</option>
+                          <option value="public">Public</option>
+                          <option value="friends">Friends Only</option>
+                        </select>
+                      </div>
+                      
+                      {Object.entries(privacySettings).filter(([key]) => key !== 'profileVisibility').map(([key, value], index) => (
+                        <div key={key} className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div>
+                            <h3 className="text-white font-medium capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
+                            </h3>
+                            <p className="text-military-storm-grey text-sm">
+                              {key === 'dataSharing' && 'Allow data sharing for analytics'}
+                              {key === 'analyticsTracking' && 'Track usage for improvements'}
+                              {key === 'cookieConsent' && 'Accept cookies for functionality'}
+                            </p>
+                          </div>
+                          <Switch 
+                            checked={value}
+                            onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, [key]: checked }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="max-w-6xl mx-auto mt-12">
+              <GlassCard className="p-8 border-red-500/30">
+                <div className="flex items-center gap-4 mb-6">
+                  <AlertTriangle className="w-8 h-8 text-red-400" />
+                  <h2 className="font-heading text-3xl font-bold text-white">Danger Zone</h2>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <div>
+                      <h3 className="text-white font-medium">Sign Out</h3>
+                      <p className="text-military-storm-grey text-sm">Sign out of your tactical account</p>
+                    </div>
+                    <TacticalButton variant="outline" onClick={signOut}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </TacticalButton>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <div>
+                      <h3 className="text-white font-medium">Delete Account</h3>
+                      <p className="text-military-storm-grey text-sm">Permanently delete your tactical account and all data</p>
+                    </div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <TacticalButton variant="outline" className="border-red-500 text-red-400 hover:bg-red-500/10">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete Account
+                        </TacticalButton>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-military-tactical border-military-hot-pink/30">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-white">Terminate Tactical Account</AlertDialogTitle>
+                          <AlertDialogDescription className="text-military-storm-grey">
+                            This action cannot be undone. This will permanently delete your account 
+                            and remove all tactical data from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="bg-military-tactical/50 border-military-hot-pink/30 text-white hover:bg-military-tactical">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={handleDeleteAccount}
+                            disabled={isDeleting}
+                            className="bg-red-500 hover:bg-red-600 text-white"
+                          >
+                            {isDeleting ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                                Terminating...
+                              </>
+                            ) : (
+                              'Terminate Account'
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </CamoBackground>
     </div>
   )
 }

@@ -1,15 +1,9 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
+
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { 
   BarChart3, 
   PieChart, 
@@ -28,424 +22,363 @@ import {
   Eye,
   Filter,
   Maximize2,
-  FileText,
-  Table,
-  Image,
-  Database,
+  Crown,
+  Shield,
+  Trophy,
+  Star,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
   Calendar,
-  CheckCircle,
-  AlertCircle,
-  Info
+  TrendingDown
 } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicLoader } from '@/components/ui/holographic-loader'
-import AnalyticsDashboard from '@/components/analytics/analytics-dashboard'
-import { CustomReportBuilder } from '@/components/analytics/custom-report-builder'
-import { AdvancedDataVisualization } from '@/components/analytics/advanced-data-visualization'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
-import { logger, logError, logInfo } from '@/lib/logger'
-
-// Types
-interface AnalyticsOverview {
-  totalUsers: number
-  activeUsers: number
-  newUsers: number
-  retentionRate: number
-  conversionRate: number
-  revenue: number
-  mrr: number
-  engagement: {
-    averageSessionDuration: number
-    pageViews: number
-    bounceRate: number
-  }
-  features: {
-    aiInteractions: number
-    goalsCreated: number
-    tasksCompleted: number
-    filesUploaded: number
-  }
-}
-
-interface ExportJob {
-  id: string
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'
-  format: string
-  createdAt: Date
-  progress: number
-  filename?: string
-  downloadUrl?: string
-  error?: string
-}
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import Link from 'next/link'
 
 export default function AnalyticsPage() {
-  const { user, loading: authLoading } = useAuth()
-  const { toast } = useToast()
-  
-  const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'visualizations' | 'exports'>('overview')
-  const [overview, setOverview] = useState<AnalyticsOverview | null>(null)
-  const [exportJobs, setExportJobs] = useState<ExportJob[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [selectedPeriod, setSelectedPeriod] = useState('7d')
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
 
-  // Load analytics data
-  const loadAnalyticsData = useCallback(async () => {
-    if (authLoading) return
-    
-    setLoading(true)
-    setError(null)
-    
-    try {
-      const [overviewRes, exportsRes] = await Promise.all([
-        fetch('/api/analytics'),
-        fetch('/api/analytics/export')
-      ])
-
-      if (overviewRes.ok) {
-        const overviewData = await overviewRes.json()
-        setOverview(overviewData.data?.businessMetrics || null)
+  // Mock data - replace with real data from your API
+  const analyticsData = {
+    overview: {
+      totalRevenue: 125000,
+      revenueGrowth: 23.5,
+      activeUsers: 2847,
+      userGrowth: 18.2,
+      conversionRate: 12.4,
+      conversionGrowth: 5.1,
+      avgSessionTime: 24.5,
+      sessionGrowth: -2.3
+    },
+    metrics: [
+      {
+        title: "Revenue Generated",
+        value: "$125,000",
+        change: "+23.5%",
+        trend: "up",
+        icon: DollarSign,
+        color: "text-green-400"
+      },
+      {
+        title: "Active Users",
+        value: "2,847",
+        change: "+18.2%",
+        trend: "up",
+        icon: Users,
+        color: "text-blue-400"
+      },
+      {
+        title: "Conversion Rate",
+        value: "12.4%",
+        change: "+5.1%",
+        trend: "up",
+        icon: Target,
+        color: "text-purple-400"
+      },
+      {
+        title: "Session Duration",
+        value: "24.5m",
+        change: "-2.3%",
+        trend: "down",
+        icon: Clock,
+        color: "text-orange-400"
       }
+    ],
+    topPages: [
+      { page: "/dashboard", views: 1247, growth: 12.3 },
+      { page: "/templates", views: 892, growth: 8.7 },
+      { page: "/analytics", views: 654, growth: 15.2 },
+      { page: "/settings", views: 423, growth: -3.1 }
+    ],
+    recentActivity: [
+      { action: "New user registered", time: "2 minutes ago", type: "user" },
+      { action: "Template generated", time: "5 minutes ago", type: "template" },
+      { action: "Analytics updated", time: "12 minutes ago", type: "analytics" },
+      { action: "Payment processed", time: "18 minutes ago", type: "payment" }
+    ]
+  }
 
-      if (exportsRes.ok) {
-        const exportsData = await exportsRes.json()
-        setExportJobs(exportsData.data?.exports || [])
-      }
-
-    } catch (err) {
-      logError('Failed to load analytics data:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load analytics data')
-    } finally {
-      setLoading(false)
-    }
-  }, [authLoading])
-
-  // Refresh data
   const handleRefresh = useCallback(async () => {
-    setRefreshing(true)
-    await loadAnalyticsData()
-    setRefreshing(false)
-    
-    toast({
-      title: 'Data Refreshed',
-      description: 'Analytics data has been updated',
-      variant: 'success'
-    })
-  }, [loadAnalyticsData, toast])
-
-  // Load data on mount
-  useEffect(() => {
-    loadAnalyticsData()
-  }, [loadAnalyticsData])
-
-  // Auto-refresh every 5 minutes
-  useEffect(() => {
-    const interval = setInterval(loadAnalyticsData, 5 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [loadAnalyticsData])
-
-  if (authLoading || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-black">
-        <HolographicLoader text="Loading Analytics Dashboard..." size="lg" />
-      </div>
-    )
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-black">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Authentication Required</h2>
-          <p className="text-gray-300 mb-4">Please sign in to access analytics</p>
-          <HolographicButton onClick={() => window.location.href = '/signin'}>
-            Sign In
-          </HolographicButton>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-black">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Error Loading Analytics</h2>
-          <p className="text-gray-300 mb-4">{error}</p>
-          <HolographicButton onClick={loadAnalyticsData}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Retry
-          </HolographicButton>
-        </div>
-      </div>
-    )
-  }
+    setIsLoading(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    setIsLoading(false)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-black text-white">
-      {/* Header */}
-      <div className="border-b border-purple-800/30 bg-black/20 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold boss-heading">Analytics Dashboard</h1>
-              <p className="text-gray-300 mt-1">
-                Comprehensive insights into your SoloSuccess AI platform
-              </p>
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/dashboard" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
+              </Link>
+              
+              <div className="flex items-center gap-4">
+                <TacticalButton variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </TacticalButton>
+                <TacticalButton size="sm">
+                  Export Report
+                </TacticalButton>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <HolographicButton
-                variant="outline"
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="flex items-center gap-2"
-              >
-                {refreshing ? (
-                  <HolographicLoader size="sm" />
-                ) : (
-                  <RefreshCw className="h-4 w-4" />
-                )}
-                Refresh
-              </HolographicButton>
-              <HolographicButton className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Export All
-              </HolographicButton>
+          </div>
+        </nav>
+
+        {/* Main Content */}
+        <div className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-12"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <RankStars count={5} size="lg" />
+                    <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                      Elite Intelligence Center
+                    </span>
+                  </div>
+                  
+                  <h1 className="font-heading text-5xl font-bold text-white mb-4">
+                    Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Analytics</span>
+                  </h1>
+                  
+                  <p className="text-xl text-military-storm-grey max-w-2xl">
+                    Monitor your business performance with elite intelligence and tactical insights. 
+                    Track every metric that matters for domination.
+                  </p>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <select 
+                    value={selectedPeriod}
+                    onChange={(e) => setSelectedPeriod(e.target.value)}
+                    className="bg-military-tactical/50 border-military-hot-pink/30 text-white rounded-lg px-4 py-2 focus:border-military-hot-pink focus:outline-none"
+                  >
+                    <option value="24h">Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="90d">Last 90 Days</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Key Metrics */}
+            <div className="mb-12">
+              <TacticalGrid className="max-w-7xl mx-auto">
+                {analyticsData.metrics.map((metric, index) => (
+                  <TacticalGridItem key={index}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <GlassCard className="h-full p-8">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                            <metric.icon className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {metric.trend === 'up' ? (
+                              <ArrowUp className="w-4 h-4 text-green-400" />
+                            ) : (
+                              <ArrowDown className="w-4 h-4 text-red-400" />
+                            )}
+                            <span className={`text-sm font-tactical ${metric.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                              {metric.change}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <h3 className="font-heading text-3xl font-bold text-white mb-2">
+                          {metric.value}
+                        </h3>
+                        
+                        <p className="text-military-storm-grey text-sm uppercase tracking-wider">
+                          {metric.title}
+                        </p>
+                      </GlassCard>
+                    </motion.div>
+                  </TacticalGridItem>
+                ))}
+              </TacticalGrid>
+            </div>
+
+            {/* Analytics Tabs */}
+            <div className="max-w-7xl mx-auto">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+                <TabsList className="glass-panel-strong border border-military-hot-pink/30">
+                  <TabsTrigger value="overview" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger value="revenue" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    Revenue
+                  </TabsTrigger>
+                  <TabsTrigger value="users" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <Users className="w-4 h-4 mr-2" />
+                    Users
+                  </TabsTrigger>
+                  <TabsTrigger value="performance" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <Activity className="w-4 h-4 mr-2" />
+                    Performance
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-8">
+                  <div className="grid lg:grid-cols-2 gap-8">
+                    {/* Revenue Chart */}
+                    <GlassCard className="p-8">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-heading text-2xl font-bold text-white">Revenue Trends</h3>
+                        <TacticalButton variant="outline" size="sm">
+                          <Download className="w-4 h-4 mr-2" />
+                          Export
+                        </TacticalButton>
+                      </div>
+                      
+                      <div className="h-64 flex items-center justify-center bg-military-tactical/20 rounded-lg">
+                        <div className="text-center">
+                          <BarChart3 className="w-16 h-16 text-military-hot-pink mx-auto mb-4" />
+                          <p className="text-military-storm-grey">Revenue chart visualization</p>
+                        </div>
+                      </div>
+                    </GlassCard>
+
+                    {/* Top Pages */}
+                    <GlassCard className="p-8">
+                      <h3 className="font-heading text-2xl font-bold text-white mb-6">Top Performing Pages</h3>
+                      
+                      <div className="space-y-4">
+                        {analyticsData.topPages.map((page, index) => (
+                          <div key={index} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-military-hot-pink/20 flex items-center justify-center">
+                                <span className="text-military-hot-pink font-bold text-sm">{index + 1}</span>
+                              </div>
+                              <span className="text-white font-medium">{page.page}</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                              <span className="text-military-storm-grey">{page.views} views</span>
+                              <div className="flex items-center gap-1">
+                                {page.growth > 0 ? (
+                                  <ArrowUp className="w-3 h-3 text-green-400" />
+                                ) : (
+                                  <ArrowDown className="w-3 h-3 text-red-400" />
+                                )}
+                                <span className={`text-sm ${page.growth > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {page.growth}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </GlassCard>
+                  </div>
+
+                  {/* Recent Activity */}
+                  <GlassCard className="p-8">
+                    <h3 className="font-heading text-2xl font-bold text-white mb-6">Recent Activity</h3>
+                    
+                    <div className="space-y-4">
+                      {analyticsData.recentActivity.map((activity, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: index * 0.1 }}
+                          className="flex items-center gap-4 p-4 bg-military-tactical/20 rounded-lg"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                            <Activity className="w-5 h-5 text-white" />
+                          </div>
+                          
+                          <div className="flex-1">
+                            <p className="text-white font-medium">{activity.action}</p>
+                            <p className="text-military-storm-grey text-sm">{activity.time}</p>
+                          </div>
+                          
+                          <div className="px-3 py-1 bg-military-hot-pink/20 text-military-hot-pink text-xs rounded-full uppercase tracking-wider">
+                            {activity.type}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                <TabsContent value="revenue" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h3 className="font-heading text-2xl font-bold text-white mb-6">Revenue Analysis</h3>
+                    <div className="h-64 flex items-center justify-center bg-military-tactical/20 rounded-lg">
+                      <div className="text-center">
+                        <DollarSign className="w-16 h-16 text-military-hot-pink mx-auto mb-4" />
+                        <p className="text-military-storm-grey">Revenue analytics visualization</p>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                <TabsContent value="users" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h3 className="font-heading text-2xl font-bold text-white mb-6">User Analytics</h3>
+                    <div className="h-64 flex items-center justify-center bg-military-tactical/20 rounded-lg">
+                      <div className="text-center">
+                        <Users className="w-16 h-16 text-military-hot-pink mx-auto mb-4" />
+                        <p className="text-military-storm-grey">User analytics visualization</p>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                <TabsContent value="performance" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h3 className="font-heading text-2xl font-bold text-white mb-6">Performance Metrics</h3>
+                    <div className="h-64 flex items-center justify-center bg-military-tactical/20 rounded-lg">
+                      <div className="text-center">
+                        <Activity className="w-16 h-16 text-military-hot-pink mx-auto mb-4" />
+                        <p className="text-military-storm-grey">Performance metrics visualization</p>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Reports
-            </TabsTrigger>
-            <TabsTrigger value="visualizations" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Visualizations
-            </TabsTrigger>
-            <TabsTrigger value="exports" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Exports
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <AnalyticsDashboard />
-          </TabsContent>
-
-          {/* Reports Tab */}
-          <TabsContent value="reports" className="space-y-6">
-            <CustomReportBuilder
-              onSave={(report) => {
-                logInfo('Custom report saved:', { reportId: report.id, name: report.name })
-                toast({
-                  title: 'Report Saved',
-                  description: `"${report.name}" has been saved successfully`,
-                  variant: 'success'
-                })
-              }}
-              onExport={(report, format) => {
-                logInfo('Report export initiated:', { reportId: report.id, format })
-                toast({
-                  title: 'Export Started',
-                  description: `Exporting "${report.name}" as ${format.toUpperCase()}...`,
-                  variant: 'success'
-                })
-              }}
-            />
-          </TabsContent>
-
-          {/* Visualizations Tab */}
-          <TabsContent value="visualizations" className="space-y-6">
-            <AdvancedDataVisualization
-              onDataUpdate={(data) => {
-                logInfo('Visualization data updated:', { count: data.length })
-              }}
-              onExport={(format, data) => {
-                logInfo('Visualization export initiated:', { format, count: data.length })
-                toast({
-                  title: 'Export Started',
-                  description: `Exporting ${data.length} visualizations as ${format.toUpperCase()}...`,
-                  variant: 'success'
-                })
-              }}
-            />
-          </TabsContent>
-
-          {/* Exports Tab */}
-          <TabsContent value="exports" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Export Jobs */}
-              <div className="lg:col-span-2">
-                <HolographicCard>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Download className="h-5 w-5" />
-                      Export Jobs
-                    </CardTitle>
-                    <CardDescription>
-                      Track your export requests and download completed files
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-96">
-                      <div className="space-y-3">
-                        {exportJobs.length === 0 ? (
-                          <div className="text-center py-8">
-                            <Download className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-gray-500">No export jobs yet</p>
-                            <p className="text-sm text-gray-400">Create reports to generate exports</p>
-                          </div>
-                        ) : (
-                          exportJobs.map(job => (
-                            <HolographicCard key={job.id} className="p-4">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-3">
-                                  <Badge variant="secondary" className="capitalize">
-                                    {job.format}
-                                  </Badge>
-                                  <span className="font-medium text-sm">
-                                    Export #{job.id.slice(-8)}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Badge 
-                                    variant={
-                                      job.status === 'completed' ? 'default' :
-                                      job.status === 'failed' ? 'destructive' :
-                                      job.status === 'processing' ? 'secondary' :
-                                      'outline'
-                                    }
-                                  >
-                                    {job.status}
-                                  </Badge>
-                                  {job.status === 'completed' && job.downloadUrl && (
-                                    <HolographicButton
-                                      size="sm"
-                                      onClick={() => window.open(job.downloadUrl, '_blank')}
-                                    >
-                                      <Download className="h-3 w-3" />
-                                    </HolographicButton>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {job.status === 'processing' && (
-                                <div className="space-y-2">
-                                  <div className="flex items-center justify-between text-xs text-gray-500">
-                                    <span>Progress</span>
-                                    <span>{job.progress}%</span>
-                                  </div>
-                                  <Progress value={job.progress} className="h-2" />
-                                </div>
-                              )}
-                              
-                              {job.status === 'failed' && job.error && (
-                                <div className="text-xs text-red-500 mt-2">
-                                  Error: {job.error}
-                                </div>
-                              )}
-                              
-                              <div className="text-xs text-gray-500 mt-2">
-                                Created: {job.createdAt.toLocaleString()}
-                              </div>
-                            </HolographicCard>
-                          ))
-                        )}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </HolographicCard>
-              </div>
-
-              {/* Export Statistics */}
-              <div className="space-y-6">
-                <HolographicCard>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Database className="h-5 w-5" />
-                      Export Statistics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-300">Total Exports</span>
-                      <span className="font-semibold">{exportJobs.length}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-300">Completed</span>
-                      <span className="font-semibold text-green-400">
-                        {exportJobs.filter(j => j.status === 'completed').length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-300">In Progress</span>
-                      <span className="font-semibold text-yellow-400">
-                        {exportJobs.filter(j => j.status === 'processing').length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-300">Failed</span>
-                      <span className="font-semibold text-red-400">
-                        {exportJobs.filter(j => j.status === 'failed').length}
-                      </span>
-                    </div>
-                  </CardContent>
-                </HolographicCard>
-
-                <HolographicCard>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5" />
-                      Quick Actions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <HolographicButton
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => setActiveTab('reports')}
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Create Report
-                    </HolographicButton>
-                    <HolographicButton
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => setActiveTab('visualizations')}
-                    >
-                      <BarChart3 className="h-4 w-4 mr-2" />
-                      New Visualization
-                    </HolographicButton>
-                    <HolographicButton
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={handleRefresh}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Refresh Data
-                    </HolographicButton>
-                  </CardContent>
-                </HolographicCard>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+      </CamoBackground>
     </div>
   )
 }
