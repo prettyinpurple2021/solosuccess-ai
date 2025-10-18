@@ -4,11 +4,45 @@
 export const dynamic = 'force-dynamic'
 
 import Link from "next/link"
-import { ArrowLeft, Crown, Brain, Target, Sparkles, Zap, TrendingUp, Shield, Users, Briefcase, Calendar, MessageCircle, Palette, Focus, CheckCircle, Play} from "lucide-react"
-import { Button} from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import { Badge} from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import { motion } from "framer-motion"
+import { 
+  ArrowLeft, 
+  Crown, 
+  Brain, 
+  Target, 
+  Sparkles, 
+  Zap, 
+  TrendingUp, 
+  Shield, 
+  Users, 
+  Briefcase, 
+  Calendar, 
+  MessageCircle, 
+  Palette, 
+  Focus, 
+  CheckCircle, 
+  Play,
+  ArrowRight,
+  Star,
+  Trophy,
+  Sword,
+  Gem,
+  Infinity,
+  Flame,
+  Rocket,
+  Award
+} from "lucide-react"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function FeaturesPage() {
   const aiAgents = [
@@ -16,7 +50,7 @@ export default function FeaturesPage() {
       name: "Roxy",
       role: "Executive Assistant",
       icon: Crown,
-      color: "from-purple-500 to-pink-500",
+      color: "from-military-hot-pink to-military-blush-pink",
       description: "Your personal EA who handles scheduling, emails, and administrative tasks with boss-level efficiency.",
       capabilities: ["Calendar Management", "Email Sorting", "Meeting Coordination", "Task Prioritization"]
     },
@@ -24,444 +58,389 @@ export default function FeaturesPage() {
       name: "Blaze",
       role: "Growth Strategist",
       icon: TrendingUp,
-      color: "from-orange-500 to-red-500",
+      color: "from-military-hot-pink to-military-blush-pink",
       description: "The marketing mastermind who develops growth strategies and identifies new business opportunities.",
       capabilities: ["Growth Planning", "Market Analysis", "Strategy Development", "Opportunity Identification"]
     },
     {
-      name: "Echo",
-      role: "Marketing Maven",
-      icon: MessageCircle,
-      color: "from-pink-500 to-purple-500",
-      description: "Your creative marketing genius who crafts compelling content and manages your brand presence.",
-      capabilities: ["Content Creation", "Social Media Strategy", "Brand Voice", "Campaign Planning"]
-    },
-    {
-      name: "Lumi",
-      role: "Legal & Docs",
-      icon: Shield,
-      color: "from-blue-500 to-indigo-500",
-      description: "The legal expert who handles contracts, compliance, and documentation with precision.",
-      capabilities: ["Contract Review", "Legal Compliance", "Document Templates", "Risk Assessment"]
-    },
-    {
-      name: "Vex",
-      role: "Technical Architect",
-      icon: Zap,
-      color: "from-green-500 to-teal-500",
-      description: "Your tech wizard who handles system design, integrations, and technical problem-solving.",
-      capabilities: ["System Design", "API Integrations", "Technical Planning", "Troubleshooting"]
-    },
-    {
-      name: "Lexi",
-      role: "Strategy Analyst",
-      icon: Target,
-      color: "from-indigo-500 to-purple-500",
-      description: "The data-driven strategist who analyzes performance and provides actionable insights.",
-      capabilities: ["Performance Analysis", "Strategic Insights", "Data Interpretation", "Recommendations"]
-    },
-    {
       name: "Nova",
-      role: "Product Designer",
+      role: "Content Creator",
       icon: Sparkles,
-      color: "from-cyan-500 to-blue-500",
-      description: "Your creative visionary who designs beautiful user experiences and product interfaces.",
-      capabilities: ["UI/UX Design", "Product Strategy", "User Research", "Design Systems"]
+      color: "from-military-hot-pink to-military-blush-pink",
+      description: "The creative genius who produces engaging content across all platforms and formats.",
+      capabilities: ["Content Strategy", "Copywriting", "Social Media", "Brand Voice"]
     },
     {
-      name: "Glitch",
-      role: "QA & Debug",
-      icon: Focus,
-      color: "from-red-500 to-orange-500",
-      description: "The quality assurance expert who ensures everything works perfectly and catches issues early.",
-      capabilities: ["Quality Testing", "Bug Detection", "Process Optimization", "System Monitoring"]
+      name: "Phoenix",
+      role: "Sales Specialist",
+      icon: Target,
+      color: "from-military-hot-pink to-military-blush-pink",
+      description: "The revenue generator who closes deals and builds lasting customer relationships.",
+      capabilities: ["Lead Generation", "Sales Scripts", "Follow-up Sequences", "Revenue Optimization"]
+    },
+    {
+      name: "Sage",
+      role: "Business Analyst",
+      icon: Brain,
+      color: "from-military-hot-pink to-military-blush-pink",
+      description: "The data wizard who analyzes performance and provides actionable business insights.",
+      capabilities: ["Data Analysis", "Performance Tracking", "ROI Optimization", "Strategic Insights"]
+    },
+    {
+      name: "Viper",
+      role: "Competitive Intelligence",
+      icon: Shield,
+      color: "from-military-hot-pink to-military-blush-pink",
+      description: "The intelligence operative who monitors competitors and identifies market opportunities.",
+      capabilities: ["Competitor Analysis", "Market Research", "Threat Assessment", "Opportunity Mapping"]
+    },
+    {
+      name: "Atlas",
+      role: "Project Manager",
+      icon: Briefcase,
+      color: "from-military-hot-pink to-military-blush-pink",
+      description: "The organizational master who keeps projects on track and teams aligned.",
+      capabilities: ["Project Planning", "Task Management", "Team Coordination", "Deadline Tracking"]
+    },
+    {
+      name: "Luna",
+      role: "Customer Success",
+      icon: Users,
+      color: "from-military-hot-pink to-military-blush-pink",
+      description: "The relationship builder who ensures customer satisfaction and retention.",
+      capabilities: ["Customer Onboarding", "Support Tickets", "Retention Strategies", "Feedback Analysis"]
     }
   ]
 
   const coreFeatures = [
     {
-      name: "SlayList",
-      icon: Target,
-      description: "AI-powered goal and task management system designed for ambitious solo entrepreneurs.",
-      features: [
-        "Smart goal breakdown and prioritization",
-        "AI-assisted task scheduling",
-        "Progress tracking and analytics",
-        "Motivation and accountability system"
-      ],
-      benefits: "Achieve 3x more goals with less stress"
+      title: "AI-Powered Automation",
+      description: "Streamline your business operations with intelligent automation that works 24/7",
+      icon: Zap,
+      features: ["Workflow Automation", "Task Scheduling", "Email Management", "Data Processing"]
     },
     {
-      name: "AI Squad",
-      icon: Brain,
-      description: "Your 8-member virtual team of specialized AI agents, each with unique expertise.",
-      features: [
-        "8 specialized AI agents with distinct personalities",
-        "Natural conversation interface",
-        "Context-aware assistance",
-        "Continuous learning and adaptation"
-      ],
-      benefits: "Get the output of a full team as a solo entrepreneur"
+      title: "Competitive Intelligence",
+      description: "Stay ahead of the competition with real-time market insights and competitor analysis",
+      icon: Shield,
+      features: ["Competitor Monitoring", "Market Analysis", "Threat Detection", "Opportunity Identification"]
     },
     {
-      name: "BrandStyler Studio",
-      icon: Palette,
-      description: "AI-powered brand creation and design tools for consistent visual identity.",
-      features: [
-        "Automated brand asset generation",
-        "Consistent style application",
-        "Marketing material creation",
-        "Brand voice development"
-      ],
-      benefits: "Professional branding without hiring a design team"
+      title: "Content Generation",
+      description: "Create engaging content across all platforms with AI-powered writing and design tools",
+      icon: Sparkles,
+      features: ["Blog Posts", "Social Media", "Email Campaigns", "Marketing Materials"]
     },
     {
-      name: "Focus Mode",
-      icon: Focus,
-      description: "Anti-burnout system that optimizes your energy and prevents overwhelm.",
-      features: [
-        "Energy-based scheduling",
-        "Burnout prevention alerts",
-        "Optimal work session planning",
-        "Mental health monitoring"
-      ],
-      benefits: "Work smarter and maintain sustainable productivity"
+      title: "Analytics & Insights",
+      description: "Make data-driven decisions with comprehensive analytics and performance tracking",
+      icon: TrendingUp,
+      features: ["Performance Metrics", "ROI Analysis", "Growth Tracking", "Predictive Insights"]
+    }
+  ]
+
+  const workflows = [
+    {
+      name: "Lead Generation",
+      description: "Automatically identify and qualify potential customers",
+      steps: ["Market Research", "Lead Scoring", "Contact Information", "Follow-up Sequences"],
+      icon: Target
     },
     {
-      name: "Briefcase",
-      icon: Briefcase,
-      description: "Secure file storage and knowledge management system for your business.",
-      features: [
-        "Encrypted file storage",
-        "AI-powered document organization",
-        "Smart search and retrieval",
-        "Version control and backup"
-      ],
-      benefits: "Keep your business organized and secure"
+      name: "Content Marketing",
+      description: "Create and distribute content across multiple channels",
+      steps: ["Content Planning", "Writing & Design", "Publishing", "Performance Tracking"],
+      icon: Sparkles
     },
     {
-      name: "Collaboration Hub",
-      icon: Users,
-      description: "Tools for managing client relationships and external collaborations.",
-      features: [
-        "Client communication management",
-        "Project collaboration tools",
-        "External team coordination",
-        "Contractor management"
-      ],
-      benefits: "Seamless collaboration without the complexity"
+      name: "Customer Onboarding",
+      description: "Streamline the customer journey from signup to success",
+      steps: ["Welcome Sequence", "Product Training", "Success Metrics", "Retention Strategies"],
+      icon: Users
+    },
+    {
+      name: "Competitive Analysis",
+      description: "Monitor competitors and identify market opportunities",
+      steps: ["Competitor Tracking", "Market Research", "Threat Assessment", "Strategy Development"],
+      icon: Shield
     }
   ]
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-                <div className="text-2xl">👑</div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloSuccess AI
-                </span>
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/pricing">
-                <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
-                  View Pricing
-                </Button>
-              </Link>
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full">
-                Start Building Empire
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <Badge className="mb-6 text-lg px-6 py-2 bg-purple-100 text-purple-700 border-purple-200 rounded-full">
-            🚀 All Features
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Everything You Need
-            </span>
-            <br />
-            <span className="text-gray-600 text-3xl md:text-4xl">To Build Your Empire</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Discover all the powerful features that make SoloSuccess AI the ultimate productivity platform 
-            for solo entrepreneurs. From AI agents to automation tools, we&apos;ve got you covered. 💪
-          </p>
-        </div>
-      </section>
-
-      {/* Feature Categories */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <Tabs defaultValue="ai-squad" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-12">
-              <TabsTrigger value="ai-squad" className="text-lg py-3">AI Squad</TabsTrigger>
-              <TabsTrigger value="core-features" className="text-lg py-3">Core Features</TabsTrigger>
-              <TabsTrigger value="integrations" className="text-lg py-3">Integrations</TabsTrigger>
-            </TabsList>
-
-            {/* AI Squad Tab */}
-            <TabsContent value="ai-squad">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-800 mb-4">Meet Your AI Squad</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  8 specialized AI agents, each with unique personalities and expertise to handle different aspects of your business
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {aiAgents.map((agent, index) => (
-                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                    <CardContent className="p-8 text-center">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${agent.color} flex items-center justify-center mx-auto mb-6 shadow-lg`}>
-                        <agent.icon className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">{agent.name}</h3>
-                      <Badge className="mb-4 text-xs">
-                        {agent.role}
-                      </Badge>
-                      <p className="text-gray-600 mb-6 leading-relaxed">
-                        {agent.description}
-                      </p>
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-semibold text-gray-800 mb-3">Specializes In:</h4>
-                        {agent.capabilities.map((capability, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                            {capability}
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Core Features Tab */}
-            <TabsContent value="core-features">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-800 mb-4">Core Platform Features</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Powerful tools designed specifically for solo entrepreneurs who want to build without burning out
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {coreFeatures.map((feature, index) => (
-                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                          <feature.icon className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-2xl font-bold text-gray-800">{feature.name}</CardTitle>
-                          <p className="text-green-600 font-semibold text-sm">{feature.benefits}</p>
-                        </div>
-                      </div>
-                      <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <h4 className="text-lg font-semibold text-gray-800">Key Features:</h4>
-                        {feature.features.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                            <span className="text-gray-600">{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Integrations Tab */}
-            <TabsContent value="integrations">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-800 mb-4">Powerful Integrations</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Connect SoloSuccess AI with your favorite tools and streamline your entire workflow
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card className="border-purple-200 hover:border-purple-300 transition-colors">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center mx-auto mb-6">
-                      <Calendar className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Productivity Tools</h3>
-                    <div className="space-y-2 text-gray-600">
-                      <p>• Google Calendar</p>
-                      <p>• Notion & Obsidian</p>
-                      <p>• Todoist & TickTick</p>
-                      <p>• Slack & Discord</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-purple-200 hover:border-purple-300 transition-colors">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center mx-auto mb-6">
-                      <TrendingUp className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Business Tools</h3>
-                    <div className="space-y-2 text-gray-600">
-                      <p>• Stripe & PayPal</p>
-                      <p>• QuickBooks</p>
-                      <p>• HubSpot & Salesforce</p>
-                      <p>• Mailchimp & ConvertKit</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-purple-200 hover:border-purple-300 transition-colors">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center mx-auto mb-6">
-                      <MessageCircle className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Communication</h3>
-                    <div className="space-y-2 text-gray-600">
-                      <p>• Gmail & Outlook</p>
-                      <p>• Zoom & Teams</p>
-                      <p>• WhatsApp Business</p>
-                      <p>• Social Media APIs</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="text-center mt-12">
-                <p className="text-gray-600 mb-6">Don't see your tool? We&apos;re constantly adding new integrations!</p>
-                <Link href="/contact">
-                  <Button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                    Request Integration
-                  </Button>
+              
+              <div className="flex items-center gap-4">
+                <Link href="/pricing">
+                  <TacticalButton variant="outline" size="sm">
+                    View Plans
+                  </TacticalButton>
+                </Link>
+                <Link href="/signup">
+                  <TacticalButton size="sm">
+                    Get Started
+                  </TacticalButton>
                 </Link>
               </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-
-      {/* Feature Benefits */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Why Solo Entrepreneurs Choose SoloSuccess</h2>
-            <p className="text-xl text-gray-600">Real benefits that make a difference in your business</p>
+            </div>
           </div>
+        </nav>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center mx-auto mb-6">
-                <TrendingUp className="w-10 h-10 text-white" />
+        {/* Hero Section */}
+        <div className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Elite Features
+                </span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">3x More Productive</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Solo entrepreneurs report 3x higher productivity with AI agents handling routine tasks and providing expert assistance.
+              
+              <h1 className="font-heading text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Features</span>
+              </h1>
+              
+              <p className="text-2xl text-military-storm-grey max-w-3xl mx-auto mb-8 leading-relaxed">
+                Discover the elite arsenal of AI agents, automation tools, and tactical features 
+                designed to dominate your business goals.
               </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">60% Less Burnout</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Our anti-burnout focus system and workload optimization help maintain sustainable productivity without overwhelm.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-6">
-                <Target className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">5x Goal Achievement</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Smart goal breakdown and AI-assisted prioritization help entrepreneurs achieve 5x more of their ambitious goals.
-              </p>
-            </div>
+              
+              <TacticalButton size="lg" className="group">
+                <Play className="w-5 h-5 mr-2" />
+                Explore Features
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </TacticalButton>
+            </motion.div>
           </div>
         </div>
-      </section>
 
-      {/* Video Demo Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">See SoloSuccess AI in Action</h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Watch how real solo entrepreneurs use SoloSuccess AI to build their empires
-          </p>
-          
-          <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-8 rounded-2xl border border-purple-200">
-            <div className="flex items-center justify-center mb-6">
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-20 h-20">
-                <Play className="w-8 h-8" />
-              </Button>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              "From Overwhelmed to Empire Builder in 30 Days&quot;
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Watch Sarah transform her struggling freelance business into a thriving empire using SoloSuccess AI&apos;s complete toolkit.
-            </p>
-            <Button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-              Watch Demo Video
-            </Button>
+        {/* AI Agents Section */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-heading text-5xl font-bold text-white mb-6">
+                Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">AI Agents</span>
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                Meet your tactical team of AI agents, each specialized for maximum business impact
+              </p>
+            </motion.div>
+
+            <TacticalGrid className="max-w-7xl mx-auto">
+              {aiAgents.map((agent, index) => (
+                <TacticalGridItem key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <GlassCard className="h-full p-8">
+                      <div className="text-center mb-6">
+                        <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center`}>
+                          <agent.icon className="w-10 h-10 text-white" />
+                        </div>
+                        
+                        <h3 className="font-heading text-2xl font-bold text-white mb-2">{agent.name}</h3>
+                        <p className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">{agent.role}</p>
+                      </div>
+                      
+                      <p className="text-military-storm-grey mb-6 text-center leading-relaxed">
+                        {agent.description}
+                      </p>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-heading text-lg font-bold text-white mb-3">Tactical Capabilities:</h4>
+                        {agent.capabilities.map((capability, capIndex) => (
+                          <div key={capIndex} className="flex items-center gap-3">
+                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                            <span className="text-military-storm-grey text-sm">{capability}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                </TacticalGridItem>
+              ))}
+            </TacticalGrid>
           </div>
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build Your Empire?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join thousands of solo entrepreneurs who&apos;ve transformed their businesses with SoloSuccess AI. 
-            Start your journey today and experience the power of having an AI squad! 🚀
-          </p>
-          <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-            <Link href="/">
-              <Button
-                size="lg"
-                className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
-              >
-                Start for free
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200 bg-transparent"
-              >
-                View Pricing
-              </Button>
-            </Link>
+        {/* Core Features Section */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-heading text-5xl font-bold text-white mb-6">
+                Core <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Capabilities</span>
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                The fundamental features that power your business success
+              </p>
+            </motion.div>
+
+            <TacticalGrid className="max-w-6xl mx-auto">
+              {coreFeatures.map((feature, index) => (
+                <TacticalGridItem key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <GlassCard className="h-full p-8">
+                      <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <feature.icon className="w-8 h-8 text-white" />
+                      </div>
+                      
+                      <h3 className="font-heading text-2xl font-bold text-white mb-4 text-center">
+                        {feature.title}
+                      </h3>
+                      
+                      <p className="text-military-storm-grey mb-6 text-center leading-relaxed">
+                        {feature.description}
+                      </p>
+                      
+                      <div className="space-y-3">
+                        {feature.features.map((item, itemIndex) => (
+                          <div key={itemIndex} className="flex items-center gap-3">
+                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                            <span className="text-military-storm-grey text-sm">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                </TacticalGridItem>
+              ))}
+            </TacticalGrid>
           </div>
         </div>
-      </section>
+
+        {/* Workflows Section */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="font-heading text-5xl font-bold text-white mb-6">
+                Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Workflows</span>
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
+                Pre-built automation workflows for common business processes
+              </p>
+            </motion.div>
+
+            <TacticalGrid className="max-w-6xl mx-auto">
+              {workflows.map((workflow, index) => (
+                <TacticalGridItem key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <GlassCard className="h-full p-8">
+                      <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <workflow.icon className="w-8 h-8 text-white" />
+                      </div>
+                      
+                      <h3 className="font-heading text-2xl font-bold text-white mb-4 text-center">
+                        {workflow.name}
+                      </h3>
+                      
+                      <p className="text-military-storm-grey mb-6 text-center leading-relaxed">
+                        {workflow.description}
+                      </p>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-heading text-lg font-bold text-white mb-3">Workflow Steps:</h4>
+                        {workflow.steps.map((step, stepIndex) => (
+                          <div key={stepIndex} className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-military-hot-pink/20 flex items-center justify-center">
+                              <span className="text-military-hot-pink font-bold text-xs">{stepIndex + 1}</span>
+                            </div>
+                            <span className="text-military-storm-grey text-sm">{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                </TacticalGridItem>
+              ))}
+            </TacticalGrid>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <GlassCard className="max-w-4xl mx-auto p-12">
+                <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Rocket className="w-10 h-10 text-white" />
+                </div>
+                
+                <h2 className="font-heading text-4xl font-bold text-white mb-6">
+                  Ready to Deploy Your Tactical Team?
+                </h2>
+                
+                <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
+                  Join thousands of entrepreneurs who've transformed their businesses 
+                  with our elite AI agents and tactical features.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  <TacticalButton size="lg" className="group">
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Your Mission
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </TacticalButton>
+                  
+                  <Link href="/pricing">
+                    <TacticalButton variant="outline" size="lg">
+                      View Pricing
+                    </TacticalButton>
+                  </Link>
+                </div>
+              </GlassCard>
+            </motion.div>
+          </div>
+        </div>
+      </CamoBackground>
     </div>
   )
 }
