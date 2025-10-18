@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+'use client'
 import Script from 'next/script'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -35,25 +35,6 @@ import {
 } from '@/components/military'
 import FaqSection from '@/components/faq/faq-section'
 
-export const metadata: Metadata = {
-  title: 'Launch Plan — Free AI Co-founder for Solo Founders',
-  description: 'Start free with AI Business Assistant, basic automation, and community access. Perfect for Solo Founders, Solopreneurs, and Individual Creators getting started.',
-  alternates: {
-    canonical: 'https://solobossai.fun/pricing/launch',
-  },
-  openGraph: {
-    title: 'Launch Plan — Free AI Co-founder',
-    description: 'Free plan for Solo Founders with AI Business Assistant and basic automation.',
-    url: 'https://solobossai.fun/pricing/launch',
-    type: 'website',
-    siteName: 'SoloSuccess AI',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Launch Plan — Free AI Co-founder',
-    description: 'Start free with AI Business Assistant for Solo Founders.',
-  },
-}
 
 // Edge Runtime disabled due to Node.js dependency incompatibility
 export const runtime = 'nodejs'

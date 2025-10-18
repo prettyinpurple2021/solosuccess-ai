@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+'use client'
 import Script from 'next/script'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -36,25 +36,6 @@ import {
 } from '@/components/military'
 import FaqSection from '@/components/faq/faq-section'
 
-export const metadata: Metadata = {
-  title: 'Dominator Plan — Unlimited AI Business Co-pilot for Empire Builders',
-  description: 'Unlimited AI agents, custom workflows, and white-label options. For empire builders who demand unlimited power with AI Business Assistant and Workflow Automation AI.',
-  alternates: {
-    canonical: 'https://solobossai.fun/pricing/dominator',
-  },
-  openGraph: {
-    title: 'Dominator Plan — Unlimited AI Business Co-pilot',
-    description: 'Unlimited plan with AI Business Co-pilot, custom workflows, and white-label options.',
-    url: 'https://solobossai.fun/pricing/dominator',
-    type: 'website',
-    siteName: 'SoloSuccess AI',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Dominator Plan — Unlimited AI Business Co-pilot',
-    description: 'Unlimited AI Business Co-pilot with custom workflows for empire builders.',
-  },
-}
 
 // Edge Runtime disabled due to Node.js dependency incompatibility
 export const runtime = 'nodejs'
