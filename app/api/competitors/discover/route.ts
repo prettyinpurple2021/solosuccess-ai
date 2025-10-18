@@ -4,8 +4,8 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Using Node.js runtime for database operations
+export const runtime = 'nodejs'
 
 
 // Edge Runtime disabled due to Node.js dependency incompatibility

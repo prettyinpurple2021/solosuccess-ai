@@ -8,8 +8,8 @@ import { z} from 'zod'
 import { gateConversation, gateAgentAccess } from '@/lib/feature-gate-middleware'
 import { incrementConversationCount, trackAgentAccess } from '@/lib/usage-tracking'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Using Node.js runtime for database and complex operations
+export const runtime = 'nodejs'
 
 // Type for Cloudflare service bindings
 interface Env {

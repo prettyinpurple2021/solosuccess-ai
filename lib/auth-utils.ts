@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { verify } from 'jsonwebtoken'
+import * as jose from 'jose'
 import { logError } from '@/lib/logger'
 
 /**
@@ -29,9 +29,10 @@ export async function getUserIdFromSession(request: NextRequest): Promise<string
       return null
     }
     
-    // Verify and decode JWT
-    const decoded = verify(token, jwtSecret) as { userId: string }
-    return decoded.userId || null
+    // Verify and decode JWT using jose (Edge Runtime compatible)
+    const secret = new TextEncoder().encode(jwtSecret)
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload.userId as string || null
   } catch (error) {
     logError('Error extracting user ID from session:', error)
     return null
@@ -51,4 +52,22 @@ export async function getUserIdFromRequest(request: NextRequest): Promise<string
   if (userIdHeader) return userIdHeader
   
   return null
+}
+
+/**
+ * Verify JWT token (alias for getUserIdFromSession for backward compatibility)
+ */
+export async function verifyToken(request: NextRequest): Promise<string | null> {
+  return await getUserIdFromSession(request)
+}
+
+/**
+ * Cookie options for authentication
+ */
+export const AUTH_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  maxAge: 60 * 60 * 24 * 7, // 7 days
+  path: '/'
 }
