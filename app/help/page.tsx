@@ -1,15 +1,47 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
+
 import Link from "next/link"
-import { useState} from "react"
-import { ArrowLeft, Search, MessageCircle, Video, Mail, ExternalLink, ChevronDown, ChevronRight, HelpCircle, Lightbulb, Zap, Users, Settings} from "lucide-react"
-import { Button} from "@/components/ui/button"
-import { Card, CardContent} from "@/components/ui/card"
-import { Badge} from "@/components/ui/badge"
-import { Input} from "@/components/ui/input"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { 
+  ArrowLeft, 
+  Search, 
+  MessageCircle, 
+  Video, 
+  Mail, 
+  ExternalLink, 
+  ChevronDown, 
+  ChevronRight, 
+  HelpCircle, 
+  Lightbulb, 
+  Zap, 
+  Users, 
+  Settings,
+  Crown,
+  Target,
+  Shield,
+  Brain,
+  Trophy,
+  ArrowRight,
+  BookOpen,
+  PlayCircle,
+  FileText,
+  Star
+} from "lucide-react"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem
+} from '@/components/military'
+import { Input } from "@/components/ui/input"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 interface FAQItem {
   id: string
@@ -29,371 +61,414 @@ interface GuideItem {
 
 export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [openFAQs, setOpenFAQs] = useState<string[]>([])
-
-  const toggleFAQ = (id: string) => {
-    setOpenFAQs(prev => 
-      prev.includes(id) 
-        ? prev.filter(faqId => faqId !== id)
-        : [...prev, id]
-    )
-  }
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [openFAQ, setOpenFAQ] = useState<string | null>(null)
 
   const faqData: FAQItem[] = [
     {
-      id: "getting-started-1",
+      id: "getting-started",
       question: "How do I get started with SoloSuccess AI?",
-      answer: "Getting started is simple! Sign up for a free account, complete the onboarding wizard to tell us about your business, and start exploring your AI squad. Begin with simple tasks like goal setting or asking your AI agents for business advice.",
-      category: "Getting Started"
+      answer: "Getting started is simple! Sign up for an account, choose your subscription tier, and complete the onboarding process. Our AI will then analyze your business and provide personalized recommendations.",
+      category: "getting-started"
     },
     {
-      id: "getting-started-2", 
-      question: "What's included in the free plan?",
-      answer: "The Launchpad (free) plan includes access to 2 AI agents (Nova & Echo), 5 AI conversations per day, basic task automation, email support, community access, and mobile app access. Perfect for getting a feel for the platform!",
-      category: "Getting Started"
+      id: "subscription-tiers",
+      question: "What's the difference between subscription tiers?",
+      answer: "Launch tier provides basic AI agents and limited conversations. Accelerator tier offers 5 AI agents and 100 daily conversations. Dominator tier gives you unlimited access to all 8 AI agents with no conversation limits.",
+      category: "billing"
     },
     {
-      id: "ai-agents-1",
-      question: "Who are the 8 AI agents and what do they do?",
-      answer: "Meet your squad: Roxy (Executive Assistant) for scheduling, Blaze (Growth Strategist) for business growth, Echo (Marketing Maven) for content, Lumi (Legal & Docs) for documentation, Vex (Technical Architect) for tech specs, Lexi (Strategy Analyst) for insights, Nova (Product Designer) for UX/UI, and Glitch (QA & Debug) for quality assurance.",
-      category: "AI Agents"
+      id: "ai-agents",
+      question: "How do the AI agents work?",
+      answer: "Our AI agents are specialized for different business functions. Each agent has unique capabilities and can help with specific tasks like marketing, sales, strategy, and more. You can interact with them through our chat interface.",
+      category: "features"
     },
     {
-      id: "ai-agents-2",
-      question: "Can the AI agents access my business data?",
-      answer: "Your AI agents only access the data you explicitly share with them. We use bank-level security with end-to-end encryption. Your data stays yours, and agents use it only to provide personalized assistance for your business needs.",
-      category: "AI Agents"
+      id: "data-security",
+      question: "Is my business data secure?",
+      answer: "Absolutely! We use military-grade encryption and security protocols. Your data is never shared with third parties and is protected by enterprise-level security measures.",
+      category: "security"
     },
     {
-      id: "features-1",
-      question: "What is SlayList and how does it work?",
-      answer: "SlayList is your AI-powered goal and task management system. Set ambitious goals, break them into actionable tasks, and let our AI help you prioritize and stay on track. It's designed specifically for solo entrepreneurs who need to juggle multiple priorities.",
-      category: "Features"
+      id: "billing-questions",
+      question: "How does billing work?",
+      answer: "Billing is handled securely through Stripe. You can upgrade, downgrade, or cancel your subscription at any time through your account settings. All subscriptions are billed automatically.",
+      category: "billing"
     },
     {
-      id: "features-2",
-      question: "How does the Briefcase feature work?",
-      answer: "Your Briefcase is a secure file storage and organization system. Upload documents, images, and files that your AI agents can reference to provide better assistance. Everything is encrypted and only accessible by you and your chosen AI agents.",
-      category: "Features"
-    },
-    {
-      id: "billing-1",
-      question: "Can I upgrade or downgrade my plan anytime?",
-      answer: "Absolutely! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences. No contracts, no commitment - just flexible pricing that grows with your business.",
-      category: "Billing"
-    },
-    {
-      id: "billing-2",
-      question: "Do you offer refunds?",
-      answer: "We offer a 30-day money-back guarantee on all paid plans. If you're not completely satisfied with SoloSuccess AI, we'll refund your payment, no questions asked. We're confident you&apos;ll love the platform!",
-      category: "Billing"
-    },
-    {
-      id: "technical-1",
-      question: "Is my data secure?",
-      answer: "Security is our top priority. We use enterprise-grade encryption, secure cloud infrastructure, and follow industry best practices. Your data is encrypted in transit and at rest, and we never share your information with third parties.",
-      category: "Technical"
-    },
-    {
-      id: "technical-2",
-      question: "Can I integrate SoloSuccess AI with other tools?",
-      answer: "Yes! We support integrations with popular tools like Google Calendar, Slack, Clerk Billing, and many more. Check out our integrations page to see the full list and set up connections to streamline your workflow.",
-      category: "Technical"
+      id: "feature-limits",
+      question: "What are the usage limits?",
+      answer: "Usage limits vary by subscription tier. Launch users get 2 AI agents and 5 daily conversations. Accelerator users get 5 agents and 100 daily conversations. Dominator users have unlimited access.",
+      category: "features"
     }
   ]
 
-  const guides: GuideItem[] = [
+  const guideData: GuideItem[] = [
     {
-      id: "getting-started-guide",
-      title: "Getting Started Guide",
-      description: "Your complete guide to dominating your industry with SoloSuccess AI",
-      icon: Settings,
-      href: "/docs/user-guides/GETTING-STARTED.md",
+      id: "onboarding",
+      title: "Complete Onboarding Guide",
+      description: "Step-by-step guide to setting up your account and maximizing your success",
+      icon: Target,
+      href: "/guides/onboarding",
       difficulty: "beginner"
     },
     {
-      id: "advanced-features-guide",
+      id: "ai-agents",
+      title: "Mastering AI Agents",
+      description: "Learn how to effectively use each AI agent for maximum business impact",
+      icon: Brain,
+      href: "/guides/ai-agents",
+      difficulty: "intermediate"
+    },
+    {
+      id: "advanced-features",
       title: "Advanced Features Guide",
-      description: "Master the powerful features that will help you dominate your industry",
-      icon: Users,
-      href: "/docs/user-guides/ADVANCED-FEATURES.md",
+      description: "Unlock the full potential of SoloSuccess AI with advanced techniques",
+      icon: Zap,
+      href: "/guides/advanced-features",
       difficulty: "advanced"
     },
     {
-      id: "ai-agents-guide",
-      title: "AI Agents Overview",
-      description: "Meet your 8 specialized AI team members and learn how to work with them",
-      icon: Zap,
-      href: "/docs/user-research/user-personas.md",
-      difficulty: "beginner"
-    },
-    {
-      id: "features-roadmap",
-      title: "Features Roadmap",
-      description: "See all current and planned features for SoloSuccess AI",
-      icon: Lightbulb,
-      href: "/docs/features/MASTER-FEATURES-ROADMAP.md",
+      id: "integration",
+      title: "Third-Party Integrations",
+      description: "Connect SoloSuccess AI with your existing business tools and workflows",
+      icon: Settings,
+      href: "/guides/integrations",
       difficulty: "intermediate"
     }
   ]
 
-  const categories = ["Getting Started", "AI Agents", "Features", "Billing", "Technical"]
-
-  const filteredFAQs = faqData.filter(faq => 
-    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredFAQs = faqData.filter(faq => {
+    const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
     faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    const matchesCategory = selectedCategory === "all" || faq.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "beginner": return "bg-green-100 text-green-700"
-      case "intermediate": return "bg-yellow-100 text-yellow-700"
-      case "advanced": return "bg-red-100 text-red-700"
-      default: return "bg-gray-100 text-gray-700"
+      case "beginner": return "text-green-400"
+      case "intermediate": return "text-yellow-400"
+      case "advanced": return "text-red-400"
+      default: return "text-military-storm-grey"
     }
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-                <div className="text-2xl">👑</div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  SoloSuccess AI
-                </span>
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/contact">
-                <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
-                  Contact Support
-                </Button>
+              
+              <div className="flex items-center gap-4">
+                <Link href="/signin">
+                  <TacticalButton variant="outline" size="sm">
+                    Sign In
+                  </TacticalButton>
+                </Link>
+                <Link href="/signup">
+                  <TacticalButton size="sm">
+                    Get Started
+                  </TacticalButton>
               </Link>
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full">
-                Start Building Empire
-              </Button>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <HelpCircle className="w-8 h-8 text-white" />
+        <section className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-4xl mx-auto"
+            >
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Tactical Support Center
+                </span>
             </div>
-          </div>
-          <Badge className="mb-6 text-lg px-6 py-2 bg-purple-100 text-purple-700 border-purple-200 rounded-full">
-            📚 Help Center
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              How Can We Help?
-            </span>
+              
+              <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Support</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Find answers, learn new strategies, and get the most out of your SoloSuccess AI experience. 
-            Your success is our mission! 💪
+              
+              <p className="text-xl text-military-storm-grey mb-8 max-w-3xl mx-auto leading-relaxed">
+                Master the art of business domination with our comprehensive guides, 
+                tutorials, and elite support resources.
           </p>
           
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <div className="max-w-2xl mx-auto">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-military-storm-grey" />
             <Input
               type="text"
-              placeholder="Search for help topics, features, or questions..."
+                    placeholder="Search for help topics, guides, or FAQs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 py-4 text-lg border-purple-200 focus:border-purple-500 rounded-full"
+                    className="pl-12 pr-4 py-4 bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink text-lg"
             />
           </div>
+              </div>
+            </motion.div>
         </div>
       </section>
 
       {/* Quick Actions */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="border-purple-200 hover:border-purple-300 transition-colors cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <MessageCircle className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Live Chat</h3>
-                <p className="text-gray-600 mb-4">Get instant help from our support team</p>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                  Start Chat
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-purple-200 hover:border-purple-300 transition-colors cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Mail className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Email Support</h3>
-                <p className="text-gray-600 mb-4">Send us a detailed message</p>
-                <Link href="/contact">
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                    Contact Us
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="border-purple-200 hover:border-purple-300 transition-colors cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Video className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Video Tutorials</h3>
-                <p className="text-gray-600 mb-4">Watch step-by-step guides</p>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Quick Tactical Actions
+              </h2>
+              <p className="text-xl text-military-storm-grey">
+                Get immediate access to the most common support resources
+              </p>
+            </div>
+            
+            <TacticalGrid className="max-w-6xl mx-auto">
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center group cursor-pointer hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">Documentation</h3>
+                  <p className="text-military-storm-grey mb-6">
+                    Comprehensive guides and technical documentation
+                  </p>
+                  <TacticalButton variant="outline" size="sm">
+                    View Docs
+                  </TacticalButton>
+                </GlassCard>
+              </TacticalGridItem>
+              
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center group cursor-pointer hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <PlayCircle className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">Video Tutorials</h3>
+                  <p className="text-military-storm-grey mb-6">
+                    Step-by-step video guides for all features
+                  </p>
+                  <TacticalButton variant="outline" size="sm">
                   Watch Videos
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                  </TacticalButton>
+                </GlassCard>
+              </TacticalGridItem>
+              
+              <TacticalGridItem>
+                <GlassCard className="h-full p-8 text-center group cursor-pointer hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <MessageCircle className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-heading text-2xl font-bold text-white mb-4">Live Chat</h3>
+                  <p className="text-military-storm-grey mb-6">
+                    Get instant help from our elite support team
+                  </p>
+                  <TacticalButton variant="outline" size="sm">
+                    Start Chat
+                  </TacticalButton>
+                </GlassCard>
+              </TacticalGridItem>
+            </TacticalGrid>
         </div>
       </section>
 
-      {/* Getting Started Guides */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
+        {/* Learning Guides */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Getting Started Guides</h2>
-            <p className="text-xl text-gray-600">Master SoloSuccess AI with our comprehensive guides</p>
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Elite Learning Paths
+              </h2>
+              <p className="text-xl text-military-storm-grey">
+                Master SoloSuccess AI with our structured learning programs
+              </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {guides.map((guide) => (
-              <Link key={guide.id} href={guide.href} target="_blank" rel="noopener noreferrer">
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
-                  <CardContent className="p-8">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                        <guide.icon className="w-6 h-6 text-white" />
+            
+            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {guideData.map((guide, index) => (
+                <motion.div
+                  key={guide.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <GlassCard className="p-8 group cursor-pointer hover:scale-105 transition-transform">
+                    <div className="flex items-start gap-6">
+                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <guide.icon className="w-8 h-8 text-white" />
                       </div>
-                      <div className="flex-grow">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="text-xl font-bold text-gray-800">{guide.title}</h3>
-                          <Badge className={`text-xs ${getDifficultyColor(guide.difficulty)}`}>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h3 className="font-heading text-2xl font-bold text-white">{guide.title}</h3>
+                          <span className={`text-sm font-tactical uppercase tracking-wider ${getDifficultyColor(guide.difficulty)}`}>
                             {guide.difficulty}
-                          </Badge>
+                          </span>
                         </div>
-                        <p className="text-gray-600 mb-4">{guide.description}</p>
-                        <div className="flex items-center gap-2 text-purple-600 font-medium">
-                          <span>Read Guide</span>
-                          <ExternalLink className="w-4 h-4" />
+                        
+                        <p className="text-military-storm-grey mb-6 leading-relaxed">
+                          {guide.description}
+                        </p>
+                        
+                        <div className="flex items-center gap-4">
+                          <TacticalButton variant="outline" size="sm" className="group">
+                            Start Guide
+                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          </TacticalButton>
+                          
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className="w-4 h-4 text-military-hot-pink fill-current" />
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
+                  </GlassCard>
+                </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <section className="py-20">
+          <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-gray-600">Quick answers to common questions</p>
-          </div>
+              <h2 className="font-heading text-4xl font-bold text-white mb-4">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-xl text-military-storm-grey mb-8">
+                Quick answers to the most common tactical questions
+              </p>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-2 mb-8 justify-center">
-            {categories.map((category) => (
-              <Badge 
+              <div className="flex flex-wrap justify-center gap-4 mb-8">
+                {["all", "getting-started", "billing", "features", "security"].map((category) => (
+                  <TacticalButton
                 key={category}
-                variant="outline" 
-                className="px-4 py-2 cursor-pointer hover:bg-purple-50 border-purple-200"
-              >
-                {category}
-              </Badge>
-            ))}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                    className="capitalize"
+                  >
+                    {category.replace("-", " ")}
+                  </TacticalButton>
+                ))}
+              </div>
           </div>
 
-          {/* FAQ Items */}
-          <div className="space-y-4">
-            {filteredFAQs.map((faq) => (
-              <Card key={faq.id} className="border border-gray-200">
-                <Collapsible>
-                  <CollapsibleTrigger 
-                    className="w-full p-6 text-left hover:bg-gray-50 transition-colors"
-                    onClick={() => toggleFAQ(faq.id)}
-                  >
+            <div className="max-w-4xl mx-auto space-y-4">
+              {filteredFAQs.map((faq, index) => (
+                <motion.div
+                  key={faq.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <GlassCard className="p-6">
+                    <Collapsible open={openFAQ === faq.id} onOpenChange={(open) => setOpenFAQ(open ? faq.id : null)}>
+                      <CollapsibleTrigger className="w-full">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline" className="text-xs">
-                          {faq.category}
-                        </Badge>
-                        <h3 className="text-lg font-semibold text-gray-800">{faq.question}</h3>
-                      </div>
-                      {openFAQs.includes(faq.id) ? (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
-                      ) : (
-                        <ChevronRight className="w-5 h-5 text-gray-400" />
-                      )}
+                          <h3 className="font-heading text-xl font-bold text-white text-left">
+                            {faq.question}
+                          </h3>
+                          <ChevronDown className={`w-6 h-6 text-military-hot-pink transition-transform ${openFAQ === faq.id ? 'rotate-180' : ''}`} />
                     </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+                      
+                      <CollapsibleContent className="mt-4">
+                        <SergeantDivider className="mb-4" />
+                        <p className="text-military-storm-grey leading-relaxed">
                       {faq.answer}
-                    </div>
+                        </p>
                   </CollapsibleContent>
                 </Collapsible>
-              </Card>
-            ))}
-          </div>
-
-          {filteredFAQs.length === 0 && searchQuery && (
-            <div className="text-center py-12">
-              <HelpCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No results found</h3>
-              <p className="text-gray-500 mb-4">Try a different search term or browse our categories</p>
-              <Link href="/contact">
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                  Contact Support
-                </Button>
-              </Link>
+                  </GlassCard>
+                </motion.div>
+              ))}
             </div>
-          )}
         </div>
       </section>
 
-      {/* Still Need Help */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Still Need Help?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Our boss support team is here to help you succeed. Don't hesitate to reach out - we&apos;re always happy to help!
-          </p>
-          <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-            <Link href="/contact">
-              <Button
-                size="lg"
-                className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
+        {/* Contact Support */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <GlassCard className="max-w-4xl mx-auto p-12 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
               >
+                <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <MessageCircle className="w-10 h-10 text-white" />
+                </div>
+                
+                <h2 className="font-heading text-4xl font-bold text-white mb-6">
+                  Still Need Tactical Support?
+                </h2>
+                
+                <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
+                  Our elite support team is standing by to assist with your mission. 
+                  Get personalized help from our experts.
+                </p>
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Link href="/contact">
+                    <TacticalButton size="lg" className="group">
                 Contact Support
-              </Button>
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </TacticalButton>
             </Link>
-            <Link href="/community">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200 bg-transparent"
-              >
-                Join Community
-              </Button>
+                  <Link href="/dashboard">
+                    <TacticalButton variant="outline" size="lg">
+                      Access Dashboard
+                    </TacticalButton>
             </Link>
+                </div>
+              </motion.div>
+            </GlassCard>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-12 border-t border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center gap-3 mb-4 md:mb-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-heading text-lg font-bold text-white">SoloSuccess AI</span>
+              </div>
+              
+              <div className="flex items-center gap-6 text-military-storm-grey">
+                <Link href="/privacy" className="hover:text-military-hot-pink transition-colors">Privacy</Link>
+                <Link href="/terms" className="hover:text-military-hot-pink transition-colors">Terms</Link>
+                <Link href="/contact" className="hover:text-military-hot-pink transition-colors">Contact</Link>
+              </div>
           </div>
         </div>
-      </section>
+        </footer>
+      </CamoBackground>
     </div>
   )
 } 
