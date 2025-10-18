@@ -110,25 +110,37 @@ async function discoverCompetitorsFromWorker(
 
 // Search business directories like Crunchbase, AngelList, etc.
 async function searchBusinessDirectories(businessDescription: string, targetMarket?: string) {
-  const competitors = []
-  
   try {
-    // In a real implementation, you would integrate with:
-    // - Crunchbase API
-    // - AngelList API
-    // - LinkedIn Company API
-    // - Google My Business API
-    
-    // For now, we'll use a more sophisticated approach with web scraping
-    const searchTerms = extractSearchTerms(businessDescription, targetMarket)
-    
-    for (const term of searchTerms) {
-      // Simulate API calls to business directories
-      const results = await simulateBusinessDirectorySearch(term)
-      competitors.push(...results)
+    const env = process.env as unknown as Env
+    const competitorWorker = env.COMPETITOR_WORKER
+
+    if (!competitorWorker) {
+      throw new Error('Competitor worker not configured')
     }
+
+    const searchTerms = extractSearchTerms(businessDescription, targetMarket)
+    const industry = extractIndustry(businessDescription)
     
-    return competitors
+    const workerRequest = new Request('https://worker/search-directories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        searchTerms,
+        industry,
+        targetMarket: targetMarket || 'Global',
+        sources: ['crunchbase', 'angellist', 'linkedin', 'google_business']
+      })
+    })
+
+    const response = await competitorWorker.fetch(workerRequest)
+    if (!response.ok) {
+      throw new Error(`Directory search failed: ${response.status}`)
+    }
+
+    const result = await response.json()
+    return result.competitors || []
   } catch (error) {
     logError('Error searching business directories:', error)
     return []
@@ -137,20 +149,36 @@ async function searchBusinessDirectories(businessDescription: string, targetMark
 
 // Search industry-specific databases
 async function searchIndustryDatabases(businessDescription: string, keyProducts?: string) {
-  const competitors = []
-  
   try {
-    // In a real implementation, you would integrate with:
-    // - Industry-specific databases
-    // - Trade association directories
-    // - Professional networks
-    // - Market research databases
-    
+    const env = process.env as unknown as Env
+    const competitorWorker = env.COMPETITOR_WORKER
+
+    if (!competitorWorker) {
+      throw new Error('Competitor worker not configured')
+    }
+
     const industry = extractIndustry(businessDescription)
-    const results = await simulateIndustryDatabaseSearch(industry, keyProducts)
-    competitors.push(...results)
     
-    return competitors
+    const workerRequest = new Request('https://worker/search-industry-databases', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        industry,
+        keyProducts,
+        businessDescription,
+        sources: ['trade_associations', 'professional_networks', 'market_research']
+      })
+    })
+
+    const response = await competitorWorker.fetch(workerRequest)
+    if (!response.ok) {
+      throw new Error(`Industry database search failed: ${response.status}`)
+    }
+
+    const result = await response.json()
+    return result.competitors || []
   } catch (error) {
     logError('Error searching industry databases:', error)
     return []
@@ -159,20 +187,37 @@ async function searchIndustryDatabases(businessDescription: string, keyProducts?
 
 // Search news and press releases for competitor mentions
 async function searchNewsAndPress(businessDescription: string, targetMarket?: string) {
-  const competitors = []
-  
   try {
-    // In a real implementation, you would integrate with:
-    // - News API
-    // - Google News API
-    // - Press release databases
-    // - Industry publications
-    
+    const env = process.env as unknown as Env
+    const competitorWorker = env.COMPETITOR_WORKER
+
+    if (!competitorWorker) {
+      throw new Error('Competitor worker not configured')
+    }
+
     const searchTerms = extractSearchTerms(businessDescription, targetMarket)
-    const results = await simulateNewsSearch(searchTerms)
-    competitors.push(...results)
+    const industry = extractIndustry(businessDescription)
     
-    return competitors
+    const workerRequest = new Request('https://worker/search-news-press', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        searchTerms,
+        industry,
+        targetMarket: targetMarket || 'Global',
+        sources: ['news_api', 'google_news', 'press_releases', 'industry_publications']
+      })
+    })
+
+    const response = await competitorWorker.fetch(workerRequest)
+    if (!response.ok) {
+      throw new Error(`News search failed: ${response.status}`)
+    }
+
+    const result = await response.json()
+    return result.competitors || []
   } catch (error) {
     logError('Error searching news and press:', error)
     return []
@@ -181,20 +226,37 @@ async function searchNewsAndPress(businessDescription: string, targetMarket?: st
 
 // Search social media for competitor mentions
 async function searchSocialMediaMentions(businessDescription: string) {
-  const competitors = []
-  
   try {
-    // In a real implementation, you would integrate with:
-    // - Twitter API
-    // - LinkedIn API
-    // - Reddit API
-    // - Industry forums
-    
+    const env = process.env as unknown as Env
+    const competitorWorker = env.COMPETITOR_WORKER
+
+    if (!competitorWorker) {
+      throw new Error('Competitor worker not configured')
+    }
+
     const searchTerms = extractSearchTerms(businessDescription)
-    const results = await simulateSocialMediaSearch(searchTerms)
-    competitors.push(...results)
+    const industry = extractIndustry(businessDescription)
     
-    return competitors
+    const workerRequest = new Request('https://worker/search-social-media', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        searchTerms,
+        industry,
+        businessDescription,
+        sources: ['twitter', 'linkedin', 'reddit', 'industry_forums']
+      })
+    })
+
+    const response = await competitorWorker.fetch(workerRequest)
+    if (!response.ok) {
+      throw new Error(`Social media search failed: ${response.status}`)
+    }
+
+    const result = await response.json()
+    return result.competitors || []
   } catch (error) {
     logError('Error searching social media:', error)
     return []
@@ -245,135 +307,7 @@ function extractIndustry(businessDescription: string): string {
   return 'General Business'
 }
 
-// Simulate API calls (replace with real implementations)
-async function simulateBusinessDirectorySearch(term: string) {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 100))
-  
-  // Return realistic competitor data based on search term
-  const competitors = []
-  
-  if (term.includes('software') || term.includes('tech')) {
-    competitors.push({
-      name: 'TechFlow Solutions',
-      domain: 'techflow.com',
-      description: 'Enterprise software solutions for workflow automation',
-      industry: 'Technology',
-      headquarters: 'San Francisco, CA',
-      employeeCount: 150,
-      fundingStage: 'Series B',
-      threatLevel: 'high',
-      matchScore: 85,
-      matchReasons: ['Similar software focus', 'Enterprise market', 'Workflow automation'],
-      keyProducts: ['Workflow Manager', 'Process Automation Suite'],
-      recentNews: ['Raised $25M Series B', 'Launched new AI features'],
-      socialMediaFollowers: { linkedin: 5000, twitter: 2500 },
-      isAlreadyTracked: false
-    })
-  }
-  
-  if (term.includes('business') || term.includes('management')) {
-    competitors.push({
-      name: 'BusinessPro Inc',
-      domain: 'businesspro.com',
-      description: 'Business management and productivity solutions',
-      industry: 'Professional Services',
-      headquarters: 'New York, NY',
-      employeeCount: 300,
-      fundingStage: 'Series C',
-      threatLevel: 'medium',
-      matchScore: 72,
-      matchReasons: ['Business management focus', 'Productivity solutions'],
-      keyProducts: ['Business Manager', 'Productivity Suite'],
-      recentNews: ['Expanded to European market', 'New partnership announced'],
-      socialMediaFollowers: { linkedin: 8000, twitter: 3000 },
-      isAlreadyTracked: false
-    })
-  }
-  
-  return competitors
-}
-
-async function simulateIndustryDatabaseSearch(industry: string, keyProducts?: string) {
-  await new Promise(resolve => setTimeout(resolve, 150))
-  
-  const competitors = []
-  
-  if (industry === 'Technology') {
-    competitors.push({
-      name: 'InnovateTech',
-      domain: 'innovatetech.io',
-      description: 'Cutting-edge technology solutions for modern businesses',
-      industry: 'Technology',
-      headquarters: 'Austin, TX',
-      employeeCount: 80,
-      fundingStage: 'Series A',
-      threatLevel: 'medium',
-      matchScore: 78,
-      matchReasons: ['Technology focus', 'Modern business solutions'],
-      keyProducts: ['Tech Platform', 'Business Tools'],
-      recentNews: ['New product launch', 'Team expansion'],
-      socialMediaFollowers: { linkedin: 2000, twitter: 1500 },
-      isAlreadyTracked: false
-    })
-  }
-  
-  return competitors
-}
-
-async function simulateNewsSearch(searchTerms: string[]) {
-  await new Promise(resolve => setTimeout(resolve, 200))
-  
-  const competitors = []
-  
-  if (searchTerms.some(term => term.includes('startup') || term.includes('funding'))) {
-    competitors.push({
-      name: 'StartupFlow',
-      domain: 'startupflow.com',
-      description: 'Startup-focused business solutions and tools',
-      industry: 'Technology',
-      headquarters: 'Seattle, WA',
-      employeeCount: 45,
-      fundingStage: 'Seed',
-      threatLevel: 'low',
-      matchScore: 65,
-      matchReasons: ['Startup focus', 'Business solutions'],
-      keyProducts: ['Startup Toolkit', 'Growth Platform'],
-      recentNews: ['Seed funding round', 'New features released'],
-      socialMediaFollowers: { linkedin: 1000, twitter: 800 },
-      isAlreadyTracked: false
-    })
-  }
-  
-  return competitors
-}
-
-async function simulateSocialMediaSearch(searchTerms: string[]) {
-  await new Promise(resolve => setTimeout(resolve, 100))
-  
-  const competitors = []
-  
-  if (searchTerms.some(term => term.includes('productivity') || term.includes('efficiency'))) {
-    competitors.push({
-      name: 'EfficiencyMax',
-      domain: 'efficiencymax.com',
-      description: 'Productivity and efficiency solutions for businesses',
-      industry: 'Professional Services',
-      headquarters: 'Chicago, IL',
-      employeeCount: 120,
-      fundingStage: 'Series A',
-      threatLevel: 'medium',
-      matchScore: 70,
-      matchReasons: ['Productivity focus', 'Efficiency solutions'],
-      keyProducts: ['Efficiency Suite', 'Productivity Tools'],
-      recentNews: ['User growth milestone', 'New integration announced'],
-      socialMediaFollowers: { linkedin: 3000, twitter: 2000 },
-      isAlreadyTracked: false
-    })
-  }
-  
-  return competitors
-}
+// These functions have been replaced with real AI worker implementations above
 
 // Helper to safely extract domain
 function safeDomainFromUrl(url?: string | null): string | null {
