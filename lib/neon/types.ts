@@ -17,6 +17,7 @@ export interface Database {
           current_period_start?: string
           current_period_end?: string
           cancel_at_period_end: boolean
+          role?: string
         }
         Insert: {
           id?: string
@@ -32,6 +33,7 @@ export interface Database {
           current_period_start?: string
           current_period_end?: string
           cancel_at_period_end?: boolean
+          role?: string
         }
         Update: {
           id?: string
@@ -47,6 +49,7 @@ export interface Database {
           current_period_start?: string
           current_period_end?: string
           cancel_at_period_end?: boolean
+          role?: string
         }
       }
       templates: {
@@ -135,6 +138,7 @@ export interface User {
   current_period_start?: Date
   current_period_end?: Date
   cancel_at_period_end: boolean
+  role?: string
 }
 
 export interface Session {

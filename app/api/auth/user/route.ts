@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     // Get user from database
     const sql = getSql()
     const users = await sql`
-      SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, created_at
+      SELECT id, email, full_name, username, date_of_birth, subscription_tier, subscription_status, stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, role, created_at
       FROM users 
       WHERE id = ${payload.userId as string}
     `
@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
       current_period_start: user.current_period_start,
       current_period_end: user.current_period_end,
       cancel_at_period_end: user.cancel_at_period_end || false,
+      role: user.role || 'user',
       created_at: user.created_at
     }
 
