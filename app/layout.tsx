@@ -13,6 +13,7 @@ import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
 import { SmartTipManager } from "@/components/ui/smart-tip"
+import { Analytics } from "@vercel/analytics/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google'
 
@@ -209,6 +210,7 @@ export default function RootLayout({
             </AccessibilityProvider>
           </AuthProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )
