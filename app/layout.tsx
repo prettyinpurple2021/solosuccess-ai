@@ -4,7 +4,6 @@ import { Inter as FontSans} from "next/font/google"
 import Script from 'next/script'
 import { cn} from "@/lib/utils"
 import { ThemeProvider} from "@/components/theme-provider"
-import { StackAuthProvider} from "@/components/auth/stack-provider"
 import { AuthProvider} from "@/hooks/use-auth"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
 import { PerformanceMonitor } from "@/components/performance/performance-monitor"
@@ -195,22 +194,20 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <StackAuthProvider>
-            <AuthProvider>
-              <AccessibilityProvider>
-                <ChatProvider>
-                  <ErrorBoundary>
-                    {children}
-                  </ErrorBoundary>
-                </ChatProvider>
-                <PerformanceMonitor />
-                {/* Ensure this client component that calls useAuth is inside AuthProvider */}
-                <ServiceWorkerRegister />
-                <ExitIntentSurvey />
-                <SmartTipManager />
-              </AccessibilityProvider>
-            </AuthProvider>
-          </StackAuthProvider>
+          <AuthProvider>
+            <AccessibilityProvider>
+              <ChatProvider>
+                <ErrorBoundary>
+                  {children}
+                </ErrorBoundary>
+              </ChatProvider>
+              <PerformanceMonitor />
+              {/* Ensure this client component that calls useAuth is inside AuthProvider */}
+              <ServiceWorkerRegister />
+              <ExitIntentSurvey />
+              <SmartTipManager />
+            </AccessibilityProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

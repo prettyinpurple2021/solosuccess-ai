@@ -6,8 +6,6 @@ import { getFeatureFlags, updateFeatureFlags } from '@/lib/feature-flags'
 export const runtime = 'edge'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export const dynamic = 'force-dynamic'
 
 export async function GET(_req: NextRequest) {

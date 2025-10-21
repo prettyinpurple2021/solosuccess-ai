@@ -13,8 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicButton } from '@/components/ui/holographic-button'
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
 import {
@@ -427,7 +426,7 @@ export default function BrandStudioPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <HolographicButton
+            <Button
               variant="outline"
               size="sm"
               onClick={analyzeBrand}
@@ -439,8 +438,8 @@ export default function BrandStudioPage() {
                 <Brain className="w-4 h-4 mr-2" />
               )}
               Analyze Brand
-            </HolographicButton>
-            <HolographicButton onClick={saveBrandSettings} disabled={saving}>
+            </Button>
+            <Button onClick={saveBrandSettings} disabled={saving}>
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -452,7 +451,7 @@ export default function BrandStudioPage() {
                   Save Brand
                 </>
               )}
-            </HolographicButton>
+            </Button>
           </div>
         </motion.div>
 
@@ -486,7 +485,7 @@ export default function BrandStudioPage() {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <HolographicCard>
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-white">
                     <Crown className="w-5 h-5 text-yellow-300" />
@@ -556,9 +555,9 @@ export default function BrandStudioPage() {
                     />
                   </div>
                 </CardContent>
-              </HolographicCard>
+              </Card>
 
-              <HolographicCard>
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-white">
                     <Lightbulb className="w-5 h-5 text-yellow-300" />
@@ -586,12 +585,12 @@ export default function BrandStudioPage() {
                     ))}
                   </div>
                 </CardContent>
-              </HolographicCard>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="guidelines" className="space-y-6">
-            <HolographicCard>
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <FileText className="w-5 h-5 text-cyan-300" />
@@ -622,16 +621,16 @@ export default function BrandStudioPage() {
                     </div>
                   </div>
                 )}
-                <HolographicButton onClick={generateBrandGuidelines}>
+                <Button onClick={generateBrandGuidelines}>
                   <Wand2 className="w-4 h-4 mr-2" />
                   Generate Brand Guidelines
-                </HolographicButton>
+                </Button>
               </CardContent>
-            </HolographicCard>
+            </Card>
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <HolographicCard>
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <TrendingUp className="w-5 h-5 text-green-300" />
@@ -674,16 +673,16 @@ export default function BrandStudioPage() {
                     </div>
                   </div>
                 )}
-                <HolographicButton onClick={analyzeBrand} disabled={analyzing}>
+                <Button onClick={analyzeBrand} disabled={analyzing}>
                   {analyzing ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
                     <Brain className="w-4 h-4 mr-2" />
                   )}
                   Analyze Brand
-                </HolographicButton>
+                </Button>
               </CardContent>
-            </HolographicCard>
+            </Card>
           </TabsContent>
 
         <TabsContent value="identity" className="space-y-6">
@@ -844,7 +843,7 @@ export default function BrandStudioPage() {
         </TabsContent>
 
           <TabsContent value="logo" className="space-y-6">
-            <HolographicCard>
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <ImageIcon className="w-5 h-5 text-pink-300" />
@@ -892,7 +891,7 @@ export default function BrandStudioPage() {
                       ))}
                     </div>
                     <div className="flex items-center gap-3">
-                      <HolographicButton onClick={generateLogo} disabled={generatingLogo}>
+                      <Button onClick={generateLogo} disabled={generatingLogo}>
                         {generatingLogo ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -904,11 +903,11 @@ export default function BrandStudioPage() {
                             Generate New Variants
                           </>
                         )}
-                      </HolographicButton>
-                      <HolographicButton variant="outline">
+                      </Button>
+                      <Button variant="outline">
                         <Download className="w-4 h-4 mr-2" />
                         Download Selected
-                      </HolographicButton>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -922,7 +921,7 @@ export default function BrandStudioPage() {
                         Generate professional logo variants based on your brand settings
                       </p>
                     </div>
-                    <HolographicButton 
+                    <Button 
                       onClick={generateLogo} 
                       disabled={generatingLogo || !brandSettings.companyName}
                       size="lg"
@@ -938,7 +937,7 @@ export default function BrandStudioPage() {
                           Generate Logo Variants
                         </>
                       )}
-                    </HolographicButton>
+                    </Button>
                     {!brandSettings.companyName && (
                       <div className="flex items-center justify-center gap-2 text-yellow-400">
                         <AlertCircle className="w-4 h-4" />
@@ -948,7 +947,7 @@ export default function BrandStudioPage() {
                   </div>
                 )}
               </CardContent>
-            </HolographicCard>
+            </Card>
           </TabsContent>
         </Tabs>
       </motion.div>

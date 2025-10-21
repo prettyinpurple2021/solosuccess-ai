@@ -4,8 +4,6 @@ import { validateRecaptcha} from '@/lib/recaptcha'
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function POST(request: NextRequest) {
   try {
     const { token, action, minScore = 0.5 } = await request.json()

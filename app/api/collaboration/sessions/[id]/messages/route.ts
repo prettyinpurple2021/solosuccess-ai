@@ -33,8 +33,6 @@ const SendMessageSchema = z.object({
 })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 /**
  * POST /api/collaboration/sessions/[id]/messages
  * Send a message in a collaboration session

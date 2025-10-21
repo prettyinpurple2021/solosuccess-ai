@@ -13,9 +13,7 @@ import webpush from 'web-push'
 
 
 // Temporarily disabled Edge Runtime due to web-push library Node.js dependencies
-// // Edge Runtime disabled due to Node.js dependency incompatibility
-
-// Force dynamic rendering
+// // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 // VAPID configuration - deferred to runtime

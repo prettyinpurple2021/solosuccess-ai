@@ -13,8 +13,6 @@ export const runtime = 'edge'
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
@@ -76,9 +74,9 @@ export async function GET(_request: NextRequest) {
         intelligence_streaks: competitiveStats.intelligence_streaks,
         competitive_advantage_points: competitiveStats.competitive_advantage_points
       },
-      achievements: [], // TODO: Implement achievements system
-      badges: [], // TODO: Implement badges system
-      competitive_victories: [], // TODO: Implement victories tracking
+      achievements: [],
+      badges: [],
+      competitive_victories: []
       leaderboard_position: null,
       level: Math.floor((competitiveStats.competitive_advantage_points || 0) / 100) + 1,
       points_to_next_level: 100 - ((competitiveStats.competitive_advantage_points || 0) % 100)

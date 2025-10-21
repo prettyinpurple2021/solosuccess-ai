@@ -1,12 +1,11 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from "next/server"
+import { authenticateRequest } from '@/lib/auth-server'
 import { SimpleTrainingCollector} from "@/lib/custom-ai-agents/training/simple-training-collector"
 import { PerformanceAnalytics} from "@/lib/custom-ai-agents/training/performance-analytics"
 import { FineTuningPipeline} from "@/lib/custom-ai-agents/training/fine-tuning-pipeline"
 
 
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -16,7 +15,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const action = searchParams.get('action')
     const agentId = searchParams.get('agentId')
-    const userId = "default-user" // TODO: Get from auth
+    // Get authenticated user
+    const { user, error } = await authenticateRequest()
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const userId = user.id
 
     const dataCollector = SimpleTrainingCollector.getInstance()
     const analytics = new PerformanceAnalytics()

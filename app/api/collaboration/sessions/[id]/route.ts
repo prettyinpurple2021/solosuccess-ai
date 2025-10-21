@@ -36,8 +36,6 @@ const UpdateSessionSchema = z.object({
 })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 /**
  * GET /api/collaboration/sessions/[id]
  * Get details of a specific collaboration session

@@ -8,10 +8,6 @@ import { z } from 'zod'
 export const runtime = 'nodejs'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
-
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
@@ -88,15 +84,15 @@ async function discoverCompetitorsFromWorker(
         domain,
         description: desc,
         industry: industry || 'Technology',
-        headquarters: 'Unknown',
-        employeeCount: 50,
-        fundingStage: 'Unknown',
+        headquarters: comp.headquarters || 'Unknown',
+        employeeCount: comp.employeeCount || null,
+        fundingStage: comp.fundingStage || 'Unknown',
         threatLevel,
         matchScore,
-        matchReasons: ['Search relevance', 'Industry match'],
-        keyProducts: keyProducts ? [keyProducts] : ['Product 1', 'Product 2'],
-        recentNews: ['Recent company news'],
-        socialMediaFollowers: { linkedin: 1000, twitter: 500 },
+        matchReasons: comp.matchReasons || ['Search relevance', 'Industry match'],
+        keyProducts: keyProducts ? [keyProducts] : (comp.keyProducts || []),
+        recentNews: comp.recentNews || [],
+        socialMediaFollowers: comp.socialMediaFollowers || { linkedin: 0, twitter: 0 },
         isAlreadyTracked: false
       }
     })

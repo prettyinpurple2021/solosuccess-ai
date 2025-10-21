@@ -11,8 +11,6 @@ import { eq, and, gte, desc, count, avg } from 'drizzle-orm'
 export const runtime = 'edge'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export const dynamic = 'force-dynamic'
 
 const querySchema = z.object({

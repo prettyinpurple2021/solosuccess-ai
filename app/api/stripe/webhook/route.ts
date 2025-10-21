@@ -7,8 +7,6 @@ import {
   getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId} from '@/lib/stripe-db-utils'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

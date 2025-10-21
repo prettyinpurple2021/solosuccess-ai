@@ -10,9 +10,7 @@ export const runtime = 'edge'
 
 
 
-// // Edge Runtime disabled due to Node.js dependency incompatibility
-
-export async function GET(
+// export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {

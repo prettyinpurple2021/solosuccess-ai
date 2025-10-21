@@ -20,8 +20,6 @@ interface DocumentSearchResult {
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function POST(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()

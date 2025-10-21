@@ -60,19 +60,6 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // SoloSuccess Brand Colors - Updated for Holographic Theme
-        SoloSuccess: {
-          purple: '#B621FF',
-          cyan: '#18FFFF', 
-          pink: '#FF1FAF',
-          black: '#000000',
-          'purple-light': '#D946EF',
-          'cyan-light': '#67E8F9',
-          'pink-light': '#FF6BB3',
-          'purple-dark': '#9333EA',
-          'cyan-dark': '#0891B2',
-          'pink-dark': '#E91E63',
-        },
         // Military Glassmorphic Design System Colors
         military: {
           'hot-pink': '#FF71B5',
@@ -111,56 +98,31 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        // ... (other keyframes are correct and can remain as they are)
-        "holo-shimmer": {
-          "0%": { transform: "translateX(-100%) rotate(45deg)" },
-          "100%": { transform: "translateX(100%) rotate(45deg)" },
-        },
-        "sparkle-twinkle": {
-          "0%, 100%": { opacity: "0", transform: "scale(0.5) rotate(0deg)" },
-          "50%": { opacity: "1", transform: "scale(1) rotate(180deg)" },
-        },
+        // Military glassmorphic animations
         "glass-shine": {
           "0%": { transform: "translateX(-100%) skewX(-15deg)" },
           "100%": { transform: "translateX(200%) skewX(-15deg)" },
         },
-        "rainbow-rotate": {
-          "0%": { filter: "hue-rotate(0deg)" },
-          "100%": { filter: "hue-rotate(360deg)" },
-        },
-        "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(182, 33, 255, 0.3), 0 0 40px rgba(24, 255, 255, 0.2)" },
-          "50%": { boxShadow: "0 0 40px rgba(255, 31, 175, 0.5), 0 0 80px rgba(182, 33, 255, 0.3)" },
-        },
-        "holographic-shift": {
-          "0%": { backgroundPosition: "0% 0%" },
-          "25%": { backgroundPosition: "100% 0%" },
-          "50%": { backgroundPosition: "100% 100%" },
-          "75%": { backgroundPosition: "0% 100%" },
-          "100%": { backgroundPosition: "0% 0%" },
+        "tactical-pulse": {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(255, 113, 181, 0.7)" },
+          "50%": { boxShadow: "0 0 0 12px rgba(255, 113, 181, 0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        // ... (other animations are correct and can remain as they are)
-        "holo-shimmer": "holo-shimmer 3s ease-in-out infinite",
-        "sparkle-twinkle": "sparkle-twinkle 2s ease-in-out infinite",
+        // Military glassmorphic animations
         "glass-shine": "glass-shine 2.5s ease-in-out infinite",
-        "rainbow-rotate": "rainbow-rotate 4s linear infinite",
-        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
-        "holographic-shift": "holographic-shift 8s ease-in-out infinite",
+        "tactical-pulse": "tactical-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        // SoloSuccess Holographic Gradients (These already match your design system perfectly!)
-        'gradient-hero': 'linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%)',
-        'gradient-card': 'linear-gradient(120deg, #B621FF 0%, #FF1FAF 100%)',
-        'gradient-holographic': 'linear-gradient(135deg, #B621FF 0%, #18FFFF 20%, #FF1FAF 40%, #18FFFF 60%, #B621FF 80%, #FF1FAF 100%)',
-        'gradient-glass': 'linear-gradient(135deg, rgba(182, 33, 255, 0.1) 0%, rgba(24, 255, 255, 0.1) 50%, rgba(255, 31, 175, 0.1) 100%)',
-        'gradient-sparkle': 'conic-gradient(from 0deg, #B621FF, #18FFFF, #FF1FAF, #18FFFF, #B621FF)',
-        // ... (your other custom and AI agent gradients can remain)
+        // Military Glassmorphic Gradients
+        'gradient-military': 'linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%)',
+        'gradient-tactical': 'linear-gradient(135deg, #FFB3D9 0%, #B2B2B2 50%, #454547 100%)',
+        'gradient-camo': 'linear-gradient(135deg, #FF71B5 0%, #5D5C61 25%, #232325 50%, #B2B2B2 75%, #454547 100%)',
+        'gradient-glass': 'linear-gradient(135deg, rgba(255, 113, 181, 0.1) 0%, rgba(93, 92, 97, 0.1) 50%, rgba(35, 35, 37, 0.1) 100%)',
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

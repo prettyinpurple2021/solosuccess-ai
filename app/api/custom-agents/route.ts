@@ -10,8 +10,6 @@ import { NextRequest, NextResponse} from "next/server"
 // const securityMiddleware = new SecurityMiddleware()
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function POST(request: NextRequest) {
   try {
     logWarn('Custom agents temporarily disabled - using fallback response')

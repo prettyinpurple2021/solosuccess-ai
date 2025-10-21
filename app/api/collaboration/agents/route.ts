@@ -16,8 +16,6 @@ export const runtime = 'edge'
 const collaborationHub = new CollaborationHub()
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 /**
  * GET /api/collaboration/agents
  * List all available AI agents

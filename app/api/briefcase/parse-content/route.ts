@@ -10,9 +10,7 @@ export const runtime = 'edge'
 
 
 
-// // Edge Runtime disabled due to Node.js dependency incompatibility
-
-export async function POST(request: NextRequest) {
+// export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const fileId = formData.get('fileId') as string;

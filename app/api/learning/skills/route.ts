@@ -8,9 +8,7 @@ import { getNeonConnection, safeDbQuery } from '@/lib/database-utils'
 export const runtime = 'edge'
 
 
-// // Edge Runtime disabled due to Node.js dependency incompatibility
-
-// Force dynamic rendering to prevent build-time execution
+// // Force dynamic rendering to prevent build-time execution
 export const dynamic = 'force-dynamic'
 
 function getSql() {

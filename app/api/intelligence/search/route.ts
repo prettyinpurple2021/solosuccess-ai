@@ -19,8 +19,6 @@ import type {
  } from '@/lib/competitor-intelligence-types'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

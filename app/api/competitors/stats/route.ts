@@ -10,8 +10,6 @@ import { eq, count, desc, gte, sql} from 'drizzle-orm'
 export const runtime = 'edge'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

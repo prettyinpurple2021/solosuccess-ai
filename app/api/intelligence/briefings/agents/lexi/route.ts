@@ -15,8 +15,6 @@ const lexiRequestSchema = z.object({
 })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

@@ -34,8 +34,6 @@ import {
   Flame,
   GraduationCap
 } from 'lucide-react'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicButton } from '@/components/ui/holographic-button'
 import { toast } from 'sonner'
 import { logger, logInfo, logError } from '@/lib/logger'
 
@@ -310,7 +308,7 @@ export default function LearningDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <HolographicButton
+            <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
@@ -318,11 +316,11 @@ export default function LearningDashboard() {
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
-            </HolographicButton>
-            <HolographicButton>
+            </Button>
+            <Button>
               <Download className="w-4 h-4 mr-2" />
               Export Progress
-            </HolographicButton>
+            </Button>
           </div>
         </motion.div>
 
@@ -397,7 +395,7 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
     <div className="space-y-8">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <HolographicCard>
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-purple-200">Modules Completed</CardTitle>
           </CardHeader>
@@ -405,9 +403,9 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
             <div className="text-2xl font-bold text-white">{analytics.total_modules_completed}</div>
             <p className="text-xs text-green-400">+3 this week</p>
           </CardContent>
-        </HolographicCard>
+        </Card>
 
-        <HolographicCard>
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-purple-200">Learning Streak</CardTitle>
           </CardHeader>
@@ -418,9 +416,9 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
               Keep it going!
             </p>
           </CardContent>
-        </HolographicCard>
+        </Card>
 
-        <HolographicCard>
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-purple-200">Skills Improved</CardTitle>
           </CardHeader>
@@ -428,9 +426,9 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
             <div className="text-2xl font-bold text-white">{analytics.skills_improved}</div>
             <p className="text-xs text-blue-400">Leveling up!</p>
           </CardContent>
-        </HolographicCard>
+        </Card>
 
-        <HolographicCard>
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-purple-200">Certifications</CardTitle>
           </CardHeader>
@@ -438,12 +436,12 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
             <div className="text-2xl font-bold text-white">{analytics.certifications_earned}</div>
             <p className="text-xs text-purple-400">Achievements unlocked</p>
           </CardContent>
-        </HolographicCard>
+        </Card>
       </div>
 
       {/* Learning Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <HolographicCard>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5 text-green-300" />
@@ -464,9 +462,9 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
               <span className="text-purple-300">4 modules target</span>
             </div>
           </CardContent>
-        </HolographicCard>
+        </Card>
 
-        <HolographicCard>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Crown className="w-5 h-5 text-yellow-300" />
@@ -486,11 +484,11 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
               <span className="text-yellow-400 text-sm">Top 5% performer</span>
             </div>
           </CardContent>
-        </HolographicCard>
+        </Card>
       </div>
 
       {/* Top Learning Categories */}
-      <HolographicCard>
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-300" />
@@ -521,7 +519,7 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
             ))}
           </div>
         </CardContent>
-      </HolographicCard>
+      </Card>
     </div>
   )
 }
@@ -529,13 +527,13 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
 function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
   if (skillGaps.length === 0) {
     return (
-      <HolographicCard>
+      <Card>
         <CardContent className="text-center py-12">
           <Target className="w-16 h-16 text-green-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Skill Gaps Detected!</h3>
           <p className="text-purple-200">You're doing great! Keep up the excellent work.</p>
         </CardContent>
-      </HolographicCard>
+      </Card>
     )
   }
 
@@ -548,7 +546,7 @@ function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <HolographicCard>
+          <Card>
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -589,17 +587,17 @@ function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
                             {module.difficulty}
                           </Badge>
                         </div>
-                        <HolographicButton size="sm">
+                        <Button size="sm">
                           <Play className="w-4 h-4 mr-2" />
                           Start Learning
-                        </HolographicButton>
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
             </CardContent>
-          </HolographicCard>
+          </Card>
         </motion.div>
       ))}
     </div>
@@ -609,13 +607,13 @@ function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
 function RecommendationsTab({ recommendations }: { recommendations: LearningRecommendation[] }) {
   if (recommendations.length === 0) {
     return (
-      <HolographicCard>
+      <Card>
         <CardContent className="text-center py-12">
           <TrendingUp className="w-16 h-16 text-blue-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Recommendations Yet</h3>
           <p className="text-purple-200">Complete a skill assessment to get personalized recommendations.</p>
         </CardContent>
-      </HolographicCard>
+      </Card>
     )
   }
 
@@ -628,7 +626,7 @@ function RecommendationsTab({ recommendations }: { recommendations: LearningReco
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <HolographicCard>
+          <Card>
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -665,12 +663,12 @@ function RecommendationsTab({ recommendations }: { recommendations: LearningReco
                 </div>
               </div>
 
-              <HolographicButton className="w-full">
+              <Button className="w-full">
                 <Play className="w-4 h-4 mr-2" />
                 Start Learning Module
-              </HolographicButton>
+              </Button>
             </CardContent>
-          </HolographicCard>
+          </Card>
         </motion.div>
       ))}
     </div>
@@ -680,13 +678,13 @@ function RecommendationsTab({ recommendations }: { recommendations: LearningReco
 function ProgressTab({ progress }: { progress: UserProgress[] }) {
   if (progress.length === 0) {
     return (
-      <HolographicCard>
+      <Card>
         <CardContent className="text-center py-12">
           <Award className="w-16 h-16 text-purple-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Learning Progress Yet</h3>
           <p className="text-purple-200">Start your first learning module to track your progress.</p>
         </CardContent>
-      </HolographicCard>
+      </Card>
     )
   }
 
@@ -699,7 +697,7 @@ function ProgressTab({ progress }: { progress: UserProgress[] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <HolographicCard>
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-white">Module: {prog.module_id}</CardTitle>
@@ -745,13 +743,13 @@ function ProgressTab({ progress }: { progress: UserProgress[] }) {
                 <div className="text-sm text-purple-200">
                   Last accessed: {new Date(prog.last_accessed).toLocaleDateString()}
                 </div>
-                <HolographicButton size="sm">
+                <Button size="sm">
                   <ArrowRight className="w-4 h-4 mr-2" />
                   Continue Learning
-                </HolographicButton>
+                </Button>
               </div>
             </CardContent>
-          </HolographicCard>
+          </Card>
         </motion.div>
       ))}
     </div>
@@ -763,7 +761,7 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
     <div className="space-y-8">
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <HolographicCard>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-blue-400" />
@@ -777,9 +775,9 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
               <Progress value={analytics.average_quiz_score} className="h-2" indicatorClassName="bg-blue-500" />
             </div>
           </CardContent>
-        </HolographicCard>
+        </Card>
         
-        <HolographicCard>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-green-400" />
@@ -795,9 +793,9 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
               </Badge>
             </div>
           </CardContent>
-        </HolographicCard>
+        </Card>
         
-        <HolographicCard>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="w-5 h-5 text-purple-400" />
@@ -813,11 +811,11 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
               </Badge>
             </div>
           </CardContent>
-        </HolographicCard>
+        </Card>
       </div>
 
       {/* Learning Distribution */}
-      <HolographicCard>
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-cyan-300" />
@@ -849,7 +847,7 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
             })}
           </div>
         </CardContent>
-      </HolographicCard>
+      </Card>
     </div>
   )
 }
@@ -913,7 +911,7 @@ function AchievementsTab({ analytics }: { analytics: LearningAnalytics | null })
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <HolographicCard className={achievement.unlocked ? 'ring-2 ring-yellow-400/50' : ''}>
+            <Card className={achievement.unlocked ? 'ring-2 ring-yellow-400/50' : ''}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center ${achievement.unlocked ? 'animate-pulse' : ''}`}>
@@ -937,7 +935,7 @@ function AchievementsTab({ analytics }: { analytics: LearningAnalytics | null })
                   <Progress value={achievement.progress} className="h-2" indicatorClassName={achievement.unlocked ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gray-600'} />
                 </div>
               </CardContent>
-            </HolographicCard>
+            </Card>
           </motion.div>
         ))}
       </div>

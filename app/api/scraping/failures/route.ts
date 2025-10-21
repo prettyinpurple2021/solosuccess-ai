@@ -8,8 +8,6 @@ import { eq, and } from 'drizzle-orm'
 export const runtime = 'edge'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {

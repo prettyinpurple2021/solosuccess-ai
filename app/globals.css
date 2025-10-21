@@ -15,47 +15,47 @@
 
 @layer base {
   :root {
-    /* SoloSuccess Holographic Color Palette */
+    /* Military Glassmorphic Color Palette */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 271 91% 65%; /* SoloSuccess Purple */
+    --primary: 330 81% 60%; /* Military Hot Pink */
     --primary-foreground: 0 0% 100%;
-    --secondary: 188 100% 50%; /* SoloSuccess Cyan */
+    --secondary: 0 0% 35%; /* Military Gunmetal */
     --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 327 81% 60%; /* SoloSuccess Pink */
+    --accent: 330 81% 60%; /* Military Hot Pink */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 271 91% 65%; /* SoloSuccess Purple */
+    --ring: 330 81% 60%; /* Military Hot Pink */
     --radius: 0.75rem;
-    --chart-1: 271 91% 65%; /* SoloSuccess Purple */
-    --chart-2: 188 100% 50%; /* SoloSuccess Cyan */
-    --chart-3: 327 81% 60%; /* SoloSuccess Pink */
-    --chart-4: 0 0% 0%; /* SoloSuccess Black */
-    --chart-5: 271 91% 65%; /* SoloSuccess Purple */
+    --chart-1: 330 81% 60%; /* Military Hot Pink */
+    --chart-2: 0 0% 35%; /* Military Gunmetal */
+    --chart-3: 0 0% 14%; /* Military Midnight */
+    --chart-4: 0 0% 0%; /* Military Black */
+    --chart-5: 330 81% 60%; /* Military Hot Pink */
 
     /* Sidebar Layout Variables */
     --sidebar-width: 16rem;
     --sidebar-width-mobile: 18rem;
     --sidebar-width-icon: 3rem;
 
-    /* SoloSuccess Holographic Gradient Variables */
-    --gradient-primary: linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%);
-    --gradient-secondary: linear-gradient(135deg, #D946EF 0%, #67E8F9 50%, #FF6BB3 100%);
-    --gradient-accent: linear-gradient(135deg, #18FFFF 0%, #B621FF 50%, #FF1FAF 100%);
-    --gradient-background: linear-gradient(135deg, rgba(182, 33, 255, 0.05) 0%, rgba(24, 255, 255, 0.05) 25%, rgba(255, 31, 175, 0.05) 50%, rgba(24, 255, 255, 0.05) 75%, rgba(182, 33, 255, 0.05) 100%);
-    --gradient-empowerment: linear-gradient(135deg, #B621FF 0%, #18FFFF 25%, #FF1FAF 50%, #18FFFF 75%, #B621FF 100%);
-    --gradient-success: linear-gradient(135deg, #18FFFF 0%, #B621FF 50%, #18FFFF 100%);
-    --gradient-warning: linear-gradient(135deg, #FF1FAF 0%, #B621FF 50%, #FF1FAF 100%);
-    --gradient-danger: linear-gradient(135deg, #FF1FAF 0%, #000000 50%, #B621FF 100%);
+    /* Military Glassmorphic Gradient Variables */
+    --gradient-primary: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
+    --gradient-secondary: linear-gradient(135deg, #FFB3D9 0%, #B2B2B2 50%, #454547 100%);
+    --gradient-accent: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
+    --gradient-background: linear-gradient(135deg, rgba(255, 113, 181, 0.05) 0%, rgba(93, 92, 97, 0.05) 25%, rgba(35, 35, 37, 0.05) 50%, rgba(178, 178, 178, 0.05) 75%, rgba(255, 113, 181, 0.05) 100%);
+    --gradient-tactical: linear-gradient(135deg, #FF71B5 0%, #5D5C61 25%, #232325 50%, #B2B2B2 75%, #454547 100%);
+    --gradient-success: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
+    --gradient-warning: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
+    --gradient-danger: linear-gradient(135deg, #FF71B5 0%, #232325 50%, #18181A 100%);
     
     /* Skull & Crown Gradients */
     --gradient-skull: linear-gradient(135deg, #1F2937 0%, #374151 50%, #4B5563 100%);
@@ -74,24 +74,24 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 271 91% 65%; /* SoloSuccess Purple */
+    --primary: 330 81% 60%; /* Military Hot Pink */
     --primary-foreground: 0 0% 100%;
-    --secondary: 188 100% 50%; /* SoloSuccess Cyan */
+    --secondary: 0 0% 35%; /* Military Gunmetal */
     --secondary-foreground: 0 0% 100%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 327 81% 60%; /* SoloSuccess Pink */
+    --accent: 330 81% 60%; /* Military Hot Pink */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 271 91% 65%; /* SoloSuccess Purple */
-    --chart-1: 271 91% 65%; /* SoloSuccess Purple */
-    --chart-2: 188 100% 50%; /* SoloSuccess Cyan */
-    --chart-3: 327 81% 60%; /* SoloSuccess Pink */
-    --chart-4: 0 0% 100%; /* SoloSuccess White */
-    --chart-5: 271 91% 65%; /* SoloSuccess Purple */
+    --ring: 330 81% 60%; /* Military Hot Pink */
+    --chart-1: 330 81% 60%; /* Military Hot Pink */
+    --chart-2: 0 0% 35%; /* Military Gunmetal */
+    --chart-3: 0 0% 14%; /* Military Midnight */
+    --chart-4: 0 0% 100%; /* Military Glass White */
+    --chart-5: 330 81% 60%; /* Military Hot Pink */
 
     /* Sidebar Layout Variables - Same for dark mode */
     --sidebar-width: 16rem;

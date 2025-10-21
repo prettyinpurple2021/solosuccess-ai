@@ -126,7 +126,7 @@ const nextConfig = {
     "wrangler",
   ],
 
-  // Disable image optimization for smaller bundles on Cloudflare
+  // Image optimization for Vercel deployment
   images: {
     unoptimized: true,
     domains: [],
@@ -136,13 +136,13 @@ const nextConfig = {
 
   // Bundle optimization for memory efficiency
   webpack: (config, { dev, isServer, webpack }) => {
-    // Add path alias resolution for Cloudflare build environment
+    // Add path alias resolution for Vercel build environment
     config.resolve.alias = {
       ...config.resolve.alias,
       "@": __dirname,
     };
 
-    // Server-side optimizations for Cloudflare Pages bundle size limit
+    // Server-side optimizations for Vercel deployment
     if (isServer) {
       // Ignore heavy packages that might be imported
       config.plugins.push(
@@ -237,7 +237,7 @@ const nextConfig = {
         },
       };
 
-      // Additional bundle size optimizations for Cloudflare Pages
+      // Additional bundle size optimizations for Vercel
       config.optimization.minimize = true;
       config.resolve.alias = {
         ...config.resolve.alias,

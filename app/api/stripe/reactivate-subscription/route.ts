@@ -11,8 +11,6 @@ import { getUserSubscription, updateUserSubscription} from '@/lib/stripe-db-util
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 

@@ -9,8 +9,6 @@ export const runtime = 'edge'
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 // POST /api/tasks/bulk-update
 // Body: { ids: string[], status?: string, priority?: string }
 export async function POST(request: NextRequest) {

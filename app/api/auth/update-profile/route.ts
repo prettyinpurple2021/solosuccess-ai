@@ -7,8 +7,6 @@ import { eq} from 'drizzle-orm'
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')

@@ -29,8 +29,6 @@ const updateJobSchema = z.object({
 })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 /**
  * GET /api/scraping/jobs/[jobId]
  * Get details of a specific scraping job

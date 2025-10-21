@@ -33,8 +33,6 @@ import {
   Info,
   Radar
 } from 'lucide-react'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicButton } from '@/components/ui/holographic-button'
 import { toast } from 'sonner'
 import { logger, logInfo, logError } from '@/lib/logger'
 
@@ -270,7 +268,7 @@ export default function IntelligencePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <HolographicButton
+            <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
@@ -278,18 +276,18 @@ export default function IntelligencePage() {
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
-            </HolographicButton>
-            <HolographicButton>
+            </Button>
+            <Button>
               <Download className="w-4 h-4 mr-2" />
               Export Report
-            </HolographicButton>
+            </Button>
           </div>
         </motion.div>
 
         {/* Stats Cards */}
         {stats && (
           <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-            <HolographicCard>
+            <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-200">Total Insights</CardTitle>
               </CardHeader>
@@ -297,9 +295,9 @@ export default function IntelligencePage() {
                 <div className="text-2xl font-bold text-white">{stats.total_insights}</div>
                 <p className="text-xs text-green-400">+12% from last week</p>
               </CardContent>
-            </HolographicCard>
+            </Card>
 
-            <HolographicCard>
+            <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-200">Critical Alerts</CardTitle>
               </CardHeader>
@@ -307,9 +305,9 @@ export default function IntelligencePage() {
                 <div className="text-2xl font-bold text-white">{stats.critical_alerts}</div>
                 <p className="text-xs text-red-400">Requires immediate attention</p>
               </CardContent>
-            </HolographicCard>
+            </Card>
 
-            <HolographicCard>
+            <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-200">Opportunities</CardTitle>
               </CardHeader>
@@ -317,9 +315,9 @@ export default function IntelligencePage() {
                 <div className="text-2xl font-bold text-white">{stats.opportunities_identified}</div>
                 <p className="text-xs text-green-400">Market gaps identified</p>
               </CardContent>
-            </HolographicCard>
+            </Card>
 
-            <HolographicCard>
+            <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-200">Threats</CardTitle>
               </CardHeader>
@@ -327,9 +325,9 @@ export default function IntelligencePage() {
                 <div className="text-2xl font-bold text-white">{stats.threats_monitored}</div>
                 <p className="text-xs text-orange-400">Active monitoring</p>
               </CardContent>
-            </HolographicCard>
+            </Card>
 
-            <HolographicCard>
+            <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-200">Market Trends</CardTitle>
               </CardHeader>
@@ -337,9 +335,9 @@ export default function IntelligencePage() {
                 <div className="text-2xl font-bold text-white">{stats.market_trends_tracked}</div>
                 <p className="text-xs text-blue-400">Trends analyzed</p>
               </CardContent>
-            </HolographicCard>
+            </Card>
 
-            <HolographicCard>
+            <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-200">Competitive Moves</CardTitle>
               </CardHeader>
@@ -347,13 +345,13 @@ export default function IntelligencePage() {
                 <div className="text-2xl font-bold text-white">{stats.competitive_moves_detected}</div>
                 <p className="text-xs text-purple-400">Moves tracked</p>
               </CardContent>
-            </HolographicCard>
+            </Card>
           </motion.div>
         )}
 
         {/* Search and Filters */}
         <motion.div variants={itemVariants}>
-          <HolographicCard>
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="w-5 h-5 text-cyan-300" />
@@ -429,7 +427,7 @@ export default function IntelligencePage() {
                 </div>
               </div>
             </CardContent>
-          </HolographicCard>
+          </Card>
         </motion.div>
 
         {/* Main Intelligence Tabs */}
@@ -454,7 +452,7 @@ export default function IntelligencePage() {
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Recent Insights */}
-                <HolographicCard>
+                <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-yellow-300" />
@@ -496,10 +494,10 @@ export default function IntelligencePage() {
                       </motion.div>
                     ))}
                   </CardContent>
-                </HolographicCard>
+                </Card>
 
                 {/* Market Position */}
-                <HolographicCard>
+                <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Target className="w-5 h-5 text-green-300" />
@@ -536,11 +534,11 @@ export default function IntelligencePage() {
                       </Badge>
                     </div>
                   </CardContent>
-                </HolographicCard>
+                </Card>
               </div>
 
               {/* Strategic Recommendations */}
-              <HolographicCard>
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Crown className="w-5 h-5 text-yellow-300" />
@@ -591,7 +589,7 @@ export default function IntelligencePage() {
                     </div>
                   </div>
                 </CardContent>
-              </HolographicCard>
+              </Card>
             </TabsContent>
 
             {/* Insights Tab */}
@@ -604,7 +602,7 @@ export default function IntelligencePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <HolographicCard>
+                    <Card>
                       <CardHeader>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -654,7 +652,7 @@ export default function IntelligencePage() {
                           </div>
                         )}
                       </CardContent>
-                    </HolographicCard>
+                    </Card>
                   </motion.div>
                 ))}
               </div>
@@ -663,7 +661,7 @@ export default function IntelligencePage() {
             {/* Analysis Tab */}
             <TabsContent value="analysis" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <HolographicCard>
+                <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Radar className="w-5 h-5 text-cyan-300" />
@@ -701,9 +699,9 @@ export default function IntelligencePage() {
                       </div>
                     </div>
                   </CardContent>
-                </HolographicCard>
+                </Card>
 
-                <HolographicCard>
+                <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-green-300" />
@@ -739,10 +737,10 @@ export default function IntelligencePage() {
                       </div>
                     </div>
                   </CardContent>
-                </HolographicCard>
+                </Card>
               </div>
 
-              <HolographicCard>
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="w-5 h-5 text-purple-300" />
@@ -793,7 +791,7 @@ export default function IntelligencePage() {
                     </div>
                   </div>
                 </CardContent>
-              </HolographicCard>
+              </Card>
             </TabsContent>
           </Tabs>
         </motion.div>

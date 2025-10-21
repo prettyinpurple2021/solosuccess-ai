@@ -34,9 +34,7 @@ async function authenticateJWTRequest(request: NextRequest) {
 }
 
 
-// // Edge Runtime disabled due to Node.js dependency incompatibility
-
-export async function GET(request: NextRequest) {
+// export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateJWTRequest(request)
     

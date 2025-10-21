@@ -7,7 +7,6 @@ import * as jose from 'jose'
 export const runtime = 'edge'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
 
 function getSql() {
   const url = process.env.DATABASE_URL

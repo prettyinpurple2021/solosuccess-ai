@@ -51,8 +51,6 @@ const ContextQuerySchema = z.object({
 })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 /**
  * POST /api/collaboration/context
  * Store context information

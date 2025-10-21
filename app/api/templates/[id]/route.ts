@@ -15,8 +15,6 @@ export const runtime = 'edge'
 const IdParamSchema = z.object({ id: z.string().regex(/^\d+$/) })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function DELETE(
   _request: Request,
   context: unknown

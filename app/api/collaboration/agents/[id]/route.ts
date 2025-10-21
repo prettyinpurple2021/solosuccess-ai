@@ -28,8 +28,6 @@ const ExecuteCapabilitySchema = z.object({
 })
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 /**
  * GET /api/collaboration/agents/[id]
  * Get details of a specific AI agent

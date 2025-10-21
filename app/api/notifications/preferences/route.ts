@@ -36,8 +36,6 @@ const notificationPreferencesSchema = z.object({
 });
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting

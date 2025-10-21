@@ -2,8 +2,6 @@ import { NextRequest, NextResponse} from 'next/server'
 import { getSql} from '@/lib/api-utils'
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId')
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })

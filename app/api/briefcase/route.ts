@@ -8,9 +8,7 @@ import * as jose from 'jose'
 export const runtime = 'edge'
 
 
-// // Edge Runtime disabled due to Node.js dependency incompatibility
-
-function getSql() {
+// function getSql() {
   const url = process.env.DATABASE_URL
   if (!url) {
     throw new Error('DATABASE_URL is not set')

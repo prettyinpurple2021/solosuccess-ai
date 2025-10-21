@@ -11,9 +11,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 // Edge runtime disabled because jsonwebtoken is not compatible with Edge
-// // // Edge Runtime disabled due to Node.js dependency incompatibility
-
-// GET current user's profile
+// // // GET current user's profile
 export async function GET(request: NextRequest) {
   const route = '/api/profile'
   try {

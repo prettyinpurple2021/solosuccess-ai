@@ -9,8 +9,6 @@ export const runtime = 'edge'
 
 
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
