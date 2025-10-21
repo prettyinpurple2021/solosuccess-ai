@@ -8,7 +8,7 @@ import * as jose from 'jose'
 export const runtime = 'edge'
 
 
-// function getSql() {
+function getSql() {
   const url = process.env.DATABASE_URL
   if (!url) {
     throw new Error('DATABASE_URL is not set')

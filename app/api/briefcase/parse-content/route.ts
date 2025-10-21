@@ -10,7 +10,7 @@ export const runtime = 'edge'
 
 
 
-// export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const fileId = formData.get('fileId') as string;

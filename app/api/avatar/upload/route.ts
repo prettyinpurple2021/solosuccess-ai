@@ -34,7 +34,7 @@ async function authenticateJWTRequest(request: NextRequest) {
 }
 
 
-// export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const { user, error } = await authenticateJWTRequest(request)
     

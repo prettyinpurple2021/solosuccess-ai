@@ -8,7 +8,7 @@ export const runtime = 'edge'
 
 
 
-// export async function GET(
+export async function GET(
   request: NextRequest,
   context: { params: Promise<{ shareId: string }> }
 ) {

@@ -76,7 +76,7 @@ export async function GET(_request: NextRequest) {
       },
       achievements: [],
       badges: [],
-      competitive_victories: []
+      competitive_victories: [],
       leaderboard_position: null,
       level: Math.floor((competitiveStats.competitive_advantage_points || 0) / 100) + 1,
       points_to_next_level: 100 - ((competitiveStats.competitive_advantage_points || 0) % 100)
