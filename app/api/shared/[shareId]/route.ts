@@ -3,8 +3,8 @@ import { NextRequest, NextResponse} from 'next/server'
 import { getDb } from '@/lib/database-client'
 import bcrypt from 'bcryptjs'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Node.js runtime required for bcryptjs password verification
+export const runtime = 'nodejs'
 
 
 

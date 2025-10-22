@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { motion } from 'framer-motion'
 import { 
-  Crown, 
+  Crown,
   Shield, 
   Target, 
   Users, 
@@ -153,7 +153,8 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-military-midnight relative overflow-hidden">
-      <CamoBackground opacity={0.1} withGrid>
+      <CamoBackground opacity={0.1} withGrid={true} />
+      <div className="relative z-10">
         {/* Navigation */}
         <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
           <div className="container mx-auto px-4">
@@ -273,8 +274,8 @@ export default function AdminPage() {
 
                 {/* Service Status */}
                 <div className="mb-12">
-                  <TacticalGrid className="max-w-6xl mx-auto">
-                    <TacticalGridItem>
+                  <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
+                    <div>
                       <GlassCard className="p-8">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="font-heading text-2xl font-bold text-white">Notification Service</h3>
@@ -313,9 +314,9 @@ export default function AdminPage() {
                           </div>
                         </div>
                       </GlassCard>
-                    </TacticalGridItem>
+                    </div>
                     
-                    <TacticalGridItem>
+                    <div>
                       <GlassCard className="p-8">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="font-heading text-2xl font-bold text-white">Scraping Service</h3>
@@ -354,8 +355,8 @@ export default function AdminPage() {
                           </div>
                         </div>
                       </GlassCard>
-                    </TacticalGridItem>
-                  </TacticalGrid>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Quick Actions */}
@@ -394,7 +395,7 @@ export default function AdminPage() {
             ) : null}
           </div>
         </div>
-      </CamoBackground>
+      </div>
     </div>
   )
 }

@@ -367,5 +367,49 @@ export async function listStripeSubscriptions(
   return subscriptions.data
 }
 
+// List all Stripe customers
+export async function listStripeCustomers(
+  limit: number = 100,
+  startingAfter?: string
+): Promise<import('stripe').Stripe.Customer[]> {
+  const stripe = await getStripe()
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
+  const customers = await stripe.customers.list({
+    limit,
+    starting_after: startingAfter
+  })
+  
+  return customers.data
+}
+
+// Get Stripe customers with pagination
+export async function getStripeCustomersPaginated(
+  limit: number = 100,
+  startingAfter?: string
+): Promise<{
+  customers: import('stripe').Stripe.Customer[]
+  hasMore: boolean
+  nextStartingAfter?: string
+}> {
+  const stripe = await getStripe()
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.')
+  }
+  
+  const customers = await stripe.customers.list({
+    limit,
+    starting_after: startingAfter
+  })
+  
+  return {
+    customers: customers.data,
+    hasMore: customers.has_more,
+    nextStartingAfter: customers.data.length > 0 ? customers.data[customers.data.length - 1].id : undefined
+  }
+}
+
 // Note: Usage records functionality removed as it's not available in current Stripe API version
 // For metered billing, use Stripe's dashboard or implement custom usage tracking
