@@ -195,16 +195,20 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
           ? row.keyproducts.split(';').map((p: string) => p.trim()).filter(Boolean)
           : []
         
-        // Parse social media followers (expecting format like "linkedin:1000,twitter:500")
+        // Parse social media followers (expecting format like "linkedin:1000;twitter:500")
+        // Using semicolon delimiter to avoid conflicts with CSV field separators
         const socialMediaFollowers = { linkedin: 0, twitter: 0 }
         if (row.socialmediafollowers) {
-          const followers = row.socialmediafollowers.split(',')
+          const followers = row.socialmediafollowers.split(';')
           followers.forEach((follower: string) => {
-            const [platform, count] = follower.split(':').map((s: string) => s.trim())
-            if (platform === 'linkedin' && !isNaN(parseInt(count))) {
-              socialMediaFollowers.linkedin = parseInt(count)
-            } else if (platform === 'twitter' && !isNaN(parseInt(count))) {
-              socialMediaFollowers.twitter = parseInt(count)
+            const trimmedFollower = follower.trim()
+            if (trimmedFollower.includes(':')) {
+              const [platform, count] = trimmedFollower.split(':').map((s: string) => s.trim())
+              if (platform === 'linkedin' && !isNaN(parseInt(count))) {
+                socialMediaFollowers.linkedin = parseInt(count)
+              } else if (platform === 'twitter' && !isNaN(parseInt(count))) {
+                socialMediaFollowers.twitter = parseInt(count)
+              }
             }
           })
         }
