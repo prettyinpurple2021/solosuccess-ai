@@ -56,7 +56,7 @@ export default [
       ],
       'prefer-const': 'warn',
       // Disallow console in application code; allow in logger and config files
-      'no-console': ['error', { allow: [] }],
+      'no-console': ['error', { allow: ['warn', 'error'] }],
       
       // React specific rules
       'react/no-unescaped-entities': 'warn',

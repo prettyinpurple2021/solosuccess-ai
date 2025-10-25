@@ -28,6 +28,9 @@ interface ImportedCompetitor {
   employeeCount: number | null
   fundingStage: string
   threatLevel: string
+  keyProducts: string[]
+  socialMediaFollowers: { linkedin: number; twitter: number }
+  isPublic: boolean
   status: 'valid' | 'warning' | 'error'
   issues: string[]
 }
@@ -102,15 +105,51 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
       // Simulate file processing
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // Parse CSV data with real validation
+      // Parse CSV data with proper CSV parsing to handle quoted fields and commas
       const csvText = await file.text()
       const lines = csvText.split('\n').filter(line => line.trim())
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
       
+      // Proper CSV parsing function that handles quoted fields
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = []
+        let current = ''
+        let inQuotes = false
+        let i = 0
+        
+        while (i < line.length) {
+          const char = line[i]
+          
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              // Escaped quote
+              current += '"'
+              i += 2
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes
+              i++
+            }
+          } else if (char === ',' && !inQuotes) {
+            // Field separator
+            result.push(current.trim())
+            current = ''
+            i++
+          } else {
+            current += char
+            i++
+          }
+        }
+        
+        // Add the last field
+        result.push(current.trim())
+        return result
+      }
+      
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase())
       const parsedData: ImportedCompetitor[] = []
       
       for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim())
+        const values = parseCSVLine(lines[i])
         const row: any = {}
         
         headers.forEach((header, index) => {
@@ -151,6 +190,30 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
         
         const status = issues.length === 0 ? 'valid' : issues.length <= 2 ? 'warning' : 'error'
         
+        // Parse key products from CSV (semicolon-separated string to avoid comma conflicts)
+        const keyProducts = row.keyproducts 
+          ? row.keyproducts.split(';').map((p: string) => p.trim()).filter(Boolean)
+          : []
+        
+        // Parse social media followers (expecting format like "linkedin:1000,twitter:500")
+        const socialMediaFollowers = { linkedin: 0, twitter: 0 }
+        if (row.socialmediafollowers) {
+          const followers = row.socialmediafollowers.split(',')
+          followers.forEach((follower: string) => {
+            const [platform, count] = follower.split(':').map((s: string) => s.trim())
+            if (platform === 'linkedin' && !isNaN(parseInt(count))) {
+              socialMediaFollowers.linkedin = parseInt(count)
+            } else if (platform === 'twitter' && !isNaN(parseInt(count))) {
+              socialMediaFollowers.twitter = parseInt(count)
+            }
+          })
+        }
+        
+        // Parse isPublic field (expecting "true", "false", "1", "0", "yes", "no")
+        const isPublic = row.ispublic 
+          ? ['true', '1', 'yes', 'y'].includes(row.ispublic.toLowerCase())
+          : false
+        
         parsedData.push({
           id: i.toString(),
           name: row.name || '',
@@ -161,6 +224,9 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
           employeeCount: row.employeecount ? parseInt(row.employeecount) : null,
           fundingStage: row.fundingstage || '',
           threatLevel: row.threatlevel?.toLowerCase() || 'medium',
+          keyProducts,
+          socialMediaFollowers,
+          isPublic,
           status,
           issues
         })
@@ -226,24 +292,30 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
   }
 
   const removeRow = (id: string) => {
-    setImportedData(prev => prev.filter(item => item.id !== id))
+    setImportedData(prev => {
+      const updatedData = prev.filter(item => item.id !== id)
+      
+      // Recalculate validation using the updated data
+      if (updatedData.length > 0) {
+        const validation: ValidationResult = {
+          valid: updatedData.filter(item => item.status === 'valid').length,
+          warnings: updatedData.filter(item => item.status === 'warning').length,
+          errors: updatedData.filter(item => item.status === 'error').length,
+          total: updatedData.length
+        }
+        setValidationResult(validation)
+      } else {
+        setValidationResult({ valid: 0, warnings: 0, errors: 0, total: 0 })
+      }
+      
+      return updatedData
+    })
+    
     setSelectedRows(prev => {
       const newSet = new Set(prev)
       newSet.delete(id)
       return newSet
     })
-    
-    // Recalculate validation
-    const updatedData = importedData.filter(item => item.id !== id)
-    if (updatedData.length > 0) {
-      const validation: ValidationResult = {
-        valid: updatedData.filter(item => item.status === 'valid').length,
-        warnings: updatedData.filter(item => item.status === 'warning').length,
-        errors: updatedData.filter(item => item.status === 'error').length,
-        total: updatedData.length
-      }
-      setValidationResult(validation)
-    }
   }
 
   const handleImport = async () => {
@@ -252,18 +324,51 @@ BizBoost Solutions,bizboost.com,Business management platform,Technology,New York
     try {
       setImporting(true)
       
-      // Simulate import process
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // Import selected competitors via API with individual error handling
+      const selectedCompetitors = importedData.filter(item => selectedRows.has(item.id))
+      const importResults = {
+        successful: 0,
+        failed: 0,
+        errors: [] as string[]
+      }
       
-      // TODO: Replace with actual API calls
-      // const selectedCompetitors = importedData.filter(item => selectedRows.has(item.id))
-      // for (const competitor of selectedCompetitors) {
-      //   await fetch('/api/competitors', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     body: JSON.stringify(competitor)
-      //   })
-      // }
+      for (const competitor of selectedCompetitors) {
+        try {
+          const response = await fetch('/api/competitors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: competitor.name,
+              domain: competitor.domain,
+              description: competitor.description,
+              industry: competitor.industry,
+              headquarters: competitor.headquarters,
+              employeeCount: competitor.employeeCount,
+              fundingStage: competitor.fundingStage,
+              keyProducts: competitor.keyProducts,
+              socialMediaFollowers: competitor.socialMediaFollowers,
+              isPublic: competitor.isPublic
+            })
+          })
+          
+          if (!response.ok) {
+            const errorText = await response.text()
+            throw new Error(`HTTP ${response.status}: ${errorText}`)
+          }
+          
+          importResults.successful++
+        } catch (error) {
+          importResults.failed++
+          importResults.errors.push(`${competitor.name}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+          logError(`Failed to import competitor ${competitor.name}:`, error)
+        }
+      }
+      
+      // Show import results
+      if (importResults.failed > 0) {
+        logError(`Import completed with ${importResults.failed} failures:`, importResults.errors)
+        // You might want to show a toast or notification here
+      }
       
       router.push('/dashboard/competitors')
     } catch (error) {

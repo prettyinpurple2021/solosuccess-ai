@@ -362,9 +362,9 @@ export class NotificationJobQueue {
     const result = await getSql().query(`
       DELETE FROM notification_jobs 
       WHERE status IN ('completed', 'failed', 'cancelled')
-        AND processed_at < NOW() - INTERVAL $1 || ' days'
+        AND processed_at < NOW() - INTERVAL $1
       RETURNING id
-    `, [olderThanDays.toString()])
+    `, [`${olderThanDays} days`])
 
     const deletedCount = result.rows.length
     if (deletedCount > 0) {

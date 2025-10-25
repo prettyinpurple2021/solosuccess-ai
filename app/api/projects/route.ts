@@ -210,11 +210,67 @@ export async function PUT(request: NextRequest) {
 
     const validatedData = ProjectUpdateSchema.parse(updateData)
 
-    // Update project - replace with actual database operation
+    // Update project in database
+    const sql = getSql()
+    
+    // First, get existing metadata to preserve other fields
+    const existingProject = await sql`
+      SELECT metadata FROM briefcases 
+      WHERE id = ${id} AND user_id = ${user.id}
+    `
+    
+    if (existingProject.length === 0) {
+      return NextResponse.json(
+        { error: 'Project not found or access denied' },
+        { status: 404 }
+      )
+    }
+    
+    // Merge existing metadata with new values
+    const existingMetadata = existingProject[0].metadata || {}
+    const updatedMetadata = {
+      ...existingMetadata,
+      ...(validatedData.color && { color: validatedData.color }),
+      ...(validatedData.icon && { icon: validatedData.icon })
+    }
+    
+    const result = await sql`
+      UPDATE briefcases 
+      SET 
+        title = CASE 
+          WHEN ${validatedData.name !== undefined} THEN ${validatedData.name}
+          ELSE title
+        END,
+        description = CASE 
+          WHEN ${validatedData.description !== undefined} THEN ${validatedData.description}
+          ELSE description
+        END,
+        status = CASE 
+          WHEN ${validatedData.status !== undefined} THEN ${validatedData.status}
+          ELSE status
+        END,
+        metadata = ${JSON.stringify(updatedMetadata)},
+        updated_at = NOW()
+      WHERE id = ${id} AND user_id = ${user.id}
+      RETURNING id, title, description, status, metadata, created_at, updated_at
+    `
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { error: 'Project not found or access denied' },
+        { status: 404 }
+      )
+    }
+
     const updatedProject = {
-      id,
-      ...validatedData,
-      updated_at: new Date().toISOString()
+      id: result[0].id.toString(),
+      name: result[0].title,
+      description: result[0].description || '',
+      color: result[0].metadata?.color || '#6366f1',
+      icon: result[0].metadata?.icon || '📁',
+      status: result[0].status as 'active' | 'completed' | 'paused',
+      created_at: result[0].created_at,
+      updated_at: result[0].updated_at
     }
 
     return NextResponse.json({
@@ -270,7 +326,21 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Delete project - replace with actual database operation
+    // Delete project from database
+    const sql = getSql()
+    const result = await sql`
+      DELETE FROM briefcases 
+      WHERE id = ${projectId} AND user_id = ${user.id}
+      RETURNING id
+    `
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { error: 'Project not found or access denied' },
+        { status: 404 }
+      )
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Project deleted successfully'
