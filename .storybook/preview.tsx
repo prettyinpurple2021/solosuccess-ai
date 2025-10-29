@@ -1,3 +1,5 @@
+'use client'
+
 import type { Preview } from '@storybook/react'
 import '../app/globals.css'
 import { ThemeProvider } from 'next-themes'
@@ -13,6 +15,7 @@ const preview: Preview = {
       </ThemeProvider>
     )
   ],
+
   parameters: {
     controls: {
       matchers: {
@@ -21,10 +24,18 @@ const preview: Preview = {
       }
     },
     a11y: {
-      element: '#root',
-      manual: false
+      context: '#root',
+      manual: false,
+      // 'todo' - show a11y violations in the test UI only
+      // 'error' - fail CI on a11y violations
+      // 'off' - skip a11y checks entirely
+      test: 'todo'
     }
-  }
+  },
+
+  tags: ['autodocs']
 }
 
 export default preview
+
+
