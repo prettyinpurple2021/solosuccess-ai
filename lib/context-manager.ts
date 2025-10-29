@@ -638,7 +638,9 @@ export class ContextManager {
    */
   private startContextCleanup(): void {
     setInterval(() => {
-      this.clearExpiredContext().catch(console.error)
+      this.clearExpiredContext().catch((err) => {
+        logError('Failed to clear expired context', err)
+      })
     }, 300000) // Run every 5 minutes
   }
 

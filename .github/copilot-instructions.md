@@ -1,6 +1,45 @@
-# SoloSuccess AI - GitHub Copilot Instructions
+# SoloSuccess AI — Copilot Instructions (concise)
 
-**ALWAYS follow these instructions first and only fallback to additional search and context gathering if the information here is incomplete or found to be in error.**
+Follow these rules first. Use repository files and tests to verify changes before opening PRs.
+
+Quick commands (Windows PowerShell):
+- Install deps: npm ci --legacy-peer-deps
+- Dev server: npm run dev  (http://localhost:3000)
+- Build: npm run build  (allow 120s+; do not cancel)
+- Tests: npm test  (allow 180s+ on CI)
+
+Critical env vars (check .env.example): DATABASE_URL, OPENAI_API_KEY, NEXT_PUBLIC_STACK_PROJECT_ID, JWT_SECRET
+
+Where to look next (important files/dirs):
+- Agent system: lib/ai-config.ts, lib/ai-personality-system.ts, lib/competitive-intelligence-*.ts
+- Chat endpoints: app/api/chat/route.ts (streaming responses + agent injection)
+- DB and migrations: db/schema.ts, drizzle.config.ts, scripts/, migrations/
+- App entry & routing: app/ (Next.js App Router), next.config.mjs, package.json scripts
+- Tests & CI: jest.config.cjs, playwright.config.ts, .github/workflows/ci.yml
+
+Project-specific conventions (do not guess):
+- Always use npm with --legacy-peer-deps here (CI and docs rely on it).
+- Many TypeScript React 19 warnings exist; builds succeed despite local type errors — don't spend large refactors on TS noise unless needed.
+- DB migrations: modify db/schema.ts then run npm run db:generate → npm run db:push (do not hand-edit migrations).
+- Agent changes require updates in both lib/ai-config.ts and lib/ai-personality-system.ts and tests for the chat route.
+
+Examples of common edits:
+- Add agent: update lib/ai-config.ts (systemPrompt + model), extend lib/ai-personality-system.ts, add UI component under components/ai or app/flows, then test app/api/chat/route.ts.
+- Add DB column: update db/schema.ts, run npm run db:generate, commit migration.
+
+Testing & validation:
+- Unit: npm test (Jest). Expect ~5/6 suites passing locally.
+- E2E: npm run e2e (install browsers: npx playwright install --with-deps)
+- Quick smoke: npm run smoke (requires dev server)
+
+Common pitfalls & where to check:
+- Module resolution/runtime failures: check scripts that reference absolute imports; run npm ci --legacy-peer-deps and clear .next/node_modules caches if needed.
+- Port 3000 in use: use npm run dev -- --port 3001
+- CI timeouts: increase job timeouts, allow 3-5 minute windows for builds/tests when diagnosing.
+
+If unsure, open these files first: package.json (scripts), lib/ai-config.ts, app/api/chat/route.ts, db/schema.ts, scripts/setup-*.mjs.
+
+If you want, I can expand this into a 1-page "how to add an agent" checklist or add sample PR checklist items. Feedback?
 
 ## Quick Start - Essential Commands
 

@@ -128,7 +128,9 @@ export class AgentInterface {
 
     // Auto-register if enabled
     if (this.config.autoRegister) {
-      this.register().catch(console.error)
+      this.register().catch((err) => {
+        logError('Agent auto-register failed', err)
+      })
     }
 
     this.initializeDefaultHandlers()
@@ -732,7 +734,9 @@ export class AgentInterface {
    * Cleanup when interface is destroyed
    */
   destroy(): void {
-    this.unregister().catch(console.error)
+    this.unregister().catch((err) => {
+      logError('Agent unregister failed during destroy', err)
+    })
     this.currentSessions.clear()
     this.messageQueue = []
     this.messageHandlers.clear()

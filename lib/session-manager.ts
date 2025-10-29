@@ -458,7 +458,9 @@ export class SessionManager {
 
       // Schedule for archival
       setTimeout(() => {
-        this.archiveSession(sessionId).catch(console.error)
+        this.archiveSession(sessionId).catch((err) => {
+          logError('Failed to archive session after completion', err)
+        })
       }, sessionState.configuration.autoArchiveAfter)
 
       logInfo(`✅ Session ${sessionId} completed`)
@@ -785,7 +787,9 @@ export class SessionManager {
 
     // Archive expired sessions
     sessionsToArchive.forEach(sessionId => {
-      this.archiveSession(sessionId).catch(console.error)
+      this.archiveSession(sessionId).catch((err) => {
+        logError('Failed to archive expired session', { sessionId }, err as unknown as Error)
+      })
     })
 
     if (sessionsToArchive.length > 0) {

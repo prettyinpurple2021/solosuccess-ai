@@ -2,6 +2,10 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { getDb } from '@/lib/database-client'
+import { db } from '@/db'
+import { users, chatConversations, chatMessages } from '@/db/schema'
+import { eq } from 'drizzle-orm'
+import { v4 as uuidv4 } from 'uuid'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intelligence-context'
 import { z} from 'zod'
@@ -68,41 +72,52 @@ export async function POST(request: NextRequest) {
       message
     )
 
-    // Ensure user exists in database
-    const db = getDb()
-    let { rows: userData } = await client.query(
-      'SELECT id FROM users WHERE id = $1',
-      [user.id]
-    )
-
-    if (userData.length === 0) {
-      // Create user if they don't exist
-      await client.query(
-        `INSERT INTO users (id, email, full_name, avatar_url, subscription_tier, level, total_points, current_streak, wellness_score, focus_minutes, onboarding_completed, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
-        [
-          user.id,
-          user.email,
-          user.full_name,
-          user.avatar_url,
-          'free',
-          1,
-          0,
-          0,
-          50,
-          0,
-          false
-        ]
-      )
+    // Ensure user exists in database (using Drizzle `db`)
+    const existing = await db.select().from(users).where(eq(users.id, user.id))
+    if (existing.length === 0) {
+      await db.insert(users).values({
+        id: user.id,
+        email: user.email,
+        password_hash: '',
+        full_name: user.full_name,
+        avatar_url: user.avatar_url,
+        subscription_tier: 'free',
+        level: 1,
+        total_points: 0,
+        current_streak: 0,
+        wellness_score: 50,
+        focus_minutes: 0,
+        onboarding_completed: false,
+        created_at: new Date(),
+        updated_at: new Date()
+      }).run()
     }
 
-    // Save conversation to database
-    const { rows: [conversation] } = await client.query(
-      `INSERT INTO conversations (user_id, agent_id, message, response, created_at)
-       VALUES ($1, $2, $3, '', NOW())
-       RETURNING *`,
-      [user.id, agentId || 'general', message]
-    )
+    // Save conversation to database (chat tables)
+    const conversationId = uuidv4()
+    await db.insert(chatConversations).values({
+      id: conversationId,
+      user_id: user.id,
+      title: '',
+      agent_id: agentId || 'general',
+      agent_name: agentId || 'general',
+      last_message: message,
+      last_message_at: new Date(),
+      message_count: 1,
+      created_at: new Date(),
+      updated_at: new Date()
+    }).run()
+
+    // Insert the initial user message
+    await db.insert(chatMessages).values({
+      id: uuidv4(),
+      conversation_id: conversationId,
+      user_id: user.id,
+      role: 'user',
+      content: message,
+      metadata: {},
+      created_at: new Date()
+    }).run()
 
     // Call OpenAI Worker via service binding
     const systemPrompt = `${agentPersonality} You are helping a SoloSuccess AI user. Be helpful, professional, and use frameworks when appropriate.${competitiveContextString}`

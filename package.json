@@ -36,13 +36,6 @@
     "test:user": "node scripts/user-testing-plan.js",
     "test:ux": "node scripts/ux-testing.js",
     "setup:analytics": "node scripts/setup-analytics.js",
-    "build:cf": "node scripts/patch-stripe.js && cross-env SKIP_DB_CHECK=true npx @cloudflare/next-on-pages",
-    "preview:cf": "npm run build:cf && npx wrangler pages dev .vercel/output",
-    "deploy:cf": "npm run build:cf && npx wrangler pages deploy .vercel/output",
-    "deploy:cf:preview": "npm run build:cf && npx wrangler pages deploy .vercel/output --env preview",
-    "setup:workers": "node scripts/dev-multi-workers.mjs",
-    "dev:multi": "npx wrangler dev -c wrangler.toml -c workers/openai-worker/wrangler.toml -c workers/google-ai-worker/wrangler.toml",
-    "deploy:workers": "node scripts/deploy-workers.mjs",
     "optimize-images": "node scripts/optimize-images-simple.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -56,7 +49,7 @@
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",
     "@neondatabase/serverless": "^1.0.1",
-    "@opennextjs/cloudflare": "^1.9.1",
+    
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -145,7 +138,7 @@
     "uuid": "^9.0.1",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
-    "wrangler": "^4.40.2",
+    
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -185,6 +178,9 @@
     "tsx": "^4.20.5",
     "vitest": "^3.2.4",
     "webpack-bundle-analyzer": "^4.10.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "overrides": {
     "lucide-react": "^0.542.0",
