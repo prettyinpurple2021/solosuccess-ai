@@ -10,6 +10,12 @@ import { Crown, CheckCircle, XCircle, RefreshCw, ArrowRight} from "lucide-react"
 
 
 export default function DebugAuthPage() {
+  if (process.env.NODE_ENV === 'production') {
+    if (typeof window !== 'undefined') {
+      window.location.replace('/not-found')
+    }
+    return null
+  }
   const [token, setToken] = useState<string | null>(null)
   const [userData, setUserData] = useState<any>(null)
   const [dashboardData, setDashboardData] = useState<any>(null)

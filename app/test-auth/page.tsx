@@ -9,6 +9,12 @@ import { EmpowermentCard} from "@/components/ui/boss-card"
 import { Crown, CheckCircle, XCircle, ArrowRight} from "lucide-react"
 
 export default function TestAuthPage() {
+  if (process.env.NODE_ENV === 'production') {
+    if (typeof window !== 'undefined') {
+      window.location.replace('/not-found')
+    }
+    return null
+  }
   const router = useRouter()
   const [authStatus, setAuthStatus] = useState<'checking' | 'authenticated' | 'unauthenticated'>('checking')
   const [userData, setUserData] = useState<any>(null)
