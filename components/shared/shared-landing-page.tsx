@@ -16,6 +16,7 @@ import {
 import Link from "next/link"
 import { ScheduleDemoModal} from "@/components/schedule/schedule-demo-modal"
 import FaqSection from "@/components/faq/faq-section"
+import { getAgentMeta } from '@/lib/agent-meta'
 
 
 interface SharedLandingPageProps {
@@ -483,14 +484,14 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
 
           <div className="mobile-first-grid mb-12">
             {[
-              { name: "Roxy", role: "Creative Strategist", specialty: "Brand & Content Creation", color: "from-purple-500 to-pink-500", image: "/images/agents/roxy.png" },
-              { name: "Blaze", role: "Performance Coach", specialty: "Productivity & Goal Achievement", color: "from-orange-500 to-red-500", image: "/images/agents/blaze.png" },
-              { name: "Echo", role: "Communication Expert", specialty: "Networking & Relationships", color: "from-teal-500 to-cyan-500", image: "/images/agents/echo.png" },
-              { name: "Glitch", role: "QA & Debug Agent", specialty: "Quality Assurance & Testing", color: "from-red-500 to-orange-500", image: "/images/agents/glitch.png" },
-              { name: "Lumi", role: "Legal & Docs Agent", specialty: "Legal Compliance & Documentation", color: "from-purple-500 to-indigo-500", image: "/images/agents/lumi.png" },
-              { name: "Vex", role: "Tech & Automation", specialty: "Technical Solutions & Workflows", color: "from-cyan-500 to-teal-500", image: "/images/agents/vex.png" },
-              { name: "Lexi", role: "Data & Analytics", specialty: "Business Intelligence & Insights", color: "from-teal-500 to-emerald-500", image: "/images/agents/lexi.png" },
-              { name: "Nova", role: "Innovation & Growth", specialty: "Strategy & Market Expansion", color: "from-pink-500 to-purple-500", image: "/images/agents/nova.png" }
+              { id: 'roxy', name: "Roxy", role: "Creative Strategist", specialty: "Brand & Content Creation", color: "from-purple-500 to-pink-500", image: getAgentMeta('roxy')?.image || '/images/agents/roxy.png' },
+              { id: 'blaze', name: "Blaze", role: "Performance Coach", specialty: "Productivity & Goal Achievement", color: "from-orange-500 to-red-500", image: getAgentMeta('blaze')?.image || '/images/agents/blaze.png' },
+              { id: 'echo', name: "Echo", role: "Communication Expert", specialty: "Networking & Relationships", color: "from-teal-500 to-cyan-500", image: getAgentMeta('echo')?.image || '/images/agents/echo.png' },
+              { id: 'glitch', name: "Glitch", role: "QA & Debug Agent", specialty: "Quality Assurance & Testing", color: "from-red-500 to-orange-500", image: getAgentMeta('glitch')?.image || '/images/agents/glitch.png' },
+              { id: 'lumi', name: "Lumi", role: "Legal & Docs Agent", specialty: "Legal Compliance & Documentation", color: "from-purple-500 to-indigo-500", image: getAgentMeta('lumi')?.image || '/images/agents/lumi.png' },
+              { id: 'vex', name: "Vex", role: "Tech & Automation", specialty: "Technical Solutions & Workflows", color: "from-cyan-500 to-teal-500", image: getAgentMeta('vex')?.image || '/images/agents/vex.png' },
+              { id: 'lexi', name: "Lexi", role: "Data & Analytics", specialty: "Business Intelligence & Insights", color: "from-teal-500 to-emerald-500", image: getAgentMeta('lexi')?.image || '/images/agents/lexi.png' },
+              { id: 'nova', name: "Nova", role: "Innovation & Growth", specialty: "Strategy & Market Expansion", color: "from-pink-500 to-purple-500", image: getAgentMeta('nova')?.image || '/images/agents/nova.png' }
             ].map((agent, index) => (
               <motion.div
                 key={index}
@@ -503,7 +504,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   <CardHeader>
                     <div className={`w-20 h-20 bg-gradient-to-r ${agent.color} rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden`}>
                       <img
-                        src={agent.image}
+                        src={getAgentMeta(agent.id)?.image || `/images/agents/${agent.id}.png`}
                         alt={agent.name}
                         width={60}
                         height={60}

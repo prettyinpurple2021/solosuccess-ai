@@ -1,14 +1,15 @@
 "use client"
 
-import { ButtonHTMLAttributes, forwardRef } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
+import { motion, type HTMLMotionProps } from 'framer-motion'
 
-interface TacticalButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+interface TacticalButtonProps extends HTMLMotionProps<'button'> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   withShine?: boolean
   withPulse?: boolean
+  children?: ReactNode
 }
 
 const TacticalButton = forwardRef<HTMLButtonElement, TacticalButtonProps>(
@@ -19,7 +20,8 @@ const TacticalButton = forwardRef<HTMLButtonElement, TacticalButtonProps>(
       primary: 'bg-gradient-to-r from-[#FF71B5] to-[#FFB3D9] text-white border-2 border-white/20 shadow-[0_4px_16px_rgba(255,113,181,0.4)] hover:shadow-[0_8px_24px_rgba(255,113,181,0.6)] hover:-translate-y-0.5',
       secondary: 'bg-gradient-to-r from-[#5D5C61] to-[#454547] text-[#FAFAFA] border-2 border-[#FF71B5]/30 shadow-[0_4px_16px_rgba(93,92,97,0.4)] hover:shadow-[0_8px_24px_rgba(255,113,181,0.4)] hover:-translate-y-0.5',
       ghost: 'bg-transparent text-[#FF71B5] border-2 border-[#FF71B5]/50 hover:bg-[#FF71B5]/10 hover:border-[#FF71B5]',
-      danger: 'bg-gradient-to-r from-red-500 to-red-600 text-white border-2 border-white/20 shadow-[0_4px_16px_rgba(239,68,68,0.4)] hover:shadow-[0_8px_24px_rgba(239,68,68,0.6)] hover:-translate-y-0.5'
+      danger: 'bg-gradient-to-r from-red-500 to-red-600 text-white border-2 border-white/20 shadow-[0_4px_16px_rgba(239,68,68,0.4)] hover:shadow-[0_8px_24px_rgba(239,68,68,0.6)] hover:-translate-y-0.5',
+      outline: 'bg-transparent text-white border-2 border-white/60 hover:border-white hover:bg-white/10'
     }
     
     const sizeClasses = {

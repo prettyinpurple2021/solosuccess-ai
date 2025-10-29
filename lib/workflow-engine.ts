@@ -69,16 +69,63 @@ export type WorkflowEdge = z.infer<typeof WorkflowEdgeSchema>
 export type Workflow = z.infer<typeof WorkflowSchema>
 
 // Execution Types
+export interface WorkflowExecutionLog {
+  id?: string
+  timestamp: Date
+  level: 'info' | 'warning' | 'error' | 'debug' | 'success'
+  message: string
+  metadata?: Record<string, unknown>
+}
+
+export interface WorkflowExecutionStep {
+  id: string
+  name: string
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped'
+  startedAt?: Date | null
+  completedAt?: Date | null
+  duration?: number | null
+  durationMs?: number | null
+  assignedTo?: string
+  output?: unknown
+  metadata?: Record<string, unknown>
+}
+
+export interface WorkflowExecutionError {
+  message: string
+  step?: string
+  timestamp?: Date
+  details?: Record<string, unknown>
+}
+
 export interface WorkflowExecution {
   id: string
   workflowId: string
+  workflowName?: string
   status: 'running' | 'completed' | 'failed' | 'cancelled'
   startedAt: Date
-  completedAt?: Date
+  completedAt?: Date | null
+  executionTime: number // milliseconds
+  progress?: number
+  currentStep?: string | null
   nodeResults: Map<string, unknown>
+  steps?: WorkflowExecutionStep[]
+  logs?: WorkflowExecutionLog[]
   variables: Record<string, unknown>
-  error?: string
-  executionTime: number
+  metadata?: {
+    executedBy?: string
+    environment?: string
+    version?: string
+    retryCount?: number
+    maxRetries?: number
+    [key: string]: unknown
+  }
+  metrics?: Record<string, number>
+  retryCount?: number
+  maxRetries?: number
+  startedBy?: string
+  trigger?: string
+  error?: string | WorkflowExecutionError | null
+  duration?: number | null
 }
 
 // Node Types

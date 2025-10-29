@@ -1,8 +1,8 @@
 "use client"
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import type React from "react"
-import React, { createContext, useContext, useEffect, useState } from "react"
+import type { Context, ReactNode } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import type { User, Session } from "@/lib/neon/types"
 
 
@@ -17,7 +17,7 @@ interface AuthContextType {
 }
 
 // Lazy context creation to prevent build errors
-let AuthContext: React.Context<AuthContextType | undefined> | undefined
+let AuthContext: Context<AuthContextType | undefined> | undefined
 
 function getAuthContext() {
   if (!AuthContext) {
@@ -26,7 +26,7 @@ function getAuthContext() {
   return AuthContext
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)

@@ -1,18 +1,45 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { createClient } from './neon/client';
-import { Template, TemplateCategory } from './templates-types';
-import templateData from '../data/templates.json';
+import { createClient } from './neon/client'
+import { Template, TemplateCategory } from './templates-types'
+import { templateCategories as normalizedCategories } from '@/lib/template-catalog'
+
+const fallbackCategories: TemplateCategory[] = (() => {
+  let templateId = 1
+
+  return normalizedCategories.map((category, categoryIndex) => ({
+    id: categoryIndex + 1,
+    category: category.name,
+    icon: category.icon,
+    description: category.description,
+    templates: category.templates.map((template) => ({
+      id: templateId++,
+      title: template.title,
+      description: template.description,
+      slug: template.slug,
+      isInteractive: template.isInteractive,
+      requiredRole: template.requiredRole,
+      categoryId: categoryIndex + 1,
+    })),
+  }))
+})()
+
+const fallbackTemplateLookup = new Map<string, Template>()
+fallbackCategories.forEach((category) => {
+  category.templates.forEach((template) => {
+    fallbackTemplateLookup.set(template.slug, template)
+  })
+})
 
 
 export async function getAllTemplates(): Promise<TemplateCategory[]> {
   try {
     // Only try to connect to database if environment variables are available
     if (!process.env.DATABASE_URL) {
-      logInfo('Neon database environment variables not available, using fallback data');
-      return templateData as TemplateCategory[];
+      logInfo('Neon database environment variables not available, using fallback data')
+      return fallbackCategories
     }
 
-    const client = await createClient();
+    const client = await createClient()
     const { rows, error } = await client.query(`
       SELECT 
         tc.id,
@@ -37,9 +64,9 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
 
     // Handle database errors
     if (error) {
-      logError('Error fetching templates from database:', error);
+      logError('Error fetching templates from database:', error)
       // Fallback to JSON data
-      return templateData as TemplateCategory[];
+      return fallbackCategories
     }
 
     // Map database fields to match TypeScript interface
@@ -53,11 +80,11 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
       })) || []
     }));
 
-    return mappedData as TemplateCategory[];
+    return mappedData as TemplateCategory[]
   } catch (error) {
-    logError('Database connection failed, using JSON fallback:', error);
+    logError('Database connection failed, using JSON fallback:', error)
     // Fallback to JSON data
-    return templateData as TemplateCategory[];
+    return fallbackCategories
   }
 }
 
@@ -65,11 +92,11 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
   try {
     // Only try to connect to database if environment variables are available
     if (!process.env.DATABASE_URL) {
-      logInfo('Neon database environment variables not available, using fallback data');
-      return findTemplateInJson(slug);
+      logInfo('Neon database environment variables not available, using fallback data')
+      return findTemplateInFallback(slug)
     }
 
-    const client = await createClient();
+    const client = await createClient()
     const { rows, error } = await client.query(
       'SELECT * FROM templates WHERE slug = $1',
       [slug]
@@ -77,25 +104,20 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
 
     // Handle database errors
     if (error) {
-      logError('Error fetching template by slug from database:', error);
+      logError('Error fetching template by slug from database:', error)
       // Fallback to JSON data for any other errors
-      return findTemplateInJson(slug);
+      return findTemplateInFallback(slug)
     }
 
-    return rows?.[0] as Template | null;
+    return rows?.[0] as Template | null
   } catch (error) {
-    logError('Database connection failed, using JSON fallback:', error);
+    logError('Database connection failed, using JSON fallback:', error)
     // Fallback to JSON data
-    return findTemplateInJson(slug);
+    return findTemplateInFallback(slug)
   }
 }
 
-function findTemplateInJson(slug: string): Template | null {
-  for (const category of templateData) {
-    const template = category.templates.find(t => t.slug === slug);
-    if (template) {
-      return template as Template;
-    }
-  }
-  return null;
-} 
+function findTemplateInFallback(slug: string): Template | null {
+  return fallbackTemplateLookup.get(slug) ?? null
+}
+

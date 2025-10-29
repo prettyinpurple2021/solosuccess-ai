@@ -1,19 +1,18 @@
 "use client"
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { useState} from "react"
-import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import { Button} from "@/components/ui/button"
-import { Input} from "@/components/ui/input"
-import { Label} from "@/components/ui/label"
-import { Textarea} from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import { Progress} from "@/components/ui/progress"
-import { Badge} from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
-import { Crown, Target, CheckCircle, Brain, Users, Rocket, Sparkles, ArrowLeft, ArrowRight} from 'lucide-react'
-
-
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Crown, Target, CheckCircle, Brain, Users, Rocket, Sparkles, ArrowLeft, ArrowRight } from 'lucide-react'
+import { getAgentMeta } from '@/lib/agent-meta'
 
 interface OnboardingData {
   personalInfo: {
@@ -95,7 +94,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
       id: "roxy",
       name: "Roxy",
       role: "Executive Assistant",
-      avatar: "/images/agents/roxy.png",
+      avatar: (getAgentMeta('roxy')?.image) || "/images/agents/roxy.png",
       description: "Manages schedules, organizes workflows, handles admin tasks",
       specialties: ["Organization", "Scheduling", "Workflow"],
     },
@@ -103,7 +102,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
       id: "blaze",
       name: "Blaze",
       role: "Growth Strategist",
-      avatar: "/images/agents/blaze.png",
+      avatar: (getAgentMeta('blaze')?.image) || "/images/agents/blaze.png",
       description: "Drives sales, creates growth strategies, optimizes conversions",
       specialties: ["Sales", "Growth", "Strategy"],
     },
@@ -111,7 +110,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
       id: "echo",
       name: "Echo",
       role: "Marketing Maven",
-      avatar: "/images/agents/echo.png",
+      avatar: (getAgentMeta('echo')?.image) || "/images/agents/echo.png",
       description: "Creates content, builds brand, manages social media",
       specialties: ["Content", "Branding", "Social Media"],
     },
@@ -119,7 +118,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
       id: "lumi",
       name: "Lumi",
       role: "Legal & Docs",
-      avatar: "/images/agents/lumi.png",
+      avatar: (getAgentMeta('lumi')?.image) || "/images/agents/lumi.png",
       description: "Handles contracts, legal docs, compliance guidance",
       specialties: ["Legal", "Contracts", "Compliance"],
     },

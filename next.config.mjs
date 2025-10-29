@@ -185,7 +185,20 @@ const nextConfig = {
       ];
       
       // Further minimize server bundle
-      config.optimization.usedExports = true;
+      // NOTE: `usedExports` can conflict with some caching strategies (cacheUnaffected) in
+      // certain webpack/Next.js versions. Enable it only for non-dev server builds to avoid
+      // dev-time startup conflicts (the error observed previously). This keeps production
+      // tree-shaking while avoiding the dev-server error.
+      try {
+        if (!dev) {
+          config.optimization.usedExports = true
+        }
+      } catch (e) {
+        // If setting usedExports fails for any reason, skip it and continue — dev server
+        // stability is more important than this micro-optimization.
+        // eslint-disable-next-line no-console
+        console.warn('Could not enable config.optimization.usedExports:', e)
+      }
       config.optimization.sideEffects = false;
     }
 

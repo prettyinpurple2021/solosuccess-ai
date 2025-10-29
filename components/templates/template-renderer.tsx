@@ -1,33 +1,25 @@
 "use client"
 
 import React from 'react'
-import templateData from '@/data/templates.json'
-import { Card, CardContent} from '@/components/ui/card'
-import { templateComponents} from './index'
+import { Card, CardContent } from '@/components/ui/card'
+import { templateComponents } from './index'
+import { getTemplateBySlug, getCategoryBySlug, type TemplateSummary } from '@/lib/template-catalog'
 
 export function TemplateRenderer({ slug }: { slug: string }) {
   const Component = templateComponents[slug]
 
-  const findTemplateInJson = (s: string) => {
-    for (const category of templateData as any[]) {
-      const template = category.templates.find((t: any) => t.slug === s)
-      if (template) {
-        return {
-          ...template,
-          category: category.category,
-          icon: category.icon,
-          description: category.description,
-          slug: template.slug,
-          isInteractive: template.isInteractive,
-          requiredRole: template.requiredRole,
-          title: template.title,
-        }
+  const summary: TemplateSummary | undefined = getTemplateBySlug(slug)
+  const category = summary ? getCategoryBySlug(summary.categoryId) : undefined
+  const template = summary
+    ? {
+        title: summary.title,
+        description: summary.description,
+        category: category?.name ?? summary.categoryName,
+        slug: summary.slug,
+        isInteractive: summary.isInteractive,
+        requiredRole: summary.requiredRole,
       }
-    }
-    return null
-  }
-
-  const template = findTemplateInJson(slug)
+    : null
 
   if (!Component) {
     return (

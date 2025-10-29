@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
     // Ensure user exists in database (using Drizzle `db`)
     const existing = await db.select().from(users).where(eq(users.id, user.id))
     if (existing.length === 0) {
+      // Insert only the columns that exist on the Drizzle users table to avoid type errors
       await db.insert(users).values({
         id: user.id,
         email: user.email,
@@ -123,15 +124,10 @@ export async function POST(request: NextRequest) {
         full_name: user.full_name,
         avatar_url: user.avatar_url,
         subscription_tier: 'free',
-        level: 1,
-        total_points: 0,
-        current_streak: 0,
-        wellness_score: 50,
-        focus_minutes: 0,
         onboarding_completed: false,
         created_at: new Date(),
         updated_at: new Date()
-      }).run()
+      });
     }
 
     // Save conversation to database (chat tables)
@@ -147,7 +143,7 @@ export async function POST(request: NextRequest) {
       message_count: 1,
       created_at: new Date(),
       updated_at: new Date()
-    }).run()
+    });
 
     // Insert the initial user message
     await db.insert(chatMessages).values({
@@ -158,7 +154,7 @@ export async function POST(request: NextRequest) {
       content: message,
       metadata: {},
       created_at: new Date()
-    }).run()
+    });
 
     // Call OpenAI Worker via service binding
     const systemPrompt = `${agentPersonality} You are helping a SoloSuccess AI user. Be helpful, professional, and use frameworks when appropriate.${competitiveContextString}`
@@ -194,7 +190,7 @@ export async function POST(request: NextRequest) {
 
     if (!workerResponse.ok) {
       const errorText = await workerResponse.text()
-      logError('OpenAI Worker error:', errorText)
+      logError(`OpenAI Worker error: ${errorText}`)
       return NextResponse.json({ error: 'AI processing failed' }, { status: 500 })
     }
 
@@ -203,7 +199,11 @@ export async function POST(request: NextRequest) {
       headers: workerResponse.headers
     })
   } catch (error) {
-    logError('Error in chat:', error)
+    const errMessage =
+      error instanceof Error
+        ? `${error.name}: ${error.message}${error.stack ? '\n' + error.stack : ''}`
+        : String(error)
+    logError(errMessage)
     return NextResponse.json(
       { error: 'Failed to process chat message' },
       { status: 500 }

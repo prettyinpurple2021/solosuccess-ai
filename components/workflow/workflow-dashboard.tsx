@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
-  Workflow,
+  Workflow as WorkflowIcon,
   Play,
   Eye,
   Settings,
@@ -38,6 +38,7 @@ import {
 import { HolographicButton } from '@/components/ui/holographic-button'
 import { HolographicCard } from '@/components/ui/holographic-card'
 import { HolographicLoader } from '@/components/ui/holographic-loader'
+import { Badge } from '@/components/ui/badge'
 import { VisualWorkflowBuilder } from './visual-workflow-builder'
 import { WorkflowTemplates } from './workflow-templates'
 import { WorkflowExecutionMonitor } from './workflow-execution-monitor'
@@ -325,7 +326,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                 Overview
               </TabsTrigger>
               <TabsTrigger value="builder" className="flex items-center gap-1">
-                <Workflow className="h-3 w-3" />
+                <WorkflowIcon className="h-3 w-3" />
                 Builder
               </TabsTrigger>
             </TabsList>
@@ -561,7 +562,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                 className="p-6 h-full"
               >
                 <div className="text-center">
-                  <Workflow className="h-16 w-16 text-purple-400 mx-auto mb-4" />
+                  <WorkflowIcon className="h-16 w-16 text-purple-400 mx-auto mb-4" />
                   <h2 className="text-xl font-bold mb-2">Welcome to Workflow Automation</h2>
                   <p className="text-gray-400 mb-6">
                     Automate your business processes with intelligent workflows. 

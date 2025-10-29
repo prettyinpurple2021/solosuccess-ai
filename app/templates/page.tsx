@@ -32,7 +32,11 @@ import {
   Gem,
   Infinity,
   Flame,
-  Award
+  Award,
+  Filter,
+  Lightbulb,
+  UserCog,
+  type LucideIcon
 } from 'lucide-react'
 import { 
   TacticalButton, 
@@ -44,69 +48,30 @@ import {
   TacticalGrid,
   TacticalGridItem
 } from '@/components/military'
-import templateData from '@/data/templates.json'
-
-type TemplateCategory = {
-  id: string
-  name: string
-  description: string
-  icon: string
-  color: string
-  templates: Template[]
-}
-
-type Template = {
-  id: string
-  title: string
-  description: string
-  category: string
-  difficulty: 'beginner' | 'intermediate' | 'advanced'
-  estimatedTime: string
-  tags: string[]
-  isAiGenerated?: boolean
-  generatedAt?: string
-  generatedBy?: string
-  aiInsights?: string[]
-  recommendations?: string[]
+import {
+  templateCategories,
+  templateList,
+  type TemplateCategoryRecord,
+  type TemplateSummary,
+} from '@/lib/template-catalog'
+const categoryIconMap: Record<string, LucideIcon> = {
+  Target,
+  TrendingUp,
+  Briefcase,
+  Sparkles,
+  Users,
+  Focus,
+  Brain,
+  Filter,
+  Lightbulb,
+  UserCog,
 }
 
 export default function TemplatesPage() {
-  const categories: TemplateCategory[] = [
-    {
-      id: 'business-planning',
-      name: 'Business Planning',
-      description: 'Strategic templates for business development and planning',
-      icon: 'Target',
-      color: 'from-military-hot-pink to-military-blush-pink',
-      templates: templateData.filter(t => t.category === 'business-planning')
-    },
-    {
-      id: 'marketing',
-      name: 'Marketing & Sales',
-      description: 'Templates for marketing campaigns and sales strategies',
-      icon: 'TrendingUp',
-      color: 'from-military-hot-pink to-military-blush-pink',
-      templates: templateData.filter(t => t.category === 'marketing')
-    },
-    {
-      id: 'operations',
-      name: 'Operations',
-      description: 'Templates for operational efficiency and workflow management',
-      icon: 'Briefcase',
-      color: 'from-military-hot-pink to-military-blush-pink',
-      templates: templateData.filter(t => t.category === 'operations')
-    },
-    {
-      id: 'content',
-      name: 'Content Creation',
-      description: 'Templates for content strategy and creation',
-      icon: 'Sparkles',
-      color: 'from-military-hot-pink to-military-blush-pink',
-      templates: templateData.filter(t => t.category === 'content')
-    }
-  ]
+  const categories: TemplateCategoryRecord[] = templateCategories
+  const featuredTemplates: TemplateSummary[] = templateList.slice(0, 6)
 
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyColor = (difficulty: TemplateSummary['difficulty']) => {
     switch (difficulty) {
       case 'beginner': return 'text-green-400'
       case 'intermediate': return 'text-yellow-400'
@@ -115,7 +80,7 @@ export default function TemplatesPage() {
     }
   }
 
-  const getDifficultyIcon = (difficulty: string) => {
+  const getDifficultyIcon = (difficulty: TemplateSummary['difficulty']) => {
     switch (difficulty) {
       case 'beginner': return <Target className="w-4 h-4" />
       case 'intermediate': return <Shield className="w-4 h-4" />
@@ -209,63 +174,64 @@ export default function TemplatesPage() {
             </motion.div>
 
             <TacticalGrid className="max-w-7xl mx-auto">
-              {categories.map((category, index) => (
-                <TacticalGridItem key={index}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                  >
-                    <GlassCard className="h-full p-8">
-                      <div className="text-center mb-6">
-                        <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center`}>
-                          {category.icon === 'Target' && <Target className="w-10 h-10 text-white" />}
-                          {category.icon === 'TrendingUp' && <TrendingUp className="w-10 h-10 text-white" />}
-                          {category.icon === 'Briefcase' && <Briefcase className="w-10 h-10 text-white" />}
-                          {category.icon === 'Sparkles' && <Sparkles className="w-10 h-10 text-white" />}
-                        </div>
-                        
-                        <h3 className="font-heading text-2xl font-bold text-white mb-2">{category.name}</h3>
-                        <p className="text-military-storm-grey mb-4">{category.description}</p>
-                        
-                        <div className="flex items-center justify-center gap-2 mb-6">
-                          <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
-                            {category.templates.length} Templates
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {category.templates.slice(0, 3).map((template, templateIndex) => (
-                          <div key={templateIndex} className="flex items-center gap-3 p-3 bg-military-tactical/20 rounded-lg">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">{templateIndex + 1}</span>
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="text-white font-medium text-sm">{template.title}</h4>
-                              <p className="text-military-storm-grey text-xs">{template.description}</p>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              {getDifficultyIcon(template.difficulty)}
-                              <span className={`text-xs ${getDifficultyColor(template.difficulty)}`}>
-                                {template.difficulty}
-                              </span>
-                            </div>
+              {categories.map((category, index) => {
+                const CategoryIcon = categoryIconMap[category.icon] ?? Target
+
+                return (
+                  <TacticalGridItem key={category.id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <GlassCard className="h-full p-8">
+                        <div className="text-center mb-6">
+                          <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center`}>
+                            <CategoryIcon className="w-10 h-10 text-white" />
                           </div>
-                        ))}
-                        
-                        {category.templates.length > 3 && (
-                          <div className="text-center">
-                            <span className="text-military-storm-grey text-sm">
-                              +{category.templates.length - 3} more templates
+
+                          <h3 className="font-heading text-2xl font-bold text-white mb-2">{category.name}</h3>
+                          <p className="text-military-storm-grey mb-4">{category.description}</p>
+
+                          <div className="flex items-center justify-center gap-2 mb-6">
+                            <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                              {category.templates.length} Templates
                             </span>
                           </div>
-                        )}
-                      </div>
-                    </GlassCard>
-                  </motion.div>
-                </TacticalGridItem>
-              ))}
+                        </div>
+
+                        <div className="space-y-3">
+                          {category.templates.slice(0, 3).map((template, templateIndex) => (
+                            <div key={template.slug} className="flex items-center gap-3 p-3 bg-military-tactical/20 rounded-lg">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">{templateIndex + 1}</span>
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="text-white font-medium text-sm">{template.title}</h4>
+                                <p className="text-military-storm-grey text-xs">{template.description}</p>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {getDifficultyIcon(template.difficulty)}
+                                <span className={`text-xs ${getDifficultyColor(template.difficulty)}`}>
+                                  {template.difficulty}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+
+                          {category.templates.length > 3 && (
+                            <div className="text-center">
+                              <span className="text-military-storm-grey text-sm">
+                                +{category.templates.length - 3} more templates
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </GlassCard>
+                    </motion.div>
+                  </TacticalGridItem>
+                )
+              })}
             </TacticalGrid>
           </div>
         </div>
@@ -289,8 +255,8 @@ export default function TemplatesPage() {
 
             <div className="max-w-6xl mx-auto">
               <TacticalGrid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {templateData.slice(0, 6).map((template, index) => (
-                  <TacticalGridItem key={index}>
+                {featuredTemplates.map((template, index) => (
+                  <TacticalGridItem key={template.slug}>
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}

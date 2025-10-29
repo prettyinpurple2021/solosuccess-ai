@@ -1,10 +1,10 @@
 "use client"
 
-import { HTMLAttributes, forwardRef } from 'react'
+import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
+import { motion, type HTMLMotionProps } from 'framer-motion'
 
-interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
+interface GlassCardProps extends HTMLMotionProps<'div'> {
   variant?: 'default' | 'strong' | 'tactical'
   withChevron?: boolean
   withShine?: boolean
@@ -19,14 +19,8 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       tactical: 'glass-overlay-tactical'
     }
 
-    const CardComponent = interactive ? motion.div : 'div'
-    const motionProps = interactive ? {
-      whileHover: { scale: 1.02, y: -2 },
-      transition: { duration: 0.2 }
-    } : {}
-
     return (
-      <CardComponent
+      <motion.div
         ref={ref}
         className={cn(
           'relative',
@@ -36,11 +30,12 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
           interactive && 'cursor-pointer',
           className
         )}
-        {...motionProps}
+        whileHover={interactive ? { scale: 1.02, y: -2 } : undefined}
+        transition={interactive ? { duration: 0.2 } : undefined}
         {...props}
       >
         {children}
-      </CardComponent>
+      </motion.div>
     )
   }
 )

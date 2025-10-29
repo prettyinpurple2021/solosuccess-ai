@@ -149,24 +149,24 @@ class Logger {
 // Export singleton instance
 export const logger = new Logger()
 // Export convenience functions for common use cases
-export const logError = (message: string, contextOrError?: Record<string, unknown> | Error, error?: Error) => {
+export const logError = (message: string, contextOrError?: unknown, error?: unknown) => {
   if (contextOrError instanceof Error) {
     logger.error(message, undefined, contextOrError)
   } else if (typeof contextOrError === 'object' && contextOrError !== null) {
-    logger.error(message, contextOrError as Record<string, unknown>, error)
+    logger.error(message, contextOrError as Record<string, unknown>, error as Error | undefined)
   } else {
-    logger.error(message, undefined, error)
+    logger.error(message, undefined, error as Error | undefined)
   }
 }
-export const logWarn = (message: string, context?: Record<string, unknown>) => 
-  logger.warn(message, context)
-export const logInfo = (message: string, context?: Record<string, unknown>) => 
-  logger.info(message, context)
-export const logDebug = (message: string, context?: Record<string, unknown>) => 
-  logger.debug(message, context)
-export const logApi = (method: string, path: string, statusCode: number, duration?: number, context?: Record<string, unknown>) => 
-  logger.apiLog(method, path, statusCode, duration, context)
-export const logDb = (operation: string, table: string, duration?: number, context?: Record<string, unknown>) => 
-  logger.dbLog(operation, table, duration, context)
-export const logAuth = (action: string, userId?: string, success?: boolean, context?: Record<string, unknown>) => 
-  logger.authLog(action, userId, success, context)
+export const logWarn = (message: string, context?: unknown) =>
+  logger.warn(message, (context as Record<string, unknown>) || undefined)
+export const logInfo = (message: string, context?: unknown) =>
+  logger.info(message, (context as Record<string, unknown>) || undefined)
+export const logDebug = (message: string, context?: unknown) =>
+  logger.debug(message, (context as Record<string, unknown>) || undefined)
+export const logApi = (method: string, path: string, statusCode: number, duration?: number, context?: unknown) =>
+  logger.apiLog(method, path, statusCode, duration, (context as Record<string, unknown>) || undefined)
+export const logDb = (operation: string, table: string, duration?: number, context?: unknown) =>
+  logger.dbLog(operation, table, duration, (context as Record<string, unknown>) || undefined)
+export const logAuth = (action: string, userId?: string, success?: boolean, context?: unknown) =>
+  logger.authLog(action, userId, success, (context as Record<string, unknown>) || undefined)

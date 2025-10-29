@@ -3,7 +3,7 @@
 import type React from "react"
 import Image from "next/image"
 
-import { useState, useEffect, useCallback} from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
 import { Label} from "@/components/ui/label"
@@ -19,20 +19,11 @@ import { useCollaboration} from "@/hooks/use-collaboration"
 import type { CollaborationTask, AgentHandoff } from "@/lib/agent-collaboration"
 import {
   Users, Play, CheckCircle, Clock, ArrowRight, Lightbulb, Loader2, Plus, Workflow, MessageSquare, } from "lucide-react"
+import { getAgentMeta } from '@/lib/agent-meta'
 
-// Add this function at the top of the component
+// Prefer metadata-driven agent avatars; fallback to static images
 const getAgentAvatar = (agent: string) => {
-  const avatars: Record<string, string> = {
-    roxy: "/images/agents/roxy.png",
-    blaze: "/images/agents/blaze.png",
-    echo: "/images/agents/echo.png",
-    lumi: "/images/agents/lumi.png",
-    vex: "/images/agents/vex.png",
-    lexi: "/images/agents/lexi.png",
-    nova: "/images/agents/nova.png",
-    glitch: "/images/agents/glitch.png",
-  }
-  return avatars[agent] || "/default-user.svg"
+  return getAgentMeta(agent)?.image || `/images/agents/${agent}.png` || "/default-user.svg"
 }
 
 export function CollaborationHub() {
@@ -273,19 +264,19 @@ export function CollaborationHub() {
                         </div>
 
                         {/* In the team members display section */}
-                        <div className="flex flex-wrap gap-1">
-                          {task.requiredAgents.map((agent) => (
-                            <Image
-                              key={agent}
-                              src={getAgentAvatar(agent) || "/default-user.svg"}
-                              alt={agent}
-                              width={24}
-                              height={24}
-                              className="rounded-full object-cover border border-white shadow-sm"
-                              title={agent.charAt(0).toUpperCase() + agent.slice(1)}
-                            />
-                          ))}
-                        </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {task.requiredAgents.map((agent) => (
+                                    <Image
+                                      key={agent}
+                                      src={getAgentAvatar(agent) || "/default-user.svg"}
+                                      alt={agent}
+                                      width={24}
+                                      height={24}
+                                      className="rounded-full object-cover border border-white shadow-sm"
+                                      title={agent.charAt(0).toUpperCase() + agent.slice(1)}
+                                    />
+                                  ))}
+                                </div>
                       </div>
                     </CardContent>
                   </Card>

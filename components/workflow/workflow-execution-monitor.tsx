@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
+import {
   Play,
   Pause,
   Square,
@@ -41,12 +41,13 @@ import {
   Settings,
   MoreHorizontal
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { HolographicButton } from '@/components/ui/holographic-button'
 import { HolographicCard } from '@/components/ui/holographic-card'
 import { HolographicLoader } from '@/components/ui/holographic-loader'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
-import type { WorkflowExecution, ExecutionStep } from '@/lib/workflow-engine'
+import type { WorkflowExecution, WorkflowExecutionStep } from '@/lib/workflow-engine'
 
 // Types
 interface WorkflowExecutionMonitorProps {
@@ -79,6 +80,8 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
     startedAt: new Date(Date.now() - 300000), // 5 minutes ago
     completedAt: null,
     duration: null,
+    executionTime: 300000,
+  nodeResults: new Map<string, unknown>(),
     progress: 65,
     currentStep: 'Sending follow-up email',
     steps: [
@@ -113,6 +116,8 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
     startedAt: new Date(Date.now() - 1800000), // 30 minutes ago
     completedAt: new Date(Date.now() - 600000), // 10 minutes ago
     duration: 1200000, // 20 minutes
+    executionTime: 1200000,
+  nodeResults: new Map<string, unknown>(),
     progress: 100,
     currentStep: null,
     steps: [
@@ -129,7 +134,7 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
       { timestamp: new Date(Date.now() - 1700000), level: 'info', message: 'User account created' },
       { timestamp: new Date(Date.now() - 1600000), level: 'info', message: 'Onboarding tasks setup completed' },
       { timestamp: new Date(Date.now() - 700000), level: 'info', message: 'Getting started guide sent' },
-      { timestamp: new Date(Date.now() - 600000), level: 'success', message: 'Customer onboarding completed successfully' }
+  { timestamp: new Date(Date.now() - 600000), level: 'success', message: 'Customer onboarding completed successfully' }
     ],
     metadata: {
       executedBy: 'user-1',
@@ -147,6 +152,8 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
     startedAt: new Date(Date.now() - 3600000), // 1 hour ago
     completedAt: new Date(Date.now() - 3300000), // 30 minutes ago
     duration: 300000, // 5 minutes
+    executionTime: 300000,
+  nodeResults: new Map<string, unknown>(),
     progress: 33,
     currentStep: null,
     steps: [
@@ -189,23 +196,27 @@ const MOCK_STATS: ExecutionStats = {
 }
 
 // Status colors
-const STATUS_COLORS = {
+type ExtendedStatus = WorkflowExecution['status'] | WorkflowExecutionStep['status'] | 'paused'
+
+const STATUS_COLORS: Record<ExtendedStatus, string> = {
   pending: '#6B7280',
   running: '#3B82F6',
   completed: '#10B981',
   failed: '#EF4444',
   cancelled: '#F59E0B',
-  paused: '#8B5CF6'
+  paused: '#8B5CF6',
+  skipped: '#94A3B8'
 }
 
 // Status icons
-const STATUS_ICONS = {
+const STATUS_ICONS: Record<ExtendedStatus, LucideIcon> = {
   pending: Clock,
   running: Loader2,
   completed: CheckCircle,
   failed: XCircle,
   cancelled: Square,
-  paused: Pause
+  paused: Pause,
+  skipped: AlertCircle
 }
 
 export function WorkflowExecutionMonitor({
@@ -254,10 +265,11 @@ export function WorkflowExecutionMonitor({
     let filtered = executions
 
     if (searchQuery) {
-      filtered = filtered.filter(exec =>
-        exec.workflowName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        exec.id.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(exec => {
+        const name = (exec.workflowName ?? 'Untitled workflow').toLowerCase()
+        return name.includes(query) || exec.id.toLowerCase().includes(query)
+      })
     }
 
     if (statusFilter !== 'all') {
@@ -371,9 +383,13 @@ export function WorkflowExecutionMonitor({
 
   // Render execution card
   const renderExecutionCard = useCallback((execution: WorkflowExecution) => {
-    const StatusIcon = STATUS_ICONS[execution.status]
-    const statusColor = STATUS_COLORS[execution.status]
+  const StatusIcon = STATUS_ICONS[execution.status]
     const isRunning = execution.status === 'running'
+  const steps = execution.steps ?? []
+  const completedSteps = steps.filter(s => s.status === 'completed').length
+  const retryCount = Number(execution.metadata?.retryCount ?? 0)
+  const maxRetries = Number(execution.metadata?.maxRetries ?? 0)
+    const durationLabel = execution.duration ? formatDuration(execution.duration) : 'Running'
 
     return (
       <motion.div
@@ -441,20 +457,18 @@ export function WorkflowExecutionMonitor({
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div className="text-center">
                   <div className="text-gray-400">Duration</div>
-                  <div className="font-semibold text-gray-300">
-                    {execution.duration ? formatDuration(execution.duration) : 'Running'}
-                  </div>
+                  <div className="font-semibold text-gray-300">{durationLabel}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-gray-400">Steps</div>
                   <div className="font-semibold text-gray-300">
-                    {execution.steps.filter(s => s.status === 'completed').length}/{execution.steps.length}
+                    {completedSteps}/{steps.length}
                   </div>
                 </div>
                 <div className="text-center">
                   <div className="text-gray-400">Retries</div>
                   <div className="font-semibold text-gray-300">
-                    {execution.metadata.retryCount}/{execution.metadata.maxRetries}
+                    {retryCount}/{maxRetries}
                   </div>
                 </div>
               </div>
@@ -466,7 +480,9 @@ export function WorkflowExecutionMonitor({
                     <AlertCircle className="h-4 w-4 text-red-500" />
                     <span className="text-sm font-medium text-red-300">Error</span>
                   </div>
-                  <p className="text-xs text-red-400">{execution.error.message}</p>
+                  <p className="text-xs text-red-400">
+                    {typeof execution.error === 'string' ? execution.error : execution.error.message}
+                  </p>
                 </div>
               )}
 
@@ -517,6 +533,9 @@ export function WorkflowExecutionMonitor({
   const renderExecutionDetails = useCallback((execution: WorkflowExecution) => {
     if (!execution) return null
 
+    const steps = execution.steps ?? []
+    const logs = execution.logs ?? []
+
     return (
       <div className="space-y-6">
         {/* Header */}
@@ -538,10 +557,9 @@ export function WorkflowExecutionMonitor({
         <div>
           <h4 className="font-semibold mb-3">Execution Steps</h4>
           <div className="space-y-2">
-            {execution.steps.map((step, index) => {
+            {steps.map((step, index) => {
               const isExpanded = expandedSteps.has(step.id)
               const StatusIcon = STATUS_ICONS[step.status]
-              const statusColor = STATUS_COLORS[step.status]
 
               return (
                 <div key={step.id} className="border border-purple-800/30 rounded-lg">
@@ -577,7 +595,7 @@ export function WorkflowExecutionMonitor({
                     </div>
                   </button>
                   
-                  {isExpanded && step.output && (
+                  {isExpanded && step.output !== undefined && step.output !== null && (
                     <div className="px-3 pb-3 border-t border-purple-800/30">
                       <div className="mt-3">
                         <h5 className="text-sm font-medium text-gray-300 mb-2">Output</h5>
@@ -598,7 +616,7 @@ export function WorkflowExecutionMonitor({
           <h4 className="font-semibold mb-3">Execution Logs</h4>
           <div className="bg-black/30 rounded-lg p-4 max-h-64 overflow-y-auto">
             <div className="space-y-1">
-              {execution.logs.map((log, index) => (
+              {logs.map((log, index) => (
                 <div key={index} className="flex items-start gap-2 text-sm">
                   <span className="text-gray-500 min-w-[60px]">
                     {log.timestamp.toLocaleTimeString()}

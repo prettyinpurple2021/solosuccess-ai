@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
 import { neon } from '@neondatabase/serverless'
-import { z} from 'zod'
-import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
-import { info, error as logError} from '@/lib/log'
+import { z } from 'zod'
+import { getIdempotencyKeyFromRequest, reserveIdempotencyKey } from '@/lib/idempotency'
+import { info, error as logError } from '@/lib/log'
+import { templateCategories } from '@/lib/template-catalog'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -53,8 +54,27 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Get system templates (from JSON data)
-    const systemTemplates = await import('@/data/templates.json').then(m => m.default)
+    // Get system templates (from normalized catalog)
+    const systemTemplates = templateCategories.map((category) => ({
+      category: category.name,
+      icon: category.icon,
+      description: category.description,
+      templates: category.templates.map((template) => ({
+        title: template.title,
+        description: template.description,
+        slug: template.slug,
+        isInteractive: template.isInteractive,
+        requiredRole: template.requiredRole,
+        difficulty: template.difficulty,
+        estimatedTime: template.estimatedTime,
+        tags: template.tags,
+        isAiGenerated: template.isAiGenerated,
+        generatedAt: template.generatedAt,
+        generatedBy: template.generatedBy,
+        aiInsights: template.aiInsights,
+        recommendations: template.recommendations,
+      })),
+    }))
 
     info('Templates fetched successfully', { 
       route, 
@@ -130,7 +150,7 @@ export async function POST(request: NextRequest) {
     // Idempotency support
     const key = getIdempotencyKeyFromRequest(request)
     if (key) {
-      const reserved = await reserveIdempotencyKey(client, key)
+      const reserved = await reserveIdempotencyKey(sql as any, key)
       if (!reserved) {
         info('Duplicate template save request', { 
           route, 
