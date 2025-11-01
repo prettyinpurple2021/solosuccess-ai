@@ -11,31 +11,29 @@
 - **Language**: TypeScript (strict mode, zero `any` types)
 - **Styling**: Tailwind CSS 3.4+ with holographic design system
 - **Database**: Neon PostgreSQL with Drizzle ORM
-- **Authentication**: Better Auth (replaces JWT/cookies)
-- **Deployment**: Cloudflare Pages with `@cloudflare/next-on-pages`
-- **File Storage**: Cloudflare R2 or compatible S3-style storage
+- **Authentication**: JWT-based custom auth
+- **Deployment**: Compatible with any modern hosting platform
+- **File Storage**: S3-compatible storage or local storage
 - **AI Integration**: OpenAI, Anthropic, Google AI SDKs
 
 ### Deployment Architecture
 ```typescript
-// cloudflare.config.ts - Required for all deployments
+// next.config.mjs - Standard Next.js configuration
 export default {
-  pages_build_output_dir: '.vercel/output/static',
-  compatibility_flags: ['nodejs_compat'],
-  build: {
-    command: 'npm run build:cf'
-  }
+  distDir: '.next',
+  output: 'standalone',
+  // Platform-agnostic configuration
 }
 ```
 
-### Environment Variables (Cloudflare)
+### Environment Variables
 ```bash
 # Required for production
 DATABASE_URL=          # Neon PostgreSQL connection
-BETTER_AUTH_SECRET=    # Better Auth secret key
+JWT_SECRET=           # JWT secret (min 32 characters)
 OPENAI_API_KEY=       # AI service keys
 ANTHROPIC_API_KEY=    # AI service keys
-CLOUDFLARE_R2_*=      # Storage credentials
+# Add storage credentials based on your provider
 ```
 
 ---

@@ -201,10 +201,10 @@ export default {
 
 ## 🚀 Deployment & Infrastructure
 
-### **Google Cloud Run**
+### **Deployment Options**
 
-- **Serverless Deployment**: Automatic scaling and performance
-- **Edge Network**: Global CDN for fast content delivery
+- **Hosting**: Compatible with any modern hosting platform
+- **Serverless**: Automatic scaling and performance
 - **Containerized**: Deploy with Docker for consistency
 - **Monitoring**: Built-in logging and monitoring
 
@@ -212,14 +212,14 @@ export default {
 
 ```yaml
 # Automatic deployment workflow
-GitHub Push → Google Cloud Build →
+GitHub Push → CI/CD Pipeline →
 Type Check → Lint → Test →
-Deploy to Cloud Run
+Deploy to Production
 ```
 
 ## 📊 Monitoring & Analytics
 
-### **Google Cloud Operations Suite**
+### **Monitoring Solutions**
 
 - **Logging**: Centralized logging for your application
 - **Monitoring**: Performance and health monitoring

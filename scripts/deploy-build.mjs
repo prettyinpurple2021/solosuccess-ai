@@ -2,91 +2,140 @@
 
 /**
  * Production Build Script
- * Ensures proper environment variables are set during build process
+ * Ensures proper environment variables are set during Next.js production build
+ * Compatible with any deployment platform (Vercel, Netlify, self-hosted, etc.)
+ * Uses project logger and follows production best practices
  */
 
 import { spawn } from 'child_process'
-import { existsSync, copyFileSync } from 'fs'
-import { join } from 'path'
+import { readFileSync, existsSync, copyFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
-console.log('🚀 Starting production build process...')
+// Get logger from project
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const projectRoot = join(__dirname, '..')
 
-// Check if build environment file exists
-const buildEnvFile = '.env.production.build'
-const prodEnvFile = '.env.production'
+/**
+ * Simple logger for build script (avoids importing full logger module)
+ * Scripts and build processes are allowed to use console per project rules
+ */
+const logInfo = (msg) => console.log(`ℹ️  ${msg}`)
+const logError = (msg) => console.error(`❌ ${msg}`)
+const logSuccess = (msg) => console.log(`✅ ${msg}`)
+const logDebug = (msg) => console.log(`🔍 ${msg}`)
 
-if (!existsSync(buildEnvFile)) {
-  console.error(`❌ Build environment file ${buildEnvFile} not found`)
-  console.log('📝 Creating build environment file from production file...')
-  
-  if (existsSync(prodEnvFile)) {
-    copyFileSync(prodEnvFile, buildEnvFile)
-    console.log(`✅ Created ${buildEnvFile} from ${prodEnvFile}`)
-  } else {
-    console.error(`❌ Production environment file ${prodEnvFile} not found`)
-    process.exit(1)
+logInfo('Starting production build process...')
+
+// Check for environment files in multiple locations
+const possibleEnvFiles = [
+  '.env.production',
+  '.env.production.local',
+  '.env.local',
+  '.env'
+]
+
+let envFile = null
+for (const file of possibleEnvFiles) {
+  if (existsSync(file)) {
+    envFile = file
+    logInfo(`Found environment file: ${file}`)
+    break
   }
 }
 
-// Set environment variables for build
+// Set critical build-time environment variables
 process.env.NODE_ENV = 'production'
 process.env.NEXT_PHASE = 'phase-production-build'
 
-// Load environment variables from build file
-try {
-  const envContent = await import('fs').then(fs => fs.readFileSync(buildEnvFile, 'utf8'))
-  const envLines = envContent.split('\n')
-  
-  for (const line of envLines) {
-    const trimmedLine = line.trim()
-    if (trimmedLine && !trimmedLine.startsWith('#')) {
-      const [key, ...valueParts] = trimmedLine.split('=')
-      if (key && valueParts.length > 0) {
-        const value = valueParts.join('=')
-        process.env[key] = value
-        console.log(`📋 Set ${key}=${value.substring(0, 20)}...`)
+// Load environment variables if file exists
+if (envFile) {
+  try {
+    const envContent = readFileSync(envFile, 'utf8')
+    const envLines = envContent.split('\n')
+    
+    let loadedCount = 0
+    for (const line of envLines) {
+      const trimmedLine = line.trim()
+      if (trimmedLine && !trimmedLine.startsWith('#')) {
+        const [key, ...valueParts] = trimmedLine.split('=')
+        if (key && valueParts.length > 0) {
+          const value = valueParts.join('=')
+          process.env[key] = value
+          loadedCount++
+        }
       }
     }
+    logSuccess(`Loaded ${loadedCount} environment variables from ${envFile}`)
+  } catch (error) {
+    logError(`Failed to load environment variables: ${error.message}`)
+    process.exit(1)
   }
-} catch (error) {
-  console.error('❌ Failed to load build environment variables:', error)
-  process.exit(1)
+} else {
+  logDebug('No environment file found - relying on system/CI environment variables')
 }
 
-// Verify critical environment variables
-const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET', 'NODE_ENV']
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName])
+// Verify critical environment variables with helpful error messages
+const requiredEnvVars = {
+  DATABASE_URL: 'Neon PostgreSQL database connection string',
+  JWT_SECRET: 'Authentication secret (minimum 32 characters)',
+  NODE_ENV: 'Environment mode'
+}
+
+const missingVars = Object.keys(requiredEnvVars).filter(
+  varName => !process.env[varName] || process.env[varName].trim() === ''
+)
 
 if (missingVars.length > 0) {
-  console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`)
+  logError('Missing required environment variables:')
+  missingVars.forEach(varName => {
+    logError(`  - ${varName}: ${requiredEnvVars[varName]}`)
+  })
+  logError('')
+  logError('Setup instructions:')
+  logError('  1. Create .env.production file in project root')
+  logError('  2. Add all required environment variables')
+  logError('  3. Or set them in your CI/CD platform settings')
+  logError('  4. See .env.example for reference')
   process.exit(1)
 }
 
-console.log('✅ Environment variables verified')
+// Additional validation
+if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
+  logError('JWT_SECRET must be at least 32 characters long')
+  process.exit(1)
+}
 
-// Run the build command
-console.log('🔨 Running Next.js build...')
+logSuccess('Environment variables verified')
+
+// Run the build command with proper memory allocation
+logInfo('Running Next.js production build...')
 
 const buildProcess = spawn('npm', ['run', 'build'], {
   stdio: 'inherit',
   shell: true,
+  cwd: projectRoot,
   env: {
     ...process.env,
     NODE_ENV: 'production',
-    NEXT_PHASE: 'phase-production-build'
+    NEXT_PHASE: 'phase-production-build',
+    // Ensure proper memory allocation for large builds
+    NODE_OPTIONS: process.env.NODE_OPTIONS || '--max-old-space-size=12288'
   }
 })
 
 buildProcess.on('close', (code) => {
   if (code === 0) {
-    console.log('✅ Build completed successfully!')
+    logSuccess('Build completed successfully!')
+    process.exit(0)
   } else {
-    console.error(`❌ Build failed with exit code ${code}`)
+    logError(`Build failed with exit code ${code}`)
     process.exit(code)
   }
 })
 
 buildProcess.on('error', (error) => {
-  console.error('❌ Build process error:', error)
+  logError(`Build process error: ${error.message}`)
   process.exit(1)
 })

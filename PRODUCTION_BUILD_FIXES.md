@@ -124,7 +124,7 @@ Created a comprehensive test script (`scripts/test-database-connection.mjs`) tha
 
 ## Deployment Instructions
 
-### For Cloudflare Pages/Workers
+### For Any Deployment Platform
 
 1. **Set Environment Variables** in your deployment platform:
    ```
@@ -144,7 +144,7 @@ Created a comprehensive test script (`scripts/test-database-connection.mjs`) tha
    npm run build
    ```
 
-### For Modern Hosting Platforms
+### Best Practices
 
 1. Set the same environment variables in your platform's dashboard
 2. The build process will automatically use the enhanced configuration

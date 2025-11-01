@@ -8,8 +8,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ### Tech Stack
 - **Frontend**: Next.js 15.5.2 with App Router, React 19, TypeScript
-- **Database**: Neon PostgreSQL with Drizzle ORM (preferred over Supabase)
-- **Deployment**: Cloudflare Pages with OpenNext, Google Cloud Run
+- **Database**: Neon PostgreSQL with Drizzle ORM
 - **Styling**: Tailwind CSS 3.4.17 with custom purple-to-pink gradient brand
 - **AI**: OpenAI (primary), Anthropic Claude, Google AI via AI SDK
 - **Authentication**: JWT-based custom auth with HTTP-only cookies
@@ -34,8 +33,6 @@ npm run setup-templates        # Setup template system
 npm run setup-compliance       # Setup compliance tables
 npm run db:verify              # Verify database setup
 npm run setup:analytics        # Setup analytics infrastructure
-npm run setup:workers          # Setup multi-worker development
-npm run deploy:workers         # Deploy Cloudflare workers
 npm run optimize-images        # Optimize images for production
 ```
 
@@ -69,13 +66,6 @@ npm run test:ux            # UX testing automation
 # Storybook
 npm run storybook       # Start Storybook dev server on port 6006
 npm run build-storybook # Build Storybook for production
-
-# Cloudflare Deployment
-npm run build:cf        # Build for Cloudflare Pages
-npm run preview:cf      # Preview Cloudflare build locally
-npm run deploy:cf       # Deploy to Cloudflare
-npm run deploy:cf:preview # Deploy to preview environment
-npm run dev:multi          # Multi-worker development mode
 ```
 
 ### Critical Build Notes
@@ -311,17 +301,11 @@ npm run e2e                # Playwright full user journeys
 
 ## Deployment & Environment
 
-### Platform Deployment
-- **Platform**: Modern hosting with serverless functions
+### Deployment Information
 - **Database**: Neon PostgreSQL with connection pooling
-- **Build Command**: `npm run build`
+- **Build Command**: `npm run build` or `npm run build:production`
 - **Environment**: Production environment variables via platform dashboard
-
-### Cloudflare Pages Deployment
-- **Build Command**: `npm run build:cf`
-- **Preview Command**: `npm run preview:cf`
-- **Deploy Command**: `npm run deploy:cf`
-- **Environment**: Uses OpenNext adapter for Cloudflare Pages compatibility
+- **Deployment**: Compatible with any modern hosting platform
 
 ### Required Environment Variables
 ```bash

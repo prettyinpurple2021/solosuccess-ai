@@ -18,8 +18,8 @@ SoloSuccess AI Platform is built as a modern, scalable web application using a s
          ▼                       ▼                       ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │                 │    │                 │    │                 │
-│  Google Cloud   │    │   PostgreSQL    │    │   External APIs │
-│   (Hosting)     │    │   (Database)    │    │   (Stripe, etc) │
+│   Hosting       │    │   PostgreSQL    │    │   External APIs │
+│   Platform      │    │   (Database)    │    │   (Stripe, etc) │
 │                 │    │                 │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
@@ -171,8 +171,8 @@ User Input → Context Building → AI Service → Response Processing → UI Di
 
 - **Database Indexing**: Optimized database queries
 - **Connection Pooling**: Efficient database connections
-- **Caching Layers**: Redis for session and data caching
-- **Edge Functions**: Google Cloud Functions for global performance
+- **Caching Layers**: Redis for session and data caching (optional)
+- **Serverless Functions**: Edge functions for global performance
 
 ## 🔧 Development Architecture
 
@@ -194,15 +194,15 @@ User Input → Context Building → AI Service → Response Processing → UI Di
 
 ### Production Infrastructure
 
-- **Google Cloud Platform**: Serverless deployment and hosting
+- **Hosting Platform**: Compatible with any modern hosting service
 - **CDN**: Global content delivery network  
-- **Edge Computing**: Cloud Functions for performance
+- **Serverless Functions**: Edge functions for performance
 - **Automatic Scaling**: Serverless auto-scaling
 
 ### CI/CD Pipeline
 
 ```
-GitHub Push → Cloud Build → Type Check → Lint → Deploy → Live
+GitHub Push → CI/CD Pipeline → Type Check → Lint → Deploy → Live
 ```
 
 ## 📈 Monitoring & Observability

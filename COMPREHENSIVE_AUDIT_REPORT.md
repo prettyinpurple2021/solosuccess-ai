@@ -109,7 +109,7 @@
 #### **2. Competitor Discovery**
 - **File:** `app/api/competitors/discover/route.ts`
 - **Issue (before):** Runtime error referencing undefined `MOCK_COMPETITOR_SUGGESTIONS`; mixed mock/simulated fallbacks
-- **Change:** Integrated Cloudflare `COMPETITOR_WORKER` service binding and mapped `/market-research` results to API suggestions. Removed mock/simulated fallbacks entirely. Auth, rate limiting, validation retained.
+- **Change:** Integrated competitive intelligence service and mapped market research results to API suggestions. Removed mock/simulated fallbacks entirely. Auth, rate limiting, validation retained.
 - **Status:** ✅ RESOLVED
 
 #### **3. Chat Conversations**
