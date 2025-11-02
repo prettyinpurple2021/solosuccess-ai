@@ -2,14 +2,6 @@
 // Components may import this module to get canonical per-agent metadata (image path, alt text).
 // Keep the exports minimal: `AgentMeta`, `agentMetaMap`, and `getAgentMeta(id)`.
 
-import roxy from '../public/agents/roxy/meta.json'
-import blaze from '../public/agents/blaze/meta.json'
-import echo from '../public/agents/echo/meta.json'
-import glitch from '../public/agents/glitch/meta.json'
-import lumi from '../public/agents/lumi/meta.json'
-import vex from '../public/agents/vex/meta.json'
-import lexi from '../public/agents/lexi/meta.json'
-import nova from '../public/agents/nova/meta.json'
 import fs from 'fs'
 import path from 'path'
 
@@ -19,21 +11,9 @@ export interface AgentMeta {
   sizes?: Record<string, any>
 }
 
-export const agentMetaMap: Record<string, AgentMeta> = {
-  roxy,
-  blaze,
-  echo,
-  glitch,
-  lumi,
-  vex,
-  lexi,
-  nova,
-}
-
-// Attempt to augment the static map with any meta.json files present under public/agents.
-// This lets adding a new agent (public/agents/<id>/meta.json + images) work without
-// updating this file. The dynamic loader runs only on the server (build/runtime).
-function buildDynamicAgentMap(): Record<string, AgentMeta> {
+// Load agent metadata dynamically from public/agents directory.
+// This works at build time and runtime, avoiding static import issues.
+function loadAgentMetaMap(): Record<string, AgentMeta> {
   try {
     if (typeof window !== 'undefined') return {}
     const base = path.join(process.cwd(), 'public', 'agents')
@@ -62,11 +42,11 @@ function buildDynamicAgentMap(): Record<string, AgentMeta> {
   }
 }
 
-const dynamicAgentMap = buildDynamicAgentMap()
+// Cache the loaded metadata
+const agentMetaMap: Record<string, AgentMeta> = loadAgentMetaMap()
 
 export function getAgentMeta(agentId: string): AgentMeta | null {
-  // Prefer dynamic map entries (new agents) but fall back to the compiled static map.
-  return (dynamicAgentMap[agentId] as AgentMeta) ?? agentMetaMap[agentId] ?? null
+  return agentMetaMap[agentId] ?? null
 }
 
 export function getAgentImage(agentId: string): string {

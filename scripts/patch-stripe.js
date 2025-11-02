@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Postinstall script to fix Stripe package.json for Cloudflare compatibility
- * This script modifies the Stripe package exports to work with OpenNext Cloudflare bundler
+ * Postinstall script - placeholder for future package patching if needed
+ * Currently not patching any packages as deployment is platform-agnostic
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -14,16 +14,9 @@ const __dirname = dirname(__filename);
 
 const stripePackageJsonPath = join(__dirname, '..', 'node_modules', 'stripe', 'package.json');
 
+// Verify Stripe is installed for reference, but don't patch
 if (existsSync(stripePackageJsonPath)) {
-  console.log('📦 Patching Stripe package.json for Cloudflare compatibility...');
-
-  const content = readFileSync(stripePackageJsonPath, 'utf8');
-  // Replace all worker file references with node file references
-  const patchedContent = content
-    .replace(/stripe\.esm\.worker\.js/g, 'stripe.esm.node.js')
-    .replace(/stripe\.cjs\.worker\.js/g, 'stripe.cjs.node.js');
-  writeFileSync(stripePackageJsonPath, patchedContent);
-  console.log('✅ Successfully patched Stripe package.json');
+  console.log('✅ Stripe package verified');
 } else {
-  console.log('⚠️  Stripe package not found, skipping patch');
+  console.log('⚠️  Stripe package not found');
 }
