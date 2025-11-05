@@ -46,7 +46,7 @@ export function useTemplates() {
       
       return true
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error("Failed to delete template", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })
@@ -136,7 +136,7 @@ export function useTemplateSave() {
       setIsSaving(false)
       return data
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error("Failed to save template", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })

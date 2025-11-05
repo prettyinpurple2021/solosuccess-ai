@@ -1,17 +1,6 @@
-﻿// Centralized agent metadata loader — imports static meta.json files from `public/agents`.
+// Centralized agent metadata loader — provides agent metadata with fallbacks.
 // Components may import this module to get canonical per-agent metadata (image path, alt text).
 // Keep the exports minimal: `AgentMeta`, `agentMetaMap`, and `getAgentMeta(id)`.
-
-import roxy from '../public/agents/roxy/meta.json'
-import blaze from '../public/agents/blaze/meta.json'
-import echo from '../public/agents/echo/meta.json'
-import glitch from '../public/agents/glitch/meta.json'
-import lumi from '../public/agents/lumi/meta.json'
-import vex from '../public/agents/vex/meta.json'
-import lexi from '../public/agents/lexi/meta.json'
-import nova from '../public/agents/nova/meta.json'
-import fs from 'fs'
-import path from 'path'
 
 export interface AgentMeta {
   image: string
@@ -19,54 +8,46 @@ export interface AgentMeta {
   sizes?: Record<string, any>
 }
 
-export const agentMetaMap: Record<string, AgentMeta> = {
-  roxy,
-  blaze,
-  echo,
-  glitch,
-  lumi,
-  vex,
-  lexi,
-  nova,
+// Fallback metadata for agents - optimized images in /public/images/optimized/agents/
+const fallbackAgentMeta: Record<string, AgentMeta> = {
+  roxy: {
+    image: '/images/optimized/agents/roxy.jpg',
+    alt: 'Roxy - Executive Assistant & Strategic Planner',
+  },
+  blaze: {
+    image: '/images/optimized/agents/blaze.jpg',
+    alt: 'Blaze - Growth & Sales Strategist',
+  },
+  echo: {
+    image: '/images/optimized/agents/echo.jpg',
+    alt: 'Echo - Marketing & Brand Strategist',
+  },
+  glitch: {
+    image: '/images/optimized/agents/glitch.jpg',
+    alt: 'Glitch - Tech & Systems Architect',
+  },
+  lumi: {
+    image: '/images/optimized/agents/lumi.jpg',
+    alt: 'Lumi - Compliance & Legal Guardian',
+  },
+  vex: {
+    image: '/images/optimized/agents/vex.jpg',
+    alt: 'Vex - Technical Development Lead',
+  },
+  lexi: {
+    image: '/images/optimized/agents/lexi.jpg',
+    alt: 'Lexi - Analytics & Insights Specialist',
+  },
+  nova: {
+    image: '/images/optimized/agents/nova.jpg',
+    alt: 'Nova - Product Innovation Strategist',
+  },
 }
 
-// Attempt to augment the static map with any meta.json files present under public/agents.
-// This lets adding a new agent (public/agents/<id>/meta.json + images) work without
-// updating this file. The dynamic loader runs only on the server (build/runtime).
-function buildDynamicAgentMap(): Record<string, AgentMeta> {
-  try {
-    if (typeof window !== 'undefined') return {}
-    const base = path.join(process.cwd(), 'public', 'agents')
-    if (!fs.existsSync(base)) return {}
-    const entries = fs.readdirSync(base, { withFileTypes: true })
-    const map: Record<string, AgentMeta> = {}
-    for (const dirent of entries) {
-      if (!dirent.isDirectory()) continue
-      const id = dirent.name
-      const metaPath = path.join(base, id, 'meta.json')
-      try {
-        if (!fs.existsSync(metaPath)) continue
-        const raw = fs.readFileSync(metaPath, { encoding: 'utf8' })
-        const parsed = JSON.parse(raw)
-        if (parsed && typeof parsed.image === 'string') {
-          map[id] = parsed as AgentMeta
-        }
-      } catch (e) {
-        // ignore malformed meta.json files
-        continue
-      }
-    }
-    return map
-  } catch (e) {
-    return {}
-  }
-}
-
-const dynamicAgentMap = buildDynamicAgentMap()
+export const agentMetaMap: Record<string, AgentMeta> = fallbackAgentMeta
 
 export function getAgentMeta(agentId: string): AgentMeta | null {
-  // Prefer dynamic map entries (new agents) but fall back to the compiled static map.
-  return (dynamicAgentMap[agentId] as AgentMeta) ?? agentMetaMap[agentId] ?? null
+  return agentMetaMap[agentId] ?? null
 }
 
 export function getAgentImage(agentId: string): string {
@@ -77,3 +58,4 @@ export function getAgentImage(agentId: string): string {
 }
 
 export default agentMetaMap
+

@@ -153,11 +153,13 @@ export function useDashboardData() {
     fetchDashboardData()
   }, [fetchDashboardData])
 
-  // Auto-refresh every 30 seconds
+  // PERFORMANCE OPTIMIZATION: Increased auto-refresh from 30s to 5 minutes
+  // to reduce unnecessary API calls and database load
+  // User can still manually refresh if needed
   useEffect(() => {
     const interval = setInterval(() => {
       fetchDashboardData()
-    }, 30000) // 30 seconds
+    }, 300000) // 5 minutes (300 seconds)
 
     return () => clearInterval(interval)
   }, [fetchDashboardData])
@@ -167,10 +169,9 @@ export function useDashboardData() {
     fetchDashboardData()
   }, [fetchDashboardData])
 
-  // Optimistic updates for immediate UI feedback
+  // PERFORMANCE OPTIMIZATION: Removed data dependency to prevent unnecessary re-renders
+  // These callbacks now use functional state updates which don't need data in dependencies
   const updateTaskStatus = useCallback((taskId: string, newStatus: string) => {
-    if (!data) return
-
     setData(prevData => {
       if (!prevData) return prevData
 
@@ -187,11 +188,9 @@ export function useDashboardData() {
         }
       }
     })
-  }, [data])
+  }, [])
 
   const updateGoalProgress = useCallback((goalId: string, newProgress: number) => {
-    if (!data) return
-
     setData(prevData => {
       if (!prevData) return prevData
 
@@ -202,7 +201,7 @@ export function useDashboardData() {
         )
       }
     })
-  }, [data])
+  }, [])
 
   return {
     data,
