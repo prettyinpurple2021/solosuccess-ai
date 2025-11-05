@@ -136,11 +136,29 @@ export async function GET(request: NextRequest) {
     }
 
     // Get basic data from existing tables (simplified for now)
+    // PERFORMANCE OPTIMIZATION: Execute all queries in parallel using Promise.allSettled
+    // This reduces total query time from ~N queries sequential to single parallel batch
     let todaysStatsRes: any, todaysTasksRes: any, activeGoalsRes: any, conversationsRes: any, achievementsRes: any, weeklyFocusRes: any, briefcasesRes: any, userStatsRes: any;
     
-    try {
-      // Get real user stats from database
-      userStatsRes = await sql`
+    const defaultUserStats = [{ 
+      total_tasks_completed: 0, 
+      total_tasks: 0, 
+      tasks_completed_today: 0,
+      goals_achieved: 0, 
+      ai_interactions: 0, 
+      total_focus_minutes: 0,
+      user_level: 1,
+      total_points: 0,
+      current_streak: 0,
+      wellness_score: 50
+    }];
+    const defaultTodaysStats = [{ tasks_completed: 0, total_tasks: 0, focus_minutes: 0, ai_interactions: 0, goals_achieved: 0, productivity_score: 0 }];
+    const defaultWeeklyFocus = [{ total_minutes: 0, sessions_count: 0, average_session: 0 }];
+
+    // Execute all database queries in parallel for maximum performance
+    const results = await Promise.allSettled([
+      // Query 1: User stats
+      sql`
         SELECT 
           COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0) AS total_tasks_completed,
           COALESCE(COUNT(DISTINCT t.id), 0) AS total_tasks,
@@ -148,12 +166,9 @@ export async function GET(request: NextRequest) {
           COALESCE(COUNT(DISTINCT CASE WHEN g.status = 'completed' THEN g.id END), 0) AS goals_achieved,
           COALESCE(COUNT(DISTINCT c.id), 0) AS ai_interactions,
           COALESCE(SUM(CASE WHEN t.estimated_minutes IS NOT NULL THEN t.estimated_minutes ELSE 0 END), 0) AS total_focus_minutes,
-          -- Calculate user level based on completed tasks (1 level per 10 tasks)
           GREATEST(1, FLOOR(COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0) / 10) + 1) AS user_level,
-          -- Calculate total points (10 points per completed task, 50 per completed goal)
           (COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0) * 10) + 
           (COALESCE(COUNT(DISTINCT CASE WHEN g.status = 'completed' THEN g.id END), 0) * 50) AS total_points,
-          -- Calculate current streak (simplified - consecutive days with completed tasks)
           COALESCE((
             SELECT COUNT(DISTINCT DATE(updated_at))
             FROM tasks 
@@ -161,7 +176,6 @@ export async function GET(request: NextRequest) {
               AND status = 'completed' 
               AND updated_at >= CURRENT_DATE - INTERVAL '30 days'
           ), 0) AS current_streak,
-          -- Calculate wellness score based on task completion rate and goal progress
           LEAST(100, GREATEST(0, 
             CASE 
               WHEN COUNT(DISTINCT t.id) = 0 THEN 50
@@ -176,54 +190,41 @@ export async function GET(request: NextRequest) {
         LEFT JOIN goals g ON u.id = g.user_id
         LEFT JOIN conversations c ON u.id = c.user_id
         WHERE u.id = ${dbUserId}
-      `;
-
-      // Try to get tasks data if table exists
-      todaysStatsRes = await sql`
+      `,
+      
+      // Query 2: Today's stats (optimized - removed subqueries)
+      sql`
         SELECT 
-            COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END),0) AS tasks_completed,
-            COUNT(*) AS total_tasks,
-            COALESCE((
-              SELECT SUM(duration_minutes) 
-              FROM focus_sessions 
-              WHERE user_id = ${dbUserId} 
-                AND DATE(started_at) = CURRENT_DATE
-            ), 0) AS focus_minutes,
-            COALESCE((
-              SELECT COUNT(DISTINCT id) 
-              FROM conversations 
-              WHERE user_id = ${dbUserId} 
-                AND DATE(last_message_at) = CURRENT_DATE
-            ), 0) AS ai_interactions,
-            COALESCE((
-              SELECT COUNT(DISTINCT g.id) 
-              FROM goals g
-              WHERE g.user_id = ${user.id} 
-                AND g.status = 'completed'
-                AND DATE(g.updated_at) = CURRENT_DATE
-            ), 0) AS goals_achieved,
-            -- Calculate productivity score based on task completion rate
+            COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END),0) AS tasks_completed,
+            COUNT(t.id) AS total_tasks,
+            COALESCE(SUM(CASE WHEN fs.duration_minutes IS NOT NULL THEN fs.duration_minutes ELSE 0 END), 0) AS focus_minutes,
+            COALESCE(COUNT(DISTINCT c.id), 0) AS ai_interactions,
+            COALESCE(COUNT(DISTINCT CASE WHEN g.status = 'completed' THEN g.id END), 0) AS goals_achieved,
             CASE 
-              WHEN COUNT(*) = 0 THEN 0
+              WHEN COUNT(t.id) = 0 THEN 0
               ELSE ROUND(
-                (COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END), 0)::FLOAT / 
-                 COUNT(*)) * 100
+                (COALESCE(SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END), 0)::FLOAT / 
+                 COUNT(t.id)) * 100
               )
             END AS productivity_score
-         FROM tasks 
-         WHERE user_id = ${dbUserId} AND DATE(updated_at) = CURRENT_DATE
-      `;
+         FROM tasks t
+         LEFT JOIN focus_sessions fs ON t.user_id = fs.user_id AND DATE(fs.started_at) = CURRENT_DATE
+         LEFT JOIN conversations c ON t.user_id = c.user_id AND DATE(c.last_message_at) = CURRENT_DATE
+         LEFT JOIN goals g ON t.user_id = g.user_id AND g.status = 'completed' AND DATE(g.updated_at) = CURRENT_DATE
+         WHERE t.user_id = ${dbUserId} AND DATE(t.updated_at) = CURRENT_DATE
+      `,
       
-      todaysTasksRes = await sql`
+      // Query 3: Today's tasks
+      sql`
         SELECT id, title, description, status, priority, due_date
            FROM tasks
           WHERE user_id = ${dbUserId}
           ORDER BY COALESCE(due_date, NOW()) ASC
           LIMIT 10
-      `;
-
-      // Get briefcases (projects) data
-      briefcasesRes = await sql`
+      `,
+      
+      // Query 4: Briefcases
+      sql`
         SELECT 
           b.id, b.title, b.description, b.status, b.metadata,
           b.created_at, b.updated_at,
@@ -236,29 +237,10 @@ export async function GET(request: NextRequest) {
         GROUP BY b.id, b.title, b.description, b.status, b.metadata, b.created_at, b.updated_at
         ORDER BY b.updated_at DESC
         LIMIT 6
-      `;
-    } catch (error) {
-      // If tables don't exist, use default data
-      userStatsRes = [{ 
-        total_tasks_completed: 0, 
-        total_tasks: 0, 
-        tasks_completed_today: 0,
-        goals_achieved: 0, 
-        ai_interactions: 0, 
-        total_focus_minutes: 0,
-        user_level: 1,
-        total_points: 0,
-        current_streak: 0,
-        wellness_score: 50
-      }];
-      todaysStatsRes = [{ tasks_completed: 0, total_tasks: 0, focus_minutes: 0, ai_interactions: 0, goals_achieved: 0, productivity_score: 0 }];
-      todaysTasksRes = [];
-      briefcasesRes = [];
-    }
-    
-    // Try to get goals data if table exists
-    try {
-      activeGoalsRes = await sql`
+      `,
+      
+      // Query 5: Active goals
+      sql`
         SELECT 
           g.id, g.title, g.description, g.target_date, g.category, g.status,
           COALESCE(
@@ -271,50 +253,38 @@ export async function GET(request: NextRequest) {
           COUNT(CASE WHEN t.status = 'completed' THEN 1 END) AS tasks_completed
         FROM goals g
         LEFT JOIN tasks t ON g.id = t.goal_id
-        WHERE g.user_id = ${user.id} AND g.status = 'active'
+        WHERE g.user_id = ${dbUserId} AND g.status = 'active'
         GROUP BY g.id, g.title, g.description, g.target_date, g.category, g.status
         ORDER BY g.updated_at DESC
         LIMIT 5
-      `;
-    } catch (error) {
-      activeGoalsRes = [];
-    }
-
-    // Try to get conversations data if table exists
-    try {
-      conversationsRes = await sql`
+      `,
+      
+      // Query 6: Recent conversations
+      sql`
         SELECT 
           c.id, c.title, c.last_message_at,
           a.name, a.display_name, a.accent_color
         FROM conversations c
         LEFT JOIN agents a ON c.agent_id = a.id
-        WHERE c.user_id = ${user.id}
+        WHERE c.user_id = ${dbUserId}
         ORDER BY c.last_message_at DESC
         LIMIT 5
-      `;
-    } catch (error) {
-      conversationsRes = [];
-    }
-
-    // Try to get achievements data if table exists
-    try {
-      achievementsRes = await sql`
+      `,
+      
+      // Query 7: Recent achievements
+      sql`
         SELECT 
           ua.id, ua.earned_at,
           a.name, a.title, a.description, a.icon, a.points
         FROM user_achievements ua
         LEFT JOIN achievements a ON ua.achievement_id = a.id
-        WHERE ua.user_id = ${user.id}
+        WHERE ua.user_id = ${dbUserId}
         ORDER BY ua.earned_at DESC
         LIMIT 5
-      `;
-    } catch (error) {
-      achievementsRes = [];
-    }
-
-    // Try to get focus sessions data if table exists
-    try {
-      weeklyFocusRes = await sql`
+      `,
+      
+      // Query 8: Weekly focus sessions
+      sql`
         SELECT 
           COALESCE(SUM(duration_minutes), 0) AS total_minutes,
           COUNT(*) AS sessions_count,
@@ -323,12 +293,20 @@ export async function GET(request: NextRequest) {
             ELSE ROUND(AVG(duration_minutes), 1)
           END AS average_session
         FROM focus_sessions 
-        WHERE user_id = ${user.id} 
+        WHERE user_id = ${dbUserId} 
           AND started_at >= CURRENT_DATE - INTERVAL '7 days'
-      `;
-    } catch (error) {
-      weeklyFocusRes = [{ total_minutes: 0, sessions_count: 0, average_session: 0 }];
-    }
+      `
+    ])
+
+    // Extract results with fallbacks
+    userStatsRes = results[0].status === 'fulfilled' ? results[0].value : defaultUserStats
+    todaysStatsRes = results[1].status === 'fulfilled' ? results[1].value : defaultTodaysStats
+    todaysTasksRes = results[2].status === 'fulfilled' ? results[2].value : []
+    briefcasesRes = results[3].status === 'fulfilled' ? results[3].value : []
+    activeGoalsRes = results[4].status === 'fulfilled' ? results[4].value : []
+    conversationsRes = results[5].status === 'fulfilled' ? results[5].value : []
+    achievementsRes = results[6].status === 'fulfilled' ? results[6].value : []
+    weeklyFocusRes = results[7].status === 'fulfilled' ? results[7].value : defaultWeeklyFocus
 
     const todaysStatsRow = todaysStatsRes[0] || {
       tasks_completed: 0,
