@@ -10,10 +10,11 @@ export const runtime = 'edge'
 
 export const dynamic = 'force-dynamic'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Initialize OpenAI client only if API key is available
+// This allows builds to succeed in environments without the key
+const openai = process.env.OPENAI_API_KEY 
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null
 
 const generateTemplateSchema = z.object({
   type: z.string().min(1),
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
 
 async function generateAITemplate(request: any, userId: string) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
+    if (!openai) {
       throw new Error('OpenAI API key not configured')
     }
 
