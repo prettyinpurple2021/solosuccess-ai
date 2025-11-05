@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { logger, logError } from '@/lib/logger'
 import { useState, useEffect, useCallback } from 'react'
 import { Skill, LearningModule, UserProgress, LearningRecommendation } from '@/lib/learning-engine'
 
@@ -87,7 +88,7 @@ export function useLearning(): UseLearningReturn {
       setSkillGaps(data.skill_gaps || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch skill gaps')
-      console.error('Error fetching skill gaps:', err)
+      logError('Error fetching skill gaps:', err)
     } finally {
       setSkillGapsLoading(false)
     }
@@ -107,7 +108,7 @@ export function useLearning(): UseLearningReturn {
       setRecommendations(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch recommendations')
-      console.error('Error fetching recommendations:', err)
+      logError('Error fetching recommendations:', err)
     } finally {
       setRecommendationsLoading(false)
     }
@@ -127,7 +128,7 @@ export function useLearning(): UseLearningReturn {
       setProgress(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch progress')
-      console.error('Error fetching progress:', err)
+      logError('Error fetching progress:', err)
     } finally {
       setProgressLoading(false)
     }
@@ -147,7 +148,7 @@ export function useLearning(): UseLearningReturn {
       setAnalytics(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch analytics')
-      console.error('Error fetching analytics:', err)
+      logError('Error fetching analytics:', err)
     } finally {
       setAnalyticsLoading(false)
     }
@@ -163,7 +164,7 @@ export function useLearning(): UseLearningReturn {
       const data = await response.json()
       setAvailableSkills(data || [])
     } catch (err) {
-      console.error('Error fetching available skills:', err)
+      logError('Error fetching available skills:', err)
     }
   }, [])
 
@@ -177,7 +178,7 @@ export function useLearning(): UseLearningReturn {
       const data = await response.json()
       setAvailableModules(data || [])
     } catch (err) {
-      console.error('Error fetching available modules:', err)
+      logError('Error fetching available modules:', err)
     }
   }, [])
 
@@ -212,7 +213,7 @@ export function useLearning(): UseLearningReturn {
       await fetchProgress()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to track progress')
-      console.error('Error tracking progress:', err)
+      logError('Error tracking progress:', err)
     }
   }, [fetchProgress])
 
@@ -246,7 +247,7 @@ export function useLearning(): UseLearningReturn {
       await Promise.all([fetchSkillGaps(), fetchRecommendations()])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create assessment')
-      console.error('Error creating assessment:', err)
+      logError('Error creating assessment:', err)
     }
   }, [fetchSkillGaps, fetchRecommendations])
 
@@ -265,7 +266,7 @@ export function useLearning(): UseLearningReturn {
       ])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load learning data')
-      console.error('Error loading learning data:', err)
+      logError('Error loading learning data:', err)
     } finally {
       setLoading(false)
     }
