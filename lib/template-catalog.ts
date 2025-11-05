@@ -108,7 +108,8 @@ const normalizedCategories: TemplateCategoryRecord[] = (rawTemplateData as RawTe
   const categoryColor = override?.color ?? DEFAULT_COLOR
 
   const normalizedTemplates: TemplateSummary[] = category.templates.map((template) => {
-    const templateSlug = toSlug(template.title)
+    // Use original slug if provided, otherwise generate from title
+    const templateSlug = template.slug || toSlug(template.title)
     const templateSummary: TemplateSummary = {
       id: templateSlug,
       slug: templateSlug,

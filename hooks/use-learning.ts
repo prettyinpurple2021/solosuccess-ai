@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { logger, logError } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 import { useState, useEffect, useCallback } from 'react'
 import { Skill, LearningModule, UserProgress, LearningRecommendation } from '@/lib/learning-engine'
 
