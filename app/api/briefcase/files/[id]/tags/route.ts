@@ -1,164 +1,147 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { logError } from '@/lib/logger'
+import { NextRequest, NextResponse } from 'next/server'
+import { 
+  withDocumentAuth, 
+  getSql, 
+  createErrorResponse,
+  verifyDocumentOwnership,
+  parseDocumentTags
+} from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
+export const POST = withDocumentAuth(
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const { tag } = await request.json()
 
+      if (!tag || typeof tag !== 'string' || !tag.trim()) {
+        return createErrorResponse('Tag is required', 400)
+      }
 
-export async function POST(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+      const sql = getSql()
 
-    const params = await context.params
-    const { id } = params
-    const documentId = id
-    const { tag } = await request.json()
+      // Get document with tags
+      const { document, error } = await verifyDocumentOwnership(
+        documentId,
+        user.id,
+        'id, tags'
+      )
 
-    if (!tag || typeof tag !== 'string' || !tag.trim()) {
-      return NextResponse.json({ error: 'Tag is required' }, { status: 400 })
-    }
+      if (error || !document) {
+        return createErrorResponse(error || 'Document not found', 404)
+      }
 
-    const db = getDb()
+      // Parse existing tags using centralized helper
+      const existingTags = parseDocumentTags(document.tags)
+      const newTag = tag.trim().toLowerCase()
 
-    // Verify document ownership
-    const { rows: [document] } = await client.query(`
-      SELECT id, tags FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      // Check if tag already exists
+      if (existingTags.includes(newTag)) {
+        return createErrorResponse('Tag already exists', 400)
+      }
 
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
+      // Add new tag
+      const updatedTags = [...existingTags, newTag]
 
-    // Parse existing tags
-    const existingTags = document.tags ? JSON.parse(document.tags) : []
-    const newTag = tag.trim().toLowerCase()
+      // Update document
+      await sql(`
+        UPDATE documents 
+        SET tags = $1, updated_at = NOW()
+        WHERE id = $2
+        RETURNING *
+      `, [JSON.stringify(updatedTags), documentId])
 
-    // Check if tag already exists
-    if (existingTags.includes(newTag)) {
-      return NextResponse.json({ error: 'Tag already exists' }, { status: 400 })
-    }
+      // Log activity
+      await sql(`
+        INSERT INTO document_activity (document_id, user_id, action, details, created_at)
+        VALUES ($1, $2, 'tag_added', $3, NOW())
+      `, [
+        documentId,
+        user.id,
+        JSON.stringify({
+          tag: newTag,
+          totalTags: updatedTags.length
+        })
+      ])
 
-    // Add new tag
-    const updatedTags = [...existingTags, newTag]
-
-    // Update document
-    const { rows: [_updatedDocument] } = await client.query(`
-      UPDATE documents 
-      SET tags = $1, updated_at = NOW()
-      WHERE id = $2
-      RETURNING *
-    `, [JSON.stringify(updatedTags), documentId])
-
-    // Log activity
-    await client.query(`
-      INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'tag_added', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        tag: newTag,
-        totalTags: updatedTags.length
+      return NextResponse.json({
+        success: true,
+        tags: updatedTags
       })
-    ])
 
-    return NextResponse.json({
-      success: true,
-      tags: updatedTags
-    })
-
-  } catch (error) {
-    logError('Add tag error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to add tag' 
-    }, { status: 500 })
+    } catch (error) {
+      logError('Add tag error:', error)
+      return createErrorResponse('Failed to add tag', 500)
+    }
   }
-}
+)
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+export const DELETE = withDocumentAuth(
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const { searchParams } = new URL(request.url)
+      const tag = searchParams.get('tag')
 
-    const params = await context.params
-    const { id } = params
-    const documentId = id
-    const { searchParams } = new URL(request.url)
-    const tag = searchParams.get('tag')
+      if (!tag) {
+        return createErrorResponse('Tag is required', 400)
+      }
 
-    if (!tag) {
-      return NextResponse.json({ error: 'Tag is required' }, { status: 400 })
-    }
+      const sql = getSql()
 
-    const db = getDb()
+      // Get document with tags
+      const { document, error } = await verifyDocumentOwnership(
+        documentId,
+        user.id,
+        'id, tags'
+      )
 
-    // Verify document ownership
-    const { rows: [document] } = await client.query(`
-      SELECT id, tags FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      if (error || !document) {
+        return createErrorResponse(error || 'Document not found', 404)
+      }
 
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
+      // Parse existing tags using centralized helper
+      const existingTags = parseDocumentTags(document.tags)
+      const tagToRemove = tag.trim().toLowerCase()
 
-    // Parse existing tags
-    const existingTags = document.tags ? JSON.parse(document.tags) : []
-    const tagToRemove = tag.trim().toLowerCase()
+      // Check if tag exists
+      if (!existingTags.includes(tagToRemove)) {
+        return createErrorResponse('Tag not found', 404)
+      }
 
-    // Check if tag exists
-    if (!existingTags.includes(tagToRemove)) {
-      return NextResponse.json({ error: 'Tag not found' }, { status: 404 })
-    }
+      // Remove tag
+      const updatedTags = existingTags.filter((t: string) => t !== tagToRemove)
 
-    // Remove tag
-    const updatedTags = existingTags.filter((t: string) => t !== tagToRemove)
+      // Update document
+      await sql(`
+        UPDATE documents 
+        SET tags = $1, updated_at = NOW()
+        WHERE id = $2
+        RETURNING *
+      `, [JSON.stringify(updatedTags), documentId])
 
-    // Update document
-    const { rows: [_updatedDocument] } = await client.query(`
-      UPDATE documents 
-      SET tags = $1, updated_at = NOW()
-      WHERE id = $2
-      RETURNING *
-    `, [JSON.stringify(updatedTags), documentId])
+      // Log activity
+      await sql(`
+        INSERT INTO document_activity (document_id, user_id, action, details, created_at)
+        VALUES ($1, $2, 'tag_removed', $3, NOW())
+      `, [
+        documentId,
+        user.id,
+        JSON.stringify({
+          tag: tagToRemove,
+          totalTags: updatedTags.length
+        })
+      ])
 
-    // Log activity
-    await client.query(`
-      INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'tag_removed', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        tag: tagToRemove,
-        totalTags: updatedTags.length
+      return NextResponse.json({
+        success: true,
+        tags: updatedTags
       })
-    ])
 
-    return NextResponse.json({
-      success: true,
-      tags: updatedTags
-    })
-
-  } catch (error) {
-    logError('Remove tag error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to remove tag' 
-    }, { status: 500 })
+    } catch (error) {
+      logError('Remove tag error:', error)
+      return createErrorResponse('Failed to remove tag', 500)
+    }
   }
-}
+)
