@@ -144,7 +144,7 @@ export function getSubscriptionTierFromPriceId(priceId: string): string {
     return priceIdToTierMap[priceId]
   }
   
-  // Fallback: check if price ID contains tier name
+  // Fallback: check if price ID contains tier name (excluding 'launch' as it's the default)
   const lowerPriceId = priceId.toLowerCase()
   const tierKeywords = ['accelerator', 'dominator']
   
@@ -154,6 +154,7 @@ export function getSubscriptionTierFromPriceId(priceId: string): string {
     }
   }
   
+  // Default to 'launch' tier if no match found
   return 'launch'
 }
 
