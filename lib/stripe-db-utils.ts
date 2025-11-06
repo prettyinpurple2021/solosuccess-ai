@@ -131,25 +131,30 @@ export async function updateUserStripeCustomerId(userId: string, customerId: str
 // Get subscription tier from price ID
 export function getSubscriptionTierFromPriceId(priceId: string): string {
   // Match exact Stripe price IDs from lib/stripe.ts
-  const acceleratorPrices = ['price_1S46LyPpYfwm37m7M5nOAYW7', 'price_1S46LyPpYfwm37m7lyRhudBs']
-  const dominatorPrices = ['price_1S46P6PpYfwm37m76hqohIw0', 'price_1S46PXPpYfwm37m7yVhLS7j2']
-  const launchPrice = 'price_1S46IjPpYfwm37m7EKFi7H4C'
-  
-  if (acceleratorPrices.includes(priceId)) {
-    return 'accelerator'
-  } else if (dominatorPrices.includes(priceId)) {
-    return 'dominator'
-  } else if (priceId === launchPrice) {
-    return 'launch'
+  const priceIdToTierMap: Record<string, string> = {
+    'price_1S46LyPpYfwm37m7M5nOAYW7': 'accelerator',
+    'price_1S46LyPpYfwm37m7lyRhudBs': 'accelerator',
+    'price_1S46P6PpYfwm37m76hqohIw0': 'dominator',
+    'price_1S46PXPpYfwm37m7yVhLS7j2': 'dominator',
+    'price_1S46IjPpYfwm37m7EKFi7H4C': 'launch',
   }
   
-  // Fallback: check if price ID contains tier name
-  if (priceId.toLowerCase().includes('accelerator')) {
-    return 'accelerator'
-  } else if (priceId.toLowerCase().includes('dominator')) {
-    return 'dominator'
+  // Check exact match first
+  if (priceIdToTierMap[priceId]) {
+    return priceIdToTierMap[priceId]
   }
   
+  // Fallback: check if price ID contains tier name (excluding 'launch' as it's the default)
+  const lowerPriceId = priceId.toLowerCase()
+  const tierKeywords = ['accelerator', 'dominator']
+  
+  for (const keyword of tierKeywords) {
+    if (lowerPriceId.includes(keyword)) {
+      return keyword
+    }
+  }
+  
+  // Default to 'launch' tier if no match found
   return 'launch'
 }
 
