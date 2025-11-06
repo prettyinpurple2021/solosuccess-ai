@@ -234,16 +234,41 @@ export function withAuth(
 /**
  * Verify document ownership utility
  * Eliminates duplication in document access control
+ * 
+ * Whitelist of allowed fields to prevent SQL injection
  */
+const ALLOWED_DOCUMENT_FIELDS = [
+  'id', 'name', 'category', 'tags', 'is_favorite', 
+  'file_data', 'file_size', 'mime_type', 'user_id',
+  'created_at', 'updated_at'
+]
+
 export async function verifyDocumentOwnership(
   documentId: string,
   userId: string,
   selectFields: string = 'id'
 ): Promise<{ document: any | null; error: string | null }> {
   try {
+    // Validate selectFields against whitelist to prevent SQL injection
+    const requestedFields = selectFields.split(',').map(f => f.trim())
+    const invalidFields = requestedFields.filter(
+      field => !ALLOWED_DOCUMENT_FIELDS.includes(field)
+    )
+    
+    if (invalidFields.length > 0) {
+      logError('Invalid document fields requested:', invalidFields)
+      return { 
+        document: null, 
+        error: 'Invalid field selection' 
+      }
+    }
+    
     const sql = getSql()
-    // Note: selectFields must be validated by caller to prevent SQL injection
-    // Build query string dynamically (safe since selectFields is controlled by our code)
+    if (!sql) {
+      throw new Error('Database connection not available')
+    }
+    
+    // Safe to use fields now that they're validated
     const query = `SELECT ${selectFields} FROM documents WHERE id = $1 AND user_id = $2`
     const result = await sql(query, [documentId, userId])
     
@@ -258,6 +283,20 @@ export async function verifyDocumentOwnership(
       document: null, 
       error: error instanceof Error ? error.message : 'Failed to verify document' 
     }
+  }
+}
+
+/**
+ * Parse document tags safely
+ * Centralized tag parsing logic
+ */
+export function parseDocumentTags(tagsField: any): string[] {
+  if (!tagsField) return []
+  try {
+    return typeof tagsField === 'string' ? JSON.parse(tagsField) : tagsField
+  } catch (error) {
+    logError('Failed to parse document tags:', error)
+    return []
   }
 }
 

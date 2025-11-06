@@ -4,7 +4,8 @@ import {
   withDocumentAuth, 
   getSql, 
   createErrorResponse,
-  verifyDocumentOwnership
+  verifyDocumentOwnership,
+  parseDocumentTags
 } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -32,8 +33,8 @@ export const POST = withDocumentAuth(
         return createErrorResponse(error || 'Document not found', 404)
       }
 
-      // Parse existing tags
-      const existingTags = document.tags ? JSON.parse(document.tags) : []
+      // Parse existing tags using centralized helper
+      const existingTags = parseDocumentTags(document.tags)
       const newTag = tag.trim().toLowerCase()
 
       // Check if tag already exists
@@ -100,8 +101,8 @@ export const DELETE = withDocumentAuth(
         return createErrorResponse(error || 'Document not found', 404)
       }
 
-      // Parse existing tags
-      const existingTags = document.tags ? JSON.parse(document.tags) : []
+      // Parse existing tags using centralized helper
+      const existingTags = parseDocumentTags(document.tags)
       const tagToRemove = tag.trim().toLowerCase()
 
       // Check if tag exists
