@@ -230,3 +230,68 @@ export function withAuth(
     return handler(request, user, context)
   })
 }
+
+/**
+ * Verify document ownership utility
+ * Eliminates duplication in document access control
+ */
+export async function verifyDocumentOwnership(
+  documentId: string,
+  userId: string,
+  selectFields: string = 'id'
+): Promise<{ document: any | null; error: string | null }> {
+  try {
+    const sql = getSql()
+    // Note: selectFields must be validated by caller to prevent SQL injection
+    // Build query string dynamically (safe since selectFields is controlled by our code)
+    const query = `SELECT ${selectFields} FROM documents WHERE id = $1 AND user_id = $2`
+    const result = await sql(query, [documentId, userId])
+    
+    if (!result || result.length === 0) {
+      return { document: null, error: 'Document not found' }
+    }
+    
+    return { document: result[0], error: null }
+  } catch (error) {
+    logError('Document verification error:', error)
+    return { 
+      document: null, 
+      error: error instanceof Error ? error.message : 'Failed to verify document' 
+    }
+  }
+}
+
+/**
+ * Protected document route wrapper
+ * Combines authentication and document ownership verification
+ */
+export function withDocumentAuth(
+  handler: (
+    request: NextRequest,
+    user: any,
+    documentId: string,
+    context?: any
+  ) => Promise<NextResponse>,
+  selectFields: string = 'id'
+) {
+  return withAuth(async (request: NextRequest, user: any, context?: any) => {
+    const params = await context.params
+    const { id: documentId } = params
+    
+    if (!documentId) {
+      return createErrorResponse('Document ID is required', 400)
+    }
+    
+    const { document, error } = await verifyDocumentOwnership(
+      documentId,
+      user.id,
+      selectFields
+    )
+    
+    if (error || !document) {
+      return createErrorResponse(error || 'Document not found', 404)
+    }
+    
+    return handler(request, user, documentId, context)
+  })
+}

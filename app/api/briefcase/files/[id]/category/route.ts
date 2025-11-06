@@ -1,113 +1,90 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { logError } from '@/lib/logger'
+import { NextRequest, NextResponse } from 'next/server'
+import { 
+  withDocumentAuth, 
+  getSql, 
+  createErrorResponse,
+  verifyDocumentOwnership
+} from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
+export const POST = withDocumentAuth(
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const { category } = await request.json()
 
+      if (!category || typeof category !== 'string') {
+        return createErrorResponse('Category is required', 400)
+      }
 
-export async function POST(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const params = await context.params
-    const { id } = params
-    
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+      const sql = getSql()
 
-    const { category } = await request.json()
-    const documentId = id
+      // Get document details for tracking previous category
+      const { document, error } = await verifyDocumentOwnership(
+        documentId,
+        user.id,
+        'id, category'
+      )
 
-    if (!category || typeof category !== 'string') {
-      return NextResponse.json({ error: 'Category is required' }, { status: 400 })
-    }
+      if (error || !document) {
+        return createErrorResponse(error || 'Document not found', 404)
+      }
 
-    const db = getDb()
+      // Update category
+      await sql(`
+        UPDATE documents 
+        SET category = $1, updated_at = NOW()
+        WHERE id = $2
+      `, [category, documentId])
 
-    // Verify document ownership
-    const { rows: [document] } = await client.query(`
-      SELECT id, category FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      // Log activity
+      await sql(`
+        INSERT INTO document_activity (document_id, user_id, action, details, created_at)
+        VALUES ($1, $2, 'category_updated', $3, NOW())
+      `, [
+        documentId,
+        user.id,
+        JSON.stringify({
+          newCategory: category,
+          previousCategory: document.category
+        })
+      ])
 
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-
-    // Update category
-    await client.query(`
-      UPDATE documents 
-      SET category = $1, updated_at = NOW()
-      WHERE id = $2
-    `, [category, documentId])
-
-    // Log activity
-    await client.query(`
-      INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'category_updated', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        newCategory: category,
-        previousCategory: document.category
+      return NextResponse.json({
+        success: true,
+        category,
+        message: 'Category updated successfully'
       })
-    ])
 
-    return NextResponse.json({
-      success: true,
-      category,
-      message: 'Category updated successfully'
-    })
-
-  } catch (error) {
-    logError('Update category error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to update category' 
-    }, { status: 500 })
-  }
-}
-
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const params = await context.params
-    const { id } = params
-    
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    } catch (error) {
+      logError('Update category error:', error)
+      return createErrorResponse('Failed to update category', 500)
     }
-
-    const documentId = id
-    const db = getDb()
-
-    // Get document category
-    const { rows: [document] } = await client.query(`
-      SELECT id, category FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
-
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-
-    return NextResponse.json({
-      category: document.category
-    })
-
-  } catch (error) {
-    logError('Get category error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to get category' 
-    }, { status: 500 })
   }
-}
+)
+
+export const GET = withDocumentAuth(
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const { document, error } = await verifyDocumentOwnership(
+        documentId,
+        user.id,
+        'id, category'
+      )
+
+      if (error || !document) {
+        return createErrorResponse(error || 'Document not found', 404)
+      }
+
+      return NextResponse.json({
+        category: document.category
+      })
+
+    } catch (error) {
+      logError('Get category error:', error)
+      return createErrorResponse('Failed to get category', 500)
+    }
+  }
+)
