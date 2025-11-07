@@ -299,7 +299,7 @@ async function getLearningProgress(db: any, userId: string, startDate: Date) {
       id: focusSessions.id,
       duration_minutes: focusSessions.duration_minutes,
       started_at: focusSessions.started_at,
-      completed_at: focusSessions.completed_at,
+      ended_at: focusSessions.ended_at,
     })
       .from(focusSessions)
       .where(
@@ -311,14 +311,24 @@ async function getLearningProgress(db: any, userId: string, startDate: Date) {
       .orderBy(desc(focusSessions.started_at))
 
     // Calculate total time spent from focus sessions
-    const totalTimeSpent = userFocusSessions.reduce((sum, session) => {
+    const totalTimeSpent = userFocusSessions.reduce((sum: number, session: { duration_minutes: number | null }) => {
       return sum + (session.duration_minutes || 0)
     }, 0)
 
     // Group tasks by category to create "learning modules"
     const modulesByCategory = new Map<string, any>()
     
-    completedTasks.forEach((task, index) => {
+    type TaskType = {
+      id: number
+      title: string
+      category: string | null
+      created_at: Date | null
+      completed_at: Date | null
+      estimated_minutes: number | null
+      actual_minutes: number | null
+    }
+    
+    completedTasks.forEach((task: TaskType, _index: number) => {
       const category = task.category || 'general'
       if (!modulesByCategory.has(category)) {
         modulesByCategory.set(category, {
