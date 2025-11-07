@@ -358,13 +358,15 @@ export class NotificationJobQueue {
       throw new Error('Invalid olderThanDays parameter: must be a number between 0 and 365')
     }
 
-    // Use parameterized query to prevent SQL injection
-    const result = await getSql().query(`
+    // Use parameterized query with proper INTERVAL syntax to prevent SQL injection
+    // olderThanDays is validated as a number, so we can safely use it in interval arithmetic
+    const sql = getSql()
+    const result = await sql`
       DELETE FROM notification_jobs 
       WHERE status IN ('completed', 'failed', 'cancelled')
-        AND processed_at < NOW() - INTERVAL $1
+        AND processed_at < NOW() - (INTERVAL '1 day' * ${olderThanDays})
       RETURNING id
-    `, [`${olderThanDays} days`])
+    `
 
     const deletedCount = result.rows.length
     if (deletedCount > 0) {

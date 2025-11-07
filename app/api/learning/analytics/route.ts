@@ -271,33 +271,108 @@ async function getLearningRecommendations(db: any, userId: string) {
 
 async function getLearningProgress(db: any, userId: string, startDate: Date) {
   try {
-    // Mock progress data - in production, this would come from learning progress tables
-    const mockProgress = [
-      {
-        module_id: 'mod1',
-        completion_percentage: Math.floor(Math.random() * 40) + 60, // 60-100%
-        time_spent: Math.floor(Math.random() * 30) + 20, // 20-50 minutes
-        quiz_scores: [
-          { quiz_id: 'q1', score: Math.floor(Math.random() * 20) + 80 } // 80-100%
-        ],
-        exercises_completed: ['ex1', 'ex2'],
-        last_accessed: new Date().toISOString(),
-        started_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() // Within last week
-      },
-      {
-        module_id: 'mod2',
-        completion_percentage: Math.floor(Math.random() * 30) + 40, // 40-70%
-        time_spent: Math.floor(Math.random() * 40) + 30, // 30-70 minutes
-        quiz_scores: [
-          { quiz_id: 'q2', score: Math.floor(Math.random() * 25) + 75 } // 75-100%
-        ],
-        exercises_completed: ['ex3'],
-        last_accessed: new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString(), // Within last 3 days
-        started_at: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString() // Within last 2 weeks
-      }
-    ]
+    // Derive learning progress from actual user activity (tasks, goals, focus sessions)
+    // This provides real production data based on user engagement
+    
+    // Get completed tasks as learning modules
+    const completedTasks = await db.select({
+      id: tasks.id,
+      title: tasks.title,
+      category: tasks.category,
+      completed_at: tasks.completed_at,
+      estimated_minutes: tasks.estimated_minutes,
+      actual_minutes: tasks.actual_minutes,
+    })
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.user_id, userId),
+          eq(tasks.status, 'completed'),
+          gte(tasks.completed_at, startDate)
+        )
+      )
+      .orderBy(desc(tasks.completed_at))
+      .limit(10)
 
-    return mockProgress
+    // Get focus sessions as learning time
+    const userFocusSessions = await db.select({
+      id: focusSessions.id,
+      duration_minutes: focusSessions.duration_minutes,
+      started_at: focusSessions.started_at,
+      completed_at: focusSessions.completed_at,
+    })
+      .from(focusSessions)
+      .where(
+        and(
+          eq(focusSessions.user_id, userId),
+          gte(focusSessions.started_at, startDate)
+        )
+      )
+      .orderBy(desc(focusSessions.started_at))
+
+    // Calculate total time spent from focus sessions
+    const totalTimeSpent = userFocusSessions.reduce((sum, session) => {
+      return sum + (session.duration_minutes || 0)
+    }, 0)
+
+    // Group tasks by category to create "learning modules"
+    const modulesByCategory = new Map<string, any>()
+    
+    completedTasks.forEach((task, index) => {
+      const category = task.category || 'general'
+      if (!modulesByCategory.has(category)) {
+        modulesByCategory.set(category, {
+          module_id: `mod_${category}`,
+          category,
+          tasks: [],
+          total_tasks: 0,
+          completed_tasks: 0,
+        })
+      }
+      const module = modulesByCategory.get(category)!
+      module.tasks.push(task)
+      module.total_tasks++
+      module.completed_tasks++
+    })
+
+    // Transform into learning progress format
+    const progress = Array.from(modulesByCategory.values()).map((module, index) => {
+      const moduleTasks = module.tasks
+      const avgTimePerTask = moduleTasks.length > 0
+        ? moduleTasks.reduce((sum: number, t: any) => sum + (t.actual_minutes || t.estimated_minutes || 0), 0) / moduleTasks.length
+        : 0
+      
+      const lastTask = moduleTasks[0] // Most recent
+      const firstTask = moduleTasks[moduleTasks.length - 1] // Oldest
+      
+      return {
+        module_id: module.module_id,
+        category: module.category,
+        completion_percentage: 100, // All tasks in this module are completed
+        time_spent: Math.round(avgTimePerTask * moduleTasks.length),
+        tasks_completed: module.completed_tasks,
+        total_tasks: module.total_tasks,
+        last_accessed: lastTask?.completed_at?.toISOString() || new Date().toISOString(),
+        started_at: firstTask?.completed_at?.toISOString() || startDate.toISOString(),
+      }
+    })
+
+    // If no tasks, return progress based on focus sessions
+    if (progress.length === 0 && userFocusSessions.length > 0) {
+      const lastSession = userFocusSessions[0]
+      return [{
+        module_id: 'focus_sessions',
+        category: 'focus',
+        completion_percentage: 100,
+        time_spent: totalTimeSpent,
+        tasks_completed: userFocusSessions.length,
+        total_tasks: userFocusSessions.length,
+        last_accessed: lastSession.started_at?.toISOString() || new Date().toISOString(),
+        started_at: userFocusSessions[userFocusSessions.length - 1]?.started_at?.toISOString() || startDate.toISOString(),
+      }]
+    }
+
+    return progress
   } catch (error) {
     logError('Error getting learning progress:', error)
     throw error
