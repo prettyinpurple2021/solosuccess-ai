@@ -1,15 +1,19 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { Resend } from "resend"
 
-
-if (!process.env.RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY is not set")
-}
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Resend client only if API key is available
+// This allows builds to succeed in environments without the key
+const resend = process.env.RESEND_API_KEY 
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null
 
 export const sendWelcomeEmail = async (email: string, name: string) => {
   try {
+    if (!resend) {
+      logWarn('Email service not configured - RESEND_API_KEY missing')
+      return { success: false, error: 'Email service not configured' }
+    }
+    
     const { data, error } = await resend.emails.send({
       from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@solobossai.fun>",
       to: [email],
@@ -67,6 +71,11 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
 
 export const sendPasswordResetEmail = async (email: string, name: string, resetToken: string) => {
   try {
+    if (!resend) {
+      logWarn('Email service not configured - RESEND_API_KEY missing')
+      return { success: false, error: 'Email service not configured' }
+    }
+    
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://solobossai.fun'}/reset-password?token=${resetToken}`
     
     const { data, error } = await resend.emails.send({
@@ -124,6 +133,11 @@ export const sendPasswordResetEmail = async (email: string, name: string, resetT
 
 export const sendSubscriptionConfirmation = async (email: string, name: string, planName: string, amount: number) => {
   try {
+    if (!resend) {
+      logWarn('Email service not configured - RESEND_API_KEY missing')
+      return { success: false, error: 'Email service not configured' }
+    }
+    
     const { data, error } = await resend.emails.send({
       from: process.env.FROM_EMAIL || "SoloSuccess AI <noreply@solobossai.fun>",
       to: [email],

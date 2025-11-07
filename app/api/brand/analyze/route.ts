@@ -10,10 +10,11 @@ export const runtime = 'edge'
 
 export const dynamic = 'force-dynamic'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Initialize OpenAI client only if API key is available
+// This allows builds to succeed in environments without the key
+const openai = process.env.OPENAI_API_KEY 
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null
 
 const brandAnalysisSchema = z.object({
   companyName: z.string().min(1),
@@ -67,8 +68,9 @@ export async function POST(request: NextRequest) {
 
 async function analyzeBrandWithAI(brandData: any) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
+    if (!openai) {
       // Fallback to rule-based analysis if AI is not available
+      logInfo('OpenAI API key not configured, using fallback analysis')
       return generateFallbackAnalysis(brandData)
     }
 

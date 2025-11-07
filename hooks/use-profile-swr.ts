@@ -1,3 +1,4 @@
+import { logError } from '@/lib/logger'
 // @ts-nocheck
 'use client'
 
@@ -68,7 +69,7 @@ export function useProfile() {
       setIsUpdating(false)
       return updatedData
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error("Failed to update profile", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })
@@ -115,7 +116,7 @@ export function useProfile() {
       setIsUpdating(false)
       return data.url
     } catch (err) {
-      console.error(err)
+      logError(err)
       toast.error("Failed to upload avatar", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })
@@ -138,7 +139,7 @@ export function useProfile() {
       setIsUpdating(false)
       return true
     } catch (err) {
-      console.error(err)
+      logError(err)
       setIsUpdating(false)
       throw err
     }

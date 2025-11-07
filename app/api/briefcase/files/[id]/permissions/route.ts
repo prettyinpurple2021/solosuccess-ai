@@ -1,165 +1,124 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { logError } from '@/lib/logger'
+import { NextRequest, NextResponse } from 'next/server'
+import { 
+  withDocumentAuth, 
+  getSql, 
+  createErrorResponse 
+} from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
+export const GET = withDocumentAuth(
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const sql = getSql()
 
+      // Get permissions with access counts
+      const permissions = await sql(`
+        SELECT 
+          dp.id,
+          dp.user_id,
+          dp.email,
+          dp.role,
+          dp.granted_at,
+          dp.expires_at,
+          dp.is_active,
+          u.name as user_name,
+          u.avatar_url,
+          dp.granted_by,
+          gb.name as granted_by_name,
+          COALESCE(a.access_count, 0) AS access_count
+        FROM document_permissions dp
+        LEFT JOIN users u ON dp.user_id = u.id
+        LEFT JOIN users gb ON dp.granted_by = gb.id
+        LEFT JOIN (
+          SELECT permission_id, COUNT(*) AS access_count
+          FROM document_access_logs
+          WHERE document_id = $1
+          GROUP BY permission_id
+        ) a ON a.permission_id = dp.id
+        WHERE dp.document_id = $1 AND dp.is_active = true
+        ORDER BY dp.granted_at DESC
+      `, [documentId])
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json(permissions.map(p => ({
+        id: p.id,
+        userId: p.user_id,
+        email: p.email,
+        name: p.user_name || p.email.split('@')[0],
+        avatar: p.avatar_url,
+        role: p.role,
+        granted: p.granted_at,
+        expiresAt: p.expires_at,
+        status: p.is_active ? 'accepted' : 'pending',
+        accessCount: Number(p.access_count) || 0,
+        invitedBy: p.granted_by_name || 'Unknown'
+      })))
+
+    } catch (error) {
+      logError('Get permissions error:', error)
+      return createErrorResponse('Failed to get permissions', 500)
     }
-
-    const params = await context.params
-    const { id } = params
-    const documentId = id
-    const db = getDb()
-
-    // Verify document ownership
-    const { rows: [document] } = await client.query(`
-      SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
-
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-
-    // Get permissions with access counts
-    const { rows: permissions } = await client.query(`
-      SELECT 
-        dp.id,
-        dp.user_id,
-        dp.email,
-        dp.role,
-        dp.granted_at,
-        dp.expires_at,
-        dp.is_active,
-        u.name as user_name,
-        u.avatar_url,
-        dp.granted_by,
-        gb.name as granted_by_name,
-        COALESCE(a.access_count, 0) AS access_count
-      FROM document_permissions dp
-      LEFT JOIN users u ON dp.user_id = u.id
-      LEFT JOIN users gb ON dp.granted_by = gb.id
-      LEFT JOIN (
-        SELECT permission_id, COUNT(*) AS access_count
-        FROM document_access_logs
-        WHERE document_id = $1
-        GROUP BY permission_id
-      ) a ON a.permission_id = dp.id
-      WHERE dp.document_id = $1 AND dp.is_active = true
-      ORDER BY dp.granted_at DESC
-    `, [documentId])
-
-    return NextResponse.json(permissions.map(p => ({
-      id: p.id,
-      userId: p.user_id,
-      email: p.email,
-      name: p.user_name || p.email.split('@')[0],
-      avatar: p.avatar_url,
-      role: p.role,
-      granted: p.granted_at,
-      expiresAt: p.expires_at,
-      status: p.is_active ? 'accepted' : 'pending',
-      accessCount: Number(p.access_count) || 0,
-      invitedBy: p.granted_by_name || 'Unknown'
-    })))
-
-  } catch (error) {
-    logError('Get permissions error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to get permissions' 
-    }, { status: 500 })
   }
-}
+)
 
-export async function POST(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+export const POST = withDocumentAuth(
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const { email, role, message } = await request.json()
 
-    const params = await context.params
-    const { id } = params
-    const documentId = id
-    const { email, role, message } = await request.json()
+      if (!email || !role) {
+        return createErrorResponse('Email and role are required', 400)
+      }
 
-    if (!email || !role) {
-      return NextResponse.json({ error: 'Email and role are required' }, { status: 400 })
-    }
+      const sql = getSql()
 
-    const db = getDb()
+      // Check if permission already exists
+      const existingPermission = await sql(`
+        SELECT id FROM document_permissions 
+        WHERE document_id = $1 AND email = $2 AND is_active = true
+      `, [documentId, email])
 
-    // Verify document ownership
-    const { rows: [document] } = await client.query(`
-      SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      if (existingPermission.length > 0) {
+        return createErrorResponse('Permission already exists for this email', 400)
+      }
 
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
+      // Create permission
+      const newPermission = await sql(`
+        INSERT INTO document_permissions (
+          document_id, user_id, email, role, granted_by, granted_at, is_active
+        ) VALUES ($1, $2, $3, $4, $5, NOW(), true)
+        RETURNING *
+      `, [documentId, null, email, role, user.id])
 
-    // Check if permission already exists
-    const { rows: [existingPermission] } = await client.query(`
-      SELECT id FROM document_permissions 
-      WHERE document_id = $1 AND email = $2 AND is_active = true
-    `, [documentId, email])
+      // Log activity
+      await sql(`
+        INSERT INTO document_activity (document_id, user_id, action, details, created_at)
+        VALUES ($1, $2, 'permission_granted', $3, NOW())
+      `, [
+        documentId,
+        user.id,
+        JSON.stringify({
+          email,
+          role,
+          message: message || null
+        })
+      ])
 
-    if (existingPermission) {
-      return NextResponse.json({ error: 'Permission already exists for this email' }, { status: 400 })
-    }
-
-    // Create permission
-    const { rows: [newPermission] } = await client.query(`
-      INSERT INTO document_permissions (
-        document_id, user_id, email, role, granted_by, granted_at, is_active
-      ) VALUES ($1, $2, $3, $4, $5, NOW(), true)
-      RETURNING *
-    `, [documentId, null, email, role, user.id])
-
-    // Log activity
-    await client.query(`
-      INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'permission_granted', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        email,
-        role,
-        message: message || null
+      return NextResponse.json({
+        id: newPermission[0].id,
+        email: newPermission[0].email,
+        role: newPermission[0].role,
+        granted: newPermission[0].granted_at,
+        status: 'pending',
+        accessCount: 0,
+        invitedBy: user.full_name || user.email
       })
-    ])
 
-    return NextResponse.json({
-      id: newPermission.id,
-      email: newPermission.email,
-      role: newPermission.role,
-      granted: newPermission.granted_at,
-      status: 'pending',
-      accessCount: 0,
-      invitedBy: user.full_name || user.email
-    })
-
-  } catch (error) {
-    logError('Create permission error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to create permission' 
-    }, { status: 500 })
+    } catch (error) {
+      logError('Create permission error:', error)
+      return createErrorResponse('Failed to create permission', 500)
+    }
   }
-}
+)
