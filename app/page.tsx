@@ -20,6 +20,7 @@ import {
   Infinity
 } from 'lucide-react';
 import { TacticalButton } from '@/components/military/TacticalButton';
+import { TacticalLink } from '@/components/military/TacticalLink';
 import { GlassCard } from '@/components/military/GlassCard';
 import { RankStars } from '@/components/military/RankStars';
 import { CamoBackground } from '@/components/military/CamoBackground';
@@ -67,13 +68,11 @@ export default function HomePage() {
                   ))}
                 </nav>
                 
-                <Link href="/signup">
-                  <TacticalButton variant="primary" withShine>
-                    <Shield className="w-4 h-4" />
-                    Deploy Now
-                    <ArrowRight className="w-4 h-4" />
-                  </TacticalButton>
-                </Link>
+                <TacticalLink href="/signup" variant="primary" withShine>
+                  <Shield className="w-4 h-4" />
+                  Deploy Now
+                  <ArrowRight className="w-4 h-4" />
+                </TacticalLink>
               </div>
             </div>
           </div>
@@ -135,20 +134,16 @@ export default function HomePage() {
                 transition={{ delay: 0.8, duration: 0.8 }}
                 className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
               >
-                <Link href="/signup">
-                  <TacticalButton variant="primary" size="lg" withShine withPulse>
-                    <Zap className="w-5 h-5" />
-                    Launch Mission
-                    <ArrowRight className="w-5 h-5" />
-                  </TacticalButton>
-                </Link>
+                <TacticalLink href="/signup" variant="primary" size="lg" withShine withPulse>
+                  <Zap className="w-5 h-5" />
+                  Launch Mission
+                  <ArrowRight className="w-5 h-5" />
+                </TacticalLink>
                 
-                <Link href="/pricing">
-                  <TacticalButton variant="ghost" size="lg">
-                    <Target className="w-5 h-5" />
-                    View Arsenal
-                  </TacticalButton>
-                </Link>
+                <TacticalLink href="/pricing" variant="ghost" size="lg">
+                  <Target className="w-5 h-5" />
+                  View Arsenal
+                </TacticalLink>
               </motion.div>
 
               {/* Stats Grid */}
@@ -259,13 +254,11 @@ export default function HomePage() {
                 Join thousands of solo operators who have transformed their businesses into tactical powerhouses
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/signup">
-                  <TacticalButton variant="primary" size="xl" withShine>
-                    <Shield className="w-6 h-6" />
-                    Begin Deployment
-                    <ArrowRight className="w-6 h-6" />
-                  </TacticalButton>
-                </Link>
+                <TacticalLink href="/signup" variant="primary" size="xl" withShine>
+                  <Shield className="w-6 h-6" />
+                  Begin Deployment
+                  <ArrowRight className="w-6 h-6" />
+                </TacticalLink>
                 <StatsBadge icon={<CheckCircle className="w-4 h-4" />} label="No Credit Card" value="Required" />
               </div>
             </GlassCard>

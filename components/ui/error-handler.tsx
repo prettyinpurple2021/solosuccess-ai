@@ -2,13 +2,13 @@
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect} from "react"
-import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card"
 import { Button} from "@/components/ui/button"
 import { Badge} from "@/components/ui/badge"
 import { Alert, AlertDescription} from "@/components/ui/alert"
 
 import {
-  AlertTriangle, RefreshCw, Wifi, WifiOff, X, Info, CheckCircle, Clock, Zap, Lightbulb} from "lucide-react"
+  AlertTriangle, RefreshCw, Wifi, WifiOff, X, Info, CheckCircle, Clock, Zap, Lightbulb, Home} from "lucide-react"
 
 interface ErrorInfo {
   id: string
@@ -276,26 +276,54 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
   }, [])
 
   if (hasError) {
+    const errorMessage = error?.message || 'An unexpected error occurred'
+    const isNetworkError = errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('fetch')
+    const isNavigationError = errorMessage.toLowerCase().includes('navigation') || errorMessage.toLowerCase().includes('route')
+    
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border-red-200 bg-red-50">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-pink-50">
+        <Card className="w-full max-w-lg border-2 border-red-200 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-800">
               <AlertTriangle className="h-5 w-5" />
               Something went wrong
             </CardTitle>
+            <CardDescription className="text-red-600">
+              {isNetworkError 
+                ? 'Network connection issue detected. Please check your internet connection.'
+                : isNavigationError
+                ? 'Navigation error occurred. The page you requested may not exist.'
+                : 'An unexpected error occurred. Our team has been notified.'}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-red-700">
-              We encountered an unexpected error. Please refresh the page or contact support if the problem persists.
-            </p>
-            <div className="flex gap-2">
+            <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+              <p className="text-xs font-mono text-gray-600 mb-2">Error Details:</p>
+              <p className="text-sm text-gray-700 break-words">{errorMessage}</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  setHasError(false)
+                  setError(null)
+                  window.location.reload()
+                }}
                 className="flex-1"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Page
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setHasError(false)
+                  setError(null)
+                  window.location.href = '/'
+                }}
+                className="flex-1"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Go Home
               </Button>
               <Button
                 variant="outline"

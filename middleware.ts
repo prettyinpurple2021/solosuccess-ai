@@ -19,6 +19,12 @@ export function middleware(request: NextRequest) {
     '/gdpr',
     '/blog',
     '/landing',
+    '/status',
+    '/help',
+    '/security',
+    '/compliance',
+    '/careers',
+    '/forgot-password',
     '/api/auth',
     '/api/health',
     '/manifest.json',
@@ -37,8 +43,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // For protected routes, temporarily allow access to test authentication
-  // TODO: Fix Better Auth cookie detection
+  // For protected routes, check authentication
   const allCookies = request.cookies.getAll()
   const hasAuthCookie = allCookies.some(cookie => 
     cookie.name.includes('session') || 
@@ -73,15 +78,15 @@ export function middleware(request: NextRequest) {
   // CSP (Content Security Policy) - adjust as needed for your app
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com",
-    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: https: blob:",
-    "font-src 'self' data:",
-    "connect-src 'self' https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
     "frame-src https://js.stripe.com https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    "form-action 'self' https://api.stripe.com",
     "frame-ancestors 'none'",
     "upgrade-insecure-requests"
   ].join('; ')

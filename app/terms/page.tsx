@@ -3,7 +3,6 @@
 
 export const dynamic = 'force-dynamic'
 import Link from "next/link"
-import { useRouter} from "next/navigation"
 import { ArrowLeft, Crown, Scale, FileText} from "lucide-react"
 import { Button} from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
@@ -12,7 +11,6 @@ import { Separator} from "@/components/ui/separator"
 // AuthModal removed - using Clerk authentication instead
 
 export default function TermsOfServicePage() {
-  const router = useRouter()
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -29,12 +27,13 @@ export default function TermsOfServicePage() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <Button 
-                onClick={() => router.push('/sign-up')}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full"
-              >
-                Start Building Empire
-              </Button>
+              <Link href="/signup">
+                <Button 
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full"
+                >
+                  Start Building Empire
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -388,13 +387,14 @@ export default function TermsOfServicePage() {
             Now that you know the terms, it&apos;s time to start your boss journey. Join thousands of entrepreneurs already scaling with SoloSuccess AI.
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex md:justify-center">
-            <Button
-              onClick={() => router.push('/sign-up')}
-              size="lg"
-              className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
-            >
-              Start Building Empire
-            </Button>
+            <Link href="/signup">
+              <Button
+                size="lg"
+                className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-200"
+              >
+                Start Building Empire
+              </Button>
+            </Link>
             <Link href="/privacy">
               <Button
                 size="lg"

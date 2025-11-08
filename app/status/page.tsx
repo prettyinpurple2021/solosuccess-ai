@@ -167,9 +167,11 @@ export default function StatusPage() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full">
-                Start Building Empire
-              </Button>
+              <Link href="/signup">
+                <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-full">
+                  Start Building Empire
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
