@@ -286,13 +286,22 @@ export default function HomePage() {
                 <div key={i}>
                   <h3 className="font-tactical text-military-glass-white mb-4">{section.title}</h3>
                   <ul className="space-y-2">
-                    {section.links.map((link) => (
-                      <li key={link}>
-                        <Link href={`/${link.toLowerCase()}`} className="text-sm text-military-storm-grey hover:text-military-hot-pink transition-colors">
-                          {link}
-                        </Link>
-                      </li>
-                    ))}
+                    {section.links.map((link) => {
+                      const href = link === 'AI Agents' ? '/features#ai-agents' 
+                                   : link === 'Integrations' ? '/features#integrations'
+                                   : `/${link.toLowerCase().replace(/\s+/g, '-')}`
+                      return (
+                        <li key={link}>
+                          <Link 
+                            href={href} 
+                            className="text-sm text-military-storm-grey hover:text-military-hot-pink transition-colors"
+                            prefetch={true}
+                          >
+                            {link}
+                          </Link>
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               ))}

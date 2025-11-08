@@ -1,219 +1,309 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
+
 import Link from "next/link"
-import { ArrowLeft, Shield, Lock, Eye, Server, Key, CheckCircle, AlertTriangle} from "lucide-react"
-import { Button} from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import { Badge} from "@/components/ui/badge"
-import { Alert, AlertDescription} from "@/components/ui/alert"
+import { motion } from "framer-motion"
+import { 
+  ArrowLeft, 
+  Crown, 
+  Shield, 
+  Lock, 
+  Eye, 
+  Server, 
+  Key, 
+  CheckCircle, 
+  AlertTriangle,
+  Target,
+  Users,
+  Zap,
+  ArrowRight,
+  FileText
+} from "lucide-react"
+import { 
+  TacticalButton, 
+  GlassCard, 
+  RankStars, 
+  CamoBackground, 
+  SergeantDivider,
+  StatsBadge,
+  TacticalGrid,
+  TacticalGridItem,
+  TacticalLink
+} from '@/components/military'
 
 const securityFeatures = [
   {
     icon: Lock,
     title: "End-to-End Encryption",
-    description: "All data is encrypted in transit and at rest using AES-256 encryption"
+    description: "All data is encrypted in transit and at rest using AES-256 encryption",
+    status: "Active"
   },
   {
     icon: Shield,
     title: "SOC 2 Type II Compliant",
-    description: "Regular security audits and compliance with industry standards"
+    description: "Regular security audits and compliance with industry standards",
+    status: "Certified"
   },
   {
     icon: Key,
     title: "Zero-Knowledge Architecture",
-    description: "We never have access to your unencrypted data or business information"
+    description: "We never have access to your unencrypted data or business information",
+    status: "Active"
   },
   {
     icon: Server,
     title: "Secure Infrastructure",
-    description: "Hosted on enterprise-grade cloud infrastructure with 99.9% uptime"
+    description: "Hosted on enterprise-grade cloud infrastructure with 99.9% uptime",
+    status: "Operational"
   },
   {
     icon: Eye,
     title: "Privacy by Design",
-    description: "Built with privacy at the core - your data belongs to you"
+    description: "Built with privacy at the core - your data belongs to you",
+    status: "Active"
+  },
+  {
+    icon: Target,
+    title: "Advanced Threat Detection",
+    description: "Real-time monitoring and automated response to security threats",
+    status: "Active"
   }
 ]
 
 const certifications = [
-  { name: "SOC 2 Type II", status: "Certified" },
-  { name: "GDPR Compliant", status: "Certified" },
-  { name: "CCPA Compliant", status: "Certified" },
-  { name: "ISO 27001", status: "In Progress" }
+  { name: "SOC 2 Type II", status: "Certified", icon: Shield },
+  { name: "GDPR Compliant", status: "Certified", icon: FileText },
+  { name: "CCPA Compliant", status: "Certified", icon: FileText },
+  { name: "ISO 27001", status: "In Progress", icon: CheckCircle }
 ]
 
 export default function SecurityPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-semibold">Back to Home</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <Link href="/privacy" className="text-gray-600 hover:text-purple-600 transition-colors">
-                Privacy Policy
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden">
+      <CamoBackground opacity={0.1} withGrid>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              <Link href="/" className="flex items-center gap-3">
+                <motion.div 
+                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Crown className="w-6 h-6 text-white" />
+                </motion.div>
+                <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              <Link href="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">
-                Contact
-              </Link>
+              
+              <div className="flex items-center gap-4">
+                <TacticalLink href="/privacy" variant="outline" size="sm">
+                  Privacy Policy
+                </TacticalLink>
+                <TacticalLink href="/contact" variant="outline" size="sm">
+                  Contact
+                </TacticalLink>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <Shield className="w-20 h-20 mx-auto mb-6 text-white" />
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Security & Trust 🔒
-            </h1>
-            <p className="text-xl md:text-2xl text-purple-100 mb-8 max-w-3xl mx-auto">
-              Your business data is precious. We protect it with enterprise-grade security 
-              that meets the highest industry standards. Sleep soundly knowing your empire is secure! ✨
-            </p>
-            <Alert className="max-w-2xl mx-auto bg-white/10 border-white/20 text-white">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Last security audit:</strong> December 2024 - All systems secure ✅
-              </AlertDescription>
-            </Alert>
-          </div>
-        </div>
-      </div>
-
-      {/* Security Features */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            How We Protect Your Data
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Multi-layered security approach ensuring your business information stays private and secure
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {securityFeatures.map((feature, index) => (
-            <Card key={index} className="text-center hover:shadow-lg transition-shadow border-2 hover:border-purple-200">
-              <CardHeader>
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-purple-600" />
-                </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Certifications */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-purple-100 mb-16">
-          <h3 className="text-2xl font-bold text-center mb-8">Security Certifications & Compliance</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {certifications.map((cert, index) => (
-              <div key={index} className="text-center">
-                <div className="flex items-center justify-center mb-3">
-                  {cert.status === "Certified" ? (
-                    <CheckCircle className="w-8 h-8 text-green-500" />
-                  ) : (
-                    <AlertTriangle className="w-8 h-8 text-yellow-500" />
-                  )}
-                </div>
-                <h4 className="font-semibold mb-2">{cert.name}</h4>
-                <Badge 
-                  variant={cert.status === "Certified" ? "default" : "secondary"}
-                  className={cert.status === "Certified" ? "bg-green-500" : "bg-yellow-500"}
-                >
-                  {cert.status}
-                </Badge>
+        {/* Hero Section */}
+        <section className="pt-32 pb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-4xl mx-auto"
+            >
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <RankStars count={5} size="lg" />
+                <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  Enterprise Security
+                </span>
               </div>
-            ))}
+              
+              <div className="flex items-center justify-center mb-6">
+                <Shield className="w-20 h-20 text-military-hot-pink" />
+              </div>
+              
+              <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Security & <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Trust</span> 🔒
+              </h1>
+              
+              <p className="text-xl text-military-storm-grey mb-8 max-w-3xl mx-auto leading-relaxed">
+                Your business data is precious. We protect it with enterprise-grade security 
+                that meets the highest industry standards. Sleep soundly knowing your empire is secure! ✨
+              </p>
+
+              <GlassCard className="max-w-2xl mx-auto p-6 mb-8 border-military-hot-pink/30">
+                <div className="flex items-center gap-3 justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-400" />
+                  <span className="text-white font-tactical">
+                    <strong>Last security audit:</strong> December 2024 - All systems secure ✅
+                  </span>
+                </div>
+              </GlassCard>
+            </motion.div>
           </div>
-        </div>
+        </section>
+
+        {/* Security Features */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="font-heading text-4xl md:text-5xl font-bold text-white mb-6">
+                How We Protect Your Data
+              </h2>
+              <p className="text-xl text-military-storm-grey max-w-3xl mx-auto">
+                Multi-layered security approach ensuring your business information stays private and secure
+              </p>
+            </div>
+
+            <TacticalGrid className="mb-16">
+              {securityFeatures.map((feature, index) => (
+                <TacticalGridItem key={index}>
+                  <GlassCard className="p-8 h-full border-military-hot-pink/20 hover:border-military-hot-pink/40 transition-colors">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-gradient-to-br from-military-hot-pink/20 to-military-blush-pink/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <feature.icon className="w-8 h-8 text-military-hot-pink" />
+                      </div>
+                      <h3 className="font-heading text-xl font-bold text-white mb-3">{feature.title}</h3>
+                      <p className="text-military-storm-grey mb-4 leading-relaxed">
+                        {feature.description}
+                      </p>
+                      <StatsBadge variant="success" size="sm">
+                        {feature.status}
+                      </StatsBadge>
+                    </div>
+                  </GlassCard>
+                </TacticalGridItem>
+              ))}
+            </TacticalGrid>
+
+            <SergeantDivider className="my-16" />
+
+            {/* Certifications */}
+            <GlassCard className="max-w-5xl mx-auto p-12 border-military-hot-pink/30">
+              <h3 className="font-heading text-3xl font-bold text-white text-center mb-12">
+                Security Certifications & Compliance
+              </h3>
+              <TacticalGrid>
+                {certifications.map((cert, index) => (
+                  <TacticalGridItem key={index}>
+                    <GlassCard className="p-6 text-center border-military-hot-pink/20">
+                      <div className="flex items-center justify-center mb-4">
+                        {cert.status === "Certified" ? (
+                          <CheckCircle className="w-10 h-10 text-green-400" />
+                        ) : (
+                          <AlertTriangle className="w-10 h-10 text-yellow-400" />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center mb-3">
+                        <cert.icon className="w-6 h-6 text-military-hot-pink mr-2" />
+                        <h4 className="font-heading font-bold text-white">{cert.name}</h4>
+                      </div>
+                      <StatsBadge 
+                        variant={cert.status === "Certified" ? "success" : "warning"} 
+                        size="sm"
+                      >
+                        {cert.status}
+                      </StatsBadge>
+                    </GlassCard>
+                  </TacticalGridItem>
+                ))}
+              </TacticalGrid>
+            </GlassCard>
+          </div>
+        </section>
 
         {/* Security Practices */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          <div>
-            <h3 className="text-2xl font-bold mb-6">Data Protection Practices</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Regular security audits and penetration testing</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>24/7 security monitoring and incident response</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Employee security training and background checks</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Secure development lifecycle (SDLC) practices</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Regular security awareness training for all staff</span>
-              </li>
-            </ul>
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <TacticalGrid className="mb-16">
+              <TacticalGridItem>
+                <GlassCard className="p-8 border-military-hot-pink/20">
+                  <h3 className="font-heading text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Shield className="w-6 h-6 text-military-hot-pink" />
+                    Data Protection Practices
+                  </h3>
+                  <ul className="space-y-4">
+                    {[
+                      "Regular security audits and penetration testing",
+                      "24/7 security monitoring and incident response",
+                      "Employee security training and background checks",
+                      "Secure development lifecycle (SDLC) practices",
+                      "Regular security awareness training for all staff"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span className="text-military-storm-grey">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </GlassCard>
+              </TacticalGridItem>
+              
+              <TacticalGridItem>
+                <GlassCard className="p-8 border-military-hot-pink/20">
+                  <h3 className="font-heading text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Server className="w-6 h-6 text-military-hot-pink" />
+                    Infrastructure Security
+                  </h3>
+                  <ul className="space-y-4">
+                    {[
+                      "Multi-region data backups with 99.9% recovery guarantee",
+                      "DDoS protection and advanced threat detection",
+                      "Network segmentation and access controls",
+                      "Automated security updates and patch management",
+                      "Enterprise-grade firewalls and intrusion detection"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span className="text-military-storm-grey">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </GlassCard>
+              </TacticalGridItem>
+            </TacticalGrid>
           </div>
-          <div>
-            <h3 className="text-2xl font-bold mb-6">Infrastructure Security</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Multi-region data backups with 99.9% recovery guarantee</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>DDoS protection and advanced threat detection</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Network segmentation and access controls</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Automated security updates and patch management</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                <span>Enterprise-grade firewalls and intrusion detection</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+        </section>
 
         {/* Contact Section */}
-        <div className="text-center bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-12">
-          <h3 className="text-2xl font-bold mb-6">Security Questions or Concerns?</h3>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Our security team is here to help. Whether you need technical documentation, 
-            want to report a security issue, or have compliance questions - we&apos;re here for you.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild className="bg-purple-600 hover:bg-purple-700">
-              <Link href="/contact">Contact Security Team</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="mailto:security@solobossai.fun">security@solobossai.fun</Link>
-            </Button>
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <GlassCard className="max-w-4xl mx-auto p-12 text-center border-military-hot-pink/30">
+              <h3 className="font-heading text-3xl font-bold text-white mb-6">
+                Security Questions or Concerns?
+              </h3>
+              <p className="text-military-storm-grey mb-8 max-w-2xl mx-auto text-lg">
+                Our security team is here to help. Whether you need technical documentation, 
+                want to report a security issue, or have compliance questions - we&apos;re here for you.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <TacticalLink href="/contact" variant="primary" size="lg">
+                  Contact Security Team
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </TacticalLink>
+                <TacticalLink href="mailto:security@solosuccessai.fun" variant="outline" size="lg">
+                  security@solosuccessai.fun
+                </TacticalLink>
+              </div>
+            </GlassCard>
           </div>
-        </div>
-      </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t border-military-hot-pink/20 py-8">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-military-storm-grey">
+              © 2025 SoloSuccess AI. All rights reserved.
+            </p>
+          </div>
+        </footer>
+      </CamoBackground>
     </div>
   )
 }
