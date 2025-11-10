@@ -60,4 +60,3 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to download export' }, { status: 500 })
   }
 }
-
