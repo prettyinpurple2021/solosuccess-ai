@@ -158,6 +158,16 @@ const nextConfig = {
 
     // Server-side optimizations for Vercel deployment
     if (isServer) {
+      // Fix pdfjs-dist worker import issue with pdf-parse
+      // Replace the problematic import with our shim module that provides a default export
+      // Webpack processes query parameters separately, so we match the base module path
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /^pdfjs-dist\/legacy\/build\/pdf\.worker\.mjs$/,
+          path.resolve(__dirname, 'lib/pdf-worker-shim.js')
+        )
+      );
+
       // Ignore heavy packages that might be imported
       config.plugins.push(
         new webpack.IgnorePlugin({

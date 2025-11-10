@@ -3,8 +3,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligence-integration'
-import { db} from '@/db'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -27,7 +26,8 @@ export async function GET(request: NextRequest) {
     const competitorId = searchParams.get('competitor_id')
     const alertId = searchParams.get('alert_id')
 
-    const db = getDb()
+    const sql = getSql()
+    const sqlClient = sql as any
     
     let query = `
       SELECT t.*, cp.name as competitor_name, ca.title as alert_title
@@ -41,18 +41,20 @@ export async function GET(request: NextRequest) {
     const params = [user.id]
     
     if (competitorId) {
-      query += ` AND (t.ai_suggestions->>'competitor_id')::text = $${params.length + 1}`
+      query += ` AND (t.ai_suggestions->>'competitor_id')::text = $2`
       params.push(competitorId)
-    }
-    
-    if (alertId) {
-      query += ` AND (t.ai_suggestions->>'alert_id')::text = $${params.length + 1}`
+      if (alertId) {
+        query += ` AND (t.ai_suggestions->>'alert_id')::text = $3`
+        params.push(alertId)
+      }
+    } else if (alertId) {
+      query += ` AND (t.ai_suggestions->>'alert_id')::text = $2`
       params.push(alertId)
     }
     
     query += ` ORDER BY t.created_at DESC`
     
-    const { rows: tasks } = await client.query(query, params)
+    const tasks = await sqlClient.unsafe(query, params) as any[]
     
     return NextResponse.json({ tasks })
   } catch (error) {
@@ -72,7 +74,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
     
-    const db = getDb()
+    const sql = getSql()
+    const sqlClient = sql as any
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-tasks:create', ip, 60_000, 30)
@@ -94,10 +97,9 @@ export async function POST(request: NextRequest) {
 
     
     // Get the alert
-    const { rows: alertRows } = await client.query(
-      'SELECT * FROM competitor_alerts WHERE id = $1 AND user_id = $2',
-      [alert_id, user.id]
-    )
+    const alertRows = await sql`
+      SELECT * FROM competitor_alerts WHERE id = ${alert_id} AND user_id = ${user.id}
+    ` as any[]
     
     if (alertRows.length === 0) {
       return NextResponse.json({ error: 'Alert not found' }, { status: 404 })
@@ -145,7 +147,7 @@ export async function POST(request: NextRequest) {
       updateFields.push(`updated_at = NOW()`)
       updateValues.push(taskId, user.id)
       
-      await client.query(
+      await sqlClient.unsafe(
         `UPDATE tasks SET ${updateFields.join(', ')} 
          WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}`,
         updateValues
@@ -153,10 +155,9 @@ export async function POST(request: NextRequest) {
     }
     
     // Get the created task
-    const { rows: taskRows } = await client.query(
-      'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
-      [taskId, user.id]
-    )
+    const taskRows = await sql`
+      SELECT * FROM tasks WHERE id = ${taskId} AND user_id = ${user.id}
+    ` as any[]
     
     return NextResponse.json({ task: taskRows[0] }, { status: 201 })
   } catch (error) {

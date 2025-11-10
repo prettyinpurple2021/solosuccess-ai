@@ -295,7 +295,8 @@ export async function PUT(
       RETURNING id, name, domain, threat_level, monitoring_status, updated_at
     `
 
-    const result = await sql.unsafe(updateQuery, updateValues)
+    const sqlClient = sql as any
+    const result = await sqlClient.unsafe(updateQuery, updateValues) as any[]
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Competitor not found' }, { status: 404 })

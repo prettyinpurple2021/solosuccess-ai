@@ -2,9 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
-import { db} from '@/db'
-import { competitors, competitorAlerts, competitorActivities} from '@/db/schema'
-import { eq, count, desc, gte, sql} from 'drizzle-orm'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -28,56 +26,57 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = user.id
+    const sql = getSql()
 
     // Get total competitors count
-    const [totalCompetitors] = await db
-      .select({ count: count() })
-      .from(competitors)
-      .where(eq(competitors.user_id, userId))
+    const totalCompetitorsRows = await sql`
+      SELECT COUNT(*) as count
+      FROM competitor_profiles
+      WHERE user_id = ${userId}
+    ` as any[]
+    const totalCompetitors = { count: parseInt(totalCompetitorsRows[0]?.count || '0') }
 
     // Get competitors by threat level
-    const threatLevelStats = await db
-      .select({
-        threat_level: competitors.threat_level,
-        count: count()
-      })
-      .from(competitors)
-      .where(eq(competitors.user_id, userId))
-      .groupBy(competitors.threat_level)
+    const threatLevelStatsRows = await sql`
+      SELECT threat_level, COUNT(*) as count
+      FROM competitor_profiles
+      WHERE user_id = ${userId}
+      GROUP BY threat_level
+    ` as any[]
 
     // Get recent alerts count (last 30 days)
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const [recentAlerts] = await db
-      .select({ count: count() })
-      .from(competitorAlerts)
-      .where(
-        sql`${competitorAlerts.competitor_id} IN (
-          SELECT id FROM ${competitors} WHERE user_id = ${userId}
-        ) AND ${competitorAlerts.created_at} >= ${thirtyDaysAgo.toISOString()}`
-      )
+    const recentAlertsRows = await sql`
+      SELECT COUNT(*) as count
+      FROM competitor_alerts ca
+      WHERE ca.competitor_id IN (
+        SELECT id FROM competitor_profiles WHERE user_id = ${userId}
+      ) AND ca.created_at >= ${thirtyDaysAgo.toISOString()}
+    ` as any[]
+    const recentAlerts = { count: parseInt(recentAlertsRows[0]?.count || '0') }
 
     // Get recent activities count (last 7 days)
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-    const [recentActivities] = await db
-      .select({ count: count() })
-      .from(competitorActivities)
-      .where(
-        sql`${competitorActivities.competitor_id} IN (
-          SELECT id FROM ${competitors} WHERE user_id = ${userId}
-        ) AND ${competitorActivities.created_at} >= ${sevenDaysAgo.toISOString()}`
-      )
+    const recentActivitiesRows = await sql`
+      SELECT COUNT(*) as count
+      FROM competitor_activities ca
+      WHERE ca.competitor_id IN (
+        SELECT id FROM competitor_profiles WHERE user_id = ${userId}
+      ) AND ca.created_at >= ${sevenDaysAgo.toISOString()}
+    ` as any[]
+    const recentActivities = { count: parseInt(recentActivitiesRows[0]?.count || '0') }
 
     // Get active monitoring count
-    const [activeMonitoring] = await db
-      .select({ count: count() })
-      .from(competitors)
-      .where(
-        sql`${competitors.user_id} = ${userId} AND ${competitors.monitoring_status} = 'active'`
-      )
+    const activeMonitoringRows = await sql`
+      SELECT COUNT(*) as count
+      FROM competitor_profiles
+      WHERE user_id = ${userId} AND monitoring_status = 'active'
+    ` as any[]
+    const activeMonitoring = { count: parseInt(activeMonitoringRows[0]?.count || '0') }
 
     // Calculate threat distribution
     const threatDistribution = {
@@ -87,27 +86,27 @@ export async function GET(request: NextRequest) {
       low: 0
     }
 
-    threatLevelStats.forEach(stat => {
-      if (stat.threat_level in threatDistribution) {
-        threatDistribution[stat.threat_level as keyof typeof threatDistribution] = stat.count
+    threatLevelStatsRows.forEach((stat: any) => {
+      if (stat.threat_level && stat.threat_level in threatDistribution) {
+        threatDistribution[stat.threat_level as keyof typeof threatDistribution] = parseInt(stat.count || '0')
       }
     })
 
-    // Calculate average employee count
-    const [avgEmployeeCount] = await db
-      .select({
-        avg: sql<number>`AVG(${competitors.employee_count})`
-      })
-      .from(competitors)
-      .where(eq(competitors.user_id, userId))
+    // Calculate average employee count (if column exists)
+    const avgEmployeeCountRows = await sql`
+      SELECT AVG(employee_count) as avg
+      FROM competitor_profiles
+      WHERE user_id = ${userId} AND employee_count IS NOT NULL
+    ` as any[]
+    const avgEmployeeCount = { avg: parseFloat(avgEmployeeCountRows[0]?.avg || '0') }
 
-    // Calculate total funding tracked
-    const [totalFunding] = await db
-      .select({
-        sum: sql<number>`SUM(${competitors.funding_amount})`
-      })
-      .from(competitors)
-      .where(eq(competitors.user_id, userId))
+    // Calculate total funding tracked (if column exists)
+    const totalFundingRows = await sql`
+      SELECT SUM(funding_amount) as sum
+      FROM competitor_profiles
+      WHERE user_id = ${userId} AND funding_amount IS NOT NULL
+    ` as any[]
+    const totalFunding = { sum: parseFloat(totalFundingRows[0]?.sum || '0') }
 
     const stats = {
       totalCompetitors: totalCompetitors.count,

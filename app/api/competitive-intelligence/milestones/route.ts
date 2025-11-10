@@ -3,8 +3,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligence-integration'
-import { db} from '@/db'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -27,7 +26,8 @@ export async function GET(request: NextRequest) {
     const goalId = searchParams.get('goal_id')
     const competitorId = searchParams.get('competitor_id')
 
-    const db = getDb()
+    const sql = getSql()
+    const sqlClient = sql as any
     
     let query = `
       SELECT t.*, g.title as goal_title, cp.name as competitor_name
@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
     
     query += ` ORDER BY t.due_date ASC, t.created_at DESC`
     
-    const { rows: milestones } = await client.query(query, params)
+    const milestones = await sqlClient.unsafe(query, params) as any[]
     
     // Enhance milestones with progress data
-    const enhancedMilestones = milestones.map(milestone => {
+    const enhancedMilestones = milestones.map((milestone: any) => {
       const aiSuggestions = milestone.ai_suggestions || {}
       return {
         ...milestone,
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
     
-    const db = getDb()
+    const sql = getSql()
 
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('competitive-milestones:create', ip, 60_000, 20)
@@ -129,10 +129,9 @@ export async function POST(request: NextRequest) {
     }
     
     // Get the created milestone
-    const { rows: milestoneRows } = await client.query(
-      'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
-      [milestoneId, user.id]
-    )
+    const milestoneRows = await sql`
+      SELECT * FROM tasks WHERE id = ${milestoneId} AND user_id = ${user.id}
+    ` as any[]
     
     return NextResponse.json({ milestone: milestoneRows[0] }, { status: 201 })
   } catch (error) {
@@ -152,7 +151,8 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
     
-    const db = getDb()
+    const sql = getSql()
+    const sqlClient = sql as any
 
     const body = await request.json()
     const BodySchema = z.object({
@@ -166,10 +166,9 @@ export async function PUT(request: NextRequest) {
 
     
     // Get current milestone
-    const { rows: milestoneRows } = await client.query(
-      'SELECT * FROM tasks WHERE id = $1 AND user_id = $2 AND category = $3',
-      [milestone_id, user.id, 'Competitive Milestone']
-    )
+    const milestoneRows = await sql`
+      SELECT * FROM tasks WHERE id = ${milestone_id} AND user_id = ${user.id} AND category = ${'Competitive Milestone'}
+    ` as any[]
     
     if (milestoneRows.length === 0) {
       return NextResponse.json({ error: 'Milestone not found' }, { status: 404 })
@@ -202,12 +201,12 @@ export async function PUT(request: NextRequest) {
     
     updateValues.push(milestone_id.toString(), user.id)
     
-    const { rows: updatedRows } = await client.query(
+    const updatedRows = await sqlClient.unsafe(
       `UPDATE tasks SET ${updateFields.join(', ')} 
        WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} 
        RETURNING *`,
       updateValues
-    )
+    ) as any[]
     
     return NextResponse.json({ milestone: updatedRows[0] })
   } catch (error) {

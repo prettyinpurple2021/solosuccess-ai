@@ -3,8 +3,7 @@ import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { CompetitiveIntelligenceIntegration} from '@/lib/competitive-intelligence-integration'
-import { db} from '@/db'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { z} from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
@@ -27,9 +26,6 @@ export async function GET(request: NextRequest) {
     const competitorId = searchParams.get('competitor_id')
     const goalId = searchParams.get('goal_id')
     
-    const db = getDb()
-
-    
     if (goalId) {
       // Get specific goal with competitive progress
       const progress = await CompetitiveIntelligenceIntegration.getCompetitiveProgress(
@@ -45,6 +41,9 @@ export async function GET(request: NextRequest) {
     }
     
     // Get all goals with competitive context
+    const sql = getSql()
+    const sqlClient = sql as any
+    
     let query = `
       SELECT g.*, 
              COUNT(t.id) as competitive_tasks_count,
@@ -59,13 +58,13 @@ export async function GET(request: NextRequest) {
     const params = [user.id]
     
     if (competitorId) {
-      query += ` AND (g.ai_suggestions->'competitive_context'->>'competitorId')::text = $${params.length + 1}`
+      query += ` AND (g.ai_suggestions->'competitive_context'->>'competitorId')::text = $2`
       params.push(competitorId)
     }
     
     query += ` GROUP BY g.id ORDER BY g.created_at DESC`
     
-    const { rows: goals } = await client.query(query, params)
+    const goals = await sqlClient.unsafe(query, params) as any[]
     
     return NextResponse.json({ goals })
   } catch (error) {

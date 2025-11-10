@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { createErrorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
 
@@ -36,7 +36,6 @@ export async function GET(request: NextRequest) {
     const status = url.searchParams.get('status')
     const search = url.searchParams.get('search')
     
-    const db = getDb()
     const offset = (page - 1) * limit
 
     // Build dynamic query based on filters
@@ -69,9 +68,12 @@ export async function GET(request: NextRequest) {
     }
 
     const whereClause = whereConditions.join(' AND ')
+    const sql = getSql()
+    const sqlClient = sql as any
 
     // Get competitors with pagination
-    const competitors = await db.query(`
+    const queryParams = [...params, limit, offset]
+    const competitorsQuery = `
       SELECT 
         id,
         name,
@@ -99,19 +101,21 @@ export async function GET(request: NextRequest) {
         END DESC,
         created_at DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `, [...params, limit, offset])
+    `
+    const competitors = await sqlClient.unsafe(competitorsQuery, queryParams) as any[]
 
     // Get total count
-    const countResult = await db.query(`
+    const countQuery = `
       SELECT COUNT(*) as total
       FROM competitor_profiles 
       WHERE ${whereClause}
-    `, params)
+    `
+    const countResult = await sqlClient.unsafe(countQuery, params) as any[]
 
     const total = parseInt(countResult[0]?.total || '0')
 
     // Transform the data
-    const transformedCompetitors = competitors.map(competitor => ({
+    const transformedCompetitors = competitors.map((competitor: any) => ({
       id: competitor.id,
       name: competitor.name,
       domain: competitor.domain,

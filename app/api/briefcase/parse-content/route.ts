@@ -5,8 +5,8 @@ import { DocumentParser} from '@/lib/documentParser';
 import { authenticateRequest} from '@/lib/auth-server'
 import { getSql } from '@/lib/api-utils'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Node.js runtime required for PDF parsing (pdf-parse requires Node.js)
+export const runtime = 'nodejs'
 
 
 
