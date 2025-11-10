@@ -250,7 +250,7 @@ export default function BriefcasePage() {
             <h1 className="text-4xl font-heading font-bold text-military-glass-white">Briefcase</h1>
             <p className="text-lg text-military-storm-grey">Manage your business documents and files</p>
           </div>
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
           <Button onClick={handleCreateFolder} variant="outline" className="border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black">
             <FolderPlus className="w-4 h-4 mr-2" />
             New Folder
@@ -269,7 +269,7 @@ export default function BriefcasePage() {
             />
           </label>
         </div>
-      </div>
+        </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -500,6 +500,7 @@ export default function BriefcasePage() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   )
