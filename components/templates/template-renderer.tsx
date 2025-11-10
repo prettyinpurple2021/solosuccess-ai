@@ -40,4 +40,3 @@ export function TemplateRenderer({ slug }: { slug: string }) {
   )
 }
 
-

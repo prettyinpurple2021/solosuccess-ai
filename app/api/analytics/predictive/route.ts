@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
     const insights = await predictiveAnalytics.generateInsights(userAnalytics, businessAnalytics)
 
     // Filter insights by category if specified
-    const filteredInsights = validatedParams.categories.length > 0
-      ? insights.filter(insight => validatedParams.categories.includes(insight.category))
+    const filteredInsights = validatedParams.categories && validatedParams.categories.length > 0
+      ? insights.filter(insight => validatedParams.categories!.includes(insight.category))
       : insights
 
     // Sort by priority and confidence
@@ -361,13 +361,16 @@ async function gatherUserData(
 
     const peakHours = computePeakHours(focusSessionRows.map(session => session.startedAt).filter(Boolean) as Date[])
 
-    const recentTasks = taskRows.slice(0, 10).map(task => ({
-      id: task.id,
-      title: task.title,
-      status: task.status,
-      createdAt: task.createdAt.toISOString(),
-      completedAt: task.completedAt ? task.completedAt.toISOString() : null
-    }))
+    const recentTasks = taskRows
+      .filter(task => task.createdAt !== null)
+      .slice(0, 10)
+      .map(task => ({
+        id: task.id,
+        title: task.title,
+        status: task.status || 'pending',
+        createdAt: task.createdAt!.toISOString(),
+        completedAt: task.completedAt ? task.completedAt.toISOString() : null
+      }))
 
     const analytics: UserAnalyticsData = {
       userId,
@@ -549,9 +552,9 @@ async function gatherBusinessData(
       return sum + tierPrice
     }, 0)
 
-    const timeframeTasks = tasksHistory.filter(task => task.createdAt >= startDate && task.createdAt <= endDate)
-    const timeframeGoals = goalsHistory.filter(goal => goal.createdAt >= startDate && goal.createdAt <= endDate)
-    const timeframeMessages = messagesHistory.filter(message => message.createdAt >= startDate && message.createdAt <= endDate)
+    const timeframeTasks = tasksHistory.filter(task => task.createdAt !== null && task.createdAt >= startDate && task.createdAt <= endDate)
+    const timeframeGoals = goalsHistory.filter(goal => goal.createdAt !== null && goal.createdAt >= startDate && goal.createdAt <= endDate)
+    const timeframeMessages = messagesHistory.filter(message => message.createdAt !== null && message.createdAt >= startDate && message.createdAt <= endDate)
 
     const tasksCompleted = timeframeTasks.filter(task => task.status === 'completed').length
     const taskCompletionRate = timeframeTasks.length > 0 ? (tasksCompleted / timeframeTasks.length) * 100 : 0
@@ -564,7 +567,7 @@ async function gatherBusinessData(
     timeframeGoals.forEach(goal => activeUserIds.add(goal.userId))
     timeframeMessages.forEach(message => activeUserIds.add(message.userId))
     focusHistory
-      .filter(session => session.startedAt >= startDate && session.startedAt <= endDate)
+      .filter(session => session.startedAt !== null && session.startedAt >= startDate && session.startedAt <= endDate)
       .forEach(session => activeUserIds.add(session.userId))
 
     const dayKeys = buildDayKeys(historyStart, endDate)
@@ -646,7 +649,7 @@ async function gatherBusinessData(
       timeframeDays,
       totalUsers,
       activeUsers,
-      newUsers: newUsersHistoryRows.filter(row => row.createdAt >= startDate).length,
+      newUsers: newUsersHistoryRows.filter(row => row.createdAt !== null && row.createdAt >= startDate).length,
       paidUsers: paidUsersCount,
       churnRate: totalUsers > 0 ? (churnedUsers / totalUsers) * 100 : 0,
       conversionRate: totalUsers > 0 ? (paidUsersCount / totalUsers) * 100 : 0,

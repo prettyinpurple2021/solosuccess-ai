@@ -78,6 +78,25 @@ export async function getUserIdFromRequest(request: NextRequest): Promise<string
 }
 
 /**
+ * Create JWT token for user authentication
+ */
+export async function createToken(userId: string, email: string): Promise<string> {
+  const jwtSecret = process.env.JWT_SECRET
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET is not configured')
+  }
+  
+  const secret = new TextEncoder().encode(jwtSecret)
+  const token = await new jose.SignJWT({ userId, email })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(secret)
+  
+  return token
+}
+
+/**
  * Verify JWT token (alias for getUserIdFromSession for backward compatibility)
  */
 export async function verifyToken(request: NextRequest): Promise<string | null> {

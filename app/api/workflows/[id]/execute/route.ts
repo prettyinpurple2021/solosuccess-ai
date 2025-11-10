@@ -19,7 +19,7 @@ function getSql() {
 // POST /api/workflows/[id]/execute - Execute workflow
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -38,7 +38,8 @@ export async function POST(
       )
     }
 
-    const workflowId = params.id
+    const resolvedParams = await params
+    const workflowId = resolvedParams.id
 
     // Get workflow
     const sql = getSql()
@@ -126,7 +127,7 @@ export async function POST(
 // GET /api/workflows/[id]/execute - Get execution status
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -136,7 +137,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const workflowId = params.id
+    const resolvedParams = await params
+    const workflowId = resolvedParams.id
     const { searchParams } = new URL(request.url)
     const executionId = searchParams.get('executionId')
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50)

@@ -79,17 +79,28 @@ export async function POST(request: NextRequest) {
     const validatedData = ExportRequestSchema.parse(body)
 
     // Create export job
+    // Ensure metadata is included for ReportData
+    const reportDataWithMetadata = {
+      ...validatedData.reportData,
+      generatedAt: new Date(),
+      generatedBy: user.id.toString(),
+      metadata: {
+        totalRecords: validatedData.reportData.data.length,
+        dateRange: validatedData.config.dateRange || {
+          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          end: new Date()
+        },
+        filters: validatedData.config.filters || {}
+      }
+    }
+    
     const result = await analyticsExportService.exportData(
-      {
-        ...validatedData.reportData,
-        generatedAt: new Date(),
-        generatedBy: user.id.toString()
-      },
+      reportDataWithMetadata,
       validatedData.config,
       user.id.toString()
     )
 
-    logApi('Analytics export created', { 
+    logApi('POST', '/api/analytics/export', 202, undefined, { 
       userId: user.id, 
       format: validatedData.config.format,
       jobId: result.jobId 
@@ -255,7 +266,7 @@ export async function DELETE(request: NextRequest) {
       }, { status: 404 })
     }
 
-    logApi('Analytics export cancelled', { 
+    logApi('DELETE', '/api/analytics/export', 200, undefined, { 
       userId: user.id, 
       jobId 
     })

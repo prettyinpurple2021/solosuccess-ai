@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -29,14 +29,16 @@ export async function POST(
     }
 
     const documentId = id
-    const db = getDb()
+    const sql = getSql()
 
     // Get document info with file data
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id, name, mime_type, file_data, user_id
       FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
+    
+    const document = documentRows[0]
 
     if (!document) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
@@ -113,26 +115,24 @@ export async function POST(
     const insights = workerResult.insights
 
     // Save insights to database
-    await client.query(`
+    const insightsJson = JSON.stringify(insights)
+    await sql`
       UPDATE documents 
-      SET ai_insights = $1, updated_at = NOW()
-      WHERE id = $2
-    `, [JSON.stringify(insights), documentId])
+      SET ai_insights = ${insightsJson}::jsonb, updated_at = NOW()
+      WHERE id = ${documentId}
+    `
 
     // Log activity
-    await client.query(`
+    const activityDetailsJson = JSON.stringify({
+      fileName: document.name,
+      fileType: document.mime_type,
+      contentLength: content.length,
+      insightsGenerated: Object.keys(insights).length,
+    })
+    await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'ai_analyzed', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        fileName: document.name,
-        fileType: document.mime_type,
-        contentLength: content.length,
-        insightsGenerated: Object.keys(insights).length,
-      })
-    ])
+      VALUES (${documentId}, ${user.id}, ${'ai_analyzed'}, ${activityDetailsJson}::jsonb, NOW())
+    `
 
     return NextResponse.json({
       success: true,

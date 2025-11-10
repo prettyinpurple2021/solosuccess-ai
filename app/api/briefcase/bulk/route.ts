@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -23,13 +23,14 @@ export async function POST(
       return NextResponse.json({ error: 'Action and file IDs are required' }, { status: 400 })
     }
 
-    const db = getDb()
+    const sql = getSql()
 
     // Verify all files belong to the user
-    const { rows: userFiles } = await client.query(`
+    // Convert fileIds array to PostgreSQL array format
+    const userFiles = await sql`
       SELECT id FROM documents 
-      WHERE id = ANY($1) AND user_id = $2
-    `, [fileIds, user.id])
+      WHERE id = ANY(${fileIds}::uuid[]) AND user_id = ${user.id}
+    ` as any[]
 
     if (userFiles.length !== fileIds.length) {
       return NextResponse.json({ error: 'Some files not found or access denied' }, { status: 403 })
@@ -39,43 +40,43 @@ export async function POST(
 
     switch (action) {
       case 'delete':
-        result = await handleBulkDelete(client, fileIds, user.id)
+        result = await handleBulkDelete(sql, fileIds, user.id)
         break
       case 'move':
         if (!options?.folderId) {
           return NextResponse.json({ error: 'Folder ID is required for move operation' }, { status: 400 })
         }
-        result = await handleBulkMove(client, fileIds, options.folderId, user.id)
+        result = await handleBulkMove(sql, fileIds, options.folderId, user.id)
         break
       case 'copy':
         if (!options?.folderId) {
           return NextResponse.json({ error: 'Folder ID is required for copy operation' }, { status: 400 })
         }
-        result = await handleBulkCopy(client, fileIds, options.folderId, user.id)
+        result = await handleBulkCopy(sql, fileIds, options.folderId, user.id)
         break
       case 'tag':
         if (!options?.tags || !Array.isArray(options.tags)) {
           return NextResponse.json({ error: 'Tags array is required for tag operation' }, { status: 400 })
         }
-        result = await handleBulkTag(client, fileIds, options.tags, options?.operation || 'add', user.id)
+        result = await handleBulkTag(sql, fileIds, options.tags, options?.operation || 'add', user.id)
         break
       case 'category':
         if (!options?.category) {
           return NextResponse.json({ error: 'Category is required for category operation' }, { status: 400 })
         }
-        result = await handleBulkCategory(client, fileIds, options.category, user.id)
+        result = await handleBulkCategory(sql, fileIds, options.category, user.id)
         break
       case 'favorite':
-        result = await handleBulkFavorite(client, fileIds, options?.favorite !== false, user.id)
+        result = await handleBulkFavorite(sql, fileIds, options?.favorite !== false, user.id)
         break
       case 'download':
-        result = await handleBulkDownload(client, fileIds, user.id)
+        result = await handleBulkDownload(sql, fileIds, user.id)
         break
       case 'share':
         if (!options?.permissions) {
           return NextResponse.json({ error: 'Permissions are required for share operation' }, { status: 400 })
         }
-        result = await handleBulkShare(client, fileIds, options.permissions, user.id)
+        result = await handleBulkShare(sql, fileIds, options.permissions, user.id)
         break
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
@@ -91,35 +92,35 @@ export async function POST(
   }
 }
 
-async function handleBulkDelete(client: any, fileIds: string[], userId: string) {
+async function handleBulkDelete(sql: any, fileIds: string[], userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[] }
 
   for (const fileId of fileIds) {
     try {
       // Delete document versions first
-      await client.query(`
-        DELETE FROM document_versions WHERE document_id = $1
-      `, [fileId])
+      await sql`
+        DELETE FROM document_versions WHERE document_id = ${fileId}
+      `
 
       // Delete document permissions
-      await client.query(`
-        DELETE FROM document_permissions WHERE document_id = $1
-      `, [fileId])
+      await sql`
+        DELETE FROM document_permissions WHERE document_id = ${fileId}
+      `
 
       // Delete share links
-      await client.query(`
-        DELETE FROM document_share_links WHERE document_id = $1
-      `, [fileId])
+      await sql`
+        DELETE FROM document_share_links WHERE document_id = ${fileId}
+      `
 
       // Delete activity logs
-      await client.query(`
-        DELETE FROM document_activity WHERE document_id = $1
-      `, [fileId])
+      await sql`
+        DELETE FROM document_activity WHERE document_id = ${fileId}
+      `
 
       // Delete the document
-      await client.query(`
-        DELETE FROM documents WHERE id = $1 AND user_id = $2
-      `, [fileId, userId])
+      await sql`
+        DELETE FROM documents WHERE id = ${fileId} AND user_id = ${userId}
+      `
 
       result.processed++
     } catch (error) {
@@ -131,31 +132,32 @@ async function handleBulkDelete(client: any, fileIds: string[], userId: string) 
   return result
 }
 
-async function handleBulkMove(client: any, fileIds: string[], folderId: string, userId: string) {
+async function handleBulkMove(sql: any, fileIds: string[], folderId: string, userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[] }
 
   // Verify folder exists and belongs to user
-  const { rows: [folder] } = await client.query(`
-    SELECT id FROM document_folders WHERE id = $1 AND user_id = $2
-  `, [folderId, userId])
+  const folderRows = await sql`
+    SELECT id FROM document_folders WHERE id = ${folderId} AND user_id = ${userId}
+  ` as any[]
 
-  if (!folder) {
+  if (folderRows.length === 0) {
     return { success: false, processed: 0, failed: fileIds.length, errors: ['Folder not found'] }
   }
 
   for (const fileId of fileIds) {
     try {
-      await client.query(`
+      await sql`
         UPDATE documents 
-        SET folder_id = $1, updated_at = NOW()
-        WHERE id = $2 AND user_id = $3
-      `, [folderId, fileId, userId])
+        SET folder_id = ${folderId}, updated_at = NOW()
+        WHERE id = ${fileId} AND user_id = ${userId}
+      `
 
       // Log activity
-      await client.query(`
+      const detailsJson = JSON.stringify({ folderId })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'moved', $3, NOW())
-      `, [fileId, userId, JSON.stringify({ folderId })])
+        VALUES (${fileId}, ${userId}, ${'moved'}, ${detailsJson}::jsonb, NOW())
+      `
 
       result.processed++
     } catch (error) {
@@ -167,59 +169,53 @@ async function handleBulkMove(client: any, fileIds: string[], folderId: string, 
   return result
 }
 
-async function handleBulkCopy(client: any, fileIds: string[], folderId: string, userId: string) {
+async function handleBulkCopy(sql: any, fileIds: string[], folderId: string, userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[], copiedFiles: [] as string[] }
 
   // Verify folder exists and belongs to user
-  const { rows: [folder] } = await client.query(`
-    SELECT id FROM document_folders WHERE id = $1 AND user_id = $2
-  `, [folderId, userId])
+  const folderRows = await sql`
+    SELECT id FROM document_folders WHERE id = ${folderId} AND user_id = ${userId}
+  ` as any[]
 
-  if (!folder) {
+  if (folderRows.length === 0) {
     return { success: false, processed: 0, failed: fileIds.length, errors: ['Folder not found'] }
   }
 
   for (const fileId of fileIds) {
     try {
       // Get original file data
-      const { rows: [originalFile] } = await client.query(`
-        SELECT * FROM documents WHERE id = $1 AND user_id = $2
-      `, [fileId, userId])
+      const originalFileRows = await sql`
+        SELECT * FROM documents WHERE id = ${fileId} AND user_id = ${userId}
+      ` as any[]
 
-      if (!originalFile) {
+      if (originalFileRows.length === 0) {
         result.failed++
         result.errors.push(`Original file ${fileId} not found`)
         continue
       }
 
+      const originalFile = originalFileRows[0]
+
       // Create copy with new name
       const copyName = `${originalFile.name} (Copy)`
-      const { rows: [copiedFile] } = await client.query(`
+      const tagsJson = typeof originalFile.tags === 'string' ? originalFile.tags : JSON.stringify(originalFile.tags || [])
+      const copiedFileRows = await sql`
         INSERT INTO documents (
           user_id, name, original_name, file_type, mime_type, size, file_data,
           category, tags, description, folder_id, is_favorite, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+        ) VALUES (${userId}, ${copyName}, ${originalFile.original_name}, ${originalFile.file_type}, ${originalFile.mime_type}, ${originalFile.size}, ${originalFile.file_data},
+        ${originalFile.category}, ${tagsJson}::jsonb, ${originalFile.description || null}, ${folderId}, ${false}, NOW(), NOW())
         RETURNING id
-      `, [
-        userId,
-        copyName,
-        originalFile.original_name,
-        originalFile.file_type,
-        originalFile.mime_type,
-        originalFile.size,
-        originalFile.file_data,
-        originalFile.category,
-        originalFile.tags,
-        originalFile.description,
-        folderId,
-        false // Don't copy favorite status
-      ])
+      ` as any[]
+
+      const copiedFile = copiedFileRows[0]
 
       // Log activity
-      await client.query(`
+      const detailsJson = JSON.stringify({ originalFileId: fileId, folderId })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'copied', $3, NOW())
-      `, [copiedFile.id, userId, JSON.stringify({ originalFileId: fileId, folderId })])
+        VALUES (${copiedFile.id}, ${userId}, ${'copied'}, ${detailsJson}::jsonb, NOW())
+      `
 
       result.processed++
       result.copiedFiles.push(copiedFile.id)
@@ -232,23 +228,24 @@ async function handleBulkCopy(client: any, fileIds: string[], folderId: string, 
   return result
 }
 
-async function handleBulkTag(client: any, fileIds: string[], tags: string[], operation: 'add' | 'remove', userId: string) {
+async function handleBulkTag(sql: any, fileIds: string[], tags: string[], operation: 'add' | 'remove', userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[] }
 
   for (const fileId of fileIds) {
     try {
       // Get current tags
-      const { rows: [file] } = await client.query(`
-        SELECT tags FROM documents WHERE id = $1 AND user_id = $2
-      `, [fileId, userId])
+      const fileRows = await sql`
+        SELECT tags FROM documents WHERE id = ${fileId} AND user_id = ${userId}
+      ` as any[]
 
-      if (!file) {
+      if (fileRows.length === 0) {
         result.failed++
         result.errors.push(`File ${fileId} not found`)
         continue
       }
 
-      const currentTags = file.tags ? JSON.parse(file.tags) : []
+      const file = fileRows[0]
+      const currentTags = typeof file.tags === 'string' ? JSON.parse(file.tags) : (file.tags || [])
       let newTags: string[]
 
       if (operation === 'add') {
@@ -257,17 +254,19 @@ async function handleBulkTag(client: any, fileIds: string[], tags: string[], ope
         newTags = currentTags.filter((tag: string) => !tags.includes(tag.toLowerCase().trim()))
       }
 
-      await client.query(`
+      const newTagsJson = JSON.stringify(newTags)
+      await sql`
         UPDATE documents 
-        SET tags = $1, updated_at = NOW()
-        WHERE id = $2 AND user_id = $3
-      `, [JSON.stringify(newTags), fileId, userId])
+        SET tags = ${newTagsJson}::jsonb, updated_at = NOW()
+        WHERE id = ${fileId} AND user_id = ${userId}
+      `
 
       // Log activity
-      await client.query(`
+      const detailsJson = JSON.stringify({ operation, tags, newTags })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'tags_updated', $3, NOW())
-      `, [fileId, userId, JSON.stringify({ operation, tags, newTags })])
+        VALUES (${fileId}, ${userId}, ${'tags_updated'}, ${detailsJson}::jsonb, NOW())
+      `
 
       result.processed++
     } catch (error) {
@@ -279,22 +278,23 @@ async function handleBulkTag(client: any, fileIds: string[], tags: string[], ope
   return result
 }
 
-async function handleBulkCategory(client: any, fileIds: string[], category: string, userId: string) {
+async function handleBulkCategory(sql: any, fileIds: string[], category: string, userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[] }
 
   for (const fileId of fileIds) {
     try {
-      await client.query(`
+      await sql`
         UPDATE documents 
-        SET category = $1, updated_at = NOW()
-        WHERE id = $2 AND user_id = $3
-      `, [category, fileId, userId])
+        SET category = ${category}, updated_at = NOW()
+        WHERE id = ${fileId} AND user_id = ${userId}
+      `
 
       // Log activity
-      await client.query(`
+      const detailsJson = JSON.stringify({ category })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'category_updated', $3, NOW())
-      `, [fileId, userId, JSON.stringify({ category })])
+        VALUES (${fileId}, ${userId}, ${'category_updated'}, ${detailsJson}::jsonb, NOW())
+      `
 
       result.processed++
     } catch (error) {
@@ -306,22 +306,24 @@ async function handleBulkCategory(client: any, fileIds: string[], category: stri
   return result
 }
 
-async function handleBulkFavorite(client: any, fileIds: string[], favorite: boolean, userId: string) {
+async function handleBulkFavorite(sql: any, fileIds: string[], favorite: boolean, userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[] }
 
   for (const fileId of fileIds) {
     try {
-      await client.query(`
+      await sql`
         UPDATE documents 
-        SET is_favorite = $1, updated_at = NOW()
-        WHERE id = $2 AND user_id = $3
-      `, [favorite, fileId, userId])
+        SET is_favorite = ${favorite}, updated_at = NOW()
+        WHERE id = ${fileId} AND user_id = ${userId}
+      `
 
       // Log activity
-      await client.query(`
+      const action = favorite ? 'favorited' : 'unfavorited'
+      const detailsJson = JSON.stringify({ isFavorite: favorite })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, $3, $4, NOW())
-      `, [fileId, userId, favorite ? 'favorited' : 'unfavorited', JSON.stringify({ isFavorite: favorite })])
+        VALUES (${fileId}, ${userId}, ${action}, ${detailsJson}::jsonb, NOW())
+      `
 
       result.processed++
     } catch (error) {
@@ -333,23 +335,24 @@ async function handleBulkFavorite(client: any, fileIds: string[], favorite: bool
   return result
 }
 
-async function handleBulkDownload(client: any, fileIds: string[], userId: string) {
+async function handleBulkDownload(sql: any, fileIds: string[], userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[], downloadUrls: [] as string[] }
 
   for (const fileId of fileIds) {
     try {
       // Update download count
-      await client.query(`
+      await sql`
         UPDATE documents 
         SET download_count = download_count + 1, last_accessed = NOW(), updated_at = NOW()
-        WHERE id = $1 AND user_id = $2
-      `, [fileId, userId])
+        WHERE id = ${fileId} AND user_id = ${userId}
+      `
 
       // Log activity
-      await client.query(`
+      const detailsJson = JSON.stringify({ bulkDownload: true })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'downloaded', $3, NOW())
-      `, [fileId, userId, JSON.stringify({ bulkDownload: true })])
+        VALUES (${fileId}, ${userId}, ${'downloaded'}, ${detailsJson}::jsonb, NOW())
+      `
 
       result.processed++
       result.downloadUrls.push(`/api/briefcase/files/${fileId}/download`)
@@ -362,7 +365,7 @@ async function handleBulkDownload(client: any, fileIds: string[], userId: string
   return result
 }
 
-async function handleBulkShare(client: any, fileIds: string[], permissions: any, _userId: string) {
+async function handleBulkShare(_sql: any, fileIds: string[], permissions: any, _userId: string) {
   const result = { success: true, processed: 0, failed: 0, errors: [] as string[], shareLinks: [] as string[] }
 
   for (const fileId of fileIds) {

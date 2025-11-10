@@ -21,9 +21,9 @@ async function authenticateJWTRequest(request: NextRequest) {
     
     return { 
       user: {
-        id: decoded.userId,
-        email: decoded.email,
-        full_name: decoded.full_name || null,
+        id: decoded.userId as string,
+        email: decoded.email as string,
+        full_name: (decoded.full_name as string) || null,
       }, 
       error: null 
     }

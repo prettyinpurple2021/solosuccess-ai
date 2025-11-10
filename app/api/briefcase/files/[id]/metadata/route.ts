@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -24,94 +24,96 @@ export async function PATCH(
     const documentId = id
     const { description, tags, category, isFavorite, metadata } = await request.json()
 
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
+    
+    const document = documentRows[0]
 
     if (!document) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Build update query dynamically
-    const updates: string[] = []
-    const values: any[] = []
-    let paramCount = 1
+    // Build update query dynamically using unsafe for dynamic fields
+    const sqlClient = sql as any
+    const setParts: string[] = []
+    const params: any[] = []
+    let paramIndex = 1
 
     if (description !== undefined) {
-      updates.push(`description = $${paramCount}`)
-      values.push(description)
-      paramCount++
+      setParts.push(`description = $${paramIndex}`)
+      params.push(description)
+      paramIndex++
     }
 
     if (tags !== undefined) {
-      updates.push(`tags = $${paramCount}`)
-      values.push(JSON.stringify(Array.isArray(tags) ? tags : []))
-      paramCount++
+      setParts.push(`tags = $${paramIndex}::jsonb`)
+      params.push(JSON.stringify(Array.isArray(tags) ? tags : []))
+      paramIndex++
     }
+
     if (metadata !== undefined) {
-      updates.push(`metadata = $${paramCount}`)
-      values.push(metadata)
-      paramCount++
+      setParts.push(`metadata = $${paramIndex}::jsonb`)
+      params.push(typeof metadata === 'string' ? metadata : JSON.stringify(metadata))
+      paramIndex++
     }
 
     if (category !== undefined) {
-      updates.push(`category = $${paramCount}`)
-      values.push(category)
-      paramCount++
+      setParts.push(`category = $${paramIndex}`)
+      params.push(category)
+      paramIndex++
     }
 
     if (isFavorite !== undefined) {
-      updates.push(`is_favorite = $${paramCount}`)
-      values.push(isFavorite)
-      paramCount++
+      setParts.push(`is_favorite = $${paramIndex}`)
+      params.push(isFavorite)
+      paramIndex++
     }
 
-    if (updates.length === 0) {
+    if (setParts.length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
-    // Add updated_at
-    updates.push(`updated_at = NOW()`)
-    values.push(documentId)
+    setParts.push(`updated_at = NOW()`)
+    params.push(documentId)
 
-    // Update document
-    const { rows: [updatedDocument] } = await client.query(`
+    // Update document using unsafe for dynamic SQL
+    const updateQuery = `
       UPDATE documents 
-      SET ${updates.join(', ')}
-      WHERE id = $${paramCount}
+      SET ${setParts.join(', ')}
+      WHERE id = $${paramIndex}
       RETURNING *
-    `, values)
+    `
+    const updatedDocumentRows = await sqlClient.unsafe(updateQuery, params) as any[]
+    const updatedDocument = updatedDocumentRows[0]
 
     // Log activity
-    await client.query(`
+    const detailsJson = JSON.stringify({
+      updatedFields: {
+        description: description !== undefined,
+        tags: tags !== undefined,
+        category: category !== undefined,
+        isFavorite: isFavorite !== undefined
+      }
+    })
+    await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'metadata_updated', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        updatedFields: {
-          description: description !== undefined,
-          tags: tags !== undefined,
-          category: category !== undefined,
-          isFavorite: isFavorite !== undefined
-        }
-      })
-    ])
+      VALUES (${documentId}, ${user.id}, ${'metadata_updated'}, ${detailsJson}::jsonb, NOW())
+    `
 
     return NextResponse.json({
       success: true,
       document: {
         id: updatedDocument.id,
         description: updatedDocument.description,
-        tags: updatedDocument.tags ? JSON.parse(updatedDocument.tags) : [],
+        tags: typeof updatedDocument.tags === 'string' ? JSON.parse(updatedDocument.tags) : (updatedDocument.tags || []),
         category: updatedDocument.category,
         isFavorite: updatedDocument.is_favorite,
-        metadata: updatedDocument.metadata,
+        metadata: typeof updatedDocument.metadata === 'string' ? JSON.parse(updatedDocument.metadata) : updatedDocument.metadata,
         updatedAt: updatedDocument.updated_at
       }
     })

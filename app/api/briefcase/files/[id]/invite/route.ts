@@ -33,37 +33,34 @@ export const POST = withDocumentAuth(
       }
 
       // Check if permission already exists
-      const existingPermission = await sql(`
+      const existingPermission = await sql`
         SELECT id FROM document_permissions 
-        WHERE document_id = $1 AND email = $2 AND is_active = true
-      `, [documentId, email])
+        WHERE document_id = ${documentId} AND email = ${email} AND is_active = true
+      ` as any[]
 
       if (existingPermission.length > 0) {
         return createErrorResponse('User already has access to this document', 400)
       }
 
       // Create permission
-      const newPermission = await sql(`
+      const newPermission = await sql`
         INSERT INTO document_permissions (
           document_id, user_id, email, role, granted_by, granted_at, is_active
-        ) VALUES ($1, $2, $3, $4, $5, NOW(), true)
+        ) VALUES (${documentId}, ${null}, ${email}, ${role}, ${user.id}, NOW(), ${true})
         RETURNING *
-      `, [documentId, null, email, role, user.id])
+      ` as any[]
 
       // Log activity
-      await sql(`
+      const detailsJson = JSON.stringify({
+        email,
+        role,
+        message: message || null,
+        documentName: document.name
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'invitation_sent', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          email,
-          role,
-          message: message || null,
-          documentName: document.name
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'invitation_sent'}, ${detailsJson}::jsonb, NOW())
+      `
 
       // Send email invitation via Resend
       try {

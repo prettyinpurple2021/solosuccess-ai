@@ -1,10 +1,10 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
-import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
+import { getIdempotencyKeyFromRequest, reserveIdempotencyKeyNeon} from '@/lib/idempotency'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -41,21 +41,23 @@ export async function POST(request: NextRequest) {
     }
     const { brandName, tagline, description, industry, colors, typography, logoData, logoStyle } = parsed.data
 
-    const db = getDb()
+    const sql = getSql()
 
     const key = getIdempotencyKeyFromRequest(request)
     if (key) {
-      const reserved = await reserveIdempotencyKey(client, key)
+      const reserved = await reserveIdempotencyKeyNeon(sql, key)
       if (!reserved) {
         return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
       }
     }
-    const { rows } = await client.query(
-      `INSERT INTO brand_profiles (user_id, brand_name, tagline, description, industry, colors, typography, logo_data, logo_style)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING *`,
-      [user.id, brandName, tagline || '', description || '', industry || '', JSON.stringify(colors), JSON.stringify(typography), logoData, logoStyle]
-    )
+    
+    const colorsJson = JSON.stringify(colors || {})
+    const typographyJson = JSON.stringify(typography || {})
+    const rows = await sql`
+      INSERT INTO brand_profiles (user_id, brand_name, tagline, description, industry, colors, typography, logo_data, logo_style)
+       VALUES (${user.id}, ${brandName}, ${tagline || ''}, ${description || ''}, ${industry || ''}, ${colorsJson}::jsonb, ${typographyJson}::jsonb, ${logoData || null}, ${logoStyle || null})
+       RETURNING *
+    ` as any[]
 
     return NextResponse.json({ 
       message: 'Brand kit saved successfully',

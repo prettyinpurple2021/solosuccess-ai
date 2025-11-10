@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { verifyToken} from '@/lib/auth-utils'
-import { db} from '@/db'
+import { getDb } from '@/lib/database-client'
 import { users} from '@/db/schema'
 import { eq} from 'drizzle-orm'
 
@@ -9,16 +9,11 @@ import { eq} from 'drizzle-orm'
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = verifyToken(token)
+    // verifyToken expects a NextRequest and returns Promise<string | null>
+    const userId = await verifyToken(request)
     
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
@@ -29,13 +24,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user profile in database
+    const db = getDb()
     await db
       .update(users)
       .set({ 
         full_name: name.trim(),
         updated_at: new Date()
       })
-      .where(eq(users.id, decoded.userId))
+      .where(eq(users.id, userId))
 
     return NextResponse.json({ 
       success: true, 

@@ -19,7 +19,7 @@ function getSql() {
 // POST /api/workflow-templates/[id]/download - Download template
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -38,7 +38,8 @@ export async function POST(
       )
     }
 
-    const templateId = params.id
+    const resolvedParams = await params
+    const templateId = resolvedParams.id
 
     // Get template
     const sql = getSql()

@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -22,20 +22,20 @@ export async function GET(
     }
 
     const documentId = id
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
     // Get activity
-    const { rows: activity } = await client.query(`
+    const activity = await sql`
       SELECT 
         da.id,
         da.user_id,
@@ -46,19 +46,19 @@ export async function GET(
         u.avatar_url
       FROM document_activity da
       LEFT JOIN users u ON da.user_id = u.id
-      WHERE da.document_id = $1
+      WHERE da.document_id = ${documentId}
       ORDER BY da.created_at DESC
       LIMIT 50
-    `, [documentId])
+    ` as any[]
 
-    return NextResponse.json(activity.map(item => ({
+    return NextResponse.json(activity.map((item: any) => ({
       id: item.id,
       userId: item.user_id,
       userName: item.user_name || 'Unknown User',
       userAvatar: item.avatar_url,
       action: item.action,
       timestamp: item.created_at,
-      details: item.details ? JSON.parse(item.details) : null
+      details: typeof item.details === 'string' ? JSON.parse(item.details) : (item.details || null)
     })))
 
   } catch (error) {

@@ -30,25 +30,21 @@ export const POST = withDocumentAuth(
       const newFavoriteStatus = !document.is_favorite
 
       // Update document
-      await sql(`
+      await sql`
         UPDATE documents 
-        SET is_favorite = $1, updated_at = NOW()
-        WHERE id = $2
-        RETURNING *
-      `, [newFavoriteStatus, documentId])
+        SET is_favorite = ${newFavoriteStatus}, updated_at = NOW()
+        WHERE id = ${documentId}
+      `
 
       // Log activity
-      await sql(`
+      const action = newFavoriteStatus ? 'favorited' : 'unfavorited'
+      const detailsJson = JSON.stringify({
+        isFavorite: newFavoriteStatus
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, $3, $4, NOW())
-      `, [
-        documentId,
-        user.id,
-        newFavoriteStatus ? 'favorited' : 'unfavorited',
-        JSON.stringify({
-          isFavorite: newFavoriteStatus
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${action}, ${detailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
         success: true,

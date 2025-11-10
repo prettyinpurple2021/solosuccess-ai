@@ -326,7 +326,6 @@ export class CompetitiveIntelligenceGamificationTriggers {
       
       // Fallback: Direct database update for critical stats
       try {
-        const db = getDb()
         const statUpdates = this.getStatUpdates(activityType, value)
         
         if (Object.keys(statUpdates).length > 0) {
@@ -345,11 +344,15 @@ export class CompetitiveIntelligenceGamificationTriggers {
               [userId]
             )
           } else {
-            // Fallback: update each field separately if unsafe not available
+            // Fallback: Execute individual updates for each field
+            // Note: This is less efficient but safer when unsafe is not available
             for (const [key, val] of Object.entries(statUpdates)) {
-              await sql`
-                UPDATE user_competitive_stats SET ${sql.raw(key)} = ${sql.raw(key)} + ${val}, updated_at = NOW() WHERE user_id = ${userId}
-              `
+              // Use parameterized query with field name validation
+              const fieldName = key // Field names are validated by getStatUpdates
+              await sqlClient.unsafe(
+                `UPDATE user_competitive_stats SET ${fieldName} = ${fieldName} + $1, updated_at = NOW() WHERE user_id = $2`,
+                [val, userId]
+              )
             }
           }
         }

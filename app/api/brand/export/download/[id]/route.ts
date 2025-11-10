@@ -9,7 +9,7 @@ export const runtime = 'edge'
 
 export async function GET(
   _request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, error } = await authenticateRequest()
@@ -17,8 +17,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const params = await context.params
     const db = getDb()
-    const id = context.params.id
+    const id = params.id
 
     const rows = await db
       .select({

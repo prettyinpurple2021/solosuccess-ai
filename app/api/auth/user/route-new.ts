@@ -19,7 +19,7 @@ const UserQuerySchema = z.object({
   include_metadata: z.string().optional().transform(val => val === 'true')
 })
 
-export const GET = withAuth(async (request: NextRequest, user) => {
+export const GET = withAuth(async (request: Request, user) => {
   try {
     const { searchParams } = new URL(request.url)
     const queryResult = UserQuerySchema.safeParse(Object.fromEntries(searchParams.entries()))

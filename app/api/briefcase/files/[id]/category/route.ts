@@ -33,24 +33,21 @@ export const POST = withDocumentAuth(
       }
 
       // Update category
-      await sql(`
+      await sql`
         UPDATE documents 
-        SET category = $1, updated_at = NOW()
-        WHERE id = $2
-      `, [category, documentId])
+        SET category = ${category}, updated_at = NOW()
+        WHERE id = ${documentId}
+      `
 
       // Log activity
-      await sql(`
+      const detailsJson = JSON.stringify({
+        newCategory: category,
+        previousCategory: document.category
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'category_updated', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          newCategory: category,
-          previousCategory: document.category
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'category_updated'}, ${detailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
         success: true,
