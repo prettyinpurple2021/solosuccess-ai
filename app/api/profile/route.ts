@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
 
     const db = getDb()
-    const { rows } = await client.query(
+    const { rows } = await db.query(
       `SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status,
               stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end,
               level, total_points, current_streak, wellness_score, focus_minutes, onboarding_completed, preferred_ai_agent
@@ -102,14 +102,14 @@ export async function PATCH(request: NextRequest) {
     const { full_name, avatar_url, onboarding_completed, onboarding_data } = parsed.data
 
     const db = getDb()
-    const { rows } = await client.query(
+    const { rows } = await db.query(
       `UPDATE users
           SET full_name = COALESCE($1, full_name),
               avatar_url = COALESCE($2, avatar_url),
               onboarding_completed = COALESCE($3, onboarding_completed),
-              notification_preferences = CASE 
+              onboarding_data = CASE 
                 WHEN $4 IS NOT NULL THEN $4::jsonb 
-                ELSE notification_preferences 
+                ELSE onboarding_data 
               END,
               updated_at = NOW()
         WHERE id = $5

@@ -29,6 +29,9 @@ export function useTemplateSave() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {}),
         },
         body: JSON.stringify({
           templateSlug,
@@ -68,7 +71,13 @@ export function useTemplateSave() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/templates');
+      const response = await fetch('/api/templates', {
+        headers: {
+          ...(typeof window !== 'undefined' && localStorage.getItem('authToken')
+            ? { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+            : {}),
+        },
+      });
       
       if (!response.ok) {
         const error = await response.json();
