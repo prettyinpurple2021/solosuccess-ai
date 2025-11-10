@@ -255,14 +255,57 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
-      logError('Global error caught:', event.error)
-      setError(event.error)
-      setHasError(true)
+      // Ignore errors that shouldn't trigger error boundary
+      // - ResizeObserver errors (common browser quirk)
+      // - Network errors (handled by network error handlers)
+      // - Script loading errors for external resources
+      // - CSP violations (already logged by browser)
+      const errorMessage = event.error?.message || event.message || ''
+      const errorSource = event.filename || ''
+      
+      // Ignore non-critical errors
+      if (
+        errorMessage.includes('ResizeObserver') ||
+        errorMessage.includes('Non-Error promise rejection') ||
+        errorMessage.includes('Script error') ||
+        errorSource.includes('googletagmanager.com') ||
+        errorSource.includes('google-analytics.com') ||
+        errorMessage.includes('Failed to load resource') ||
+        errorMessage.includes('net::ERR_')
+      ) {
+        logWarn('Ignored non-critical error:', { message: errorMessage, source: errorSource })
+        return
+      }
+
+      // Only catch actual runtime errors
+      if (event.error && event.error instanceof Error) {
+        logError('Global error caught:', event.error)
+        setError(event.error)
+        setHasError(true)
+      } else {
+        logWarn('Non-Error event caught:', event)
+      }
     }
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      logError('Unhandled promise rejection:', event.reason)
-      setError(new Error(event.reason?.message || 'Promise rejected'))
+      // Ignore non-error rejections and navigation cancellations
+      const reason = event.reason
+      const reasonMessage = reason?.message || String(reason) || ''
+      
+      // Ignore navigation cancellations and common non-critical rejections
+      if (
+        reasonMessage.includes('navigation') ||
+        reasonMessage.includes('AbortError') ||
+        reasonMessage.includes('canceled') ||
+        reasonMessage.includes('aborted') ||
+        !(reason instanceof Error)
+      ) {
+        logWarn('Ignored promise rejection:', reason)
+        return
+      }
+
+      logError('Unhandled promise rejection:', reason)
+      setError(reason instanceof Error ? reason : new Error(reasonMessage || 'Promise rejected'))
       setHasError(true)
     }
 
@@ -304,9 +347,13 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
             <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 onClick={() => {
-                  setHasError(false)
-                  setError(null)
-                  window.location.reload()
+                  try {
+                    setHasError(false)
+                    setError(null)
+                    window.location.reload()
+                  } catch (e) {
+                    logError('Error during page reload:', e)
+                  }
                 }}
                 className="flex-1"
               >
@@ -316,9 +363,13 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
               <Button
                 variant="outline"
                 onClick={() => {
-                  setHasError(false)
-                  setError(null)
-                  window.location.href = '/'
+                  try {
+                    setHasError(false)
+                    setError(null)
+                    window.location.href = '/'
+                  } catch (e) {
+                    logError('Error during navigation:', e)
+                  }
                 }}
                 className="flex-1"
               >
@@ -327,7 +378,13 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.open('/contact', '_blank')}
+                onClick={() => {
+                  try {
+                    window.open('/contact', '_blank')
+                  } catch (e) {
+                    logError('Error opening contact page:', e)
+                  }
+                }}
               >
                 Contact Support
               </Button>

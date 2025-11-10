@@ -10,7 +10,6 @@ import { PerformanceMonitor } from "@/components/performance/performance-monitor
 import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"
 import ExitIntentSurvey from "@/components/marketing/exit-intent-survey"
 import { AccessibilityProvider } from "@/components/ui/accessibility"
-import { ErrorBoundary } from "@/components/ui/error-handler"
 import { ChatProvider } from "@/components/providers/chat-provider"
 import { SmartTipManager } from "@/components/ui/smart-tip"
 import { Analytics } from "@vercel/analytics/next"
@@ -195,9 +194,7 @@ export default function RootLayout({
           <AuthProvider>
             <AccessibilityProvider>
               <ChatProvider>
-                <ErrorBoundary>
-                  {children}
-                </ErrorBoundary>
+                {children}
               </ChatProvider>
               <PerformanceMonitor />
               {/* Ensure this client component that calls useAuth is inside AuthProvider */}

@@ -3,6 +3,7 @@
 import { forwardRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { motion, type HTMLMotionProps } from 'framer-motion'
+import { logError } from '@/lib/logger'
 
 interface TacticalButtonProps extends HTMLMotionProps<'button'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline'
@@ -13,7 +14,7 @@ interface TacticalButtonProps extends HTMLMotionProps<'button'> {
 }
 
 const TacticalButton = forwardRef<HTMLButtonElement, TacticalButtonProps>(
-  ({ className, variant = 'primary', size = 'md', withShine = true, withPulse = false, children, ...props }, ref) => {
+  ({ className, variant = 'primary', size = 'md', withShine = true, withPulse = false, children, onClick, ...props }, ref) => {
     const baseClasses = 'inline-flex items-center justify-center gap-2 font-heading font-bold text-uppercase tracking-wider rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden'
     
     const variantClasses = {
@@ -31,6 +32,18 @@ const TacticalButton = forwardRef<HTMLButtonElement, TacticalButtonProps>(
       xl: 'px-10 py-5 text-xl'
     }
 
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      try {
+        if (onClick) {
+          onClick(e)
+        }
+      } catch (error) {
+        logError('Error in TacticalButton click handler:', error)
+        // Prevent error from propagating to error boundary
+        e.stopPropagation()
+      }
+    }
+
     return (
       <motion.button
         ref={ref}
@@ -44,6 +57,7 @@ const TacticalButton = forwardRef<HTMLButtonElement, TacticalButtonProps>(
         )}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        onClick={handleClick}
         {...props}
       >
         {children}

@@ -1,15 +1,11 @@
-import { logger, logError, logWarn, logInfo, logDebug } from '@/lib/logger'
-// AI SDK removed - using worker-based approach
-// import { generateText } from 'ai'
-// import { openai } from '@ai-sdk/openai'
+import { logError, logInfo } from '@/lib/logger'
 
-// Types for predictive analytics
 export interface PredictiveInsight {
   id: string
   type: 'trend' | 'anomaly' | 'forecast' | 'recommendation' | 'risk'
   title: string
   description: string
-  confidence: number // 0-100
+  confidence: number
   impact: 'low' | 'medium' | 'high' | 'critical'
   category: 'productivity' | 'engagement' | 'performance' | 'business' | 'user_behavior'
   timeframe: 'short_term' | 'medium_term' | 'long_term'
@@ -20,31 +16,70 @@ export interface PredictiveInsight {
     changePercent?: number
     historicalData?: number[]
     factors?: string[]
+    seriesLabel?: string
   }
   recommendations?: string[]
   actionable: boolean
-  priority: number // 1-10
+  priority: number
   createdAt: Date
   expiresAt?: Date
 }
 
-export interface UserBehaviorPattern {
+export interface BusinessTrendPoint {
+  periodStart: string
+  activeUsers: number
+  newUsers: number
+  paidUsers: number
+  estimatedRevenue: number
+  taskCompletionRate: number
+  goalCompletionRate: number
+  aiInteractions: number
+}
+
+export interface BusinessAnalyticsData {
+  timeframeDays: number
+  totalUsers: number
+  activeUsers: number
+  newUsers: number
+  paidUsers: number
+  churnRate: number
+  conversionRate: number
+  revenue30d: number
+  taskCompletionRate: number
+  goalCompletionRate: number
+  aiInteractions: number
+  historicalTrends: BusinessTrendPoint[]
+}
+
+export interface UserAnalyticsData {
   userId: string
-  patterns: {
+  timeframeDays: number
+  tasksTotal: number
+  tasksCompleted: number
+  taskCompletionRate: number
+  goalsTotal: number
+  goalsCompleted: number
+  goalCompletionRate: number
+  focusSessionsCount: number
+  totalFocusMinutes: number
+  avgSessionDurationMinutes: number
+  aiConversationsCount: number
+  aiMessagesCount: number
+  loginFrequencyPerWeek: number
+  sessionFrequencyPerWeek: number
+  engagementScore: number
+  interactionDepth: number
+  featureUsage: Record<string, number>
+  sessionPatterns: {
     peakHours: number[]
-    preferredFeatures: string[]
-    taskCompletionRate: number
-    sessionDuration: number
-    churnRisk: number
-    engagementScore: number
-    productivityTrend: 'increasing' | 'stable' | 'decreasing'
+    averageSessionLengthMinutes: number
+    sessionsPerWeek: number
   }
-  predictions: {
-    nextLoginTime?: Date
-    likelyToChurn: number
-    featureAdoptionProbability: Record<string, number>
-    productivityForecast: number[]
-  }
+  taskCompletionHistory: number[]
+  sessionDurationHistory: number[]
+  aiInteractionHistory: number[]
+  activeDays: number
+  lastLoginAt?: Date | null
 }
 
 export interface BusinessForecast {
@@ -75,474 +110,491 @@ export interface AnomalyDetection {
   recommendations: string[]
 }
 
+type InsightBuilder = (userData: UserAnalyticsData, businessData: BusinessAnalyticsData) => PredictiveInsight | null
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+const average = (values: number[]) => {
+  if (values.length === 0) return 0
+  return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+const safePercentChange = (current: number, previous: number) => {
+  if (previous === 0) {
+    return current === 0 ? 0 : 100
+  }
+  return ((current - previous) / previous) * 100
+}
+
+const toSeries = (points: BusinessTrendPoint[], selector: (point: BusinessTrendPoint) => number) =>
+  points.map(selector)
+
+const selectTopKeys = (data: Record<string, number>, limit: number) =>
+  Object.entries(data)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([key]) => key)
+
 class PredictiveAnalyticsEngine {
   private insights: Map<string, PredictiveInsight> = new Map()
-  private userPatterns: Map<string, UserBehaviorPattern> = new Map()
   private anomalies: AnomalyDetection[] = []
 
-  /**
-   * Generate predictive insights from user data
-   */
-  async generateInsights(userData: any, businessData: any): Promise<PredictiveInsight[]> {
+  async generateInsights(userData: UserAnalyticsData, businessData: BusinessAnalyticsData): Promise<PredictiveInsight[]> {
     try {
-      const insights: PredictiveInsight[] = []
+      const builders: InsightBuilder[] = [
+        this.buildProductivityInsight,
+        this.buildEngagementInsight,
+        this.buildChurnRiskInsight,
+        this.buildFeatureAdoptionInsight,
+        this.buildBusinessHealthInsight,
+      ]
 
-      // Analyze user productivity trends
-      const productivityInsight = await this.analyzeProductivityTrends(userData)
-      if (productivityInsight) insights.push(productivityInsight)
+      const insights = builders
+        .map(builder => builder.call(this, userData, businessData))
+        .filter((insight): insight is PredictiveInsight => Boolean(insight))
 
-      // Analyze engagement patterns
-      const engagementInsight = await this.analyzeEngagementPatterns(userData)
-      if (engagementInsight) insights.push(engagementInsight)
-
-      // Predict churn risk
-      const churnInsight = await this.predictChurnRisk(userData)
-      if (churnInsight) insights.push(churnInsight)
-
-      // Analyze feature adoption
-      const adoptionInsight = await this.analyzeFeatureAdoption(userData)
-      if (adoptionInsight) insights.push(adoptionInsight)
-
-      // Business metrics forecasting
-      const businessInsight = await this.forecastBusinessMetrics(businessData)
-      if (businessInsight) insights.push(businessInsight)
-
-      // Store insights
       insights.forEach(insight => {
         this.insights.set(insight.id, insight)
       })
 
-      logInfo(`Generated ${insights.length} predictive insights`)
+      logInfo(`Generated ${insights.length} predictive insights`, { userId: userData.userId })
       return insights
-
     } catch (error) {
-      logError('Error generating predictive insights:', error)
+      logError('Error generating predictive insights', error)
       return []
     }
   }
 
-  /**
-   * Analyze productivity trends using AI
-   */
-  private async analyzeProductivityTrends(userData: any): Promise<PredictiveInsight | null> {
-    try {
-      const prompt = `
-        Analyze the following user productivity data and provide insights:
-        
-        User Data:
-        - Tasks completed: ${userData.tasksCompleted || 0}
-        - Goals achieved: ${userData.goalsAchieved || 0}
-        - Focus sessions: ${userData.focusSessions || 0}
-        - AI interactions: ${userData.aiInteractions || 0}
-        - Session duration: ${userData.avgSessionDuration || 0} minutes
-        - Days active: ${userData.daysActive || 0}
-        - Productivity score: ${userData.productivityScore || 0}
-        
-        Historical data (last 7 days):
-        ${JSON.stringify(userData.recentActivity || [])}
-        
-        Provide a productivity trend analysis with:
-        1. Current productivity level assessment
-        2. Trend direction (increasing/stable/decreasing)
-        3. Confidence level (0-100)
-        4. Key factors affecting productivity
-        5. Actionable recommendations
-        
-        Format as JSON with: type, title, description, confidence, impact, category, timeframe, data, recommendations, actionable, priority
-      `
-
-      // TODO: Replace with worker-based AI call
-      // const result = await generateText({
-      //   model: openai('gpt-4-turbo'),
-      //   prompt,
-      //   temperature: 0.3,
-      // })
-      
-      // For now, return a fallback analysis
-      const analysis = {
-        title: 'Productivity Analysis (Fallback)',
-        description: 'Basic productivity assessment while AI integration is in progress',
-        confidence: 65,
-        impact: 'medium',
-        data: { current: userData.productivityScore || 0 },
-        recommendations: ['Continue tracking your progress', 'Focus on completing high-priority tasks'],
-        actionable: true,
-        priority: 5
-      }
-      
-      return {
-        id: `productivity_${Date.now()}`,
-        type: 'trend',
-        title: analysis.title || 'Productivity Trend Analysis',
-        description: analysis.description || 'Analysis of user productivity patterns',
-        confidence: analysis.confidence || 75,
-        impact: analysis.impact || 'medium',
-        category: 'productivity',
-        timeframe: 'medium_term',
-        data: analysis.data || {},
-        recommendations: analysis.recommendations || [],
-        actionable: analysis.actionable || true,
-        priority: analysis.priority || 5,
-        createdAt: new Date()
-      }
-
-    } catch (error) {
-      logError('Error analyzing productivity trends:', error)
+  private buildProductivityInsight(userData: UserAnalyticsData): PredictiveInsight | null {
+    const history = userData.taskCompletionHistory
+    if (history.length < 4) {
       return null
+    }
+
+    const midpoint = Math.floor(history.length / 2)
+    const previousWindow = history.slice(0, midpoint)
+    const recentWindow = history.slice(midpoint)
+
+    const previousAvg = average(previousWindow)
+    const recentAvg = average(recentWindow)
+    const changePercent = safePercentChange(recentAvg, previousAvg)
+
+    const direction = changePercent > 5 ? 'improving' : changePercent < -5 ? 'declining' : 'stable'
+    const confidence = clamp(60 + Math.min(history.length * 5, 30), 60, 95)
+    const impact = Math.abs(changePercent) > 15 ? 'high' : Math.abs(changePercent) > 5 ? 'medium' : 'low'
+    const priority = impact === 'high' ? 8 : impact === 'medium' ? 6 : 4
+
+    const recommendations: string[] = []
+    if (direction === 'declining') {
+      recommendations.push('Review task workload and redistribute if necessary')
+      recommendations.push('Schedule focus blocks for high-priority work')
+      recommendations.push('Use AI assistance to break down complex goals')
+    } else if (direction === 'improving') {
+      recommendations.push('Reinforce the habits that increased productivity')
+      recommendations.push('Capture and replicate successful workflows')
+      recommendations.push('Identify upcoming milestones that benefit from current momentum')
+    } else {
+      recommendations.push('Maintain current routines and monitor for shifts')
+      recommendations.push('Experiment with incremental improvements to session structure')
+    }
+
+    return {
+      id: `productivity_${userData.userId}_${Date.now()}`,
+      type: 'trend',
+      title: 'Productivity trajectory',
+      description: `Task completion is ${direction} by ${changePercent.toFixed(1)}% over the current period.`,
+      confidence,
+      impact,
+      category: 'productivity',
+      timeframe: 'medium_term',
+      data: {
+        current: recentAvg,
+        change: recentAvg - previousAvg,
+        changePercent,
+        historicalData: history,
+        seriesLabel: 'Tasks completed per day'
+      },
+      recommendations,
+      actionable: true,
+      priority,
+      createdAt: new Date()
     }
   }
 
-  /**
-   * Analyze engagement patterns
-   */
-  private async analyzeEngagementPatterns(userData: any): Promise<PredictiveInsight | null> {
-    try {
-      const prompt = `
-        Analyze user engagement patterns:
-        
-        Engagement Data:
-        - Login frequency: ${userData.loginFrequency || 0} times/week
-        - Feature usage: ${JSON.stringify(userData.featureUsage || {})}
-        - Session patterns: ${JSON.stringify(userData.sessionPatterns || {})}
-        - Interaction depth: ${userData.interactionDepth || 0}
-        
-        Provide engagement insights with:
-        1. Engagement level assessment
-        2. Peak usage times
-        3. Feature preferences
-        4. Engagement trend
-        5. Recommendations for improvement
-        
-        Format as JSON with the same structure as productivity analysis
-      `
+  private buildEngagementInsight(userData: UserAnalyticsData): PredictiveInsight | null {
+    const { sessionFrequencyPerWeek, avgSessionDurationMinutes, loginFrequencyPerWeek, engagementScore, sessionPatterns } = userData
 
-      const result = await generateText({
-        model: openai('gpt-4-turbo'),
-        prompt,
-        temperature: 0.3,
-      })
-
-      const analysis = JSON.parse(result.text)
-      
-      return {
-        id: `engagement_${Date.now()}`,
-        type: 'trend',
-        title: analysis.title || 'Engagement Pattern Analysis',
-        description: analysis.description || 'Analysis of user engagement patterns',
-        confidence: analysis.confidence || 70,
-        impact: analysis.impact || 'medium',
-        category: 'engagement',
-        timeframe: 'short_term',
-        data: analysis.data || {},
-        recommendations: analysis.recommendations || [],
-        actionable: analysis.actionable || true,
-        priority: analysis.priority || 4,
-        createdAt: new Date()
-      }
-
-    } catch (error) {
-      logError('Error analyzing engagement patterns:', error)
+    if (userData.sessionDurationHistory.length === 0) {
       return null
+    }
+
+    const avgDuration = avgSessionDurationMinutes
+    const sessionsPerWeek = sessionFrequencyPerWeek
+    const peakHours = sessionPatterns.peakHours
+
+    const engagementLevel =
+      engagementScore >= 75 ? 'very high' :
+      engagementScore >= 55 ? 'healthy' :
+      engagementScore >= 35 ? 'moderate' :
+      'at risk'
+
+    const impact =
+      engagementScore < 35 ? 'high' :
+      engagementScore < 55 ? 'medium' : 'low'
+
+    const confidence = clamp(70 + Math.min(userData.sessionDurationHistory.length * 3, 20), 70, 92)
+    const priority = impact === 'high' ? 7 : impact === 'medium' ? 5 : 3
+
+    const recommendations: string[] = []
+    if (impact === 'high') {
+      recommendations.push('Trigger re-engagement workflow with personalized content')
+      recommendations.push('Schedule proactive outreach from success team')
+      recommendations.push('Offer guided sessions aligned with peak availability hours')
+    } else if (impact === 'medium') {
+      recommendations.push('Introduce new feature walkthroughs during peak hours')
+      recommendations.push('Surface personalized productivity tips inside focus sessions')
+    } else {
+      recommendations.push('Maintain engagement cadence and monitor for deviation')
+      recommendations.push('Introduce advanced features tied to existing usage patterns')
+    }
+
+    return {
+      id: `engagement_${userData.userId}_${Date.now()}`,
+      type: 'trend',
+      title: 'Engagement health assessment',
+      description: `User engagement is ${engagementLevel}. Average ${sessionsPerWeek.toFixed(1)} sessions per week at ${avgDuration.toFixed(0)} minutes each.`,
+      confidence,
+      impact,
+      category: 'engagement',
+      timeframe: 'short_term',
+      data: {
+        current: engagementScore,
+        historicalData: userData.sessionDurationHistory,
+        factors: peakHours.length > 0 ? peakHours.map(hour => `Peak hour ${hour}:00`) : undefined
+      },
+      recommendations,
+      actionable: true,
+      priority,
+      createdAt: new Date()
     }
   }
 
-  /**
-   * Predict churn risk using AI
-   */
-  private async predictChurnRisk(userData: any): Promise<PredictiveInsight | null> {
-    try {
-      const prompt = `
-        Predict user churn risk based on behavior patterns:
-        
-        User Behavior:
-        - Last login: ${userData.lastLogin || 'unknown'}
-        - Session frequency: ${userData.sessionFrequency || 0}
-        - Task completion rate: ${userData.taskCompletionRate || 0}%
-        - Goal achievement rate: ${userData.goalAchievementRate || 0}%
-        - Feature adoption: ${userData.featureAdoption || 0}
-        - Support tickets: ${userData.supportTickets || 0}
-        - Engagement score: ${userData.engagementScore || 0}
-        
-        Calculate churn risk and provide:
-        1. Risk level (low/medium/high/critical)
-        2. Risk factors
-        3. Probability percentage
-        4. Retention recommendations
-        5. Timeline for intervention
-        
-        Format as JSON with the same structure
-      `
+  private buildChurnRiskInsight(userData: UserAnalyticsData): PredictiveInsight | null {
+    const activityPenalty = clamp(60 - userData.sessionFrequencyPerWeek * 12, 0, 40)
+    const completionPenalty = clamp(50 - userData.taskCompletionRate, 0, 30)
+    const engagementPenalty = clamp(50 - userData.engagementScore, 0, 30)
 
-      const result = await generateText({
-        model: openai('gpt-4-turbo'),
-        prompt,
-        temperature: 0.2,
-      })
+    const riskScore = clamp(activityPenalty + completionPenalty + engagementPenalty, 0, 100)
+    const riskLevel =
+      riskScore >= 70 ? 'critical' :
+      riskScore >= 50 ? 'high' :
+      riskScore >= 30 ? 'medium' :
+      'low'
 
-      const analysis = JSON.parse(result.text)
-      
-      return {
-        id: `churn_risk_${Date.now()}`,
-        type: 'risk',
-        title: analysis.title || 'Churn Risk Assessment',
-        description: analysis.description || 'Prediction of user churn likelihood',
-        confidence: analysis.confidence || 80,
-        impact: analysis.impact || 'high',
-        category: 'user_behavior',
-        timeframe: 'short_term',
-        data: analysis.data || {},
-        recommendations: analysis.recommendations || [],
-        actionable: analysis.actionable || true,
-        priority: analysis.priority || 8,
-        createdAt: new Date()
-      }
+    const impact = riskScore >= 50 ? 'high' : riskScore >= 30 ? 'medium' : 'low'
+    const priority = riskScore >= 50 ? 9 : riskScore >= 30 ? 7 : 4
+    const confidence = clamp(65 + userData.taskCompletionHistory.length * 3, 65, 90)
 
-    } catch (error) {
-      logError('Error predicting churn risk:', error)
-      return null
+    const factors: string[] = []
+    if (activityPenalty > 20) factors.push('Low weekly session frequency')
+    if (completionPenalty > 20) factors.push('Task completion below target')
+    if (engagementPenalty > 20) factors.push('Decreasing engagement score')
+
+    const recommendations: string[] = []
+    recommendations.push('Send tailored retention playbook emphasising quick wins')
+    if (activityPenalty > 20) {
+      recommendations.push('Invite user to schedule recurring focus sessions')
+    }
+    if (completionPenalty > 20) {
+      recommendations.push('Surface unfinished goals and suggest next best action')
+    }
+    if (engagementPenalty > 20) {
+      recommendations.push('Highlight new capabilities aligned with prior usage')
+    }
+
+    return {
+      id: `churn_${userData.userId}_${Date.now()}`,
+      type: 'risk',
+      title: 'Churn risk assessment',
+      description: `Churn risk is ${riskLevel} with a score of ${riskScore.toFixed(0)} based on recent activity patterns.`,
+      confidence,
+      impact,
+      category: 'user_behavior',
+      timeframe: 'short_term',
+      data: {
+        current: riskScore,
+        factors,
+        historicalData: userData.taskCompletionHistory
+      },
+      recommendations,
+      actionable: true,
+      priority,
+      createdAt: new Date()
     }
   }
 
-  /**
-   * Analyze feature adoption patterns
-   */
-  private async analyzeFeatureAdoption(userData: any): Promise<PredictiveInsight | null> {
-    try {
-      const prompt = `
-        Analyze feature adoption patterns:
-        
-        Feature Usage:
-        ${JSON.stringify(userData.featureUsage || {})}
-        
-        User Profile:
-        - Experience level: ${userData.experienceLevel || 'beginner'}
-        - Primary use case: ${userData.primaryUseCase || 'unknown'}
-        - Subscription tier: ${userData.subscriptionTier || 'free'}
-        
-        Provide feature adoption insights:
-        1. Current adoption level
-        2. Underutilized features
-        3. Adoption barriers
-        4. Recommended features
-        5. Personalization opportunities
-        
-        Format as JSON with the same structure
-      `
-
-      const result = await generateText({
-        model: openai('gpt-4-turbo'),
-        prompt,
-        temperature: 0.4,
-      })
-
-      const analysis = JSON.parse(result.text)
-      
-      return {
-        id: `feature_adoption_${Date.now()}`,
-        type: 'recommendation',
-        title: analysis.title || 'Feature Adoption Analysis',
-        description: analysis.description || 'Analysis of feature usage patterns',
-        confidence: analysis.confidence || 65,
-        impact: analysis.impact || 'medium',
-        category: 'user_behavior',
-        timeframe: 'short_term',
-        data: analysis.data || {},
-        recommendations: analysis.recommendations || [],
-        actionable: analysis.actionable || true,
-        priority: analysis.priority || 3,
-        createdAt: new Date()
-      }
-
-    } catch (error) {
-      logError('Error analyzing feature adoption:', error)
+  private buildFeatureAdoptionInsight(userData: UserAnalyticsData): PredictiveInsight | null {
+    const featureEntries = Object.entries(userData.featureUsage)
+    if (featureEntries.length === 0) {
       return null
+    }
+
+    const [topFeatureKey, topFeatureValue] = featureEntries.sort((a, b) => b[1] - a[1])[0]
+    const underutilised = featureEntries
+      .filter(([_, value]) => topFeatureValue > 0 && value / topFeatureValue < 0.3)
+      .map(([key]) => key)
+
+    if (underutilised.length === 0) {
+      return null
+    }
+
+    const recommendations = underutilised.map(feature => {
+      switch (feature) {
+        case 'goal_tracking':
+          return 'Encourage goal tracking by linking active tasks to measurable outcomes.'
+        case 'focus_mode':
+          return 'Offer guided focus sessions during established peak hours to deepen usage.'
+        case 'ai_chat':
+          return 'Promote AI co-pilot suggestions within task workflow to increase interactions.'
+        case 'task_management':
+          return 'Provide task templates aligned with recent activity to accelerate planning.'
+        default:
+          return `Highlight the benefits of ${feature.replace('_', ' ')} with contextual tips.`
+      }
+    })
+
+    const confidence = clamp(65 + underutilised.length * 5, 65, 90)
+
+    return {
+      id: `adoption_${userData.userId}_${Date.now()}`,
+      type: 'recommendation',
+      title: 'Feature adoption opportunities',
+      description: `Feature adoption is concentrated on ${topFeatureKey.replace('_', ' ')}. ${underutilised.length} capabilities need guidance.`,
+      confidence,
+      impact: underutilised.length > 2 ? 'medium' : 'low',
+      category: 'user_behavior',
+      timeframe: 'medium_term',
+      data: {
+        factors: selectTopKeys(userData.featureUsage, 5),
+        current: topFeatureValue
+      },
+      recommendations,
+      actionable: true,
+      priority: underutilised.length > 2 ? 6 : 4,
+      createdAt: new Date()
     }
   }
 
-  /**
-   * Forecast business metrics
-   */
-  private async forecastBusinessMetrics(businessData: any): Promise<PredictiveInsight | null> {
-    try {
-      const prompt = `
-        Forecast business metrics based on current data:
-        
-        Current Metrics:
-        - Active users: ${businessData.activeUsers || 0}
-        - New users (30d): ${businessData.newUsers30d || 0}
-        - Revenue (30d): $${businessData.revenue30d || 0}
-        - Churn rate: ${businessData.churnRate || 0}%
-        - Conversion rate: ${businessData.conversionRate || 0}%
-        
-        Historical Trends:
-        ${JSON.stringify(businessData.historicalTrends || [])}
-        
-        Provide business forecast:
-        1. Growth projections (30d, 90d, 1y)
-        2. Revenue forecasts
-        3. User acquisition predictions
-        4. Risk factors
-        5. Strategic recommendations
-        
-        Format as JSON with the same structure
-      `
-
-      const result = await generateText({
-        model: openai('gpt-4-turbo'),
-        prompt,
-        temperature: 0.3,
-      })
-
-      const analysis = JSON.parse(result.text)
-      
-      return {
-        id: `business_forecast_${Date.now()}`,
-        type: 'forecast',
-        title: analysis.title || 'Business Metrics Forecast',
-        description: analysis.description || 'Projection of key business metrics',
-        confidence: analysis.confidence || 60,
-        impact: analysis.impact || 'high',
-        category: 'business',
-        timeframe: 'long_term',
-        data: analysis.data || {},
-        recommendations: analysis.recommendations || [],
-        actionable: analysis.actionable || true,
-        priority: analysis.priority || 7,
-        createdAt: new Date()
-      }
-
-    } catch (error) {
-      logError('Error forecasting business metrics:', error)
+  private buildBusinessHealthInsight(_userData: UserAnalyticsData, businessData: BusinessAnalyticsData): PredictiveInsight | null {
+    if (businessData.historicalTrends.length < 4) {
       return null
+    }
+
+    const userSeries = toSeries(businessData.historicalTrends, point => point.activeUsers)
+    const revenueSeries = toSeries(businessData.historicalTrends, point => point.estimatedRevenue)
+    const churnSeries = toSeries(businessData.historicalTrends, point => point.paidUsers > 0 ? (point.paidUsers - point.activeUsers) / point.paidUsers : 0)
+
+    const usersChange = safePercentChange(userSeries[userSeries.length - 1], userSeries[0])
+    const revenueChange = safePercentChange(revenueSeries[revenueSeries.length - 1], revenueSeries[0])
+
+    const momentum =
+      usersChange > 8 && revenueChange > 5 ? 'accelerating' :
+      usersChange > 0 || revenueChange > 0 ? 'growing' :
+      'flattening'
+
+    const impact =
+      revenueChange < -5 || usersChange < -5 ? 'high' :
+      revenueChange < 2 && usersChange < 2 ? 'medium' :
+      'low'
+
+    const priority = impact === 'high' ? 8 : impact === 'medium' ? 6 : 4
+    const confidence = clamp(70 + businessData.historicalTrends.length * 2, 70, 90)
+
+    const recommendations: string[] = []
+    if (momentum === 'accelerating') {
+      recommendations.push('Scale acquisition channels sustaining user growth.')
+      recommendations.push('Reinvest in revenue-driving cohorts to compound gains.')
+    } else if (momentum === 'growing') {
+      recommendations.push('Protect current growth by monitoring activation to paid conversion.')
+      recommendations.push('Pilot pricing or packaging experiments for incremental lift.')
+    } else {
+      recommendations.push('Investigate recent churn signals and reactivate dormant cohorts.')
+      recommendations.push('Align product roadmap with underperforming adoption segments.')
+    }
+
+    const churnRecent = churnSeries.slice(-Math.min(5, churnSeries.length))
+    const churnAvg = average(churnRecent) * 100
+
+    return {
+      id: `business_${Date.now()}`,
+      type: 'trend',
+      title: 'Business momentum analysis',
+      description: `Business momentum is ${momentum}. Active users changed ${usersChange.toFixed(1)}% and revenue ${revenueChange.toFixed(1)}% over the observed window.`,
+      confidence,
+      impact,
+      category: 'business',
+      timeframe: 'long_term',
+      data: {
+        current: businessData.activeUsers,
+        changePercent: usersChange,
+        historicalData: userSeries,
+        factors: [
+          `Revenue change ${revenueChange.toFixed(1)}%`,
+          `Average churn ${(churnAvg).toFixed(2)}%`
+        ]
+      },
+      recommendations,
+      actionable: true,
+      priority,
+      createdAt: new Date()
     }
   }
 
-  /**
-   * Detect anomalies in data
-   */
-  async detectAnomalies(data: any[]): Promise<AnomalyDetection[]> {
+  async detectAnomalies(metrics: Array<{
+    name: string
+    type?: AnomalyDetection['type']
+    historicalData: number[]
+    currentValue: number
+  }>): Promise<AnomalyDetection[]> {
     try {
       const anomalies: AnomalyDetection[] = []
 
-      // Simple statistical anomaly detection
-      for (const metric of data) {
-        const values = metric.historicalData || []
-        if (values.length < 3) continue
-
-        const mean = values.reduce((sum: number, val: number) => sum + val, 0) / values.length
-        const variance = values.reduce((sum: number, val: number) => sum + Math.pow(val - mean, 2), 0) / values.length
-        const stdDev = Math.sqrt(variance)
-
-        const currentValue = metric.currentValue || 0
-        const deviation = Math.abs(currentValue - mean) / stdDev
-
-        // Flag as anomaly if deviation > 2 standard deviations
-        if (deviation > 2) {
-          anomalies.push({
-            id: `anomaly_${metric.name}_${Date.now()}`,
-            type: metric.type || 'performance',
-            severity: deviation > 3 ? 'critical' : deviation > 2.5 ? 'high' : 'medium',
-            description: `Unusual ${metric.name} detected`,
-            detectedAt: new Date(),
-            metric: metric.name,
-            expectedValue: mean,
-            actualValue: currentValue,
-            deviation: deviation,
-            impact: `Significant deviation in ${metric.name}`,
-            recommendations: [
-              'Investigate root cause',
-              'Monitor closely',
-              'Consider system adjustments'
-            ]
-          })
+      for (const metric of metrics) {
+        const { historicalData, currentValue, name } = metric
+        if (historicalData.length < 4) {
+          continue
         }
+
+        const mean = average(historicalData)
+        const variance = historicalData.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / historicalData.length
+        const standardDeviation = Math.sqrt(variance)
+
+        if (standardDeviation === 0) {
+          continue
+        }
+
+        const deviation = Math.abs(currentValue - mean) / standardDeviation
+        if (deviation <= 2) {
+          continue
+        }
+
+        anomalies.push({
+          id: `anomaly_${name}_${Date.now()}`,
+          type: metric.type ?? 'performance',
+          severity: deviation > 3 ? 'critical' : deviation > 2.5 ? 'high' : 'medium',
+          description: `Detected anomaly for ${name}: ${currentValue.toFixed(2)} vs expected ${mean.toFixed(2)}.`,
+          detectedAt: new Date(),
+          metric: name,
+          expectedValue: mean,
+          actualValue: currentValue,
+          deviation,
+          impact: `Deviation of ${(deviation * 100).toFixed(0)}% from expected`,
+          recommendations: [
+            'Inspect recent changes affecting this metric',
+            'Validate upstream data sources for accuracy',
+            'Implement temporary guardrails while diagnosing'
+          ]
+        })
       }
 
-      this.anomalies.push(...anomalies)
-      logInfo(`Detected ${anomalies.length} anomalies`)
-      return anomalies
+      if (anomalies.length > 0) {
+        this.anomalies.push(...anomalies)
+        logInfo(`Detected ${anomalies.length} anomalies`, {
+          metrics: anomalies.map(anomaly => anomaly.metric)
+        })
+      }
 
+      return anomalies
     } catch (error) {
-      logError('Error detecting anomalies:', error)
+      logError('Error detecting anomalies', error)
       return []
     }
   }
 
-  /**
-   * Generate business forecast
-   */
-  async generateBusinessForecast(timeframe: '7d' | '30d' | '90d' | '1y'): Promise<BusinessForecast> {
+  async generateBusinessForecast(timeframe: '7d' | '30d' | '90d' | '1y', businessData: BusinessAnalyticsData): Promise<BusinessForecast> {
     try {
-      // This would integrate with your actual business data
-      // For now, returning a mock forecast
-      return {
+      const projectionSteps: Record<typeof timeframe, number> = {
+        '7d': 7,
+        '30d': 6,
+        '90d': 9,
+        '1y': 12
+      }
+
+      const steps = projectionSteps[timeframe]
+      const history = businessData.historicalTrends
+
+      const makeProjection = (series: number[]) => {
+        if (series.length < 2) {
+          return Array(steps).fill(series[series.length - 1] ?? 0)
+        }
+
+        const lastValue = series[series.length - 1]
+        const secondLast = series[series.length - 2]
+        const slope = lastValue - secondLast
+
+        return Array.from({ length: steps }, (_, index) => {
+          const projected = lastValue + slope * (index + 1)
+          return Number(projected.toFixed(2))
+        })
+      }
+
+      const userGrowthSeries = toSeries(history, point => point.activeUsers)
+      const revenueSeries = toSeries(history, point => point.estimatedRevenue)
+      const engagementSeries = toSeries(history, point => point.taskCompletionRate)
+      const churnSeries = toSeries(history, point => point.paidUsers > 0 ? ((point.paidUsers - point.activeUsers) / point.paidUsers) * 100 : 0)
+      const adoptionSeries = {
+        ai_chat: toSeries(history, point => point.aiInteractions),
+        goals: toSeries(history, point => point.goalCompletionRate),
+        tasks: toSeries(history, point => point.taskCompletionRate)
+      }
+
+      const forecast: BusinessForecast = {
         timeframe,
         metrics: {
-          userGrowth: [100, 105, 110, 115, 120, 125, 130],
-          revenue: [1000, 1050, 1100, 1150, 1200, 1250, 1300],
-          engagement: [75, 76, 77, 78, 79, 80, 81],
-          churn: [5, 4.8, 4.6, 4.4, 4.2, 4.0, 3.8],
-          featureAdoption: {
-            'ai_chat': [60, 62, 64, 66, 68, 70, 72],
-            'task_management': [80, 81, 82, 83, 84, 85, 86]
-          }
+          userGrowth: makeProjection(userGrowthSeries),
+          revenue: makeProjection(revenueSeries),
+          engagement: makeProjection(engagementSeries),
+          churn: makeProjection(churnSeries),
+          featureAdoption: Object.fromEntries(
+            Object.entries(adoptionSeries).map(([key, series]) => [key, makeProjection(series)])
+          )
         },
-        confidence: 75,
+        confidence: clamp(65 + Math.min(history.length * 3, 25), 65, 92),
         factors: [
-          'Current growth trajectory',
-          'Seasonal patterns',
-          'Feature releases',
-          'Market conditions'
+          `Active users: ${businessData.activeUsers}`,
+          `Paid conversion: ${businessData.conversionRate.toFixed(2)}%`,
+          `AI interactions: ${businessData.aiInteractions}`
         ],
         assumptions: [
-          'No major external disruptions',
-          'Current product strategy maintained',
-          'User acquisition channels remain stable'
+          'Historical cadence continues without major structural changes',
+          'No pricing adjustments or large acquisition spikes',
+          'Infrastructure capacity handles projected demand'
         ]
       }
 
+      return forecast
     } catch (error) {
-      logError('Error generating business forecast:', error)
+      logError('Error generating business forecast', error)
       throw error
     }
   }
 
-  /**
-   * Get all insights
-   */
   getInsights(): PredictiveInsight[] {
     return Array.from(this.insights.values())
   }
 
-  /**
-   * Get insights by category
-   */
-  getInsightsByCategory(category: string): PredictiveInsight[] {
-    return this.getInsights().filter(insight => insight.category === category)
-  }
-
-  /**
-   * Get high-priority insights
-   */
   getHighPriorityInsights(): PredictiveInsight[] {
     return this.getInsights().filter(insight => insight.priority >= 7)
   }
 
-  /**
-   * Get actionable insights
-   */
   getActionableInsights(): PredictiveInsight[] {
     return this.getInsights().filter(insight => insight.actionable)
   }
 
-  /**
-   * Get recent anomalies
-   */
   getRecentAnomalies(): AnomalyDetection[] {
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    return this.anomalies.filter(anomaly => anomaly.detectedAt > oneDayAgo)
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    return this.anomalies.filter(anomaly => anomaly.detectedAt >= twentyFourHoursAgo)
   }
 }
 
-// Export singleton instance
 export const predictiveAnalytics = new PredictiveAnalyticsEngine()

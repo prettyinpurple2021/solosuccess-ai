@@ -4,6 +4,7 @@ import { db} from '@/db'
 import { intelligenceData, competitorProfiles} from '@/db/schema'
 import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
+import { createErrorResponse } from '@/lib/api-response'
 import { z} from 'zod'
 import { eq, and, or, desc, asc, gte, lte, inArray} from 'drizzle-orm'
 

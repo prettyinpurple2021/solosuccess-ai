@@ -133,6 +133,12 @@
 - **Content:** Focus session tracking, productivity calculations not implemented
 - **Status:** INCOMPLETE
 
+#### **6. Predictive Analytics Insights**
+- **File:** `app/api/analytics/predictive/route.ts`
+- **Issue (before):** Placeholder metrics and mock insight generation; AI calls stubbed with static fallbacks; revenue/churn hardcoded.
+- **Change:** Implemented full data pipeline using Drizzle queries for user/business metrics, deterministic insight engine (`lib/predictive-analytics.ts`), anomaly detection, and forecast generation without mock data. Added real engagement/churn scoring and revenue estimation from subscription tiers.
+- **Status:** ✅ RESOLVED
+
 ### **Components with Placeholder Content:**
 
 #### **1. Competitor Edit Page**

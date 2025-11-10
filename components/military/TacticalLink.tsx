@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { logError } from '@/lib/logger'
 
 interface TacticalLinkProps {
   href: string
@@ -14,6 +15,7 @@ interface TacticalLinkProps {
   className?: string
   target?: string
   rel?: string
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
 export function TacticalLink({
@@ -25,7 +27,8 @@ export function TacticalLink({
   children,
   className,
   target,
-  rel
+  rel,
+  onClick
 }: TacticalLinkProps) {
   const baseClasses = 'inline-flex items-center justify-center gap-2 font-heading font-bold text-uppercase tracking-wider rounded-xl transition-all duration-300 relative overflow-hidden no-underline hover:scale-105 active:scale-95'
   
@@ -44,11 +47,24 @@ export function TacticalLink({
     xl: 'px-10 py-5 text-xl'
   }
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    try {
+      if (onClick) {
+        onClick(e)
+      }
+      // Allow default navigation behavior
+    } catch (error) {
+      logError('Error in TacticalLink click handler:', error)
+      // Don't prevent default navigation even if onClick handler fails
+    }
+  }
+
   return (
     <Link
       href={href}
       target={target}
       rel={rel}
+      onClick={handleClick}
       className={cn(
         baseClasses,
         variantClasses[variant],
@@ -57,6 +73,7 @@ export function TacticalLink({
         withPulse && 'pulse-tactical',
         className
       )}
+      prefetch={true}
     >
       {children}
       {withShine && (

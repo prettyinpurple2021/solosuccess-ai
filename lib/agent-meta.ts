@@ -50,42 +50,9 @@ const fallbackAgentMeta: Record<string, AgentMeta> = {
 // This works at build time and runtime, avoiding static import issues.
 // Only runs on server-side to avoid fs module issues in client bundles
 function loadAgentMetaMap(): Record<string, AgentMeta> {
-  try {
-    // Client-side: return empty object, use fallbacks
-    if (typeof window !== 'undefined') return {}
-    
-    // Server-side: try to load dynamic metadata
-    // Use dynamic import to avoid bundling fs in client code
-    if (typeof require !== 'undefined') {
-      const fs = require('fs')
-      const path = require('path')
-      const base = path.join(process.cwd(), 'public', 'agents')
-      if (!fs.existsSync(base)) return {}
-      const entries = fs.readdirSync(base, { withFileTypes: true })
-      const map: Record<string, AgentMeta> = {}
-      for (const dirent of entries) {
-        if (!dirent.isDirectory()) continue
-        const id = dirent.name
-        const metaPath = path.join(base, id, 'meta.json')
-        try {
-          if (!fs.existsSync(metaPath)) continue
-          const raw = fs.readFileSync(metaPath, { encoding: 'utf8' })
-          const parsed = JSON.parse(raw)
-          if (parsed && typeof parsed.image === 'string') {
-            map[id] = parsed as AgentMeta
-          }
-        } catch (e) {
-          // ignore malformed meta.json files
-          continue
-        }
-      }
-      return map
-    }
-    return {}
-  } catch (e) {
-    // If anything fails, return empty object and use fallbacks
-    return {}
-  }
+  // To ensure zero warnings on serverless/edge builds, we avoid any use
+  // of Node core modules like `fs` during bundling. Rely on fallbacks.
+  return {}
 }
 
 // Load dynamic metadata and merge with fallback
