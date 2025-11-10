@@ -7,7 +7,7 @@ import { useDashboardData} from "@/hooks/use-dashboard-data"
 import { useAuth} from "@/hooks/use-auth"
 import { useSmartTips, TRIGGER_CONDITIONS } from "@/hooks/use-smart-tips"
 import { useAnalytics, usePageTracking, usePerformanceTracking} from "@/hooks/use-analytics"
-import { EnhancedOnboarding} from "@/components/onboarding/enhanced-onboarding"
+import { SimpleOnboarding} from "@/components/onboarding/simple-onboarding"
 import { WelcomeDashboard} from "@/components/onboarding/welcome-dashboard"
 import { Loading} from "@/components/ui/loading"
 import { motion, easeOut} from "framer-motion"
@@ -212,10 +212,10 @@ export default function DashboardPage() {
         <CamoBackground />
         <TacticalGrid />
         
-        <EnhancedOnboarding 
+        <SimpleOnboarding 
           open={showOnboarding} 
-          onComplete={handleOnboardingComplete}
-          onSkip={handleOnboardingSkip}
+          onCompleteAction={handleOnboardingComplete}
+          onSkipAction={handleOnboardingSkip}
         />
         
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -241,10 +241,10 @@ export default function DashboardPage() {
         <CamoBackground />
         <TacticalGrid />
         
-        <EnhancedOnboarding 
+        <SimpleOnboarding 
           open={showOnboarding} 
-          onComplete={handleOnboardingComplete}
-          onSkip={handleOnboardingSkip}
+          onCompleteAction={handleOnboardingComplete}
+          onSkipAction={handleOnboardingSkip}
         />
         
         <div className="flex items-center justify-center min-h-[60vh] p-4">
@@ -276,10 +276,10 @@ export default function DashboardPage() {
         <CamoBackground />
         <TacticalGrid />
         
-        <EnhancedOnboarding 
+        <SimpleOnboarding 
           open={showOnboarding} 
-          onComplete={handleOnboardingComplete}
-          onSkip={handleOnboardingSkip}
+          onCompleteAction={handleOnboardingComplete}
+          onSkipAction={handleOnboardingSkip}
         />
         
         <div className="flex items-center justify-center min-h-[60vh] p-4">
@@ -349,10 +349,10 @@ export default function DashboardPage() {
       <CamoBackground />
       <TacticalGrid />
       
-      <EnhancedOnboarding 
+      <SimpleOnboarding 
         open={showOnboarding} 
-        onComplete={handleOnboardingComplete}
-        onSkip={handleOnboardingSkip}
+        onCompleteAction={handleOnboardingComplete}
+        onSkipAction={handleOnboardingSkip}
       />
       
       <motion.div 

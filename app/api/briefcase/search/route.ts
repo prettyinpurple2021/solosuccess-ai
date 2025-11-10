@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -46,7 +46,8 @@ export async function POST(request: NextRequest) {
       offset = 0
     } = await request.json()
 
-    const db = getDb()
+    const sql = getSql()
+    const sqlClient = sql as any
 
     // Build base query
     let whereConditions = ['d.user_id = $1']
@@ -57,12 +58,12 @@ export async function POST(request: NextRequest) {
     if (query.trim()) {
       if (semantic && includeContent) {
         // For semantic search, we'll use AI to find relevant documents
-        const semanticResults = await performSemanticSearch(query, user.id, client)
+        const semanticResults = await performSemanticSearch(query, user.id, sql)
         if (semanticResults.length > 0) {
           // Use parameterized queries to prevent SQL injection
           const placeholders = semanticResults.map(() => `$${paramIndex++}`).join(',')
           whereConditions.push(`d.id IN (${placeholders})`)
-          params.push(...semanticResults.map(r => r.id))
+          params.push(...semanticResults.map((r: any) => r.id))
         } else {
           // Fallback to regular text search if semantic search fails
           whereConditions.push(`(
@@ -188,8 +189,8 @@ export async function POST(request: NextRequest) {
 
     params.push(limit, offset)
 
-    // Execute search
-    const { rows: files } = await client.query(query_sql, params)
+    // Execute search using unsafe for dynamic SQL
+    const files = await sqlClient.unsafe(query_sql, params) as any[]
 
     // Get total count for pagination
     const countQuery = `
@@ -198,13 +199,15 @@ export async function POST(request: NextRequest) {
       LEFT JOIN document_folders f ON d.folder_id = f.id
       WHERE ${whereConditions.join(' AND ')}
     `
-    const { rows: [{ total }] } = await client.query(countQuery, params.slice(0, -2)) // Remove limit and offset
+    const countParams = params.slice(0, -2) // Remove limit and offset
+    const countResult = await sqlClient.unsafe(countQuery, countParams) as any[]
+    const total = countResult[0]?.total || 0
 
     // Get search statistics
-    const stats = await getSearchStats(client, user.id, whereConditions, params.slice(0, -2))
+    const stats = await getSearchStats(sql, user.id, whereConditions, countParams)
 
     return NextResponse.json({
-      files: files.map(file => ({
+      files: files.map((file: any) => ({
         ...file,
         downloadUrl: `/api/briefcase/files/${file.id}/download`,
         previewUrl: `/api/briefcase/files/${file.id}/preview`,
@@ -240,16 +243,16 @@ export async function POST(request: NextRequest) {
 }
 
 // Perform semantic search using AI worker
-async function performSemanticSearch(query: string, userId: string, client: any) {
+async function performSemanticSearch(query: string, userId: string, sql: any) {
   try {
     // Get user's documents for semantic analysis
-    const { rows: documents }: { rows: DocumentSearchResult[] } = await client.query(`
+    const documents = await sql`
       SELECT id, name, description, tags, category, file_type, ai_insights
       FROM documents 
-      WHERE user_id = $1
+      WHERE user_id = ${userId}
       ORDER BY created_at DESC
       LIMIT 100
-    `, [userId])
+    ` as DocumentSearchResult[]
 
     if (documents.length === 0) {
       return []
@@ -311,35 +314,40 @@ async function performSemanticSearch(query: string, userId: string, client: any)
 }
 
 // Get search statistics
-async function getSearchStats(client: any, userId: string, whereConditions: string[], params: any[]) {
+async function getSearchStats(sql: any, userId: string, whereConditions: string[], params: any[]) {
   try {
+    const sqlClient = sql as any
+    
     // File type distribution
-    const { rows: fileTypeStats } = await client.query(`
+    const fileTypeStatsQuery = `
       SELECT file_type, COUNT(*) as count, SUM(size) as total_size
       FROM documents d
-      WHERE ${whereConditions.map((_, i) => `$${i + 1}`).join(' AND ')}
+      WHERE ${whereConditions.join(' AND ')}
       GROUP BY file_type
       ORDER BY count DESC
-    `, params)
+    `
+    const fileTypeStats = await sqlClient.unsafe(fileTypeStatsQuery, params) as any[]
 
     // Category distribution
-    const { rows: categoryStats } = await client.query(`
+    const categoryStatsQuery = `
       SELECT category, COUNT(*) as count
       FROM documents d
-      WHERE ${whereConditions.map((_, i) => `$${i + 1}`).join(' AND ')}
+      WHERE ${whereConditions.join(' AND ')}
       GROUP BY category
       ORDER BY count DESC
-    `, params)
+    `
+    const categoryStats = await sqlClient.unsafe(categoryStatsQuery, params) as any[]
 
     // Tag distribution
-    const { rows: tagStats } = await client.query(`
+    const tagStatsQuery = `
       SELECT jsonb_array_elements_text(tags) as tag, COUNT(*) as count
       FROM documents d
-      WHERE ${whereConditions.map((_, i) => `$${i + 1}`).join(' AND ')} AND tags IS NOT NULL
+      WHERE ${whereConditions.join(' AND ')} AND tags IS NOT NULL
       GROUP BY tag
       ORDER BY count DESC
       LIMIT 20
-    `, params)
+    `
+    const tagStats = await sqlClient.unsafe(tagStatsQuery, params) as any[]
 
     return {
       fileTypes: fileTypeStats,

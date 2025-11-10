@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -31,31 +31,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ suggestions: [] })
     }
 
-    const db = getDb()
+    const sql = getSql()
 
     // Get user's documents for context
-    const { rows: documents } = await client.query(`
+    const documents = await sql`
       SELECT name, category, tags, description, file_type
       FROM documents 
-      WHERE user_id = $1 
+      WHERE user_id = ${user.id} 
       ORDER BY created_at DESC 
       LIMIT 50
-    `, [user.id])
+    ` as any[]
 
     // Get available tags and categories
-    const { rows: tags } = await client.query(`
+    const tags = await sql`
       SELECT DISTINCT jsonb_array_elements_text(tags) as tag
       FROM documents 
-      WHERE user_id = $1 AND tags IS NOT NULL
+      WHERE user_id = ${user.id} AND tags IS NOT NULL
       LIMIT 20
-    `, [user.id])
+    ` as any[]
 
-    const { rows: categories } = await client.query(`
+    const categories = await sql`
       SELECT DISTINCT category
       FROM documents 
-      WHERE user_id = $1 AND category IS NOT NULL
+      WHERE user_id = ${user.id} AND category IS NOT NULL
       LIMIT 10
-    `, [user.id])
+    ` as any[]
 
     // Use explicit type for suggestions array
     const suggestions: Suggestion[] = []
@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
     if (!semantic) {
       // Tag suggestions
       tags
-        .filter(tag => tag.tag.toLowerCase().includes(query.toLowerCase()))
+        .filter((tag: any) => tag.tag && tag.tag.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 3)
-        .forEach(tag => {
+        .forEach((tag: any) => {
           suggestions.push({
             query: tag.tag,
             label: `Tag: ${tag.tag}`,
@@ -76,9 +76,9 @@ export async function POST(request: NextRequest) {
 
       // Category suggestions
       categories
-        .filter(cat => cat.category.toLowerCase().includes(query.toLowerCase()))
+        .filter((cat: any) => cat.category && cat.category.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 3)
-        .forEach(cat => {
+        .forEach((cat: any) => {
           suggestions.push({
             query: cat.category,
             label: `Category: ${cat.category}`,
@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
 
       // File name suggestions
       documents
-        .filter(doc => doc.name.toLowerCase().includes(query.toLowerCase()))
+        .filter((doc: any) => doc.name && doc.name.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 3)
-        .forEach(doc => {
+        .forEach((doc: any) => {
           suggestions.push({
             query: doc.name,
             label: `File: ${doc.name}`,
@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
           description: doc.description,
           fileType: doc.file_type
         })),
-        availableTags: tags.map(t => t.tag),
-        availableCategories: categories.map(c => c.category)
+        availableTags: tags.map((t: any) => t.tag).filter(Boolean),
+        availableCategories: categories.map((c: any) => c.category).filter(Boolean)
       }
 
       const requestBody = {
@@ -152,9 +152,9 @@ export async function POST(request: NextRequest) {
 
     // Add basic suggestions as fallback
     tags
-      .filter(tag => tag.tag.toLowerCase().includes(query.toLowerCase()))
+      .filter((tag: any) => tag.tag && tag.tag.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 2)
-      .forEach(tag => {
+      .forEach((tag: any) => {
         suggestions.push({
           query: tag.tag,
           label: `Tag: ${tag.tag}`,

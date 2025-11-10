@@ -15,7 +15,7 @@ export const GET = withDocumentAuth(
       const sql = getSql()
 
       // Get permissions with access counts
-      const permissions = await sql(`
+      const permissions = await sql`
         SELECT 
           dp.id,
           dp.user_id,
@@ -35,12 +35,12 @@ export const GET = withDocumentAuth(
         LEFT JOIN (
           SELECT permission_id, COUNT(*) AS access_count
           FROM document_access_logs
-          WHERE document_id = $1
+          WHERE document_id = ${documentId}
           GROUP BY permission_id
         ) a ON a.permission_id = dp.id
-        WHERE dp.document_id = $1 AND dp.is_active = true
+        WHERE dp.document_id = ${documentId} AND dp.is_active = true
         ORDER BY dp.granted_at DESC
-      `, [documentId])
+      ` as any[]
 
       return NextResponse.json(permissions.map(p => ({
         id: p.id,
@@ -75,36 +75,33 @@ export const POST = withDocumentAuth(
       const sql = getSql()
 
       // Check if permission already exists
-      const existingPermission = await sql(`
+      const existingPermission = await sql`
         SELECT id FROM document_permissions 
-        WHERE document_id = $1 AND email = $2 AND is_active = true
-      `, [documentId, email])
+        WHERE document_id = ${documentId} AND email = ${email} AND is_active = true
+      ` as any[]
 
       if (existingPermission.length > 0) {
         return createErrorResponse('Permission already exists for this email', 400)
       }
 
       // Create permission
-      const newPermission = await sql(`
+      const newPermission = await sql`
         INSERT INTO document_permissions (
           document_id, user_id, email, role, granted_by, granted_at, is_active
-        ) VALUES ($1, $2, $3, $4, $5, NOW(), true)
+        ) VALUES (${documentId}, ${null}, ${email}, ${role}, ${user.id}, NOW(), ${true})
         RETURNING *
-      `, [documentId, null, email, role, user.id])
+      ` as any[]
 
       // Log activity
-      await sql(`
+      const detailsJson = JSON.stringify({
+        email,
+        role,
+        message: message || null
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'permission_granted', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          email,
-          role,
-          message: message || null
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'permission_granted'}, ${detailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
         id: newPermission[0].id,

@@ -15,7 +15,7 @@ export const GET = withDocumentAuth(
       const sql = getSql()
 
       // Get document versions
-      const versions = await sql(`
+      const versions = await sql`
         SELECT 
           dv.id,
           dv.version_number,
@@ -30,9 +30,9 @@ export const GET = withDocumentAuth(
           u.avatar_url
         FROM document_versions dv
         LEFT JOIN users u ON dv.created_by = u.id
-        WHERE dv.document_id = $1
+        WHERE dv.document_id = ${documentId}
         ORDER BY dv.version_number DESC
-      `, [documentId])
+      ` as any[]
 
       return NextResponse.json(versions.map(v => ({
         id: v.id,
@@ -62,76 +62,67 @@ export const POST = withDocumentAuth(
       const sql = getSql()
 
       // Get document details
-      const document = await sql(`
+      const documentRows = await sql`
         SELECT id, name, file_data, file_size, mime_type FROM documents 
-        WHERE id = $1 AND user_id = $2
-      `, [documentId, user.id])
+        WHERE id = ${documentId} AND user_id = ${user.id}
+      ` as any[]
 
-      if (!document || document.length === 0) {
+      if (documentRows.length === 0) {
         return createErrorResponse('Document not found', 404)
       }
 
-      const doc = document[0]
+      const doc = documentRows[0]
 
       // Get next version number
-      const lastVersion = await sql(`
+      const lastVersionRows = await sql`
         SELECT version_number FROM document_versions 
-        WHERE document_id = $1 
+        WHERE document_id = ${documentId} 
         ORDER BY version_number DESC 
         LIMIT 1
-      `, [documentId])
+      ` as any[]
 
-      const nextVersionNumber = lastVersion.length > 0 ? lastVersion[0].version_number + 1 : 1
+      const nextVersionNumber = lastVersionRows.length > 0 ? lastVersionRows[0].version_number + 1 : 1
 
       // Create new version
-      const newVersion = await sql(`
+      const changelogText = changelog || `Version ${nextVersionNumber}`
+      const newVersionRows = await sql`
         INSERT INTO document_versions (
           document_id, version_number, file_name, file_data, file_size, 
           mime_type, created_by, changelog, is_current, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+        ) VALUES (${documentId}, ${nextVersionNumber}, ${doc.name}, ${doc.file_data}, ${doc.file_size}, 
+        ${doc.mime_type}, ${user.id}, ${changelogText}, ${true}, NOW())
         RETURNING *
-      `, [
-        documentId,
-        nextVersionNumber,
-        doc.name,
-        doc.file_data,
-        doc.file_size,
-        doc.mime_type,
-        user.id,
-        changelog || `Version ${nextVersionNumber}`,
-        true
-      ])
+      ` as any[]
+      const newVersion = newVersionRows[0]
 
       // Mark all other versions as not current
-      await sql(`
+      await sql`
         UPDATE document_versions 
         SET is_current = false 
-        WHERE document_id = $1 AND id != $2
-      `, [documentId, newVersion[0].id])
+        WHERE document_id = ${documentId} AND id != ${newVersion.id}
+      `
 
       // Log activity
-      await sql(`
+      const activityDetailsJson = JSON.stringify({
+        versionId: newVersion.id,
+        versionNumber: nextVersionNumber,
+        changelog: changelogText
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'version_created', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          versionNumber: nextVersionNumber,
-          changelog: changelog || `Version ${nextVersionNumber}`
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'version_created'}, ${activityDetailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
-        id: newVersion[0].id,
-        versionNumber: newVersion[0].version_number,
-        fileName: newVersion[0].file_name,
-        fileSize: newVersion[0].file_size,
-        mimeType: newVersion[0].mime_type,
-        createdAt: newVersion[0].created_at,
-        createdBy: newVersion[0].created_by,
-        changelog: newVersion[0].changelog,
-        isCurrent: newVersion[0].is_current
+        id: newVersion.id,
+        versionNumber: newVersion.version_number,
+        fileName: newVersion.file_name,
+        fileSize: newVersion.file_size,
+        mimeType: newVersion.mime_type,
+        createdAt: newVersion.created_at,
+        createdBy: newVersion.created_by,
+        changelog: newVersion.changelog,
+        isCurrent: newVersion.is_current
       })
 
     } catch (error) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { logger, logInfo } from '@/lib/logger'
+import { logInfo } from '@/lib/logger'
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button} from "@/components/ui/button"
@@ -13,14 +13,16 @@ import { GlassCard, CamoBackground, TacticalGrid } from "@/components/military"
 
 interface SimpleOnboardingProps {
   open: boolean
-  onComplete: (data: Record<string, unknown>) => void
-  onSkip: () => void
+  onCompleteAction: (data: Record<string, unknown>) => void
+  onSkipAction: () => void
   userData?: Record<string, unknown>
 }
 
-export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleOnboardingProps) {
+export function SimpleOnboarding({ open, onCompleteAction, onSkipAction, userData }: SimpleOnboardingProps) {
   const [step, setStep] = useState(1)
-  const [name, setName] = useState(userData?.full_name || "")
+  const [name, setName] = useState<string>(
+    typeof userData?.full_name === 'string' ? userData.full_name : ""
+  )
   const [businessType, setBusinessType] = useState("")
   const [goals, setGoals] = useState<string[]>([])
 
@@ -75,14 +77,14 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
       body: JSON.stringify({ onboarding_completed: true, onboarding_data: data })
     }).catch(() => {})
     
-    onComplete(data)
+    onCompleteAction(data)
   }
 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <CamoBackground opacity={0.1} withGrid />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-military-midnight/80 backdrop-blur-md">
+      <CamoBackground opacity={0.15} withGrid />
       <TacticalGrid />
       
       <motion.div
@@ -133,7 +135,7 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
                     placeholder="Your name or business name"
                     value={name || ""}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white placeholder:text-military-storm-grey"
+                    className="bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white placeholder:text-military-storm-grey focus-visible:border-military-hot-pink focus-visible:ring-military-hot-pink/20 focus-visible:ring-2"
                   />
                 </div>
 
@@ -142,12 +144,16 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
                     What type of business do you run?
                   </Label>
                   <Select value={businessType} onValueChange={setBusinessType}>
-                    <SelectTrigger className="bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white">
+                    <SelectTrigger className="bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white focus:ring-military-hot-pink/20 focus:border-military-hot-pink hover:border-military-hot-pink/50 transition-colors">
                       <SelectValue placeholder="Select your business type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-military-tactical-black border-military-storm-grey">
+                    <SelectContent className="bg-military-tactical-black/95 backdrop-blur-xl border-military-storm-grey shadow-2xl">
                       {businessTypes.map((type) => (
-                        <SelectItem key={type} value={type} className="text-military-glass-white hover:bg-military-midnight">
+                        <SelectItem 
+                          key={type} 
+                          value={type} 
+                          className="text-military-glass-white hover:bg-military-hot-pink/20 focus:bg-military-hot-pink/30 focus:text-white cursor-pointer"
+                        >
                           {type}
                         </SelectItem>
                       ))}
@@ -158,16 +164,16 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
 
               <div className="flex items-center justify-between pt-4">
                 <Button
-                  onClick={onSkip}
+                  onClick={onSkipAction}
                   variant="outline"
-                  className="border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black"
+                  className="border-military-storm-grey/50 text-military-glass-white hover:bg-military-tactical-black hover:border-military-storm-grey transition-colors"
                 >
                   Skip for Now
                 </Button>
                 <Button
                   onClick={handleNext}
                   disabled={!name || !businessType}
-                  className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90"
+                  className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90 hover:shadow-lg hover:shadow-military-hot-pink/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   Next
                   <ArrowRight className="h-4 w-4 ml-2" />
@@ -202,21 +208,23 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
                   <motion.button
                     key={goal.id}
                     onClick={() => toggleGoal(goal.id)}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`p-4 rounded-lg glass-card border transition-all text-left ${
+                    className={`p-4 rounded-xl glass-card border-2 backdrop-blur-sm transition-all text-left ${
                       goals.includes(goal.id)
-                        ? "border-military-hot-pink/50 ring-2 ring-military-hot-pink/30"
-                        : "border-white/10 hover:border-white/20"
+                        ? "border-military-hot-pink/60 ring-2 ring-military-hot-pink/40 bg-military-hot-pink/10 shadow-lg shadow-military-hot-pink/20"
+                        : "border-military-storm-grey/30 hover:border-military-hot-pink/40 hover:bg-military-tactical-black/50"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{goal.emoji}</span>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-military-glass-white">{goal.label}</h4>
+                        <h4 className={`font-semibold ${goals.includes(goal.id) ? "text-military-glass-white" : "text-military-glass-white/90"}`}>
+                          {goal.label}
+                        </h4>
                       </div>
                       {goals.includes(goal.id) && (
-                        <CheckCircle className="h-5 w-5 text-military-hot-pink" />
+                        <CheckCircle className="h-5 w-5 text-military-hot-pink animate-in fade-in zoom-in duration-200" />
                       )}
                     </div>
                   </motion.button>
@@ -227,13 +235,13 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
                 <Button
                   onClick={() => setStep(1)}
                   variant="outline"
-                  className="border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black"
+                  className="border-military-storm-grey/50 text-military-glass-white hover:bg-military-tactical-black hover:border-military-storm-grey transition-colors"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleComplete}
-                  className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90"
+                  className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90 hover:shadow-lg hover:shadow-military-hot-pink/50 transition-all"
                 >
                   <Rocket className="h-4 w-4 mr-2" />
                   Launch Your Empire!

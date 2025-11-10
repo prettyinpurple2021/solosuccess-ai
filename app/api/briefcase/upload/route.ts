@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { v4 as uuidv4} from 'uuid'
 import { headers} from 'next/headers'
 
@@ -68,60 +68,50 @@ async function saveFile(params: {
   const fileId = uuidv4()
   const fileBuffer = await file.arrayBuffer()
   const fileData = Buffer.from(fileBuffer)
-  const db = getDb()
+  const sql = getSql()
   const parsedTags = tags ? JSON.parse(tags) : []
+  const tagsJson = JSON.stringify(parsedTags)
+  const userAgent = (await headers()).get('user-agent')
+  const metadataJson = JSON.stringify({
+    originalSize: file.size,
+    uploadedAt: new Date().toISOString(),
+    userAgent: userAgent,
+  })
 
-  const { rows: [document] } = await client.query(`
+  const documentRows = await sql`
       INSERT INTO documents (
         id, user_id, folder_id, name, original_name, file_type, mime_type,
         size, file_data, category, description, tags,
         metadata, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+      ) VALUES (${fileId}, ${userId}, ${folderId || null}, ${file.name}, ${file.name}, 
+      ${getFileTypeFromMime(file.type)}, ${file.type}, ${file.size}, ${fileData}, 
+      ${category}, ${description || null}, ${tagsJson}::jsonb, ${metadataJson}::jsonb, NOW(), NOW())
       RETURNING *
-    `, [
-      fileId,
-      userId,
-      folderId || null,
-      file.name,
-      file.name,
-      getFileTypeFromMime(file.type),
-      file.type,
-      file.size,
-      fileData,
-      category,
-      description || null,
-      JSON.stringify(parsedTags),
-      JSON.stringify({
-        originalSize: file.size,
-        uploadedAt: new Date().toISOString(),
-        userAgent: (await headers()).get('user-agent'),
-      })
-    ])
+    ` as any[]
+  
+  const document = documentRows[0]
 
   if (folderId) {
-    await client.query(`
+    await sql`
         UPDATE document_folders
         SET file_count = file_count + 1,
-            total_size = total_size + $1,
+            total_size = total_size + ${file.size},
             updated_at = NOW()
-        WHERE id = $2 AND user_id = $3
-      `, [file.size, folderId, userId])
+        WHERE id = ${folderId} AND user_id = ${userId}
+      `
   }
 
-  await client.query(`
+  const activityDetailsJson = JSON.stringify({
+    fileName: file.name,
+    fileSize: file.size,
+    fileType: file.type,
+    category,
+    folderId: folderId || null,
+  })
+  await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'uploaded', $3, NOW())
-    `, [
-    fileId,
-    userId,
-    JSON.stringify({
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      category,
-      folderId: folderId || null,
-    })
-  ])
+      VALUES (${fileId}, ${userId}, ${'uploaded'}, ${activityDetailsJson}::jsonb, NOW())
+    `
 
   return {
     id: document.id,

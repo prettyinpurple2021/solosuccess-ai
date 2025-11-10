@@ -19,8 +19,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const params = await context.params
-    const { id } = params
+    const routeParams = await context.params
+    const { id } = routeParams
     const documentId = id
     const { description, tags, category, isFavorite, metadata } = await request.json()
 
@@ -41,36 +41,36 @@ export async function PATCH(
     // Build update query dynamically using unsafe for dynamic fields
     const sqlClient = sql as any
     const setParts: string[] = []
-    const params: any[] = []
+    const queryParams: any[] = []
     let paramIndex = 1
 
     if (description !== undefined) {
       setParts.push(`description = $${paramIndex}`)
-      params.push(description)
+      queryParams.push(description)
       paramIndex++
     }
 
     if (tags !== undefined) {
       setParts.push(`tags = $${paramIndex}::jsonb`)
-      params.push(JSON.stringify(Array.isArray(tags) ? tags : []))
+      queryParams.push(JSON.stringify(Array.isArray(tags) ? tags : []))
       paramIndex++
     }
 
     if (metadata !== undefined) {
       setParts.push(`metadata = $${paramIndex}::jsonb`)
-      params.push(typeof metadata === 'string' ? metadata : JSON.stringify(metadata))
+      queryParams.push(typeof metadata === 'string' ? metadata : JSON.stringify(metadata))
       paramIndex++
     }
 
     if (category !== undefined) {
       setParts.push(`category = $${paramIndex}`)
-      params.push(category)
+      queryParams.push(category)
       paramIndex++
     }
 
     if (isFavorite !== undefined) {
       setParts.push(`is_favorite = $${paramIndex}`)
-      params.push(isFavorite)
+      queryParams.push(isFavorite)
       paramIndex++
     }
 
@@ -79,7 +79,7 @@ export async function PATCH(
     }
 
     setParts.push(`updated_at = NOW()`)
-    params.push(documentId)
+    queryParams.push(documentId)
 
     // Update document using unsafe for dynamic SQL
     const updateQuery = `
@@ -88,7 +88,7 @@ export async function PATCH(
       WHERE id = $${paramIndex}
       RETURNING *
     `
-    const updatedDocumentRows = await sqlClient.unsafe(updateQuery, params) as any[]
+    const updatedDocumentRows = await sqlClient.unsafe(updateQuery, queryParams) as any[]
     const updatedDocument = updatedDocumentRows[0]
 
     // Log activity

@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -27,43 +27,42 @@ export async function PATCH(
       return NextResponse.json({ error: 'Role is required' }, { status: 400 })
     }
 
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
     // Update permission
-    const { rows: [updatedPermission] } = await client.query(`
+    const updatedPermissionRows = await sql`
       UPDATE document_permissions 
-      SET role = $1
-      WHERE id = $2 AND document_id = $3
+      SET role = ${role}
+      WHERE id = ${permissionId} AND document_id = ${documentId}
       RETURNING *
-    `, [role, permissionId, documentId])
+    ` as any[]
 
-    if (!updatedPermission) {
+    if (updatedPermissionRows.length === 0) {
       return NextResponse.json({ error: 'Permission not found' }, { status: 404 })
     }
 
+    const updatedPermission = updatedPermissionRows[0]
+
     // Log activity
-    await client.query(`
+    const detailsJson = JSON.stringify({
+      permissionId,
+      newRole: role,
+      email: updatedPermission.email
+    })
+    await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'permission_updated', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        permissionId,
-        newRole: role,
-        email: updatedPermission.email
-      })
-    ])
+      VALUES (${documentId}, ${user.id}, ${'permission_updated'}, ${detailsJson}::jsonb, NOW())
+    `
 
     return NextResponse.json({
       success: true,
@@ -91,47 +90,46 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
     // Get permission details before deletion
-    const { rows: [permission] } = await client.query(`
+    const permissionRows = await sql`
       SELECT email, role FROM document_permissions 
-      WHERE id = $1 AND document_id = $2
-    `, [permissionId, documentId])
+      WHERE id = ${permissionId} AND document_id = ${documentId}
+    ` as any[]
 
-    if (!permission) {
+    if (permissionRows.length === 0) {
       return NextResponse.json({ error: 'Permission not found' }, { status: 404 })
     }
 
+    const permission = permissionRows[0]
+
     // Delete permission
-    await client.query(`
+    await sql`
       DELETE FROM document_permissions 
-      WHERE id = $1 AND document_id = $2
-    `, [permissionId, documentId])
+      WHERE id = ${permissionId} AND document_id = ${documentId}
+    `
 
     // Log activity
-    await client.query(`
+    const detailsJson = JSON.stringify({
+      permissionId,
+      email: permission.email,
+      role: permission.role
+    })
+    await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'permission_revoked', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        permissionId,
-        email: permission.email,
-        role: permission.role
-      })
-    ])
+      VALUES (${documentId}, ${user.id}, ${'permission_revoked'}, ${detailsJson}::jsonb, NOW())
+    `
 
     return NextResponse.json({
       success: true,

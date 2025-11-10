@@ -11,6 +11,7 @@ export interface AuthenticatedUser {
   full_name: string | null
   name: string | null
   username: string | null
+  avatar_url: string | null
   created_at: Date
   updated_at: Date
   subscription_tier: string

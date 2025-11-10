@@ -46,25 +46,22 @@ export const POST = withDocumentAuth(
       const updatedTags = [...existingTags, newTag]
 
       // Update document
-      await sql(`
+      const updatedTagsJson = JSON.stringify(updatedTags)
+      await sql`
         UPDATE documents 
-        SET tags = $1, updated_at = NOW()
-        WHERE id = $2
-        RETURNING *
-      `, [JSON.stringify(updatedTags), documentId])
+        SET tags = ${updatedTagsJson}::jsonb, updated_at = NOW()
+        WHERE id = ${documentId}
+      `
 
       // Log activity
-      await sql(`
+      const detailsJson = JSON.stringify({
+        tag: newTag,
+        totalTags: updatedTags.length
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'tag_added', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          tag: newTag,
-          totalTags: updatedTags.length
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'tag_added'}, ${detailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
         success: true,
@@ -114,25 +111,22 @@ export const DELETE = withDocumentAuth(
       const updatedTags = existingTags.filter((t: string) => t !== tagToRemove)
 
       // Update document
-      await sql(`
+      const updatedTagsJson = JSON.stringify(updatedTags)
+      await sql`
         UPDATE documents 
-        SET tags = $1, updated_at = NOW()
-        WHERE id = $2
-        RETURNING *
-      `, [JSON.stringify(updatedTags), documentId])
+        SET tags = ${updatedTagsJson}::jsonb, updated_at = NOW()
+        WHERE id = ${documentId}
+      `
 
       // Log activity
-      await sql(`
+      const detailsJson = JSON.stringify({
+        tag: tagToRemove,
+        totalTags: updatedTags.length
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'tag_removed', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          tag: tagToRemove,
-          totalTags: updatedTags.length
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'tag_removed'}, ${detailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
         success: true,

@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -20,32 +20,34 @@ export async function GET(
 
     const params = await context.params
     const { id: documentId, versionId } = params
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
     // Get version details
-    const { rows: [version] } = await client.query(`
+    const versionRows = await sql`
       SELECT 
         dv.*,
         u.name as created_by_name,
         u.avatar_url
       FROM document_versions dv
       LEFT JOIN users u ON dv.created_by = u.id
-      WHERE dv.id = $1 AND dv.document_id = $2
-    `, [versionId, documentId])
+      WHERE dv.id = ${versionId} AND dv.document_id = ${documentId}
+    ` as any[]
 
-    if (!version) {
+    if (versionRows.length === 0) {
       return NextResponse.json({ error: 'Version not found' }, { status: 404 })
     }
+    
+    const version = versionRows[0]
 
     return NextResponse.json({
       id: version.id,
@@ -82,67 +84,66 @@ export async function POST(
     const params = await context.params
     const { id: documentId, versionId } = params
     const { action } = await request.json()
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
     // Get version details
-    const { rows: [version] } = await client.query(`
+    const versionRows = await sql`
       SELECT * FROM document_versions 
-      WHERE id = $1 AND document_id = $2
-    `, [versionId, documentId])
+      WHERE id = ${versionId} AND document_id = ${documentId}
+    ` as any[]
 
-    if (!version) {
+    if (versionRows.length === 0) {
       return NextResponse.json({ error: 'Version not found' }, { status: 404 })
     }
+
+    const version = versionRows[0]
 
     switch (action) {
       case 'restore':
         // Restore this version as current
-        await client.query(`
+        await sql`
           UPDATE document_versions 
           SET is_current = false 
-          WHERE document_id = $1
-        `, [documentId])
+          WHERE document_id = ${documentId}
+        `
 
-        await client.query(`
+        await sql`
           UPDATE document_versions 
           SET is_current = true 
-          WHERE id = $1
-        `, [versionId])
+          WHERE id = ${versionId}
+        `
 
         // Update the main document with this version's data
-        await client.query(`
+        await sql`
           UPDATE documents 
           SET 
-            file_data = $1,
-            file_size = $2,
-            mime_type = $3,
+            file_data = ${version.file_data},
+            file_size = ${version.file_size},
+            mime_type = ${version.mime_type},
             updated_at = NOW()
-          WHERE id = $4
-        `, [version.file_data, version.file_size, version.mime_type, documentId])
+          WHERE id = ${documentId}
+        `
 
         // Log activity
-        await client.query(`
+        const restoreDetailsJson = JSON.stringify({
+          versionId,
+          versionNumber: version.version_number,
+          changelog: version.changelog
+        })
+        await sql`
           INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-          VALUES ($1, $2, 'version_restored', $3, NOW())
-        `, [
-          documentId,
-          user.id,
-          JSON.stringify({
-            versionId,
-            versionNumber: version.version_number,
-            changelog: version.changelog
-          })
-        ])
+          VALUES (${documentId}, ${user.id}, ${'version_restored'}, ${restoreDetailsJson}::jsonb, NOW())
+        `
 
         return NextResponse.json({
           success: true,
@@ -183,27 +184,29 @@ export async function DELETE(
 
     const params = await context.params
     const { id: documentId, versionId } = params
-    const db = getDb()
+    const sql = getSql()
 
     // Verify document ownership
-    const { rows: [document] } = await client.query(`
+    const documentRows = await sql`
       SELECT id FROM documents 
-      WHERE id = $1 AND user_id = $2
-    `, [documentId, user.id])
+      WHERE id = ${documentId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
     // Get version details before deletion
-    const { rows: [version] } = await client.query(`
+    const versionRows = await sql`
       SELECT version_number, changelog, is_current FROM document_versions 
-      WHERE id = $1 AND document_id = $2
-    `, [versionId, documentId])
+      WHERE id = ${versionId} AND document_id = ${documentId}
+    ` as any[]
 
-    if (!version) {
+    if (versionRows.length === 0) {
       return NextResponse.json({ error: 'Version not found' }, { status: 404 })
     }
+
+    const version = versionRows[0]
 
     // Don't allow deletion of current version
     if (version.is_current) {
@@ -211,24 +214,21 @@ export async function DELETE(
     }
 
     // Delete version
-    await client.query(`
+    await sql`
       DELETE FROM document_versions 
-      WHERE id = $1 AND document_id = $2
-    `, [versionId, documentId])
+      WHERE id = ${versionId} AND document_id = ${documentId}
+    `
 
     // Log activity
-    await client.query(`
+    const deleteDetailsJson = JSON.stringify({
+      versionId,
+      versionNumber: version.version_number,
+      changelog: version.changelog
+    })
+    await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'version_deleted', $3, NOW())
-    `, [
-      documentId,
-      user.id,
-      JSON.stringify({
-        versionId,
-        versionNumber: version.version_number,
-        changelog: version.changelog
-      })
-    ])
+      VALUES (${documentId}, ${user.id}, ${'version_deleted'}, ${deleteDetailsJson}::jsonb, NOW())
+    `
 
     return NextResponse.json({
       success: true,

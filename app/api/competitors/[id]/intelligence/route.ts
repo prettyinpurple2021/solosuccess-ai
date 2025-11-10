@@ -138,7 +138,7 @@ export async function GET(
 
     if (filters.tags && filters.tags.length > 0) {
       // Use JSON contains operator for tags array
-      // This is a simplified approach - in production you'd want proper JSON array contains
+      // This is a simplified approach - in  you'd want proper JSON array contains
       conditions.push(
         // For now, we'll use a simple string match - this should be improved with proper JSON operators
         eq(intelligenceData.tags, JSON.stringify(filters.tags))

@@ -3,7 +3,7 @@ import '@/lib/server-polyfills'
 import { NextRequest, NextResponse} from 'next/server';
 import { DocumentParser} from '@/lib/documentParser';
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -32,20 +32,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Load file securely from DB (Neon) instead of filesystem
-    const db = getDb()
-    const { rows: [document] } = await client.query(
-      `SELECT id, user_id, mime_type, original_name, name, file_data
-       FROM documents
-       WHERE id = $1 AND user_id = $2`,
-      [fileId, user.id]
-    )
+    const sql = getSql()
+    const documentRows = await sql`
+      SELECT id, user_id, mime_type, original_name, name, file_data
+      FROM documents
+      WHERE id = ${fileId} AND user_id = ${user.id}
+    ` as any[]
 
-    if (!document) {
+    if (documentRows.length === 0) {
       return NextResponse.json(
         { error: 'Document not found' },
         { status: 404 }
       )
     }
+    
+    const document = documentRows[0]
 
     const mimeType: string = document.mime_type || providedMimeType || 'application/octet-stream'
     const fileName: string = document.original_name || document.name || providedFileName || 'file'

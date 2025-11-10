@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
 async function generateBrandGuidelinesWithAI(brandData: any) {
   try {
-    // Mock AI-generated guidelines - in production, this would use OpenAI
+    // Mock AI-generated guidelines - in , this would use OpenAI
     const guidelines = {
       logoUsage: generateLogoUsageRules(brandData),
       colorUsage: generateColorUsageRules(brandData),

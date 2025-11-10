@@ -1,7 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { NextRequest, NextResponse} from 'next/server'
 import { authenticateRequest} from '@/lib/auth-server'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -19,22 +19,23 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     const { id } = params
     const body = await request.json()
 
-    const db = getDb()
+    const sql = getSql()
     // Ensure ownership
-    const { rows: [doc] } = await client.query(`SELECT id FROM documents WHERE id = $1 AND user_id = $2`, [id, user.id])
-    if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const docRows = await sql`SELECT id FROM documents WHERE id = ${id} AND user_id = ${user.id}` as any[]
+    if (docRows.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const { name, description, category, folder_id } = body
-    const { rows: [updated] } = await client.query(`
+    const updatedRows = await sql`
       UPDATE documents
-      SET name = COALESCE($1, name),
-          description = COALESCE($2, description),
-          category = COALESCE($3, category),
-          folder_id = COALESCE($4, folder_id),
+      SET name = COALESCE(${name || null}, name),
+          description = COALESCE(${description || null}, description),
+          category = COALESCE(${category || null}, category),
+          folder_id = COALESCE(${folder_id || null}, folder_id),
           updated_at = NOW()
-      WHERE id = $5
+      WHERE id = ${id}
       RETURNING *
-    `, [name, description, category, folder_id, id])
+    ` as any[]
+    const updated = updatedRows[0]
 
     return NextResponse.json({ success: true, document: updated })
   } catch (error) {
@@ -52,22 +53,23 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
     const params = await context.params
     const { id } = params
 
-    const db = getDb()
+    const sql = getSql()
     // Ensure ownership
-    const { rows: [doc] } = await client.query(`SELECT id, size, folder_id FROM documents WHERE id = $1 AND user_id = $2`, [id, user.id])
-    if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const docRows = await sql`SELECT id, size, folder_id FROM documents WHERE id = ${id} AND user_id = ${user.id}` as any[]
+    if (docRows.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const doc = docRows[0]
 
-    await client.query(`DELETE FROM documents WHERE id = $1`, [id])
+    await sql`DELETE FROM documents WHERE id = ${id}`
 
     // Update folder counters if applicable
     if (doc.folder_id) {
-      await client.query(`
+      await sql`
         UPDATE document_folders
         SET file_count = GREATEST(file_count - 1, 0),
-            total_size = GREATEST(total_size - $1, 0),
+            total_size = GREATEST(total_size - ${doc.size || 0}, 0),
             updated_at = NOW()
-        WHERE id = $2 AND user_id = $3
-      `, [doc.size || 0, doc.folder_id, user.id])
+        WHERE id = ${doc.folder_id} AND user_id = ${user.id}
+      `
     }
 
     return NextResponse.json({ success: true })
@@ -86,13 +88,14 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
     const params = await context.params
     const { id } = params
 
-    const db = getDb()
-    const { rows: [r] } = await client.query(`
+    const sql = getSql()
+    const resultRows = await sql`
       SELECT d.*, f.name AS folder_name, f.color AS folder_color
       FROM documents d
       LEFT JOIN document_folders f ON f.id = d.folder_id
-      WHERE d.id = $1 AND d.user_id = $2
-    `, [id, user.id])
+      WHERE d.id = ${id} AND d.user_id = ${user.id}
+    ` as any[]
+    const r = resultRows[0]
     if (!r) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     let tags: string[] = []

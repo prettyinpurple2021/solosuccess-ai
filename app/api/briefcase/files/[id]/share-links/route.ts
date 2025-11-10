@@ -17,15 +17,15 @@ export const GET = withDocumentAuth(
       const sql = getSql()
 
       // Get share links
-      const shareLinks = await sql(`
+      const shareLinks = await sql`
         SELECT 
           id, url, permissions, expires_at, max_access_count, 
           access_count, download_enabled, require_auth, is_active, created_at,
           password_hash
         FROM document_share_links 
-        WHERE document_id = $1 AND is_active = true
+        WHERE document_id = ${documentId} AND is_active = true
         ORDER BY created_at DESC
-      `, [documentId])
+      ` as any[]
 
       return NextResponse.json(shareLinks.map(link => ({
         id: link.id,
@@ -77,53 +77,42 @@ export const POST = withDocumentAuth(
       }
 
       // Create share link
-      const newLink = await sql(`
+      const permissionsJson = typeof permissions === 'string' ? permissions : JSON.stringify(permissions)
+      const newLinkRows = await sql`
         INSERT INTO document_share_links (
           id, document_id, created_by, url, password_hash, permissions, 
           expires_at, max_access_count, download_enabled, require_auth, 
           is_active, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+        ) VALUES (${shareId}, ${documentId}, ${user.id}, ${shareUrl}, ${passwordHash}, ${permissionsJson}::jsonb, 
+        ${expiresAt || null}, ${maxAccess || null}, ${downloadEnabled || false}, ${requireAuth || false}, 
+        ${true}, NOW())
         RETURNING *
-      `, [
-        shareId,
-        documentId,
-        user.id,
-        shareUrl,
-        passwordHash,
-        permissions,
-        expiresAt,
-        maxAccess,
-        downloadEnabled,
-        requireAuth,
-        true
-      ])
+      ` as any[]
+      const newLink = newLinkRows[0]
 
       // Log activity
-      await sql(`
+      const detailsJson = JSON.stringify({
+        shareId,
+        permissions,
+        expiresAt,
+        hasPassword: !!passwordHash
+      })
+      await sql`
         INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-        VALUES ($1, $2, 'share_link_created', $3, NOW())
-      `, [
-        documentId,
-        user.id,
-        JSON.stringify({
-          shareId,
-          permissions,
-          expiresAt,
-          hasPassword: !!passwordHash
-        })
-      ])
+        VALUES (${documentId}, ${user.id}, ${'share_link_created'}, ${detailsJson}::jsonb, NOW())
+      `
 
       return NextResponse.json({
-        id: newLink[0].id,
-        url: newLink[0].url,
-        permissions: newLink[0].permissions,
-        expiresAt: newLink[0].expires_at,
-        maxAccess: newLink[0].max_access_count,
+        id: newLink.id,
+        url: newLink.url,
+        permissions: newLink.permissions,
+        expiresAt: newLink.expires_at,
+        maxAccess: newLink.max_access_count,
         accessCount: 0,
-        downloadEnabled: newLink[0].download_enabled,
-        requireAuth: newLink[0].require_auth,
-        isActive: newLink[0].is_active,
-        createdAt: newLink[0].created_at
+        downloadEnabled: newLink.download_enabled,
+        requireAuth: newLink.require_auth,
+        isActive: newLink.is_active,
+        createdAt: newLink.created_at
       })
 
     } catch (error) {
