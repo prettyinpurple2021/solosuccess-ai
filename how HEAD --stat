@@ -1,0 +1,10 @@
+[33m6b6b58cb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix: Add missing pulse-tactical CSS class and update testing results
+[33m503598b2[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: Production readiness fixes - resolve all browser testing issues
+[33me340be15[m Refactor learning progress analytics: rename 'completed_at' to 'ended_at' for clarity, enhance type definitions for better type safety, and improve code readability in the focus session calculations.
+[33m0479d7db[m Enhance production readiness by fixing SQL injection vulnerabilities and improving learning analytics. Updated the audit report to reflect recent fixes and production readiness status. Transitioned from mock data to real user activity for learning progress calculations, ensuring accurate reporting. Verified console log cleanup and API functionality. Recommendation updated to 'PRODUCTION READY' with a score increase from 72 to 85.
+[33m5e6366aa[m Merge branch 'main' of https://github.com/prettyinpurple2021/solosuccess-ai
+[33mc25b2b93[m[33m ([m[1;31morigin/cursor/production-readiness-and-design-theme-finalization-f5e9[m[33m)[m Merge pull request #255 from prettyinpurple2021/copilot/refactor-similar-code-issues
+[33m12d0b13c[m Merge branch 'main' into copilot/refactor-similar-code-issues
+[33m508aba33[m Merge pull request #257 from prettyinpurple2021/copilot/refactor-function-with-many-returns
+[33m627cb447[m Add security validation and helper functions to prevent SQL injection
+[33m07310ea8[m Add clarifying comments to getSubscriptionTierFromPriceId
