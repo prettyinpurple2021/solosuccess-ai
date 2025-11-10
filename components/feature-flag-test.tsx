@@ -1,43 +1,60 @@
-'use client'
+import { getFeatureFlags } from '@/lib/env-validation'
+import { cn } from '@/lib/utils'
+
+const FLAG_LABELS: Record<string, string> = {
+  hasDatabase: 'Database Connected',
+  hasAuth: 'Authentication Configured',
+  hasBilling: 'Billing Enabled',
+  hasAI: 'AI Providers Available',
+  hasEmail: 'Email Service Configured',
+  hasSMS: 'SMS Service Configured',
+  hasPushNotifications: 'Push Notifications Enabled',
+  hasRecaptcha: 'reCAPTCHA Enabled',
+}
 
 export function FeatureFlagTest() {
-  // Feature flags are now disabled - PostHog has been removed
-  // These would previously have been controlled by PostHog feature flags
-  const myFlagEnabled = false
-  const newDashboardEnabled = false
-  const betaFeaturesEnabled = false
+  const flags = getFeatureFlags()
+  const entries = Object.entries(flags)
 
   return (
-    <div className="p-6 border rounded-lg bg-card">
-      <h2 className="text-xl font-semibold mb-4">Feature Flag Test</h2>
-      
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">my-flag:</span>
-          <span className="px-2 py-1 rounded text-sm bg-red-100 text-red-800">
-            DISABLED (PostHog removed)
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <span className="font-medium">new-dashboard:</span>
-          <span className="px-2 py-1 rounded text-sm bg-red-100 text-red-800">
-            DISABLED (PostHog removed)
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <span className="font-medium">beta-features:</span>
-          <span className="px-2 py-1 rounded text-sm bg-red-100 text-red-800">
-            DISABLED (PostHog removed)
-          </span>
-        </div>
-      </div>
+    <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-holo-surface/80 via-holo-surface to-holo-surface/60 p-6 shadow-[0_0_40px_-15px_rgba(139,92,246,0.45)] backdrop-blur">
+      <header className="mb-4 flex items-center justify-between">
+        <h2 className="font-heading text-lg uppercase tracking-[0.3em] text-holo-iris">
+          Feature Diagnostics
+        </h2>
+        <span className="rounded-full bg-holo-iris/10 px-3 py-1 text-xs font-semibold text-holo-iris">
+          Environment Check
+        </span>
+      </header>
 
-      {/* Feature flags are disabled since PostHog was removed */}
-      <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded">
-        <p className="text-gray-800">ℹ️ Feature flags have been disabled. PostHog integration was removed from this application.</p>
-      </div>
-    </div>
+      <ul className="space-y-3">
+        {entries.map(([key, enabled]) => (
+          <li
+            key={key}
+            className={cn(
+              'flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors',
+              enabled
+                ? 'border-holo-emerald/40 bg-holo-emerald/10 text-holo-emerald'
+                : 'border-holo-crimson/40 bg-holo-crimson/10 text-holo-crimson',
+            )}
+          >
+            <span className="font-medium tracking-wide">
+              {FLAG_LABELS[key as keyof typeof FLAG_LABELS] ?? key}
+            </span>
+            <span className="text-xs font-semibold uppercase tracking-[0.25em]">
+              {enabled ? 'ACTIVE' : 'MISSING'}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <footer className="mt-5 rounded-xl border border-white/5 bg-white/3 px-4 py-3 text-xs text-white/80">
+        <p>
+          Toggle flags by provisioning the corresponding infrastructure
+          secrets. This dashboard renders directly from server-side
+          environment validation—no PostHog or client-side toggles involved.
+        </p>
+      </footer>
+    </section>
   )
 }

@@ -1,44 +1,70 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextResponse} from 'next/server'
-// AI config temporarily disabled
-// import { getTeamMemberConfig } from '@/lib/ai-config'
-
+import { logError, logInfo, logWarn } from '@/lib/logger'
+import { NextResponse } from 'next/server'
+import { AgentCollaborationSystem } from '@/lib/custom-ai-agents/agent-collaboration-system'
 
 export const runtime = 'edge'
 
 export async function GET() {
   try {
-    logWarn('AI test route temporarily using fallback response during migration')
-    
-    // Simple connectivity test without external API calls
     const envChecks = {
       nodeEnv: process.env.NODE_ENV,
       hasOpenAiKey: !!process.env.OPENAI_API_KEY,
+      hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       hasEncryptionKey: !!process.env.ENCRYPTION_KEY,
-      timestamp: new Date().toISOString()
+      appUrlConfigured: !!process.env.NEXT_PUBLIC_APP_URL,
+      timestamp: new Date().toISOString(),
     }
 
-    // Fallback response while AI workers are being integrated
-    const fallbackResponse = "Hi! I'm Roxy, your AI assistant. The AI testing system is currently being migrated to use workers for better performance."
+    if (!envChecks.hasOpenAiKey && !envChecks.hasAnthropicKey) {
+      logWarn('AI test route detected missing provider keys', envChecks)
+      return NextResponse.json(
+        {
+          status: 'error',
+          error: 'Missing AI provider credentials',
+          message: 'Set OPENAI_API_KEY or ANTHROPIC_API_KEY to run the AI diagnostic.',
+          environmentChecks: envChecks,
+        },
+        { status: 500 },
+      )
+    }
+
+    const system = new AgentCollaborationSystem('ai-test')
+    const response = await system.processRequest(
+      `Run a SoloSuccess AI system diagnostic and confirm the AI stack is operational.
+Focus on:
+- Connectivity to language models
+- Expected capabilities that should be online
+- Critical next checks the team should perform
+
+Respond conversationally in your own voice.`,
+      {
+        environment: envChecks,
+        testType: 'ai_diagnostic',
+      },
+      'roxy',
+    )
+
+    logInfo('AI diagnostic completed', { confidence: response.confidence })
 
     return NextResponse.json({
       status: 'success',
-      agent: 'Roxy',
-      response: fallbackResponse,
-      message: 'AI service test running with fallback response during migration!',
+      agent: 'roxy',
+      confidence: response.confidence,
+      reasoning: response.reasoning,
+      response: response.content,
+      suggestedActions: response.suggestedActions,
       environmentChecks: envChecks,
-      testType: 'fallback_migration'
     })
   } catch (error) {
     logError('AI test error:', error)
     return NextResponse.json(
-      { 
+      {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error',
-        message: 'AI service connectivity test failed'
+        message: 'AI service connectivity test failed',
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

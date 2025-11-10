@@ -31,11 +31,6 @@ import {
   TacticalGridItem
 } from '@/components/military'
 import FaqSection from '@/components/faq/faq-section'
-
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-export const runtime = 'nodejs'
-
 const features = [
   {
     category: "AI Agents",

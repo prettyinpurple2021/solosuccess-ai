@@ -1,18 +1,26 @@
 type RateLimitEntry = { count: number; ts: number }
+type RateLimitStore = Map<string, Map<string, RateLimitEntry>>
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __rateLimits: Map<string, Map<string, RateLimitEntry>> | undefined
+const RATE_LIMIT_STATE_SYMBOL = Symbol.for('solosuccess.rateLimitStore')
+
+function getRateLimitStore(): RateLimitStore {
+  const globalState = globalThis as typeof globalThis & {
+    [RATE_LIMIT_STATE_SYMBOL]?: RateLimitStore
+  }
+
+  if (!globalState[RATE_LIMIT_STATE_SYMBOL]) {
+    globalState[RATE_LIMIT_STATE_SYMBOL] = new Map()
+  }
+
+  return globalState[RATE_LIMIT_STATE_SYMBOL]!
 }
 
 function getBucket(bucketName: string) {
-  if (!globalThis.__rateLimits) {
-    globalThis.__rateLimits = new Map()
-  }
-  let bucket = globalThis.__rateLimits.get(bucketName)
+  const store = getRateLimitStore()
+  let bucket = store.get(bucketName)
   if (!bucket) {
     bucket = new Map<string, RateLimitEntry>()
-    globalThis.__rateLimits.set(bucketName, bucket)
+    store.set(bucketName, bucket)
   }
   return bucket
 }

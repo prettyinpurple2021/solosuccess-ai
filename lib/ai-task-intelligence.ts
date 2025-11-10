@@ -1,7 +1,7 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-// AI SDK removed - using worker-based approach
-// import { generateText } from 'ai'
-// import { openai } from '@ai-sdk/openai'
+import { logError } from '@/lib/logger'
+import { generateText } from 'ai'
+import { getTeamMemberConfig } from './ai-config'
+import { z } from 'zod'
 
 
 export interface TaskIntelligenceData {
@@ -56,6 +56,7 @@ export interface TaskOptimizationResult {
 }
 
 export class TaskIntelligenceEngine {
+  private taskAgent = getTeamMemberConfig('roxy')
   private userContext: {
     workStyle: 'focused' | 'collaborative' | 'flexible'
     preferredWorkHours: { start: string; end: string }
@@ -127,18 +128,87 @@ export class TaskIntelligenceEngine {
   ): Promise<TaskSuggestion> {
     try {
       const prompt = this.buildTaskAnalysisPrompt(task, allTasks)
-      
-      // TODO: Replace with worker-based AI call
-      // const result = await generateText({
-      //   model: openai('gpt-4-turbo') as any,
-      //   prompt,
-      //   temperature: 0.3,
-      //   maxOutputTokens: 500,
-      // })
-      
-      // For now, return a default suggestion
-      logWarn('AI task intelligence temporarily disabled - using fallback')
-      return this.createDefaultSuggestion(task)
+
+      const schema = z.object({
+        suggestedPriority: z.enum(['low', 'medium', 'high', 'urgent']).default(task.priority),
+        suggestedDeadline: z.string().optional().nullable(),
+        suggestedCategory: z.string().optional().nullable(),
+        suggestedTags: z.array(z.string()).optional().default([]),
+        confidence: z.number().min(0).max(1),
+        reasoning: z.string().min(1),
+        estimatedCompletionTime: z.number().optional().nullable(),
+        dependencies: z.array(z.string()).optional().default([]),
+        difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
+        impact: z.enum(['low', 'medium', 'high']).default('medium'),
+        urgency: z.enum(['low', 'medium', 'high']).default('medium'),
+      })
+
+      const taskBundle = JSON.stringify({
+        task,
+        allTasks: allTasks.slice(0, 25),
+        userContext: this.userContext,
+      })
+
+      const { text } = await generateText({
+        model: this.taskAgent.model as any,
+        messages: [
+          { role: 'system', content: this.taskAgent.systemPrompt },
+          {
+            role: 'user',
+            content: `
+You are Roxy, the proactive executive AI. Analyze the task data below and respond with JSON only.
+
+Constraints:
+- Recommend priority, deadline, and categorization based on workload.
+- Provide clarity on reasoning.
+- Confidence must be between 0 and 1.
+
+Return JSON:
+{
+  "suggestedPriority": "low|medium|high|urgent",
+  "suggestedDeadline": "ISO date or null",
+  "suggestedCategory": "string or null",
+  "suggestedTags": ["tag"],
+  "confidence": number,
+  "reasoning": "string",
+  "estimatedCompletionTime": number,
+  "dependencies": ["taskId"],
+  "difficulty": "easy|medium|hard",
+  "impact": "low|medium|high",
+  "urgency": "low|medium|high"
+}
+
+Task payload:
+${taskBundle}
+${prompt}
+`,
+          },
+        ],
+        temperature: 0.35,
+        maxOutputTokens: 600,
+      })
+
+      let content = text.trim()
+      if (content.startsWith('```')) {
+        content = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/, '').trim()
+      }
+
+      const parsed = schema.parse(JSON.parse(content))
+
+      return {
+        taskId: task.id,
+        suggestedPriority: parsed.suggestedPriority,
+        suggestedDeadline: parsed.suggestedDeadline ?? undefined,
+        suggestedCategory: parsed.suggestedCategory ?? undefined,
+        suggestedTags: parsed.suggestedTags ?? [],
+        confidence: parsed.confidence,
+        reasoning: parsed.reasoning,
+        estimatedCompletionTime: parsed.estimatedCompletionTime ?? undefined,
+        dependencies: parsed.dependencies ?? [],
+        difficulty: parsed.difficulty,
+        impact: parsed.impact,
+        urgency: parsed.urgency,
+      }
     } catch (error) {
       logError('Error generating task suggestion:', error)
       return this.createDefaultSuggestion(task)
@@ -351,14 +421,21 @@ Overdue Tasks: ${workloadAnalysis.overdueTasks}
 
 Provide specific, actionable tips that would help improve productivity and task management. Keep each tip under 100 characters.`
 
-      const result = await generateText({
-        model: openai('gpt-4-turbo') as any,
-        prompt,
-        temperature: 0.7,
-        maxOutputTokens: 300,
+      const { text } = await generateText({
+        model: this.taskAgent.model as any,
+        messages: [
+          { role: 'system', content: this.taskAgent.systemPrompt },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.6,
+        maxOutputTokens: 320,
       })
 
-      return result.text.split('\n').filter(line => line.trim().length > 0).slice(0, 5)
+      return text
+        .split('\n')
+        .map((line) => line.replace(/^\d+[\.\)]\s*/, '').trim())
+        .filter((line) => line.length > 0)
+        .slice(0, 5)
     } catch (error) {
       logError('Error generating productivity tips:', error)
       return [
@@ -402,36 +479,6 @@ Provide a JSON response with:
   "impact": "low|medium|high",
   "urgency": "low|medium|high"
 }`
-  }
-
-  /**
-   * Parse AI response into TaskSuggestion
-   */
-  private parseTaskSuggestion(aiResponse: string, taskId: string): TaskSuggestion {
-    try {
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('No JSON found in response')
-      
-      const parsed = JSON.parse(jsonMatch[0])
-      
-      return {
-        taskId,
-        suggestedPriority: parsed.suggestedPriority || 'medium',
-        suggestedDeadline: parsed.suggestedDeadline,
-        suggestedCategory: parsed.suggestedCategory,
-        suggestedTags: parsed.suggestedTags || [],
-        confidence: parsed.confidence || 0.5,
-        reasoning: parsed.reasoning || 'AI analysis completed',
-        estimatedCompletionTime: parsed.estimatedCompletionTime,
-        dependencies: parsed.dependencies || [],
-        difficulty: parsed.difficulty || 'medium',
-        impact: parsed.impact || 'medium',
-        urgency: parsed.urgency || 'medium'
-      }
-    } catch (error) {
-      logError('Error parsing task suggestion:', error)
-      return this.createDefaultSuggestion({ id: taskId } as TaskIntelligenceData)
-    }
   }
 
   /**

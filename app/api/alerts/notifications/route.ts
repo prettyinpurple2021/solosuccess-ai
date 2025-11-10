@@ -11,8 +11,9 @@ import { Resend } from 'resend'
 import webpush from 'web-push'
 import twilio from 'twilio'
 import { getSql } from '@/lib/api-utils'
-// Edge runtime disabled due to Node.js dependencies (web-push, twilio)
-// export const runtime = 'edge'
+
+// Twilio + web-push depend on Node.js runtime primitives (Streams, crypto)
+export const runtime = 'nodejs'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

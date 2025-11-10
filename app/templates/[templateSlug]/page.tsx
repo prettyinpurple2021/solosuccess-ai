@@ -7,11 +7,6 @@ import { getTemplateBySlug, type TemplateSummary } from '@/lib/template-catalog'
 // Force dynamic rendering to prevent auth issues during static generation
 export const dynamic = 'force-dynamic'
 
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
-// Note: generateStaticParams removed to make compatible with Edge Runtime
-// All templates will be rendered dynamically
-
 type TemplatePageProps = {
   params: Promise<{
     templateSlug: string;

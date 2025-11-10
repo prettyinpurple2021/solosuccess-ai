@@ -4,7 +4,6 @@ import { Button} from "@/components/ui/button"
 
 // Force dynamic rendering to avoid static generation issues
 export const dynamic = 'force-dynamic'
-// Edge Runtime disabled due to Node.js dependency incompatibility
 
 export default function NotFound() {
   return (

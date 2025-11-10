@@ -6,6 +6,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { z} from 'zod'
 import { eq, and, inArray, gte, desc} from 'drizzle-orm'
+import { AgentCollaborationSystem } from '@/lib/custom-ai-agents/agent-collaboration-system'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -31,55 +32,178 @@ const AnalysisRequestSchema = z.object({
 })
 
 // Fallback AI analysis service during migration
+const INSIGHT_TYPES: AnalysisResult['insights'][number]['type'][] = [
+  'marketing',
+  'strategic',
+  'product',
+  'pricing',
+  'technical',
+  'opportunity',
+  'threat',
+]
+
+const RECOMMENDATION_TYPES: AnalysisResult['recommendations'][number]['type'][] = [
+  'defensive',
+  'offensive',
+  'monitoring',
+  'strategic',
+]
+
+const PRIORITY_LEVELS = ['low', 'medium', 'high'] as const
+
 async function performIntelligenceAnalysis(
+  userId: string,
   intelligenceEntries: any[],
   analysisType: string,
   agentIds?: string[],
   focusAreas?: string[]
 ): Promise<AnalysisResult[]> {
-  logWarn('Intelligence analysis temporarily using fallback response during migration')
-  
+  const system = new AgentCollaborationSystem(userId)
   const agents = agentIds && agentIds.length ? agentIds : ['echo', 'lexi', 'nova', 'blaze']
-  const results: AnalysisResult[] = []
-  
-  // Return fallback analysis results
-  for (const agentId of agents.slice(0, 2)) { // Limit to 2 agents for fallback
-    results.push({
-      agentId,
-      analysisType,
-      insights: [
-        {
-          id: `fallback-insight-${Date.now()}-${agentId}`,
-          type: 'competitive',
-          title: `${agentId.charAt(0).toUpperCase() + agentId.slice(1)} Analysis Pending`,
-          description: 'Intelligence analysis is temporarily disabled during migration to worker-based system',
-          significance: 'medium',
-          confidence: 0.5,
-          evidence: ['System migration in progress'],
-          implications: ['Full analysis will be available after worker integration'],
-          relatedCompetitors: [],
-          tags: ['fallback', 'migration']
-        }
-      ],
-      recommendations: [
-        {
-          id: `fallback-rec-${Date.now()}-${agentId}`,
-          type: 'strategic',
-          title: 'System Migration Notice',
-          description: 'Intelligence analysis system is being migrated to worker-based architecture for better performance',
-          priority: 'medium',
-          estimatedEffort: 'TBD',
-          potentialImpact: 'System restoration',
-          timeline: 'Migration in progress',
-          actionItems: ['Wait for system migration completion'],
-          rationale: 'Improving system architecture and performance'
-        }
-      ],
-      confidence: 0.5,
-      analyzedAt: new Date(),
-    })
+  const focusLabel = focusAreas && focusAreas.length ? focusAreas.join(', ') : 'all focus areas'
+
+  const buildEntrySummary = (entry: any, index: number) => {
+    const competitor = entry.competitor
+    const extracted = entry.intelligence.extracted_data || {}
+    const title = extracted.title || entry.intelligence.data_type || 'Untitled intelligence'
+    const snippets = Array.isArray(extracted.keyInsights) ? extracted.keyInsights.slice(0, 3).join(' | ') : ''
+
+    return `
+Intelligence ${index + 1}:
+- Title: ${title}
+- Source: ${entry.intelligence.source_type}${entry.intelligence.source_url ? ` (${entry.intelligence.source_url})` : ''}
+- Competitor: ${competitor?.name ?? 'Unknown'}${competitor?.threatLevel ? ` (Threat: ${competitor.threatLevel})` : ''}
+- Importance: ${entry.intelligence.importance}
+- Summary: ${snippets || 'No extracted insights yet'}
+- Tags: ${(entry.intelligence.tags || []).join(', ')}
+`
   }
-  
+
+  const intelligenceSummary = intelligenceEntries.map(buildEntrySummary).join('\n')
+
+  const results: AnalysisResult[] = []
+
+  for (const agentId of agents) {
+    try {
+      const prompt = `
+You are providing a ${analysisType} intelligence analysis focusing on ${focusLabel}.
+
+Analyze the intelligence entries below and produce structured insights and recommendations that map to the SoloSuccess AI intelligence schema.
+
+${intelligenceSummary}
+
+Requirements:
+- Insights must use one of: "marketing", "strategic", "product", "pricing", "technical", "opportunity", "threat".
+- Recommendations must use one of: "defensive", "offensive", "monitoring", "strategic".
+- Be specific about supporting evidence and actionability.
+- Highlight cross-intelligence patterns, emerging risks, and opportunities.
+`
+
+      const response = await system.processRequest(
+        prompt,
+        {
+          analysisType,
+          focusAreas,
+          intelligenceCount: intelligenceEntries.length,
+        },
+        agentId
+      )
+
+      const analysis = response.analysis
+
+      if (!analysis || analysis.insights.length === 0) {
+        logWarn('Agent response missing structured analysis, falling back to content parsing', { agentId })
+
+      results.push({
+          agentId,
+          analysisType,
+          insights: [
+            {
+              id: `auto-insight-${Date.now()}-${agentId}`,
+              type: 'strategic',
+              title: 'Qualitative Intelligence Summary',
+              description: response.content,
+              confidence: response.confidence,
+              impact: 'medium',
+              urgency: 'medium',
+              supportingData: [],
+            },
+          ],
+          recommendations: response.suggestedActions.map((action, index) => ({
+            id: `auto-rec-${Date.now()}-${agentId}-${index}`,
+            type: 'strategic',
+            title: action,
+            description: action,
+            priority: 'medium',
+            estimatedEffort: 'moderate',
+            potentialImpact: 'medium',
+            timeline: '30 days',
+            actionItems: [],
+          })),
+          confidence: response.confidence,
+          analyzedAt: new Date(),
+        })
+
+        continue
+      }
+
+      results.push({
+        agentId,
+        analysisType,
+        insights: analysis.insights.map((insight, index) => ({
+          id: insight.id || `insight-${Date.now()}-${agentId}-${index}`,
+          type: (INSIGHT_TYPES.includes(insight.type as any) ? (insight.type as any) : 'strategic') as AnalysisResult['insights'][number]['type'],
+          title: insight.title,
+          description: insight.description,
+          confidence: insight.confidence ?? response.confidence,
+          impact: (PRIORITY_LEVELS.includes(insight.impact as any) ? (insight.impact as any) : 'medium'),
+          urgency: (PRIORITY_LEVELS.includes(insight.urgency as any) ? (insight.urgency as any) : 'medium'),
+          supportingData: insight.supportingData ?? [],
+        })),
+        recommendations: analysis.recommendations.map((recommendation, index) => ({
+          id: recommendation.id || `recommendation-${Date.now()}-${agentId}-${index}`,
+          type: (RECOMMENDATION_TYPES.includes(recommendation.type as any)
+            ? (recommendation.type as any)
+            : 'strategic') as AnalysisResult['recommendations'][number]['type'],
+          title: recommendation.title,
+          description: recommendation.description,
+          priority: (PRIORITY_LEVELS.includes(recommendation.priority as any)
+            ? (recommendation.priority as any)
+            : 'medium'),
+          estimatedEffort: recommendation.estimatedEffort ?? 'moderate',
+          potentialImpact: recommendation.potentialImpact ?? 'medium',
+          timeline: recommendation.timeline ?? '30 days',
+          actionItems: recommendation.actionItems ?? [],
+        })),
+        confidence: response.confidence,
+        analyzedAt: new Date(),
+      })
+    } catch (error) {
+      logError(`Agent analysis failed for ${agentId}`, error)
+      results.push({
+        agentId,
+        analysisType,
+        insights: [
+          {
+            id: `error-insight-${Date.now()}-${agentId}`,
+            type: 'threat',
+            title: 'Analysis failed',
+            description: `Agent ${agentId} failed to analyze intelligence: ${
+              error instanceof Error ? error.message : 'Unknown error'
+            }`,
+            confidence: 0.1,
+            impact: 'low',
+            urgency: 'low',
+            supportingData: [],
+          },
+        ],
+        recommendations: [],
+        confidence: 0.1,
+        analyzedAt: new Date(),
+      })
+    }
+  }
+
   return results
 }
 
@@ -155,6 +279,7 @@ export async function POST(request: NextRequest) {
 
     // Perform AI analysis
     const analysisResults = await performIntelligenceAnalysis(
+      user.id,
       intelligenceForAnalysis,
       data.analysisType,
       data.agentIds,

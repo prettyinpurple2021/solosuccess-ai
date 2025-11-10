@@ -4,11 +4,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { getUserSubscription, hasActiveSubscription} from '@/lib/stripe-db-utils'
 import { getStripe} from '@/lib/stripe'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-// Edge Runtime disabled due to Node.js dependency incompatibility (Stripe library)
-// export const runtime = 'edge'
-
-
+export const runtime = 'nodejs'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

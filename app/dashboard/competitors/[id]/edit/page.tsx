@@ -73,9 +73,6 @@ interface CompetitorFormData {
     }
   }
 }
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function EditCompetitorPage() {
   const params = useParams()
   const router = useRouter()

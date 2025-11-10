@@ -1,7 +1,4 @@
 import { EmpowermentCard} from "@/components/ui/boss-card"
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function StackHandlerPage() {
   return (
     <div className="min-h-screen gradient-background p-6">

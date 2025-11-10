@@ -7,13 +7,9 @@ import { notificationJobQueue } from '@/lib/notification-job-queue'
 import { z } from 'zod'
 import webpush from 'web-push'
 
-// Edge Runtime disabled due to Node.js dependency incompatibility (web-push library)
-// export const runtime = 'edge'
+// web-push relies on Node crypto and HTTP modules
+export const runtime = 'nodejs'
 
-
-
-// Temporarily disabled Edge Runtime due to web-push library Node.js dependencies
-// // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 // VAPID configuration - deferred to runtime

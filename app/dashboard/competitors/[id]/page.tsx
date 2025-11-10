@@ -53,9 +53,6 @@ interface Insight {
   confidence: string
   timestamp: string
 }
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function CompetitorDetailPage() {
   const params = useParams()
   const router = useRouter()

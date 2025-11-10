@@ -60,6 +60,21 @@
 - **Fix:** Added a dedicated `onboarding_data` JSONB column via migration, aligned the Drizzle schema, and updated the profile API to persist validated onboarding payloads while tracking completion timestamps.
 - **Status:** ✅ RESOLVED
 
+### ✅ Restored Production Features (November 2025)
+
+- **Custom Agents API** (`app/api/custom-agents/route.ts`, `lib/custom-ai-agents/**`, `app/api/workers/custom-agents/route.ts`)
+  - Replaced disabled fallbacks with an Upstash-backed job queue (Redis + QStash) and background worker.
+  - Added secure job persistence, SSE streaming with polling, security middleware integration, and QStash signature verification.
+- **Onboarding Workflow** (`app/api/auth/signup/route.ts`, `lib/onboarding/workflow.ts`, `lib/onboarding/onboarding-queue.ts`, `app/api/workers/onboarding/route.ts`)
+  - Removed Temporal placeholder; enqueue real onboarding jobs that provision default data, goals, tasks, and send welcome email notifications.
+- **AI Intelligence Stack**
+  - `app/api/intelligence/analyze/route.ts`: real agent-driven competitor analysis with structured outputs (no placeholder alerts).
+  - `lib/documentParser.ts`: PDF/Word/Excel parsers restored using `pdf-parse`, `mammoth`, and ExcelJS/csv parsing with metadata.
+  - `lib/blaze-growth-intelligence.ts`, `lib/ai-task-intelligence.ts`, `app/api/test-ai/route.ts`: reinstated model calls and structured JSON parsing; removed migration fallbacks.
+- **Infrastructure Hardening**
+  - `next.config.mjs`: replaced `console.warn` fallback with structured stderr logger and removed lint suppression.
+  - `lib/rate-limit.ts`: removed global `var` usage; introduced typed `globalThis` singleton with Symbol guard.
+
 ### **Linting Errors by Category (36 Remaining):**
 
 #### **1. Unused Imports & Variables (22 errors)**

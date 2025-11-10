@@ -4,11 +4,7 @@ import { authenticateRequest} from '@/lib/auth-server'
 import { rateLimitByIp} from '@/lib/rate-limit'
 import { createBillingPortalSession} from '@/lib/stripe'
 
-// Edge Runtime disabled due to Node.js dependency incompatibility (Stripe library)
-// // Edge Runtime disabled due to Node.js dependency incompatibility (Stripe library)
-// export const runtime = 'edge'
-
-
+export const runtime = 'nodejs'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

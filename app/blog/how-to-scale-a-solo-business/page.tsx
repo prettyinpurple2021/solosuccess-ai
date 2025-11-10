@@ -5,9 +5,6 @@ export const dynamic = 'force-dynamic'
 import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, ListChecks } from "lucide-react"
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function HowToScaleSoloBusinessPage() {
   const howTo = {
     "@context": "https://schema.org",

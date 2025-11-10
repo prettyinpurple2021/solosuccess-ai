@@ -44,6 +44,16 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1, "Stripe webhook secret is required").optional(),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1, "Stripe publishable key is required").optional(),
 
+  // Upstash Queue / Redis - Required for worker-based systems
+  UPSTASH_REDIS_REST_URL: z.string().url("Upstash Redis REST URL must be a valid URL").optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1, "Upstash Redis REST token is required").optional(),
+  QSTASH_TOKEN: z.string().min(1, "Upstash QStash token is required").optional(),
+  QSTASH_URL: z.string().url("Upstash QStash URL must be a valid URL").optional(),
+  QSTASH_CURRENT_SIGNING_KEY: z.string().min(1, "QStash current signing key is required").optional(),
+  QSTASH_NEXT_SIGNING_KEY: z.string().min(1, "QStash next signing key is required").optional(),
+  QSTASH_WORKER_CALLBACK_URL: z.string().url("QStash worker callback URL must be a valid URL").optional(),
+  QSTASH_ONBOARDING_CALLBACK_URL: z.string().url("QStash onboarding callback URL must be a valid URL").optional(),
+
   // Security - Optional for reCAPTCHA protection
   NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().min(1, "reCAPTCHA site key is required").optional(),
   RECAPTCHA_SECRET_KEY: z.string().min(1, "reCAPTCHA secret key is required").optional(),

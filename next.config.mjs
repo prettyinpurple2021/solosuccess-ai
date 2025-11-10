@@ -4,6 +4,20 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function emitConfigWarning(message, error) {
+  const payload = {
+    level: "warn",
+    message,
+    error:
+      error && error instanceof Error
+        ? { name: error.name, message: error.message, stack: error.stack }
+        : error || null,
+    timestamp: new Date().toISOString(),
+    source: "next.config.mjs",
+  };
+  process.stderr.write(`${JSON.stringify(payload)}\n`);
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Fix workspace root warning
@@ -194,10 +208,7 @@ const nextConfig = {
           config.optimization.usedExports = true
         }
       } catch (e) {
-        // If setting usedExports fails for any reason, skip it and continue — dev server
-        // stability is more important than this micro-optimization.
-        // eslint-disable-next-line no-console
-        console.warn('Could not enable config.optimization.usedExports:', e)
+        emitConfigWarning('Could not enable config.optimization.usedExports', e)
       }
       config.optimization.sideEffects = false;
     }

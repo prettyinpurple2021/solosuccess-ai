@@ -1,10 +1,7 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-// Heavy parsing libraries removed - using simplified approach or worker
-// import pdf from 'pdf-parse';
-// import mammoth from 'mammoth';
-// import * as ExcelJS from 'exceljs';
-// import * as cheerio from 'cheerio';
-// import { parse } from 'node-html-parser';
+import { logError } from '@/lib/logger'
+import pdf from 'pdf-parse'
+import mammoth from 'mammoth'
+import ExcelJS from 'exceljs'
 
 
 export interface ParseResult {
@@ -16,6 +13,10 @@ export interface ParseResult {
     title?: string;
     createdDate?: string;
     modifiedDate?: string;
+    sheetCount?: number;
+    rowCount?: number;
+    columnCount?: number;
+    format?: string;
   };
   success: boolean;
   error?: string;
@@ -114,36 +115,139 @@ export class DocumentParser {
   }
 
   private static async parsePDF(buffer: Buffer): Promise<ParseResult> {
-    // TODO: Implement with worker-based PDF parsing
-    return {
-      content: '[PDF Content - Processing with worker not yet implemented]',
-      metadata: {
-        wordCount: 0,
-        pageCount: 1
-      },
-      success: false,
-      error: 'PDF parsing temporarily disabled - will use worker-based processing'
-    };
+    try {
+      const parsed = await pdf(buffer)
+      const content = parsed.text.substring(0, this.MAX_CONTENT_LENGTH).trim()
+      const words = content.split(/\s+/).filter(Boolean).length
+
+      return {
+        content,
+        metadata: {
+          pageCount: parsed.numpages,
+          wordCount: words,
+          author: parsed.info?.Author,
+          title: parsed.info?.Title,
+          createdDate: parsed.info?.CreationDate,
+          modifiedDate: parsed.info?.ModDate,
+          format: 'pdf',
+        },
+        success: true,
+      }
+    } catch (error) {
+      return {
+        content: '',
+        success: false,
+        error: `PDF parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      }
+    }
   }
 
   private static async parseWordDocx(buffer: Buffer): Promise<ParseResult> {
-    // TODO: Implement with worker-based Word parsing
-    return {
-      content: '[Word Document Content - Processing with worker not yet implemented]',
-      metadata: { wordCount: 0 },
-      success: false,
-      error: 'Word document parsing temporarily disabled - will use worker-based processing'
-    };
+    try {
+      const result = await mammoth.extractRawText({ buffer })
+      const content = result.value.substring(0, this.MAX_CONTENT_LENGTH).trim()
+      const wordCount = content.split(/\s+/).filter(Boolean).length
+
+      return {
+        content,
+        metadata: {
+          wordCount,
+          format: 'docx',
+        },
+        success: true,
+      }
+    } catch (error) {
+      return {
+        content: '',
+        success: false,
+        error: `Word document parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      }
+    }
   }
 
   private static async parseExcel(buffer: Buffer, fileName: string): Promise<ParseResult> {
-    // TODO: Implement with worker-based Excel parsing
-    return {
-      content: '[Excel Content - Processing with worker not yet implemented]',
-      metadata: { wordCount: 0 },
-      success: false,
-      error: 'Excel parsing temporarily disabled - will use worker-based processing'
-    };
+    try {
+      const lowerFile = fileName.toLowerCase()
+
+      if (lowerFile.endsWith('.csv') || lowerFile.endsWith('.tsv')) {
+        const text = buffer.toString('utf-8')
+        const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0)
+        const preview = lines.slice(0, 200)
+        const content = preview.join('\n').substring(0, this.MAX_CONTENT_LENGTH)
+
+        const columnCount = preview.reduce((max, line) => {
+          const columns = line.split(lowerFile.endsWith('.tsv') ? '\t' : ',')
+          return Math.max(max, columns.length)
+        }, 0)
+
+        return {
+          content,
+          metadata: {
+            wordCount: content.split(/\s+/).filter(Boolean).length,
+            sheetCount: 1,
+            rowCount: preview.length,
+            columnCount,
+            format: lowerFile.endsWith('.tsv') ? 'tsv' : 'csv',
+          },
+          success: true,
+        }
+      }
+
+      const workbook = new ExcelJS.Workbook()
+      await workbook.xlsx.load(Buffer.from(buffer))
+
+      const rows: string[] = []
+      let rowCount = 0
+      let columnCount = 0
+
+      workbook.worksheets.forEach((sheet) => {
+        sheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+          if (rows.length >= 1000) {
+            return
+          }
+
+          const rawValues = Array.isArray(row.values)
+            ? row.values
+            : Object.values(row.values ?? {})
+
+          const values = rawValues
+            .slice(1)
+            .map((value: unknown) =>
+              typeof value === 'object' && value !== null
+                ? JSON.stringify(value)
+                : String(value ?? '').trim(),
+            )
+            .filter((value: string) => value.length > 0)
+          if (values.length === 0) {
+            return
+          }
+
+          rows.push(`${sheet.name} | Row ${rowNumber}: ${values.join(' | ')}`)
+          rowCount += 1
+          columnCount = Math.max(columnCount, values.length)
+        })
+      })
+
+      const content = rows.join('\n').substring(0, this.MAX_CONTENT_LENGTH)
+
+      return {
+        content,
+        metadata: {
+          wordCount: content.split(/\s+/).filter(Boolean).length,
+          sheetCount: workbook.worksheets.length,
+          rowCount,
+          columnCount,
+          format: 'xlsx',
+        },
+        success: true,
+      }
+    } catch (error) {
+      return {
+        content: '',
+        success: false,
+        error: `Spreadsheet parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      }
+    }
   }
 
   private static async parseHTML(buffer: Buffer): Promise<ParseResult> {

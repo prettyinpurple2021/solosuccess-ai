@@ -27,9 +27,6 @@ interface SessionData {
   updatedAt: string
   userId: number
 }
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [session, setSession] = useState<SessionData | null>(null)

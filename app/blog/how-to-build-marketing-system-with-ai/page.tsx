@@ -5,9 +5,6 @@ export const dynamic = 'force-dynamic'
 import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, Megaphone } from "lucide-react"
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function HowToBuildMarketingSystemWithAIPage() {
   const howTo = {
     "@context": "https://schema.org",

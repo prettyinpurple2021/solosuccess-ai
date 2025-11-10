@@ -5,9 +5,6 @@ export const dynamic = 'force-dynamic'
 import Script from "next/script"
 import Link from "next/link"
 import { ArrowLeft, Bot } from "lucide-react"
-
-// Edge Runtime disabled due to Node.js dependency incompatibility
-
 export default function HowToAutomateRevenueWorkflowsPage() {
   const howTo = {
     "@context": "https://schema.org",

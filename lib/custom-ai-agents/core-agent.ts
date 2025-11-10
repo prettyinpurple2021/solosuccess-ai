@@ -1,10 +1,7 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-// AI SDK removed - using worker-based approach
-// import { generateText, streamText } from "ai"
-// import { openai } from "@ai-sdk/openai"
-// import { anthropic } from "@ai-sdk/anthropic"
-// import { google } from "@ai-sdk/google"
+import { logError } from '@/lib/logger'
+import { generateText } from 'ai'
 import { SimpleTrainingCollector } from "./training/simple-training-collector"
+import { z } from 'zod'
 
 
 export interface AgentCapabilities {
@@ -55,6 +52,30 @@ export interface AgentResponse {
     priority: string
   }>
   followUpTasks: AgentTask[]
+  analysis?: {
+    insights: Array<{
+      id?: string
+      type: string
+      title: string
+      description: string
+      confidence?: number
+      impact?: string
+      urgency?: string
+      supportingData?: Array<Record<string, any>>
+    }>
+    recommendations: Array<{
+      id?: string
+      type: string
+      title: string
+      description: string
+      priority?: string
+      estimatedEffort?: string
+      potentialImpact?: string
+      timeline?: string
+      actionItems?: string[]
+    }>
+    metadata?: Record<string, any>
+  }
 }
 
 export abstract class CustomAgent {
@@ -178,39 +199,139 @@ ${context}
 
 ${prompt}
 
-Please respond with:
-1. Your analysis and recommendations
-2. Your confidence level (0-1)
-3. Your reasoning process
-4. Suggested next actions
-5. Any collaboration requests to other agents
-6. Follow-up tasks you should handle
+Respond ONLY with valid JSON using the following schema:
+{
+  "content": string,            // Detailed agent response in your voice
+  "confidence": number,         // Value between 0 and 1
+  "reasoning": string,          // Summary of your analysis process
+  "suggestedActions": string[], // Actionable next steps
+  "collaborationRequests": [
+    {
+      "agentId": string,        // Target agent id (e.g., "roxy")
+      "request": string,
+      "priority": "low" | "medium" | "high" | "critical"
+    }
+  ],
+  "followUpTasks": [
+    {
+      "type": string,
+      "priority": "low" | "medium" | "high" | "critical",
+      "assignedTo": string,
+      "context": Record<string, any>,
+      "expectedOutcome": string,
+      "deadline": string | null
+    }
+  ]
+}
 
-Be specific, actionable, and maintain your ${this.name} personality.`
+Do not include markdown code fences or additional commentary.`
 
     try {
-      // TODO: Replace with worker-based AI call
-      // const { text } = await generateText({
-      //   model: this.model as any,
-      //   prompt: fullPrompt,
-      //   temperature: 0.7,
-      //   maxOutputTokens: 1000
-      // })
-      
-      // For now, return a fallback response
-      const text = `Analysis complete. Confidence: 0.8. Reasoning: Default response while AI workers are being integrated. Recommended actions: Review system status. No collaboration requests at this time.`
+      const response = await generateText({
+        model: this.model as any,
+        prompt: fullPrompt,
+        temperature: 0.5,
+        maxOutputTokens: 1200,
+      })
 
-      // Parse the response (in a real implementation, you'd want more robust parsing)
-      const lines = text.split('\n').filter(line => line.trim())
-      const content = lines.join('\n')
-      
+      let text = response.text.trim()
+
+      if (text.startsWith('```')) {
+        text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/, '').trim()
+      }
+
+      const schema = z.object({
+        content: z.string().min(1),
+        confidence: z.number().min(0).max(1),
+        reasoning: z.string().min(1),
+        suggestedActions: z.array(z.string()).default([]),
+        collaborationRequests: z
+          .array(
+            z.object({
+              agentId: z.string().min(1),
+              request: z.string().min(1),
+              priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+            }),
+          )
+          .default([]),
+        followUpTasks: z
+          .array(
+            z.object({
+              type: z.string().min(1),
+              priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+              assignedTo: z.string().min(1),
+              context: z.record(z.any()).default({}),
+              expectedOutcome: z.string().min(1),
+              deadline: z.string().optional().nullable(),
+            }),
+          )
+          .default([]),
+        analysis: z
+          .object({
+            insights: z
+              .array(
+                z.object({
+                  id: z.string().optional(),
+                  type: z.string().min(1),
+                  title: z.string().min(1),
+                  description: z.string().min(1),
+                  confidence: z.number().min(0).max(1).optional(),
+                  impact: z.string().optional(),
+                  urgency: z.string().optional(),
+                  supportingData: z.array(z.record(z.any())).default([]),
+                }),
+              )
+              .default([]),
+            recommendations: z
+              .array(
+                z.object({
+                  id: z.string().optional(),
+                  type: z.string().min(1),
+                  title: z.string().min(1),
+                  description: z.string().min(1),
+                  priority: z.string().optional(),
+                  estimatedEffort: z.string().optional(),
+                  potentialImpact: z.string().optional(),
+                  timeline: z.string().optional(),
+                  actionItems: z.array(z.string()).default([]),
+                }),
+              )
+              .default([]),
+            metadata: z.record(z.any()).optional(),
+          })
+          .optional(),
+      })
+
+      const parsed = schema.parse(JSON.parse(text))
+
       return {
-        content,
-        confidence: 0.8, // Default confidence
-        reasoning: "Generated using custom agent logic",
-        suggestedActions: ["Review the response", "Ask for clarification if needed"],
-        collaborationRequests: [],
-        followUpTasks: []
+        content: parsed.content,
+        confidence: parsed.confidence,
+        reasoning: parsed.reasoning,
+        suggestedActions: parsed.suggestedActions,
+        collaborationRequests: parsed.collaborationRequests.map((req) => ({
+          agentId: req.agentId,
+          request: req.request,
+          priority: req.priority,
+        })),
+        followUpTasks: parsed.followUpTasks.map((task) => ({
+          id: `task_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          type: task.type,
+          priority: task.priority,
+          assignedTo: task.assignedTo,
+          context: task.context,
+          expectedOutcome: task.expectedOutcome,
+          deadline: task.deadline ? new Date(task.deadline) : undefined,
+          status: 'pending',
+          dependencies: [],
+        })),
+        analysis: parsed.analysis
+          ? {
+              insights: parsed.analysis.insights,
+              recommendations: parsed.analysis.recommendations,
+              metadata: parsed.analysis.metadata,
+            }
+          : undefined,
       }
     } catch (error) {
       logError(`Error generating response for ${this.name}:`, error)

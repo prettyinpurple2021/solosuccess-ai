@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'
 import * as jose from 'jose'
 import jwt from 'jsonwebtoken'
 import { neon } from '@neondatabase/serverless'
+import { enqueueOnboardingWorkflow } from '@/lib/onboarding/onboarding-queue'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'nodejs'
@@ -102,13 +103,15 @@ export async function POST(request: NextRequest) {
       created_at: newUser.created_at
     }
 
-    // Start Temporal onboarding workflow in the background (disabled for now)
+    // Trigger onboarding workflow asynchronously
     try {
-      // Temporarily disabled to prevent 500 errors
-      logInfo(`User ${newUser.id} created successfully - onboarding workflow disabled`)
+      const { jobId: onboardingJobId } = await enqueueOnboardingWorkflow({ userId: newUser.id })
+      logInfo('Onboarding workflow queued', { userId: newUser.id, onboardingJobId })
     } catch (error) {
-      // Don't fail the signup if Temporal workflow fails
-      logError('Failed to start onboarding workflow:', error)
+      logError('Failed to enqueue onboarding workflow', {
+        userId: newUser.id,
+        error: error instanceof Error ? error.message : String(error)
+      })
     }
 
     const response = NextResponse.json({
