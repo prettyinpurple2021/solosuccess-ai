@@ -20,6 +20,7 @@ export const users = pgTable('users', {
   is_verified: boolean('is_verified').default(false),
   onboarding_completed: boolean('onboarding_completed').default(false),
   onboarding_completed_at: timestamp('onboarding_completed_at'),
+  onboarding_data: jsonb('onboarding_data'),
   // role: varchar('role', { length: 20 }).default('user'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),

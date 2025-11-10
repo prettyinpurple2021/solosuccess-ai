@@ -84,8 +84,7 @@ export async function PATCH(request: NextRequest) {
       full_name: z.string().min(1).max(200).nullable().optional(),
       avatar_url: z.string().url().nullable().optional(),
       onboarding_completed: z.boolean().optional(),
-      // onboarding_data intentionally not supported until column exists
-      onboarding_data: z.any().optional(),
+      onboarding_data: z.unknown().optional(),
     })
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
@@ -102,14 +101,28 @@ export async function PATCH(request: NextRequest) {
     }
     const { full_name, avatar_url, onboarding_completed, onboarding_data } = parsed.data
 
-    // Gracefully ignore onboarding_data for now if present (no DB column yet)
-    if (typeof onboarding_data !== 'undefined') {
-      info('Profile update: onboarding_data provided, ignoring until schema available', {
-        route,
-        userId: user.id,
-        status: 200,
-        meta: { hasOnboardingData: true, ip: request.headers.get('x-forwarded-for') || 'unknown' }
-      })
+    const shouldUpdateOnboardingData = typeof onboarding_data !== 'undefined'
+    let onboardingDataJson: string | null = null
+
+    if (shouldUpdateOnboardingData) {
+      if (onboarding_data === null) {
+        onboardingDataJson = null
+      } else {
+        try {
+          onboardingDataJson = JSON.stringify(onboarding_data)
+        } catch (serializationError) {
+          info('Invalid onboarding_data payload', {
+            route,
+            userId: user.id,
+            status: 400,
+            meta: {
+              serializationError: serializationError instanceof Error ? serializationError.message : 'Unknown error',
+              ip: request.headers.get('x-forwarded-for') || 'unknown'
+            }
+          })
+          return NextResponse.json({ error: 'Invalid onboarding_data payload' }, { status: 400 })
+        }
+      }
     }
 
     const db = getDb()
@@ -120,13 +133,25 @@ export async function PATCH(request: NextRequest) {
             avatar_url = COALESCE($2, avatar_url),
             onboarding_completed = COALESCE($3, onboarding_completed),
             onboarding_completed_at = CASE 
-              WHEN $3 = true THEN NOW() 
+              WHEN $3 = true THEN NOW()
+              WHEN $3 = false THEN NULL
               ELSE onboarding_completed_at 
             END,
+            onboarding_data = CASE 
+              WHEN $4 THEN $5::jsonb 
+              ELSE onboarding_data 
+            END,
             updated_at = NOW()
-        WHERE id = $4
-        RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, onboarding_completed`,
-      [full_name ?? null, avatar_url ?? null, onboarding_completed ?? null, user.id]
+        WHERE id = $6
+        RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, onboarding_completed, onboarding_completed_at, onboarding_data`,
+      [
+        full_name ?? null,
+        avatar_url ?? null,
+        onboarding_completed ?? null,
+        shouldUpdateOnboardingData,
+        onboardingDataJson,
+        user.id
+      ]
     )
 
     info('Profile updated successfully', { 
@@ -136,7 +161,9 @@ export async function PATCH(request: NextRequest) {
       meta: { 
         updatedFields: {
           full_name: full_name !== undefined,
-          avatar_url: avatar_url !== undefined
+          avatar_url: avatar_url !== undefined,
+          onboarding_completed: onboarding_completed !== undefined,
+          onboarding_data: shouldUpdateOnboardingData
         },
         ip: request.headers.get('x-forwarded-for') || 'unknown'
       }
