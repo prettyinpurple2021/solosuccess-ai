@@ -84,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="bg-military-midnight/85 backdrop-blur-md border-r border-military-hot-pink/20"
+      className="bg-military-midnight/85 backdrop-blur-md"
       {...props}
     >
       <SidebarHeader>

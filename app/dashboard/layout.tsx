@@ -15,7 +15,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="min-h-screen">
+      <SidebarInset className="min-h-screen bg-military-midnight">
         <DashboardHeader />
         <main className="flex-1 p-0">
           {children}
