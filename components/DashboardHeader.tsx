@@ -69,24 +69,24 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   }
 
   return (
-    <div className={`bg-gradient-to-r from-purple-50 via-pink-50 to-teal-50 border-b border-purple-200 px-6 py-4 ${className}`}>
+    <div className={`glass-panel-strong bg-military-midnight/80 backdrop-blur-md border-b border-military-hot-pink/20 px-6 py-4 ${className}`}>
       <div className="flex items-center justify-between">
         {/* Left side - Title or Search */}
         <div className="flex items-center gap-6 flex-1">
           {/* Sidebar Toggle */}
-          <SidebarTrigger className="text-purple-600 hover:text-pink-600" />
+          <SidebarTrigger className="text-military-glass-white hover:text-military-hot-pink" />
           
           {title ? (
             <div>
               <div className="flex items-center gap-3">
-                <Crown className="text-purple-600" size={24} />
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-teal-600 bg-clip-text text-transparent">
+                <Crown className="text-military-hot-pink" size={24} />
+                <h1 className="text-2xl font-heading font-bold bg-gradient-to-r from-military-hot-pink via-pink-400 to-cyan-300 bg-clip-text text-transparent">
                   {title}
                 </h1>
-                <Sparkles className="text-teal-500 animate-pulse" size={20} />
+                <Sparkles className="text-pink-400 animate-pulse" size={20} />
               </div>
               {subtitle && (
-                <p className="text-purple-700/80 font-medium mt-1">{subtitle}</p>
+                <p className="text-military-storm-grey font-medium mt-1">{subtitle}</p>
               )}
             </div>
           ) : null}
@@ -107,11 +107,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative hover:bg-purple-100 text-purple-600 hover:text-pink-600 transition-colors rounded-full"
+                className="relative hover:bg-military-tactical-black text-military-glass-white hover:text-military-hot-pink transition-colors rounded-full"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 rounded-full text-xs flex items-center justify-center text-white font-bold">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-military-hot-pink rounded-full text-xs flex items-center justify-center text-white font-bold">
                     {unreadCount}
                   </span>
                 )}
@@ -119,31 +119,31 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="end">
               <div className="p-4 border-b">
-                <h4 className="font-semibold text-purple-900">Notifications</h4>
-                <p className="text-sm text-purple-600">You have {unreadCount} unread notifications</p>
+                <h4 className="font-semibold text-military-glass-white">Notifications</h4>
+                <p className="text-sm text-military-storm-grey">You have {unreadCount} unread notifications</p>
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                  <div className="p-4 text-center text-military-storm-grey">
+                    <Bell className="w-8 h-8 mx-auto mb-2 text-military-storm-grey/60" />
                     <p>No notifications yet</p>
                   </div>
                 ) : (
                   notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 border-b last:border-b-0 hover:bg-purple-50 cursor-pointer ${
+                      className={`p-4 border-b last:border-b-0 hover:bg-military-tactical-black/40 cursor-pointer ${
                         notification.unread ? 'bg-purple-25' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-purple-900">{notification.title}</p>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                          <p className="text-xs text-gray-400 mt-2">{notification.time}</p>
+                          <p className="font-medium text-sm text-military-glass-white">{notification.title}</p>
+                          <p className="text-sm text-military-storm-grey mt-1">{notification.message}</p>
+                          <p className="text-xs text-military-storm-grey/70 mt-2">{notification.time}</p>
                         </div>
                         {notification.unread && (
-                          <div className="w-2 h-2 bg-pink-500 rounded-full mt-1 ml-2 flex-shrink-0"></div>
+                          <div className="w-2 h-2 bg-military-hot-pink rounded-full mt-1 ml-2 flex-shrink-0"></div>
                         )}
                       </div>
                     </div>
@@ -152,7 +152,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </div>
               {notifications.length > 0 && (
                 <div className="p-4 border-t">
-                  <Button variant="outline" className="w-full text-sm">
+                  <Button variant="outline" className="w-full text-sm border-military-hot-pink/30 text-military-glass-white hover:bg-military-tactical-black">
                     View All Notifications
                   </Button>
                 </div>
@@ -165,16 +165,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center gap-3 hover:bg-purple-100 text-purple-700 hover:text-pink-600 transition-all duration-200 px-3 py-2 rounded-full"
+                className="flex items-center gap-3 hover:bg-military-tactical-black text-military-glass-white hover:text-military-hot-pink transition-all duration-200 px-3 py-2 rounded-full"
               >
                 {user?.avatar_url ? (
                   <img
                     src={user.avatar_url}
                     alt="Profile"
-                    className="w-8 h-8 rounded-full border-2 border-purple-300"
+                    className="w-8 h-8 rounded-full border-2 border-military-hot-pink/40"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-military-hot-pink to-pink-400 flex items-center justify-center text-white font-bold text-sm">
                     {user?.email?.charAt(0).toUpperCase() || 'U'}
                   </div>
                 )}
@@ -185,29 +185,29 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-56 bg-white/95 backdrop-blur-sm border-purple-200"
+              className="w-56 bg-military-midnight/95 backdrop-blur-sm border-military-hot-pink/30"
             >
-              <DropdownMenuLabel className="font-bold text-purple-900">
+              <DropdownMenuLabel className="font-bold text-military-glass-white">
                 My Account
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                className="cursor-pointer hover:bg-purple-50"
+                className="cursor-pointer hover:bg-military-tactical-black text-military-glass-white"
                 onClick={handleProfileSettings}
               >
-                <Crown className="mr-2 h-4 w-4 text-purple-600" />
+                <Crown className="mr-2 h-4 w-4 text-military-hot-pink" />
                 <span>Profile Settings</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="cursor-pointer hover:bg-purple-50"
+                className="cursor-pointer hover:bg-military-tactical-black text-military-glass-white"
                 onClick={handleYourBriefcase}
               >
-                <Sparkles className="mr-2 h-4 w-4 text-pink-600" />
+                <Sparkles className="mr-2 h-4 w-4 text-pink-400" />
                 <span>Your Briefcase</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                className="cursor-pointer hover:bg-red-50 text-red-600"
+                className="cursor-pointer hover:bg-red-900/20 text-red-400"
                 onClick={handleSignOut}
               >
                 Sign out
