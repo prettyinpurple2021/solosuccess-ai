@@ -410,10 +410,7 @@ export default function BriefcasePage() {
             )}
           </GlassCard>
         ) : (
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-            : "space-y-2"
-          }>
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" : "space-y-2"}>
             {filteredDocuments.map(doc => (
               <GlassCard key={doc.id} className="cursor-pointer hover:shadow-md transition-shadow" glow>
                 <div className={viewMode === 'grid' ? 'p-4' : 'p-3'}>

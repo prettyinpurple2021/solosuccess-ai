@@ -294,6 +294,7 @@ export function WelcomeDashboard({ userData, onStartOnboarding, onSkipOnboarding
                     </Button>
                   </div>
                 </div>
+                </div>
               </div>
             </GlassCard>
           </motion.div>
