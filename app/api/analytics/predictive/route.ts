@@ -9,8 +9,8 @@ import { eq, gte, lte, desc, count, and, not, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 import { SUBSCRIPTION_TIERS } from '@/lib/stripe'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Stripe types and some libs require Node.js built-ins; run on Node runtime
+export const runtime = 'nodejs'
 
 
 // Force dynamic rendering
