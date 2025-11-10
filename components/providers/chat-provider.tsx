@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import FloatingChatButton from '@/components/chat/floating-chat-button'
 import { useToast } from '@/hooks/use-toast'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
+import { useAuth } from '@/hooks/use-auth'
 
 
 interface Message {
@@ -123,6 +124,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const { user } = useAuth()
+  const [chatbaseIdentified, setChatbaseIdentified] = useState(false)
   
   // Use database preferences for chat messages with localStorage fallback
   const { preferences, setPreference, loading: preferencesLoading } = useUserPreferences({
@@ -148,6 +151,71 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [preferences.chatMessages, preferencesLoading])
+
+  useEffect(() => {
+    if (!user) {
+      if (chatbaseIdentified) {
+        setChatbaseIdentified(false)
+      }
+      return
+    }
+    if (chatbaseIdentified) {
+      return
+    }
+
+    let active = true
+
+    const identifyWithChatbase = async () => {
+      try {
+        const authToken = typeof window !== 'undefined' ? window.localStorage.getItem('authToken') : null
+        if (!authToken) {
+          logDebug('Chatbase identify skipped: no auth token present')
+          return
+        }
+
+        const response = await fetch('/api/chatbase/identity', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        })
+
+        if (!response.ok) {
+          logWarn('Chatbase identity request failed', { status: response.status })
+          return
+        }
+
+        const data = await response.json() as { token?: string }
+        if (!data.token) {
+          logWarn('Chatbase identity token missing from response')
+          return
+        }
+
+        if (!active) {
+          return
+        }
+
+        const chatbase = (window as typeof window & { chatbase?: (...args: any[]) => void }).chatbase
+        if (typeof chatbase === 'function') {
+          chatbase('identify', { token: data.token })
+          setChatbaseIdentified(true)
+          logInfo('Chatbase user identified successfully', { userId: user.id })
+        } else {
+          logWarn('Chatbase identify skipped: widget not initialized')
+        }
+      } catch (error) {
+        if (active) {
+          logError('Failed to identify user with Chatbase', error)
+        }
+      }
+    }
+
+    void identifyWithChatbase()
+
+    return () => {
+      active = false
+    }
+  }, [user, chatbaseIdentified])
 
   // Cache messages when they change using preferences API
   useEffect(() => {

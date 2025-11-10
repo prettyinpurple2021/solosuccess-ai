@@ -186,6 +186,43 @@ export default function RootLayout({
             gtag('config', 'G-W174T4ZFNF');
           `}
         </Script>
+        <Script
+          id="chatbase-widget-loader"
+          strategy="afterInteractive"
+        >
+          {`
+            (function () {
+              if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+                window.chatbase = (...args) => {
+                  if (!window.chatbase.q) {
+                    window.chatbase.q = [];
+                  }
+                  window.chatbase.q.push(args);
+                };
+                window.chatbase = new Proxy(window.chatbase, {
+                  get(target, prop) {
+                    if (prop === "q") {
+                      return target.q;
+                    }
+                    return (...proxyArgs) => target(prop, ...proxyArgs);
+                  },
+                });
+              }
+              const onLoad = function () {
+                const script = document.createElement("script");
+                script.src = "https://www.chatbase.co/embed.min.js";
+                script.id = "8-mWFi8v0Y7sa4YG0EdmV";
+                script.domain = "www.chatbase.co";
+                document.body.appendChild(script);
+              };
+              if (document.readyState === "complete") {
+                onLoad();
+              } else {
+                window.addEventListener("load", onLoad);
+              }
+            })();
+          `}
+        </Script>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

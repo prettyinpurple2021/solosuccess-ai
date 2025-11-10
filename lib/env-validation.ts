@@ -22,11 +22,35 @@ const envSchema = z.object({
 
   // AI Services - Optional for AI functionality
   OPENAI_API_KEY: z.string().min(1, "OpenAI API key is required").optional(),
+  ANTHROPIC_API_KEY: z.string().min(1, "Anthropic API key is required").optional(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1, "Google Gemini API key is required").optional(),
 
   // Email - Optional for notifications
   RESEND_API_KEY: z.string().min(1, "Resend API key is required").optional(),
   FROM_EMAIL: z.string().email("Invalid from email address").optional(),
+
+  // SMS Notifications - Optional for SMS notifications
+  TWILIO_ACCOUNT_SID: z.string().min(1, "Twilio account SID is required").optional(),
+  TWILIO_AUTH_TOKEN: z.string().min(1, "Twilio auth token is required").optional(),
+  TWILIO_PHONE_NUMBER: z.string().min(1, "Twilio phone number is required").optional(),
+
+  // Web Push Notifications - Optional for push notifications
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().min(1, "VAPID public key is required").optional(),
+  VAPID_PRIVATE_KEY: z.string().min(1, "VAPID private key is required").optional(),
+  VAPID_CONTACT_EMAIL: z.string().min(1, "VAPID contact email is required").optional(),
+
+  // Payment Processing - Optional for subscription billing
+  STRIPE_SECRET_KEY: z.string().min(1, "Stripe secret key is required").optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1, "Stripe webhook secret is required").optional(),
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1, "Stripe publishable key is required").optional(),
+
+  // Security - Optional for reCAPTCHA protection
+  NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().min(1, "reCAPTCHA site key is required").optional(),
+  RECAPTCHA_SECRET_KEY: z.string().min(1, "reCAPTCHA secret key is required").optional(),
+  NEXT_PUBLIC_RECAPTCHA_PROJECT_ID: z.string().min(1, "reCAPTCHA project ID is required").optional(),
+
+  // Analytics - Optional for analytics tracking
+  NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().min(1, "Google Analytics measurement ID is required").optional(),
 
   // App Configuration - Required
   NEXT_PUBLIC_APP_URL: z.string().url("Invalid app URL"),
@@ -88,9 +112,12 @@ export function getFeatureFlags() {
   return {
     hasDatabase: !!process.env.DATABASE_URL,
     hasAuth: !!(process.env.JWT_SECRET || (process.env.NEXT_PUBLIC_STACK_PROJECT_ID && process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY)),
-    hasBilling: false, // Chargebee removed
-    hasAI: !!(process.env.OPENAI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY),
+    hasBilling: !!process.env.STRIPE_SECRET_KEY,
+    hasAI: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY),
     hasEmail: !!process.env.RESEND_API_KEY,
+    hasSMS: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER),
+    hasPushNotifications: !!(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY),
+    hasRecaptcha: !!(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.RECAPTCHA_SECRET_KEY),
   }
 }
 
