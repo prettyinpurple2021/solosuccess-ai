@@ -139,7 +139,7 @@ const SidebarProvider = React.forwardRef<
         <TooltipProvider delayDuration={0}>
           <div
             className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar sidebar-provider",
+              "group/sidebar-wrapper flex min-h-svh w-full gap-0 has-[[data-variant=inset]]:bg-sidebar sidebar-provider",
               className
             )}
             ref={ref}
@@ -319,8 +319,9 @@ const SidebarInset = React.forwardRef<
       className={cn(
         "relative flex min-h-svh flex-1 flex-col bg-background",
         "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
-        // Add proper margin for desktop when sidebar is shown
-        !isMobile && "md:ml-[--sidebar-width] md:peer-data-[state=collapsed]:ml-[--sidebar-width-icon] transition-[margin] duration-200 ease-linear",
+        // Add proper margin for desktop when sidebar is shown - ensure no gap
+        // Using CSS variable directly - matches --sidebar-width: 16rem from globals.css
+        !isMobile && "md:ml-[16rem] md:peer-data-[state=collapsed]:ml-[3rem] transition-[margin] duration-200 ease-linear",
         className
       )}
       {...props}
