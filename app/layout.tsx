@@ -135,6 +135,11 @@ export default function RootLayout({
         <meta name="google-site-verification" content="CHANGE_ME" />
         <meta name="msvalidate.01" content="CHANGE_ME" />
         {/* Analytics scripts moved to afterInteractive to prevent chunk loading issues */}
+        {/* Move canonical & prefetch links into head to avoid incorrect tag handling */}
+        <link rel="canonical" href="https://www.solosuccessai.fun/" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
       </head>
       <body
         className={cn(
@@ -145,10 +150,6 @@ export default function RootLayout({
           orbitron.variable
         )}
       >
-        <link rel="canonical" href="https://www.solosuccessai.fun/" />
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
-        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         {/* Structured Data */}
         <Script 
           id="ld-org" 

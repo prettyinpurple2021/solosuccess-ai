@@ -84,6 +84,7 @@ export async function PATCH(request: NextRequest) {
       full_name: z.string().min(1).max(200).nullable().optional(),
       avatar_url: z.string().url().nullable().optional(),
       onboarding_completed: z.boolean().optional(),
+      // onboarding_data intentionally not supported until column exists
       onboarding_data: z.any().optional(),
     })
     const parsed = BodySchema.safeParse(await request.json())
@@ -101,20 +102,31 @@ export async function PATCH(request: NextRequest) {
     }
     const { full_name, avatar_url, onboarding_completed, onboarding_data } = parsed.data
 
+    // Gracefully ignore onboarding_data for now if present (no DB column yet)
+    if (typeof onboarding_data !== 'undefined') {
+      info('Profile update: onboarding_data provided, ignoring until schema available', {
+        route,
+        userId: user.id,
+        status: 200,
+        meta: { hasOnboardingData: true, ip: request.headers.get('x-forwarded-for') || 'unknown' }
+      })
+    }
+
     const db = getDb()
     const { rows } = await db.query(
       `UPDATE users
-          SET full_name = COALESCE($1, full_name),
-              avatar_url = COALESCE($2, avatar_url),
-              onboarding_completed = COALESCE($3, onboarding_completed),
-              onboarding_data = CASE 
-                WHEN $4 IS NOT NULL THEN $4::jsonb 
-                ELSE onboarding_data 
-              END,
-              updated_at = NOW()
-        WHERE id = $5
+          SET 
+            full_name = COALESCE($1, full_name),
+            avatar_url = COALESCE($2, avatar_url),
+            onboarding_completed = COALESCE($3, onboarding_completed),
+            onboarding_completed_at = CASE 
+              WHEN $3 = true THEN NOW() 
+              ELSE onboarding_completed_at 
+            END,
+            updated_at = NOW()
+        WHERE id = $4
         RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, onboarding_completed`,
-      [full_name ?? null, avatar_url ?? null, onboarding_completed ?? null, onboarding_data ? JSON.stringify(onboarding_data) : null, user.id]
+      [full_name ?? null, avatar_url ?? null, onboarding_completed ?? null, user.id]
     )
 
     info('Profile updated successfully', { 

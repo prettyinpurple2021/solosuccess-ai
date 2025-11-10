@@ -9,7 +9,8 @@ import { toast } from 'sonner'
 
 
 const authFetch = async (url: string, init?: RequestInit) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+  // Standardize on 'auth_token' per auth-client
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
   const headers: HeadersInit = {
     ...(init?.headers || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

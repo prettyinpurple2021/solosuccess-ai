@@ -1,8 +1,9 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import * as jose from 'jose'
-import { neon} from '@neondatabase/serverless'
+import jwt from 'jsonwebtoken'
+import { neon } from '@neondatabase/serverless'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'nodejs'
