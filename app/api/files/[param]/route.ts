@@ -94,7 +94,7 @@ async function handleIdBasedFile(id: string) {
     }
 
     const bytes = normalizeBinary(file.content)
-    return new NextResponse(bytes, {
+    return new NextResponse(bytes as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': file.content_type,
@@ -130,7 +130,7 @@ async function handlePathnameBasedFile(pathname: string) {
     // Convert buffer back to response
     const bytes = normalizeBinary(file.file_data)
     
-    return new NextResponse(bytes, {
+    return new NextResponse(bytes as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': file.content_type,
@@ -180,13 +180,13 @@ async function handleIdBasedFileDeletion(id: string) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const client = await createClient()
-    const { rowCount } = await client.query(
-      'DELETE FROM documents WHERE id = $1 AND user_id = $2',
-      [id, user.id]
-    )
+    const sql = getSql()
+    const deletedRows = await sql`
+      DELETE FROM documents WHERE id = ${id} AND user_id = ${user.id}
+      RETURNING id
+    ` as any[]
 
-    if (rowCount === 0) {
+    if (deletedRows.length === 0) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 

@@ -140,11 +140,7 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await rateLimitByIp(request, { requests: 12, window: 60 })
     if (!rateLimitResult.allowed) {
-      const response = NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
-      if (rateLimitResult.retryAfter) {
-        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
-      }
-      return response
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     const { user } = await authenticateRequest()
@@ -163,7 +159,7 @@ export async function POST(request: NextRequest) {
     const payload = parsedBody.data
 
     const securityResult = await securityMiddleware.processRequest(
-      request.clone(),
+      request as NextRequest,
       payload.agentId,
       'invoke',
       'custom_agents',
@@ -211,11 +207,7 @@ export async function GET(request: NextRequest) {
   try {
     const rateLimitResult = await rateLimitByIp(request, { requests: 30, window: 60 })
     if (!rateLimitResult.allowed) {
-      const response = NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
-      if (rateLimitResult.retryAfter) {
-        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
-      }
-      return response
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     const { user } = await authenticateRequest()

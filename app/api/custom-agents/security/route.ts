@@ -113,14 +113,16 @@ async function getUserPermissions(request: NextRequest) {
     }
 
     // Get user permissions for the agent
-    const db = await securityManager['getDb']()
-    const result = await db.query(`
+    const { getSql } = await import('@/lib/api-utils')
+    const sql = getSql()
+    const result = await sql`
       SELECT permissions, restrictions, expires_at
       FROM agent_permissions 
-      WHERE user_id = $1 AND agent_id = $2
-    `, [_userId, agentId])
+      WHERE user_id = ${_userId} AND agent_id = ${agentId}
+      AND (expires_at IS NULL OR expires_at > NOW())
+    ` as any[]
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return NextResponse.json({
         success: true,
         permissions: {
@@ -132,14 +134,20 @@ async function getUserPermissions(request: NextRequest) {
       })
     }
 
-    const permission = result.rows[0]
+    const permission = result[0]
+    const permissions = typeof permission.permissions === 'string' 
+      ? JSON.parse(permission.permissions) 
+      : (permission.permissions || [])
+    const restrictions = typeof permission.restrictions === 'string'
+      ? JSON.parse(permission.restrictions)
+      : (permission.restrictions || [])
     
     return NextResponse.json({
       success: true,
       permissions: {
         agentId,
-        permissions: permission.permissions || [],
-        restrictions: permission.restrictions || [],
+        permissions: permissions,
+        restrictions: restrictions,
         expiresAt: permission.expires_at
       }
     })

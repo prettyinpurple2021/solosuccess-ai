@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
         ],
         temperature: 0.7,
         maxTokens: 1000,
-      })
+      } as any)
 
       // Save assistant message to database
       const assistantMessageId = uuidv4()

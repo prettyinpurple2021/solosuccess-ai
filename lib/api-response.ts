@@ -199,9 +199,9 @@ export function withApiHandler<T>(
  * Authentication middleware for API routes
  */
 export function withAuth<T>(
-  handler: (request: Request, user: any) => Promise<NextResponse<ApiResponse<T>>>
+  handler: (request: NextRequest, user: any) => Promise<NextResponse<ApiResponse<T>>>
 ) {
-  return async (request: Request): Promise<NextResponse<ApiResponse<T>>> => {
+  return async (request: NextRequest | Request): Promise<NextResponse<ApiResponse<T>>> => {
     try {
       // Import here to avoid circular dependencies
       const { authenticateRequest } = await import('./auth-server')

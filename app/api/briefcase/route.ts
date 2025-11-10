@@ -179,7 +179,7 @@ export async function GET(request: NextRequest) {
     const stats = statsResult[0]
 
     // Transform briefcases to match expected format
-    const files = briefcases.map((briefcase: { id: number; title: string; description: string; status: string; metadata: unknown; created_at: string; updated_at: string; goal_count: string; task_count: string }) => ({
+    const files = briefcases.map((briefcase: any) => ({
       id: briefcase.id.toString(),
       name: briefcase.title,
       original_name: briefcase.title,
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
       mime_type: 'application/briefcase',
       size: 0,
       category: briefcase.status,
-      description: briefcase.description,
+      description: briefcase.description || '',
       tags: [],
       metadata: briefcase.metadata || {},
       ai_insights: {},
@@ -202,8 +202,8 @@ export async function GET(request: NextRequest) {
       folder_color: null,
       downloadUrl: '',
       previewUrl: '',
-      goal_count: parseInt(briefcase.goal_count),
-      task_count: parseInt(briefcase.task_count)
+      goal_count: parseInt(briefcase.goal_count || '0', 10),
+      task_count: parseInt(briefcase.task_count || '0', 10),
     }))
 
     return NextResponse.json({
