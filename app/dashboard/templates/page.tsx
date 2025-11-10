@@ -2,7 +2,6 @@
 
 const React = require("react")
 const { useState, useEffect } = React
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -28,6 +27,10 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { logger, logInfo } from "@/lib/logger"
 import { useSmartTips } from "@/hooks/use-smart-tips"
+import { GlassCard, CamoBackground, TacticalGrid } from "@/components/military"
+import { useTemplateSave } from "@/hooks/use-templates-swr"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 interface Template {
   id: string
@@ -49,6 +52,9 @@ interface Template {
 
 export default function TemplatesDashboard() {
   const { user } = useAuth()
+  const router = useRouter()
+  const { toast } = useToast()
+  const { saveTemplate, isSaving } = useTemplateSave()
   const [templates, setTemplates] = useState([])
   const [filteredTemplates, setFilteredTemplates] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -233,23 +239,39 @@ export default function TemplatesDashboard() {
     setFilteredTemplates(filtered)
   }, [templates, searchQuery, selectedCategory, selectedTier])
 
-  const handleUseTemplate = (template: Template) => {
+  const handleUseTemplate = async (template: Template) => {
     logInfo('Using template:', { templateId: template.id })
     
-    // Track usage
-    const newUsedTemplates = new Set(usedTemplates)
-    newUsedTemplates.add(template.id)
-    setUsedTemplates(newUsedTemplates)
-    localStorage.setItem('used-templates', JSON.stringify(Array.from(newUsedTemplates)))
-    
-    // In production, this would:
-    // 1. Check user's subscription tier
-    // 2. Apply template to user's workspace
-    // 3. Track usage analytics
-    // 4. Redirect to appropriate page
-    
-    // For now, show success message
-    alert(`Template "${template.title}" has been applied to your workspace!`)
+    try {
+      // Save template to user's workspace
+      await saveTemplate({
+        template_slug: template.id,
+        template_data: template.content || {},
+        title: template.title,
+        description: template.description
+      })
+      
+      // Track usage
+      const newUsedTemplates = new Set(usedTemplates)
+      newUsedTemplates.add(template.id)
+      setUsedTemplates(newUsedTemplates)
+      localStorage.setItem('used-templates', JSON.stringify(Array.from(newUsedTemplates)))
+      
+      toast({
+        title: "Template Added!",
+        description: `"${template.title}" has been added to your workspace.`,
+      })
+      
+      // Redirect to workspace to view saved templates
+      router.push('/dashboard/workspace')
+    } catch (error) {
+      logInfo('Error saving template:', error)
+      toast({
+        title: "Error",
+        description: "Failed to save template. Please try again.",
+        variant: "destructive"
+      })
+    }
   }
 
   const getTierIcon = (tier: string) => {
@@ -279,21 +301,24 @@ export default function TemplatesDashboard() {
   }
 
   return (
-    <div className="min-h-screen gradient-background p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-military-midnight relative overflow-hidden p-6">
+      <CamoBackground opacity={0.1} withGrid />
+      <TacticalGrid />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold boss-heading mb-2">
+              <h1 className="text-4xl font-heading font-bold text-military-glass-white mb-2">
                 Template Library 📚
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-military-storm-grey">
                 Professional templates to accelerate your business growth
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-sm border border-gray-300">
+              <span className="px-3 py-1 rounded-full text-sm border border-military-storm-grey text-military-glass-white bg-military-tactical-black/50">
                 {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
               </span>
             </div>
@@ -302,21 +327,21 @@ export default function TemplatesDashboard() {
           {/* Search and Filters */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-military-storm-grey" />
               <Input
                 placeholder="Search templates..."
                 value={searchQuery}
                 onChange={(e: any) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white placeholder:text-military-storm-grey"
               />
             </div>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-48 bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-military-tactical-black border-military-storm-grey">
                 {categories.map(category => (
-                  <SelectItem key={category.id} value={category.id}>
+                  <SelectItem key={category.id} value={category.id} className="text-military-glass-white hover:bg-military-midnight">
                     <div className="flex items-center gap-2">
                       <category.icon className="h-4 w-4" />
                       {category.label}
@@ -326,12 +351,12 @@ export default function TemplatesDashboard() {
               </SelectContent>
             </Select>
             <Select value={selectedTier} onValueChange={setSelectedTier}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-48 bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white">
                 <SelectValue placeholder="Tier" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-military-tactical-black border-military-storm-grey">
                 {tiers.map(tier => (
-                  <SelectItem key={tier.id} value={tier.id}>
+                  <SelectItem key={tier.id} value={tier.id} className="text-military-glass-white hover:bg-military-midnight">
                     <div className="flex items-center gap-2">
                       {tier.id !== "all" && getTierIcon(tier.id)}
                       {tier.label}
@@ -350,29 +375,31 @@ export default function TemplatesDashboard() {
             const isUsed = usedTemplates.has(template.id)
             
             return (
-              <Card key={template.id} className="boss-card hover:shadow-lg transition-all duration-200">
-                <CardHeader className="pb-3">
+              <GlassCard key={template.id} className="p-6 hover:shadow-lg transition-all duration-200" glow>
+                <div className="space-y-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {getTierIcon(template.tier)}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        template.difficulty === "beginner" ? "bg-green-500/20 text-green-400" :
+                        template.difficulty === "intermediate" ? "bg-yellow-500/20 text-yellow-400" :
+                        "bg-red-500/20 text-red-400"
+                      }`}>
                         {template.difficulty}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      {template.isNew && <span className="px-2 py-1 rounded-full text-xs border border-gray-300">New</span>}
-                      {template.isPopular && <span className="px-2 py-1 rounded-full text-xs border border-gray-300">Popular</span>}
-                      {template.isPremium && <span className="px-2 py-1 rounded-full text-xs border border-gray-300">Premium</span>}
+                      {template.isNew && <span className="px-2 py-1 rounded-full text-xs border border-military-hot-pink/30 text-military-hot-pink">New</span>}
+                      {template.isPopular && <span className="px-2 py-1 rounded-full text-xs border border-military-hot-pink/30 text-military-hot-pink">Popular</span>}
+                      {template.isPremium && <span className="px-2 py-1 rounded-full text-xs border border-military-hot-pink/30 text-military-hot-pink">Premium</span>}
                     </div>
                   </div>
-                  <CardTitle className="text-lg">{template.title}</CardTitle>
-                  <CardDescription className="text-sm">
+                  <h3 className="text-lg font-heading font-bold text-military-glass-white">{template.title}</h3>
+                  <p className="text-sm text-military-storm-grey">
                     {template.description}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-xs text-military-storm-grey">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {template.estimatedTime}
@@ -389,59 +416,59 @@ export default function TemplatesDashboard() {
 
                   <div className="flex flex-wrap gap-1">
                     {template.tags.slice(0, 3).map((tag: string) => (
-                      <span key={tag} className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                      <span key={tag} className="px-2 py-1 rounded-full text-xs bg-military-tactical-black/50 text-military-storm-grey border border-white/10">
                         {tag}
                       </span>
                     ))}
                     {template.tags.length > 3 && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                      <span className="px-2 py-1 rounded-full text-xs bg-military-tactical-black/50 text-military-storm-grey border border-white/10">
                         +{template.tags.length - 3}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 pt-2">
                     <Dialog>
-                      <DialogTrigger>
-                        <Button variant="outline" size="sm" className="flex-1">
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="flex-1 border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black">
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
+                      <DialogContent className="max-w-2xl bg-military-tactical-black border-military-storm-grey">
                         <DialogHeader>
-                          <DialogTitle>{template.title}</DialogTitle>
-                          <DialogDescription>
+                          <DialogTitle className="text-military-glass-white">{template.title}</DialogTitle>
+                          <DialogDescription className="text-military-storm-grey">
                             {template.description}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                          <div className="p-4 bg-muted rounded-lg">
-                            <h4 className="font-medium mb-2">Template Preview:</h4>
-                            <p className="text-sm text-muted-foreground">
+                          <div className="p-4 glass-card rounded-lg">
+                            <h4 className="font-medium mb-2 text-military-glass-white">Template Preview:</h4>
+                            <p className="text-sm text-military-storm-grey">
                               {template.preview}
                             </p>
                           </div>
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-4 text-sm text-military-storm-grey">
                               <span>⏱️ {template.estimatedTime}</span>
                               <span>👥 {template.usageCount.toLocaleString()} uses</span>
                               <span>⭐ {template.rating}</span>
                             </div>
                             <Button
                               onClick={() => handleUseTemplate(template)}
-                              disabled={!hasAccess}
-                              className="punk-button text-white"
+                              disabled={!hasAccess || isSaving}
+                              className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90"
                             >
                               {isUsed ? (
                                 <>
                                   <CheckCircle className="h-4 w-4 mr-2" />
-                                  Used
+                                  Added
                                 </>
                               ) : (
                                 <>
                                   <Download className="h-4 w-4 mr-2" />
-                                  Use Template
+                                  Add to Workspace
                                 </>
                               )}
                             </Button>
@@ -452,40 +479,40 @@ export default function TemplatesDashboard() {
                     
                     <Button
                       onClick={() => handleUseTemplate(template)}
-                      disabled={!hasAccess}
+                      disabled={!hasAccess || isSaving}
                       size="sm"
-                      className="flex-1"
+                      className="flex-1 bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90"
                     >
                       {isUsed ? (
                         <>
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Used
+                          Added
                         </>
                       ) : (
                         <>
                           <Copy className="h-4 w-4 mr-2" />
-                          Use
+                          Add
                         </>
                       )}
                     </Button>
                   </div>
 
                   {!hasAccess && (
-                    <div className="text-xs text-muted-foreground text-center">
+                    <div className="text-xs text-military-storm-grey text-center pt-2">
                       Upgrade to {template.tier} plan to access this template
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </GlassCard>
             )
           })}
         </div>
 
         {filteredTemplates.length === 0 && (
           <div className="text-center py-12">
-            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No templates found</h3>
-            <p className="text-muted-foreground">
+            <FileText className="h-12 w-12 text-military-storm-grey mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2 text-military-glass-white">No templates found</h3>
+            <p className="text-military-storm-grey">
               Try adjusting your search or filter criteria
             </p>
           </div>

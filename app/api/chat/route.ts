@@ -11,6 +11,8 @@ import { CompetitiveIntelligenceContextService} from '@/lib/competitive-intellig
 import { z} from 'zod'
 import { gateConversation, gateAgentAccess } from '@/lib/feature-gate-middleware'
 import { incrementConversationCount, trackAgentAccess } from '@/lib/usage-tracking'
+import { openai } from '@ai-sdk/openai'
+import { streamText } from 'ai'
 
 // Using Node.js runtime for database and complex operations
 export const runtime = 'nodejs'
@@ -163,41 +165,118 @@ export async function POST(request: NextRequest) {
     const env = process.env as unknown as Env
     const openaiWorker = env.OPENAI_WORKER
 
-    if (!openaiWorker) {
-      logError('OpenAI Worker service binding not found')
-      return NextResponse.json({ error: 'AI service temporarily unavailable' }, { status: 503 })
+    // If worker binding is available, use it
+    if (openaiWorker) {
+      try {
+        // Create request to OpenAI worker
+        const workerRequest = new Request('https://worker/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message,
+            agentId,
+            systemPrompt,
+            user: {
+              id: user.id,
+              email: user.email
+            }
+          })
+        })
+
+        // Call the worker
+        const workerResponse = await openaiWorker.fetch(workerRequest)
+
+        if (workerResponse.ok) {
+          // The worker returns a streaming response, pass it through
+          return new Response(workerResponse.body, {
+            headers: workerResponse.headers
+          })
+        } else {
+          const errorText = await workerResponse.text()
+          logWarn(`OpenAI Worker error: ${errorText}, falling back to direct AI SDK`)
+        }
+      } catch (error) {
+        logWarn('OpenAI Worker failed, falling back to direct AI SDK:', error)
+      }
+    } else {
+      logInfo('OpenAI Worker service binding not found, using direct AI SDK fallback')
     }
 
-    // Create request to OpenAI worker
-    const workerRequest = new Request('https://worker/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-        agentId,
-        systemPrompt,
-        user: {
-          id: user.id,
-          email: user.email
+    // Fallback: Use AI SDK directly
+    try {
+      const result = await streamText({
+        model: openai('gpt-4o-mini'),
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        temperature: 0.7,
+        maxTokens: 1000,
+      })
+
+      // Save assistant message to database
+      const assistantMessageId = uuidv4()
+      let assistantContent = ''
+      
+      // Create a readable stream that saves the message as it streams
+      const stream = new ReadableStream({
+        async start(controller) {
+          const encoder = new TextEncoder()
+          
+          try {
+            for await (const chunk of result.textStream) {
+              assistantContent += chunk
+              // Stream the chunk directly as text (frontend handles it)
+              controller.enqueue(encoder.encode(chunk))
+            }
+            
+            // Save the complete assistant message
+            await db.insert(chatMessages).values({
+              id: assistantMessageId,
+              conversation_id: conversationId,
+              user_id: user.id,
+              role: 'assistant',
+              content: assistantContent,
+              metadata: { agentId: agentId || 'general' },
+              created_at: new Date()
+            })
+            
+            // Update conversation
+            await db.update(chatConversations)
+              .set({
+                last_message: assistantContent,
+                last_message_at: new Date(),
+                message_count: 2,
+                updated_at: new Date()
+              })
+              .where(eq(chatConversations.id, conversationId))
+            
+            controller.close()
+          } catch (error) {
+            logError('Error streaming AI response:', error)
+            controller.error(error)
+          }
         }
       })
-    })
 
-    // Call the worker
-    const workerResponse = await openaiWorker.fetch(workerRequest)
-
-    if (!workerResponse.ok) {
-      const errorText = await workerResponse.text()
-      logError(`OpenAI Worker error: ${errorText}`)
-      return NextResponse.json({ error: 'AI processing failed' }, { status: 500 })
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      })
+    } catch (error) {
+      logError('AI SDK fallback failed:', error)
+      return NextResponse.json({ 
+        error: 'AI service temporarily unavailable. Please try again later.' 
+      }, { status: 503 })
     }
-
-    // The worker returns a streaming response, pass it through
-    return new Response(workerResponse.body, {
-      headers: workerResponse.headers
-    })
   } catch (error) {
     const errMessage =
       error instanceof Error
