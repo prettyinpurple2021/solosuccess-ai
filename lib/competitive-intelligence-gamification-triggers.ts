@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { CompetitiveIntelligenceGamification } from './competitive-intelligence-gamification'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 
 export class CompetitiveIntelligenceGamificationTriggers {
@@ -36,11 +36,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
       await this.triggerGamificationEvent(userId, 'alert_processed', 1)
       
       // Check if this was a high-priority alert for bonus points
-      const db = getDb()
-      const { rows: alertRows } = await db.query(
-        'SELECT severity FROM competitor_alerts WHERE id = $1 AND user_id = $2',
-        [alertId, userId]
-      )
+      const sql = getSql()
+      const alertRows = await sql`
+        SELECT severity FROM competitor_alerts WHERE id = ${alertId} AND user_id = ${userId}
+      ` as any[]
       
       if (alertRows.length > 0 && (alertRows[0].severity === 'urgent' || alertRows[0].severity === 'critical')) {
         // Bonus points for processing urgent/critical alerts
@@ -73,11 +72,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
       await this.triggerGamificationEvent(userId, 'competitive_task_completed', 1)
       
       // Check if this was a high-priority task for bonus points
-      const db = getDb()
-      const { rows: taskRows } = await db.query(
-        'SELECT priority FROM tasks WHERE id = $1 AND user_id = $2',
-        [taskId, userId]
-      )
+      const sql = getSql()
+      const taskRows = await sql`
+        SELECT priority FROM tasks WHERE id = ${taskId} AND user_id = ${userId}
+      ` as any[]
       
       if (taskRows.length > 0 && (taskRows[0].priority === 'high' || taskRows[0].priority === 'critical')) {
         // Bonus points for completing high-priority competitive tasks
@@ -144,18 +142,17 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async checkIntelligenceStreaks(userId: string): Promise<void> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get intelligence gathering activity for the last 30 days
-      const { rows: activityRows } = await db.query(
-        `SELECT DATE(collected_at) as activity_date, COUNT(*) as intelligence_count
+      const activityRows = await sql`
+        SELECT DATE(collected_at) as activity_date, COUNT(*) as intelligence_count
          FROM intelligence_data 
-         WHERE user_id = $1 
+         WHERE user_id = ${userId} 
          AND collected_at > NOW() - INTERVAL '30 days'
          GROUP BY DATE(collected_at)
-         ORDER BY activity_date DESC`,
-        [userId]
-      )
+         ORDER BY activity_date DESC
+      ` as any[]
       
       // Calculate current streak
       let currentStreak = 0
@@ -173,10 +170,9 @@ export class CompetitiveIntelligenceGamificationTriggers {
       }
       
       // Update streak in competitive stats
-      await db.query(
-        'UPDATE user_competitive_stats SET intelligence_streaks = $1 WHERE user_id = $2',
-        [currentStreak, userId]
-      )
+      await sql`
+        UPDATE user_competitive_stats SET intelligence_streaks = ${currentStreak} WHERE user_id = ${userId}
+      `
       
       // Trigger streak achievements if applicable
       if (currentStreak >= 7) {
@@ -192,19 +188,17 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async awardBonusPoints(userId: string, points: number, reason: string): Promise<void> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Update competitive advantage points
-      await db.query(
-        'UPDATE user_competitive_stats SET competitive_advantage_points = competitive_advantage_points + $1 WHERE user_id = $2',
-        [points, userId]
-      )
+      await sql`
+        UPDATE user_competitive_stats SET competitive_advantage_points = competitive_advantage_points + ${points} WHERE user_id = ${userId}
+      `
       
       // Update user total points
-      await db.query(
-        'UPDATE users SET total_points = total_points + $1 WHERE id = $2',
-        [points, userId]
-      )
+      await sql`
+        UPDATE users SET total_points = total_points + ${points} WHERE id = ${userId}
+      `
       
       logInfo(`Bonus points awarded: ${points} points to user ${userId} for ${reason}`)
     } catch (error) {
@@ -217,7 +211,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async generateTeamChallenge(userIds: string[]): Promise<string> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       const challengeId = `team_challenge_${Date.now()}`
       const challengeData = {
@@ -235,20 +229,13 @@ export class CompetitiveIntelligenceGamificationTriggers {
       
       // Create challenge for each team member
       for (const userId of userIds) {
-        await db.query(
-          `INSERT INTO competitive_challenges (
+        const challengeUserId = `${challengeId}_${userId}`
+        const objectivesJson = JSON.stringify(challengeData.objectives)
+        await sql`
+          INSERT INTO competitive_challenges (
             id, user_id, title, description, objectives, total_points, expires_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [
-            `${challengeId}_${userId}`,
-            userId,
-            challengeData.title,
-            challengeData.description,
-            JSON.stringify(challengeData.objectives),
-            challengeData.total_points,
-            challengeData.expires_at
-          ]
-        )
+          ) VALUES (${challengeUserId}, ${userId}, ${challengeData.title}, ${challengeData.description}, ${objectivesJson}::jsonb, ${challengeData.total_points}, ${challengeData.expires_at})
+        `
       }
       
       return challengeId
@@ -263,10 +250,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
    */
   static async updateLeaderboards(): Promise<void> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Update global competitive intelligence leaderboard
-      await db.query(`
+      await sql`
         INSERT INTO competitive_leaderboard (
           user_id, competitive_advantage_points, market_victories, intelligence_gathered, last_updated
         )
@@ -282,10 +269,10 @@ export class CompetitiveIntelligenceGamificationTriggers {
           market_victories = EXCLUDED.market_victories,
           intelligence_gathered = EXCLUDED.intelligence_gathered,
           last_updated = NOW()
-      `)
+      `
       
       // Update rankings
-      await db.query(`
+      await sql`
         WITH ranked_users AS (
           SELECT 
             user_id,
@@ -299,7 +286,7 @@ export class CompetitiveIntelligenceGamificationTriggers {
           percentile = ROUND(ru.new_percentile::numeric, 2)
         FROM ranked_users ru
         WHERE cl.user_id = ru.user_id
-      `)
+      `
       
       logInfo('Competitive intelligence leaderboards updated')
     } catch (error) {
@@ -343,13 +330,28 @@ export class CompetitiveIntelligenceGamificationTriggers {
         const statUpdates = this.getStatUpdates(activityType, value)
         
         if (Object.keys(statUpdates).length > 0) {
-          const updateQuery = `
-            UPDATE user_competitive_stats SET 
-            ${Object.keys(statUpdates).map((key, index) => `${key} = ${key} + $${index + 2}`).join(', ')},
-            updated_at = NOW()
-            WHERE user_id = $1
-          `
-          await db.query(updateQuery, [userId, ...Object.values(statUpdates)])
+          const sql = getSql()
+          // Build dynamic UPDATE query safely
+          // Since statUpdates keys are from our internal function, they're safe
+          const setClause = Object.keys(statUpdates)
+            .map(key => `${key} = ${key} + ${statUpdates[key]}`)
+            .join(', ')
+          
+          // Use unsafe for dynamic field updates (fields are validated internally)
+          const sqlClient = sql as any
+          if (typeof sqlClient.unsafe === 'function') {
+            await sqlClient.unsafe(
+              `UPDATE user_competitive_stats SET ${setClause}, updated_at = NOW() WHERE user_id = $1`,
+              [userId]
+            )
+          } else {
+            // Fallback: update each field separately if unsafe not available
+            for (const [key, val] of Object.entries(statUpdates)) {
+              await sql`
+                UPDATE user_competitive_stats SET ${sql.raw(key)} = ${sql.raw(key)} + ${val}, updated_at = NOW() WHERE user_id = ${userId}
+              `
+            }
+          }
         }
       } catch (fallbackError) {
         logError('Fallback gamification update failed:', fallbackError)

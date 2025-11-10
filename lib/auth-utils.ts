@@ -3,6 +3,29 @@ import * as jose from 'jose'
 import { logError } from '@/lib/logger'
 
 /**
+ * Authenticated user type
+ */
+export interface AuthenticatedUser {
+  id: string
+  email: string
+  full_name: string | null
+  name: string | null
+  username: string | null
+  created_at: Date
+  updated_at: Date
+  subscription_tier: string
+  subscription_status: string
+}
+
+/**
+ * Authentication result type
+ */
+export interface AuthResult {
+  user: AuthenticatedUser | null
+  error: string | null
+}
+
+/**
  * Extract user ID from JWT session token
  */
 export async function getUserIdFromSession(request: NextRequest): Promise<string | null> {

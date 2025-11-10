@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { createClient } from './neon/client'
+import { getSql } from '@/lib/api-utils'
 import { Template, TemplateCategory } from './templates-types'
 import { templateCategories as normalizedCategories } from '@/lib/template-catalog'
 
@@ -39,8 +39,8 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
       return fallbackCategories
     }
 
-    const client = await createClient()
-    const { rows, error } = await client.query(`
+    const sql = getSql()
+    const rows = await sql`
       SELECT 
         tc.id,
         tc.category,
@@ -60,14 +60,7 @@ export async function getAllTemplates(): Promise<TemplateCategory[]> {
       FROM template_categories tc
       LEFT JOIN templates t ON tc.id = t.category_id
       GROUP BY tc.id, tc.category, tc.icon, tc.description
-    `);
-
-    // Handle database errors
-    if (error) {
-      logError('Error fetching templates from database:', error)
-      // Fallback to JSON data
-      return fallbackCategories
-    }
+    ` as any[];
 
     // Map database fields to match TypeScript interface
     const mappedData = rows?.map((category: any) => ({
@@ -96,18 +89,10 @@ export async function getTemplateBySlug(slug: string): Promise<Template | null> 
       return findTemplateInFallback(slug)
     }
 
-    const client = await createClient()
-    const { rows, error } = await client.query(
-      'SELECT * FROM templates WHERE slug = $1',
-      [slug]
-    );
-
-    // Handle database errors
-    if (error) {
-      logError('Error fetching template by slug from database:', error)
-      // Fallback to JSON data for any other errors
-      return findTemplateInFallback(slug)
-    }
+    const sql = getSql()
+    const rows = await sql`
+      SELECT * FROM templates WHERE slug = ${slug}
+    ` as any[];
 
     return rows?.[0] as Template | null
   } catch (error) {

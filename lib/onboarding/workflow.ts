@@ -73,38 +73,38 @@ const DEFAULT_TASKS = [
 export async function runOnboardingWorkflow(jobId: string, userId: string): Promise<WorkflowResult> {
   const sql = getSql()
 
-  const userRows = await sql<{
-    id: string
-    email: string | null
-    full_name: string | null
-  }>`
+  const userRows = await sql`
     SELECT id, email, full_name
     FROM users
     WHERE id = ${userId}
     LIMIT 1
-  `
+  ` as Array<{
+    id: string
+    email: string | null
+    full_name: string | null
+  }>
 
   const userRecord = userRows[0]
   if (!userRecord) {
     throw new Error(`User ${userId} not found for onboarding workflow`)
   }
 
-  const briefcaseRows = await sql<{ id: number }>`
+  const briefcaseRows = await sql`
     SELECT id
     FROM briefcases
     WHERE user_id = ${userId}
     ORDER BY created_at ASC
     LIMIT 1
-  `
+  ` as Array<{ id: number }>
 
   const insertedBriefcase = briefcaseRows[0]
     ? briefcaseRows[0]
     : (
-        await sql<{ id: number }>`
+        (await sql`
           INSERT INTO briefcases (user_id, title, description, status, metadata, created_at, updated_at)
           VALUES (${userId}, ${DEFAULT_BRIEFCASE.title}, ${DEFAULT_BRIEFCASE.description}, ${DEFAULT_BRIEFCASE.status}, ${JSON.stringify(DEFAULT_BRIEFCASE.metadata)}::jsonb, NOW(), NOW())
           RETURNING id
-        `
+        ` as Array<{ id: number }>)
       )[0]
 
   if (!insertedBriefcase) {
@@ -115,27 +115,28 @@ export async function runOnboardingWorkflow(jobId: string, userId: string): Prom
   let goalsCreated = 0
 
   for (const goal of DEFAULT_GOALS) {
-    const existing = await sql<{ id: number }>`
+    const existing = await sql`
       SELECT id
       FROM goals
       WHERE user_id = ${userId} AND LOWER(title) = LOWER(${goal.title})
       LIMIT 1
-    `
+    ` as Array<{ id: number }>
 
     if (existing.length > 0) {
       goalRows.push({ id: existing[0].id, title: goal.title })
       continue
     }
 
-    const created = await sql<{ id: number; title: string }>`
+    const created = await sql`
       INSERT INTO goals (user_id, briefcase_id, title, description, priority, status, created_at, updated_at)
       VALUES (${userId}, ${insertedBriefcase.id}, ${goal.title}, ${goal.description}, ${goal.priority}, 'pending', NOW(), NOW())
       RETURNING id, title
-    `
+    ` as Array<{ id: number; title: string }>
 
-    if (created[0]) {
+    const createdGoal = created[0]
+    if (createdGoal) {
       goalsCreated += 1
-      goalRows.push(created[0])
+      goalRows.push(createdGoal)
     }
   }
 

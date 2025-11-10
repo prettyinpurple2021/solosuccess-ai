@@ -164,7 +164,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
                   e.preventDefault()
                   e.stopPropagation()
                   logInfo('Personality card clicked:', style.id)
-                  logInfo('Current step:', currentStep, 'Open:', open)
+                  logInfo('Current step', { currentStep, open })
                   setSelectedPersonality(style.id)
                   logInfo('Personality set to:', style.id)
                 }}
@@ -550,7 +550,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   ]
 
   const toggleGoal = (goalId: string) => {
-    logInfo('Toggling goal:', goalId, 'Current goals:', selectedGoals)
+    logInfo('Toggling goal', { goalId, currentGoals: selectedGoals })
     if (selectedGoals.length >= 3 && !selectedGoals.includes(goalId)) {
       logInfo('Maximum of 3 goals allowed')
       return // Maximum 3 goals
@@ -563,7 +563,7 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   }
 
   const toggleAgent = (agentId: string) => {
-    logInfo('Toggling agent:', agentId, 'Current agents:', selectedAgents)
+    logInfo('Toggling agent', { agentId, currentAgents: selectedAgents })
     if (selectedAgents.length >= 3 && !selectedAgents.includes(agentId)) {
       logInfo('Maximum of 3 agents allowed')
       return // Maximum 3 agents
@@ -579,13 +579,13 @@ export function EnhancedWelcomeFlow({ open, onComplete, onSkip, userData }: Welc
   const progress = ((currentStep + 1) / totalSteps) * 100
 
   const nextStep = () => {
-    logInfo('NextStep called - Current step:', currentStep, 'Total steps:', totalSteps)
+    logInfo('NextStep called', { currentStep, totalSteps })
     if (currentStep < totalSteps - 1) {
       logInfo('Moving to next step:', currentStep + 1)
       setCurrentStep(currentStep + 1)
     } else {
       logInfo('Ready to complete welcome flow, but let\'s double check...')
-      logInfo('Current step:', currentStep, 'Should be:', totalSteps - 1)
+      logInfo('Current step check', { currentStep, expectedStep: totalSteps - 1 })
       if (currentStep === totalSteps - 1) {
         logInfo('Completing welcome flow')
         onComplete({

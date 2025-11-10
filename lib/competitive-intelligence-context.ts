@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 
 export interface CompetitiveIntelligenceContext {
@@ -89,11 +89,11 @@ export class CompetitiveIntelligenceContextService {
    */
   static async getCompetitiveContext(userId: string, agentId?: string): Promise<CompetitiveIntelligenceContext> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get active competitors with recent activity
-      const { rows: competitors } = await db.query(
-        `SELECT cp.id, cp.name, cp.threat_level, cp.market_position,
+      const competitors = await sql`
+        SELECT cp.id, cp.name, cp.threat_level, cp.market_position,
                 COUNT(id.id) as recent_intelligence_count,
                 COUNT(ca.id) as recent_alerts_count
          FROM competitor_profiles cp
@@ -101,69 +101,64 @@ export class CompetitiveIntelligenceContextService {
            AND id.collected_at > NOW() - INTERVAL '7 days'
          LEFT JOIN competitor_alerts ca ON ca.competitor_id = cp.id 
            AND ca.created_at > NOW() - INTERVAL '7 days'
-         WHERE cp.user_id = $1 AND cp.monitoring_status = 'active'
+         WHERE cp.user_id = ${userId} AND cp.monitoring_status = 'active'
          GROUP BY cp.id, cp.name, cp.threat_level, cp.market_position
          ORDER BY cp.threat_level DESC, recent_intelligence_count DESC
-         LIMIT 5`,
-        [userId]
-      )
+         LIMIT 5
+      ` as any[]
       
       // Get recent alerts (last 7 days)
-      const { rows: recent_alerts } = await db.query(
-        `SELECT ca.id, ca.title, ca.severity, ca.alert_type, ca.created_at,
+      const recent_alerts = await sql`
+        SELECT ca.id, ca.title, ca.severity, ca.alert_type, ca.created_at,
                 cp.name as competitor_name
          FROM competitor_alerts ca
          JOIN competitor_profiles cp ON ca.competitor_id = cp.id
-         WHERE ca.user_id = $1 AND ca.created_at > NOW() - INTERVAL '7 days'
+         WHERE ca.user_id = ${userId} AND ca.created_at > NOW() - INTERVAL '7 days'
          AND ca.is_archived = false
          ORDER BY ca.created_at DESC
-         LIMIT 10`,
-        [userId]
-      )
+         LIMIT 10
+      ` as any[]
       
       // Get competitive opportunities
-      const { rows: opportunities } = await db.query(
-        `SELECT co.id, co.title, co.impact, co.opportunity_type,
+      const opportunities = await sql`
+        SELECT co.id, co.title, co.impact, co.opportunity_type,
                 cp.name as competitor_name
          FROM competitive_opportunities co
          JOIN competitor_profiles cp ON co.competitor_id::int = cp.id
-         WHERE co.user_id::text = $1 AND co.status = 'identified'
+         WHERE co.user_id::text = ${userId} AND co.status = 'identified'
          AND co.is_archived = false
          ORDER BY co.priority_score DESC
-         LIMIT 5`,
-        [userId]
-      )
+         LIMIT 5
+      ` as any[]
       
       // Get competitive tasks
-      const { rows: competitive_tasks } = await db.query(
-        `SELECT t.id, t.title, t.status, t.priority,
+      const competitive_tasks = await sql`
+        SELECT t.id, t.title, t.status, t.priority,
                 cp.name as competitor_name
          FROM tasks t
          LEFT JOIN competitor_alerts ca ON (t.ai_suggestions->>'alert_id')::text = ca.id::text
          LEFT JOIN competitor_profiles cp ON ca.competitor_id = cp.id
-         WHERE t.user_id = $1 
+         WHERE t.user_id = ${userId} 
          AND t.ai_suggestions->>'source' = 'competitive_intelligence'
          AND t.status != 'completed'
          ORDER BY t.created_at DESC
-         LIMIT 8`,
-        [userId]
-      )
+         LIMIT 8
+      ` as any[]
       
       // Generate market insights based on recent intelligence
       const market_insights = await this.generateMarketInsights(userId)
       
       // Enhance competitors with recent activities
       const enhancedCompetitors = await Promise.all(
-        competitors.map(async (competitor: { id: number; name: string; threat_level: string; market_position: any }) => {
-          const { rows: activities } = await db.query(
-            `SELECT data_type, importance, collected_at
+        (competitors as any[]).map(async (competitor: { id: number; name: string; threat_level: string; market_position: any }) => {
+          const activities = await sql`
+            SELECT data_type, importance, collected_at
              FROM intelligence_data
-             WHERE competitor_id = $1 AND user_id = $2
+             WHERE competitor_id = ${competitor.id} AND user_id = ${userId}
              AND collected_at > NOW() - INTERVAL '7 days'
              ORDER BY collected_at DESC
-             LIMIT 3`,
-            [competitor.id, userId]
-          )
+             LIMIT 3
+          ` as any[]
           
           return {
             ...competitor,
@@ -200,20 +195,19 @@ export class CompetitiveIntelligenceContextService {
    */
   private static async generateMarketInsights(userId: string): Promise<any[]> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get recent high-importance intelligence
-      const { rows: intelligence } = await db.query(
-        `SELECT id.data_type, id.analysis_results, cp.name as competitor_name
+      const intelligence = await sql`
+        SELECT id.data_type, id.analysis_results, cp.name as competitor_name
          FROM intelligence_data id
          JOIN competitor_profiles cp ON id.competitor_id = cp.id
-         WHERE id.user_id = $1 
+         WHERE id.user_id = ${userId} 
          AND id.importance IN ('high', 'critical')
          AND id.collected_at > NOW() - INTERVAL '14 days'
          ORDER BY id.collected_at DESC
-         LIMIT 20`,
-        [userId]
-      )
+         LIMIT 20
+      ` as any[]
       
       // Analyze patterns and generate insights
       const insights = []

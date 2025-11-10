@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { getDb } from "@/lib/database-client"
+import { getSql } from "@/lib/api-utils"
 
 
 export interface AgentPermission {
@@ -57,9 +57,8 @@ export class AgentSecurityManager {
     return AgentSecurityManager.instance
   }
 
-  private async getDb() {
-    const db = getDb()
-    return db
+  private getSql() {
+    return getSql()
   }
 
   // Authentication and Authorization
@@ -98,21 +97,21 @@ export class AgentSecurityManager {
 
   async authorizeAgentAccess(userId: string, agentId: string, action: string): Promise<boolean> {
     try {
-      const db = await this.getDb()
+      const sql = this.getSql()
       
       // Check if user has permission for this agent and action
-      const result = await db.query(`
+      const result = await sql`
         SELECT permissions, restrictions, expires_at
         FROM agent_permissions 
-        WHERE user_id = $1 AND agent_id = $2
+        WHERE user_id = ${userId} AND agent_id = ${agentId}
         AND (expires_at IS NULL OR expires_at > NOW())
-      `, [userId, agentId])
+      ` as any[]
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return false
       }
 
-      const permission = result.rows[0]
+      const permission = result[0] as { permissions: string[]; restrictions: string[]; expires_at: Date | null }
       
       // Check if action is explicitly restricted
       if (permission.restrictions && permission.restrictions.includes(action)) {
@@ -172,27 +171,19 @@ export class AgentSecurityManager {
     userAgent?: string
   ): Promise<void> {
     try {
-      const db = await this.getDb()
+      const sql = this.getSql()
+      const auditId = crypto.randomUUID()
+      const metadataJson = JSON.stringify(metadata)
       
-      await db.query(`
+      await sql`
         INSERT INTO security_audit_logs (
           id, user_id, agent_id, action, resource, success,
           ip_address, user_agent, metadata, timestamp
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+          ${auditId}, ${userId}, ${agentId}, ${action}, ${resource}, ${success},
+          ${ipAddress || null}, ${userAgent || null}, ${metadataJson}::jsonb, ${new Date()}
         )
-      `, [
-        crypto.randomUUID(),
-        userId,
-        agentId,
-        action,
-        resource,
-        success,
-        ipAddress || null,
-        userAgent || null,
-        JSON.stringify(metadata),
-        new Date()
-      ])
+      `
     } catch (error) {
       logError('Audit logging error:', error)
     }
@@ -207,29 +198,24 @@ export class AgentSecurityManager {
     expiresAt?: Date
   ): Promise<void> {
     try {
-      const db = await this.getDb()
+      const sql = this.getSql()
+      const permissionId = crypto.randomUUID()
+      const permissionsJson = JSON.stringify(permissions)
+      const restrictionsJson = JSON.stringify(restrictions)
+      const now = new Date()
       
-      await db.query(`
+      await sql`
         INSERT INTO agent_permissions (
           id, user_id, agent_id, permissions, restrictions, expires_at, created_at, updated_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8
+          ${permissionId}, ${userId}, ${agentId}, ${permissionsJson}::jsonb, ${restrictionsJson}::jsonb, ${expiresAt || null}, ${now}, ${now}
         ) ON CONFLICT (user_id, agent_id) 
         DO UPDATE SET 
-          permissions = $4,
-          restrictions = $5,
-          expires_at = $6,
-          updated_at = $8
-      `, [
-        crypto.randomUUID(),
-        userId,
-        agentId,
-        JSON.stringify(permissions),
-        JSON.stringify(restrictions),
-        expiresAt || null,
-        new Date(),
-        new Date()
-      ])
+          permissions = ${permissionsJson}::jsonb,
+          restrictions = ${restrictionsJson}::jsonb,
+          expires_at = ${expiresAt || null},
+          updated_at = ${now}
+      `
     } catch (error) {
       logError('Permission grant error:', error)
       throw new Error('Failed to grant permission')
@@ -238,12 +224,12 @@ export class AgentSecurityManager {
 
   async revokePermission(userId: string, agentId: string): Promise<void> {
     try {
-      const db = await this.getDb()
+      const sql = this.getSql()
       
-      await db.query(`
+      await sql`
         DELETE FROM agent_permissions 
-        WHERE user_id = $1 AND agent_id = $2
-      `, [userId, agentId])
+        WHERE user_id = ${userId} AND agent_id = ${agentId}
+      `
     } catch (error) {
       logError('Permission revoke error:', error)
       throw new Error('Failed to revoke permission')
@@ -394,26 +380,26 @@ export class AgentSecurityManager {
     rateLimitHits: number
   }> {
     try {
-      const db = await this.getDb()
+      const sql = this.getSql()
       
       const [auditResult, failedAuthResult] = await Promise.all([
-        db.query(`
+        sql`
           SELECT COUNT(*) as total_logs
           FROM security_audit_logs 
           WHERE timestamp >= NOW() - INTERVAL '24 hours'
-        `),
-        db.query(`
+        ` as Promise<any[]>,
+        sql`
           SELECT COUNT(*) as failed_attempts
           FROM security_audit_logs 
           WHERE action = 'authenticate' AND success = false
           AND timestamp >= NOW() - INTERVAL '24 hours'
-        `)
+        ` as Promise<any[]>
       ])
 
       return {
         activeSessions: this.activeSessions.size,
-        totalAuditLogs: parseInt(auditResult.rows[0]?.total_logs || '0'),
-        failedAuthAttempts: parseInt(failedAuthResult.rows[0]?.failed_attempts || '0'),
+        totalAuditLogs: parseInt(String(auditResult[0]?.total_logs || '0')),
+        failedAuthAttempts: parseInt(String(failedAuthResult[0]?.failed_attempts || '0')),
         rateLimitHits: 0 // This would need to be tracked separately
       }
     } catch (error) {

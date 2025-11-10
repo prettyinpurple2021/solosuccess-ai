@@ -131,7 +131,7 @@ export function SimpleOnboarding({ open, onComplete, onSkip, userData }: SimpleO
                   <Input
                     id="name"
                     placeholder="Your name or business name"
-                    value={name}
+                    value={name || ""}
                     onChange={(e) => setName(e.target.value)}
                     className="bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white placeholder:text-military-storm-grey"
                   />

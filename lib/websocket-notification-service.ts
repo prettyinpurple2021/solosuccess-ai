@@ -113,7 +113,7 @@ export class WebSocketNotificationService {
     };
 
     this.ws.onclose = (event) => {
-      logInfo('WebSocket disconnected:', event.code, event.reason);
+      logInfo('WebSocket disconnected', { code: event.code, reason: event.reason });
       this.connectionStatus = 'disconnected';
       this.notifyConnectionStatus();
       this.stopHeartbeat();

@@ -151,7 +151,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   const toggleGoal = (goalId: string) => {
-    logInfo('Toggling goal:', goalId, 'Current goals:', data.goals.primaryGoals)
+    logInfo('Toggling goal', { goalId, currentGoals: data.goals.primaryGoals })
     const currentGoals = data.goals.primaryGoals
     const newGoals = currentGoals.includes(goalId)
       ? currentGoals.filter((g) => g !== goalId)
@@ -161,7 +161,7 @@ export function OnboardingWizard({ open, onComplete, onSkip }: OnboardingWizardP
   }
 
   const toggleAgent = (agentId: string) => {
-    logInfo('Toggling agent:', agentId, 'Current agents:', data.aiTeam.selectedAgents)
+    logInfo('Toggling agent', { agentId, currentAgents: data.aiTeam.selectedAgents })
     const currentAgents = data.aiTeam.selectedAgents
     const newAgents = currentAgents.includes(agentId)
       ? currentAgents.filter((a) => a !== agentId)

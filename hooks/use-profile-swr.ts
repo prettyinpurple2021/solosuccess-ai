@@ -69,7 +69,7 @@ export function useProfile() {
       setIsUpdating(false)
       return updatedData
     } catch (err) {
-      logError(err)
+      logError('Failed to update profile', err)
       toast.error("Failed to update profile", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })
@@ -116,7 +116,7 @@ export function useProfile() {
       setIsUpdating(false)
       return data.url
     } catch (err) {
-      logError(err)
+      logError('Failed to upload avatar', err)
       toast.error("Failed to upload avatar", { 
         description: err instanceof Error ? err.message : "An unknown error occurred." 
       })
@@ -139,7 +139,7 @@ export function useProfile() {
       setIsUpdating(false)
       return true
     } catch (err) {
-      logError(err)
+      logError('Failed to remove avatar', err)
       setIsUpdating(false)
       throw err
     }

@@ -51,10 +51,12 @@ export function getDb() {
  * Database transaction helper
  */
 export async function withTransaction<T>(
-  callback: (db: ReturnType<typeof drizzle>) => Promise<T>
+  callback: (tx: any) => Promise<T>
 ): Promise<T> {
   const db = getDb()
-  return await db.transaction(callback)
+  return await db.transaction(async (tx) => {
+    return await callback(tx)
+  })
 }
 
 /**

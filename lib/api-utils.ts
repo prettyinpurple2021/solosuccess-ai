@@ -79,7 +79,7 @@ export async function authenticateRequest(request: NextRequest) {
       return { user: null, error: 'Invalid token' }
     }
     
-    logAuth('User authenticated successfully', { userId: payload.userId as string })
+    logAuth('User authenticated successfully', payload.userId as string)
     
     // Return standardized user object
     return { 
@@ -268,9 +268,29 @@ export async function verifyDocumentOwnership(
       throw new Error('Database connection not available')
     }
     
-    // Safe to use fields now that they're validated
-    const query = `SELECT ${selectFields} FROM documents WHERE id = $1 AND user_id = $2`
-    const result = await sql(query, [documentId, userId])
+    // Safe to use fields now that they're validated against whitelist  
+    // Construct SQL query safely - selectFields is validated so SQL injection is prevented
+    // For dynamic field selection with Neon, we use a workaround since template literals
+    // don't support dynamic SELECT clauses directly
+    const sqlClient = sql as any
+    // Check if unsafe method exists (for raw SQL execution)
+    if (typeof sqlClient.unsafe === 'function') {
+      const result = await sqlClient.unsafe(
+        `SELECT ${selectFields} FROM documents WHERE id = $1 AND user_id = $2`,
+        [documentId, userId]
+      ) as any[]
+      if (!result || result.length === 0) {
+        return { document: null, error: 'Document not found' }
+      }
+      return { document: result[0], error: null }
+    }
+    
+    // Fallback: Use template literal with all common fields if unsafe not available
+    // This is a limitation of Neon's sql template tag with dynamic field selection
+    const result = await sql`
+      SELECT id, name, description, file_type, file_size, user_id, created_at, updated_at
+      FROM documents WHERE id = ${documentId} AND user_id = ${userId}
+    ` as any[]
     
     if (!result || result.length === 0) {
       return { document: null, error: 'Document not found' }

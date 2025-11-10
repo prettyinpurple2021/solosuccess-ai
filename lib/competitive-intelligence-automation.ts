@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { CompetitiveIntelligenceIntegration } from './competitive-intelligence-integration'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 
 export interface AutomationRule {
@@ -32,23 +32,22 @@ export class CompetitiveIntelligenceAutomation {
    */
   static async processAlert(alertId: number, userId: string): Promise<void> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get the alert details
-      const { rows: alertRows } = await db.query(
-        `SELECT ca.*, cp.threat_level, cp.name as competitor_name
-         FROM competitor_alerts ca
-         JOIN competitor_profiles cp ON ca.competitor_id = cp.id
-         WHERE ca.id = $1 AND ca.user_id = $2`,
-        [alertId, userId]
-      )
+      const alertRows = await sql`
+        SELECT ca.*, cp.threat_level, cp.name as competitor_name
+        FROM competitor_alerts ca
+        JOIN competitor_profiles cp ON ca.competitor_id = cp.id
+        WHERE ca.id = ${alertId} AND ca.user_id = ${userId}
+      `
       
       if (alertRows.length === 0) {
         logInfo(`Alert ${alertId} not found for user ${userId}`)
         return
       }
       
-      const alert = alertRows[0]
+      const alert = alertRows[0] as any
       
       // Get automation rules for this user
       const automationRules = await this.getAutomationRules(userId)
@@ -111,20 +110,18 @@ export class CompetitiveIntelligenceAutomation {
         
         if (taskId && actions.assign_to_goal) {
           // Assign task to specific goal
-          const db = getDb()
-          await db.query(
-            'UPDATE tasks SET goal_id = $1 WHERE id = $2 AND user_id = $3',
-            [actions.assign_to_goal, taskId, userId]
-          )
+          const sql = getSql()
+          await sql`
+            UPDATE tasks SET goal_id = ${actions.assign_to_goal} WHERE id = ${taskId} AND user_id = ${userId}
+          `
         }
         
         if (taskId && actions.priority_override) {
           // Override task priority
-          const db = getDb()
-          await db.query(
-            'UPDATE tasks SET priority = $1 WHERE id = $2 AND user_id = $3',
-            [actions.priority_override, taskId, userId]
-          )
+          const sql = getSql()
+          await sql`
+            UPDATE tasks SET priority = ${actions.priority_override} WHERE id = ${taskId} AND user_id = ${userId}
+          `
         }
         
         logInfo(`Created task ${taskId} from alert ${alert.id} via automation rule ${rule.id}`)
@@ -235,53 +232,49 @@ export class CompetitiveIntelligenceAutomation {
    */
   static async createBenchmarkingGoals(competitorId: number, userId: string): Promise<number[]> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get competitor information
-      const { rows: competitorRows } = await db.query(
-        'SELECT name, industry, threat_level FROM competitor_profiles WHERE id = $1 AND user_id = $2',
-        [competitorId, userId]
-      )
+      const competitorRows = await sql`
+        SELECT name, industry, threat_level FROM competitor_profiles WHERE id = ${competitorId} AND user_id = ${userId}
+      `
       
       if (competitorRows.length === 0) {
         return []
       }
       
-      const competitor = competitorRows[0]
+      const competitor = competitorRows[0] as { name: string; industry: string; threat_level: string }
       const createdGoals: number[] = []
       
       // Create benchmarking goals based on competitor threat level
       const goalTemplates = this.getBenchmarkingGoalTemplates(competitor)
       
       for (const template of goalTemplates) {
-        const { rows: goalRows } = await db.query(
-          `INSERT INTO goals (
+        const title = template.title.replace('{competitor}', competitor.name)
+        const description = template.description.replace(/{competitor}/g, competitor.name)
+        const aiSuggestions = JSON.stringify({
+          competitive_context: {
+            competitorId,
+            competitorName: competitor.name,
+            threatLevel: competitor.threat_level,
+            benchmarkingType: template.type,
+            created_from_automation: true
+          }
+        })
+        
+        const goalRows = await sql`
+          INSERT INTO goals (
             user_id, title, description, category, priority, status,
             ai_suggestions
-          ) VALUES ($1, $2, $3, $4, $5, 'active', $6) RETURNING id`,
-          [
-            userId,
-            template.title.replace('{competitor}', competitor.name),
-            template.description.replace(/{competitor}/g, competitor.name),
-            'Competitive Benchmarking',
-            template.priority,
-            JSON.stringify({
-              competitive_context: {
-                competitorId,
-                competitorName: competitor.name,
-                threatLevel: competitor.threat_level,
-                benchmarkingType: template.type,
-                created_from_automation: true
-              }
-            })
-          ]
-        )
+          ) VALUES (${userId}, ${title}, ${description}, ${'Competitive Benchmarking'}, ${template.priority}, ${'active'}, ${aiSuggestions}) RETURNING id
+        `
         
-        if (goalRows[0]?.id) {
-          createdGoals.push(goalRows[0].id)
+        const goalRow = goalRows[0] as { id: number } | undefined
+        if (goalRow?.id) {
+          createdGoals.push(goalRow.id)
           
           // Create initial milestones for the goal
-          await this.createInitialMilestones(goalRows[0].id, competitorId, template.type, userId)
+          await this.createInitialMilestones(goalRow.id, competitorId, template.type, userId)
         }
       }
       

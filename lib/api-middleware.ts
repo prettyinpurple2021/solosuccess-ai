@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { logger, logError, logWarn } from './logger'
 import { rateLimitByIp } from './rate-limit'
-import { createErrorResponse } from './api-response'
+import { createErrorResponse, createSuccessResponse } from './api-response'
 
 /**
  * Comprehensive API middleware for production-ready error handling,
@@ -170,24 +170,24 @@ export function withApiMiddleware<T>(
       // Apply rate limiting
       if (options.rateLimit) {
         const rateLimitResult = await withRateLimit(request, options.rateLimit)
-        if (!rateLimitResult.allowed) {
-          return rateLimitResult.response!
+        if (!rateLimitResult.allowed && rateLimitResult.response) {
+          return rateLimitResult.response as NextResponse<T>
         }
       }
 
       // Validate request body
       if (options.validate?.body) {
         const bodyValidation = await validateRequestBody(request, options.validate.body)
-        if (!bodyValidation.success) {
-          return bodyValidation.response
+        if (!bodyValidation.success && bodyValidation.response) {
+          return bodyValidation.response as NextResponse<T>
         }
       }
 
       // Validate query parameters
       if (options.validate?.query) {
         const queryValidation = validateRequest(request, options.validate.query, 'query')
-        if (!queryValidation.success) {
-          return queryValidation.response
+        if (!queryValidation.success && queryValidation.response) {
+          return queryValidation.response as NextResponse<T>
         }
       }
 
@@ -200,7 +200,7 @@ export function withApiMiddleware<T>(
         
         if (error || !user) {
           const response = createErrorResponse(error || 'Authentication required', 401)
-          return applySecurityHeaders(response)
+          return applySecurityHeaders(response) as NextResponse<T>
         }
       }
 
@@ -208,7 +208,7 @@ export function withApiMiddleware<T>(
       const response = await handler(request, ...args)
       
       // Apply security headers
-      return applySecurityHeaders(response)
+      return applySecurityHeaders(response) as NextResponse<T>
 
     } catch (error) {
       logError('API middleware error:', error)
@@ -218,7 +218,7 @@ export function withApiMiddleware<T>(
         500
       )
       
-      return applySecurityHeaders(response)
+      return applySecurityHeaders(response) as NextResponse<T>
     }
   }
 }

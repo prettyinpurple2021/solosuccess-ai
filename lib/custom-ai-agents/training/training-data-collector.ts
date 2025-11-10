@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { createClient } from "@/lib/neon/server"
+import { getSql } from "@/lib/api-utils"
 
 
 export interface TrainingInteraction {
@@ -51,42 +51,28 @@ export interface TrainingMetrics {
 }
 
 export class TrainingDataCollector {
-  private async getDb() {
-    const pool = await createClient()
-    return pool
-  }
-
   async recordInteraction(interaction: Omit<TrainingInteraction, 'id' | 'timestamp'>): Promise<string> {
     const id = crypto.randomUUID()
     const timestamp = new Date()
 
     try {
-      const db = await this.getDb()
-      await db.query(`
+      const sql = getSql()
+      const contextJson = JSON.stringify(interaction.context)
+      const collaborationJson = JSON.stringify(interaction.collaborationRequests)
+      const followUpJson = JSON.stringify(interaction.followUpTasks)
+      const metadataJson = JSON.stringify(interaction.metadata)
+      
+      await sql`
         INSERT INTO agent_training_interactions (
           id, user_id, agent_id, timestamp, user_message, agent_response,
           context, user_rating, user_feedback, success, response_time,
           confidence, collaboration_requests, follow_up_tasks, metadata
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+          ${id}, ${interaction.userId}, ${interaction.agentId}, ${timestamp}, ${interaction.userMessage}, ${interaction.agentResponse},
+          ${contextJson}::jsonb, ${interaction.userRating || null}, ${interaction.userFeedback || null}, ${interaction.success}, ${interaction.responseTime},
+          ${interaction.confidence}, ${collaborationJson}::jsonb, ${followUpJson}::jsonb, ${metadataJson}::jsonb
         )
-      `, [
-        id,
-        interaction.userId,
-        interaction.agentId,
-        timestamp,
-        interaction.userMessage,
-        interaction.agentResponse,
-        JSON.stringify(interaction.context),
-        interaction.userRating || null,
-        interaction.userFeedback || null,
-        interaction.success,
-        interaction.responseTime,
-        interaction.confidence,
-        JSON.stringify(interaction.collaborationRequests),
-        JSON.stringify(interaction.followUpTasks),
-        JSON.stringify(interaction.metadata)
-      ])
+      `
 
       return id
     } catch (error) {
@@ -97,12 +83,12 @@ export class TrainingDataCollector {
 
   async updateInteractionRating(interactionId: string, rating: number, feedback?: string): Promise<void> {
     try {
-      const db = await this.getDb()
-      await db.query(`
+      const sql = getSql()
+      await sql`
         UPDATE agent_training_interactions 
-        SET user_rating = $1, user_feedback = $2, updated_at = NOW()
-        WHERE id = $3
-      `, [rating, feedback || null, interactionId])
+        SET user_rating = ${rating}, user_feedback = ${feedback || null}, updated_at = NOW()
+        WHERE id = ${interactionId}
+      `
     } catch (error) {
       logError('Error updating interaction rating:', error)
       throw new Error('Failed to update interaction rating')
@@ -111,85 +97,125 @@ export class TrainingDataCollector {
 
   async getTrainingMetrics(userId: string, timeRange?: { start: Date; end: Date }): Promise<TrainingMetrics> {
     try {
-      const db = await this.getDb()
-      const timeFilter = timeRange 
-        ? `AND timestamp BETWEEN $2 AND $3`
-        : ''
-      
-      const params = timeRange ? [userId, timeRange.start, timeRange.end] : [userId]
+      const sql = getSql()
 
       // Get total interactions
-      const totalResult = await db.query(`
-        SELECT COUNT(*) as total
-        FROM agent_training_interactions 
-        WHERE user_id = $1 ${timeFilter}
-      `, params)
+      const totalResult = timeRange 
+        ? await sql`
+          SELECT COUNT(*) as total
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND timestamp BETWEEN ${timeRange.start} AND ${timeRange.end}
+        ` as any[]
+        : await sql`
+          SELECT COUNT(*) as total
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId}
+        ` as any[]
 
       // Get average rating
-      const ratingResult = await db.query(`
-        SELECT AVG(user_rating) as avg_rating
-        FROM agent_training_interactions 
-        WHERE user_id = $1 AND user_rating IS NOT NULL ${timeFilter}
-      `, params)
+      const ratingResult = timeRange 
+        ? await sql`
+          SELECT AVG(user_rating) as avg_rating
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND user_rating IS NOT NULL AND timestamp BETWEEN ${timeRange.start} AND ${timeRange.end}
+        ` as any[]
+        : await sql`
+          SELECT AVG(user_rating) as avg_rating
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND user_rating IS NOT NULL
+        ` as any[]
 
       // Get success rate
-      const successResult = await db.query(`
-        SELECT 
-          COUNT(*) FILTER (WHERE success = true) as successful,
-          COUNT(*) as total
-        FROM agent_training_interactions 
-        WHERE user_id = $1 ${timeFilter}
-      `, params)
+      const successResult = timeRange 
+        ? await sql`
+          SELECT 
+            COUNT(*) FILTER (WHERE success = true) as successful,
+            COUNT(*) as total
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND timestamp BETWEEN ${timeRange.start} AND ${timeRange.end}
+        ` as any[]
+        : await sql`
+          SELECT 
+            COUNT(*) FILTER (WHERE success = true) as successful,
+            COUNT(*) as total
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId}
+        ` as any[]
 
       // Get average response time
-      const responseTimeResult = await db.query(`
-        SELECT AVG(response_time) as avg_response_time
-        FROM agent_training_interactions 
-        WHERE user_id = $1 ${timeFilter}
-      `, params)
+      const responseTimeResult = timeRange 
+        ? await sql`
+          SELECT AVG(response_time) as avg_response_time
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND timestamp BETWEEN ${timeRange.start} AND ${timeRange.end}
+        ` as any[]
+        : await sql`
+          SELECT AVG(response_time) as avg_response_time
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId}
+        ` as any[]
 
       // Get average confidence
-      const confidenceResult = await db.query(`
-        SELECT AVG(confidence) as avg_confidence
-        FROM agent_training_interactions 
-        WHERE user_id = $1 ${timeFilter}
-      `, params)
+      const confidenceResult = timeRange 
+        ? await sql`
+          SELECT AVG(confidence) as avg_confidence
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND timestamp BETWEEN ${timeRange.start} AND ${timeRange.end}
+        ` as any[]
+        : await sql`
+          SELECT AVG(confidence) as avg_confidence
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId}
+        ` as any[]
 
       // Get top performing agents
-      const topAgentsResult = await db.query(`
-        SELECT 
-          agent_id,
-          COUNT(*) as total_interactions,
-          AVG(user_rating) as avg_rating,
-          COUNT(*) FILTER (WHERE success = true)::float / COUNT(*) as success_rate
-        FROM agent_training_interactions 
-        WHERE user_id = $1 ${timeFilter}
-        GROUP BY agent_id
-        ORDER BY success_rate DESC, avg_rating DESC
-        LIMIT 5
-      `, params)
+      const topAgentsResult = timeRange 
+        ? await sql`
+          SELECT 
+            agent_id,
+            COUNT(*) as total_interactions,
+            AVG(user_rating) as avg_rating,
+            COUNT(*) FILTER (WHERE success = true)::float / COUNT(*) as success_rate
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId} AND timestamp BETWEEN ${timeRange.start} AND ${timeRange.end}
+          GROUP BY agent_id
+          ORDER BY success_rate DESC, avg_rating DESC
+          LIMIT 5
+        ` as any[]
+        : await sql`
+          SELECT 
+            agent_id,
+            COUNT(*) as total_interactions,
+            AVG(user_rating) as avg_rating,
+            COUNT(*) FILTER (WHERE success = true)::float / COUNT(*) as success_rate
+          FROM agent_training_interactions 
+          WHERE user_id = ${userId}
+          GROUP BY agent_id
+          ORDER BY success_rate DESC, avg_rating DESC
+          LIMIT 5
+        ` as any[]
 
       // Get user satisfaction trends (last 30 days)
-      const trendsResult = await db.query(`
+      const trendsResult = await sql`
         SELECT 
           DATE(timestamp) as date,
           AVG(user_rating) as avg_rating,
           COUNT(*) as total_interactions
         FROM agent_training_interactions 
-        WHERE user_id = $1 
+        WHERE user_id = ${userId} 
           AND timestamp >= NOW() - INTERVAL '30 days'
           AND user_rating IS NOT NULL
         GROUP BY DATE(timestamp)
         ORDER BY date DESC
-      `, [userId])
+      ` as any[]
 
-      const total = parseInt(totalResult.rows[0]?.total || '0')
-      const avgRating = parseFloat(ratingResult.rows[0]?.avg_rating || '0')
-      const successData = successResult.rows[0]
+      const total = parseInt(String(totalResult[0]?.total || '0'))
+      const avgRating = parseFloat(String(ratingResult[0]?.avg_rating || '0'))
+      const successData = successResult[0] as { successful: number; total: number } | undefined
       const successRate = successData ? 
-        (parseInt(successData.successful || '0') / parseInt(successData.total || '1')) * 100 : 0
-      const avgResponseTime = parseFloat(responseTimeResult.rows[0]?.avg_response_time || '0')
-      const avgConfidence = parseFloat(confidenceResult.rows[0]?.avg_confidence || '0')
+        (parseInt(String(successData.successful || '0')) / parseInt(String(successData.total || '1'))) * 100 : 0
+      const avgResponseTime = parseFloat(String(responseTimeResult[0]?.avg_response_time || '0'))
+      const avgConfidence = parseFloat(String(confidenceResult[0]?.avg_confidence || '0'))
 
       return {
         totalInteractions: total,
@@ -197,17 +223,17 @@ export class TrainingDataCollector {
         successRate,
         averageResponseTime: avgResponseTime,
         averageConfidence: avgConfidence,
-        topPerformingAgents: topAgentsResult.rows.map(row => ({
+        topPerformingAgents: topAgentsResult.map((row: any) => ({
           agentId: row.agent_id,
-          successRate: parseFloat(row.success_rate || '0') * 100,
-          averageRating: parseFloat(row.avg_rating || '0'),
-          totalInteractions: parseInt(row.total_interactions || '0')
+          successRate: parseFloat(String(row.success_rate || '0')) * 100,
+          averageRating: parseFloat(String(row.avg_rating || '0')),
+          totalInteractions: parseInt(String(row.total_interactions || '0'))
         })),
         commonFailurePatterns: [], // TODO: Implement pattern analysis
-        userSatisfactionTrends: trendsResult.rows.map(row => ({
-          date: row.date,
-          averageRating: parseFloat(row.avg_rating || '0'),
-          totalInteractions: parseInt(row.total_interactions || '0')
+        userSatisfactionTrends: trendsResult.map((row: any) => ({
+          date: String(row.date),
+          averageRating: parseFloat(String(row.avg_rating || '0')),
+          totalInteractions: parseInt(String(row.total_interactions || '0'))
         }))
       }
     } catch (error) {
@@ -218,31 +244,31 @@ export class TrainingDataCollector {
 
   async getTrainingDataForAgent(agentId: string, userId: string, limit = 1000): Promise<TrainingInteraction[]> {
     try {
-      const db = await this.getDb()
-      const result = await db.query(`
+      const sql = getSql()
+      const result = await sql`
         SELECT *
         FROM agent_training_interactions 
-        WHERE agent_id = $1 AND user_id = $2
+        WHERE agent_id = ${agentId} AND user_id = ${userId}
         ORDER BY timestamp DESC
-        LIMIT $3
-      `, [agentId, userId, limit])
+        LIMIT ${limit}
+      ` as any[]
 
-      return result.rows.map(row => ({
+      return result.map((row: any) => ({
         id: row.id,
         userId: row.user_id,
         agentId: row.agent_id,
         timestamp: new Date(row.timestamp),
         userMessage: row.user_message,
         agentResponse: row.agent_response,
-        context: JSON.parse(row.context || '{}'),
+        context: typeof row.context === 'string' ? JSON.parse(row.context) : (row.context || {}),
         userRating: row.user_rating,
         userFeedback: row.user_feedback,
         success: row.success,
         responseTime: row.response_time,
         confidence: row.confidence,
-        collaborationRequests: JSON.parse(row.collaboration_requests || '[]'),
-        followUpTasks: JSON.parse(row.follow_up_tasks || '[]'),
-        metadata: JSON.parse(row.metadata || '{}')
+        collaborationRequests: typeof row.collaboration_requests === 'string' ? JSON.parse(row.collaboration_requests) : (row.collaboration_requests || []),
+        followUpTasks: typeof row.follow_up_tasks === 'string' ? JSON.parse(row.follow_up_tasks) : (row.follow_up_tasks || []),
+        metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : (row.metadata || {})
       }))
     } catch (error) {
       logError('Error getting training data for agent:', error)
@@ -252,30 +278,30 @@ export class TrainingDataCollector {
 
   async exportTrainingData(userId: string, format: 'json' | 'csv' = 'json'): Promise<string> {
     try {
-      const db = await this.getDb()
-      const result = await db.query(`
+      const sql = getSql()
+      const result = await sql`
         SELECT *
         FROM agent_training_interactions 
-        WHERE user_id = $1
+        WHERE user_id = ${userId}
         ORDER BY timestamp DESC
-      `, [userId])
+      ` as any[]
 
-      const data = result.rows.map(row => ({
+      const data = result.map((row: any) => ({
         id: row.id,
         userId: row.user_id,
         agentId: row.agent_id,
         timestamp: row.timestamp,
         userMessage: row.user_message,
         agentResponse: row.agent_response,
-        context: JSON.parse(row.context || '{}'),
+        context: typeof row.context === 'string' ? JSON.parse(row.context) : (row.context || {}),
         userRating: row.user_rating,
         userFeedback: row.user_feedback,
         success: row.success,
         responseTime: row.response_time,
         confidence: row.confidence,
-        collaborationRequests: JSON.parse(row.collaboration_requests || '[]'),
-        followUpTasks: JSON.parse(row.follow_up_tasks || '[]'),
-        metadata: JSON.parse(row.metadata || '{}')
+        collaborationRequests: typeof row.collaboration_requests === 'string' ? JSON.parse(row.collaboration_requests) : (row.collaboration_requests || []),
+        followUpTasks: typeof row.follow_up_tasks === 'string' ? JSON.parse(row.follow_up_tasks) : (row.follow_up_tasks || []),
+        metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : (row.metadata || {})
       }))
 
       if (format === 'csv') {

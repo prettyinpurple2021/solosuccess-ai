@@ -9,10 +9,11 @@ interface GlassCardProps extends HTMLMotionProps<'div'> {
   withChevron?: boolean
   withShine?: boolean
   interactive?: boolean
+  glow?: boolean
 }
 
 const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
-  ({ className, variant = 'default', withChevron = false, withShine = false, interactive = false, children, ...props }, ref) => {
+  ({ className, variant = 'default', withChevron = false, withShine = false, interactive = false, glow = false, children, ...props }, ref) => {
     const variantClasses = {
       default: 'glass-card',
       strong: 'glass-panel-strong',
@@ -27,6 +28,7 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
           variantClasses[variant],
           withChevron && 'chevron-accent',
           withShine && 'glass-shine',
+          glow && 'shadow-[0_0_30px_rgba(255,113,181,0.35)]',
           interactive && 'cursor-pointer',
           className
         )}

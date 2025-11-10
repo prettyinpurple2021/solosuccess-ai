@@ -111,7 +111,7 @@ class AnalyticsService {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      logInfo('📊 Analytics Event:', event, properties)
+      logInfo('📊 Analytics Event', { event, properties })
     }
 
     // Note: PostHog integration was removed. Events are only stored internally now.

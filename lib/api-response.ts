@@ -104,7 +104,7 @@ export function createErrorResponse(
     error,
     status,
     details,
-    timestamp: response.meta.timestamp
+    timestamp: response.meta?.timestamp
   })
 
   return NextResponse.json(response, { status })

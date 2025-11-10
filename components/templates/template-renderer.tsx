@@ -8,7 +8,7 @@ import { getTemplateBySlug, getCategoryBySlug, type TemplateSummary } from '@/li
 export function TemplateRenderer({ slug }: { slug: string }) {
   const Component = templateComponents[slug]
 
-  const summary: TemplateSummary | undefined = getTemplateBySlug(slug)
+  const summary: TemplateSummary | undefined = getTemplateBySlug(slug) ?? undefined
   const category = summary ? getCategoryBySlug(summary.categoryId) : undefined
   const template = summary
     ? {

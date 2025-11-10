@@ -1,6 +1,6 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { Achievement, UserStats, GamificationEngine } from './gamification-system'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 
 export interface CompetitiveIntelligenceStats {
   competitors_monitored: number
@@ -405,26 +405,25 @@ export class CompetitiveIntelligenceGamification extends GamificationEngine {
     percentile: number
   }> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get user's competitive advantage points
       const userPoints = this.competitiveStats.competitive_advantage_points
       
       // Count users with higher points
-      const { rows: higherUsers } = await db.query(
-        `SELECT COUNT(*) as count 
+      const higherUsers = await sql`
+        SELECT COUNT(*) as count 
          FROM users u
          JOIN user_competitive_stats ucs ON u.id = ucs.user_id
-         WHERE ucs.competitive_advantage_points > $1`,
-        [userPoints]
-      )
+         WHERE ucs.competitive_advantage_points > ${userPoints}
+      ` as any[]
       
       // Count total users with competitive stats
-      const { rows: totalUsers } = await db.query(
-        `SELECT COUNT(*) as count 
+      const totalUsers = await sql`
+        SELECT COUNT(*) as count 
          FROM users u
-         JOIN user_competitive_stats ucs ON u.id = ucs.user_id`
-      )
+         JOIN user_competitive_stats ucs ON u.id = ucs.user_id
+      ` as any[]
       
       const position = (higherUsers[0]?.count || 0) + 1
       const total = totalUsers[0]?.count || 1

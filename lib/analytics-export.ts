@@ -98,7 +98,7 @@ export class AnalyticsExportService {
     reportData: ReportData,
     config: ExportConfig,
     userId: string
-  ): Promise<ExportResult> {
+  ): Promise<{ jobId: string; status: string; message: string }> {
     const jobId = crypto.randomUUID()
     
     try {

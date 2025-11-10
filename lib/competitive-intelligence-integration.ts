@@ -1,5 +1,5 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import type { CompetitorAlert, CompetitiveOpportunity } from '@/lib/types'
 
 
@@ -125,8 +125,6 @@ export class CompetitiveIntelligenceIntegration {
    */
   static async createTaskFromAlert(alert: CompetitorAlert, userId: string): Promise<number | null> {
     try {
-      const db = getDb()
-      
       // Find matching task template
       const template = COMPETITIVE_TASK_TEMPLATES.find(t => 
         t.alertTypes.includes(alert.alert_type)
@@ -138,39 +136,31 @@ export class CompetitiveIntelligenceIntegration {
       }
       
       // Get competitor name for template substitution
-      const { rows: competitorRows } = await db.query(
-        'SELECT name FROM competitor_profiles WHERE id = $1',
-        [alert.competitor_id]
-      )
+      const sql = getSql()
+      const competitorRows = await sql`
+        SELECT name FROM competitor_profiles WHERE id = ${alert.competitor_id}
+      ` as any[]
       
       const competitorName = competitorRows[0]?.name || 'Unknown Competitor'
       
       // Create task with template
       const taskTitle = template.taskTemplate.title.replace('{competitor}', competitorName)
       const taskDescription = template.taskTemplate.description.replace(/{competitor}/g, competitorName)
+      const tagsJson = JSON.stringify([...template.taskTemplate.tags, `alert-${alert.id}`])
+      const aiSuggestionsJson = JSON.stringify({
+        source: 'competitive_intelligence',
+        alert_id: alert.id,
+        competitor_id: alert.competitor_id,
+        template_id: template.id,
+        created_from_alert: true
+      })
       
-      const { rows: taskRows } = await db.query(
-        `INSERT INTO tasks (
+      const taskRows = await sql`
+        INSERT INTO tasks (
           user_id, title, description, category, priority, 
           estimated_minutes, tags, ai_suggestions, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending') RETURNING id`,
-        [
-          userId,
-          taskTitle,
-          taskDescription,
-          template.taskTemplate.category,
-          template.taskTemplate.priority,
-          template.estimatedMinutes,
-          JSON.stringify([...template.taskTemplate.tags, `alert-${alert.id}`]),
-          JSON.stringify({
-            source: 'competitive_intelligence',
-            alert_id: alert.id,
-            competitor_id: alert.competitor_id,
-            template_id: template.id,
-            created_from_alert: true
-          })
-        ]
-      )
+        ) VALUES (${userId}, ${taskTitle}, ${taskDescription}, ${template.taskTemplate.category}, ${template.taskTemplate.priority}, ${template.estimatedMinutes}, ${tagsJson}::jsonb, ${aiSuggestionsJson}::jsonb, 'pending') RETURNING id
+      ` as any[]
       
       return taskRows[0]?.id || null
     } catch (error) {
@@ -188,30 +178,28 @@ export class CompetitiveIntelligenceIntegration {
     userId: string
   ): Promise<CompetitiveGoalContext | null> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get competitor information
-      const { rows: competitorRows } = await db.query(
-        'SELECT name, threat_level, market_position FROM competitor_profiles WHERE id = $1 AND user_id = $2',
-        [competitorId, userId]
-      )
+      const competitorRows = await sql`
+        SELECT name, threat_level, market_position FROM competitor_profiles WHERE id = ${competitorId} AND user_id = ${userId}
+      ` as any[]
       
       if (competitorRows.length === 0) {
         return null
       }
       
-      const competitor = competitorRows[0]
+      const competitor = competitorRows[0] as { name: string; threat_level: string; market_position: any }
       
       // Get recent intelligence for benchmarking
-      const { rows: intelligenceRows } = await db.query(
-        `SELECT data_type, extracted_data, analysis_results 
+      const intelligenceRows = await sql`
+        SELECT data_type, extracted_data, analysis_results 
          FROM intelligence_data 
-         WHERE competitor_id = $1 AND user_id = $2 
+         WHERE competitor_id = ${competitorId} AND user_id = ${userId} 
          AND importance IN ('high', 'critical')
          ORDER BY collected_at DESC 
-         LIMIT 10`,
-        [competitorId, userId]
-      )
+         LIMIT 10
+      ` as any[]
       
       // Extract benchmark metrics from intelligence data
       const benchmarkMetrics = this.extractBenchmarkMetrics(intelligenceRows)
@@ -226,19 +214,15 @@ export class CompetitiveIntelligenceIntegration {
       }
       
       // Update goal with competitive context
-      await db.query(
-        `UPDATE goals 
-         SET ai_suggestions = COALESCE(ai_suggestions, '{}')::jsonb || $1::jsonb
-         WHERE id = $2 AND user_id = $3`,
-        [
-          JSON.stringify({
-            competitive_context: context,
-            updated_at: new Date().toISOString()
-          }),
-          goalId,
-          userId
-        ]
-      )
+      const contextJson = JSON.stringify({
+        competitive_context: context,
+        updated_at: new Date().toISOString()
+      })
+      await sql`
+        UPDATE goals 
+         SET ai_suggestions = COALESCE(ai_suggestions, '{}')::jsonb || ${contextJson}::jsonb
+         WHERE id = ${goalId} AND user_id = ${userId}
+      `
       
       return context
     } catch (error) {
@@ -264,33 +248,25 @@ export class CompetitiveIntelligenceIntegration {
     userId: string
   ): Promise<number | null> {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Create a task that represents the competitive milestone
-      const { rows: taskRows } = await db.query(
-        `INSERT INTO tasks (
+      const tagsJson = JSON.stringify(['competitive-milestone', 'benchmark', `competitor-${competitorId}`])
+      const aiSuggestionsJson = JSON.stringify({
+        milestone_type: 'competitive_benchmark',
+        competitor_id: competitorId,
+        target_metric: milestoneData.targetMetric,
+        competitor_benchmark: milestoneData.competitorBenchmark,
+        target_value: milestoneData.targetValue,
+        created_from_intelligence: true
+      })
+      
+      const taskRows = await sql`
+        INSERT INTO tasks (
           user_id, goal_id, title, description, category, priority,
           due_date, tags, ai_suggestions, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending') RETURNING id`,
-        [
-          userId,
-          goalId,
-          milestoneData.title,
-          milestoneData.description,
-          'Competitive Milestone',
-          'high',
-          milestoneData.dueDate,
-          JSON.stringify(['competitive-milestone', 'benchmark', `competitor-${competitorId}`]),
-          JSON.stringify({
-            milestone_type: 'competitive_benchmark',
-            competitor_id: competitorId,
-            target_metric: milestoneData.targetMetric,
-            competitor_benchmark: milestoneData.competitorBenchmark,
-            target_value: milestoneData.targetValue,
-            created_from_intelligence: true
-          })
-        ]
-      )
+        ) VALUES (${userId}, ${goalId}, ${milestoneData.title}, ${milestoneData.description}, ${'Competitive Milestone'}, ${'high'}, ${milestoneData.dueDate || null}, ${tagsJson}::jsonb, ${aiSuggestionsJson}::jsonb, 'pending') RETURNING id
+      ` as any[]
       
       return taskRows[0]?.id || null
     } catch (error) {
@@ -304,19 +280,18 @@ export class CompetitiveIntelligenceIntegration {
    */
   static async getCompetitiveProgress(goalId: number, userId: string) {
     try {
-      const db = getDb()
+      const sql = getSql()
       
       // Get goal with competitive context
-      const { rows: goalRows } = await db.query(
-        'SELECT title, description, ai_suggestions FROM goals WHERE id = $1 AND user_id = $2',
-        [goalId, userId]
-      )
+      const goalRows = await sql`
+        SELECT title, description, ai_suggestions FROM goals WHERE id = ${goalId} AND user_id = ${userId}
+      ` as any[]
       
       if (goalRows.length === 0) {
         return null
       }
       
-      const goal = goalRows[0]
+      const goal = goalRows[0] as { title: string; description: string; ai_suggestions: any }
       const competitiveContext = goal.ai_suggestions?.competitive_context
       
       if (!competitiveContext) {
@@ -324,26 +299,26 @@ export class CompetitiveIntelligenceIntegration {
       }
       
       // Get competitive milestone tasks
-      const { rows: milestoneRows } = await db.query(
-        `SELECT id, title, description, status, ai_suggestions, completed_at
+      const milestoneRows = await sql`
+        SELECT id, title, description, status, ai_suggestions, completed_at
          FROM tasks 
-         WHERE goal_id = $1 AND user_id = $2 
+         WHERE goal_id = ${goalId} AND user_id = ${userId} 
          AND category = 'Competitive Milestone'
-         ORDER BY created_at ASC`,
-        [goalId, userId]
-      )
+         ORDER BY created_at ASC
+      ` as any[]
       
-      // Get recent competitive intelligence updates
-      const { rows: recentIntelligence } = await db.query(
-        `SELECT id.data_type, id.importance, id.collected_at, cp.name as competitor_name
+      // Get recent competitive intelligence updates  
+      // Note: We need competitor_id from competitiveContext
+      const competitorId = competitiveContext.competitorId
+      const recentIntelligence = await sql`
+        SELECT id.data_type, id.importance, id.collected_at, cp.name as competitor_name
          FROM intelligence_data id
          JOIN competitor_profiles cp ON cp.id = id.competitor_id
-         WHERE id.competitor_id = $1 AND id.user_id = $2
+         WHERE id.competitor_id = ${competitorId} AND id.user_id = ${userId}
          AND id.collected_at > NOW() - INTERVAL '30 days'
          ORDER BY id.collected_at DESC
-         LIMIT 5`,
-        [competitiveContext.competitorId, userId]
-      )
+         LIMIT 5
+      ` as any[]
       
       return {
         goal,
