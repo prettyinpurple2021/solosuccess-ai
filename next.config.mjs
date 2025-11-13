@@ -296,6 +296,15 @@ const nextConfig = {
         ],
       },
       {
+        source: "/:path*.css",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/css; charset=utf-8",
+          },
+        ],
+      },
+      {
         source: "/api/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },

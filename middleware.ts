@@ -38,29 +38,7 @@ export function middleware(request: NextRequest) {
     pathname === route || pathname.startsWith(route + '/')
   )
 
-  // Always allow public routes and API routes
-  if (isPublicRoute || pathname.startsWith('/api/')) {
-    return NextResponse.next()
-  }
-
-  // For protected routes, check authentication
-  const allCookies = request.cookies.getAll()
-  const hasAuthCookie = allCookies.some(cookie => 
-    cookie.name.includes('session') || 
-    cookie.name.includes('auth') ||
-    cookie.name.includes('token') ||
-    cookie.name.includes('better-auth')
-  )
-  
-  // Temporarily disable auth check for debugging
-  // if (!hasAuthCookie) {
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/signin'
-  //   url.searchParams.set('redirect', pathname)
-  //   return NextResponse.redirect(url)
-  // }
-
-  // Create response with security headers
+  // Create response with security headers for ALL routes
   const response = NextResponse.next()
   
   // Security headers (production-ready)
@@ -76,9 +54,10 @@ export function middleware(request: NextRequest) {
   }
 
   // CSP (Content Security Policy) - adjust as needed for your app
+  // Applied to ALL routes to ensure chatbase.co is always allowed
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://www.chatbase.co",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: https: blob:",
     "font-src 'self' data: https://fonts.gstatic.com",
@@ -92,7 +71,26 @@ export function middleware(request: NextRequest) {
   ].join('; ')
   
   response.headers.set('Content-Security-Policy', csp)
-
+  
+  // For protected routes, check authentication
+  if (!isPublicRoute && !pathname.startsWith('/api/')) {
+    const allCookies = request.cookies.getAll()
+    const hasAuthCookie = allCookies.some(cookie => 
+      cookie.name.includes('session') || 
+      cookie.name.includes('auth') ||
+      cookie.name.includes('token') ||
+      cookie.name.includes('better-auth')
+    )
+    
+    // Temporarily disable auth check for debugging
+    // if (!hasAuthCookie) {
+    //   const url = request.nextUrl.clone()
+    //   url.pathname = '/signin'
+    //   url.searchParams.set('redirect', pathname)
+    //   return NextResponse.redirect(url)
+    // }
+  }
+  
   return response
 }
 
