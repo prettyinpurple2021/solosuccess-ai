@@ -35,6 +35,7 @@ import { TheLaunchpad } from './components/TheLaunchpad';
 import { TheScout } from './components/TheScout';
 import { AgentId, Task } from './types';
 import { Menu, NotebookPen } from 'lucide-react';
+import { useSwipe } from './hooks/useSwipe';
 
 function App() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -60,8 +61,25 @@ function App() {
     setCheckingBoot(false);
   }, []);
 
+  // Swipe gestures for mobile sidebar
+  const swipeHandlers = useSwipe({
+    onSwipeRight: () => {
+      if (!isMobileSidebarOpen && window.innerWidth < 768) {
+        setIsMobileSidebarOpen(true);
+      }
+    },
+    onSwipeLeft: () => {
+      if (isMobileSidebarOpen) {
+        setIsMobileSidebarOpen(false);
+      }
+    },
+    minSwipeDistance: 80
+  });
+
   const handleViewChange = (view: string) => {
     setIsTransitioning(true);
+    // Close mobile sidebar when changing views
+    setIsMobileSidebarOpen(false);
     setTimeout(() => {
       setCurrentView(view);
       setIsTransitioning(false);
@@ -217,7 +235,10 @@ function App() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 h-full flex flex-col relative">
+      <main
+        className="flex-1 md:ml-64 h-full flex flex-col relative"
+        {...swipeHandlers}
+      >
         {/* Enhanced Mobile Header */}
         <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 glass-strong z-10 sticky top-0 animate-slide-in-top">
           <div className="flex items-center gap-3">
@@ -235,8 +256,8 @@ function App() {
           <button
             onClick={() => setIsScratchpadOpen(!isScratchpadOpen)}
             className={`p-2 rounded-lg transition-all hover-scale active:scale-95 ${isScratchpadOpen
-                ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
-                : 'hover:bg-white/5 text-zinc-400 hover:text-white'
+              ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
+              : 'hover:bg-white/5 text-zinc-400 hover:text-white'
               }`}
             aria-label="Toggle scratchpad"
           >

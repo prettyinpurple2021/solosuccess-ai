@@ -29,55 +29,57 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onMove, onDelete, onFocus }) 
     const agentStyle = getAgentColor(task.assignee);
 
     return (
-        <div className="glass-card p-4 rounded-xl group hover:border-emerald-500/30 transition-all shadow-lg hover:shadow-xl relative animate-in fade-in zoom-in duration-300 flex flex-col">
+        <div className="glass-card p-3 md:p-4 rounded-xl group hover:border-emerald-500/30 transition-all shadow-lg hover:shadow-xl relative animate-in fade-in zoom-in duration-300 flex flex-col touch-none">
 
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex justify-between items-start mb-2 md:mb-3">
                 <div className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border ${agentStyle} bg-black/40 backdrop-blur-sm`}>
                     {agent.name}
                 </div>
-                <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]' :
+                <div className={`w-2 h-2 rounded-full shrink-0 ${task.priority === 'high' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]' :
                     task.priority === 'medium' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
                     }`} title={`Priority: ${task.priority}`} />
             </div>
 
-            <h4 className="text-sm font-bold text-white mb-2 leading-tight group-hover:text-emerald-400 transition-colors">{task.title}</h4>
-            <p className="text-xs text-zinc-400 mb-4 line-clamp-3 flex-1">{task.description}</p>
+            <h4 className="text-sm font-bold text-white mb-1 md:mb-2 leading-tight group-hover:text-emerald-400 transition-colors">{task.title}</h4>
+            <p className="text-xs text-zinc-400 mb-3 md:mb-4 line-clamp-2 md:line-clamp-3 flex-1">{task.description}</p>
 
-            <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/5">
-                <div className="flex items-center gap-1 text-[10px] text-zinc-500 font-mono">
-                    <Clock size={10} /> {task.estimatedTime}
+            <div className="flex items-center justify-between mt-auto pt-2 md:pt-3 border-t border-white/5 gap-2">
+                <div className="flex items-center gap-1 text-[10px] text-zinc-500 font-mono shrink-0">
+                    <Clock size={10} /> <span className="hidden sm:inline">{task.estimatedTime}</span>
                 </div>
 
-                <div className="flex gap-1">
+                <div className="flex gap-0.5 md:gap-1 flex-wrap justify-end">
                     {/* Focus Button */}
                     {task.status !== 'done' && (
                         <button
                             onClick={() => onFocus(task)}
-                            className="p-1.5 hover:bg-indigo-500/20 rounded text-indigo-400 transition-colors"
+                            className="p-1.5 md:p-2 hover:bg-indigo-500/20 rounded text-indigo-400 transition-colors touch-target"
                             title="Enter Focus Mode"
+                            aria-label="Enter focus mode"
                         >
-                            <Target size={14} />
+                            <Target size={12} className="md:hidden" />
+                            <Target size={14} className="hidden md:inline" />
                         </button>
                     )}
 
-                    <div className="w-px h-4 bg-white/10 mx-1 self-center" />
+                    <div className="w-px h-4 bg-white/10 mx-0.5 md:mx-1 self-center" />
 
                     {task.status !== 'todo' && (
-                        <button onClick={() => onMove(task.id, 'todo')} className="p-1.5 hover:bg-white/10 rounded text-zinc-400 transition-colors" title="Move to Todo">
+                        <button onClick={() => onMove(task.id, 'todo')} className="p-1.5 md:p-2 hover:bg-white/10 rounded text-zinc-400 transition-colors touch-target" title="Move to Todo" aria-label="Move to todo">
                             <Circle size={12} />
                         </button>
                     )}
                     {task.status !== 'in_progress' && (
-                        <button onClick={() => onMove(task.id, 'in_progress')} className="p-1.5 hover:bg-amber-500/20 rounded text-amber-400 transition-colors" title="Move to In Progress">
+                        <button onClick={() => onMove(task.id, 'in_progress')} className="p-1.5 md:p-2 hover:bg-amber-500/20 rounded text-amber-400 transition-colors touch-target" title="Move to In Progress" aria-label="Move to in progress">
                             <PlayCircle size={12} />
                         </button>
                     )}
                     {task.status !== 'done' && (
-                        <button onClick={() => onMove(task.id, 'done')} className="p-1.5 hover:bg-emerald-500/20 rounded text-emerald-400 transition-colors" title="Complete">
+                        <button onClick={() => onMove(task.id, 'done')} className="p-1.5 md:p-2 hover:bg-emerald-500/20 rounded text-emerald-400 transition-colors touch-target" title="Complete" aria-label="Mark as complete">
                             <CheckCircle2 size={12} />
                         </button>
                     )}
-                    <button onClick={() => onDelete(task.id)} className="p-1.5 hover:bg-red-500/20 rounded text-red-500 transition-colors" title="Delete">
+                    <button onClick={() => onDelete(task.id)} className="p-1.5 md:p-2 hover:bg-red-500/20 rounded text-red-500 transition-colors touch-target" title="Delete" aria-label="Delete task">
                         <Trash2 size={12} />
                     </button>
                 </div>
@@ -168,17 +170,17 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
         const colTasks = tasks.filter(t => t.status === status);
 
         return (
-            <div className="flex-1 min-w-[300px] flex flex-col glass-panel rounded-xl p-4 h-full relative overflow-hidden">
+            <div className="flex-1 md:min-w-[280px] lg:min-w-[300px] flex flex-col glass-panel rounded-xl p-3 md:p-4 h-full md:h-auto relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
+                <div className="flex items-center justify-between mb-3 md:mb-4 pb-2 border-b border-white/5 shrink-0">
                     <h3 className="font-bold text-xs uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-                        {icon} {title}
+                        {icon} <span className="hidden sm:inline">{title}</span>
                     </h3>
                     <span className="bg-white/10 text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/5">
                         {colTasks.length}
                     </span>
                 </div>
-                <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
+                <div className="flex-1 overflow-y-auto space-y-2 md:space-y-3 custom-scrollbar pr-1 momentum-scroll">
                     {colTasks.map(task => (
                         <TaskCard
                             key={task.id}
@@ -189,8 +191,9 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
                         />
                     ))}
                     {colTasks.length === 0 && (
-                        <div className="h-24 border border-dashed border-white/10 rounded-xl flex items-center justify-center text-zinc-600 text-xs uppercase tracking-widest bg-white/5">
-                            No Tasks
+                        <div className="h-20 md:h-24 border border-dashed border-white/10 rounded-xl flex items-center justify-center text-zinc-600 text-xs uppercase tracking-widest bg-white/5">
+                            <span className="hidden sm:inline">No Tasks</span>
+                            <span className="sm:hidden">Empty</span>
                         </div>
                     )}
                 </div>
@@ -199,28 +202,30 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
     };
 
     return (
-        <div className="h-[85vh] flex flex-col">
+        <div className="h-auto md:h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <h2 className="text-3xl font-black text-white tracking-tighter uppercase drop-shadow-glow">Tactical Roadmap</h2>
-                    <p className="text-zinc-400 text-sm">Operational Execution Board // Overseer: ROXY</p>
+            <div className="mb-4 md:mb-6 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4">
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase drop-shadow-glow">Tactical Roadmap</h2>
+                    <p className="text-zinc-400 text-xs md:text-sm truncate"><span className="hidden md:inline">Operational Execution Board // Overseer: ROXY</span><span className="md:hidden">Execution Board</span></p>
                 </div>
                 <div className="flex gap-2">
                     {tasks.length > 0 && (
-                        <button onClick={clearBoard} className="px-4 py-2 text-xs font-bold text-red-400 border border-red-500/20 hover:bg-red-500/10 rounded transition-colors uppercase tracking-wider hover:border-red-500/40">
-                            Clear Board
+                        <button onClick={clearBoard} className="px-3 md:px-4 py-2 text-xs font-bold text-red-400 border border-red-500/20 hover:bg-red-500/10 rounded transition-colors uppercase tracking-wider hover:border-red-500/40 touch-target">
+                            <span className="hidden sm:inline">Clear Board</span>
+                            <span className="sm:hidden">Clear</span>
                         </button>
                     )}
                 </div>
             </div>
 
             {/* Goal Input */}
-            <div className="glass-panel p-2 rounded-xl mb-8 flex gap-2 shadow-2xl relative overflow-hidden group">
+            <div className="glass-panel p-2 rounded-xl mb-4 md:mb-8 flex flex-col md:flex-row gap-2 shadow-2xl relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 <div className="flex-1 relative z-10">
                     <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-500">
-                        <Plus size={18} />
+                        <Plus size={16} className="md:hidden" />
+                        <Plus size={18} className="hidden md:inline" />
                     </div>
                     <input
                         type="text"
@@ -228,22 +233,22 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
                         onChange={(e) => setGoal(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                         placeholder="Enter a high-level goal (e.g., 'Plan a viral TikTok campaign for Q3')"
-                        className="w-full bg-transparent border-none pl-10 pr-4 py-3 text-white focus:ring-0 placeholder-zinc-600 font-medium"
+                        className="w-full bg-transparent border-none pl-9 md:pl-10 pr-4 py-2 md:py-3 text-sm md:text-base text-white focus:ring-0 placeholder-zinc-600 font-medium"
                         disabled={loading}
                     />
                 </div>
                 <button
                     onClick={handleGenerate}
                     disabled={loading || !goal.trim()}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 rounded-lg font-bold text-xs uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] z-10"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold text-xs uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] z-10 touch-target w-full md:w-auto"
                 >
-                    {loading ? <Loader2 size={16} className="animate-spin" /> : 'Generate Plan'}
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : <><span className="hidden sm:inline">Generate Plan</span><span className="sm:hidden">Generate</span></>}
                 </button>
             </div>
 
             {/* Kanban Board */}
-            <div className="flex-1 overflow-x-auto">
-                <div className="flex gap-6 h-full min-w-[1000px]">
+            <div className="flex-1 overflow-x-auto overflow-y-auto md:overflow-y-hidden scrollbar-hide">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-full md:min-w-[900px] lg:min-w-[1000px]">
                     <Column title="Pending Intel" status="todo" icon={<Circle size={14} className="text-zinc-500" />} />
                     <Column title="Active Ops" status="in_progress" icon={<Loader2 size={14} className="text-amber-500 animate-spin-slow" />} />
                     <Column title="Mission Complete" status="done" icon={<CheckCircle2 size={14} className="text-emerald-500" />} />

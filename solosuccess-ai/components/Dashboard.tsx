@@ -16,18 +16,18 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, subValue, icon, color }) => (
-    <div className="glass-card p-6 rounded-xl hover:border-emerald-500/30 transition-all group relative overflow-hidden">
+    <div className="glass-card p-4 md:p-6 rounded-xl hover:border-emerald-500/30 transition-all group relative overflow-hidden touch-none">
         <div className={`absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity ${color} blur-xl`}>
             {icon}
         </div>
-        <div className="flex justify-between items-start mb-4 relative z-10">
-            <div className={`p-2 bg-white/5 rounded-lg border border-white/10 ${color} shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>
+        <div className="flex justify-between items-start mb-3 md:mb-4 relative z-10">
+            <div className={`p-1.5 md:p-2 bg-white/5 rounded-lg border border-white/10 ${color} shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>
                 {icon}
             </div>
         </div>
         <div className="relative z-10">
-            <div className="text-3xl font-black text-white tracking-tighter mb-1 drop-shadow-md">{value}</div>
-            <div className="flex items-center justify-between">
+            <div className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-1 drop-shadow-md">{value}</div>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="text-xs text-zinc-400 font-mono uppercase tracking-wide font-bold">{label}</div>
                 {subValue && <div className={`text-[10px] px-2 py-0.5 rounded bg-white/5 border border-white/10 ${color}`}>{subValue}</div>}
             </div>
@@ -178,30 +178,30 @@ export const Dashboard: React.FC = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700 relative">
+        <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 relative">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-end border-b border-white/5 pb-6 gap-4">
-                <div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-4 md:pb-6 gap-3 md:gap-4">
+                <div className="w-full md:w-auto">
                     <div className="flex items-center gap-2 text-emerald-500 font-mono text-xs font-bold uppercase tracking-widest mb-2">
                         <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_#10b981]" />
-                        Live Feed // Connection Established
+                        <span className="text-[10px] md:text-xs">Live Feed // Connection Established</span>
                     </div>
-                    <h2 className="text-4xl font-black text-white tracking-tighter drop-shadow-glow">MISSION CONTROL</h2>
-                    <p className="text-zinc-400 mt-1">Welcome back, {founderName}. Systems operational.</p>
+                    <h2 className="text-2xl md:text-4xl font-black text-white tracking-tighter drop-shadow-glow">MISSION CONTROL</h2>
+                    <p className="text-sm md:text-base text-zinc-400 mt-1">Welcome back, {founderName}. Systems operational.</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full md:w-auto">
                     <button
                         onClick={handleGenerateBriefing}
                         disabled={loadingBriefing}
-                        className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 rounded border border-emerald-500/20 hover:border-emerald-500/50 flex items-center gap-2 transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                        className="flex-1 md:flex-initial px-3 md:px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 rounded border border-emerald-500/20 hover:border-emerald-500/50 flex items-center justify-center gap-2 transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.1)] touch-target"
                     >
                         {loadingBriefing ? <Activity className="animate-spin" size={16} /> : <FileText size={16} />}
                         <span className="text-xs font-bold uppercase tracking-wider">
                             {loadingBriefing ? 'Compiling...' : 'Morning Brief'}
                         </span>
                     </button>
-                    <div className="px-4 py-2 bg-white/5 rounded border border-white/10 flex flex-col items-end">
+                    <div className="hidden md:flex px-4 py-2 bg-white/5 rounded border border-white/10 flex-col items-end">
                         <span className="text-[10px] text-zinc-500 font-bold uppercase">Current Date</span>
                         <span className="text-xs font-mono text-white">{new Date().toLocaleDateString()}</span>
                     </div>
@@ -210,17 +210,21 @@ export const Dashboard: React.FC = () => {
 
             {/* Briefing Modal Overlay */}
             {showBriefingModal && briefing && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-zinc-950 border border-zinc-700 w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300 safe-top safe-bottom">
+                    <div className="mobile-fullscreen bg-zinc-950 border-0 md:border md:border-zinc-700 w-full rounded-none md:rounded-xl shadow-2xl overflow-hidden flex flex-col">
                         {/* Modal Header */}
-                        <div className="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
-                            <div>
+                        <div className="p-4 md:p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900 shrink-0">
+                            <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 text-emerald-500 font-mono text-xs font-bold uppercase tracking-widest mb-1">
-                                    <Zap size={12} fill="currentColor" /> Executive Summary
+                                    <Zap size={12} fill="currentColor" /> <span className="truncate">Executive Summary</span>
                                 </div>
-                                <h3 className="text-xl font-black text-white">DAILY BRIEFING // {briefing.date}</h3>
+                                <h3 className="text-lg md:text-xl font-black text-white truncate">DAILY BRIEFING // {briefing.date}</h3>
                             </div>
-                            <button onClick={() => setShowBriefingModal(false)} className="text-zinc-500 hover:text-white">
+                            <button
+                                onClick={() => setShowBriefingModal(false)}
+                                className="ml-4 p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all touch-target shrink-0"
+                                aria-label="Close briefing"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
@@ -316,22 +320,25 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* Main Content Split */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-[400px]">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 min-h-[300px] md:min-h-[400px]">
 
                 {/* Left Column: Chart */}
-                <div className="lg:col-span-2 glass-panel rounded-xl p-6 flex flex-col shadow-2xl relative overflow-hidden">
+                <div className="lg:col-span-2 glass-panel rounded-xl p-4 md:p-6 flex flex-col shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none" />
-                    <div className="flex justify-between items-center mb-8 relative z-10">
-                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                            <TrendingUp size={16} className="text-emerald-500" /> Productivity Velocity (7 Days)
+                    <div className="flex justify-between items-center mb-4 md:mb-8 relative z-10">
+                        <h3 className="text-xs md:text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <TrendingUp size={14} className="md:hidden text-emerald-500" />
+                            <TrendingUp size={16} className="hidden md:inline text-emerald-500" />
+                            <span className="hidden sm:inline">Productivity Velocity (7 Days)</span>
+                            <span className="sm:hidden">Velocity</span>
                         </h3>
                         <div className="flex gap-2">
-                            <span className="w-3 h-3 bg-emerald-500/20 border border-emerald-500/50 rounded-full shadow-[0_0_5px_#10b981]"></span>
-                            <span className="w-3 h-3 bg-zinc-800 rounded-full"></span>
+                            <span className="w-2 h-2 md:w-3 md:h-3 bg-emerald-500/20 border border-emerald-500/50 rounded-full shadow-[0_0_5px_#10b981]"></span>
+                            <span className="w-2 h-2 md:w-3 md:h-3 bg-zinc-800 rounded-full"></span>
                         </div>
                     </div>
 
-                    <div className="flex-1 w-full min-h-0 relative z-10">
+                    <div className="flex-1 w-full min-h-[200px] md:min-h-0 relative z-10">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData}>
                                 <defs>
@@ -363,45 +370,47 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Right Column: Activity Pulse */}
-                <div className="glass-panel rounded-xl flex flex-col overflow-hidden shadow-2xl">
-                    <div className="p-6 border-b border-white/5 bg-white/5">
-                        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                            <Activity size={16} className="text-amber-500" /> The Pulse
+                <div className="glass-panel rounded-xl flex flex-col overflow-hidden shadow-2xl max-h-[400px] lg:max-h-full">
+                    <div className="p-4 md:p-6 border-b border-white/5 bg-white/5 shrink-0">
+                        <h3 className="text-xs md:text-sm font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                            <Activity size={14} className="md:hidden text-amber-500" />
+                            <Activity size={16} className="hidden md:inline text-amber-500" /> The Pulse
                         </h3>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-black/20">
+                    <div className="flex-1 overflow-y-auto p-3 md:p-4 custom-scrollbar bg-black/20 momentum-scroll">
                         {feed.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-zinc-600 opacity-50">
-                                <Activity size={48} strokeWidth={1} />
+                                <Activity size={36} className="md:hidden" strokeWidth={1} />
+                                <Activity size={48} className="hidden md:block" strokeWidth={1} />
                                 <p className="mt-4 text-xs font-mono uppercase">No Activity Detected</p>
                             </div>
                         ) : (
-                            <div className="space-y-6 relative">
+                            <div className="space-y-4 md:space-y-6 relative">
                                 {/* Timeline Line */}
-                                <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-white/5"></div>
+                                <div className="absolute left-3 md:left-4 top-2 bottom-2 w-0.5 bg-white/5"></div>
 
                                 {feed.map((item) => {
                                     const agent = AGENTS[item.agentId as AgentId] || AGENTS[AgentId.ROXY];
                                     return (
-                                        <div key={item.id} className="relative pl-10 group">
+                                        <div key={item.id} className="relative pl-8 md:pl-10 group touch-none">
                                             {/* Timeline Dot */}
-                                            <div className={`absolute left-[11px] top-1 w-2.5 h-2.5 rounded-full border-2 border-zinc-950 transition-all
+                                            <div className={`absolute left-[9px] md:left-[11px] top-1 w-2 h-2 md:w-2.5 md:h-2.5 rounded-full border-2 border-zinc-950 transition-all
                                     ${item.type === 'INTEL' ? 'bg-blue-500 group-hover:shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'bg-emerald-500 group-hover:shadow-[0_0_10px_rgba(16,185,129,0.5)]'}
                                 `}></div>
 
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div>
+                                            <div className="flex items-start justify-between gap-2 md:gap-4">
+                                                <div className="flex-1 min-w-0">
                                                     <div className={`text-[10px] font-bold uppercase tracking-wider mb-0.5
                                             ${item.type === 'INTEL' ? 'text-blue-400' : 'text-emerald-400'}
                                         `}>
                                                         {item.title}
                                                     </div>
-                                                    <div className="text-sm text-zinc-300 font-medium leading-tight mb-1 group-hover:text-white transition-colors">
+                                                    <div className="text-xs md:text-sm text-zinc-300 font-medium leading-tight mb-1 group-hover:text-white transition-colors line-clamp-2">
                                                         {item.details}
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <img src={agent.avatar} className="w-4 h-4 rounded-full grayscale opacity-70" alt="avatar" />
+                                                        <img src={agent.avatar} className="w-3 h-3 md:w-4 md:h-4 rounded-full grayscale opacity-70" alt="avatar" />
                                                         <span className="text-[10px] text-zinc-500 font-mono uppercase">{agent.name}</span>
                                                     </div>
                                                 </div>
@@ -415,7 +424,7 @@ export const Dashboard: React.FC = () => {
                             </div>
                         )}
                     </div>
-                    <div className="p-3 border-t border-white/5 bg-white/5 text-center">
+                    <div className="p-2 md:p-3 border-t border-white/5 bg-white/5 text-center shrink-0">
                         <p className="text-[10px] text-zinc-500 font-mono uppercase animate-pulse">System Monitoring Active</p>
                     </div>
                 </div>
