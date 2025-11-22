@@ -106,16 +106,16 @@ export const TheCodex: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-8">
+            <div className="flex gap-2 mb-8 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
                 <button
                     onClick={() => setActiveTab('dna')}
-                    className={`px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${activeTab === 'dna' ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}`}
+                    className={`px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border whitespace-nowrap ${activeTab === 'dna' ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}`}
                 >
                     <Fingerprint size={16} className="inline mb-0.5 mr-2" /> Identity Matrix
                 </button>
                 <button
                     onClick={() => setActiveTab('personas')}
-                    className={`px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${activeTab === 'personas' ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}`}
+                    className={`px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border whitespace-nowrap ${activeTab === 'personas' ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}`}
                 >
                     <Users size={16} className="inline mb-0.5 mr-2" /> Target Personas
                 </button>

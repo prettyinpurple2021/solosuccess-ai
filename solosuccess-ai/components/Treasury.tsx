@@ -179,7 +179,7 @@ export const Treasury: React.FC = () => {
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-x-auto md:overflow-visible">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className={`bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex flex-col items-center justify-center text-center
                             ${isProfitable ? 'border-emerald-900/50 bg-emerald-950/10' : parseFloat(runway as string) < 6 ? 'border-red-900/50 bg-red-950/10' : ''}
                         `}>

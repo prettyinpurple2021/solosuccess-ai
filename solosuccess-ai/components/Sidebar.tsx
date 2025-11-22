@@ -44,6 +44,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         rankTitle: 'Garage Hacker',
         totalActions: 0
     });
+    const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+
+    const toggleCategory = (title: string) => {
+        setCollapsedCategories(prev => ({
+            ...prev,
+            [title]: !prev[title]
+        }));
+    };
 
     useEffect(() => {
         // Load initial progress
@@ -128,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     ];
 
     const navItemClass = (isActive: boolean, colorClass: string = 'text-white', label: string) => `
-    flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer group rounded-lg mr-2 relative overflow-hidden
+    flex items-center gap-3 px-4 py-2.5 min-h-[44px] text-base md:text-sm font-medium transition-all duration-200 cursor-pointer group rounded-lg mr-2 relative overflow-hidden
     ${isActive
             ? `glass-subtle ${colorClass} shadow-lg border-l-2 border-${colorClass.split('-')[1]}-500`
             : 'text-zinc-400 hover:glass-subtle hover:text-white border-l-2 border-transparent hover-lift'}
@@ -249,12 +257,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Navigation List */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar pb-20 pt-3">
                     {navCategories.map((cat, i) => (
-                        <div key={i} className="mb-6 animate-slide-in-left" style={{ animationDelay: `${i * 50}ms` }}>
-                            <h3 className="px-4 text-[10px] font-bold text-zinc-600 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <div className="w-2 h-[2px] bg-zinc-700 rounded" />
-                                {cat.title}
-                            </h3>
-                            <nav className="space-y-0.5">
+                        <div key={i} className="mb-4 md:mb-6 animate-slide-in-left" style={{ animationDelay: `${i * 50}ms` }}>
+                            <button
+                                onClick={() => toggleCategory(cat.title)}
+                                className="w-full px-4 py-2 flex items-center justify-between group"
+                            >
+                                <h3 className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider flex items-center gap-2 group-hover:text-zinc-400 transition-colors">
+                                    <div className="w-2 h-[2px] bg-zinc-700 rounded" />
+                                    {cat.title}
+                                </h3>
+                                <ChevronUp
+                                    size={12}
+                                    className={`text-zinc-600 transition-transform duration-300 ${collapsedCategories[cat.title] ? 'rotate-180' : ''}`}
+                                />
+                            </button>
+
+                            <div className={`space-y-0.5 overflow-hidden transition-all duration-300 ${collapsedCategories[cat.title] ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100'}`}>
                                 {cat.items.map(item => {
                                     if (item.id === 'chat') {
                                         // Special Chat handling to show agents if active
@@ -301,7 +319,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                         </div>
                                     );
                                 })}
-                            </nav>
+                            </div>
                         </div>
                     ))}
                 </div>

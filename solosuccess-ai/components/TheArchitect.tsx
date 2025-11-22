@@ -119,7 +119,7 @@ export const TheArchitect: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 overflow-y-auto max-h-[400px] custom-scrollbar">
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 overflow-y-auto max-h-[300px] md:max-h-[400px] custom-scrollbar">
                         <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 ml-2">Spec Archive</h3>
                         <div className="space-y-2">
                             {specs.map(spec => (

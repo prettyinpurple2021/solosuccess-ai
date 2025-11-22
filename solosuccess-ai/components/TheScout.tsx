@@ -33,7 +33,7 @@ export const TheScout: React.FC = () => {
         const result = await generateJobDescription(roleTitle, employmentType);
         if (result) {
             setJd(result);
-            
+
             // PRODUCTION NOTE:
             // Generated Job Descriptions are not currently saved.
             // Add logic to persist these to the Vault or a 'HR' database table.
@@ -84,8 +84,8 @@ export const TheScout: React.FC = () => {
 
     return (
         <div className="min-h-[85vh] flex flex-col animate-in fade-in duration-500">
-             {/* Header */}
-             <div className="mb-6 flex items-end justify-between border-b border-zinc-800 pb-6">
+            {/* Header */}
+            <div className="mb-6 flex items-end justify-between border-b border-zinc-800 pb-6">
                 <div>
                     <div className="flex items-center gap-2 text-indigo-400 font-mono text-xs font-bold uppercase tracking-widest mb-2">
                         <UserPlus size={14} /> Talent Operations
@@ -96,20 +96,20 @@ export const TheScout: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-8 border-b border-zinc-800">
-                <button onClick={() => setActiveTab('recruit')} className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'recruit' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}>
+            <div className="flex gap-4 mb-8 border-b border-zinc-800 overflow-x-auto pb-1 scrollbar-hide">
+                <button onClick={() => setActiveTab('recruit')} className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${activeTab === 'recruit' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}>
                     <span className="flex items-center gap-2"><Briefcase size={16} /> Recruit</span>
                 </button>
-                <button onClick={() => setActiveTab('vet')} className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'vet' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}>
+                <button onClick={() => setActiveTab('vet')} className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${activeTab === 'vet' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}>
                     <span className="flex items-center gap-2"><Ear size={16} /> Vet</span>
                 </button>
-                <button onClick={() => setActiveTab('delegate')} className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'delegate' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}>
+                <button onClick={() => setActiveTab('delegate')} className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${activeTab === 'delegate' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}>
                     <span className="flex items-center gap-2"><ListTodo size={16} /> Delegate</span>
                 </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
-                
+
                 {/* Input Column */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 h-fit">
                     {activeTab === 'recruit' && (
@@ -208,7 +208,7 @@ export const TheScout: React.FC = () => {
                                     </ul>
                                 </div>
                             </div>
-                            
+
                             <div className="bg-indigo-900/10 border border-indigo-500/20 p-4 rounded-lg">
                                 <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3">The Perks (Why Us?)</h4>
                                 <ul className="space-y-2">
@@ -227,7 +227,7 @@ export const TheScout: React.FC = () => {
                                 {guide.questions.map((q, i) => (
                                     <div key={i} className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg">
                                         <div className="flex items-start gap-3 mb-3">
-                                            <span className="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded font-bold text-xs shrink-0">{i+1}</span>
+                                            <span className="bg-indigo-600 text-white w-6 h-6 flex items-center justify-center rounded font-bold text-xs shrink-0">{i + 1}</span>
                                             <p className="text-white font-medium">{q.question}</p>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm pl-9">
@@ -252,7 +252,7 @@ export const TheScout: React.FC = () => {
                                 <h2 className="text-2xl font-bold text-white">{sop.taskName}</h2>
                                 <p className="text-zinc-400 text-sm mt-1">Goal: {sop.goal}</p>
                             </div>
-                            
+
                             <div className="space-y-4">
                                 {sop.steps.map((step, i) => (
                                     <div key={i} className="flex gap-4">

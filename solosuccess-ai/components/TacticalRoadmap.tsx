@@ -29,7 +29,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onMove, onDelete, onFocus }) 
     const agentStyle = getAgentColor(task.assignee);
 
     return (
-        <div className="glass-card p-3 md:p-4 rounded-xl group hover:border-emerald-500/30 transition-all shadow-lg hover:shadow-xl relative animate-in fade-in zoom-in duration-300 flex flex-col touch-none">
+        <div className="glass-card p-3 md:p-5 rounded-xl group hover:border-emerald-500/30 transition-all shadow-lg hover:shadow-xl relative animate-in fade-in zoom-in duration-300 flex flex-col touch-none">
 
             <div className="flex justify-between items-start mb-2 md:mb-3">
                 <div className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border ${agentStyle} bg-black/40 backdrop-blur-sm`}>
@@ -96,6 +96,7 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
     const [goal, setGoal] = useState('');
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(false);
+    const [filterAgent, setFilterAgent] = useState<AgentId | 'ALL'>('ALL');
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -167,7 +168,7 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
     };
 
     const Column = ({ title, status, icon }: { title: string, status: TaskStatus, icon: React.ReactNode }) => {
-        const colTasks = tasks.filter(t => t.status === status);
+        const colTasks = tasks.filter(t => t.status === status && (filterAgent === 'ALL' || t.assignee === filterAgent));
 
         return (
             <div className="flex-1 md:min-w-[280px] lg:min-w-[300px] flex flex-col glass-panel rounded-xl p-3 md:p-4 h-full md:h-auto relative overflow-hidden">
@@ -246,9 +247,37 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
                 </button>
             </div>
 
+            {/* Agent Filters */}
+            <div className="mb-4 md:mb-6 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+                <div className="flex flex-nowrap md:flex-wrap gap-2">
+                    <button
+                        onClick={() => setFilterAgent('ALL')}
+                        className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${filterAgent === 'ALL'
+                            ? 'bg-white text-black shadow-glow'
+                            : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
+                            }`}
+                    >
+                        All Agents
+                    </button>
+                    {Object.values(AGENTS).map(agent => (
+                        <button
+                            key={agent.id}
+                            onClick={() => setFilterAgent(agent.id)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-2 ${filterAgent === agent.id
+                                ? `bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 shadow-glow`
+                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
+                                }`}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${filterAgent === agent.id ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'}`} />
+                            {agent.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Kanban Board */}
             <div className="flex-1 overflow-x-auto overflow-y-auto md:overflow-y-hidden scrollbar-hide">
-                <div className="flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-full md:min-w-[900px] lg:min-w-[1000px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 h-auto md:h-full md:min-w-0">
                     <Column title="Pending Intel" status="todo" icon={<Circle size={14} className="text-zinc-500" />} />
                     <Column title="Active Ops" status="in_progress" icon={<Loader2 size={14} className="text-amber-500 animate-spin-slow" />} />
                     <Column title="Mission Complete" status="done" icon={<CheckCircle2 size={14} className="text-emerald-500" />} />

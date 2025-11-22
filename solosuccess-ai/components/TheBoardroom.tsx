@@ -142,8 +142,8 @@ export const TheBoardroom: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-2xl font-bold text-white mb-4">Executive Summary</h3>
-                                    <p className="text-lg text-zinc-300 leading-relaxed font-medium">
+                                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-4">Executive Summary</h3>
+                                    <p className="text-base md:text-lg text-zinc-300 leading-relaxed font-medium">
                                         "{report.executiveSummary}"
                                     </p>
                                 </div>

@@ -47,7 +47,7 @@ export const Settings: React.FC = () => {
                 allData[key] = localStorage.getItem(key);
             }
         }
-        
+
         const blob = new Blob([JSON.stringify(allData)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -90,7 +90,7 @@ export const Settings: React.FC = () => {
 
     return (
         <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-            
+
             <div className="mb-8 border-b border-zinc-800 pb-6">
                 <div className="flex items-center gap-2 text-zinc-500 font-mono text-xs font-bold uppercase tracking-widest mb-2">
                     <SettingsIcon size={14} /> System Configuration
@@ -100,7 +100,7 @@ export const Settings: React.FC = () => {
             </div>
 
             <div className="grid gap-8">
-                
+
                 {/* Business Profile */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
                     <div className="bg-zinc-950 p-4 border-b border-zinc-800 flex items-center gap-3">
@@ -111,43 +111,43 @@ export const Settings: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-zinc-500 uppercase">Founder Name</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={context.founderName}
-                                    onChange={(e) => setContext({...context, founderName: e.target.value})}
+                                    onChange={(e) => setContext({ ...context, founderName: e.target.value })}
                                     className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-zinc-500 uppercase">Company Name</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={context.companyName}
-                                    onChange={(e) => setContext({...context, companyName: e.target.value})}
+                                    onChange={(e) => setContext({ ...context, companyName: e.target.value })}
                                     className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-zinc-500 uppercase">Industry / Sector</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 value={context.industry}
-                                onChange={(e) => setContext({...context, industry: e.target.value})}
+                                onChange={(e) => setContext({ ...context, industry: e.target.value })}
                                 className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
                             />
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-zinc-500 uppercase">Mission / Description</label>
-                            <textarea 
+                            <textarea
                                 value={context.description}
-                                onChange={(e) => setContext({...context, description: e.target.value})}
+                                onChange={(e) => setContext({ ...context, description: e.target.value })}
                                 rows={4}
                                 className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors resize-none"
                             />
                         </div>
                         <div className="flex justify-end pt-4 border-t border-zinc-800/50">
-                            <button 
+                            <button
                                 onClick={handleSave}
                                 disabled={saved}
                                 className={`flex items-center gap-2 px-6 py-3 rounded font-bold text-xs uppercase tracking-wider transition-all
@@ -166,41 +166,41 @@ export const Settings: React.FC = () => {
                         <h3 className="font-bold text-sm text-white uppercase tracking-widest">Data Management</h3>
                     </div>
                     <div className="p-6">
-                        
+
                         {/* Backup/Restore */}
                         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <button 
+                            <button
                                 onClick={handleExportData}
                                 className="px-4 py-4 bg-zinc-950 border border-zinc-800 hover:border-emerald-500 hover:text-emerald-500 rounded-lg flex flex-col items-center gap-2 transition-all group"
-                             >
+                            >
                                 <Download size={24} className="text-zinc-500 group-hover:text-emerald-500" />
                                 <div className="text-center">
                                     <div className="text-xs font-bold uppercase tracking-widest">Export Workspace</div>
                                     <div className="text-[10px] text-zinc-500 mt-1">Download JSON Backup</div>
                                 </div>
-                             </button>
+                            </button>
 
-                             <button 
+                            <button
                                 onClick={handleImportClick}
                                 className="px-4 py-4 bg-zinc-950 border border-zinc-800 hover:border-blue-500 hover:text-blue-500 rounded-lg flex flex-col items-center gap-2 transition-all group"
-                             >
+                            >
                                 <Upload size={24} className="text-zinc-500 group-hover:text-blue-500" />
                                 <div className="text-center">
                                     <div className="text-xs font-bold uppercase tracking-widest">Restore Workspace</div>
                                     <div className="text-[10px] text-zinc-500 mt-1">Upload JSON Backup</div>
                                 </div>
-                             </button>
-                             <input 
-                                type="file" 
-                                ref={fileInputRef} 
-                                className="hidden" 
-                                accept=".json" 
+                            </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept=".json"
                                 onChange={handleFileChange}
-                             />
+                            />
                         </div>
 
                         {/* Factory Reset */}
-                        <div className="flex items-start justify-between gap-6 p-4 bg-red-950/10 border border-red-900/30 rounded-lg">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6 p-4 bg-red-950/10 border border-red-900/30 rounded-lg">
                             <div>
                                 <h4 className="text-red-500 font-bold text-sm uppercase flex items-center gap-2 mb-2">
                                     <AlertTriangle size={16} /> Factory Reset
@@ -209,9 +209,9 @@ export const Settings: React.FC = () => {
                                     Irreversible. Clears all local storage data including Tasks, Reports, War Room History, and Business Context.
                                 </p>
                             </div>
-                            <button 
+                            <button
                                 onClick={handleFactoryReset}
-                                className="px-4 py-2 bg-red-950/30 text-red-500 border border-red-900/50 hover:bg-red-900/50 rounded text-xs font-bold uppercase tracking-wider whitespace-nowrap flex items-center gap-2 transition-colors"
+                                className="w-full md:w-auto px-4 py-2 bg-red-950/30 text-red-500 border border-red-900/50 hover:bg-red-900/50 rounded text-xs font-bold uppercase tracking-wider whitespace-nowrap flex items-center justify-center gap-2 transition-colors"
                             >
                                 <Trash2 size={14} /> Wipe System
                             </button>

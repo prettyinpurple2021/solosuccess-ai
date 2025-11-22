@@ -122,7 +122,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, setIsOpe
             icon: <Power size={16} />,
             colorClass: 'text-red-500',
             action: () => {
-                if(confirm("Reboot System? This will clear your session context.")) {
+                if (confirm("Reboot System? This will clear your session context.")) {
                     // PRODUCTION NOTE: This is a client-side reset.
                     // In production, implement proper auth logout (e.g., POST /api/auth/logout)
                     // to invalidate session tokens and clear HTTP-only cookies.
@@ -133,7 +133,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, setIsOpe
         }
     ];
 
-    const filteredCommands = commands.filter(cmd => 
+    const filteredCommands = commands.filter(cmd =>
         cmd.label.toLowerCase().includes(query.toLowerCase()) ||
         cmd.category.toLowerCase().includes(query.toLowerCase())
     );
@@ -174,15 +174,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, setIsOpe
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4">
+        <div className="fixed inset-0 z-50 flex items-start md:items-start justify-center pt-4 md:pt-[20vh] px-2 md:px-4">
             {/* Backdrop */}
-            <div 
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+            <div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                 onClick={() => setIsOpen(false)}
             />
 
             {/* Modal */}
-            <div className="w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden relative animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[60vh]">
+            <div className="w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden relative animate-in fade-in zoom-in-95 duration-200 flex flex-col h-[80vh] md:h-auto md:max-h-[60vh]">
                 {/* Decorative Top Border */}
                 <div className="h-1 w-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500"></div>
 
@@ -221,7 +221,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, setIsOpe
                                 <div className={`p-2 rounded-md transition-colors ${index === selectedIndex ? 'bg-zinc-800 text-emerald-500' : 'bg-zinc-900 text-zinc-500'}`}>
                                     {cmd.icon}
                                 </div>
-                                
+
                                 <div className="flex-1">
                                     <span className={`text-sm font-medium ${cmd.colorClass || ''} ${index === selectedIndex ? 'text-white' : ''}`}>
                                         {cmd.label}
@@ -240,7 +240,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, setIsOpe
                         ))
                     )}
                 </div>
-                
+
                 {/* Footer */}
                 <div className="bg-zinc-900/50 border-t border-zinc-800 px-4 py-2 flex items-center justify-between text-[10px] text-zinc-500 font-mono uppercase tracking-wider">
                     <div className="flex gap-4">

@@ -133,7 +133,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agentId, initialMessage, o
 
     return (
 
-        <div className="flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-4rem)] max-h-[100vh] md:max-h-[800px] glass-panel rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 relative">
+        <div className="flex flex-col fixed inset-0 z-50 md:relative md:inset-auto md:z-auto md:h-[calc(100vh-4rem)] max-h-[100vh] md:max-h-[800px] glass-panel rounded-none md:rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 relative">
 
             {/* Agent Header & Tabs */}
             <div className="bg-white/5 border-b border-white/5 backdrop-blur-md relative z-20 shrink-0 safe-top">
@@ -176,7 +176,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agentId, initialMessage, o
                 </div>
 
                 {/* Tabs */}
-                <div className="flex px-3 md:px-4 lg:px-6 gap-1 overflow-x-auto scrollbar-hide">
+                <div className="flex lg:hidden px-3 md:px-4 lg:px-6 gap-1 overflow-x-auto scrollbar-hide">
                     <button
                         onClick={() => { setActiveTab('chat'); soundService.playClick(); }}
                         className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest border-b-2 transition-colors relative shrink-0 touch-target
@@ -207,17 +207,17 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agentId, initialMessage, o
                 </div>
             </div>
 
-            {/* TAB CONTENT: CHAT */}
-            {activeTab === 'chat' && (
-                <>
-                    <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-6 relative custom-scrollbar z-10 momentum-scroll" ref={scrollRef}>
+            <div className="flex flex-1 overflow-hidden relative">
+                {/* CHAT COLUMN */}
+                <div className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'flex' : 'hidden lg:flex'}`}>
+                    <div className="flex-1 overflow-y-auto p-2 md:p-4 space-y-3 md:space-y-6 relative custom-scrollbar z-10 momentum-scroll" ref={scrollRef}>
                         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
 
                         {messages.map((msg, idx) => {
                             const isUser = msg.role === 'user';
                             return (
                                 <div key={idx} className={`flex ${isUser ? 'justify-end' : 'justify-start'} relative z-10 animate-in slide-in-from-bottom-2 duration-300`}>
-                                    <div className={`max-w-[95%] sm:max-w-[90%] md:max-w-[80%] p-3 md:p-5 rounded-2xl shadow-lg backdrop-blur-sm ${isUser
+                                    <div className={`max-w-[95%] sm:max-w-[90%] md:max-w-[80%] p-2.5 md:p-5 rounded-2xl shadow-lg backdrop-blur-sm ${isUser
                                         ? 'bg-zinc-800/80 text-white rounded-tr-none border border-white/5'
                                         : 'bg-black/40 border border-white/10 text-zinc-200 rounded-tl-none'
                                         }`}>
@@ -227,7 +227,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agentId, initialMessage, o
                                             <span className="font-bold tracking-wider text-[9px] md:text-[10px]">{isUser ? 'YOU' : agent.name}</span>
                                             <span className="ml-auto text-[9px] md:text-[10px]">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
-                                        <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-light">{msg.text}</p>
+                                        <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed font-normal">{msg.text}</p>
                                     </div>
                                 </div>
                             );
@@ -269,58 +269,59 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agentId, initialMessage, o
                             </button>
                         </div>
                     </div>
-                </>
-            )}
-            {/* TAB CONTENT: TASKS */}
-            {activeTab === 'tasks' && (
-                <div className="flex-1 overflow-y-auto p-3 md:p-4 lg:p-8 bg-black/20 custom-scrollbar momentum-scroll">
-                    {tasks.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-zinc-600 opacity-50">
-                            <ListTodo size={48} className="md:hidden" strokeWidth={1} />
-                            <ListTodo size={64} className="hidden md:block" strokeWidth={1} />
-                            <p className="mt-4 font-mono text-xs md:text-sm uppercase tracking-widest text-center px-4">No Active Directives for {agent.name}</p>
-                            <p className="text-xs mt-2 text-center px-4">Assign tasks in the Tactical Roadmap.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3 md:space-y-4 max-w-2xl mx-auto">
-                            <div className="flex items-center justify-between mb-4 md:mb-6">
-                                <h3 className="text-xs md:text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                                    <AlertCircle size={14} className="md:hidden" />
-                                    <AlertCircle size={16} className={`hidden md:inline ${agent.color}`} /> <span className="hidden sm:inline">Pending Directives</span>
-                                </h3>
-                                <span className="text-xs font-mono text-zinc-500">{tasks.length} ACTIVE</span>
-                            </div>
-
-                            {tasks.map(task => (
-                                <div key={task.id} className="glass-card p-6 rounded-xl group hover:border-emerald-500/30 transition-all relative overflow-hidden">
-                                    <div className={`absolute top-0 left-0 w-1 h-full ${task.priority === 'high' ? 'bg-red-500' : task.priority === 'medium' ? 'bg-yellow-500' : 'bg-emerald-500'}`} />
-
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h4 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{task.title}</h4>
-                                        <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded bg-black/40 border border-white/10 ${task.priority === 'high' ? 'text-red-400' : 'text-zinc-400'}`}>
-                                            {task.priority} Priority
-                                        </span>
-                                    </div>
-
-                                    <p className="text-zinc-400 text-sm leading-relaxed mb-6 pr-12">{task.description}</p>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                                        <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono">
-                                            <Clock size={12} /> Est: {task.estimatedTime}
-                                        </div>
-                                        <button
-                                            onClick={() => handleCompleteTask(task.id)}
-                                            className="flex items-center gap-2 bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 text-zinc-400 px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all border border-white/5 hover:border-emerald-500/30"
-                                        >
-                                            <CheckCircle2 size={14} /> Mark Complete
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
-            )}
+
+                {/* TASKS COLUMN */}
+                <div className={`lg:w-80 xl:w-96 border-l border-white/5 bg-black/20 ${activeTab === 'tasks' ? 'flex flex-col flex-1' : 'hidden lg:flex flex-col'}`}>
+                    <div className="flex-1 overflow-y-auto p-3 md:p-4 lg:p-6 custom-scrollbar momentum-scroll">
+                        {tasks.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-zinc-600 opacity-50">
+                                <ListTodo size={48} className="md:hidden" strokeWidth={1} />
+                                <ListTodo size={64} className="hidden md:block" strokeWidth={1} />
+                                <p className="mt-4 font-mono text-xs md:text-sm uppercase tracking-widest text-center px-4">No Active Directives for {agent.name}</p>
+                                <p className="text-xs mt-2 text-center px-4">Assign tasks in the Tactical Roadmap.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3 md:space-y-4 max-w-2xl mx-auto">
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
+                                    <h3 className="text-xs md:text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                                        <AlertCircle size={14} className="md:hidden" />
+                                        <AlertCircle size={16} className={`hidden md:inline ${agent.color}`} /> <span className="hidden sm:inline">Pending Directives</span>
+                                    </h3>
+                                    <span className="text-xs font-mono text-zinc-500">{tasks.length} ACTIVE</span>
+                                </div>
+
+                                {tasks.map(task => (
+                                    <div key={task.id} className="glass-card p-4 md:p-6 rounded-xl group hover:border-emerald-500/30 transition-all relative overflow-hidden">
+                                        <div className={`absolute top-0 left-0 w-1 h-full ${task.priority === 'high' ? 'bg-red-500' : task.priority === 'medium' ? 'bg-yellow-500' : 'bg-emerald-500'}`} />
+
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h4 className="text-sm md:text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{task.title}</h4>
+                                            <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded bg-black/40 border border-white/10 ${task.priority === 'high' ? 'text-red-400' : 'text-zinc-400'}`}>
+                                                {task.priority}
+                                            </span>
+                                        </div>
+
+                                        <p className="text-zinc-400 text-xs md:text-sm leading-relaxed mb-4 pr-12">{task.description}</p>
+
+                                        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                            <div className="flex items-center gap-2 text-[10px] md:text-xs text-zinc-500 font-mono">
+                                                <Clock size={12} /> Est: {task.estimatedTime}
+                                            </div>
+                                            <button
+                                                onClick={() => handleCompleteTask(task.id)}
+                                                className="flex items-center gap-2 bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 text-zinc-400 px-3 py-1.5 md:px-4 md:py-2 rounded text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all border border-white/5 hover:border-emerald-500/30"
+                                            >
+                                                <CheckCircle2 size={14} /> Complete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

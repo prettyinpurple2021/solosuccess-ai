@@ -9,12 +9,12 @@ import { soundService } from '../services/soundService';
 export const TheIronclad: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'draft' | 'review'>('draft');
     const [disclaimerAgreed, setDisclaimerAgreed] = useState(false);
-    
+
     // Draft State
     const [docType, setDocType] = useState<LegalDocType>('NDA');
     const [docDetails, setDocDetails] = useState('');
     const [draftResult, setDraftResult] = useState<string | null>(null);
-    
+
     // Review State
     const [contractText, setContractText] = useState('');
     const [analysisResult, setAnalysisResult] = useState<LegalAnalysis | null>(null);
@@ -74,17 +74,17 @@ export const TheIronclad: React.FC = () => {
 
     if (!disclaimerAgreed) {
         return (
-            <div className="min-h-[85vh] flex flex-col items-center justify-center animate-in fade-in duration-500">
-                <div className="max-w-lg w-full bg-zinc-900 border-2 border-red-900/50 p-8 rounded-xl relative overflow-hidden shadow-2xl">
+            <div className="min-h-[85vh] flex flex-col items-center justify-center animate-in fade-in duration-500 p-4">
+                <div className="max-w-lg w-full bg-zinc-900 border-2 border-red-900/50 p-6 md:p-8 rounded-xl relative overflow-hidden shadow-2xl">
                     <div className="absolute inset-0 bg-red-950/10 pointer-events-none"></div>
                     <div className="relative z-10 flex flex-col items-center text-center">
                         <div className="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center text-red-500 mb-6 border border-red-900/50">
                             <Hand size={32} />
                         </div>
-                        
+
                         <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Compliance Gate</h2>
                         <p className="text-red-400 font-mono text-sm mb-6 uppercase tracking-widest">Legal Disclaimer Required</p>
-                        
+
                         <div className="bg-black border border-zinc-800 p-4 rounded-lg text-zinc-300 text-sm leading-relaxed text-left mb-8 font-mono">
                             <p className="mb-3">
                                 <strong className="text-white">SOLOSUCCESS AI IS NOT A LAW FIRM.</strong>
@@ -97,7 +97,7 @@ export const TheIronclad: React.FC = () => {
                             </p>
                         </div>
 
-                        <button 
+                        <button
                             onClick={handleAgree}
                             className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-bold uppercase tracking-widest rounded transition-all shadow-lg shadow-red-900/20"
                         >
@@ -112,7 +112,7 @@ export const TheIronclad: React.FC = () => {
     return (
         <div className="min-h-[85vh] flex flex-col animate-in fade-in duration-500">
             {/* Header */}
-             <div className="mb-6 flex items-end justify-between border-b border-zinc-800 pb-6">
+            <div className="mb-6 flex items-end justify-between border-b border-zinc-800 pb-6">
                 <div>
                     <div className="flex items-center gap-2 text-violet-400 font-mono text-xs font-bold uppercase tracking-widest mb-2">
                         <Scale size={14} /> Legal & Compliance
@@ -123,34 +123,34 @@ export const TheIronclad: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-8 border-b border-zinc-800">
-                <button 
+            <div className="flex gap-4 mb-8 border-b border-zinc-800 overflow-x-auto pb-1 scrollbar-hide">
+                <button
                     onClick={() => setActiveTab('draft')}
-                    className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'draft' ? 'border-violet-500 text-violet-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
+                    className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${activeTab === 'draft' ? 'border-violet-500 text-violet-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
                 >
                     <span className="flex items-center gap-2"><PenTool size={16} /> Drafter</span>
                 </button>
-                <button 
+                <button
                     onClick={() => setActiveTab('review')}
-                     className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 ${activeTab === 'review' ? 'border-violet-500 text-violet-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
+                    className={`pb-4 px-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${activeTab === 'review' ? 'border-violet-500 text-violet-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
                 >
                     <span className="flex items-center gap-2"><ShieldAlert size={16} /> Loophole Scanner</span>
                 </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-                
+
                 {/* Input Section */}
                 <div className="flex flex-col gap-4">
                     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex-1 flex flex-col">
-                        
+
                         {activeTab === 'draft' ? (
                             <>
                                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Document Configuration</h3>
                                 <div className="space-y-4 flex-1">
                                     <div>
                                         <label className="text-xs font-bold text-zinc-400 block mb-2">Document Type</label>
-                                        <select 
+                                        <select
                                             value={docType}
                                             onChange={(e) => setDocType(e.target.value as LegalDocType)}
                                             className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-violet-500"
@@ -164,7 +164,7 @@ export const TheIronclad: React.FC = () => {
                                     </div>
                                     <div className="flex-1 flex flex-col">
                                         <label className="text-xs font-bold text-zinc-400 block mb-2">Key Details (Parties, Dates, Jurisdiction)</label>
-                                        <textarea 
+                                        <textarea
                                             value={docDetails}
                                             onChange={(e) => setDocDetails(e.target.value)}
                                             className="w-full flex-1 bg-black border border-zinc-700 rounded p-4 text-sm text-white resize-none focus:border-violet-500"
@@ -172,7 +172,7 @@ export const TheIronclad: React.FC = () => {
                                         />
                                     </div>
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleDraft}
                                     disabled={loading || !docDetails.trim()}
                                     className="mt-6 w-full py-3 bg-violet-700 hover:bg-violet-600 text-white rounded font-bold uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-violet-900/20"
@@ -184,14 +184,14 @@ export const TheIronclad: React.FC = () => {
                             <>
                                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Contract Analysis</h3>
                                 <div className="flex-1 flex flex-col">
-                                    <textarea 
+                                    <textarea
                                         value={contractText}
                                         onChange={(e) => setContractText(e.target.value)}
                                         className="w-full flex-1 bg-black border border-zinc-700 rounded p-4 text-sm text-white resize-none focus:border-violet-500 font-mono"
                                         placeholder="Paste the full contract text here for analysis..."
                                     />
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleAnalyze}
                                     disabled={loading || !contractText.trim()}
                                     className="mt-6 w-full py-3 bg-red-900/50 hover:bg-red-900 text-red-200 border border-red-900 rounded font-bold uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2"
@@ -222,7 +222,7 @@ export const TheIronclad: React.FC = () => {
 
                     {activeTab === 'draft' && draftResult && (
                         <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
-                             <div className="flex justify-between items-center mb-4 border-b border-zinc-800 pb-4">
+                            <div className="flex justify-between items-center mb-4 border-b border-zinc-800 pb-4">
                                 <h3 className="font-bold text-white flex items-center gap-2"><CheckCircle2 className="text-emerald-500" size={18} /> Draft Ready</h3>
                                 <button onClick={() => copyToClipboard(draftResult)} className="text-xs font-bold text-zinc-500 hover:text-white flex items-center gap-2 uppercase">
                                     {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Copied' : 'Copy Text'}
