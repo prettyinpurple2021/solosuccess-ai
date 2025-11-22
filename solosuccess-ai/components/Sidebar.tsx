@@ -127,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }
     ];
 
-    const navItemClass = (isActive: boolean, colorClass: string = 'text-white') => `
+    const navItemClass = (isActive: boolean, colorClass: string = 'text-white', label: string) => `
     flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer group rounded-lg mr-2 relative overflow-hidden
     ${isActive
             ? `glass-subtle ${colorClass} shadow-lg border-l-2 border-${colorClass.split('-')[1]}-500`
@@ -264,7 +264,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                 <div
                                                     onClick={() => handleNavClick(() => { setCurrentView('chat'); setActiveAgent(activeAgent || AgentId.ROXY); })}
                                                     onMouseEnter={handleMouseEnter}
-                                                    className={navItemClass(isChatActive, item.colorClass)}
+                                                    aria-current={isChatActive ? 'page' : undefined}
+                                                    aria-label={item.label}
+                                                    className={navItemClass(isChatActive, item.colorClass, item.label)}
                                                 >
                                                     {item.icon}
                                                     <span>{item.label}</span>
@@ -290,7 +292,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                             key={item.id}
                                             onClick={() => handleNavClick(() => { setCurrentView(item.id); setActiveAgent(null); })}
                                             onMouseEnter={handleMouseEnter}
-                                            className={navItemClass(currentView === item.id, item.colorClass)}
+                                            aria-current={currentView === item.id ? 'page' : undefined}
+                                            aria-label={item.label}
+                                            className={navItemClass(currentView === item.id, item.colorClass, item.label)}
                                         >
                                             {item.icon}
                                             <span>{item.label}</span>
