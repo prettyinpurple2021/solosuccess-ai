@@ -1,31 +1,23 @@
-import { StackProvider, StackClientApp, useStackApp } from "@stackframe/stack";
-import { ReactNode, useEffect } from "react";
+import { StackProvider, StackClientApp } from "@stackframe/stack";
+import { ReactNode } from "react";
 
-// Initialize Stack Client App
-const stackClientApp = new StackClientApp({
-    projectId: (import.meta as any).env?.VITE_STACK_PROJECT_ID || "",
-    publishableClientKey: (import.meta as any).env?.VITE_STACK_PUBLISHABLE_CLIENT_KEY || "",
+// Create Stack Client App instance
+const stackApp = new StackClientApp({
+    projectId: import.meta.env.VITE_STACK_PROJECT_ID,
+    publishableClientKey: import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY,
 });
 
-function StackAppExposer({ children }: { children: ReactNode }) {
-    const app = useStackApp();
-
-    useEffect(() => {
-        // Expose Stack App globally for storageService to access user ID
-        (window as any).stackApp = app;
-    }, [app]);
-
-    return <>{children}</>;
+// Make stackApp globally accessible for storageService
+if (typeof window !== 'undefined') {
+    (window as any).stackApp = stackApp;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     return (
-        <StackProvider app={stackClientApp}>
-            <StackAppExposer>
-                {children}
-            </StackAppExposer>
+        <StackProvider app={stackApp}>
+            {children}
         </StackProvider>
     );
 }
 
-export { stackClientApp };
+export { stackApp };

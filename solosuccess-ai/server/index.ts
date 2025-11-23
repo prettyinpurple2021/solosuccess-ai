@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 3000;
 // Initialize Redis
 const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPST_REDIS_REST_TOKEN!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
 app.use(cors());

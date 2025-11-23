@@ -122,7 +122,6 @@ function App() {
 
   if (checkingBoot) return null;
 
-  // Boot flow happens AFTER authentication
   if (!isBooted) {
     return (
       <AuthGate>
