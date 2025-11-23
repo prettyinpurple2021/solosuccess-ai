@@ -1,44 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Zap, Shield, Target, Cpu, BarChart3, Users } from 'lucide-react';
+import { MarketingLayout } from './marketing/layout/MarketingLayout';
 
 export function LandingPage() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white selection:bg-emerald-500/30 overflow-hidden relative">
+        <MarketingLayout>
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[120px] animate-pulse-glow" />
                 <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-violet-500/5 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
             </div>
 
-            {/* Navbar */}
-            <nav className="relative z-10 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <span className="font-bold text-black text-lg">S</span>
-                    </div>
-                    <span className="font-bold text-xl tracking-tight">SOLO_SUCCESS<span className="text-emerald-400">_AI</span></span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
-                    >
-                        Log In
-                    </button>
-                    <button
-                        onClick={() => navigate('/signup')}
-                        className="px-4 py-2 text-sm font-medium bg-white text-black rounded-lg hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95"
-                    >
-                        Get Started
-                    </button>
-                </div>
-            </nav>
-
             {/* Hero Section */}
-            <main className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32">
+            <div className="max-w-7xl mx-auto px-6 pt-20 pb-32">
                 <div className="text-center max-w-4xl mx-auto space-y-8 animate-fade-in-up">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-emerald-400 mb-4">
                         <span className="relative flex h-2 w-2">
@@ -111,22 +88,8 @@ export function LandingPage() {
                         [Dashboard Interface Preview]
                     </div>
                 </div>
-            </main>
-
-            {/* Footer */}
-            <footer className="border-t border-white/5 bg-black/50 backdrop-blur-sm relative z-10">
-                <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="text-zinc-500 text-sm">
-                        © 2024 SoloSuccess AI. All rights reserved.
-                    </div>
-                    <div className="flex gap-6 text-sm text-zinc-400">
-                        <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                        <a href="#" className="hover:text-white transition-colors">Terms</a>
-                        <a href="#" className="hover:text-white transition-colors">Contact</a>
-                    </div>
-                </div>
-            </footer>
-        </div>
+            </div>
+        </MarketingLayout>
     );
 }
 

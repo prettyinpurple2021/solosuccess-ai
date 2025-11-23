@@ -12,11 +12,15 @@ I have successfully implemented the custom authentication system and the landing
 
 ### Frontend (`src/`)
 - **Landing Page**: Created `components/LandingPage.tsx` with a premium, responsive design featuring a hero section, features grid, and CTA.
+- **Marketing Pages**: Created `FeaturesPage`, `ContactPage`, `PricingPage`, `AboutPage`, `PrivacyPolicy`, and `TermsOfService` in `components/marketing/`.
+- **Layout**: Implemented reusable `MarketingLayout`, `Navbar`, and `Footer` components.
 - **Auth Pages**: Created `components/auth/Login.tsx` and `components/auth/Signup.tsx` with form validation and API integration.
 - **Routing**: 
     - Replaced `AuthProvider` with `BrowserRouter` in `index.tsx`.
     - Refactored `App.tsx` to define routes:
         - `/`: Landing Page
+        - `/features`, `/pricing`, `/about`, `/contact`: Marketing Pages
+        - `/privacy`, `/terms`: Legal Pages
         - `/login`: Login Page
         - `/signup`: Signup Page
         - `/app`: Dashboard (Protected)
@@ -34,13 +38,15 @@ npm run db:migrate
 
 ### 2. Frontend Verification
 1.  **Landing Page**: Open the root URL `/`. You should see the new Landing Page.
-2.  **Signup**: Click "Get Started" or "Start Building Free".
+2.  **Navigation**: Click on "Features", "Pricing", "About", "Contact" links in the navbar. Verify each page loads correctly and maintains the layout.
+3.  **Legal Pages**: Scroll to the footer and click "Privacy Policy" and "Terms of Service". Verify content exists.
+4.  **Signup**: Click "Get Started" or "Start Building Free".
     - Fill in email and password.
     - Submit. You should be redirected to `/app` (Dashboard).
-3.  **Login**: Log out (clear localStorage or use incognito) and try "Log In".
+5.  **Login**: Log out (clear localStorage or use incognito) and try "Log In".
     - Enter credentials.
     - Submit. You should be redirected to `/app`.
-4.  **Dashboard Access**: Try accessing `/app` directly without logging in. You should be redirected to `/login`.
+6.  **Dashboard Access**: Try accessing `/app` directly without logging in. You should be redirected to `/login`.
 
 ### 3. Backend Verification
 You can test the API endpoints using curl or Postman:

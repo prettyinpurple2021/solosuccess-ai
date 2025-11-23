@@ -42,6 +42,12 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LandingPage } from './components/LandingPage';
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
+import { FeaturesPage } from './components/marketing/FeaturesPage';
+import { ContactPage } from './components/marketing/ContactPage';
+import { PricingPage } from './components/marketing/PricingPage';
+import { AboutPage } from './components/marketing/AboutPage';
+import { PrivacyPolicy } from './components/marketing/PrivacyPolicy';
+import { TermsOfService } from './components/marketing/TermsOfService';
 
 
 function DashboardLayout() {
@@ -293,6 +299,12 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/features" element={<FeaturesPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/app/*" element={
