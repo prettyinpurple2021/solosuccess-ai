@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 
-export interface AuthRequest extends Request {
+export type AuthRequest = Omit<Request, 'userId'> & {
     userId?: string;
     userEmail?: string;
-}
+};
 
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
     // Get token from Authorization header or cookie

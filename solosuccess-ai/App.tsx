@@ -48,6 +48,8 @@ import { PricingPage } from './components/marketing/PricingPage';
 import { AboutPage } from './components/marketing/AboutPage';
 import { PrivacyPolicy } from './components/marketing/PrivacyPolicy';
 import { TermsOfService } from './components/marketing/TermsOfService';
+import { AdminLogin } from './components/admin/AdminLogin';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 
 function DashboardLayout() {
@@ -307,6 +309,16 @@ function App() {
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/app/admin/login" element={
+        <AuthGate>
+          <AdminLogin />
+        </AuthGate>
+      } />
+      <Route path="/app/admin/dashboard" element={
+        <AuthGate>
+          <AdminDashboard />
+        </AuthGate>
+      } />
       <Route path="/app/*" element={
         <AuthGate>
           <DashboardLayout />

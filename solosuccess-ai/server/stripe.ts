@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 
 // Initialize Stripe with secret key from environment
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2024-11-20.acacia',
+    apiVersion: '2025-11-17.clover',
 });
 
 // Price IDs for each tier (set these after creating products in Stripe dashboard)

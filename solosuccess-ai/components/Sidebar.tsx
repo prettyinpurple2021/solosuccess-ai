@@ -53,6 +53,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }));
     };
 
+    const [isAdmin, setIsAdmin] = useState(false);
+
     useEffect(() => {
         // Load initial progress
         const loadProgress = async () => {
@@ -60,6 +62,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             setProgress(p);
         };
         loadProgress();
+
+        const checkAdmin = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const res = await fetch('http://localhost:3000/api/user', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const user = await res.json();
+                if (user.role === 'admin') {
+                    setIsAdmin(true);
+                }
+            } catch (e) {
+                console.error('Failed to check admin status', e);
+            }
+        };
+        checkAdmin();
 
         const saved = localStorage.getItem('solo_business_context');
         if (saved) {
@@ -128,7 +148,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 { id: 'uplink', label: 'Voice Uplink', icon: <Mic size={18} className="text-red-500" />, colorClass: 'text-red-400' },
                 { id: 'academy', label: 'The Academy', icon: <GraduationCap size={18} className="text-white" />, colorClass: 'text-white' },
                 { id: 'sanctuary', label: 'The Sanctuary', icon: <Moon size={18} className="text-zinc-300" />, colorClass: 'text-zinc-200' },
-                { id: 'vault', label: 'The Vault', icon: <Archive size={18} />, colorClass: 'text-white' }
+                { id: 'vault', label: 'The Vault', icon: <Archive size={18} />, colorClass: 'text-white' },
+                ...(isAdmin ? [{ id: 'admin-dashboard', label: 'Admin Control', icon: <ShieldAlert size={18} className="text-emerald-500" />, colorClass: 'text-emerald-500' }] : [])
             ]
         }
     ];
@@ -306,7 +327,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     return (
                                         <div
                                             key={item.id}
-                                            onClick={() => handleNavClick(() => { setCurrentView(item.id); setActiveAgent(null); })}
+                                            onClick={() => handleNavClick(() => {
+                                                if (item.id === 'admin-dashboard') {
+                                                    window.location.href = '/app/admin/dashboard';
+                                                } else {
+                                                    setCurrentView(item.id);
+                                                    setActiveAgent(null);
+                                                }
+                                            })}
                                             onMouseEnter={handleMouseEnter}
                                             aria-current={currentView === item.id ? 'page' : undefined}
                                             aria-label={item.label}

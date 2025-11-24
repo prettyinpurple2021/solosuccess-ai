@@ -12,6 +12,8 @@ import { Redis } from '@upstash/redis';
 import bcrypt from 'bcryptjs';
 import { generateToken, verifyToken } from './utils/jwt';
 import { authMiddleware, AuthRequest } from './middleware/auth';
+import adminRouter from './routes/admin';
+import path from 'path';
 
 const app = express();
 const httpServer = createServer(app);
@@ -99,6 +101,8 @@ function broadcastToUser(userId: string, event: string, data: any) {
 }
 
 // --- Routes ---
+
+app.use('/api/admin', adminRouter);
 
 // Auth Routes
 app.post('/api/auth/signup', async (req, res) => {
@@ -604,6 +608,19 @@ app.post('/api/reports', async (req, res) => {
         res.status(500).json({ error: 'Failed to save report' });
     }
 });
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+    const distPath = path.join(__dirname, '../../dist');
+    app.use(express.static(distPath));
+
+    // Handle client-side routing
+    app.get('*', (req, res) => {
+        if (!req.path.startsWith('/api')) {
+            res.sendFile(path.join(distPath, 'index.html'));
+        }
+    });
+}
 
 httpServer.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

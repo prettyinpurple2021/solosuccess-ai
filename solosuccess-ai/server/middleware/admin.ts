@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import { db } from '../db';
-import { users } from '../db/schema';
+import { users, adminActions } from '../db/schema';
 import { eq } from 'drizzle-orm';
 
 // Extend Express Request to include user info
@@ -57,7 +57,7 @@ export async function verifyAdminPin(email: string, pin: string): Promise<boolea
             where: eq(users.email, email)
         });
 
-        if (!user || !user.admin PinHash) {
+        if (!user || !user.adminPinHash) {
             return false;
         }
 
