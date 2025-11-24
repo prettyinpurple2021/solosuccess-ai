@@ -55,13 +55,14 @@ export function FeaturesPage() {
                 <div className="mt-32 p-12 rounded-3xl bg-gradient-to-br from-emerald-900/20 to-cyan-900/20 border border-emerald-500/20 text-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-emerald-500/5 blur-3xl" />
                     <div className="relative z-10">
-                        <h2 className="text-3xl font-bold mb-4">Ready to Supercharge Your Workflow?</h2>
+                        <h2 className="text-3xl font-bold mb-4">Ready to Build Your Empire?</h2>
                         <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
-                            Join thousands of solopreneurs who are building faster and smarter with SoloSuccess AI.
+                            Join our beta cohort of ambitious solo founders building the future with AI.
                         </p>
                         <button className="px-8 py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/25">
-                            Get Started for Free
+                            Start Free Trial
                         </button>
+                        <p className="text-sm text-zinc-500 mt-4">14 days free · No credit card required</p>
                     </div>
                 </div>
             </div>

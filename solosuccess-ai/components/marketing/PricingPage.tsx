@@ -31,18 +31,20 @@ export function PricingPage() {
 
                     {/* Pro Plan */}
                     <PricingCard
-                        title="Pro"
-                        price="$29"
+                        title="Professional"
+                        price="$79"
                         period="/month"
-                        description="For serious solopreneurs ready to scale."
+                        description="For serious solopreneurs scaling their business."
                         isPopular
                         features={[
-                            "Advanced Strategic Roadmap",
-                            "Unlimited Projects",
-                            "Full AI Agent Access",
-                            "Competitor Tracking (5)",
-                            "Priority Support",
-                            "Financial Treasury"
+                            "Everything in Starter",
+                            "Unlimited AI Generations",
+                            "Unlimited Competitors",
+                            "3 Business Profiles",
+                            "Priority Support (24hr)",
+                            "Email Integration (Coming Soon)",
+                            "Cash Flow Forecasting",
+                            "Custom Branding"
                         ]}
                     />
 
@@ -104,8 +106,8 @@ function PricingCard({ title, price, period, description, features, isPopular }:
             </div>
 
             <button className={`w-full py-3 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] ${isPopular
-                    ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/25'
-                    : 'bg-white text-black hover:bg-zinc-200'
+                ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/25'
+                : 'bg-white text-black hover:bg-zinc-200'
                 }`}>
                 Choose {title}
             </button>

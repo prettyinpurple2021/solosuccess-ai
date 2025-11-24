@@ -223,11 +223,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, setIsOpe
                                     <span className={`text-sm font-medium ${cmd.colorClass || ''} ${index === selectedIndex ? 'text-white' : ''}`}>
                                         {cmd.label}
                                     </span>
-                                    {index === selectedIndex && (
-                                        <span className="ml-2 text-[10px] text-zinc-500 uppercase tracking-widest font-bold">
-                                            // {cmd.category}
-                                        </span>
-                                    )}
                                 </div>
 
                                 {index === selectedIndex && (

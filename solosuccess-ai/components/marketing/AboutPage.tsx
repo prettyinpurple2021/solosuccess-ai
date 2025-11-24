@@ -26,6 +26,14 @@ export function AboutPage() {
                             We set out to build an operating system that leverages the latest advancements in Artificial Intelligence to bridge this gap. Our mission is to democratize business success by giving solopreneurs access to the same strategic intelligence and execution power as large corporations.
                         </p>
 
+                        <div className="my-8 p-6 rounded-xl bg-emerald-900/20 border border-emerald-500/20">
+                            <p className="text-emerald-400 font-semibold mb-2">We're in Beta</p>
+                            <p className="text-sm text-zinc-300">
+                                Currently building with our founding cohort of solo founders. Every feature you see is production-ready and actively used.
+                                Your feedback shapes the future of this platform.
+                            </p>
+                        </div>
+
                         <h2 className="text-2xl font-bold text-white mt-12 mb-6">Our Values</h2>
 
                         <div className="grid gap-8">
