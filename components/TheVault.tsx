@@ -5,6 +5,13 @@ import { CompetitorReport, SavedWarRoomSession, PitchDeck, CreativeAsset, SavedC
 import { soundService } from '../services/soundService';
 import { generateCompetitorMarkdown, generateWarRoomMarkdown, downloadMarkdown } from '../services/exportService';
 
+
+// Only allow certain data:image mime types as safe src
+function isSafeBase64ImageSrc(src: string): boolean {
+    // allow data:image/png, data:image/jpeg, data:image/jpg, data:image/gif, data:image/webp, data:image/svg+xml only
+    return /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,/.test(src);
+}
+
 type VaultTab = 'all' | 'intel' | 'strategy' | 'visuals' | 'decks' | 'code';
 
 export const TheVault: React.FC = () => {
@@ -224,7 +231,13 @@ export const TheVault: React.FC = () => {
                             {/* Image Preview for Visuals */}
                             {item._type === 'image' && viewMode === 'grid' && (
                                 <div className="aspect-video w-full bg-black mb-4 rounded overflow-hidden border border-zinc-800">
-                                    <img src={item.imageBase64} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="asset" />
+                                    {isSafeBase64ImageSrc(item.imageBase64) ? (
+                                        <img src={item.imageBase64} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="asset" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-zinc-500 bg-zinc-800">
+                                            Invalid image source
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
