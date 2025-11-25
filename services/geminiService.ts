@@ -7,7 +7,8 @@ import { apiService } from "./apiService";
 
 // PRODUCTION CONFIGURATION
 // Set VITE_USE_BACKEND_PROXY=true in .env.local to use the secure backend proxy
-const USE_BACKEND_PROXY = (import.meta as any).env?.VITE_USE_BACKEND_PROXY === 'true';
+// Default to true unless explicitly disabled
+const USE_BACKEND_PROXY = (import.meta as any).env?.VITE_USE_BACKEND_PROXY !== 'false';
 const apiKey = (process as any).env?.API_KEY || '';
 
 if (USE_BACKEND_PROXY) {

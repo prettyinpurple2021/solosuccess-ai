@@ -44,7 +44,7 @@ export function Signup() {
             localStorage.setItem('user', JSON.stringify(data.user));
 
             // Redirect
-            window.location.href = '/'; // Force reload to update auth state
+            window.location.href = '/app/dashboard'; // Force reload to update auth state
         } catch (err: any) {
             setError(err.message);
         } finally {

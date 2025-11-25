@@ -128,9 +128,9 @@ app.post('/api/auth/signup', async (req: Request, res: Response) => {
         const token = generateToken(String(newUser[0].id), email);
 
         res.json({ token, user: newUser[0] });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Signup error:', error);
-        res.status(500).json({ error: 'Signup failed' });
+        res.status(500).json({ error: `Signup failed: ${error.message}` });
     }
 });
 
@@ -210,6 +210,15 @@ app.post('/api/generate', async (req: Request, res: Response) => {
         console.error("Generation error:", error);
         res.status(500).json({ error: 'Generation failed' });
     }
+});
+
+// Root route for developer convenience
+app.get('/', (req: Request, res: Response) => {
+    res.send(`
+        <h1>SoloSuccess AI Backend is Running 🚀</h1>
+        <p>You are currently accessing the backend API server.</p>
+        <p>Please visit the frontend application at: <a href="${process.env.CLIENT_URL || 'http://localhost:3001'}">${process.env.CLIENT_URL || 'http://localhost:3001'}</a></p>
+    `);
 });
 
 // Health Check
