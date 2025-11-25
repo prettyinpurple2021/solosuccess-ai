@@ -14,6 +14,7 @@ import { generateToken, verifyToken } from './utils/jwt';
 import { authMiddleware, AuthRequest } from './middleware/auth';
 import adminRouter from './routes/admin';
 import path from 'path';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 const httpServer = createServer(app);
@@ -623,8 +624,16 @@ if (process.env.NODE_ENV === 'production') {
     const distPath = path.join(__dirname, '../../dist');
     app.use(express.static(distPath));
 
+    // Rate limiter for index.html (client-side routing)
+    const clientRouteLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // limit each IP to 100 requests per windowMs
+        standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+        legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    });
+    
     // Handle client-side routing
-    app.get('*', (req: Request, res: Response) => {
+    app.get('*', clientRouteLimiter, (req: Request, res: Response) => {
         if (!req.path.startsWith('/api')) {
             res.sendFile(path.join(distPath, 'index.html'));
         }
