@@ -13,6 +13,8 @@ import bcrypt from 'bcryptjs';
 import { generateToken, verifyToken } from './utils/jwt';
 import { authMiddleware, AuthRequest } from './middleware/auth';
 import adminRouter from './routes/admin';
+import contactsRouter from './routes/contacts';
+import pitchDecksRouter from './routes/pitchDecks';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
 
@@ -106,6 +108,8 @@ function broadcastToUser(userId: string, event: string, data: any) {
 // --- Routes ---
 
 app.use('/api/admin', adminRouter);
+app.use('/api/contacts', contactsRouter);
+app.use('/api/pitch-decks', pitchDecksRouter);
 
 // Auth Routes
 app.post('/api/auth/signup', async (req: Request, res: Response) => {
@@ -633,7 +637,7 @@ if (process.env.NODE_ENV === 'production') {
         standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
         legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     });
-    
+
     // Handle client-side routing
     app.get('*', clientRouteLimiter, (req: Request, res: Response) => {
         if (!req.path.startsWith('/api')) {

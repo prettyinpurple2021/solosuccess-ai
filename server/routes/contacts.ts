@@ -1,0 +1,160 @@
+import express, { Request, Response } from 'express';
+import { db } from '../db';
+import { contacts } from '../db/schema';
+import { eq, and, desc } from 'drizzle-orm';
+import { authMiddleware, AuthRequest } from '../middleware/auth';
+import { checkSuspended } from '../middleware/checkSuspended';
+
+const router = express.Router();
+
+// Apply auth and suspension check to all routes
+router.use(authMiddleware as any);
+router.use(checkSuspended as any);
+
+// Get all contacts for authenticated user
+router.get('/', async (req: Request, res: Response) => {
+    try {
+        const userId = ((req as unknown) as AuthRequest).userId;
+
+        const userContacts = await db.select()
+            .from(contacts)
+            .where(eq(contacts.userId, Number(userId)))
+            .orderBy(desc(contacts.updatedAt));
+
+        res.json(userContacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ error: 'Failed to fetch contacts' });
+    }
+});
+
+// Get single contact by ID
+router.get('/:id', async (req: Request, res: Response) => {
+    try {
+        const userId = ((req as unknown) as AuthRequest).userId;
+        const contactId = Number(req.params.id);
+
+        const contact = await db.select()
+            .from(contacts)
+            .where(and(
+                eq(contacts.id, contactId),
+                eq(contacts.userId, Number(userId))
+            ))
+            .limit(1);
+
+        if (!contact.length) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+
+        res.json(contact[0]);
+    } catch (error) {
+        console.error('Error fetching contact:', error);
+        res.status(500).json({ error: 'Failed to fetch contact' });
+    }
+});
+
+// Create new contact
+router.post('/', async (req: Request, res: Response) => {
+    try {
+        const userId = ((req as unknown) as AuthRequest).userId;
+        const { name, email, company, role, notes, linkedinUrl, tags, lastContact, relationship } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ error: 'Name is required' });
+        }
+
+        const [newContact] = await db.insert(contacts)
+            .values({
+                userId: Number(userId),
+                name,
+                email,
+                company,
+                role,
+                notes,
+                linkedinUrl,
+                tags,
+                lastContact: lastContact ? new Date(lastContact) : null,
+                relationship
+            })
+            .returning();
+
+        res.status(201).json(newContact);
+    } catch (error) {
+        console.error('Error creating contact:', error);
+        res.status(500).json({ error: 'Failed to create contact' });
+    }
+});
+
+// Update contact
+router.put('/:id', async (req: Request, res: Response) => {
+    try {
+        const userId = ((req as unknown) as AuthRequest).userId;
+        const contactId = Number(req.params.id);
+        const { name, email, company, role, notes, linkedinUrl, tags, lastContact, relationship } = req.body;
+
+        // Verify ownership
+        const existing = await db.select()
+            .from(contacts)
+            .where(and(
+                eq(contacts.id, contactId),
+                eq(contacts.userId, Number(userId))
+            ))
+            .limit(1);
+
+        if (!existing.length) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+
+        const [updated] = await db.update(contacts)
+            .set({
+                name,
+                email,
+                company,
+                role,
+                notes,
+                linkedinUrl,
+                tags,
+                lastContact: lastContact ? new Date(lastContact) : null,
+                relationship,
+                updatedAt: new Date()
+            })
+            .where(eq(contacts.id, contactId))
+            .returning();
+
+        res.json(updated);
+    } catch (error) {
+        console.error('Error updating contact:', error);
+        res.status(500).json({ error: 'Failed to update contact' });
+    }
+});
+
+// Delete contact
+router.delete('/:id', async (req: Request, res: Response) => {
+    try {
+        const userId = ((req as unknown) as AuthRequest).userId;
+        const contactId = Number(req.params.id);
+
+        // Verify ownership before deleting
+        const existing = await db.select()
+            .from(contacts)
+            .where(and(
+                eq(contacts.id, contactId),
+                eq(contacts.userId, Number(userId))
+            ))
+            .limit(1);
+
+        if (!existing.length) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+
+        await db.delete(contacts)
+            .where(eq(contacts.id, contactId));
+
+        res.json({ success: true, message: 'Contact deleted' });
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        res.status(500).json({ error: 'Failed to delete contact' });
+    }
+});
+
+export default router;

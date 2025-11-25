@@ -30,8 +30,8 @@ export const TheBoardroom: React.FC = () => {
         const tasks = await storageService.getTasks();
         const reports = await storageService.getCompetitorReports();
 
-        // Network still on localStorage for now
-        const contacts = JSON.parse(localStorage.getItem('solo_network') || '[]');
+        // Get contacts from backend/storage
+        const contacts = await storageService.getContacts();
 
         // Default fallbacks if data missing
         if (!financials.currentCash) financials.currentCash = 0;

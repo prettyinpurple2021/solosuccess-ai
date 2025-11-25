@@ -30,8 +30,13 @@ export function AdminLogin() {
                 throw new Error(data.error || 'Verification failed');
             }
 
-            // Store admin session token or flag if needed
-            // For now, just navigate to dashboard
+            // Store admin session token
+            if (data.adminToken) {
+                sessionStorage.setItem('admin_session', data.adminToken);
+                sessionStorage.setItem('admin_session_expires',
+                    String(Date.now() + (2 * 60 * 60 * 1000))); // 2 hours
+            }
+
             navigate('/app/admin/dashboard');
         } catch (err: any) {
             setError(err.message);

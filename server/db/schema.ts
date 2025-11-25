@@ -14,6 +14,9 @@ export const users = pgTable('users', {
     xp: integer('xp').default(0),
     level: integer('level').default(1),
     totalActions: integer('total_actions').default(0),
+    suspended: boolean('suspended').default(false),
+    suspendedAt: timestamp('suspended_at'),
+    suspendedReason: text('suspended_reason'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -169,4 +172,37 @@ export const dailyIntelligence = pgTable('daily_intelligence', {
     insights: jsonb('insights'), // Array of insight objects
     motivationalMessage: text('motivational_message'),
     generatedAt: timestamp('generated_at').defaultNow(),
+});
+
+// ========================================
+// CONTACTS (NETWORK)
+// ========================================
+
+export const contacts = pgTable('contacts', {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    email: text('email'),
+    company: text('company'),
+    role: text('role'),
+    notes: text('notes'),
+    linkedinUrl: text('linkedin_url'),
+    tags: text('tags').array(),
+    lastContact: timestamp('last_contact'),
+    relationship: text('relationship'), // 'hot' | 'warm' | 'cold' | 'partner' | 'investor'
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// ========================================
+// PITCH DECKS
+// ========================================
+
+export const pitchDecks = pgTable('pitch_decks', {
+    id: text('id').primaryKey(),
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    slides: jsonb('slides').notNull(), // Array of slide objects
+    generatedAt: timestamp('generated_at').notNull(),
+    updatedAt: timestamp('updated_at').defaultNow(),
 });

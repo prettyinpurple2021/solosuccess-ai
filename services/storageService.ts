@@ -252,22 +252,13 @@ export const storageService = {
         return this.getCompetitorReports();
     },
 
-    // --- Pitch Decks (localStorage only for now) ---
+    // --- Pitch Decks ---
     async getPitchDecks(): Promise<PitchDeck[]> {
-        await delay();
-        return get<PitchDeck[]>(KEYS.PITCH_DECKS, []);
+        return apiCall<PitchDeck[]>('GET', '/api/pitch-decks', null, KEYS.PITCH_DECKS, []);
     },
 
     async savePitchDeck(deck: PitchDeck): Promise<void> {
-        const decks = await this.getPitchDecks();
-        const index = decks.findIndex(d => d.id === deck.id);
-        if (index >= 0) {
-            decks[index] = deck;
-        } else {
-            decks.unshift(deck);
-        }
-        await delay();
-        set(KEYS.PITCH_DECKS, decks);
+        await apiCall('POST', '/api/pitch-decks', deck, KEYS.PITCH_DECKS);
     },
 
     // --- Creative Assets ---
@@ -285,20 +276,15 @@ export const storageService = {
 
     // --- Contacts ---
     async getContacts(): Promise<Contact[]> {
-        await delay();
-        return get<Contact[]>(KEYS.CONTACTS, []);
+        return apiCall<Contact[]>('GET', '/api/contacts', null, KEYS.CONTACTS, []);
     },
 
     async saveContact(contact: Contact): Promise<void> {
-        const contacts = await this.getContacts();
-        const index = contacts.findIndex(c => c.id === contact.id);
-        if (index >= 0) {
-            contacts[index] = contact;
+        if (contact.id) {
+            await apiCall('PUT', `/api/contacts/${contact.id}`, contact, KEYS.CONTACTS);
         } else {
-            contacts.push(contact);
+            await apiCall('POST', '/api/contacts', contact, KEYS.CONTACTS);
         }
-        await delay();
-        set(KEYS.CONTACTS, contacts);
     },
 
     // --- Launch Strategies ---
