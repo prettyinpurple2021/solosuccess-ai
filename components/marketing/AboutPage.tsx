@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { MarketingLayout } from './layout/MarketingLayout';
 
 export function AboutPage() {
