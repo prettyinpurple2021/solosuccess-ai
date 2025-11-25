@@ -14,7 +14,8 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
         founderName: '',
         companyName: '',
         industry: '',
-        description: ''
+        description: '',
+        goals: []
     });
     const [activeField, setActiveField] = useState<keyof BusinessContext>('founderName');
 
@@ -49,6 +50,7 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
         else if (activeField === 'companyName') setActiveField('industry');
         else if (activeField === 'industry') setActiveField('description');
         else {
+            await storageService.saveContext(formData);
             setStep(2); // Success animation
             setTimeout(onComplete, 2000);
         }
@@ -109,7 +111,7 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
                         <input
                             autoFocus
                             type="text"
-                            value={formData[activeField]}
+                            value={formData[activeField] as string}
                             onChange={(e) => setFormData({ ...formData, [activeField]: e.target.value })}
                             onKeyDown={handleKeyDown}
                             className="w-full bg-transparent border-b-2 border-zinc-700 text-2xl md:text-4xl py-4 text-emerald-500 focus:border-emerald-500 focus:outline-none font-mono"

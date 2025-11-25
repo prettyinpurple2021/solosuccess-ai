@@ -129,7 +129,7 @@ export const storageService = {
     // --- User Progress ---
     async getUserProgress(): Promise<UserProgress> {
         const defaultProgress: UserProgress = {
-            level: 1, currentXP: 0, nextLevelXP: 100, rankTitle: 'Garage Hacker', totalActions: 0
+            level: 1, currentXP: 0, nextLevelXP: 100, rankTitle: 'Garage Hacker', totalActions: 0, achievements: []
         };
 
         try {
@@ -140,7 +140,8 @@ export const storageService = {
                 currentXP: user.xp || 0,
                 nextLevelXP: user.nextLevelXP || 100,
                 rankTitle: user.rankTitle || 'Garage Hacker',
-                totalActions: user.totalActions || 0
+                totalActions: user.totalActions || 0,
+                achievements: user.achievements || []
             };
         } catch (error) {
             return defaultProgress;
@@ -244,6 +245,11 @@ export const storageService = {
         const reports = await this.getCompetitorReports();
         reports.unshift(report);
         set(KEYS.REPORTS, reports);
+    },
+
+    // Alias for getCompetitorReports
+    async getCompetitors(): Promise<CompetitorReport[]> {
+        return this.getCompetitorReports();
     },
 
     // --- Pitch Decks (localStorage only for now) ---

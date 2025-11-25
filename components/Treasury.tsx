@@ -37,8 +37,9 @@ export const Treasury: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            storageService.saveContext(financials).catch(console.error);
+        const timeout = setTimeout(async () => {
+            const current = await storageService.getContext() || {} as any;
+            storageService.saveContext({ ...current, ...financials }).catch(console.error);
         }, 1000);
 
         calculateProjection();

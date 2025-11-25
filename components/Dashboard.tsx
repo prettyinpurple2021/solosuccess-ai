@@ -76,7 +76,7 @@ export const Dashboard: React.FC = () => {
             } catch (e) { console.error(e); }
 
             // Calc Stats
-            const active = tasks.filter((t) => t.status === 'in_progress').length;
+            const active = tasks.filter((t) => t.status === 'in-progress').length;
             const done = tasks.filter((t) => t.status === 'done').length;
             const total = tasks.length;
             const rate = total > 0 ? Math.round((done / total) * 100) : 0;

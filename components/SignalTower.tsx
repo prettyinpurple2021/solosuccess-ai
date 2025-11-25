@@ -9,14 +9,17 @@ export const SignalTower: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [briefing, setBriefing] = useState<string | null>(null);
     const [sources, setSources] = useState<any[]>([]);
+    const [industry, setIndustry] = useState('');
 
     const handleScan = async () => {
+        if (!industry.trim()) return;
+
         setLoading(true);
         setBriefing(null);
         setSources([]);
         soundService.playClick();
 
-        const result = await generateMarketPulse();
+        const result = await generateMarketPulse(industry);
         if (result) {
             setBriefing(result.content);
             setSources(result.sources);
@@ -46,12 +49,23 @@ export const SignalTower: React.FC = () => {
                 </div>
                 <button
                     onClick={handleScan}
-                    disabled={loading}
+                    disabled={loading || !industry.trim()}
                     className="flex items-center gap-2 px-6 py-3 bg-cyan-900/20 hover:bg-cyan-900/40 border border-cyan-500/50 text-cyan-400 rounded font-bold text-xs uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? <RefreshCw size={16} className="animate-spin" /> : <Search size={16} />}
                     {loading ? 'Scanning Frequencies...' : 'Scan Market'}
                 </button>
+            </div>
+
+            {/* Industry Input */}
+            <div className="mb-6">
+                <input
+                    type="text"
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    placeholder="ENTER TARGET INDUSTRY / TOPIC (e.g. SaaS AI, FinTech, BioTech)..."
+                    className="w-full bg-zinc-900/50 border border-zinc-800 text-white px-4 py-3 rounded focus:outline-none focus:border-cyan-500/50 font-mono text-sm placeholder:text-zinc-700"
+                />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">

@@ -25,7 +25,9 @@ export const TheStudio: React.FC = () => {
             prompt: prompt,
             style: selectedStyle.label,
             imageBase64: imageBase64,
-            createdAt: new Date().toISOString()
+            type: 'image',
+            content: prompt,
+            generatedAt: new Date().toISOString()
         };
 
         const savedRaw = localStorage.getItem('solo_creative_assets');

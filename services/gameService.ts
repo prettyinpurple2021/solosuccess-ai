@@ -1,8 +1,6 @@
 import { UserProgress, ToastMessage } from "../types";
 import { storageService } from "./storageService";
 
-
-
 const RANKS = [
     { level: 1, title: "Garage Hacker" },
     { level: 5, title: "Bootstrapped Believer" },
@@ -31,15 +29,8 @@ export const getRankTitle = (level: number) => {
 };
 
 export const getUserProgress = async (): Promise<UserProgress> => {
-
     const data = await storageService.getUserProgress();
-
-    // Recalculate derived values just in case (though storage usually has raw data)
-    // But here we are storing the full object in storageService for simplicity in the mock.
-    // Actually storageService.getUserProgress returns the full object with derived fields if we saved them.
-    // But let's stick to the logic: XP is the source of truth.
-
-    const level = getLevelFromXP(data.currentXP || 0); // Handle potential missing field if format changed
+    const level = getLevelFromXP(data.currentXP || 0);
     const nextLevelXP = getXPForLevel(level + 1);
 
     return {
@@ -47,7 +38,8 @@ export const getUserProgress = async (): Promise<UserProgress> => {
         currentXP: data.currentXP || 0,
         nextLevelXP,
         rankTitle: getRankTitle(level),
-        totalActions: data.totalActions || 0
+        totalActions: data.totalActions || 0,
+        achievements: data.achievements || []
     };
 };
 
@@ -67,7 +59,6 @@ export const addXP = async (amount: number): Promise<{ progress: UserProgress, l
         nextLevelXP: getXPForLevel(newLevel + 1)
     };
 
-
     await storageService.saveUserProgress(newData);
 
     return {
@@ -85,7 +76,7 @@ export const subscribeToToasts = (listener: ToastListener) => {
     return () => { listeners = listeners.filter(l => l !== listener); };
 };
 
-export const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' | 'xp' = 'info', xpAmount?: number) => {
+export const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' | 'xp' = 'info', xpAmount?: number, newProgress?: UserProgress) => {
     const toast: ToastMessage = {
         id: Math.random().toString(36).substr(2, 9),
         title,

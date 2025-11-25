@@ -87,9 +87,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             setCompanyName(ctx.companyName.toUpperCase().replace(/\s/g, '_'));
         }
 
-        return subscribeToToasts(async () => {
-            const p = await getUserProgress();
-            setProgress(p);
+        return subscribeToToasts(async (toast) => {
+            if (toast.newProgress) {
+                setProgress(toast.newProgress);
+            } else {
+                const p = await getUserProgress();
+                setProgress(p);
+            }
             soundService.playSuccess();
         });
     }, []);
@@ -294,54 +298,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             <div className={`space-y-0.5 overflow-hidden transition-all duration-300 ${collapsedCategories[cat.title] ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100'}`}>
                                 {cat.items.map(item => {
                                     if (item.id === 'chat') {
-                                        // Special Chat handling to show agents if active
-                                        const isChatActive = currentView === 'chat';
                                         return (
-                                            <div key={item.id}>
+                                            <div key={item.id} className="relative">
                                                 <div
-                                                    onClick={() => handleNavClick(() => { setCurrentView('chat'); setActiveAgent(activeAgent || AgentId.ROXY); })}
+                                                    onClick={() => handleNavClick(() => setCurrentView(item.id))}
                                                     onMouseEnter={handleMouseEnter}
-                                                    aria-current={isChatActive ? 'page' : undefined}
-                                                    aria-label={item.label}
-                                                    className={navItemClass(isChatActive, item.colorClass, item.label)}
+                                                    className={navItemClass(currentView === item.id, item.colorClass, item.label)}
                                                 >
-                                                    {item.icon}
-                                                    <span>{item.label}</span>
+                                                    <div className={`transition-colors duration-300 ${currentView === item.id ? item.colorClass : 'text-zinc-500 group-hover:text-white'}`}>
+                                                        {item.icon}
+                                                    </div>
+                                                    <span className="truncate">{item.label}</span>
                                                 </div>
-                                                {isChatActive && (
-                                                    <div className="ml-8 mt-1 space-y-1 border-l border-zinc-800 pl-2">
+                                                {/* Sub-menu for Agents */}
+                                                {currentView === 'chat' && (
+                                                    <div className="ml-9 mt-1 space-y-1 border-l border-white/10 pl-2 animate-fade-in">
                                                         {Object.values(AGENTS).map(agent => (
-                                                            <div
+                                                            <button
                                                                 key={agent.id}
-                                                                onClick={() => setActiveAgent(agent.id)}
-                                                                className={`text-xs px-2 py-1 rounded cursor-pointer transition-colors ${activeAgent === agent.id ? agent.color : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setActiveAgent(agent.id);
+                                                                    soundService.playClick();
+                                                                }}
+                                                                className={`
+                                                                    w-full text-left px-3 py-1.5 text-xs rounded-md transition-all flex items-center gap-2
+                                                                    ${activeAgent === agent.id ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}
+                                                                `}
                                                             >
+                                                                <div className={`w-1.5 h-1.5 rounded-full ${agent.color.replace('text-', 'bg-')}`} />
                                                                 {agent.name}
-                                                            </div>
+                                                            </button>
                                                         ))}
                                                     </div>
                                                 )}
                                             </div>
                                         );
                                     }
+
                                     return (
                                         <div
                                             key={item.id}
-                                            onClick={() => handleNavClick(() => {
-                                                if (item.id === 'admin-dashboard') {
-                                                    window.location.href = '/app/admin/dashboard';
-                                                } else {
-                                                    setCurrentView(item.id);
-                                                    setActiveAgent(null);
-                                                }
-                                            })}
+                                            onClick={() => handleNavClick(() => setCurrentView(item.id))}
                                             onMouseEnter={handleMouseEnter}
-                                            aria-current={currentView === item.id ? 'page' : undefined}
-                                            aria-label={item.label}
                                             className={navItemClass(currentView === item.id, item.colorClass, item.label)}
                                         >
-                                            {item.icon}
-                                            <span>{item.label}</span>
+                                            <div className={`transition-colors duration-300 ${currentView === item.id ? item.colorClass : 'text-zinc-500 group-hover:text-white'}`}>
+                                                {item.icon}
+                                            </div>
+                                            <span className="truncate">{item.label}</span>
                                         </div>
                                     );
                                 })}
@@ -350,24 +355,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     ))}
                 </div>
 
-                {/* Enhanced Footer */}
-                <div className="absolute bottom-0 left-0 w-full glass-strong border-t border-white/10 p-4 space-y-2 z-20">
-                    <button
-                        onClick={() => handleNavClick(() => { setCurrentView('settings'); setActiveAgent(null); })}
-                        onMouseEnter={handleMouseEnter}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover-lift group
-                  ${currentView === 'settings' ? 'glass-panel text-white border border-white/10' : 'text-zinc-500 hover:text-white hover:glass-subtle'}`}
-                    >
-                        <Settings size={14} className="group-hover:rotate-90 transition-transform duration-300" />
-                        <span>HQ Config</span>
-                    </button>
+                {/* Footer / User Profile */}
+                <div className="p-4 border-t border-white/5 shrink-0 bg-black/20">
                     <button
                         onClick={handleLogout}
-                        onMouseEnter={handleMouseEnter}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all uppercase group border border-transparent hover:border-red-500/20"
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-zinc-500 transition-all group"
                     >
-                        <Power size={14} className="group-hover:animate-pulse" />
-                        <span>Reboot System</span>
+                        <Power size={16} className="group-hover:rotate-90 transition-transform" />
+                        <span className="text-xs font-medium">System Reboot</span>
                     </button>
                 </div>
             </div>

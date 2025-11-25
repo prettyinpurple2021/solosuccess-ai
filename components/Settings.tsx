@@ -11,7 +11,8 @@ export const Settings: React.FC = () => {
         founderName: '',
         companyName: '',
         industry: '',
-        description: ''
+        description: '',
+        goals: []
     });
     const [saved, setSaved] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);

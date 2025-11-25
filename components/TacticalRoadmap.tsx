@@ -69,8 +69,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onMove, onDelete, onFocus }) 
                             <Circle size={12} />
                         </button>
                     )}
-                    {task.status !== 'in_progress' && (
-                        <button onClick={() => onMove(task.id, 'in_progress')} className="p-1.5 md:p-2 hover:bg-amber-500/20 rounded text-amber-400 transition-colors touch-target" title="Move to In Progress" aria-label="Move to in progress">
+                    {task.status !== 'in-progress' && (
+                        <button onClick={() => onMove(task.id, 'in-progress')} className="p-1.5 md:p-2 hover:bg-amber-500/20 rounded text-amber-400 transition-colors touch-target" title="Move to In Progress" aria-label="Move to in progress">
                             <PlayCircle size={12} />
                         </button>
                     )}
@@ -113,7 +113,7 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
     const handleGenerate = async () => {
         if (!goal.trim()) return;
         setLoading(true);
-        const generatedTasks = await generateTacticalPlan(goal);
+        const generatedTasks = await generateTacticalPlan([goal]);
         if (generatedTasks) {
             await storageService.saveTasks(generatedTasks);
             setTasks(prev => [...prev, ...generatedTasks]);
@@ -279,7 +279,7 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
             <div className="flex-1 overflow-x-auto overflow-y-auto md:overflow-y-hidden scrollbar-hide">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 h-auto md:h-full md:min-w-0">
                     <Column title="Pending Intel" status="todo" icon={<Circle size={14} className="text-zinc-500" />} />
-                    <Column title="Active Ops" status="in_progress" icon={<Loader2 size={14} className="text-amber-500 animate-spin-slow" />} />
+                    <Column title="Active Ops" status="in-progress" icon={<Loader2 size={14} className="text-amber-500 animate-spin-slow" />} />
                     <Column title="Mission Complete" status="done" icon={<CheckCircle2 size={14} className="text-emerald-500" />} />
                 </div>
             </div>

@@ -61,7 +61,7 @@ export const TheMainframe: React.FC = () => {
             ...codeResult,
             id: `code-${Date.now()}`,
             title: input.length > 30 ? input.substring(0, 30) + '...' : input,
-            generatedAt: new Date().toISOString()
+            timestamp: new Date().toISOString()
         };
 
         // Save to Vault
