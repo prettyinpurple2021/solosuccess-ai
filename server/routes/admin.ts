@@ -9,7 +9,7 @@ import { authMiddleware, AuthRequest } from '../middleware/auth';
 const router = express.Router();
 
 // Verify PIN endpoint (doesn't require admin role yet, used to elevate session)
-router.post('/verify-pin', async (req: Request, res: Response) => {
+router.post('/verify-pin', authMiddleware, async (req: Request, res: Response) => {
     try {
         const { pin } = req.body;
         const userEmail = ((req as unknown) as AuthRequest).userEmail;
