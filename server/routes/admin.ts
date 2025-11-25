@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { db } from '../db';
 import { users, subscriptions, adminActions, usageTracking } from '../db/schema';
 import { eq, desc, count, sql } from 'drizzle-orm';
@@ -6,9 +7,6 @@ import { requireAdmin, verifyAdminPin } from '../middleware/admin';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
-
-// Apply auth middleware to all admin routes
-router.use(authMiddleware as any);
 
 // Verify PIN endpoint (doesn't require admin role yet, used to elevate session)
 router.post('/verify-pin', async (req: Request, res: Response) => {
