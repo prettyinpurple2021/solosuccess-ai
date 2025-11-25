@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createServer } from 'http';
-import { Server as SocketServer } from 'socket.io';
+import { Server as SocketServer, Socket } from 'socket.io';
 import cors from 'cors';
 import { db } from './db';
 import { users, tasks, chatHistory, competitorReports, businessContext } from './db/schema';
@@ -81,7 +81,7 @@ async function invalidateCache(pattern: string): Promise<void> {
 }
 
 // WebSocket connection handling
-io.on('connection', (socket) => {
+io.on('connection', (socket: Socket) => {
     console.log('Client connected:', socket.id);
 
     // Join user-specific room
@@ -105,7 +105,7 @@ function broadcastToUser(userId: string, event: string, data: any) {
 app.use('/api/admin', adminRouter);
 
 // Auth Routes
-app.post('/api/auth/signup', async (req, res) => {
+app.post('/api/auth/signup', async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -134,7 +134,7 @@ app.post('/api/auth/signup', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -162,7 +162,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // AI Generation Proxy
-app.post('/api/generate', async (req, res) => {
+app.post('/api/generate', async (req: Request, res: Response) => {
     try {
         const { prompt, systemInstruction, model, history, temperature, maxOutputTokens } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
@@ -213,7 +213,7 @@ app.post('/api/generate', async (req, res) => {
 });
 
 // Health Check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (req: Request, res: Response) => {
     res.json({
         status: 'ok',
         db: process.env.DATABASE_URL ? 'configured' : 'missing_env',
@@ -223,7 +223,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // User Progress
-app.get('/api/user', async (req, res) => {
+app.get('/api/user', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -269,7 +269,7 @@ app.get('/api/user', async (req, res) => {
     }
 });
 
-app.post('/api/user/progress', async (req, res) => {
+app.post('/api/user/progress', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -304,7 +304,7 @@ app.post('/api/user/progress', async (req, res) => {
 });
 
 // Tasks with multi-user support
-app.get('/api/tasks', async (req, res) => {
+app.get('/api/tasks', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -329,7 +329,7 @@ app.get('/api/tasks', async (req, res) => {
     }
 });
 
-app.post('/api/tasks', async (req, res) => {
+app.post('/api/tasks', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -359,7 +359,7 @@ app.post('/api/tasks', async (req, res) => {
     }
 });
 
-app.post('/api/tasks/batch', async (req, res) => {
+app.post('/api/tasks/batch', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -393,7 +393,7 @@ app.post('/api/tasks/batch', async (req, res) => {
     }
 });
 
-app.delete('/api/tasks/:id', async (req, res) => {
+app.delete('/api/tasks/:id', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -414,7 +414,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/tasks', async (req, res) => {
+app.delete('/api/tasks', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -432,7 +432,7 @@ app.delete('/api/tasks', async (req, res) => {
 });
 
 // Chat History with multi-user
-app.get('/api/chat/:agentId', async (req, res) => {
+app.get('/api/chat/:agentId', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -462,7 +462,7 @@ app.get('/api/chat/:agentId', async (req, res) => {
     }
 });
 
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -497,7 +497,7 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // Business Context with multi-user
-app.get('/api/context', async (req, res) => {
+app.get('/api/context', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -522,7 +522,7 @@ app.get('/api/context', async (req, res) => {
     }
 });
 
-app.post('/api/context', async (req, res) => {
+app.post('/api/context', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -554,7 +554,7 @@ app.post('/api/context', async (req, res) => {
 });
 
 // Reports with multi-user
-app.get('/api/reports', async (req, res) => {
+app.get('/api/reports', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -571,7 +571,7 @@ app.get('/api/reports', async (req, res) => {
             .where(eq(competitorReports.userId, userId))
             .orderBy(desc(competitorReports.generatedAt));
 
-        const formatted = reports.map(r => ({
+        const formatted = reports.map((r: any) => ({
             ...r.data as object,
             id: r.id,
             generatedAt: r.generatedAt
@@ -584,7 +584,7 @@ app.get('/api/reports', async (req, res) => {
     }
 });
 
-app.post('/api/reports', async (req, res) => {
+app.post('/api/reports', async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         if (!userId) {
@@ -615,7 +615,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(distPath));
 
     // Handle client-side routing
-    app.get('*', (req, res) => {
+    app.get('*', (req: Request, res: Response) => {
         if (!req.path.startsWith('/api')) {
             res.sendFile(path.join(distPath, 'index.html'));
         }

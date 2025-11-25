@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { db } from '../db';
 import { users, subscriptions, adminActions, usageTracking } from '../db/schema';
 import { eq, desc, count, sql } from 'drizzle-orm';
@@ -11,7 +11,7 @@ const router = express.Router();
 router.use(authMiddleware as any);
 
 // Verify PIN endpoint (doesn't require admin role yet, used to elevate session)
-router.post('/verify-pin', async (req, res) => {
+router.post('/verify-pin', async (req: Request, res: Response) => {
     try {
         const { pin } = req.body;
         const userEmail = ((req as unknown) as AuthRequest).userEmail;
@@ -36,7 +36,7 @@ router.post('/verify-pin', async (req, res) => {
 router.use(requireAdmin as any);
 
 // Analytics Dashboard
-router.get('/analytics', async (req, res) => {
+router.get('/analytics', async (req: Request, res: Response) => {
     try {
         const [userCount] = await db.select({ count: count() }).from(users);
         const [subCount] = await db.select({ count: count() }).from(subscriptions);
@@ -44,7 +44,7 @@ router.get('/analytics', async (req, res) => {
         // Calculate MRR (simplified)
         const activeSubs = await db.select().from(subscriptions).where(eq(subscriptions.status, 'active'));
         let mrr = 0;
-        activeSubs.forEach(sub => {
+        activeSubs.forEach((sub: any) => {
             if (sub.tier === 'starter') mrr += 29;
             if (sub.tier === 'professional') mrr += 79;
             if (sub.tier === 'empire') mrr += 199;
@@ -62,7 +62,7 @@ router.get('/analytics', async (req, res) => {
 });
 
 // User Management
-router.get('/users', async (req, res) => {
+router.get('/users', async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;
         const limit = 20;
@@ -89,7 +89,7 @@ router.get('/users', async (req, res) => {
     }
 });
 
-router.get('/users/:userId', async (req, res) => {
+router.get('/users/:userId', async (req: Request, res: Response) => {
     try {
         const userId = Number(req.params.userId);
         const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
@@ -111,7 +111,7 @@ router.get('/users/:userId', async (req, res) => {
     }
 });
 
-router.post('/users/:userId/suspend', async (req, res) => {
+router.post('/users/:userId/suspend', async (req: Request, res: Response) => {
     try {
         const userId = Number(req.params.userId);
         // In a real app, we'd have a suspended flag or status
@@ -131,7 +131,7 @@ router.post('/users/:userId/suspend', async (req, res) => {
 });
 
 // System Health
-router.get('/system-health', async (req, res) => {
+router.get('/system-health', async (req: Request, res: Response) => {
     try {
         // Check DB connection
         const dbStart = Date.now();
