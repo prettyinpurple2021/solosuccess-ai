@@ -1,12 +1,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings as SettingsIcon, Save, AlertTriangle, RefreshCcw, Monitor, Database, Trash2, Download, Upload } from 'lucide-react';
+import { Settings as SettingsIcon, Save, AlertTriangle, RefreshCcw, Monitor, Database, Trash2, Download, Upload, CreditCard } from 'lucide-react';
 import { BusinessContext } from '../types';
 import { showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
 import { storageService } from '../services/storageService';
+import { apiService } from '../services/apiService';
+import { useUser } from '@stackframe/stack';
+import { useNavigate } from 'react-router-dom';
 
 export const Settings: React.FC = () => {
+    const user = useUser();
+    const navigate = useNavigate();
     const [context, setContext] = useState<BusinessContext>({
         founderName: '',
         companyName: '',
@@ -15,6 +20,7 @@ export const Settings: React.FC = () => {
         goals: []
     });
     const [saved, setSaved] = useState(false);
+    const [subscription, setSubscription] = useState<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -25,7 +31,19 @@ export const Settings: React.FC = () => {
             }
         };
         loadContext();
-    }, []);
+
+        const loadSubscription = async () => {
+            if (user) {
+                try {
+                    const sub = await apiService.get(`/stripe/subscription?userId=${user.id}`);
+                    setSubscription(sub);
+                } catch (error) {
+                    console.error('Failed to load subscription', error);
+                }
+            }
+        };
+        loadSubscription();
+    }, [user]);
 
     const handleSave = async () => {
         await storageService.saveContext(context);
@@ -93,6 +111,31 @@ export const Settings: React.FC = () => {
             </div>
 
             <div className="grid gap-8">
+
+                {/* Subscription Management */}
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+                    <div className="bg-zinc-950 p-4 border-b border-zinc-800 flex items-center gap-3">
+                        <CreditCard className="text-purple-500" size={18} />
+                        <h3 className="font-bold text-sm text-white uppercase tracking-widest">Subscription</h3>
+                    </div>
+                    <div className="p-6 flex items-center justify-between">
+                        <div>
+                            <div className="text-xs font-bold text-zinc-500 uppercase mb-1">Current Plan</div>
+                            <div className="text-2xl font-bold text-white capitalize">{subscription?.tier || 'Free'} Tier</div>
+                            {subscription?.currentPeriodEnd && (
+                                <div className="text-xs text-zinc-400 mt-1">
+                                    Renews: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                                </div>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => navigate('/pricing')}
+                            className="px-6 py-3 bg-white text-black font-bold rounded hover:bg-zinc-200 transition-colors uppercase text-xs tracking-wider"
+                        >
+                            Upgrade Plan
+                        </button>
+                    </div>
+                </div>
 
                 {/* Business Profile */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">

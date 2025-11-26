@@ -78,4 +78,24 @@ export const apiService = {
             throw error;
         }
     },
+    async get(endpoint: string): Promise<any> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Request failed');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API Service Error:', error);
+            throw error;
+        }
+    },
 };

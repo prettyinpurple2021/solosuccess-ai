@@ -48,6 +48,30 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
+// Get Subscription Status
+router.get('/subscription', async (req, res) => {
+    try {
+        const userId = req.headers['x-user-id'] || req.query.userId;
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const sub = await db.select().from(subscriptions)
+            .where(eq(subscriptions.userId, Number(userId)))
+            .limit(1);
+
+        if (!sub.length) {
+            return res.json({ tier: 'free', status: 'active' });
+        }
+
+        res.json(sub[0]);
+    } catch (error) {
+        console.error('Error fetching subscription:', error);
+        res.status(500).json({ error: 'Failed to fetch subscription' });
+    }
+});
+
 // Webhook Handler
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
