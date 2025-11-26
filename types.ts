@@ -323,3 +323,20 @@ export interface UserProgress {
     totalActions: number;
     achievements: string[];
 }
+
+export interface WarRoomEntry {
+    speaker: AgentId;
+    text: string;
+}
+
+export interface WarRoomResponse {
+    dialogue: WarRoomEntry[];
+    consensus: string;
+    actionPlan: string[];
+}
+
+export interface SavedWarRoomSession extends WarRoomResponse {
+    id: string;
+    topic: string;
+    timestamp: string;
+}
