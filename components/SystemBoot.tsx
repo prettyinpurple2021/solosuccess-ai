@@ -51,6 +51,7 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
         else if (activeField === 'industry') setActiveField('description');
         else {
             await storageService.saveContext(formData);
+            localStorage.setItem('solo_boot_completed', 'true');
             setStep(2); // Success animation
             setTimeout(onComplete, 2000);
         }

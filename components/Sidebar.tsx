@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, Eye, ShieldAlert, Swords, Flame, KanbanSquare, Power, Search, Command, Settings, Trophy, ChevronUp, NotebookPen, X, Menu, Coins, Radio, Palette, Presentation, BookTemplate, Archive, Terminal, GitBranch, Scale, Mic, Crown, Compass, Moon, Box, GraduationCap, Flag, Megaphone, Rocket, UserPlus } from 'lucide-react';
 import { AGENTS } from '../constants';
 import { AgentId, BusinessContext } from '../types';
@@ -23,6 +24,7 @@ type NavCategory = {
         label: string;
         icon: React.ReactNode;
         colorClass: string; // Text color class for active state or icon
+        onClick?: () => void;
     }[];
 };
 
@@ -36,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCloseMobile,
     onToggleScratchpad
 }) => {
+    const navigate = useNavigate();
     const [companyName, setCompanyName] = useState('SOLO_SUCCESS');
     const [progress, setProgress] = useState({
         level: 1,
@@ -153,7 +156,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 { id: 'academy', label: 'The Academy', icon: <GraduationCap size={18} className="text-white" />, colorClass: 'text-white' },
                 { id: 'sanctuary', label: 'The Sanctuary', icon: <Moon size={18} className="text-zinc-300" />, colorClass: 'text-zinc-200' },
                 { id: 'vault', label: 'The Vault', icon: <Archive size={18} />, colorClass: 'text-white' },
-                ...(isAdmin ? [{ id: 'admin-dashboard', label: 'Admin Control', icon: <ShieldAlert size={18} className="text-emerald-500" />, colorClass: 'text-emerald-500' }] : [])
+                ...(isAdmin ? [{
+                    id: 'admin-dashboard',
+                    label: 'Admin Control',
+                    icon: <ShieldAlert size={18} className="text-emerald-500" />,
+                    colorClass: 'text-emerald-500',
+                    onClick: () => navigate('/app/admin/login')
+                }] : [])
             ]
         }
     ];
@@ -339,7 +348,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     return (
                                         <div
                                             key={item.id}
-                                            onClick={() => handleNavClick(() => setCurrentView(item.id))}
+                                            onClick={() => handleNavClick(item.onClick || (() => setCurrentView(item.id)))}
                                             onMouseEnter={handleMouseEnter}
                                             className={navItemClass(currentView === item.id, item.colorClass, item.label)}
                                         >

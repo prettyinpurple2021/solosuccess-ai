@@ -21,7 +21,9 @@ export function AdminDashboard() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // Clear any admin session state if needed
+        // Clear admin session
+        sessionStorage.removeItem('admin_session');
+        sessionStorage.removeItem('admin_session_expires');
         navigate('/app');
     };
 
@@ -116,8 +118,8 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, labe
         <button
             onClick={onClick}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${active
-                    ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
         >
             {icon}
