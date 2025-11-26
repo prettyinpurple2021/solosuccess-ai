@@ -70,10 +70,24 @@ function DashboardLayout() {
 
   useEffect(() => {
     const checkBoot = async () => {
+      // Check if user has ever completed boot (persistent flag)
+      const bootCompleted = localStorage.getItem('solo_boot_completed');
+
+      if (bootCompleted === 'true') {
+        // User already did initial setup, skip boot
+        setIsBooted(true);
+        setCheckingBoot(false);
+        return;
+      }
+
+      // Check if they have context saved (migrating from old behavior)
       const context = await storageService.getContext();
       if (context) {
+        // Has context, mark as completed and skip boot
+        localStorage.setItem('solo_boot_completed', 'true');
         setIsBooted(true);
       }
+
       setCheckingBoot(false);
     };
     checkBoot();
