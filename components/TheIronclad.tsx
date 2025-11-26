@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Scale, FileText, ShieldAlert, CheckCircle2, PenTool, AlertTriangle, Loader2, Copy, Check, Hand } from 'lucide-react';
-import { draftLegalDoc, analyzeContract } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { LegalDocType, LegalAnalysis } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -33,7 +33,7 @@ export const TheIronclad: React.FC = () => {
         setDraftResult(null);
         soundService.playClick();
 
-        const result = await draftLegalDoc(docType, docDetails);
+        const result = await geminiService.draftLegalDoc(docType, docDetails);
         if (result) {
             setDraftResult(result);
 
@@ -51,7 +51,7 @@ export const TheIronclad: React.FC = () => {
         setAnalysisResult(null);
         soundService.playClick();
 
-        const result = await analyzeContract(contractText);
+        const result = await geminiService.analyzeContract(contractText);
         if (result) {
             setAnalysisResult(result);
             const { leveledUp } = await addXP(60);

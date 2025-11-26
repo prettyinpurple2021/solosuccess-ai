@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Rocket, Calendar, CheckCircle2, PlayCircle, Megaphone, Box, ArrowDown, Loader2, Trash2, Target } from 'lucide-react';
-import { generateLaunchStrategy } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { LaunchStrategy, Task, AgentId } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -30,7 +30,7 @@ export const TheLaunchpad: React.FC = () => {
         setDeployed(false);
         soundService.playClick();
 
-        const result = await generateLaunchStrategy(productName, launchDate);
+        const result = await geminiService.generateLaunchStrategy(productName, launchDate);
         if (result) {
             setStrategy(result);
             // Save to Vault

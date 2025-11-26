@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GraduationCap, MessageSquare, Play, Trophy, RefreshCw, User, Bot, ArrowRight, Swords, AlertTriangle } from 'lucide-react';
 import { RoleplayScenario, RoleplayTurn, RoleplayFeedback } from '../types';
-import { getRoleplayReply, evaluateRoleplaySession } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
 import { storageService } from '../services/storageService';
@@ -78,7 +78,7 @@ export const TheAcademy: React.FC = () => {
         setLoading(true);
         soundService.playClick();
 
-        const reply = await getRoleplayReply(activeScenario, newHistory, input);
+        const reply = await geminiService.getRoleplayReply(activeScenario, newHistory, input);
 
         setHistory([...newHistory, { role: 'opponent', text: reply }]);
         setLoading(false);
@@ -88,7 +88,7 @@ export const TheAcademy: React.FC = () => {
     const handleFinish = async () => {
         if (!activeScenario || history.length < 2) return;
         setLoading(true);
-        const result = await evaluateRoleplaySession(activeScenario, history);
+        const result = await geminiService.evaluateRoleplaySession(activeScenario, history);
         if (result) {
             setFeedback(result);
             await storageService.saveTrainingResult(result);

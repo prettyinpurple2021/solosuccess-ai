@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Flag, Users, Flame, Scroll, ArrowRight, Loader2, HeartHandshake, Save, Trash2 } from 'lucide-react';
-import { generateTribeBlueprint } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { TribeBlueprint } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -23,7 +23,7 @@ export const TheTribe: React.FC = () => {
         setLoading(true);
         soundService.playClick();
 
-        const result = await generateTribeBlueprint(audience, enemy);
+        const result = await geminiService.generateTribeBlueprint(audience, enemy);
         if (result) {
             setBlueprint(result);
             localStorage.setItem('solo_tribe_blueprint', JSON.stringify(result));

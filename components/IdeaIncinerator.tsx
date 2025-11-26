@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Flame, Hammer, Skull, Zap, ArrowRight, Copy, Check, Thermometer } from 'lucide-react';
-import { generateIncineratorFeedback } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { IncineratorResponse } from '../types';
 import { addXP, showToast } from '../services/gameService';
 
@@ -18,7 +18,7 @@ export const IdeaIncinerator: React.FC = () => {
         setLoading(true);
         setResult(null);
 
-        const response = await generateIncineratorFeedback(content, mode, brutality);
+        const response = await geminiService.generateIncineratorFeedback(content, mode, brutality.toString());
         setResult(response);
         setLoading(false);
 
@@ -161,14 +161,14 @@ export const IdeaIncinerator: React.FC = () => {
                                     <div className="text-right">
                                         <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Survival Score</p>
                                         <p className={`text-4xl font-black ${result.survivalScore > 80 ? 'text-emerald-500' :
-                                                result.survivalScore > 50 ? 'text-yellow-500' : 'text-red-500'
+                                            result.survivalScore > 50 ? 'text-yellow-500' : 'text-red-500'
                                             }`}>
                                             {result.survivalScore}
                                             <span className="text-sm text-zinc-600 font-medium">/100</span>
                                         </p>
                                     </div>
                                     <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center ${result.survivalScore > 80 ? 'border-emerald-900/50 bg-emerald-900/20' :
-                                            result.survivalScore > 50 ? 'border-yellow-900/50 bg-yellow-900/20' : 'border-red-900/50 bg-red-900/20'
+                                        result.survivalScore > 50 ? 'border-yellow-900/50 bg-yellow-900/20' : 'border-red-900/50 bg-red-900/20'
                                         }`}>
                                         {result.survivalScore > 80 ? <Check className="text-emerald-500" /> : <Skull className={result.survivalScore > 50 ? 'text-yellow-500' : 'text-red-500'} />}
                                     </div>

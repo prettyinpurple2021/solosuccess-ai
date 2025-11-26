@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Crosshair, Search, ShieldAlert, Target, Zap, AlertTriangle, Loader2, Eye, ArrowRight, Mail, X } from 'lucide-react';
-import { generateCompetitorReport } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { CompetitorReport, AgentId } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -35,7 +35,7 @@ export const CompetitorStalker: React.FC<CompetitorStalkerProps> = ({ onNavigate
         soundService.playClick();
 
         // Use LEXI (Insight Engine) for analysis
-        const result = await generateCompetitorReport(input, AgentId.LEXI);
+        const result = await geminiService.generateCompetitorReport(input, AgentId.LEXI);
 
         if (result) {
             setReport(result);

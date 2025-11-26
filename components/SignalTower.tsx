@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Radio, Globe, ExternalLink, RefreshCw, Zap, Search, Rss } from 'lucide-react';
-import { generateMarketPulse } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
 
@@ -19,7 +19,7 @@ export const SignalTower: React.FC = () => {
         setSources([]);
         soundService.playClick();
 
-        const result = await generateMarketPulse(industry);
+        const result = await geminiService.generateMarketPulse(industry);
         if (result) {
             setBriefing(result.content);
             setSources(result.sources);

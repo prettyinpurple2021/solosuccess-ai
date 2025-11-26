@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, Search, Mail, Handshake, Trash2, Briefcase, Crown, Megaphone, Star, User, X, Copy, Check, Loader2 } from 'lucide-react';
 import { Contact, ContactCategory, NegotiationPrep } from '../types';
-import { generateColdEmail, generateNegotiationPrep } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
 
@@ -77,7 +77,7 @@ export const TheNetwork: React.FC = () => {
         setNegPrep(null);
         soundService.playClick();
 
-        const email = await generateColdEmail(selectedContact);
+        const email = await geminiService.generateColdEmail(selectedContact);
         if (email) {
             setGeneratedEmail(email);
             const { leveledUp } = await addXP(30);
@@ -95,7 +95,7 @@ export const TheNetwork: React.FC = () => {
         setNegPrep(null);
         soundService.playClick();
 
-        const prep = await generateNegotiationPrep(selectedContact);
+        const prep = await geminiService.generateNegotiationPrep(selectedContact);
         if (prep) {
             setNegPrep(prep);
             const { leveledUp } = await addXP(50);

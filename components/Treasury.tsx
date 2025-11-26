@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Coins, TrendingUp, TrendingDown, DollarSign, Calculator, AlertTriangle, Lightbulb, Loader2 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
 import { FinancialContext, FinancialAudit } from '../types';
-import { generateFinancialAudit } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
 import { storageService } from '../services/storageService';
@@ -81,7 +81,7 @@ export const Treasury: React.FC = () => {
         setAudit(null);
         soundService.playClick();
 
-        const result = await generateFinancialAudit(financials);
+        const result = await geminiService.conductFinancialAudit(financials);
         if (result) {
             setAudit(result);
             const { leveledUp } = await addXP(75);

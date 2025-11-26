@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserPlus, Users, FileText, CheckCircle2, AlertTriangle, Copy, Check, Loader2, Briefcase, ListTodo, Ear } from 'lucide-react';
-import { generateJobDescription, generateInterviewGuide, generateSOP } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { JobDescription, InterviewGuide, SOP } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -31,7 +31,7 @@ export const TheScout: React.FC = () => {
         setLoading(true);
         setJd(null);
         soundService.playClick();
-        const result = await generateJobDescription(roleTitle, employmentType);
+        const result = await geminiService.generateJobDescription(roleTitle, employmentType);
         if (result) {
             setJd(result);
 
@@ -50,7 +50,7 @@ export const TheScout: React.FC = () => {
         setLoading(true);
         setGuide(null);
         soundService.playClick();
-        const result = await generateInterviewGuide(vetRole, vetFocus);
+        const result = await geminiService.generateInterviewGuide(vetRole, vetFocus);
         if (result) {
             setGuide(result);
             addXP(40);
@@ -65,7 +65,7 @@ export const TheScout: React.FC = () => {
         setLoading(true);
         setSop(null);
         soundService.playClick();
-        const result = await generateSOP(taskName);
+        const result = await geminiService.generateSOP(taskName);
         if (result) {
             setSop(result);
             addXP(50);

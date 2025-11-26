@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Swords, Send, Terminal, CheckCircle2, Target, Loader2, ArrowRight, KanbanSquare, Save, History, Archive, Trash2, Clock, Download } from 'lucide-react';
 import { AGENTS } from '../constants';
-import { generateWarRoomDebate } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { WarRoomEntry, WarRoomResponse, AgentId, Task, SavedWarRoomSession } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { downloadMarkdown, generateWarRoomMarkdown } from '../services/exportService';
@@ -92,7 +92,7 @@ export const WarRoom: React.FC = () => {
         setJustSaved(false);
         soundService.playClick();
 
-        const response = await generateWarRoomDebate(topic);
+        const response = await geminiService.generateWarRoomDebate(topic);
 
         if (response) {
             setFullResponse(response);

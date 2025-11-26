@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Paintbrush, Image as ImageIcon, Loader2, Download, Sparkles, Palette, Layers, Save } from 'lucide-react';
-import { generateBrandImage } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
 import { CreativeAsset } from '../types';
@@ -42,7 +42,7 @@ export const TheStudio: React.FC = () => {
         setGeneratedImage(null);
         soundService.playClick();
 
-        const result = await generateBrandImage(prompt, selectedStyle.desc);
+        const result = await geminiService.generateBrandImage(prompt, selectedStyle.desc);
 
         if (result) {
             setGeneratedImage(result);

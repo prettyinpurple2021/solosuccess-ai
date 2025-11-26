@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Crown, Briefcase, Loader2, CheckCircle2, TrendingUp, AlertOctagon, FileText } from 'lucide-react';
-import { generateBoardMeetingReport } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { BoardMeetingReport, AgentId } from '../types';
 import { AGENTS } from '../constants';
 import { addXP, showToast } from '../services/gameService';
@@ -36,7 +36,7 @@ export const TheBoardroom: React.FC = () => {
         // Default fallbacks if data missing
         if (!financials.currentCash) financials.currentCash = 0;
 
-        const result = await generateBoardMeetingReport(financials, tasks, reports, contacts);
+        const result = await geminiService.generateBoardReport(financials, tasks, reports, contacts);
 
         if (result) {
             setReport(result);

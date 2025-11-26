@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun, CloudRain, Zap, Wind, Fingerprint, ArrowRight, Sparkles } from 'lucide-react';
-import { generateStoicCoaching } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { MentalCoaching } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -20,7 +20,7 @@ export const TheSanctuary: React.FC = () => {
         setCoaching(null);
         soundService.playClick();
 
-        const result = await generateStoicCoaching({
+        const result = await geminiService.generateStoicCoaching({
             mood,
             stressLevel: stress,
             primaryBlocker: blocker

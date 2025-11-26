@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Clock, CheckCircle2, Circle, AlertCircle, Calendar, ArrowRight, Loader2, Trash2, PlayCircle, Zap, Target } from 'lucide-react';
-import { generateTacticalPlan } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { Task, TaskStatus, AgentId } from '../types';
 import { AGENTS } from '../constants';
 import { addXP, showToast } from '../services/gameService';
@@ -113,7 +113,7 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
     const handleGenerate = async () => {
         if (!goal.trim()) return;
         setLoading(true);
-        const generatedTasks = await generateTacticalPlan([goal]);
+        const generatedTasks = await geminiService.generateTacticalPlan([goal]);
         if (generatedTasks) {
             await storageService.saveTasks(generatedTasks);
             setTasks(prev => [...prev, ...generatedTasks]);

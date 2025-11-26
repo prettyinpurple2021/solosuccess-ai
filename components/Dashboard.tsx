@@ -4,7 +4,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { TrendingUp, Users, ShieldAlert, Activity, ArrowUpRight, Zap, Eye, CheckCircle2, CalendarClock, ArrowRight, FileText, X, Quote } from 'lucide-react';
 import { AGENTS } from '../constants';
 import { AgentId, DailyBriefing, Task } from '../types';
-import { generateDailyBriefing } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { storageService } from '../services/storageService';
 
 interface StatCardProps {
@@ -166,7 +166,7 @@ export const Dashboard: React.FC = () => {
     const handleGenerateBriefing = async () => {
         setLoadingBriefing(true);
         setBriefing(null);
-        const data = await generateDailyBriefing();
+        const data = await geminiService.generateDailyBriefing();
         if (data) {
             setBriefing(data);
             setShowBriefingModal(true);

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Network, Info, MessageSquare, ListTodo, CheckCircle2, Clock, AlertCircle, Trash2, RefreshCcw } from 'lucide-react';
 import { AgentId, ChatMessage, Task } from '../types';
 import { AGENTS } from '../constants';
-import { getAgentResponse } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { soundService } from '../services/soundService';
 import { storageService } from '../services/storageService';
 import { addXP, showToast } from '../services/gameService';
@@ -123,7 +123,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ agentId, initialMessage, o
 
         const history = messages.map(m => ({ role: m.role, text: m.text }));
 
-        const responseText = await getAgentResponse(agentId, history, userMsg.text);
+        const responseText = await geminiService.getAgentResponse(agentId, history, userMsg.text);
 
         soundService.playTyping(); // Effect for received message
         const botMsg: ChatMessage = { role: 'model', text: responseText, timestamp: Date.now() };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Terminal, Code, Cpu, Bug, CheckCircle2, AlertTriangle, Copy, Check, Loader2, Save } from 'lucide-react';
-import { generateTechAudit, generateCodeSolution } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { TechStackAudit, CodeSnippet, SavedCodeSnippet } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -23,7 +23,7 @@ export const TheMainframe: React.FC = () => {
 
         if (activeTab === 'audit') {
             setAuditResult(null);
-            const result = await generateTechAudit(input);
+            const result = await geminiService.conductTechAudit(input);
             if (result) {
                 setAuditResult(result);
                 const { leveledUp } = await addXP(75);
@@ -33,7 +33,7 @@ export const TheMainframe: React.FC = () => {
             }
         } else {
             setCodeResult(null);
-            const result = await generateCodeSolution(input);
+            const result = await geminiService.generateCodeSolution(input);
             if (result) {
                 setCodeResult(result);
                 const { leveledUp } = await addXP(60);

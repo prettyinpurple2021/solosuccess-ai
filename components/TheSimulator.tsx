@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Spline, GitBranch, AlertTriangle, ThumbsUp, ArrowRight, Activity, Loader2, Crosshair } from 'lucide-react';
-import { runSimulation } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { SimulationResult, ScenarioOutcome } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -18,7 +18,7 @@ export const TheSimulator: React.FC = () => {
         setResult(null);
         soundService.playClick();
 
-        const sim = await runSimulation(scenario);
+        const sim = await geminiService.runSimulation(scenario);
         if (sim) {
             setResult(sim);
 

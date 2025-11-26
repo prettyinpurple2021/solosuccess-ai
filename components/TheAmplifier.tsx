@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Megaphone, Repeat, Twitter, Linkedin, Video, Mail, Copy, Check, Loader2, FileText, Map, Lightbulb, Target, Hash } from 'lucide-react';
-import { generateAmplifiedContent, generateSocialStrategy } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { ContentAmplification, SocialStrategy } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -36,7 +36,7 @@ export const TheAmplifier: React.FC = () => {
         setResult(null);
         soundService.playClick();
 
-        const data = await generateAmplifiedContent(source);
+        const data = await geminiService.generateAmplifiedContent(source);
         if (data) {
             setResult(data);
 
@@ -68,7 +68,7 @@ export const TheAmplifier: React.FC = () => {
         setStrategy(null);
         soundService.playClick();
 
-        const result = await generateSocialStrategy();
+        const result = await geminiService.generateSocialStrategy();
         if (result) {
             setStrategy(result);
             localStorage.setItem('solo_social_strategy', JSON.stringify(result));

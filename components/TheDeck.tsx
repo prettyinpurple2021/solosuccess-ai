@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Presentation, RefreshCcw, Download, Layout, ChevronRight, ChevronLeft, FileText, MonitorPlay, Save } from 'lucide-react';
-import { generatePitchDeck } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { PitchDeck, Slide } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -21,7 +21,7 @@ export const TheDeck: React.FC = () => {
     const handleGenerate = async () => {
         setLoading(true);
         soundService.playClick();
-        const result = await generatePitchDeck();
+        const result = await geminiService.generatePitchDeck();
         if (result) {
             // Assign ID
             result.id = `deck-${Date.now()}`;

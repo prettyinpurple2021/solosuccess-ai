@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Plus, FileCode, CheckCircle2, ArrowRight, Loader2, Database, Layers, Save, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { generateProductSpec } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
 import { ProductSpec, Task, AgentId } from '../types';
 import { addXP, showToast } from '../services/gameService';
 import { soundService } from '../services/soundService';
@@ -32,7 +32,7 @@ export const TheArchitect: React.FC = () => {
         setActiveSpec(null);
         soundService.playClick();
 
-        const result = await generateProductSpec(idea);
+        const result = await geminiService.generateProductSpec(idea);
         if (result) {
             const newSpecs = [result, ...specs];
             saveSpecs(newSpecs);
