@@ -35,6 +35,7 @@ import { TheAmplifier } from './components/TheAmplifier';
 import { TheLaunchpad } from './components/TheLaunchpad';
 import { TheScout } from './components/TheScout';
 import { AuthGate } from './components/AuthGate';
+import { KeyboardShortcutsOverlay } from './components/KeyboardShortcutsOverlay';
 import { AgentId, Task } from './types';
 import { Menu, NotebookPen } from 'lucide-react'
 import { useSwipe } from './hooks/useSwipe';
@@ -60,6 +61,7 @@ function DashboardLayout() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isScratchpadOpen, setIsScratchpadOpen] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Focus Mode State
@@ -121,6 +123,19 @@ function DashboardLayout() {
   const handleBootComplete = () => {
     setIsBooted(true);
   };
+
+  // Keyboard shortcuts overlay
+  React.useEffect(() => {
+    const handleShortcutKey = (e: KeyboardEvent) => {
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        setShowShortcuts(true);
+      }
+    };
+    window.addEventListener('keydown', handleShortcutKey);
+    return () => window.removeEventListener('keydown', handleShortcutKey);
+  }, []);
+
 
   const handleSendFromScratchpad = (text: string) => {
     if (activeAgent) {
@@ -307,6 +322,10 @@ function DashboardLayout() {
           </div>
         </div>
       </main>
+
+      {showShortcuts && (
+        <KeyboardShortcutsOverlay onClose={() => setShowShortcuts(false)} />
+      )}
     </div>
   );
 }
@@ -345,6 +364,7 @@ function App() {
       } />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+
   );
 }
 
