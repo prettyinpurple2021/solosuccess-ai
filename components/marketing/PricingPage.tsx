@@ -1,8 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MarketingLayout } from './layout/MarketingLayout';
-import { Check, X } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
+import { useUser } from '@stackframe/stack';
+import { apiService } from '../../services/apiService';
 
 export function PricingPage() {
+    const user = useUser();
+    const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+    const handleUpgrade = async (tier: string, priceId: string) => {
+        if (!user) {
+            // Redirect to login if not logged in
+            window.location.href = '/sign-in';
+            return;
+        }
+
+        if (!priceId) {
+            console.error('Price ID missing for tier:', tier);
+            return;
+        }
+
+        try {
+            setLoadingTier(tier);
+            const response = await apiService.post('/stripe/create-checkout-session', {
+                priceId,
+                userId: user.id
+            });
+
+            if (response.url) {
+                window.location.href = response.url;
+            }
+        } catch (error) {
+            console.error('Upgrade failed:', error);
+            alert('Failed to start checkout. Please try again.');
+        } finally {
+            setLoadingTier(null);
+        }
+    };
+
+    const PRICE_IDS = {
+        solo: import.meta.env.VITE_STRIPE_SOLO_PRICE_ID,
+        pro: import.meta.env.VITE_STRIPE_PRO_PRICE_ID,
+        agency: import.meta.env.VITE_STRIPE_AGENCY_PRICE_ID,
+    };
+
     return (
         <MarketingLayout>
             <div className="max-w-7xl mx-auto px-6 py-20">
@@ -28,6 +69,8 @@ export function PricingPage() {
                             "View-Only Advanced Tools",
                             "Community Support"
                         ]}
+                        buttonText="Current Plan"
+                        disabled
                     />
 
                     {/* Solo Plan */}
@@ -45,6 +88,8 @@ export function PricingPage() {
                             "50 Research Credits",
                             "Full Tool Access"
                         ]}
+                        onUpgrade={() => handleUpgrade('solo', PRICE_IDS.solo)}
+                        isLoading={loadingTier === 'solo'}
                     />
 
                     {/* Pro Plan */}
@@ -61,6 +106,8 @@ export function PricingPage() {
                             "200 Research Credits",
                             "Priority Support"
                         ]}
+                        onUpgrade={() => handleUpgrade('pro', PRICE_IDS.pro)}
+                        isLoading={loadingTier === 'pro'}
                     />
 
                     {/* Agency Plan */}
@@ -77,6 +124,8 @@ export function PricingPage() {
                             "1000 Research Credits",
                             "API Access"
                         ]}
+                        onUpgrade={() => handleUpgrade('agency', PRICE_IDS.agency)}
+                        isLoading={loadingTier === 'agency'}
                     />
                 </div>
             </div>
@@ -84,13 +133,17 @@ export function PricingPage() {
     );
 }
 
-function PricingCard({ title, price, period, description, features, isPopular }: {
+function PricingCard({ title, price, period, description, features, isPopular, onUpgrade, isLoading, disabled, buttonText }: {
     title: string,
     price: string,
     period?: string,
     description: string,
     features: string[],
-    isPopular?: boolean
+    isPopular?: boolean,
+    onUpgrade?: () => void,
+    isLoading?: boolean,
+    disabled?: boolean,
+    buttonText?: string
 }) {
     return (
         <div className={`relative p-6 rounded-2xl border ${isPopular ? 'bg-white/10 border-emerald-500 shadow-2xl shadow-emerald-500/20' : 'bg-white/5 border-white/10'} flex flex-col`}>
@@ -120,13 +173,20 @@ function PricingCard({ title, price, period, description, features, isPopular }:
                 ))}
             </div>
 
-            <button className={`w-full py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${isPopular
-                ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/25'
-                : 'bg-white text-black hover:bg-zinc-200'
-                }`}>
-                Choose {title}
+            <button
+                onClick={onUpgrade}
+                disabled={disabled || isLoading}
+                className={`w-full py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${disabled
+                        ? 'bg-white/5 text-zinc-500 cursor-not-allowed'
+                        : isPopular
+                            ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98]'
+                            : 'bg-white text-black hover:bg-zinc-200 hover:scale-[1.02] active:scale-[0.98]'
+                    }`}
+            >
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (buttonText || `Choose ${title}`)}
             </button>
         </div>
     );
 }
+
 
