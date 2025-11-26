@@ -21,7 +21,7 @@ export interface ChatMessage {
     timestamp?: number;
 }
 
-export type TaskStatus = 'todo' | 'in-progress' | 'done';
+export type TaskStatus = 'backlog' | 'todo' | 'in-progress' | 'done';
 
 export interface Task {
     id: string;
@@ -31,8 +31,10 @@ export interface Task {
     status: TaskStatus;
     priority: 'low' | 'medium' | 'high';
     estimatedTime: string;
-    createdAt: string;
-    rewrittenContent: string;
+    createdAt?: string;
+    completedAt?: string;
+    rewrittenContent?: string; // For Idea Incinerator tasks
+    timestamp?: number;
 }
 
 // THE SIGNAL TOWER (DAILY BRIEFING)
@@ -99,21 +101,6 @@ export interface NegotiationPrep {
 // THE MATRIX (TECH STACK)
 export interface TechStackAudit {
     score: number;
-    verdict: string;
-    pros: string[];
-    cons: string[];
-    recommendations: string[];
-}
-
-export interface CodeSnippet {
-    language: string;
-    code: string;
-    explanation: string;
-}
-
-export interface SavedCodeSnippet extends CodeSnippet {
-    id: string;
-    title: string;
     timestamp: string;
 }
 
@@ -239,102 +226,92 @@ export interface RoleplayFeedback {
 // THE TRIBE (COMMUNITY)
 export interface CommunityManifesto {
     title: string;
-    enemy: string; // The "Anti-Persona" or status quo
-    belief: string; // The core belief
-    tagline: string;
-}
-
-export interface CommunityRitual {
-    name: string;
-    frequency: 'Daily' | 'Weekly' | 'Monthly' | 'Onboarding';
-    description: string;
-    action: string;
+    values: string[];
+    missionStatement: string;
+    rituals: string[];
 }
 
 export interface TribeBlueprint {
-    manifesto: CommunityManifesto;
-    rituals: CommunityRitual[];
-    engagementLoops: string[];
     id: string;
+    targetAudience: string;
+    platform: string;
+    manifesto: CommunityManifesto;
+    growthTactics: string[];
     generatedAt: string;
 }
 
-// THE AMPLIFIER (CONTENT REPURPOSING)
+// THE AMPLIFIER (MARKETING)
 export interface ContentAmplification {
     id: string;
-    sourceTitle: string;
-    twitterThread: string[]; // Array of tweets
-    linkedinPost: string;
-    tiktokScript: string; // Visual + Audio direction
-    newsletterSection: string;
+    originalContent: string;
+    channels: {
+        twitter: string;
+        linkedin: string;
+        newsletter: string;
+    };
+    viralHooks: string[];
     generatedAt: string;
 }
 
-export interface SocialStrategy {
+// THE SYSTEM (SOPs)
+export interface SOP {
     id: string;
-    pillars: { title: string; description: string; }[];
-    cadence: string;
-    personaTactics: { persona: string; tactic: string; }[];
-    sampleHooks: string[];
-    generatedAt: string;
-}
-
-// THE LAUNCHPAD (GTM)
-export interface LaunchEvent {
-    day: string; // e.g. "T-Minus 7"
     title: string;
-    description: string;
-    owner: AgentId;
-    channel: string;
-}
-
-export interface LaunchStrategy {
-    id: string;
-    productName: string;
-    launchDate: string;
-    phases: {
-        name: string; // Pre-Launch, Liftoff, Orbit
-        events: LaunchEvent[];
-    }[];
+    trigger: string;
+    steps: string[];
+    tools: string[];
     generatedAt: string;
 }
 
-// THE SCOUT (HR & DELEGATION)
+// THE RECRUITER (HR)
 export interface JobDescription {
     id: string;
     roleTitle: string;
-    hook: string;
     responsibilities: string[];
     requirements: string[];
-    perks: string[];
+    cultureFit: string;
     generatedAt: string;
-}
-
-export interface InterviewQuestion {
-    question: string;
-    whatToLookFor: string; // The "Green Flag"
-    redFlag: string;
 }
 
 export interface InterviewGuide {
     id: string;
     roleTitle: string;
-    questions: InterviewQuestion[];
+    questions: string[];
+    founderName: string;
+    industry: string;
+    description: string;
+    brandDna?: BrandDNA;
+    updatedAt: string;
+}
+
+export interface BrandDNA {
+    voice: string;
+    values: string[];
+    aesthetic: string;
+    mission: string;
+}
+
+export interface CompetitorReport {
+    id: string;
+    competitorName: string;
+    url: string;
+    strengths: string[];
+    weaknesses: string[];
+    pricingModel: string;
+    marketingChannels: string[];
+    threatLevel: 'Low' | 'Medium' | 'High' | 'Critical';
     generatedAt: string;
 }
 
-export interface SOPStep {
-    step: number;
-    action: string;
-    details: string;
-}
-
-export interface SOP {
+export interface LaunchStrategy {
     id: string;
-    taskName: string;
-    goal: string;
-    steps: SOPStep[];
-    successCriteria: string;
+    productName: string;
+    phases: {
+        name: string;
+        duration: string;
+        actions: string[];
+    }[];
+    channels: string[];
     generatedAt: string;
 }
 
@@ -345,58 +322,4 @@ export interface UserProgress {
     rankTitle: string;
     totalActions: number;
     achievements: string[];
-}
-
-export interface CreativeAsset {
-    id: string;
-    type: 'image' | 'copy' | 'video_script';
-    content: string;
-    prompt: string;
-    style?: string;
-    imageBase64?: string;
-    generatedAt: string;
-}
-
-export enum Type {
-    STRING = "STRING",
-    NUMBER = "NUMBER",
-    INTEGER = "INTEGER",
-    BOOLEAN = "BOOLEAN",
-    ARRAY = "ARRAY",
-    OBJECT = "OBJECT"
-}
-
-export interface ToastMessage {
-    id: string;
-    type: 'success' | 'error' | 'info' | 'xp';
-    title: string;
-    message: string;
-    xpAmount?: number;
-    newProgress?: UserProgress;
-}
-
-export interface MarketPulse {
-    content: string;
-    sources: { title: string; url: string }[];
-}
-
-// COMPETITOR STALKER (INTELLIGENCE)
-export interface CompetitorMetrics {
-    innovation: number;
-    marketPresence: number;
-    ux: number;
-    pricing: number;
-    velocity: number;
-}
-
-export interface CompetitorReport {
-    id: string;
-    competitorName: string;
-    threatLevel: 'CRITICAL' | 'High' | 'Medium' | 'Low';
-    missionBrief: string;
-    vulnerabilities: string[];
-    strengths: string[];
-    intel: string[];
-    metrics: CompetitorMetrics;
-    generatedAt: string;
 }

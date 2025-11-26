@@ -12,6 +12,14 @@ export const TheArchitect: React.FC = () => {
     const [activeSpec, setActiveSpec] = useState<ProductSpec | null>(null);
     const [loading, setLoading] = useState(false);
     const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
+    const [selectedFeatures, setSelectedFeatures] = useState<number[]>([]);
+
+    useEffect(() => {
+        if (activeSpec) {
+            // Select all by default when loading a spec
+            setSelectedFeatures(activeSpec.features.map((_, i) => i));
+        }
+    }, [activeSpec]);
 
     useEffect(() => {
         const loadSpecs = async () => {
@@ -62,15 +70,23 @@ export const TheArchitect: React.FC = () => {
     const handleDeployToRoadmap = async (spec: ProductSpec) => {
         const currentTasks = await storageService.getTasks();
 
-        const newTasks: Task[] = spec.features.map((feat, i) => ({
-            id: `task-spec-${spec.id}-${i}`,
+        const featuresToDeploy = spec.features.filter((_, i) => selectedFeatures.includes(i));
+
+        if (featuresToDeploy.length === 0) {
+            showToast("NO FEATURES SELECTED", "Please select at least one feature to deploy.", "error");
+            return;
+        }
+
+        const newTasks: Task[] = featuresToDeploy.map((feat, i) => ({
+            id: `task-spec-${spec.id}-${Date.now()}-${i}`,
             title: `Build: ${feat.name}`,
             description: `User Story: ${feat.userStory}\n\nAcceptance Criteria:\n${feat.acceptanceCriteria.join('\n')}\n\nTech Notes: ${feat.techNotes}`,
             assignee: AgentId.GLITCH, // Default to Tech
-            status: 'todo',
+            status: 'backlog', // Default to Backlog to avoid clutter
             priority: 'medium',
             estimatedTime: '4h',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            rewrittenContent: ''
         }));
 
         const updatedTasks = [...currentTasks, ...newTasks];
@@ -174,7 +190,7 @@ export const TheArchitect: React.FC = () => {
                                     onClick={() => handleDeployToRoadmap(activeSpec)}
                                     className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold uppercase tracking-wider transition-all"
                                 >
-                                    <CheckCircle2 size={14} /> Deploy Tasks
+                                    <CheckCircle2 size={14} /> Deploy {selectedFeatures.length} Tasks
                                 </button>
                             </div>
 
@@ -184,35 +200,51 @@ export const TheArchitect: React.FC = () => {
                                     <Layers size={14} /> Functional Requirements
                                 </h3>
                                 {activeSpec.features.map((feat, i) => (
-                                    <div key={i} className="border border-zinc-800 rounded-lg bg-zinc-900/30 overflow-hidden">
-                                        <button
-                                            onClick={() => setExpandedFeature(expandedFeature === i ? null : i)}
-                                            className="w-full flex items-center justify-between p-4 hover:bg-zinc-900 transition-colors text-left"
-                                        >
-                                            <div className="font-bold text-zinc-200 text-sm">{feat.name}</div>
-                                            {expandedFeature === i ? <ChevronUp size={16} className="text-zinc-500" /> : <ChevronDown size={16} className="text-zinc-500" />}
-                                        </button>
+                                    <div key={i} className="flex gap-3 items-start">
+                                        <div className="pt-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedFeatures.includes(i)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedFeatures([...selectedFeatures, i]);
+                                                    } else {
+                                                        setSelectedFeatures(selectedFeatures.filter(f => f !== i));
+                                                    }
+                                                }}
+                                                className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-blue-600 focus:ring-blue-500 focus:ring-offset-zinc-900"
+                                            />
+                                        </div>
+                                        <div className="flex-1 border border-zinc-800 rounded-lg bg-zinc-900/30 overflow-hidden">
+                                            <button
+                                                onClick={() => setExpandedFeature(expandedFeature === i ? null : i)}
+                                                className="w-full flex items-center justify-between p-4 hover:bg-zinc-900 transition-colors text-left"
+                                            >
+                                                <div className="font-bold text-zinc-200 text-sm">{feat.name}</div>
+                                                {expandedFeature === i ? <ChevronUp size={16} className="text-zinc-500" /> : <ChevronDown size={16} className="text-zinc-500" />}
+                                            </button>
 
-                                        {expandedFeature === i && (
-                                            <div className="p-4 border-t border-zinc-800 bg-black/20 space-y-4">
-                                                <div>
-                                                    <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">User Story</span>
-                                                    <p className="text-sm text-zinc-300 italic">"{feat.userStory}"</p>
+                                            {expandedFeature === i && (
+                                                <div className="p-4 border-t border-zinc-800 bg-black/20 space-y-4">
+                                                    <div>
+                                                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">User Story</span>
+                                                        <p className="text-sm text-zinc-300 italic">"{feat.userStory}"</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Acceptance Criteria</span>
+                                                        <ul className="list-disc list-inside text-sm text-zinc-400 space-y-1">
+                                                            {feat.acceptanceCriteria.map((ac, idx) => (
+                                                                <li key={idx}>{ac}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div className="bg-zinc-900 p-3 rounded border border-zinc-800">
+                                                        <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-wider block mb-1">Tech Notes</span>
+                                                        <p className="text-xs text-zinc-400 font-mono">{feat.techNotes}</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Acceptance Criteria</span>
-                                                    <ul className="list-disc list-inside text-sm text-zinc-400 space-y-1">
-                                                        {feat.acceptanceCriteria.map((ac, idx) => (
-                                                            <li key={idx}>{ac}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                                <div className="bg-zinc-900 p-3 rounded border border-zinc-800">
-                                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-wider block mb-1">Tech Notes</span>
-                                                    <p className="text-xs text-zinc-400 font-mono">{feat.techNotes}</p>
-                                                </div>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>

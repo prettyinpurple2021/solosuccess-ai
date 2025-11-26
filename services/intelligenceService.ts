@@ -68,6 +68,7 @@ class IntelligenceService {
             // Gather user data
             const tasks = await storageService.getTasks();
             const context = await storageService.getContext();
+            const contacts = await storageService.getContacts();
 
             const today = new Date().toISOString().split('T')[0];
 
@@ -83,6 +84,18 @@ class IntelligenceService {
                 t.priority === 'high'
             );
 
+            // Analyze Network (Stale Contacts)
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            const staleContacts = contacts.filter(c =>
+                c.lastContact && new Date(c.lastContact) < thirtyDaysAgo
+            );
+
+            const staleAlerts = staleContacts.slice(0, 3).map(c => ({
+                type: 'opportunity',
+                message: `Reconnect with ${c.name} (${c.company}). Last contact: ${new Date(c.lastContact!).toLocaleDateString()}.`,
+                action: 'Draft Email'
+            }));
+
             // Build prompt for Gemini
             const prompt = `You are an AI strategic advisor. Analyze this solo founder's current state and provide daily intelligence.
 
@@ -92,6 +105,7 @@ class IntelligenceService {
 - Total Active Tasks: ${tasks.filter(t => t.status !== 'done').length}
 - Overdue Tasks: ${overdueTasks.length}
 - High Priority Tasks: ${dueSoon.length}
+- Stale Contacts: ${staleContacts.length} (e.g. ${staleContacts.slice(0, 2).map(c => c.name).join(', ')})
 
 **Instructions:**
 Generate a JSON response with:
@@ -115,6 +129,17 @@ Respond ONLY with valid JSON.`;
             // Parse AI response
             const intelligence: DailyIntelligence = JSON.parse(response);
             intelligence.date = today;
+
+            // Inject Stale Contact Alerts if AI missed them
+            if (staleAlerts.length > 0) {
+                // Deduplicate based on message content to avoid double adding if AI already included them
+                const existingMessages = new Set(intelligence.alerts.map(a => a.message));
+                staleAlerts.forEach(alert => {
+                    if (!existingMessages.has(alert.message)) {
+                        intelligence.alerts.push(alert as any);
+                    }
+                });
+            }
 
             // Cache for today
             localStorage.setItem(this.cacheKey, JSON.stringify(intelligence));

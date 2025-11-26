@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { GoogleGenAI, Type } from '@google/genai';
 import { db } from '../db';
-import { businessContext, tasks, competitorReports } from '../db/schema';
+import { businessContext, tasks, competitorReports, boardReports, pivotAnalyses } from '../db/schema';
 import { eq, desc, and } from 'drizzle-orm';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { SYSTEM_INSTRUCTIONS, AGENTS, AgentId } from '../constants';
@@ -81,6 +81,33 @@ const getDeepMindContext = async (userId: string) => {
         ).join('\n');
     }
 
+    // Strategic Memory (Board Reports)
+    const lastQbr = await db.select().from(boardReports)
+        .where(eq(boardReports.userId, userId))
+        .orderBy(desc(boardReports.generatedAt))
+        .limit(1);
+
+    let strategyContext = "NO PAST STRATEGIC REVIEWS.";
+    if (lastQbr.length > 0) {
+        const qbr = lastQbr[0];
+        strategyContext = `LAST QBR SCORE: CEO: ${qbr.ceoScore}/100. CONSENSUS: "${qbr.consensus}".`;
+    }
+
+    // Market Gaps (The Pivot)
+    const pivot = await db.select().from(pivotAnalyses)
+        .where(eq(pivotAnalyses.userId, userId))
+        .orderBy(desc(pivotAnalyses.generatedAt))
+        .limit(1);
+
+    let marketContext = "";
+    if (pivot.length > 0) {
+        const p = pivot[0];
+        const gaps = p.gaps as any[];
+        if (gaps && gaps.length > 0) {
+            marketContext = `MARKET OPPORTUNITIES: ${gaps.map(g => g.name).join(', ')}.`;
+        }
+    }
+
     return `
     === DEEP MIND / SYSTEM DATA LAYER ===
     The following is REAL-TIME data from the user's dashboard. Use this to answer questions intelligently.
@@ -90,6 +117,10 @@ const getDeepMindContext = async (userId: string) => {
 
     [GATHERED INTELLIGENCE / COMPETITORS]
     ${intelContext}
+
+    [STRATEGIC MEMORY]
+    ${strategyContext}
+    ${marketContext}
     =====================================
     `;
 };
@@ -208,12 +239,31 @@ router.post('/competitor-report', authMiddleware, requireAi, async (req: any, re
 // War Room
 router.post('/war-room', authMiddleware, requireAi, async (req: any, res: any) => {
     try {
-        const { topic } = req.body;
+        const { topic, previousSessionId } = req.body;
         const userId = (req as AuthRequest).userId!;
         const context = await getContext(userId);
         const deepMind = await getDeepMindContext(userId);
 
-        const prompt = `${context}\n${deepMind}\nThe user has convened "The War Room" to discuss: "${topic}". Simulate a debate between Roxy, Echo, Lexi, Glitch. Return JSON with dialogue, consensus, and actionPlan.`;
+        let historyContext = "";
+        if (previousSessionId) {
+            const prevSession = await db.select().from(warRoomSessions)
+                .where(and(eq(warRoomSessions.id, previousSessionId), eq(warRoomSessions.userId, userId)))
+                .limit(1);
+
+            if (prevSession.length > 0) {
+                const session = prevSession[0];
+                historyContext = `
+                CONTEXT FROM PREVIOUS SESSION:
+                Topic: "${session.topic}"
+                Consensus: "${session.consensus}"
+                Action Plan: ${session.actionPlan?.join(', ')}
+                
+                (Use this history to maintain continuity if the new topic is related.)
+                `;
+            }
+        }
+
+        const prompt = `${context}\n${deepMind}\n${historyContext}\nThe user has convened "The War Room" to discuss: "${topic}". Simulate a debate between Roxy, Echo, Lexi, Glitch. Return JSON with dialogue, consensus, and actionPlan.`;
 
         const response = await ai!.models.generateContent({
             model: 'gemini-2.5-flash',
@@ -309,7 +359,11 @@ router.post('/incinerator', authMiddleware, requireAi, async (req: any, res: any
         const { content, mode, brutality } = req.body;
         const userId = (req as AuthRequest).userId!;
         const context = await getContext(userId);
-        const prompt = `${context}\nIncinerator Mode. Content: "${content}". Mode: ${mode}. Brutality: ${brutality}. Return JSON with roastSummary, survivalScore, feedback, rewrittenContent.`;
+        const deepMind = await getDeepMindContext(userId);
+        const prompt = `${context}\n${deepMind}\nIncinerator Mode. Content: "${content}". Mode: ${mode}. Brutality: ${brutality}. 
+        INSTRUCTION: Use the "Market Opportunities" and "Competitor Intel" from the system data to validate or destroy this idea. 
+        If the idea ignores a known market gap or competitor threat, be extra brutal.
+        Return JSON with roastSummary, survivalScore, feedback, rewrittenContent.`;
 
         const response = await ai!.models.generateContent({
             model: 'gemini-2.5-flash',

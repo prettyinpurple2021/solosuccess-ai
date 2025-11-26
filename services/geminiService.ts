@@ -1,5 +1,5 @@
 import { apiService } from './apiService';
-import { AgentId, CompetitorReport, WarRoomScenario, FinancialContext } from '../types';
+import { AgentId, CompetitorReport, WarRoomResponse, FinancialContext } from '../types';
 
 // Types
 export interface ChatMessage {
@@ -38,9 +38,9 @@ export const geminiService = {
     },
 
     // War Room
-    async generateWarRoomDebate(scenario: WarRoomScenario | string): Promise<WarRoomDebate | null> {
+    async generateWarRoomDebate(topic: string, previousSessionId?: string): Promise<WarRoomResponse | null> {
         try {
-            return await apiService.post('/ai/war-room', { scenario });
+            return await apiService.post('/ai/war-room', { topic, previousSessionId });
         } catch (error) {
             console.error('War Room Error:', error);
             return null;

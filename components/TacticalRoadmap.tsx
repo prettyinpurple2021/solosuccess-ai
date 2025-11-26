@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Clock, CheckCircle2, Circle, AlertCircle, Calendar, ArrowRight, Loader2, Trash2, PlayCircle, Zap, Target } from 'lucide-react';
+import { Plus, Clock, CheckCircle2, Circle, AlertCircle, Calendar, ArrowRight, Loader2, Trash2, PlayCircle, Zap, Target, Layers } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { Task, TaskStatus, AgentId } from '../types';
 import { AGENTS } from '../constants';
@@ -63,6 +63,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onMove, onDelete, onFocus }) 
                     )}
 
                     <div className="w-px h-4 bg-white/10 mx-0.5 md:mx-1 self-center" />
+
+                    {task.status !== 'backlog' && (
+                        <button onClick={() => onMove(task.id, 'backlog')} className="p-1.5 md:p-2 hover:bg-white/10 rounded text-zinc-500 transition-colors touch-target" title="Move to Backlog" aria-label="Move to backlog">
+                            <Layers size={12} />
+                        </button>
+                    )}
 
                     {task.status !== 'todo' && (
                         <button onClick={() => onMove(task.id, 'todo')} className="p-1.5 md:p-2 hover:bg-white/10 rounded text-zinc-400 transition-colors touch-target" title="Move to Todo" aria-label="Move to todo">
@@ -277,7 +283,8 @@ export const TacticalRoadmap: React.FC<TacticalRoadmapProps> = ({ onEnterFocusMo
 
             {/* Kanban Board */}
             <div className="flex-1 overflow-x-auto overflow-y-auto md:overflow-y-hidden scrollbar-hide">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 h-auto md:h-full md:min-w-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 h-auto md:h-full md:min-w-0">
+                    <Column title="Backlog" status="backlog" icon={<Layers size={14} className="text-zinc-600" />} />
                     <Column title="Pending Intel" status="todo" icon={<Circle size={14} className="text-zinc-500" />} />
                     <Column title="Active Ops" status="in-progress" icon={<Loader2 size={14} className="text-amber-500 animate-spin-slow" />} />
                     <Column title="Mission Complete" status="done" icon={<CheckCircle2 size={14} className="text-emerald-500" />} />
