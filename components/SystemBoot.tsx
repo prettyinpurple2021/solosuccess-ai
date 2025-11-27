@@ -15,20 +15,28 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
         companyName: '',
         industry: '',
         description: '',
-        goals: ['', '', ''] // 3 empty goals
+        goals: ['', '', ''], // 3 empty goals
+        brandDna: { onboardingStatus: 'draft' } // Initialize with draft status
     });
 
-    // Load saved progress on mount
+    // Load saved progress from DB on mount
     useEffect(() => {
-        const saved = localStorage.getItem('onboarding_progress');
-        if (saved) {
+        const loadProgress = async () => {
             try {
-                const parsed = JSON.parse(saved);
-                setFormData(prev => ({ ...prev, ...parsed }));
+                const context = await storageService.getContext();
+                if (context) {
+                    setFormData(prev => ({
+                        ...prev,
+                        ...context,
+                        goals: context.goals && context.goals.length > 0 ? context.goals : ['', '', ''],
+                        brandDna: { ...prev.brandDna, ...context.brandDna }
+                    }));
+                }
             } catch (e) {
                 console.error("Failed to load saved progress", e);
             }
-        }
+        };
+        loadProgress();
     }, []);
 
     useEffect(() => {
@@ -56,16 +64,21 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
         }
     }, [step]);
 
-    const saveProgress = () => {
-        localStorage.setItem('onboarding_progress', JSON.stringify(formData));
+    const saveProgress = async (status: 'draft' | 'completed' = 'draft') => {
+        const updatedData = {
+            ...formData,
+            brandDna: { ...formData.brandDna, onboardingStatus: status }
+        };
+        await storageService.saveContext(updatedData);
+        return updatedData;
     };
 
     const completeOnboarding = async () => {
-        // Save context
-        await storageService.saveContext(formData);
+        // Save context as completed
+        const finalData = await saveProgress('completed');
 
         // Create initial tasks from goals
-        for (const goal of formData.goals) {
+        for (const goal of finalData.goals) {
             if (goal && typeof goal === 'string' && goal.trim()) {
                 await storageService.addTask({
                     id: crypto.randomUUID(),
@@ -80,13 +93,13 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
             }
         }
 
-        localStorage.setItem('solo_boot_completed', 'true');
-        localStorage.removeItem('onboarding_progress'); // Clear saved progress
+        // We don't use localStorage for persistence anymore, but we can set a flag for the current session
+        // to avoid re-checking DB immediately if we wanted, but App.tsx will handle the check.
         setTimeout(onComplete, 2000);
     };
 
     const handleNext = async () => {
-        saveProgress();
+        await saveProgress('draft');
         if (step < 5) {
             setStep(step + 1);
         } else {
@@ -99,19 +112,20 @@ export const SystemBoot: React.FC<SystemBootProps> = ({ onComplete }) => {
         if (step > 1) setStep(step - 1);
     };
 
-    const handleSkip = () => {
+    const handleSkip = async () => {
         if (confirm("Skip onboarding? You can configure your profile later in Settings.")) {
-            localStorage.setItem('solo_onboarding_skipped', 'true');
-            localStorage.setItem('solo_boot_completed', 'true');
+            // Mark as completed (skipped is effectively completed for the purpose of not showing it again)
+            // We could add a 'skipped' status if we wanted to distinguish.
+            await saveProgress('completed');
             onComplete();
         }
     };
 
-    const handleSaveAndExit = () => {
-        saveProgress();
-        alert("Progress saved. You can resume later.");
-        localStorage.setItem('solo_onboarding_skipped', 'true');
-        localStorage.setItem('solo_boot_completed', 'true');
+    const handleSaveAndExit = async () => {
+        await saveProgress('draft');
+        // Mark as temporarily skipped for this session only
+        sessionStorage.setItem('solo_onboarding_temp_skip', 'true');
+        alert("Progress saved to database. You can resume later.");
         onComplete();
     };
 

@@ -21,6 +21,15 @@ export interface ChatMessage {
     timestamp?: number;
 }
 
+export interface BrandDNA {
+    voice?: string;
+    values?: string[];
+    audience?: string;
+    style?: string;
+    onboardingStatus?: 'draft' | 'completed';
+    [key: string]: any;
+}
+
 export interface BusinessContext {
     id?: string;
     userId?: string;

@@ -75,19 +75,34 @@ function DashboardLayout() {
       // Check if user has ever completed boot (persistent flag)
       const bootCompleted = localStorage.getItem('solo_boot_completed');
 
-      if (bootCompleted === 'true') {
-        // User already did initial setup, skip boot
+      // Check for temporary skip in current session
+      const tempSkip = sessionStorage.getItem('solo_onboarding_temp_skip');
+
+      if (bootCompleted === 'true' || tempSkip === 'true') {
+        // User already did initial setup or skipped for this session
         setIsBooted(true);
         setCheckingBoot(false);
         return;
       }
 
-      // Check if they have context saved (migrating from old behavior)
+      // Check if they have context saved
       const context = await storageService.getContext();
+
       if (context) {
-        // Has context, mark as completed and skip boot
-        localStorage.setItem('solo_boot_completed', 'true');
-        setIsBooted(true);
+        // Check for explicit completion status in brandDna
+        const status = (context.brandDna as any)?.onboardingStatus;
+
+        if (status === 'completed') {
+          localStorage.setItem('solo_boot_completed', 'true');
+          setIsBooted(true);
+        } else if (status === 'draft') {
+          // Explicitly draft, so we should show onboarding (unless temp skipped, which is checked above)
+          // Do nothing here, setIsBooted remains false
+        } else if (context.founderName || context.companyName) {
+          // Legacy fallback: Has meaningful context but no status flag, assume completed
+          localStorage.setItem('solo_boot_completed', 'true');
+          setIsBooted(true);
+        }
       }
 
       setCheckingBoot(false);
