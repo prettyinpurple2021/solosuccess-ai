@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 
 // Initialize OpenAI client only if API key is available
 // This allows builds to succeed in environments without the key
-const openai = process.env.OPENAI_API_KEY 
+const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null
 
@@ -38,7 +38,6 @@ const generateTemplateSchema = z.object({
   keyBenefits: z.array(z.string()).optional(),
   contentIdea: z.string().optional(),
   contentType: z.string().optional(),
-  targetAudience: z.string().optional(),
   desiredVibe: z.string().optional(),
 })
 
@@ -60,14 +59,14 @@ export async function POST(request: NextRequest) {
     // Generate AI-powered template using OpenAI
     const result = await generateAITemplate(templateRequest, authResult.user.id)
 
-    logInfo('AI template generated successfully', { 
-      userId: authResult.user.id, 
+    logInfo('AI template generated successfully', {
+      userId: authResult.user.id,
       type: templateRequest.type,
-      templateType: templateRequest.templateType 
+      templateType: templateRequest.templateType
     })
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       content: result.content,
       metadata: result.metadata,
       templateType: result.templateType
@@ -89,7 +88,7 @@ async function generateAITemplate(request: any, userId: string) {
 
     // Generate AI prompt based on template type
     const prompt = generateAIPrompt(request)
-    
+
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
@@ -108,10 +107,10 @@ async function generateAITemplate(request: any, userId: string) {
     })
 
     const aiResponse = completion.choices[0]?.message?.content || ''
-    
+
     // Parse and structure the AI response
     const structuredContent = parseAIResponse(aiResponse, request.type, request.templateType)
-    
+
     return {
       content: structuredContent,
       metadata: {
@@ -125,7 +124,7 @@ async function generateAITemplate(request: any, userId: string) {
     }
   } catch (error) {
     logError('Error in AI template generation:', error)
-    
+
     // Fallback to structured mock data if AI fails
     return generateFallbackTemplate(request, userId)
   }
@@ -133,7 +132,7 @@ async function generateAITemplate(request: any, userId: string) {
 
 function generateAIPrompt(request: any): string {
   const basePrompt = `Generate professional, actionable content for the following request:`
-  
+
   switch (request.templateType || request.type) {
     case 'sales-script':
       return `${basePrompt}
@@ -253,7 +252,7 @@ function parseAIResponse(aiResponse: string, type: string, templateType?: string
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0])
     }
-    
+
     // If not JSON, structure the response based on type
     switch (templateType || type) {
       case 'sales-script':
@@ -339,7 +338,7 @@ function generateFallbackTemplate(request: any, userId: string) {
   }
 
   return {
-    content: fallbackContent[request.templateType || request.type] || [{
+    content: (fallbackContent as any)[request.templateType || request.type] || [{
       content: 'AI-generated content based on your requirements',
       type: request.templateType || request.type,
       generated: true

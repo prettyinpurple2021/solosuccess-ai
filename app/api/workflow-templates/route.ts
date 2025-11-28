@@ -13,7 +13,7 @@ function getSql() {
   if (!url) {
     throw new Error('DATABASE_URL is not set')
   }
-  return neon(url)
+  return neon(url) as any
 }
 
 // GET /api/workflow-templates - List workflow templates
@@ -68,22 +68,25 @@ export async function GET(request: NextRequest) {
 
     // Get templates
     const sql = getSql()
-    const templates = await sql`
+    const query = `
       SELECT 
         id, name, description, category, tags, featured, usage_count,
         created_at, updated_at, created_by
       FROM workflow_templates
-      WHERE ${sql.unsafe(whereClause, ...params)}
+      WHERE ${whereClause}
       ORDER BY featured DESC, usage_count DESC, created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `
 
+    const templates = await sql(query, [...params, limit, offset])
+
     // Get total count
-    const countResult = await sql`
+    const countQuery = `
       SELECT COUNT(*) as total
       FROM workflow_templates
-      WHERE ${sql.unsafe(whereClause, ...params)}
+      WHERE ${whereClause}
     `
+    const countResult = await sql(countQuery, params)
     const total = parseInt(countResult[0]?.total || '0')
 
     logInfo('Workflow templates fetched successfully', {
@@ -153,16 +156,26 @@ export async function POST(request: NextRequest) {
 
     // Create template
     const sql = getSql()
-    const template = await sql`
+    const query = `
       INSERT INTO workflow_templates (
         name, description, category, tags, workflow_data, is_public, featured,
         created_by, usage_count, created_at, updated_at
       ) VALUES (
-        ${name}, ${description}, ${category || 'general'}, ${JSON.stringify(tags || [])},
-        ${JSON.stringify(workflowData)}, ${isPublic}, ${featured},
-        ${user.id}, 0, NOW(), NOW()
+        $1, $2, $3, $4, $5, $6, $7,
+        $8, 0, NOW(), NOW()
       ) RETURNING *
     `
+
+    const template = await sql(query, [
+      name,
+      description,
+      category || 'general',
+      JSON.stringify(tags || []),
+      JSON.stringify(workflowData),
+      isPublic,
+      featured,
+      user.id
+    ])
 
     logInfo('Workflow template created successfully', {
       templateId: template[0].id,

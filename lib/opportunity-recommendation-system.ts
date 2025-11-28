@@ -1,27 +1,32 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { db } from '@/db'
-import {
-  competitiveOpportunities,
-  opportunityActions,
-  opportunityMetrics,
-  competitorProfiles,
-  intelligenceData,
-  users
-} from '@/db/schema'
-import { eq, and, desc, gte, sql, asc, lte, isNull, not, inArray } from 'drizzle-orm'
-import { competitiveOpportunityDetector, type OpportunityDetectionResult } from './competitive-opportunity-detection'
+import { db } from '@/lib/db'
+import { competitiveOpportunities, opportunityActions, opportunityMetrics, competitorProfiles } from '@/db/schema'
+import { eq, and, desc, asc, inArray, gte, not, isNull, sql } from 'drizzle-orm'
+import { logError } from '@/lib/logger'
 
+export interface OpportunityDetectionResult {
+  id: string
+  competitorId: string
+  opportunityType: 'weakness_exploitation' | 'market_gap' | 'pricing_opportunity' | 'talent_acquisition' | 'partnership_opportunity'
+  title: string
+  description: string
+  confidence: number
+  impact: 'low' | 'medium' | 'high' | 'critical'
+  effort: 'low' | 'medium' | 'high'
+  timing: 'immediate' | 'short-term' | 'medium-term' | 'long-term'
+  evidence: string[]
+  recommendations: string[]
+  detectedAt: Date
+}
 
-// Types for opportunity recommendation system
 export interface OpportunityRecommendation {
   id: string
   opportunityId: string
   title: string
   description: string
-  actionType: 'immediate' | 'strategic' | 'research' | 'marketing' | 'product' | 'pricing' | 'talent' | 'partnership'
+  actionType: 'marketing' | 'product' | 'sales' | 'strategic' | 'pricing' | 'talent' | 'partnership' | 'research'
   priority: 'low' | 'medium' | 'high' | 'critical'
   estimatedEffort: number // hours
-  estimatedCost: number // dollars
+  estimatedCost: number // USD
   expectedROI: number // percentage
   timeframe: 'immediate' | 'short-term' | 'medium-term' | 'long-term'
   prerequisites: string[]
@@ -34,154 +39,28 @@ export interface OpportunityRecommendation {
 
 export interface OpportunityPrioritization {
   opportunityId: string
-  priorityScore: number
-  impactScore: number
-  effortScore: number
-  timingScore: number
-  confidenceScore: number
-  riskScore: number
-  resourceScore: number
-  strategicAlignmentScore: number
-  competitiveAdvantageScore: number
-  marketTimingScore: number
-}
-
-export interface OpportunityTracking {
-  opportunityId: string
-  status: 'identified' | 'planned' | 'in_progress' | 'completed' | 'paused' | 'cancelled'
-  progress: number // 0-100
-  milestones: OpportunityMilestone[]
-  actions: OpportunityAction[]
-  metrics: OpportunityMetric[]
-  timeline: OpportunityTimelineEvent[]
-  roi: OpportunityROI
-  lessons: string[]
-}
-
-export interface OpportunityMilestone {
-  id: string
-  title: string
-  description: string
-  targetDate: Date
-  completedDate?: Date
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue'
-  dependencies: string[]
-}
-
-export interface OpportunityAction {
-  id: string
-  title: string
-  description: string
-  actionType: string
-  priority: 'low' | 'medium' | 'high'
-  estimatedEffortHours: number
-  actualEffortHours?: number
-  estimatedCost: number
-  actualCost?: number
-  expectedOutcome: string
-  actualOutcome?: string
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled'
-  assignedTo?: string
-  dueDate?: Date
-  completedAt?: Date
-}
-
-export interface OpportunityMetric {
-  id: string
-  name: string
-  type: 'revenue' | 'cost_savings' | 'market_share' | 'customer_acquisition' | 'efficiency' | 'brand' | 'custom'
-  baselineValue: number
-  targetValue: number
-  currentValue: number
-  unit: string
-  measurementDate: Date
-  trend: 'improving' | 'declining' | 'stable'
-}
-
-export interface OpportunityTimelineEvent {
-  id: string
-  eventType: 'created' | 'started' | 'milestone' | 'action_completed' | 'metric_updated' | 'status_changed' | 'note_added'
-  title: string
-  description: string
-  timestamp: Date
-  userId: string
-  metadata?: Record<string, any>
-}
-
-export interface OpportunityROI {
-  estimatedROI: number
-  actualROI?: number
-  investmentAmount: number
-  returnAmount: number
-  paybackPeriod: number // months
-  netPresentValue: number
-  internalRateOfReturn: number
-  riskAdjustedReturn: number
-}
-
-export interface OpportunityCollaboration {
-  opportunityId: string
-  teamMembers: OpportunityTeamMember[]
-  sharedNotes: OpportunityNote[]
-  discussions: OpportunityDiscussion[]
-  permissions: OpportunityPermissions
-}
-
-export interface OpportunityTeamMember {
-  userId: string
-  role: 'owner' | 'contributor' | 'viewer' | 'stakeholder'
-  permissions: string[]
-  addedAt: Date
-  addedBy: string
-}
-
-export interface OpportunityNote {
-  id: string
-  content: string
-  type: 'general' | 'insight' | 'risk' | 'action_item' | 'lesson_learned'
-  authorId: string
-  createdAt: Date
-  updatedAt: Date
-  tags: string[]
-}
-
-export interface OpportunityDiscussion {
-  id: string
-  title: string
-  messages: OpportunityMessage[]
-  participants: string[]
-  createdAt: Date
-  lastActivity: Date
-}
-
-export interface OpportunityMessage {
-  id: string
-  content: string
-  authorId: string
-  timestamp: Date
-  replyTo?: string
-}
-
-export interface OpportunityPermissions {
-  canView: string[]
-  canEdit: string[]
-  canDelete: string[]
-  canShare: string[]
-  canAssignActions: string[]
+  priorityScore: number // 0-100
+  impactScore: number // 0-10
+  effortScore: number // 0-10
+  timingScore: number // 0-10
+  confidenceScore: number // 0-10
+  riskScore: number // 0-10
+  resourceScore: number // 0-10
+  strategicAlignmentScore: number // 0-10
+  competitiveAdvantageScore: number // 0-10
+  marketTimingScore: number // 0-10
 }
 
 export class OpportunityRecommendationSystem {
-
   /**
-   * Generate actionable recommendations for a detected opportunity
+   * Generate actionable recommendations based on opportunity type
    */
   async generateRecommendations(opportunity: OpportunityDetectionResult): Promise<OpportunityRecommendation[]> {
     try {
       const recommendations: OpportunityRecommendation[] = []
 
-      // Generate recommendations based on opportunity type
       switch (opportunity.opportunityType) {
-        case 'competitor_weakness':
+        case 'weakness_exploitation':
           recommendations.push(...await this.generateWeaknessRecommendations(opportunity))
           break
         case 'market_gap':
@@ -767,24 +646,57 @@ export class OpportunityRecommendationSystem {
         estimatedCost: 15000,
         expectedROI: 100,
         timeframe: 'short-term',
-        prerequisites: ['Talent pipeline', 'Competitive packages'],
-        risks: ['Legal issues', 'Cultural fit'],
-        successMetrics: ['Key hires', 'Team capability'],
-        resources: ['HR team', 'Recruitment budget'],
-        confidence: opportunity.confidence * 0.7,
-        title: 'Opportunity Research',
-        description: 'Conduct detailed research to understand the opportunity better',
-        actionType: 'research',
-        priority: 'medium',
-        estimatedEffort: 15,
-        estimatedCost: 1000,
-        expectedROI: 50,
-        timeframe: 'short-term',
         prerequisites: ['Research plan'],
         risks: ['Time investment'],
         successMetrics: ['Research insights', 'Action plan'],
         resources: ['Research team'],
         confidence: opportunity.confidence * 0.5,
+        createdAt: new Date()
+      }
+    ]
+  }
+
+  private async generatePartnershipRecommendations(opportunity: OpportunityDetectionResult): Promise<OpportunityRecommendation[]> {
+    return [
+      {
+        id: `rec_partner_${Date.now()}_1`,
+        opportunityId: opportunity.id,
+        title: 'Strategic Partnership Outreach',
+        description: 'Initiate partnership discussions with key players',
+        actionType: 'partnership',
+        priority: 'high',
+        estimatedEffort: 40,
+        estimatedCost: 2000,
+        expectedROI: 150,
+        timeframe: 'medium-term',
+        prerequisites: ['Partnership proposal', 'Target list'],
+        risks: ['Negotiation failure', 'Misaligned goals'],
+        successMetrics: ['Partnership agreement', 'Joint revenue'],
+        resources: ['BD team', 'Legal counsel'],
+        confidence: opportunity.confidence,
+        createdAt: new Date()
+      }
+    ]
+  }
+
+  private async generateGenericRecommendations(opportunity: OpportunityDetectionResult): Promise<OpportunityRecommendation[]> {
+    return [
+      {
+        id: `rec_generic_${Date.now()}_1`,
+        opportunityId: opportunity.id,
+        title: 'Opportunity Assessment',
+        description: 'Conduct detailed assessment of the identified opportunity',
+        actionType: 'research',
+        priority: 'medium',
+        estimatedEffort: 20,
+        estimatedCost: 1000,
+        expectedROI: 50,
+        timeframe: 'short-term',
+        prerequisites: ['Research plan'],
+        risks: ['Time investment'],
+        successMetrics: ['Assessment report', 'Action plan'],
+        resources: ['Analyst'],
+        confidence: opportunity.confidence,
         createdAt: new Date()
       }
     ]
@@ -860,3 +772,5 @@ export class OpportunityRecommendationSystem {
     ]
   }
 }
+
+export const opportunityRecommendationSystem = new OpportunityRecommendationSystem()

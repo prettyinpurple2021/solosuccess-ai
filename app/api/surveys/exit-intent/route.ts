@@ -28,7 +28,7 @@ async function getUserIdFromToken(request: NextRequest): Promise<string | null> 
     const token = authHeader.substring(7)
     const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
     const { payload: decoded } = await jose.jwtVerify(token, secret)
-    return decoded?.userId || null
+    return (decoded?.userId as string) || null
   } catch {
     return null
   }
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
   try {
     const sql = getSql()
     const userId = await getUserIdFromToken(req)
-    
+
     // Create table if it doesn't exist
     await sql`create table if not exists user_survey_status (
       id serial primary key,
@@ -48,21 +48,21 @@ export async function GET(req: NextRequest) {
       created_at timestamptz default now(),
       unique(user_id, survey_type)
     )`
-    
+
     if (!userId) {
       // For anonymous users, return default state
       return NextResponse.json({ status: null, canShow: true })
     }
-    
+
     // Check if user has already interacted with exit-intent survey
     const result = await sql`
       select status from user_survey_status 
       where user_id = ${userId} and survey_type = 'exit-intent'
     `
-    
+
     const status = result.length > 0 ? result[0].status : null
     const canShow = status === null // Only show if no previous interaction
-    
+
     return NextResponse.json({ status, canShow })
   } catch (error) {
     logError('Survey status check error:', { error })
@@ -75,9 +75,9 @@ export async function POST(req: NextRequest) {
     const { role, goal, blocker, email, action } = await req.json().catch(() => ({}))
     const sql = getSql()
     const userId = await getUserIdFromToken(req)
-    
+
     logDebug('Survey submission data:', { role, goal, blocker, email, action, userId })
-    
+
     // Create tables if they don't exist - with proper error handling
     try {
       await sql`create table if not exists exit_intent_surveys (
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       logError('Error creating exit_intent_surveys table:', tableError)
       // If table creation fails, try to continue anyway
     }
-    
+
     await sql`create table if not exists user_survey_status (
       id serial primary key,
       user_id varchar(255),
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
       created_at timestamptz default now(),
       unique(user_id, survey_type)
     )`
-    
+
     if (action === 'dismiss') {
       // User clicked skip/dismiss
       if (userId) {
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
         logError('Error inserting survey data:', insertError)
         // Continue with status update even if survey data insert fails
       }
-      
+
       if (userId) {
         await sql`
           insert into user_survey_status (user_id, survey_type, status) 
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
             status = 'submitted', created_at = now()
         `
       }
-      
+
       return NextResponse.json({ ok: true, action: 'submitted' })
     }
   } catch (error) {

@@ -18,14 +18,14 @@ async function authenticateJWTRequest(request: NextRequest) {
     const token = authHeader.substring(7)
     const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
     const { payload: decoded } = await jose.jwtVerify(token, secret)
-    
-    return { 
+
+    return {
       user: {
-        id: decoded.userId,
-        email: decoded.email,
-        full_name: decoded.full_name || null,
-      }, 
-      error: null 
+        id: decoded.user_id as string,
+        email: decoded.email as string,
+        full_name: (decoded.full_name as string) || null,
+      },
+      error: null
     }
   } catch (error) {
     logError('JWT authentication error:', error)
@@ -37,14 +37,14 @@ async function authenticateJWTRequest(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateJWTRequest(request)
-    
+
     if (error || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       )
     }
-    
+
     const userId = user.id
 
     const { searchParams } = new URL(request.url)
@@ -54,9 +54,9 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     const result = await unifiedBriefcase.getBriefcaseItems(
-      userId, 
-      type as string | undefined, 
-      limit, 
+      userId,
+      type as string | undefined,
+      limit,
       offset,
       search
     )
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     logError('Get briefcase items error:', error)
-    
+
     return NextResponse.json(
       { error: 'Failed to fetch briefcase items' },
       { status: 500 }
@@ -81,14 +81,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { user, error } = await authenticateJWTRequest(request)
-    
+
     if (error || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       )
     }
-    
+
     const userId = user.id
 
     const body = await request.json()
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     let item
-    
+
     switch (type) {
       case 'chat':
         if (!content?.messages) {
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
           )
         }
         item = await unifiedBriefcase.saveChatConversation(
-          userId, 
-          title, 
+          userId,
+          title,
           content.messages,
           metadata?.agentName
         )
@@ -167,9 +167,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logError('Save briefcase item error:', error)
-    
+
     const errorMessage = error instanceof Error ? error.message : 'Save failed'
-    
+
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }
@@ -180,14 +180,14 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { user, error } = await authenticateJWTRequest(request)
-    
+
     if (error || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       )
     }
-    
+
     const userId = user.id
 
     const { searchParams } = new URL(request.url)
@@ -201,7 +201,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const success = await unifiedBriefcase.deleteItem(userId, itemId)
-    
+
     if (!success) {
       return NextResponse.json(
         { error: 'Item not found or unauthorized' },
@@ -216,7 +216,7 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     logError('Delete briefcase item error:', error)
-    
+
     return NextResponse.json(
       { error: 'Failed to delete item' },
       { status: 500 }

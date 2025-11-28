@@ -2,27 +2,27 @@
 
 export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { useState, useEffect, useMemo, useCallback} from "react"
-import { useDashboardData} from "@/hooks/use-dashboard-data"
-import { useAuth} from "@/hooks/use-auth"
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { useDashboardData } from "@/hooks/use-dashboard-data"
+import { useAuth } from "@/hooks/use-auth"
 import { useSmartTips, TRIGGER_CONDITIONS } from "@/hooks/use-smart-tips"
-import { useAnalytics, usePageTracking, usePerformanceTracking} from "@/hooks/use-analytics"
-import { SimpleOnboarding} from "@/components/onboarding/simple-onboarding"
-import { WelcomeDashboard} from "@/components/onboarding/welcome-dashboard"
-import { Loading} from "@/components/ui/loading"
-import { motion, easeOut} from "framer-motion"
-import { 
-  CheckCircle, 
-  Target, 
-  Clock, 
-  MessageCircle, 
-  Trophy, 
-  Crown, 
-  Sparkles, 
-  Flame, 
-  ArrowRight, 
-  BarChart3, 
-  Plus, 
+import { useAnalytics, usePageTracking, usePerformanceTracking } from "@/hooks/use-analytics"
+import { SimpleOnboarding } from "@/components/onboarding/simple-onboarding"
+import { WelcomeDashboard } from "@/components/onboarding/welcome-dashboard"
+import { Loading } from "@/components/ui/loading"
+import { motion, easeOut } from "framer-motion"
+import {
+  CheckCircle,
+  Target,
+  Clock,
+  MessageCircle,
+  Trophy,
+  Crown,
+  Sparkles,
+  Flame,
+  ArrowRight,
+  BarChart3,
+  Plus,
   Briefcase,
   Shield,
   Zap,
@@ -31,14 +31,14 @@ import {
   Award
 } from "lucide-react"
 import Link from "next/link"
-import { useSearchParams, useRouter} from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileDashboardEnhanced from "@/components/mobile/mobile-dashboard-enhanced"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid
@@ -130,7 +130,7 @@ export default function DashboardPage() {
           action: 'completed',
           onboardingData
         })
-        
+
         setShowOnboarding(false)
         // Refresh dashboard data
         window.location.reload()
@@ -211,13 +211,13 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-military-midnight">
         <CamoBackground />
         <TacticalGrid />
-        
-        <SimpleOnboarding 
-          open={showOnboarding} 
+
+        <SimpleOnboarding
+          open={showOnboarding}
           onCompleteAction={handleOnboardingComplete}
           onSkipAction={handleOnboardingSkip}
         />
-        
+
         <div className="flex items-center justify-center min-h-[60vh]">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -240,13 +240,13 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-military-midnight">
         <CamoBackground />
         <TacticalGrid />
-        
-        <SimpleOnboarding 
-          open={showOnboarding} 
+
+        <SimpleOnboarding
+          open={showOnboarding}
           onCompleteAction={handleOnboardingComplete}
           onSkipAction={handleOnboardingSkip}
         />
-        
+
         <div className="flex items-center justify-center min-h-[60vh] p-4">
           <GlassCard className="max-w-md p-8 text-center" glow>
             <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -256,7 +256,7 @@ export default function DashboardPage() {
               Mission Critical Error
             </h2>
             <p className="text-military-storm-grey mb-6">{error}</p>
-            <TacticalButton 
+            <TacticalButton
               onClick={() => window.location.reload()}
               variant="primary"
               className="w-full"
@@ -275,36 +275,36 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-military-midnight">
         <CamoBackground />
         <TacticalGrid />
-        
-        <SimpleOnboarding 
-          open={showOnboarding} 
+
+        <SimpleOnboarding
+          open={showOnboarding}
           onCompleteAction={handleOnboardingComplete}
           onSkipAction={handleOnboardingSkip}
         />
-        
+
         <div className="flex items-center justify-center min-h-[60vh] p-4">
           <GlassCard className="max-w-md p-8 text-center" glow>
-            <RankStars rank="Commander" size="large" className="justify-center mb-4" />
+            <RankStars count={5} size="lg" className="justify-center mb-4" />
             <h2 className="text-2xl font-heading font-bold text-military-glass-white mb-2">
               Welcome to SoloSuccess AI
             </h2>
             <p className="text-military-storm-grey mb-6">Begin your tactical mission</p>
             <div className="space-y-3">
               <Link href="/dashboard/slaylist">
-                <TacticalButton 
-                  variant="primary" 
+                <TacticalButton
+                  variant="primary"
                   className="w-full"
-                  icon={<Target className="w-4 h-4" />}
                 >
+                  <Target className="w-4 h-4 mr-2" />
                   Create Mission
                 </TacticalButton>
               </Link>
               <Link href="/dashboard/agents">
-                <TacticalButton 
-                  variant="secondary" 
+                <TacticalButton
+                  variant="secondary"
                   className="w-full"
-                  icon={<MessageCircle className="w-4 h-4" />}
                 >
+                  <MessageCircle className="w-4 h-4 mr-2" />
                   Contact Command
                 </TacticalButton>
               </Link>
@@ -324,7 +324,7 @@ export default function DashboardPage() {
         user={{
           name: data.user.full_name || data.user.email.split('@')[0],
           email: data.user.email,
-          avatar: data.user.avatar,
+          avatar: data.user.avatar_url || undefined,
           level: data.user.level,
           points: data.user.total_points
         }}
@@ -337,8 +337,23 @@ export default function DashboardPage() {
             goals_achieved: data.todaysStats.goals_achieved,
             productivity_score: data.todaysStats.productivity_score
           },
-          todaysTasks: data.todaysTasks || [],
-          todaysGoals: data.todaysGoals || []
+          todaysTasks: (data.todaysTasks || []).map(task => ({
+            id: task.id,
+            title: task.title,
+            description: task.description || undefined,
+            status: task.status,
+            priority: task.priority,
+            estimated_minutes: 0,
+            due_date: task.due_date || undefined
+          })),
+          todaysGoals: (data.activeGoals || []).map(goal => ({
+            id: goal.id,
+            title: goal.title,
+            description: goal.description || undefined,
+            progress: goal.progress_percentage,
+            target: 100,
+            deadline: goal.target_date || undefined
+          }))
         }}
       />
     )
@@ -348,14 +363,14 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-military-midnight" role="main">
       <CamoBackground />
       <TacticalGrid />
-      
-      <SimpleOnboarding 
-        open={showOnboarding} 
+
+      <SimpleOnboarding
+        open={showOnboarding}
         onCompleteAction={handleOnboardingComplete}
         onSkipAction={handleOnboardingSkip}
       />
-      
-      <motion.div 
+
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -366,14 +381,14 @@ export default function DashboardPage() {
           <div className="space-y-2">
             <div className="flex items-center space-x-3">
               <motion.div
-                animate={{ 
+                animate={{
                   rotate: [0, 10, -10, 0],
                   scale: [1, 1.1, 1]
                 }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
                 }}
                 className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center"
               >
@@ -417,7 +432,7 @@ export default function DashboardPage() {
               </h3>
               <p className="text-military-storm-grey text-sm">Tasks Completed</p>
             </GlassCard>
-            
+
             <GlassCard className="p-6" glow>
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
@@ -432,7 +447,7 @@ export default function DashboardPage() {
               </h3>
               <p className="text-military-storm-grey text-sm">Focus Time</p>
             </GlassCard>
-            
+
             <GlassCard className="p-6" glow>
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
@@ -447,7 +462,7 @@ export default function DashboardPage() {
               </h3>
               <p className="text-military-storm-grey text-sm">AI Interactions</p>
             </GlassCard>
-            
+
             <GlassCard className="p-6" glow>
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
@@ -481,7 +496,7 @@ export default function DashboardPage() {
                     View All
                   </TacticalButton>
                 </div>
-                
+
                 <div className="space-y-4">
                   {todaysTasks.length > 0 ? (
                     todaysTasks.map((task, index) => (
@@ -495,9 +510,8 @@ export default function DashboardPage() {
                         <div className="flex items-center space-x-3">
                           <motion.div
                             whileHover={{ scale: 1.2 }}
-                            className={`w-3 h-3 rounded-full ${
-                              task.status === 'completed' ? 'bg-military-hot-pink' : 'bg-military-storm-grey'
-                            }`}
+                            className={`w-3 h-3 rounded-full ${task.status === 'completed' ? 'bg-military-hot-pink' : 'bg-military-storm-grey'
+                              }`}
                           />
                           <div>
                             <p className="font-medium text-military-glass-white">{task.title}</p>
@@ -509,8 +523,8 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <StatsBadge 
-                            variant={task.priority === 'high' ? 'error' : task.priority === 'medium' ? 'warning' : 'success'} 
+                          <StatsBadge
+                            variant={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'success'}
                             size="sm"
                           >
                             {task.priority}
@@ -525,11 +539,11 @@ export default function DashboardPage() {
                     <div className="text-center py-8">
                       <Target className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
                       <p className="text-military-storm-grey mb-4">No missions for today</p>
-                      <TacticalButton 
-                        variant="primary" 
+                      <TacticalButton
+                        variant="primary"
                         size="sm"
-                        icon={<Plus className="w-4 h-4" />}
                       >
+                        <Plus className="w-4 h-4 mr-2" />
                         Add Mission
                       </TacticalButton>
                     </div>
@@ -553,7 +567,7 @@ export default function DashboardPage() {
                     View All
                   </TacticalButton>
                 </div>
-                
+
                 <div className="space-y-4">
                   {activeGoals.length > 0 ? (
                     activeGoals.map((goal, index) => (
@@ -571,7 +585,7 @@ export default function DashboardPage() {
                           </span>
                         </div>
                         <div className="w-full bg-military-gunmetal/30 rounded-full h-2 mb-2">
-                          <div 
+                          <div
                             className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink h-2 rounded-full transition-all duration-300"
                             style={{ width: `${goal.progress_percentage}%` }}
                           />
@@ -587,11 +601,11 @@ export default function DashboardPage() {
                     <div className="text-center py-8">
                       <Trophy className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
                       <p className="text-military-storm-grey mb-4">No active objectives</p>
-                      <TacticalButton 
-                        variant="primary" 
+                      <TacticalButton
+                        variant="primary"
                         size="sm"
-                        icon={<Crown className="w-4 h-4" />}
                       >
+                        <Crown className="w-4 h-4 mr-2" />
                         Create Objective
                       </TacticalButton>
                     </div>
@@ -618,7 +632,7 @@ export default function DashboardPage() {
                     View All
                   </TacticalButton>
                 </div>
-                
+
                 <div className="space-y-3">
                   {recentConversations.length > 0 ? (
                     recentConversations.map((conversation, index) => (
@@ -629,7 +643,7 @@ export default function DashboardPage() {
                         transition={{ delay: index * 0.1 }}
                         className="flex items-center space-x-3 p-3 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all cursor-pointer"
                       >
-                        <div 
+                        <div
                           className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
                           style={{ backgroundColor: conversation.agent.accent_color }}
                         >
@@ -648,8 +662,8 @@ export default function DashboardPage() {
                     <div className="text-center py-8">
                       <MessageCircle className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
                       <p className="text-military-storm-grey mb-4">No recent intel</p>
-                      <TacticalButton 
-                        variant="primary" 
+                      <TacticalButton
+                        variant="primary"
                         size="sm"
                       >
                         Start Communication
@@ -672,7 +686,7 @@ export default function DashboardPage() {
                     View All
                   </TacticalButton>
                 </div>
-                
+
                 <div className="space-y-4">
                   {insights.length > 0 ? (
                     insights.map((insight, index) => (
@@ -723,7 +737,7 @@ export default function DashboardPage() {
                   </TacticalButton>
                 </Link>
               </div>
-              
+
               <div className="space-y-3">
                 {recentBriefcases && recentBriefcases.length > 0 ? (
                   recentBriefcases.map((briefcase: any, index: number) => (
@@ -747,8 +761,8 @@ export default function DashboardPage() {
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <StatsBadge 
-                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'info' : 'secondary'} 
+                        <StatsBadge
+                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'info' : 'secondary'}
                           size="sm"
                         >
                           {briefcase.status}
@@ -765,11 +779,11 @@ export default function DashboardPage() {
                       Create your first briefcase to organize your missions and objectives
                     </p>
                     <Link href="/dashboard/briefcase">
-                      <TacticalButton 
-                        variant="primary" 
+                      <TacticalButton
+                        variant="primary"
                         size="sm"
-                        icon={<Plus className="w-4 h-4" />}
                       >
+                        <Plus className="w-4 h-4 mr-2" />
                         Create Briefcase
                       </TacticalButton>
                     </Link>

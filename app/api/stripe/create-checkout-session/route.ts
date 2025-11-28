@@ -1,11 +1,12 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { rateLimitByIp} from '@/lib/rate-limit'
-import { 
-  stripe, createCheckoutSession, SUBSCRIPTION_TIERS, STRIPE_PRICES} from '@/lib/stripe'
-import { updateUserStripeCustomerId} from '@/lib/stripe-db-utils'
-import { z} from 'zod'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import {
+  stripe, createCheckoutSession, SUBSCRIPTION_TIERS, STRIPE_PRICES
+} from '@/lib/stripe'
+import { updateUserStripeCustomerId } from '@/lib/stripe-db-utils'
+import { z } from 'zod'
 
 // Stripe API requires Node.js runtime (native modules + TLS)
 export const runtime = 'nodejs'
@@ -71,17 +72,17 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.full_name,
+        email: user.email || undefined,
+        name: user.full_name || undefined,
         metadata: {
           user_id: user.id,
           platform: 'SoloSuccess-ai'
         }
       })
       customerId = customer.id
-      
+
       // Update user with Stripe customer ID
       const updateResult = await updateUserStripeCustomerId(user.id, customerId)
       if (!updateResult.success) {
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logError('Error creating checkout session:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid request data', details: error.errors },

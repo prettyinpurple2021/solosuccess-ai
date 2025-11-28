@@ -25,9 +25,9 @@ export async function GET(request: NextRequest) {
     const analytics = await getUserTemplateAnalytics(authResult.user.id)
 
     logInfo('Template analytics fetched successfully', { userId: authResult.user.id })
-    return NextResponse.json({ 
-      success: true, 
-      analytics 
+    return NextResponse.json({
+      success: true,
+      analytics
     })
   } catch (error) {
     logError('Error fetching template analytics:', error)
@@ -40,7 +40,7 @@ async function getUserTemplateAnalytics(userId: string) {
     // Get real analytics data from database
     const { getDb } = await import('@/lib/database-client')
     const db = getDb()
-    
+
     // Query real template usage data
     const templateUsage = await db.query(`
       SELECT 
@@ -51,9 +51,9 @@ async function getUserTemplateAnalytics(userId: string) {
       FROM template_usage 
       WHERE user_id = $1
     `, [userId])
-    
+
     const usage = templateUsage.rows[0] || {}
-    
+
     const analytics = {
       overview: {
         totalTemplatesUsed: parseInt(usage.total_templates_used) || 0,
@@ -115,8 +115,8 @@ async function getTemplatesByCategory(db: any, userId: string) {
       GROUP BY category
       ORDER BY count DESC
     `, [userId])
-    
-    const total = result.rows.reduce((sum, row) => sum + parseInt(row.count), 0)
+
+    const total = result.rows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0)
     return result.rows.map(row => ({
       category: row.category,
       count: parseInt(row.count),
@@ -138,8 +138,8 @@ async function getTemplatesByDifficulty(db: any, userId: string) {
       GROUP BY difficulty
       ORDER BY count DESC
     `, [userId])
-    
-    const total = result.rows.reduce((sum, row) => sum + parseInt(row.count), 0)
+
+    const total = result.rows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0)
     return result.rows.map(row => ({
       difficulty: row.difficulty,
       count: parseInt(row.count),
@@ -163,7 +163,7 @@ async function getMonthlyUsage(db: any, userId: string) {
       GROUP BY TO_CHAR(created_at, 'Mon'), DATE_TRUNC('month', created_at)
       ORDER BY DATE_TRUNC('month', created_at)
     `, [userId])
-    
+
     return result.rows.map(row => ({
       month: row.month,
       count: parseInt(row.count)
@@ -184,7 +184,7 @@ async function getProductivityStats(db: any, userId: string) {
       FROM template_usage
       WHERE user_id = $1
     `, [userId])
-    
+
     const stats = result.rows[0] || {}
     return {
       averageCompletionTime: Math.round(parseFloat(stats.avg_completion_time) || 0),
@@ -216,7 +216,7 @@ async function getTemplateInsights(db: any, userId: string) {
       ORDER BY usage DESC
       LIMIT 3
     `, [userId])
-    
+
     return {
       topPerformingTemplates: topTemplates.rows.map(row => ({
         name: row.name,
@@ -251,7 +251,7 @@ async function calculateStreakDays(db: any, userId: string) {
       FROM daily_completions
       WHERE date >= CURRENT_DATE - INTERVAL '30 days'
     `, [userId])
-    
+
     return parseInt(result.rows[0]?.streak) || 0
   } catch (error) {
     return 0

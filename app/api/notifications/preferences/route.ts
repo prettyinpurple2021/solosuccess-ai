@@ -1,10 +1,10 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server';
-import { authenticateRequest} from '@/lib/auth-server';
-import { rateLimitByIp} from '@/lib/rate-limit';
-import { notificationDelivery, NotificationPreferences} from '@/lib/notification-delivery-system';
-import { AlertType} from '@/lib/competitor-alert-system';
-import { z} from 'zod';
+import { NextRequest, NextResponse } from 'next/server';
+import { authenticateRequest } from '@/lib/auth-server';
+import { rateLimitByIp } from '@/lib/rate-limit';
+import { notificationDelivery, NotificationPreferences } from '@/lib/notification-delivery-system';
+import { AlertType } from '@/lib/competitor-alert-system';
+import { z } from 'zod';
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -106,7 +106,7 @@ export async function PUT(request: NextRequest) {
 
     // In a real implementation, save to database
     // For now, we'll just validate and return success
-    logInfo('Saving notification preferences for user:', user.id, fullPreferences);
+    logInfo('Saving notification preferences for user:', { userId: user.id, preferences: fullPreferences });
 
     return NextResponse.json({
       success: true,
@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest) {
 
   } catch (error) {
     logError('Error updating notification preferences:', error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid preferences data', details: error.errors },

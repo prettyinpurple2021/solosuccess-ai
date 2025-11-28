@@ -28,7 +28,7 @@ async function getUserIdFromToken(request: NextRequest): Promise<string | null> 
     const token = authHeader.substring(7)
     const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
     const { payload: decoded } = await jose.jwtVerify(token, secret)
-    return decoded?.userId || null
+    return (decoded?.userId as string) || null
   } catch {
     return null
   }
@@ -38,23 +38,23 @@ export async function GET(req: NextRequest) {
   try {
     const sql = getSql()
     const userId = await getUserIdFromToken(req)
-    
+
     // Get specific preference key from query params
     const url = new URL(req.url)
     const key = url.searchParams.get('key')
-    
+
     if (!userId) {
       // For anonymous users, return default/empty state
       return NextResponse.json({ preferences: {} })
     }
-    
+
     if (key) {
       // Get specific preference
       const result = await sql`
         select preference_value from user_preferences 
         where user_id = ${userId} and preference_key = ${key}
       `
-      
+
       const value = result.length > 0 ? result[0].preference_value : null
       return NextResponse.json({ key, value })
     } else {
@@ -63,12 +63,12 @@ export async function GET(req: NextRequest) {
         select preference_key, preference_value from user_preferences 
         where user_id = ${userId}
       `
-      
+
       const preferences = result.reduce((acc, row) => {
         acc[row.preference_key] = row.preference_value
         return acc
       }, {} as Record<string, any>)
-      
+
       return NextResponse.json({ preferences })
     }
   } catch (error) {
@@ -85,13 +85,13 @@ export async function POST(req: NextRequest) {
   try {
     const sql = getSql()
     const userId = await getUserIdFromToken(req)
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
-    
+
     const { key, value, preferences } = await req.json().catch(() => ({}))
-    
+
     if (preferences) {
       // Bulk update multiple preferences
       const results = []
@@ -106,9 +106,9 @@ export async function POST(req: NextRequest) {
         `
         results.push(result[0])
       }
-      
-      return NextResponse.json({ 
-        success: true, 
+
+      return NextResponse.json({
+        success: true,
         updated: results.length,
         preferences: results.reduce((acc, row) => {
           acc[row.preference_key] = row.preference_value
@@ -125,11 +125,11 @@ export async function POST(req: NextRequest) {
           updated_at = now()
         returning preference_key, preference_value
       `
-      
-      return NextResponse.json({ 
-        success: true, 
-        key: result[0].preference_key, 
-        value: result[0].preference_value 
+
+      return NextResponse.json({
+        success: true,
+        key: result[0].preference_key,
+        value: result[0].preference_value
       })
     } else {
       return NextResponse.json({ error: 'Key and value, or preferences object required' }, { status: 400 })
@@ -151,23 +151,23 @@ export async function DELETE(req: NextRequest) {
   try {
     const sql = getSql()
     const userId = await getUserIdFromToken(req)
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
-    
+
     const url = new URL(req.url)
     const key = url.searchParams.get('key')
-    
+
     if (!key) {
       return NextResponse.json({ error: 'Key parameter required' }, { status: 400 })
     }
-    
+
     await sql`
       delete from user_preferences 
       where user_id = ${userId} and preference_key = ${key}
     `
-    
+
     return NextResponse.json({ success: true, deleted: key })
   } catch (error) {
     logError('Preferences DELETE error:', error)

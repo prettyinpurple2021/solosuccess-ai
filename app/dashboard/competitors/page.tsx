@@ -4,23 +4,27 @@
 export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { useState, useEffect } from "react"
-import { motion, easeOut} from "framer-motion"
+import { motion, easeOut } from "framer-motion"
 import {
-  Search, Filter, Plus, Eye, AlertTriangle, TrendingUp, Users, Globe, Shield, Target, Zap, MoreVertical, RefreshCw, Download, Settings, Activity, BarChart3, Map, Clock, Radar, Grid3X3, Layers, Crosshair} from "lucide-react"
+  Search, Filter, Plus, Eye, AlertTriangle, TrendingUp, Users, Globe, Shield, Target, Zap, MoreVertical, RefreshCw, Download, Settings, Activity, BarChart3, Map, Clock, Radar, Grid3X3, Layers, Crosshair
+} from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard, StatsCard} from "@/components/ui/boss-card"
-import { BossButton, ZapButton} from "@/components/ui/boss-button"
-import { Input} from "@/components/ui/input"
-import { Badge} from "@/components/ui/badge"
+import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
+import { BossButton, ZapButton } from "@/components/ui/boss-button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator} from "@/components/ui/dropdown-menu"
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select"
 import {
-  Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
-import { Loading} from "@/components/ui/loading"
-import { Progress as _Progress} from "@/components/ui/progress"
+  Tabs, TabsContent, TabsList, TabsTrigger,
+} from "@/components/ui/tabs"
+import { Loading } from "@/components/ui/loading"
+import { Progress as _Progress } from "@/components/ui/progress"
 
 
 interface Competitor {
@@ -38,6 +42,7 @@ interface Competitor {
   vulnerabilities: string[]
   recent_activity_count: number
   alert_count: number
+  funding_amount?: number
 }
 
 interface DashboardStats {
@@ -121,15 +126,15 @@ export default function CompetitorDashboardPage() {
         const threatMatrixData = (competitorsData.competitors || []).map((comp: Competitor, index: number) => {
           // Calculate market overlap based on industry and description similarity
           const marketOverlap = comp.threat_level === 'critical' ? 90 + Math.random() * 10 :
-                               comp.threat_level === 'high' ? 70 + Math.random() * 20 :
-                               comp.threat_level === 'medium' ? 40 + Math.random() * 30 :
-                               20 + Math.random() * 30
-          
+            comp.threat_level === 'high' ? 70 + Math.random() * 20 :
+              comp.threat_level === 'medium' ? 40 + Math.random() * 30 :
+                20 + Math.random() * 30
+
           // Calculate competitive strength based on employee count and funding
           const employeeCount = comp.employee_count || 50
           const fundingAmount = comp.funding_amount || 0
           const competitiveStrength = Math.min(100, (employeeCount / 10) + (fundingAmount / 1000000) + Math.random() * 20)
-          
+
           return {
             competitorId: comp.id,
             name: comp.name,
@@ -150,15 +155,15 @@ export default function CompetitorDashboardPage() {
           // Calculate market share based on employee count and threat level
           const employeeCount = comp.employee_count || 50
           const marketShare = comp.threat_level === 'critical' ? 25 + Math.random() * 10 :
-                             comp.threat_level === 'high' ? 15 + Math.random() * 10 :
-                             comp.threat_level === 'medium' ? 8 + Math.random() * 7 :
-                             3 + Math.random() * 5
-          
+            comp.threat_level === 'high' ? 15 + Math.random() * 10 :
+              comp.threat_level === 'medium' ? 8 + Math.random() * 7 :
+                3 + Math.random() * 5
+
           // Calculate growth rate based on recent activity and funding
           const recentActivity = comp.recent_activity_count || 0
           const fundingAmount = comp.funding_amount || 0
           const growthRate = (recentActivity * 2) + (fundingAmount / 10000000) + (Math.random() - 0.5) * 20
-          
+
           return {
             competitorId: comp.id,
             name: comp.name,

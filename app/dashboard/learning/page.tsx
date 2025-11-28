@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  BookOpen, 
-  Target, 
-  TrendingUp, 
-  Award, 
-  Clock, 
-  Brain, 
+import {
+  BookOpen,
+  Target,
+  TrendingUp,
+  Award,
+  Clock,
+  Brain,
   CheckCircle,
   Star,
   Zap,
@@ -114,7 +114,7 @@ export default function LearningDashboard() {
   const loadLearningData = useCallback(async () => {
     try {
       setLoading(true)
-      
+
       // Mock data - in production, this would come from API
       const mockAnalytics: LearningAnalytics = {
         total_modules_completed: 23,
@@ -224,7 +224,7 @@ export default function LearningDashboard() {
       setSkillGaps(mockSkillGaps)
       setRecommendations(mockRecommendations)
       setProgress(mockProgress)
-      
+
       logInfo('Learning data loaded successfully')
     } catch (error) {
       logError('Error loading learning data:', error)
@@ -326,7 +326,7 @@ export default function LearningDashboard() {
 
         {/* Learning Tabs */}
         <motion.div variants={itemVariants}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="space-y-6">
             <TabsList className="grid w-full grid-cols-6 bg-purple-900/50 border border-purple-700">
               <TabsTrigger value="overview" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">
                 <BookOpen className="w-4 h-4 mr-2" />
@@ -776,7 +776,7 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -794,7 +794,7 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -830,7 +830,7 @@ function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
             {analytics.top_categories.map((category, index) => {
               const totalTime = analytics.top_categories.reduce((sum, c) => sum + c.time_spent, 0)
               const percentage = totalTime > 0 ? (category.time_spent / totalTime) * 100 : 0
-              
+
               return (
                 <div key={category.category} className="space-y-2">
                   <div className="flex items-center justify-between">

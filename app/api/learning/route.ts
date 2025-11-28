@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
     const { payload: decoded } = await jose.jwtVerify(token, secret)
-    const userId = decoded.user_id
+    const userId = decoded.user_id as string
 
     const { searchParams } = new URL(request.url)
     const action = searchParams.get('action')
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
     const { payload: decoded } = await jose.jwtVerify(token, secret)
-    const userId = decoded.user_id
+    const userId = decoded.user_id as string
 
     const body = await request.json()
     const { action, data } = body

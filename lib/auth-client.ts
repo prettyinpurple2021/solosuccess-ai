@@ -56,7 +56,7 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
   }
 
   const data = await response.json()
-  
+
   // Store token in localStorage for client-side access
   if (typeof window !== 'undefined' && data.token) {
     localStorage.setItem('auth_token', data.token)
@@ -98,7 +98,7 @@ export async function signUp(email: string, password: string, metadata?: {
   }
 
   const data = await response.json()
-  
+
   // Store token in localStorage for client-side access
   if (typeof window !== 'undefined' && data.token) {
     localStorage.setItem('auth_token', data.token)
@@ -121,7 +121,7 @@ export async function signOut(): Promise<void> {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_token')
   }
-  
+
   await fetch('/api/auth/logout', {
     method: 'POST',
   })
@@ -132,15 +132,15 @@ export async function signOut(): Promise<void> {
  */
 export async function getSession(): Promise<AuthResponse> {
   let token: string | null = null
-  
+
   if (typeof window !== 'undefined') {
     token = localStorage.getItem('auth_token')
   }
-  
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   }
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
@@ -156,6 +156,57 @@ export async function getSession(): Promise<AuthResponse> {
   }
 
   return await response.json()
+}
+
+/**
+ * Verify TOTP code
+ */
+export async function verifyTOTP(data: { code: string; trustDevice: boolean }): Promise<{ data: boolean; error: any }> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch('/api/auth/2fa/verify', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { data: false, error }
+    }
+
+    return { data: true, error: null }
+  } catch (error) {
+    return { data: false, error }
+  }
+}
+
+/**
+ * Resend 2FA code
+ */
+export async function resend2FACode(): Promise<{ data: boolean; error: any }> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch('/api/auth/2fa/resend', {
+      method: 'POST',
+      headers,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { data: false, error }
+    }
+
+    return { data: true, error: null }
+  } catch (error) {
+    return { data: false, error }
+  }
 }
 
 /**
@@ -201,4 +252,8 @@ export const authClient = {
   getSession,
   useSession,
   useUser,
+  twoFactor: {
+    verifyTOTP,
+    resendCode: resend2FACode
+  }
 }

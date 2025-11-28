@@ -7,11 +7,11 @@ import { useAuth } from "@/hooks/use-auth"
 import { Loading } from "@/components/ui/loading"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
-import { 
-  CreditCard, 
-  Crown, 
-  Zap, 
-  Check, 
+import {
+  CreditCard,
+  Crown,
+  Zap,
+  Check,
   X,
   Shield,
   Target,
@@ -26,11 +26,11 @@ import {
   AlertTriangle,
   CheckCircle
 } from "lucide-react"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid,
@@ -60,7 +60,7 @@ export default function BillingPage() {
       description: "Perfect for getting started with basic AI assistance",
       features: [
         "2 Elite AI Agents",
-        "5 Daily Conversations", 
+        "5 Daily Conversations",
         "Basic Template Library",
         "Email Support",
         "Basic Analytics"
@@ -77,7 +77,7 @@ export default function BillingPage() {
       features: [
         "5 Elite AI Agents",
         "100 Daily Conversations",
-        "Premium Template Library", 
+        "Premium Template Library",
         "Priority Support",
         "Advanced Analytics",
         "Custom Workflows",
@@ -90,13 +90,13 @@ export default function BillingPage() {
     {
       name: "Dominator",
       price: 29,
-      period: "month", 
+      period: "month",
       description: "Maximum power for elite entrepreneurs",
       features: [
         "8 Elite AI Agents",
         "Unlimited Conversations",
         "Full Template Library",
-        "24/7 Elite Support", 
+        "24/7 Elite Support",
         "Real-time Analytics",
         "Custom AI Training",
         "White-label Options",
@@ -117,7 +117,7 @@ export default function BillingPage() {
       description: "Launch Plan - Free Tier"
     },
     {
-      id: "inv_002", 
+      id: "inv_002",
       date: "2024-01-01",
       amount: 0,
       status: "paid",
@@ -181,7 +181,7 @@ export default function BillingPage() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               <Link href="/dashboard" className="flex items-center gap-3">
-                <motion.div 
+                <motion.div
                   className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -189,7 +189,7 @@ export default function BillingPage() {
                 </motion.div>
                 <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              
+
               <div className="flex items-center gap-4">
                 <Link href="/dashboard">
                   <TacticalButton variant="outline" size="sm">
@@ -220,13 +220,13 @@ export default function BillingPage() {
                   Elite Command Center
                 </span>
               </div>
-              
+
               <h1 className="font-heading text-5xl font-bold text-white mb-6">
                 Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Billing</span>
               </h1>
-              
+
               <p className="text-xl text-military-storm-grey max-w-2xl">
-                Manage your elite subscription and tactical resources. 
+                Manage your elite subscription and tactical resources.
                 Upgrade your arsenal for maximum business domination.
               </p>
             </motion.div>
@@ -243,7 +243,7 @@ export default function BillingPage() {
                       Your active subscription and usage details
                     </p>
                   </div>
-                  
+
                   <div className="text-right">
                     <div className="text-3xl font-bold text-military-hot-pink mb-1">
                       {subscription.plan}
@@ -253,7 +253,7 @@ export default function BillingPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <h3 className="font-heading text-xl font-bold text-white mb-4">Active Features</h3>
@@ -266,7 +266,7 @@ export default function BillingPage() {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-heading text-xl font-bold text-white mb-4">Usage Statistics</h3>
                     <div className="space-y-4">
@@ -277,7 +277,7 @@ export default function BillingPage() {
                       <div className="w-full bg-military-tactical/20 rounded-full h-2">
                         <div className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink h-2 rounded-full" style={{ width: '60%' }}></div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="text-military-storm-grey">Active AI Agents</span>
                         <span className="text-white font-bold">2 / 2</span>
@@ -301,7 +301,7 @@ export default function BillingPage() {
                   Choose your tactical advantage level
                 </p>
               </div>
-              
+
               <TacticalGrid className="max-w-6xl mx-auto">
                 {plans.map((plan, index) => (
                   <TacticalGridItem key={index}>
@@ -318,7 +318,7 @@ export default function BillingPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         {plan.current && (
                           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                             <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-1 rounded-full text-sm font-tactical uppercase tracking-wider">
@@ -326,23 +326,23 @@ export default function BillingPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         <div className="text-center mb-8">
                           <div className={`w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center`}>
                             {plan.name === 'Launch' && <Target className="w-8 h-8 text-white" />}
                             {plan.name === 'Accelerator' && <Zap className="w-8 h-8 text-white" />}
                             {plan.name === 'Dominator' && <Crown className="w-8 h-8 text-white" />}
                           </div>
-                          
+
                           <h3 className="font-heading text-2xl font-bold text-white mb-2">{plan.name}</h3>
                           <p className="text-military-storm-grey mb-4">{plan.description}</p>
-                          
+
                           <div className="mb-6">
                             <span className="text-4xl font-bold text-white">${plan.price}</span>
                             <span className="text-military-storm-grey">/{plan.period}</span>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-4 mb-8">
                           {plan.features.map((feature, featureIndex) => (
                             <div key={featureIndex} className="flex items-center gap-3">
@@ -351,10 +351,10 @@ export default function BillingPage() {
                             </div>
                           ))}
                         </div>
-                        
-                        <TacticalButton 
+
+                        <TacticalButton
                           className="w-full group"
-                          variant={plan.current ? "outline" : "default"}
+                          variant={plan.current ? "outline" : "primary"}
                           disabled={plan.current || isLoading}
                           onClick={() => handleUpgrade(plan.name)}
                         >
@@ -396,7 +396,7 @@ export default function BillingPage() {
                     Export
                   </TacticalButton>
                 </div>
-                
+
                 <div className="space-y-4">
                   {billingHistory.map((invoice, index) => (
                     <motion.div
@@ -410,13 +410,13 @@ export default function BillingPage() {
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                           <CreditCard className="w-5 h-5 text-white" />
                         </div>
-                        
+
                         <div>
                           <p className="text-white font-medium">{invoice.description}</p>
                           <p className="text-military-storm-grey text-sm">{invoice.date}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-4">
                         <span className="text-white font-bold">${invoice.amount}</span>
                         <div className="flex items-center gap-2">
@@ -434,19 +434,19 @@ export default function BillingPage() {
             <div className="mb-12">
               <GlassCard className="p-8">
                 <h2 className="font-heading text-3xl font-bold text-white mb-6">Payment Method</h2>
-                
+
                 <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                       <CreditCard className="w-6 h-6 text-white" />
                     </div>
-                    
+
                     <div>
                       <p className="text-white font-medium">No payment method on file</p>
                       <p className="text-military-storm-grey text-sm">Free plan - no payment required</p>
                     </div>
                   </div>
-                  
+
                   <TacticalButton variant="outline" size="sm">
                     Add Payment Method
                   </TacticalButton>

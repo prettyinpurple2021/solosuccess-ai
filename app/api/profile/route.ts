@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
 import { getDb } from '@/lib/database-client'
-import { z} from 'zod'
-import { info, error as logError} from '@/lib/log'
+import { z } from 'zod'
+import { logger, logError, logInfo } from '@/lib/logger'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
     if (error || !user) {
-      info('Unauthorized profile request', { 
-        route, 
+      logInfo('Unauthorized profile request', {
+        route,
         status: 401,
         meta: { ip: request.headers.get('x-forwarded-for') || 'unknown' }
       })
@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
     )
 
     if (rows.length === 0) {
-      info('Profile not found', { 
-        route, 
+      logInfo('Profile not found', {
+        route,
         userId: user.id,
         status: 404,
         meta: { ip: request.headers.get('x-forwarded-for') || 'unknown' }
@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    info('Profile fetched successfully', { 
-      route, 
+    logInfo('Profile fetched successfully', {
+      route,
       userId: user.id,
       status: 200,
       meta: { ip: request.headers.get('x-forwarded-for') || 'unknown' }
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       route,
       status: 500,
       error: err,
-      meta: { 
+      meta: {
         errorMessage: err instanceof Error ? err.message : String(err),
         ip: request.headers.get('x-forwarded-for') || 'unknown'
       }
@@ -70,8 +70,8 @@ export async function PATCH(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
     if (error || !user) {
-      info('Unauthorized profile update attempt', { 
-        route, 
+      logInfo('Unauthorized profile update attempt', {
+        route,
         status: 401,
         meta: { ip: request.headers.get('x-forwarded-for') || 'unknown' }
       })
@@ -86,11 +86,11 @@ export async function PATCH(request: NextRequest) {
     })
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
-      info('Invalid profile update payload', { 
-        route, 
+      logInfo('Invalid profile update payload', {
+        route,
         userId: user.id,
         status: 400,
-        meta: { 
+        meta: {
           validationErrors: parsed.error.flatten(),
           ip: request.headers.get('x-forwarded-for') || 'unknown'
         }
@@ -109,7 +109,7 @@ export async function PATCH(request: NextRequest) {
         try {
           onboardingDataJson = JSON.stringify(onboarding_data)
         } catch (serializationError) {
-          info('Invalid onboarding_data payload', {
+          logInfo('Invalid onboarding_data payload', {
             route,
             userId: user.id,
             status: 400,
@@ -152,11 +152,11 @@ export async function PATCH(request: NextRequest) {
       ]
     )
 
-    info('Profile updated successfully', { 
-      route, 
+    logInfo('Profile updated successfully', {
+      route,
       userId: user.id,
       status: 200,
-      meta: { 
+      meta: {
         updatedFields: {
           full_name: full_name !== undefined,
           avatar_url: avatar_url !== undefined,
@@ -173,7 +173,7 @@ export async function PATCH(request: NextRequest) {
       route,
       status: 500,
       error: err,
-      meta: { 
+      meta: {
         errorMessage: err instanceof Error ? err.message : String(err),
         ip: request.headers.get('x-forwarded-for') || 'unknown'
       }

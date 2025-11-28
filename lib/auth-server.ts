@@ -60,7 +60,8 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
         updated_at: users.updated_at,
         subscription_tier: users.subscription_tier,
         subscription_status: users.subscription_status,
-        avatar_url: users.avatar_url
+        avatar_url: users.avatar_url,
+        stripe_customer_id: users.stripe_customer_id
       })
       .from(users)
       .where(eq(users.id, payload.userId as string))
@@ -84,6 +85,7 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
       updated_at: user.updated_at ?? new Date(),
       subscription_tier: (user.subscription_tier ?? 'free') as string,
       subscription_status: (user.subscription_status ?? 'active') as string,
+      stripe_customer_id: user.stripe_customer_id,
     }
   } catch (err) {
     logError('JWT authentication error:', err)
