@@ -1,23 +1,23 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { db} from '@/db'
-import { intelligenceData, competitorProfiles} from '@/db/schema'
-import { authenticateRequest} from '@/lib/auth-server'
-import { rateLimitByIp} from '@/lib/rate-limit'
-import { z} from 'zod'
-import { eq, and, inArray, gte, desc} from 'drizzle-orm'
+import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/db'
+import { intelligenceData, competitorProfiles } from '@/db/schema'
+import { authenticateRequest } from '@/lib/auth-server'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { z } from 'zod'
+import { eq, and, inArray, gte, desc } from 'drizzle-orm'
 import { AgentCollaborationSystem } from '@/lib/custom-ai-agents/agent-collaboration-system'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-import type { 
+import type {
   IntelligenceData,
   AnalysisResult,
   ExtractedData,
   SourceType,
   ImportanceLevel
- } from '@/lib/competitor-intelligence-types'
+} from '@/lib/competitor-intelligence-types'
 
 
 // Force dynamic rendering
@@ -109,12 +109,12 @@ Requirements:
         agentId
       )
 
-      const analysis = response.analysis
+      const analysis = response.primaryResponse.analysis
 
       if (!analysis || analysis.insights.length === 0) {
         logWarn('Agent response missing structured analysis, falling back to content parsing', { agentId })
 
-      results.push({
+        results.push({
           agentId,
           analysisType,
           insights: [
@@ -122,14 +122,14 @@ Requirements:
               id: `auto-insight-${Date.now()}-${agentId}`,
               type: 'strategic',
               title: 'Qualitative Intelligence Summary',
-              description: response.content,
-              confidence: response.confidence,
+              description: response.primaryResponse.content,
+              confidence: response.primaryResponse.confidence,
               impact: 'medium',
               urgency: 'medium',
               supportingData: [],
             },
           ],
-          recommendations: response.suggestedActions.map((action, index) => ({
+          recommendations: response.primaryResponse.suggestedActions.map((action, index) => ({
             id: `auto-rec-${Date.now()}-${agentId}-${index}`,
             type: 'strategic',
             title: action,
@@ -140,7 +140,7 @@ Requirements:
             timeline: '30 days',
             actionItems: [],
           })),
-          confidence: response.confidence,
+          confidence: response.primaryResponse.confidence,
           analyzedAt: new Date(),
         })
 
@@ -155,7 +155,7 @@ Requirements:
           type: (INSIGHT_TYPES.includes(insight.type as any) ? (insight.type as any) : 'strategic') as AnalysisResult['insights'][number]['type'],
           title: insight.title,
           description: insight.description,
-          confidence: insight.confidence ?? response.confidence,
+          confidence: insight.confidence ?? response.primaryResponse.confidence,
           impact: (PRIORITY_LEVELS.includes(insight.impact as any) ? (insight.impact as any) : 'medium'),
           urgency: (PRIORITY_LEVELS.includes(insight.urgency as any) ? (insight.urgency as any) : 'medium'),
           supportingData: insight.supportingData ?? [],
@@ -175,7 +175,7 @@ Requirements:
           timeline: recommendation.timeline ?? '30 days',
           actionItems: recommendation.actionItems ?? [],
         })),
-        confidence: response.confidence,
+        confidence: response.primaryResponse.confidence,
         analyzedAt: new Date(),
       })
     } catch (error) {
@@ -188,9 +188,8 @@ Requirements:
             id: `error-insight-${Date.now()}-${agentId}`,
             type: 'threat',
             title: 'Analysis failed',
-            description: `Agent ${agentId} failed to analyze intelligence: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`,
+            description: `Agent ${agentId} failed to analyze intelligence: ${error instanceof Error ? error.message : 'Unknown error'
+              }`,
             confidence: 0.1,
             impact: 'low',
             urgency: 'low',
@@ -216,14 +215,14 @@ export async function POST(request: NextRequest) {
     }
 
     const { user, error } = await authenticateRequest()
-    
+
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
     const parsed = AnalysisRequestSchema.safeParse(body)
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid payload', details: parsed.error.flatten() },
@@ -289,7 +288,7 @@ export async function POST(request: NextRequest) {
     // Update intelligence entries with new analysis results
     const updatePromises = intelligence.map(async (item) => {
       const existingAnalysisResults = (item.intelligence.analysis_results as AnalysisResult[]) || []
-      const newAnalysisResults = analysisResults.filter(_result => 
+      const newAnalysisResults = analysisResults.filter(_result =>
         // Add analysis results to all entries for now - in production you'd be more selective
         true
       )
@@ -325,7 +324,7 @@ export async function POST(request: NextRequest) {
         })
         return acc
       }, {} as Record<string, number>),
-      highPriorityRecommendations: analysisResults.reduce((count, result) => 
+      highPriorityRecommendations: analysisResults.reduce((count, result) =>
         count + result.recommendations.filter(r => r.priority === 'high').length, 0
       ),
     }

@@ -7,8 +7,6 @@ import bcrypt from 'bcryptjs'
 // Node.js runtime required for bcryptjs password verification
 export const runtime = 'nodejs'
 
-
-
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ shareId: string }> }
@@ -20,15 +18,15 @@ export async function GET(
 
     // Get share link details
     const sql = getSql()
-    const shareLinkResult = await sql(`
+    const shareLinkResult = await sql`
       SELECT 
         dsl.*,
         d.name, d.original_name, d.file_type, d.mime_type, d.size, d.file_data,
         d.description, d.tags, d.metadata, d.created_at, d.updated_at
       FROM document_share_links dsl
       JOIN documents d ON dsl.document_id = d.id
-      WHERE dsl.id = $1 AND dsl.is_active = true
-    `, [shareId])
+      WHERE dsl.id = ${shareId} AND dsl.is_active = true
+    `
     const shareLink = shareLinkResult[0]
 
     if (!shareLink) {
@@ -46,25 +44,25 @@ export async function GET(
     }
 
     // Increment access count
-    await sql(`
+    await sql`
       UPDATE document_share_links 
       SET access_count = access_count + 1
-      WHERE id = $1
-    `, [shareId])
+      WHERE id = ${shareId}
+    `
 
     // Log access activity
-    await sql(`
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+    const userAgent = request.headers.get('user-agent')
+    const details = JSON.stringify({
+      shareId,
+      ipAddress,
+      userAgent
+    })
+
+    await sql`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
-      VALUES ($1, $2, 'shared_access', $3, NOW())
-    `, [
-      shareLink.document_id,
-      null, // No user ID for anonymous access
-      JSON.stringify({
-        shareId,
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
-        userAgent: request.headers.get('user-agent')
-      })
-    ])
+      VALUES (${shareLink.document_id}, NULL, 'shared_access', ${details}, NOW())
+    `
 
     return NextResponse.json({
       file: {
@@ -111,14 +109,14 @@ export async function POST(
 
     // Get share link details
     const sql = getSql()
-    const shareLinkResult = await sql(`
+    const shareLinkResult = await sql`
       SELECT 
         dsl.*,
         d.name, d.original_name, d.file_type, d.mime_type, d.size, d.file_data
       FROM document_share_links dsl
       JOIN documents d ON dsl.document_id = d.id
-      WHERE dsl.id = $1 AND dsl.is_active = true
-    `, [shareId])
+      WHERE dsl.id = ${shareId} AND dsl.is_active = true
+    `
     const shareLink = shareLinkResult[0]
 
     if (!shareLink) {

@@ -187,7 +187,7 @@ export class WebPushNotificationManager {
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
         silent: payload.silent
-      })
+      } as any)
     } else {
       // Use service worker notification
       await registration.showNotification(payload.title, {
@@ -199,7 +199,7 @@ export class WebPushNotificationManager {
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
         silent: payload.silent
-      })
+      } as any)
     }
   }
 

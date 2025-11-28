@@ -1,15 +1,10 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
-import { getDb} from '@/lib/database-client'
-import { z} from 'zod'
-import { rateLimitByIp} from '@/lib/rate-limit'
-import { getIdempotencyKeyFromRequest, reserveIdempotencyKey} from '@/lib/idempotency'
-import { sql} from 'drizzle-orm'
-
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
-
+import { NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
+import { z } from 'zod'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { getIdempotencyKeyFromRequest, reserveIdempotencyKeyNeon } from '@/lib/idempotency'
+import { getSql } from '@/lib/api-utils'
 
 // DELETE /api/templates/:id → delete a saved user template
 const IdParamSchema = z.object({ id: z.string().regex(/^\d+$/) })
@@ -34,20 +29,21 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const db = getDb()
+    const sql = getSql()
 
     const key = getIdempotencyKeyFromRequest(req)
     if (key) {
-      const reserved = await reserveIdempotencyKey(db, `tpl-del:${id}:${user.id}:${key}`)
+      const reserved = await reserveIdempotencyKeyNeon(sql, `tpl-del:${id}:${user.id}:${key}`)
       if (!reserved) {
         return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
       }
     }
-    const result = await db.execute(sql`
+    const result = await sql`
       DELETE FROM user_templates WHERE id = ${id} AND user_id = ${user.id}
-    `)
+      RETURNING id
+    `
 
-    if (result.rowCount === 0) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 

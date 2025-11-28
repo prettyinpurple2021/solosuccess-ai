@@ -22,12 +22,6 @@ const subscriptionSchema = z.object({
   })
 })
 
-// Helper for direct query execution
-async function query(text: string, params: any[] = []): Promise<any[]> {
-  const sql = getSql()
-  return await sql(text, params)
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { allowed } = await rateLimitByIp(request, { requests: 5, window: 60 })
@@ -52,9 +46,10 @@ export async function POST(request: NextRequest) {
 
     const { subscription } = parsed.data
     const now = new Date()
+    const sql = getSql()
 
     // Check if push_subscriptions table exists, if not create it
-    await query(`
+    await sql`
       CREATE TABLE IF NOT EXISTS push_subscriptions (
         id SERIAL PRIMARY KEY,
         user_id VARCHAR(255) NOT NULL,
@@ -68,23 +63,33 @@ export async function POST(request: NextRequest) {
         last_used_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         is_active BOOLEAN DEFAULT true
       )
-    `)
+    `
 
     // Create index if it doesn't exist
-    await query(`
+    await sql`
       CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_id ON push_subscriptions(user_id)
-    `)
-    await query(`
+    `
+    await sql`
       CREATE INDEX IF NOT EXISTS idx_push_subscriptions_endpoint ON push_subscriptions(endpoint)
-    `)
+    `
 
     // Insert or update subscription
-    const sql = getSql()
-    const result = await sql(`
+    const result = await sql`
       INSERT INTO push_subscriptions (
         user_id, endpoint, expiration_time, p256dh_key, auth_key, 
         user_agent, created_at, updated_at, last_used_at, is_active
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $7, true)
+      ) VALUES (
+        ${user.id}, 
+        ${subscription.endpoint}, 
+        ${subscription.expirationTime}, 
+        ${subscription.keys.p256dh}, 
+        ${subscription.keys.auth}, 
+        ${request.headers.get('user-agent') || 'Unknown'}, 
+        ${now}, 
+        ${now}, 
+        ${now}, 
+        true
+      )
       ON CONFLICT (endpoint) 
       DO UPDATE SET 
         user_id = EXCLUDED.user_id,
@@ -96,22 +101,14 @@ export async function POST(request: NextRequest) {
         last_used_at = EXCLUDED.last_used_at,
         is_active = true
       RETURNING id, created_at
-    `, [
-      user.id,
-      subscription.endpoint,
-      subscription.expirationTime,
-      subscription.keys.p256dh,
-      subscription.keys.auth,
-      request.headers.get('user-agent') || 'Unknown',
-      now
-    ])
+    `
 
     // Update user's notification preferences if this is their first subscription
-    const userSubscriptionsCount = await query(`
+    const userSubscriptionsCount = await sql`
       SELECT COUNT(*) as count 
       FROM push_subscriptions 
-      WHERE user_id = $1 AND is_active = true
-    `, [user.id])
+      WHERE user_id = ${user.id} AND is_active = true
+    `
 
     if (parseInt(userSubscriptionsCount[0].count) === 1) {
       // This might be their first subscription - log the milestone
@@ -129,7 +126,7 @@ export async function POST(request: NextRequest) {
     logError('Error subscribing to push notifications:', error)
 
     // Type-safe error handling
-    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
       // PostgreSQL unique constraint violation
       return NextResponse.json(
         { error: 'Subscription already exists for this endpoint' },

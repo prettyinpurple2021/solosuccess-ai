@@ -22,12 +22,6 @@ const unsubscribeSchema = z.object({
   })
 })
 
-// Helper for direct query execution
-async function query(text: string, params: any[] = []): Promise<any[]> {
-  const sql = getSql()
-  return await sql(text, params)
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { allowed } = await rateLimitByIp(request, { requests: 10, window: 60 })
@@ -55,14 +49,14 @@ export async function POST(request: NextRequest) {
 
     // Mark subscription as inactive instead of deleting it (for audit purposes)
     const sql = getSql()
-    const result = await sql(`
+    const result = await sql`
       UPDATE push_subscriptions 
       SET 
         is_active = false,
-        updated_at = $1
-      WHERE endpoint = $2 AND user_id = $3 AND is_active = true
+        updated_at = ${now}
+      WHERE endpoint = ${subscription.endpoint} AND user_id = ${user.id} AND is_active = true
       RETURNING id, created_at
-    `, [now, subscription.endpoint, user.id])
+    `
 
     if (result.length === 0) {
       return NextResponse.json(
@@ -75,11 +69,11 @@ export async function POST(request: NextRequest) {
     logInfo(`User ${user.id} unsubscribed from push notifications`)
 
     // Check if user has any remaining active subscriptions
-    const remainingSubscriptions = await query(`
+    const remainingSubscriptions = await sql`
       SELECT COUNT(*) as count 
       FROM push_subscriptions 
-      WHERE user_id = $1 AND is_active = true
-    `, [user.id])
+      WHERE user_id = ${user.id} AND is_active = true
+    `
 
     const hasRemainingSubscriptions = parseInt(remainingSubscriptions[0].count) > 0
 
@@ -114,11 +108,11 @@ export async function DELETE(request: NextRequest) {
 
     // Delete all subscriptions for the user (complete cleanup)
     const sql = getSql()
-    const result = await sql(`
+    const result = await sql`
       DELETE FROM push_subscriptions 
-      WHERE user_id = $1
+      WHERE user_id = ${user.id}
       RETURNING COUNT(*) as deleted_count
-    `, [user.id])
+    `
 
     const deletedCount = result[0]?.deleted_count || 0
 

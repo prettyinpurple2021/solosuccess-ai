@@ -772,39 +772,6 @@ export class OpportunityRecommendationSystem {
         successMetrics: ['Key hires', 'Team capability'],
         resources: ['HR team', 'Recruitment budget'],
         confidence: opportunity.confidence * 0.7,
-        createdAt: new Date()
-      }
-    ]
-  }
-
-  private async generatePartnershipRecommendations(opportunity: OpportunityDetectionResult): Promise<OpportunityRecommendation[]> {
-    return [
-      {
-        id: `rec_partnership_${Date.now()}_1`,
-        opportunityId: opportunity.id,
-        title: 'Strategic Partnership Development',
-        description: 'Develop partnerships to fill gaps left by competitor relationship changes',
-        actionType: 'partnership',
-        priority: 'medium',
-        estimatedEffort: 50,
-        estimatedCost: 8000,
-        expectedROI: 90,
-        timeframe: 'medium-term',
-        prerequisites: ['Partner identification', 'Value proposition'],
-        risks: ['Partnership failure', 'Integration challenges'],
-        successMetrics: ['Partnership deals', 'Revenue impact'],
-        resources: ['Business development', 'Legal support'],
-        confidence: opportunity.confidence * 0.6,
-        createdAt: new Date()
-      }
-    ]
-  }
-
-  private async generateGenericRecommendations(opportunity: OpportunityDetectionResult): Promise<OpportunityRecommendation[]> {
-    return [
-      {
-        id: `rec_generic_${Date.now()}_1`,
-        opportunityId: opportunity.id,
         title: 'Opportunity Research',
         description: 'Conduct detailed research to understand the opportunity better',
         actionType: 'research',

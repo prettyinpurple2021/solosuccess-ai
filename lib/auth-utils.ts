@@ -16,6 +16,7 @@ export interface AuthenticatedUser {
   updated_at: Date
   subscription_tier: string
   subscription_status: string
+  stripe_customer_id: string | null
 }
 
 /**
@@ -34,7 +35,7 @@ export async function getUserIdFromSession(request: NextRequest): Promise<string
     // Try to get session token from Authorization header or cookie
     const authHeader = request.headers.get('authorization')
     let token: string | undefined
-    
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.substring(7)
     } else {
@@ -42,17 +43,17 @@ export async function getUserIdFromSession(request: NextRequest): Promise<string
       const cookies = request.cookies
       token = cookies.get('session')?.value
     }
-    
+
     if (!token) {
       return null
     }
-    
+
     const jwtSecret = process.env.JWT_SECRET
     if (!jwtSecret) {
       logError('JWT_SECRET is not configured')
       return null
     }
-    
+
     // Verify and decode JWT using jose (Edge Runtime compatible)
     const secret = new TextEncoder().encode(jwtSecret)
     const { payload } = await jose.jwtVerify(token, secret)
@@ -70,11 +71,11 @@ export async function getUserIdFromRequest(request: NextRequest): Promise<string
   // First try JWT session
   const userId = await getUserIdFromSession(request)
   if (userId) return userId
-  
+
   // Fallback to user-id header (for development/testing)
   const userIdHeader = request.headers.get('x-user-id')
   if (userIdHeader) return userIdHeader
-  
+
   return null
 }
 
@@ -86,14 +87,14 @@ export async function createToken(userId: string, email: string): Promise<string
   if (!jwtSecret) {
     throw new Error('JWT_SECRET is not configured')
   }
-  
+
   const secret = new TextEncoder().encode(jwtSecret)
   const token = await new jose.SignJWT({ userId, email })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
     .sign(secret)
-  
+
   return token
 }
 

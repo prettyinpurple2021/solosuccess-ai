@@ -45,15 +45,15 @@ Respond conversationally in your own voice.`,
       'roxy',
     )
 
-    logInfo('AI diagnostic completed', { confidence: response.confidence })
+    logInfo('AI diagnostic completed', { confidence: response.primaryResponse.confidence })
 
     return NextResponse.json({
       status: 'success',
       agent: 'roxy',
-      confidence: response.confidence,
-      reasoning: response.reasoning,
-      response: response.content,
-      suggestedActions: response.suggestedActions,
+      confidence: response.primaryResponse.confidence,
+      reasoning: response.primaryResponse.reasoning,
+      response: response.primaryResponse.content,
+      suggestedActions: response.primaryResponse.suggestedActions,
       environmentChecks: envChecks,
     })
   } catch (error) {

@@ -64,12 +64,11 @@ export async function POST(request: NextRequest) {
     )
 
     // Log usage for analytics in Postgres (Neon)
-    const db = getDb()
     const sql = getSql()
-    await sql(
-      'INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at) VALUES ($1, $2, $3, $4, $5)',
-      [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date().toISOString()]
-    )
+    await sql`
+      INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at) 
+      VALUES (${user.id}, 'task_intelligence', 'optimize_tasks', ${validatedData.tasks.length}, ${new Date().toISOString()})
+    `
 
     return NextResponse.json({
       success: true,
@@ -113,12 +112,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's recent AI usage stats from Postgres (Neon)
-    const db = getDb()
     const sql = getSql()
-    const usageStats = await sql(
-      'SELECT * FROM ai_usage_logs WHERE user_id = $1 AND feature = $2 ORDER BY created_at DESC LIMIT 10',
-      [user.id, 'task_intelligence']
-    )
+    const usageStats = await sql`
+      SELECT * FROM ai_usage_logs WHERE user_id = ${user.id} AND feature = 'task_intelligence' ORDER BY created_at DESC LIMIT 10
+    `
 
     return NextResponse.json({
       success: true,

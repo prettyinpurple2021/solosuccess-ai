@@ -9,8 +9,6 @@ import { z } from 'zod'
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-
-
 export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
@@ -23,46 +21,68 @@ export async function GET(request: NextRequest) {
     const includeCompetitive = searchParams.get('include_competitive') === 'true'
     const competitiveOnly = searchParams.get('competitive_only') === 'true'
 
-    const db = getDb()
-
-    let query = `
-      SELECT t.*, 
-             g.title as goal_title,
-             g.category as goal_category
-      FROM tasks t
-      LEFT JOIN goals g ON t.goal_id = g.id
-      WHERE t.user_id = $1
-    `
-
-    if (competitiveOnly) {
-      query += ` AND t.ai_suggestions->>'source' = 'competitive_intelligence'`
-    }
+    const sql = getSql()
+    let tasks: any[] = []
 
     if (includeCompetitive) {
-      query = `
-        SELECT t.*, 
-               g.title as goal_title,
-               g.category as goal_category,
-               cp.name as competitor_name,
-               cp.threat_level as competitor_threat_level,
-               ca.title as alert_title,
-               ca.severity as alert_severity
-        FROM tasks t
-        LEFT JOIN goals g ON t.goal_id = g.id
-        LEFT JOIN competitor_alerts ca ON (t.ai_suggestions->>'alert_id')::text = ca.id::text
-        LEFT JOIN competitor_profiles cp ON ca.competitor_id = cp.id
-        WHERE t.user_id = $1
-      `
-
       if (competitiveOnly) {
-        query += ` AND t.ai_suggestions->>'source' = 'competitive_intelligence'`
+        tasks = await sql`
+          SELECT t.*, 
+                 g.title as goal_title,
+                 g.category as goal_category,
+                 cp.name as competitor_name,
+                 cp.threat_level as competitor_threat_level,
+                 ca.title as alert_title,
+                 ca.severity as alert_severity
+          FROM tasks t
+          LEFT JOIN goals g ON t.goal_id = g.id
+          LEFT JOIN competitor_alerts ca ON (t.ai_suggestions->>'alert_id')::text = ca.id::text
+          LEFT JOIN competitor_profiles cp ON ca.competitor_id = cp.id
+          WHERE t.user_id = ${user.id} 
+          AND t.ai_suggestions->>'source' = 'competitive_intelligence'
+          ORDER BY t.created_at DESC
+        `
+      } else {
+        tasks = await sql`
+          SELECT t.*, 
+                 g.title as goal_title,
+                 g.category as goal_category,
+                 cp.name as competitor_name,
+                 cp.threat_level as competitor_threat_level,
+                 ca.title as alert_title,
+                 ca.severity as alert_severity
+          FROM tasks t
+          LEFT JOIN goals g ON t.goal_id = g.id
+          LEFT JOIN competitor_alerts ca ON (t.ai_suggestions->>'alert_id')::text = ca.id::text
+          LEFT JOIN competitor_profiles cp ON ca.competitor_id = cp.id
+          WHERE t.user_id = ${user.id}
+          ORDER BY t.created_at DESC
+        `
+      }
+    } else {
+      if (competitiveOnly) {
+        tasks = await sql`
+          SELECT t.*, 
+                 g.title as goal_title,
+                 g.category as goal_category
+          FROM tasks t
+          LEFT JOIN goals g ON t.goal_id = g.id
+          WHERE t.user_id = ${user.id}
+          AND t.ai_suggestions->>'source' = 'competitive_intelligence'
+          ORDER BY t.created_at DESC
+        `
+      } else {
+        tasks = await sql`
+          SELECT t.*, 
+                 g.title as goal_title,
+                 g.category as goal_category
+          FROM tasks t
+          LEFT JOIN goals g ON t.goal_id = g.id
+          WHERE t.user_id = ${user.id}
+          ORDER BY t.created_at DESC
+        `
       }
     }
-
-    query += ` ORDER BY t.created_at DESC`
-
-    const sql = getSql()
-    const tasks = await sql(query, [user.id])
 
     // Enhance tasks with competitive intelligence context
     const enhancedTasks = tasks.map(task => {
@@ -119,14 +139,12 @@ export async function POST(request: NextRequest) {
     }
     const { title, description, priority, due_date, category } = parsed.data
 
-    const db = getDb()
     const sql = getSql()
-    const rows = await sql(
-      `INSERT INTO tasks (user_id, title, description, priority, due_date, category, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
-       RETURNING *`,
-      [user.id, title, description || '', priority || 'medium', due_date, category || 'general']
-    )
+    const rows = await sql`
+      INSERT INTO tasks (user_id, title, description, priority, due_date, category, status)
+      VALUES (${user.id}, ${title}, ${description || ''}, ${priority || 'medium'}, ${due_date}, ${category || 'general'}, 'pending')
+      RETURNING *
+    `
 
     return NextResponse.json({ task: rows[0] }, { status: 201 })
   } catch (error) {

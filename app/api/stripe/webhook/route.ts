@@ -1,10 +1,12 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { getStripe, STRIPE_WEBHOOK_EVENTS} from '@/lib/stripe'
-import { headers} from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
+import { getStripe, STRIPE_WEBHOOK_EVENTS } from '@/lib/stripe'
+import { headers } from 'next/headers'
+import Stripe from 'stripe'
 
 import {
-  getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId} from '@/lib/stripe-db-utils'
+  getUserByStripeCustomerId, updateUserSubscription, getSubscriptionTierFromPriceId
+} from '@/lib/stripe-db-utils'
 
 
 // Force dynamic rendering
@@ -13,7 +15,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text()
-    
+
     // Get Stripe instance
     const stripe = await getStripe()
     const signature = (await headers()).get('stripe-signature')
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify webhook signature
-    
+
     let event: import('stripe').Stripe.Event
     try {
       event = stripe.webhooks.constructEvent(
@@ -102,7 +104,7 @@ async function handleSubscriptionCreated(subscription: import('stripe').Stripe.S
   try {
     const customerId = subscription.customer as string
     const priceId = subscription.items.data[0].price.id
-    
+
     // Get user by Stripe customer ID
     const user = await getUserByStripeCustomerId(customerId)
     if (!user) {
@@ -139,7 +141,7 @@ async function handleSubscriptionUpdated(subscription: import('stripe').Stripe.S
   try {
     const customerId = subscription.customer as string
     const priceId = subscription.items.data[0].price.id
-    
+
     // Get user by Stripe customer ID
     const user = await getUserByStripeCustomerId(customerId)
     if (!user) {

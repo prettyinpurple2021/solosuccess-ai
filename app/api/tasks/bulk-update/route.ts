@@ -32,27 +32,32 @@ export async function POST(request: NextRequest) {
     }
     const { ids, status, priority } = parsed.data
 
-    const db = getDb()
-    const fields: string[] = []
-    const values: any[] = []
-
-    if (status) {
-      fields.push(`status = $${values.length + 1}`)
-      values.push(status)
-    }
-    if (priority) {
-      fields.push(`priority = $${values.length + 1}`)
-      values.push(priority)
-    }
-    values.push(user.id)
-    const idsParamIndex = values.length + 1
-
-    const query = `UPDATE tasks SET ${fields.join(', ')}, updated_at = NOW()
-                   WHERE user_id = $${values.length} AND id = ANY($${idsParamIndex})
-                   RETURNING id, status, priority`
-
     const sql = getSql()
-    const rows = await sql(query, [...values, ids])
+    let rows: any[] = []
+
+    if (status && priority) {
+      rows = await sql`
+        UPDATE tasks 
+        SET status = ${status}, priority = ${priority}, updated_at = NOW()
+        WHERE user_id = ${user.id} AND id = ANY(${ids})
+        RETURNING id, status, priority
+      `
+    } else if (status) {
+      rows = await sql`
+        UPDATE tasks 
+        SET status = ${status}, updated_at = NOW()
+        WHERE user_id = ${user.id} AND id = ANY(${ids})
+        RETURNING id, status, priority
+      `
+    } else if (priority) {
+      rows = await sql`
+        UPDATE tasks 
+        SET priority = ${priority}, updated_at = NOW()
+        WHERE user_id = ${user.id} AND id = ANY(${ids})
+        RETURNING id, status, priority
+      `
+    }
+
     return NextResponse.json({ updated: rows })
   } catch (error) {
     logError('Bulk update tasks error:', error)

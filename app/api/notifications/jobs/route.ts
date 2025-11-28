@@ -10,8 +10,6 @@ import { getSql } from '@/lib/api-utils'
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
@@ -122,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const parsed = createJobSchema.safeParse(body)
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid job data', details: parsed.error.flatten() },
@@ -132,7 +130,8 @@ export async function POST(request: NextRequest) {
 
     const jobData = parsed.data
     const scheduledTime = new Date(jobData.scheduledTime)
-    
+    const flags = getFeatureFlags()
+
     if (scheduledTime <= new Date()) {
       return NextResponse.json(
         { error: 'Scheduled time must be in the future' },
@@ -142,11 +141,9 @@ export async function POST(request: NextRequest) {
 
     // Enforce daily cap (last 24 hours, DB-accurate)
     const last24 = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    const capRes = await query(
-      `SELECT COUNT(*)::int AS cnt FROM notification_jobs WHERE created_at >= $1`,
-      [last24]
-    )
-    const recentCount = capRes.rows?.[0]?.cnt || 0
+    const sql = getSql()
+    const capRes = await sql`SELECT COUNT(*)::int AS cnt FROM notification_jobs WHERE created_at >= ${last24}`
+    const recentCount = capRes[0]?.cnt || 0
     if (recentCount >= flags.notifDailyCap) {
       return NextResponse.json({ error: `Daily notifications cap reached (${flags.notifDailyCap}). Try again later.` }, { status: 429 })
     }
@@ -230,10 +227,10 @@ export async function DELETE(request: NextRequest) {
         const cancelled = await notificationJobQueue.cancelJob(jobId)
         results.push({ jobId, cancelled })
       } catch (error) {
-        results.push({ 
-          jobId, 
-          cancelled: false, 
-          error: error instanceof Error ? error.message : 'Unknown error' 
+        results.push({
+          jobId,
+          cancelled: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
         })
       }
     }

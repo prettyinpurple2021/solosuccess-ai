@@ -1,0 +1,9 @@
+﻿
+> SoloSuccess-ai-platform@0.1.0 typecheck
+> cross-env NODE_OPTIONS='--max-old-space-size=4096' tsc --noEmit
+
+app/api/intelligence/analyze/route.ts(48,9): error TS1137: Expression or comma expected.
+app/api/intelligence/analyze/route.ts(49,7): error TS1128: Declaration or statement expected.
+app/api/intelligence/analyze/route.ts(179,5): error TS1128: Declaration or statement expected.
+app/api/intelligence/analyze/route.ts(179,7): error TS1005: 'try' expected.
+app/api/intelligence/analyze/route.ts(186,3): error TS1128: Declaration or statement expected.

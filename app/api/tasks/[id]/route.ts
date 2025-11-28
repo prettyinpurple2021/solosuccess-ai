@@ -37,15 +37,12 @@ export async function PUT(
     }
     const { title, description, status, priority, due_date, category } = parsed.data
 
-    const db = getDb()
-
     // First verify the task belongs to the user
     const params = await context.params
     const sql = getSql()
-    const rows = await sql(
-      `SELECT * FROM tasks WHERE id = $1 AND user_id = $2`,
-      [params.id, user.id]
-    )
+    const rows = await sql`
+      SELECT * FROM tasks WHERE id = ${params.id} AND user_id = ${user.id}
+    `
     const existingTask = rows[0]
 
     if (!existingTask) {
@@ -53,28 +50,18 @@ export async function PUT(
     }
 
     // Update task
-    const updateResult = await sql(
-      `UPDATE tasks 
-       SET title = COALESCE($1, title), 
-           description = COALESCE($2, description), 
-           priority = COALESCE($3, priority), 
-           due_date = COALESCE($4, due_date), 
-           category = COALESCE($5, category), 
-           status = COALESCE($6, status), 
-           updated_at = NOW()
-       WHERE id = $7 AND user_id = $8
-       RETURNING *`,
-      [
-        title,
-        description,
-        priority,
-        due_date,
-        category,
-        status,
-        params.id,
-        user.id
-      ]
-    )
+    const updateResult = await sql`
+      UPDATE tasks 
+      SET title = COALESCE(${title}, title), 
+          description = COALESCE(${description}, description), 
+          priority = COALESCE(${priority}, priority), 
+          due_date = COALESCE(${due_date}, due_date), 
+          category = COALESCE(${category}, category), 
+          status = COALESCE(${status}, status), 
+          updated_at = NOW()
+      WHERE id = ${params.id} AND user_id = ${user.id}
+      RETURNING *
+    `
     const updatedTask = updateResult[0]
 
     return NextResponse.json({ task: updatedTask })
@@ -98,15 +85,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const db = getDb()
-
     // Verify the task belongs to the user and delete it in one step
     const params = await context.params
     const sql = getSql()
-    const result = await sql(
-      `DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING id`,
-      [params.id, user.id]
-    )
+    const result = await sql`
+      DELETE FROM tasks WHERE id = ${params.id} AND user_id = ${user.id} RETURNING id
+    `
 
     if (result.length === 0) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 })

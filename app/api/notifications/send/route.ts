@@ -157,25 +157,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Get target subscriptions
-    let subscriptionsQuery: string
-    let subscriptionsParams: any[]
+    const sql = getSql()
+    let subscriptions: any[] = []
 
     if (notification.allUsers) {
-      subscriptionsQuery = `
+      subscriptions = await sql`
         SELECT ps.*, u.email
         FROM push_subscriptions ps
         LEFT JOIN users u ON ps.user_id = u.id
         WHERE ps.is_active = true
       `
-      subscriptionsParams = []
     } else if (notification.userIds && notification.userIds.length > 0) {
-      subscriptionsQuery = `
+      subscriptions = await sql`
         SELECT ps.*, u.email
         FROM push_subscriptions ps
         LEFT JOIN users u ON ps.user_id = u.id
-        WHERE ps.user_id = ANY($1) AND ps.is_active = true
+        WHERE ps.user_id = ANY(${notification.userIds}) AND ps.is_active = true
       `
-      subscriptionsParams = [notification.userIds]
     } else {
       // For system jobs without specific targeting, require explicit userIds or allUsers
       if (isSystemJob) {
@@ -193,18 +191,13 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      subscriptionsQuery = `
+      subscriptions = await sql`
         SELECT ps.*, u.email
         FROM push_subscriptions ps
         LEFT JOIN users u ON ps.user_id = u.id
-        WHERE ps.user_id = $1 AND ps.is_active = true
+        WHERE ps.user_id = ${user.id} AND ps.is_active = true
       `
-      subscriptionsParams = [user.id]
     }
-
-    const sql = getSql()
-    const subscriptionsResult = await sql(subscriptionsQuery, subscriptionsParams)
-    const subscriptions = subscriptionsResult
 
     if (subscriptions.length === 0) {
       return NextResponse.json(
@@ -258,11 +251,11 @@ export async function POST(request: NextRequest) {
         await webpush.sendNotification(pushSubscription, JSON.stringify(payload))
 
         // Update last_used_at
-        await sql(`
+        await sql`
           UPDATE push_subscriptions 
           SET last_used_at = NOW() 
-          WHERE id = $1
-        `, [subscription.id])
+          WHERE id = ${subscription.id}
+        `
 
         results.push({
           userId: subscription.user_id,
@@ -275,11 +268,11 @@ export async function POST(request: NextRequest) {
 
         // If subscription is invalid, mark it as inactive
         if (error.statusCode === 410 || error.statusCode === 404) {
-          await sql(`
+          await sql`
             UPDATE push_subscriptions 
             SET is_active = false, updated_at = NOW() 
-            WHERE id = $1
-          `, [subscription.id])
+            WHERE id = ${subscription.id}
+          `
         }
 
         errors.push({
@@ -291,16 +284,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Log notification sending
-    const notificationLogQuery = `
-      INSERT INTO notification_logs (
-        sent_by, title, body, target_count, success_count, error_count, 
-        payload, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-    `
-
     // Create notification_logs table if it doesn't exist
-    await sql(`
+    await sql`
       CREATE TABLE IF NOT EXISTS notification_logs (
         id SERIAL PRIMARY KEY,
         sent_by VARCHAR(255),
@@ -312,17 +297,24 @@ export async function POST(request: NextRequest) {
         payload JSONB,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
-    `)
+    `
 
-    await sql(notificationLogQuery, [
-      user?.id || 'system',
-      notification.title,
-      notification.body,
-      subscriptions.length,
-      results.length,
-      errors.length,
-      JSON.stringify(payload)
-    ])
+    // Log notification sending
+    await sql`
+      INSERT INTO notification_logs (
+        sent_by, title, body, target_count, success_count, error_count, 
+        payload, created_at
+      ) VALUES (
+        ${user?.id || 'system'}, 
+        ${notification.title}, 
+        ${notification.body}, 
+        ${subscriptions.length}, 
+        ${results.length}, 
+        ${errors.length}, 
+        ${JSON.stringify(payload)}, 
+        NOW()
+      )
+    `
 
     return NextResponse.json({
       success: true,
