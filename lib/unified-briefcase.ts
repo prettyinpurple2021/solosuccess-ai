@@ -1,7 +1,12 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { getSql } from '@/lib/api-utils'
 import { uploadFile, deleteFile } from '@/lib/file-storage'
+import { logInfo, logWarn } from '@/lib/logger'
 
+// Helper for direct query execution
+async function query(text: string, params: any[] = []): Promise<any[]> {
+  const sql = getSql()
+  return await (sql as any)(text, params)
+}
 
 export interface UserBriefcase {
   id: string
@@ -104,14 +109,15 @@ export class UnifiedBriefcaseManager {
    */
   async getDefaultBriefcase(userId: string): Promise<UserBriefcase> {
     // Check if user has a default briefcase
-    const result = await getSql().query(`
+    const sql = getSql()
+    const result = await (sql as any)(`
       SELECT * FROM user_briefcases 
       WHERE user_id = $1 AND is_default = true
       LIMIT 1
     `, [userId])
 
-    if (result.rows.length > 0) {
-      const row = result.rows[0]
+    if (result.length > 0) {
+      const row = result[0]
       return {
         id: row.id,
         userId: row.user_id,
@@ -218,8 +224,8 @@ export class UnifiedBriefcaseManager {
       'chat',
       title,
       JSON.stringify({ messages }),
-      JSON.stringify({ 
-        agentName, 
+      JSON.stringify({
+        agentName,
         messageCount: messages.length,
         lastMessage: new Date()
       }),
@@ -234,8 +240,8 @@ export class UnifiedBriefcaseManager {
       title,
       content: { messages },
       tags: agentName ? [agentName, 'conversation'] : ['conversation'],
-      metadata: { 
-        agentName, 
+      metadata: {
+        agentName,
         messageCount: messages.length,
         lastMessage: new Date()
       },
@@ -263,7 +269,7 @@ export class UnifiedBriefcaseManager {
       'brand',
       title,
       JSON.stringify(brandData),
-      JSON.stringify({ 
+      JSON.stringify({
         brandType: brandData.type || 'general',
         lastModified: new Date()
       }),
@@ -278,7 +284,7 @@ export class UnifiedBriefcaseManager {
       title,
       content: brandData,
       tags: ['branding', 'design'],
-      metadata: { 
+      metadata: {
         brandType: brandData.type || 'general',
         lastModified: new Date()
       },
@@ -293,7 +299,7 @@ export class UnifiedBriefcaseManager {
    */
   async saveTemplateProgress(userId: string, templateSlug: string, title: string, content: any, progress: number): Promise<BriefcaseItem> {
     const briefcase = await this.getDefaultBriefcase(userId)
-    
+
     // Check if template save already exists
     const existing = await query(`
       SELECT id FROM briefcase_items 
@@ -301,9 +307,9 @@ export class UnifiedBriefcaseManager {
       AND metadata->>'templateSlug' = $2
     `, [userId, templateSlug])
 
-    if (existing.rows.length > 0) {
+    if (existing.length > 0) {
       // Update existing save
-      const itemId = existing.rows[0].id
+      const itemId = existing[0].id
       await query(`
         UPDATE briefcase_items 
         SET title = $1, content = $2, 
@@ -312,7 +318,7 @@ export class UnifiedBriefcaseManager {
       `, [
         title,
         JSON.stringify(content),
-        JSON.stringify({ 
+        JSON.stringify({
           templateSlug,
           progress,
           lastSaved: new Date()
@@ -328,7 +334,7 @@ export class UnifiedBriefcaseManager {
         title,
         content,
         tags: ['template', templateSlug],
-        metadata: { 
+        metadata: {
           templateSlug,
           progress,
           lastSaved: new Date()
@@ -352,7 +358,7 @@ export class UnifiedBriefcaseManager {
       'template_save',
       title,
       JSON.stringify(content),
-      JSON.stringify({ 
+      JSON.stringify({
         templateSlug,
         progress,
         lastSaved: new Date()
@@ -368,7 +374,7 @@ export class UnifiedBriefcaseManager {
       title,
       content,
       tags: ['template', templateSlug],
-      metadata: { 
+      metadata: {
         templateSlug,
         progress,
         lastSaved: new Date()
@@ -383,9 +389,9 @@ export class UnifiedBriefcaseManager {
    * Get user's briefcase items
    */
   async getBriefcaseItems(
-    userId: string, 
-    type?: string, 
-    limit: number = 50, 
+    userId: string,
+    type?: string,
+    limit: number = 50,
     offset: number = 0,
     search?: string
   ): Promise<{ items: BriefcaseItem[], total: number }> {
@@ -423,7 +429,7 @@ export class UnifiedBriefcaseManager {
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `, [...params, limit, offset])
 
-    const items = itemsResult.rows.map(row => ({
+    const items = itemsResult.map(row => ({
       id: row.id,
       briefcaseId: row.briefcase_id,
       userId: row.user_id,
@@ -443,7 +449,7 @@ export class UnifiedBriefcaseManager {
 
     return {
       items,
-      total: parseInt(countResult.rows[0].total)
+      total: parseInt(countResult[0].total)
     }
   }
 
@@ -451,16 +457,17 @@ export class UnifiedBriefcaseManager {
    * Get user's current avatar
    */
   async getUserAvatar(userId: string): Promise<BriefcaseItem | null> {
-    const result = await getSql().query(`
+    const sql = getSql()
+    const result = await (sql as any)(`
       SELECT * FROM briefcase_items 
       WHERE user_id = $1 AND type = 'avatar'
       ORDER BY created_at DESC
       LIMIT 1
     `, [userId])
 
-    if (result.rows.length === 0) return null
+    if (result.length === 0) return null
 
-    const row = result.rows[0]
+    const row = result[0]
     return {
       id: row.id,
       briefcaseId: row.briefcase_id,
@@ -490,7 +497,7 @@ export class UnifiedBriefcaseManager {
     `, [userId, type])
 
     // Delete blob files
-    for (const item of items.rows) {
+    for (const item of items) {
       if (item.blob_url) {
         try {
           await deleteFile(item.blob_url)
@@ -512,17 +519,18 @@ export class UnifiedBriefcaseManager {
    */
   async deleteItem(userId: string, itemId: string): Promise<boolean> {
     // Get item details for blob cleanup
-    const result = await getSql().query(`
+    const sql = getSql()
+    const result = await (sql as any)(`
       SELECT blob_url FROM briefcase_items 
       WHERE id = $1 AND user_id = $2
     `, [itemId, userId])
 
-    if (result.rows.length === 0) return false
+    if (result.length === 0) return false
 
     // Delete blob file if exists
-    if (result.rows[0].blob_url) {
+    if (result[0].blob_url) {
       try {
-        await deleteFile(result.rows[0].blob_url)
+        await deleteFile(result[0].blob_url)
       } catch (error) {
         logWarn('Failed to delete blob:', error)
       }

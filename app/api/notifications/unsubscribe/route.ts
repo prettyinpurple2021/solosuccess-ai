@@ -8,8 +8,6 @@ import { z } from 'zod'
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +21,12 @@ const unsubscribeSchema = z.object({
     }).optional()
   })
 })
+
+// Helper for direct query execution
+async function query(text: string, params: any[] = []): Promise<any[]> {
+  const sql = getSql()
+  return await sql(text, params)
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const parsed = unsubscribeSchema.safeParse(body)
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid subscription data', details: parsed.error.flatten() },
@@ -50,7 +54,8 @@ export async function POST(request: NextRequest) {
     const now = new Date()
 
     // Mark subscription as inactive instead of deleting it (for audit purposes)
-    const result = await getSql().query(`
+    const sql = getSql()
+    const result = await sql(`
       UPDATE push_subscriptions 
       SET 
         is_active = false,
@@ -59,7 +64,7 @@ export async function POST(request: NextRequest) {
       RETURNING id, created_at
     `, [now, subscription.endpoint, user.id])
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return NextResponse.json(
         { error: 'Subscription not found or already inactive' },
         { status: 404 }
@@ -76,12 +81,12 @@ export async function POST(request: NextRequest) {
       WHERE user_id = $1 AND is_active = true
     `, [user.id])
 
-    const hasRemainingSubscriptions = parseInt(remainingSubscriptions.rows[0].count) > 0
+    const hasRemainingSubscriptions = parseInt(remainingSubscriptions[0].count) > 0
 
     return NextResponse.json({
       success: true,
       message: 'Successfully unsubscribed from push notifications',
-      subscriptionId: result.rows[0].id,
+      subscriptionId: result[0].id,
       hasRemainingSubscriptions,
       timestamp: now
     })
@@ -108,13 +113,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete all subscriptions for the user (complete cleanup)
-    const result = await getSql().query(`
+    const sql = getSql()
+    const result = await sql(`
       DELETE FROM push_subscriptions 
       WHERE user_id = $1
       RETURNING COUNT(*) as deleted_count
     `, [user.id])
 
-    const deletedCount = result.rows[0]?.deleted_count || 0
+    const deletedCount = result[0]?.deleted_count || 0
 
     return NextResponse.json({
       success: true,

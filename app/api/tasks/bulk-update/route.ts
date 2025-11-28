@@ -1,13 +1,12 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
-import { authenticateRequest} from '@/lib/auth-server'
+import { NextRequest, NextResponse } from 'next/server'
+import { authenticateRequest } from '@/lib/auth-server'
 import { getDb } from '@/lib/database-client'
-import { z} from 'zod'
+import { getSql } from '@/lib/api-utils'
+import { z } from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
-
-
 
 // POST /api/tasks/bulk-update
 // Body: { ids: string[], status?: string, priority?: string }
@@ -50,14 +49,13 @@ export async function POST(request: NextRequest) {
 
     const query = `UPDATE tasks SET ${fields.join(', ')}, updated_at = NOW()
                    WHERE user_id = $${values.length} AND id = ANY($${idsParamIndex})
-                   RETURNING id, status, priority` as string
+                   RETURNING id, status, priority`
 
-    const { rows } = await client.query(query, [...values, ids])
+    const sql = getSql()
+    const rows = await sql(query, [...values, ids])
     return NextResponse.json({ updated: rows })
   } catch (error) {
     logError('Bulk update tasks error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-
-

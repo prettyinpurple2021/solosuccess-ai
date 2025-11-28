@@ -18,10 +18,10 @@ let vapidConfigured = false
 // Function to configure VAPID keys at runtime
 function ensureVapidConfigured(): boolean {
   if (vapidConfigured) return true
-  
+
   const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   const privateVapidKey = process.env.VAPID_PRIVATE_KEY
-  
+
   if (publicVapidKey && privateVapidKey && privateVapidKey !== 'your-private-key-here' && privateVapidKey.length > 20) {
     try {
       webpush.setVapidDetails(
@@ -81,10 +81,10 @@ export async function POST(request: NextRequest) {
     // Check if this is a system job (from job queue)
     const isSystemJob = request.headers.get('X-System-Job') === 'true'
     const jobId = request.headers.get('X-Job-Id')
-    
+
     let user = null
     let isAdmin = false
-    
+
     if (isSystemJob) {
       // System jobs bypass user authentication
       logInfo(`Processing system job: ${jobId}`)
@@ -94,10 +94,10 @@ export async function POST(request: NextRequest) {
       if (authResult.error || !authResult.user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
-      
+
       user = authResult.user
       isAdmin = user.email === 'prettyinpurple2021@gmail.com'
-      
+
       if (!isAdmin) {
         return NextResponse.json({ error: 'Insufficient permissions - only admin can send notifications' }, { status: 403 })
       }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const parsed = notificationSchema.safeParse(body)
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid notification data', details: parsed.error.flatten() },
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     const notification = parsed.data
-    
+
     // If scheduled, add to job queue for later processing
     if (notification.scheduledTime && !isSystemJob) {
       const scheduledDate = new Date(notification.scheduledTime)
@@ -124,10 +124,10 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-      
+
       // Initialize job queue and add job
       await notificationJobQueue.initialize()
-      
+
       const jobId = await notificationJobQueue.addJob({
         title: notification.title,
         body: notification.body,
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
         createdBy: user?.id || 'system',
         maxAttempts: 3
       })
-      
+
       return NextResponse.json({
         success: true,
         message: 'Notification scheduled successfully',
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-      
+
       // Default to sending to the requesting user only (for authenticated users)
       if (!user) {
         return NextResponse.json(
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-      
+
       subscriptionsQuery = `
         SELECT ps.*, u.email
         FROM push_subscriptions ps
@@ -203,8 +203,8 @@ export async function POST(request: NextRequest) {
     }
 
     const sql = getSql()
-    const subscriptionsResult = await sql.query(subscriptionsQuery, subscriptionsParams)
-    const subscriptions = subscriptionsResult.rows
+    const subscriptionsResult = await sql(subscriptionsQuery, subscriptionsParams)
+    const subscriptions = subscriptionsResult
 
     if (subscriptions.length === 0) {
       return NextResponse.json(
@@ -256,9 +256,9 @@ export async function POST(request: NextRequest) {
         }
 
         await webpush.sendNotification(pushSubscription, JSON.stringify(payload))
-        
+
         // Update last_used_at
-        await sql.query(`
+        await sql(`
           UPDATE push_subscriptions 
           SET last_used_at = NOW() 
           WHERE id = $1
@@ -272,10 +272,10 @@ export async function POST(request: NextRequest) {
 
       } catch (error: any) {
         logError(`Failed to send notification to user ${subscription.user_id}:`, error)
-        
+
         // If subscription is invalid, mark it as inactive
         if (error.statusCode === 410 || error.statusCode === 404) {
-          await sql.query(`
+          await sql(`
             UPDATE push_subscriptions 
             SET is_active = false, updated_at = NOW() 
             WHERE id = $1
@@ -298,9 +298,9 @@ export async function POST(request: NextRequest) {
         payload, created_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
     `
-    
+
     // Create notification_logs table if it doesn't exist
-    await sql.query(`
+    await sql(`
       CREATE TABLE IF NOT EXISTS notification_logs (
         id SERIAL PRIMARY KEY,
         sent_by VARCHAR(255),
@@ -314,7 +314,7 @@ export async function POST(request: NextRequest) {
       )
     `)
 
-    await sql.query(notificationLogQuery, [
+    await sql(notificationLogQuery, [
       user?.id || 'system',
       notification.title,
       notification.body,
@@ -360,7 +360,7 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json()
     const parsed = batchNotificationSchema.safeParse(body)
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid batch notification data', details: parsed.error.flatten() },
@@ -375,7 +375,7 @@ export async function PUT(request: NextRequest) {
 
     for (let i = 0; i < notifications.length; i++) {
       const notification = notifications[i]
-      
+
       // Add a small delay between notifications to avoid rate limiting
       if (i > 0) {
         await new Promise(resolve => setTimeout(resolve, 100))

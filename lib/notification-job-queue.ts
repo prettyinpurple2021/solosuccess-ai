@@ -139,7 +139,7 @@ export class NotificationJobQueue {
     if (typeof window === 'undefined') {
       try {
         this.startProcessor()
-      } catch {}
+      } catch { }
     }
     return jobId
   }
@@ -157,7 +157,7 @@ export class NotificationJobQueue {
       LIMIT $1
     `, [limit])
 
-    return result.rows.map(row => ({
+    return result.map(row => ({
       id: row.id,
       title: row.title,
       body: row.body,
@@ -222,7 +222,7 @@ export class NotificationJobQueue {
       RETURNING attempts, max_attempts
     `, [jobId, error])
 
-    const job = result.rows[0]
+    const job = result[0]
     if (job && job.attempts >= job.max_attempts) {
       logError(`Job ${jobId} failed permanently after ${job.attempts} attempts`)
     } else {
@@ -243,7 +243,7 @@ export class NotificationJobQueue {
       RETURNING id
     `, [jobId])
 
-    return result.rows.length > 0
+    return result.length > 0
   }
 
   /**
@@ -267,7 +267,7 @@ export class NotificationJobQueue {
       total: 0
     }
 
-    result.rows.forEach(row => {
+    result.forEach(row => {
       const status = row.status as keyof JobQueueStats
       if (status in stats && status !== 'total') {
         stats[status] = parseInt(row.count)
@@ -282,8 +282,8 @@ export class NotificationJobQueue {
    * Get jobs by status with pagination
    */
   async getJobs(
-    status?: string, 
-    limit: number = 50, 
+    status?: string,
+    limit: number = 50,
     offset: number = 0,
     createdBy?: string
   ): Promise<{ jobs: NotificationJob[], total: number }> {
@@ -318,7 +318,7 @@ export class NotificationJobQueue {
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `, [...params, limit, offset])
 
-    const jobs = jobsResult.rows.map(row => ({
+    const jobs = jobsResult.map((row: any) => ({
       id: row.id,
       title: row.title,
       body: row.body,
@@ -345,7 +345,7 @@ export class NotificationJobQueue {
 
     return {
       jobs,
-      total: parseInt(countResult.rows[0].total)
+      total: parseInt(countResult[0].total)
     }
   }
 
@@ -368,7 +368,7 @@ export class NotificationJobQueue {
       RETURNING id
     `
 
-    const deletedCount = result.rows.length
+    const deletedCount = result.length
     if (deletedCount > 0) {
       logInfo(`Cleaned up ${deletedCount} old notification jobs`)
     }
@@ -386,7 +386,7 @@ export class NotificationJobQueue {
     }
 
     logInfo(`Starting notification job processor with ${intervalMs}ms interval`)
-    
+
     this.processingInterval = setInterval(async () => {
       if (this.isProcessing) {
         logInfo('Skipping job processing - already in progress')
@@ -426,13 +426,13 @@ export class NotificationJobQueue {
    * Process ready jobs
    */
   private async processJobs(): Promise<number> {
-    if (this.isProcessing) return
+    if (this.isProcessing) return 0
 
     this.isProcessing = true
-    
+
     try {
       const jobs = await this.getReadyJobs(5) // Process 5 jobs at a time
-      
+
       if (jobs.length === 0) {
         return 0
       }

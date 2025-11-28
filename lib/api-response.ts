@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { logger, logError } from './logger'
 
 /**
@@ -62,7 +63,7 @@ export function createPaginatedResponse<T>(
   message?: string
 ): NextResponse<PaginatedResponse<T>> {
   const totalPages = Math.ceil(pagination.total / pagination.limit)
-  
+
   const response: PaginatedResponse<T> = {
     success: true,
     data,
@@ -116,7 +117,7 @@ export function createErrorResponse(
 export function handleApiError(error: unknown, context?: string): NextResponse<ApiResponse> {
   const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
   const fullContext = context ? `${context}: ${errorMessage}` : errorMessage
-  
+
   logError('API Route Error:', {
     error: errorMessage,
     context,
@@ -205,18 +206,16 @@ export function withAuth<T>(
     try {
       // Import here to avoid circular dependencies
       const { authenticateRequest } = await import('./auth-server')
-      
+
       const { user, error } = await authenticateRequest()
-      
+
       if (error || !user) {
         return createErrorResponse(error || 'Authentication required', 401)
       }
 
-      return await handler(request, user)
+      return await handler(request as NextRequest, user)
     } catch (error) {
       return handleApiError(error, 'Authentication')
     }
   }
 }
-
-

@@ -8,8 +8,6 @@ import { z } from 'zod'
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +21,12 @@ const subscriptionSchema = z.object({
     })
   })
 })
+
+// Helper for direct query execution
+async function query(text: string, params: any[] = []): Promise<any[]> {
+  const sql = getSql()
+  return await sql(text, params)
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const parsed = subscriptionSchema.safeParse(body)
-    
+
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid subscription data', details: parsed.error.flatten() },
@@ -75,7 +79,8 @@ export async function POST(request: NextRequest) {
     `)
 
     // Insert or update subscription
-    const result = await getSql().query(`
+    const sql = getSql()
+    const result = await sql(`
       INSERT INTO push_subscriptions (
         user_id, endpoint, expiration_time, p256dh_key, auth_key, 
         user_agent, created_at, updated_at, last_used_at, is_active
@@ -108,7 +113,7 @@ export async function POST(request: NextRequest) {
       WHERE user_id = $1 AND is_active = true
     `, [user.id])
 
-    if (parseInt(userSubscriptionsCount.rows[0].count) === 1) {
+    if (parseInt(userSubscriptionsCount[0].count) === 1) {
       // This might be their first subscription - log the milestone
       logInfo(`User ${user.id} subscribed to push notifications for the first time`)
     }
@@ -116,13 +121,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Successfully subscribed to push notifications',
-      subscriptionId: result.rows[0].id,
-      timestamp: result.rows[0].created_at
+      subscriptionId: result[0].id,
+      timestamp: result[0].created_at
     })
 
   } catch (error) {
     logError('Error subscribing to push notifications:', error)
-    
+
     // Type-safe error handling
     if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
       // PostgreSQL unique constraint violation

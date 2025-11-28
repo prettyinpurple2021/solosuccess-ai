@@ -1,4 +1,5 @@
 import { logError } from '@/lib/logger'
+// @ts-ignore
 import pdf from 'pdf-parse'
 import mammoth from 'mammoth'
 import ExcelJS from 'exceljs'
@@ -59,51 +60,51 @@ export class DocumentParser {
   static async parseDocument(buffer: Buffer, mimeType: string, fileName: string): Promise<ParseResult> {
     try {
       const normalizedMimeType = mimeType.toLowerCase();
-      
+
       // PDF Documents
       if (normalizedMimeType === 'application/pdf') {
         return await this.parsePDF(buffer);
       }
-      
+
       // Microsoft Word Documents
       if (normalizedMimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
         return await this.parseWordDocx(buffer);
       }
-      
+
       // Microsoft Excel Documents
       if (normalizedMimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-          normalizedMimeType === 'application/vnd.ms-excel' ||
-          normalizedMimeType === 'text/csv' ||
-          fileName.toLowerCase().endsWith('.xlsx') ||
-          fileName.toLowerCase().endsWith('.xls') ||
-          fileName.toLowerCase().endsWith('.csv')) {
+        normalizedMimeType === 'application/vnd.ms-excel' ||
+        normalizedMimeType === 'text/csv' ||
+        fileName.toLowerCase().endsWith('.xlsx') ||
+        fileName.toLowerCase().endsWith('.xls') ||
+        fileName.toLowerCase().endsWith('.csv')) {
         return await this.parseExcel(buffer, fileName);
       }
-      
+
       // Text-based files
-      if (normalizedMimeType.startsWith('text/') || 
-          normalizedMimeType === 'application/json' ||
-          normalizedMimeType === 'application/javascript' ||
-          normalizedMimeType === 'application/xml') {
+      if (normalizedMimeType.startsWith('text/') ||
+        normalizedMimeType === 'application/json' ||
+        normalizedMimeType === 'application/javascript' ||
+        normalizedMimeType === 'application/xml') {
         return await this.parseTextFile(buffer, normalizedMimeType);
       }
-      
+
       // HTML files
       if (normalizedMimeType === 'text/html') {
         return await this.parseHTML(buffer);
       }
-      
+
       // RTF files
       if (normalizedMimeType === 'application/rtf' || normalizedMimeType === 'text/rtf') {
         return await this.parseRTF(buffer);
       }
-      
+
       return {
         content: '',
         success: false,
         error: `Unsupported file type: ${mimeType}`
       };
-      
+
     } catch (error) {
       logError('Document parsing error:', error);
       return {
@@ -194,7 +195,7 @@ export class DocumentParser {
       }
 
       const workbook = new ExcelJS.Workbook()
-      await workbook.xlsx.load(Buffer.from(buffer))
+      await workbook.xlsx.load(Buffer.from(buffer) as any)
 
       const rows: string[] = []
       let rowCount = 0
@@ -253,7 +254,7 @@ export class DocumentParser {
   private static async parseHTML(buffer: Buffer): Promise<ParseResult> {
     try {
       const html = buffer.toString('utf-8');
-      
+
       // Simple HTML text extraction without cheerio
       let content = html
         .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove scripts
@@ -262,13 +263,13 @@ export class DocumentParser {
         .replace(/\s+/g, ' ') // Normalize whitespace
         .trim()
         .substring(0, this.MAX_CONTENT_LENGTH);
-        
+
       const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-      
+
       // Extract title with regex
       const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
       const title = titleMatch ? titleMatch[1].trim() : undefined;
-      
+
       return {
         content,
         metadata: {
@@ -290,7 +291,7 @@ export class DocumentParser {
     try {
       // Try different encodings
       let content = '';
-      
+
       try {
         content = buffer.toString('utf-8');
       } catch {
@@ -300,10 +301,10 @@ export class DocumentParser {
           content = buffer.toString('ascii');
         }
       }
-      
+
       content = content.substring(0, this.MAX_CONTENT_LENGTH);
       const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-      
+
       return {
         content,
         metadata: {
@@ -323,7 +324,7 @@ export class DocumentParser {
   private static async parseRTF(buffer: Buffer): Promise<ParseResult> {
     try {
       const rtfContent = buffer.toString('utf-8');
-      
+
       // Basic RTF text extraction (remove RTF control codes)
       const text = rtfContent
         .replace(/\{\\[^}]*\}/g, '') // Remove RTF groups
@@ -331,10 +332,10 @@ export class DocumentParser {
         .replace(/[{}]/g, '') // Remove remaining braces
         .replace(/\s+/g, ' ') // Normalize whitespace
         .trim();
-      
+
       const content = text.substring(0, this.MAX_CONTENT_LENGTH);
       const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-      
+
       return {
         content,
         metadata: {
@@ -354,7 +355,7 @@ export class DocumentParser {
   static getEstimatedProcessingTime(fileSizeBytes: number, mimeType: string): number {
     // Estimate processing time in milliseconds based on file size and type
     const sizeMB = fileSizeBytes / (1024 * 1024);
-    
+
     switch (mimeType.toLowerCase()) {
       case 'application/pdf':
         return Math.min(sizeMB * 2000, 30000); // 2 seconds per MB, max 30 seconds

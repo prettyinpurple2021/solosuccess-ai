@@ -1,6 +1,7 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import bcrypt from 'bcryptjs'
 
 // Node.js runtime required for bcryptjs password verification
@@ -18,7 +19,8 @@ export async function GET(
     const db = getDb()
 
     // Get share link details
-    const { rows: [shareLink] } = await client.query(`
+    const sql = getSql()
+    const shareLinkResult = await sql(`
       SELECT 
         dsl.*,
         d.name, d.original_name, d.file_type, d.mime_type, d.size, d.file_data,
@@ -27,6 +29,7 @@ export async function GET(
       JOIN documents d ON dsl.document_id = d.id
       WHERE dsl.id = $1 AND dsl.is_active = true
     `, [shareId])
+    const shareLink = shareLinkResult[0]
 
     if (!shareLink) {
       return NextResponse.json({ error: 'Share link not found or expired' }, { status: 404 })
@@ -43,14 +46,14 @@ export async function GET(
     }
 
     // Increment access count
-    await client.query(`
+    await sql(`
       UPDATE document_share_links 
       SET access_count = access_count + 1
       WHERE id = $1
     `, [shareId])
 
     // Log access activity
-    await client.query(`
+    await sql(`
       INSERT INTO document_activity (document_id, user_id, action, details, created_at)
       VALUES ($1, $2, 'shared_access', $3, NOW())
     `, [
@@ -90,8 +93,8 @@ export async function GET(
 
   } catch (error) {
     logError('Get shared file error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to access shared file' 
+    return NextResponse.json({
+      error: 'Failed to access shared file'
     }, { status: 500 })
   }
 }
@@ -107,7 +110,8 @@ export async function POST(
     const db = getDb()
 
     // Get share link details
-    const { rows: [shareLink] } = await client.query(`
+    const sql = getSql()
+    const shareLinkResult = await sql(`
       SELECT 
         dsl.*,
         d.name, d.original_name, d.file_type, d.mime_type, d.size, d.file_data
@@ -115,6 +119,7 @@ export async function POST(
       JOIN documents d ON dsl.document_id = d.id
       WHERE dsl.id = $1 AND dsl.is_active = true
     `, [shareId])
+    const shareLink = shareLinkResult[0]
 
     if (!shareLink) {
       return NextResponse.json({ error: 'Share link not found or expired' }, { status: 404 })
@@ -130,7 +135,7 @@ export async function POST(
       if (!password) {
         return NextResponse.json({ error: 'Password required' }, { status: 401 })
       }
-      
+
       const isValidPassword = await bcrypt.compare(password, shareLink.password_hash)
       if (!isValidPassword) {
         return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
@@ -143,7 +148,7 @@ export async function POST(
         if (!shareLink.download_enabled) {
           return NextResponse.json({ error: 'Download not allowed' }, { status: 403 })
         }
-        
+
         // Return file data for download
         return new NextResponse(shareLink.file_data, {
           headers: {
@@ -169,8 +174,8 @@ export async function POST(
 
   } catch (error) {
     logError('Shared file action error:', error)
-    return NextResponse.json({ 
-      error: 'Failed to process request' 
+    return NextResponse.json({
+      error: 'Failed to process request'
     }, { status: 500 })
   }
 }

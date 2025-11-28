@@ -1,9 +1,10 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createErrorResponse } from '@/lib/api-response'
 import { getDb } from '@/lib/database-client'
-import { authenticateRequest} from '@/lib/auth-server'
-import { z} from 'zod'
+import { getSql } from '@/lib/api-utils'
+import { authenticateRequest } from '@/lib/auth-server'
+import { z } from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -13,7 +14,7 @@ export const runtime = 'edge'
 export async function GET(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
-    
+
     if (error || !user) {
       return createErrorResponse('Unauthorized', 401)
     }
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const competitiveOnly = searchParams.get('competitive_only') === 'true'
 
     const db = getDb()
-    
+
     let query = `
       SELECT t.*, 
              g.title as goal_title,
@@ -32,11 +33,11 @@ export async function GET(request: NextRequest) {
       LEFT JOIN goals g ON t.goal_id = g.id
       WHERE t.user_id = $1
     `
-    
+
     if (competitiveOnly) {
       query += ` AND t.ai_suggestions->>'source' = 'competitive_intelligence'`
     }
-    
+
     if (includeCompetitive) {
       query = `
         SELECT t.*, 
@@ -52,21 +53,22 @@ export async function GET(request: NextRequest) {
         LEFT JOIN competitor_profiles cp ON ca.competitor_id = cp.id
         WHERE t.user_id = $1
       `
-      
+
       if (competitiveOnly) {
         query += ` AND t.ai_suggestions->>'source' = 'competitive_intelligence'`
       }
     }
-    
+
     query += ` ORDER BY t.created_at DESC`
-    
-    const { rows: tasks } = await client.query(query, [user.id])
+
+    const sql = getSql()
+    const tasks = await sql(query, [user.id])
 
     // Enhance tasks with competitive intelligence context
     const enhancedTasks = tasks.map(task => {
       const aiSuggestions = task.ai_suggestions || {}
       const isCompetitiveTask = aiSuggestions.source === 'competitive_intelligence'
-      
+
       return {
         ...task,
         competitive_intelligence: isCompetitiveTask ? {
@@ -99,7 +101,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { user, error } = await authenticateRequest()
-    
+
     if (error || !user) {
       return createErrorResponse('Unauthorized', 401)
     }
@@ -118,7 +120,8 @@ export async function POST(request: NextRequest) {
     const { title, description, priority, due_date, category } = parsed.data
 
     const db = getDb()
-    const { rows } = await client.query(
+    const sql = getSql()
+    const rows = await sql(
       `INSERT INTO tasks (user_id, title, description, priority, due_date, category, status)
        VALUES ($1, $2, $3, $4, $5, $6, 'pending')
        RETURNING *`,

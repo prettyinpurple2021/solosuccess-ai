@@ -1,6 +1,4 @@
-// lib/auth-server.ts
-
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { NextRequest, NextResponse } from "next/server"
 import type { AuthenticatedUser, AuthResult } from "./auth-utils"
 import { headers } from "next/headers"
@@ -13,9 +11,9 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   try {
     const headersList = await headers()
     const authHeader = headersList.get('authorization')
-    
+
     let token: string | null = null
-    
+
     // Try to get token from Authorization header first
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.substring(7)
@@ -28,11 +26,11 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
           acc[name] = value
           return acc
         }, {} as Record<string, string>)
-        
+
         token = cookies.auth_token || null
       }
     }
-    
+
     if (!token) {
       return null
     }
@@ -44,7 +42,7 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
     // Use jose for Edge-compatible JWT verification
     const secret = new TextEncoder().encode(process.env.JWT_SECRET)
     const { payload } = await jose.jwtVerify(token, secret)
-    
+
     if (!payload || !payload.userId) {
       return null
     }
@@ -61,7 +59,8 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
         created_at: users.created_at,
         updated_at: users.updated_at,
         subscription_tier: users.subscription_tier,
-        subscription_status: users.subscription_status
+        subscription_status: users.subscription_status,
+        avatar_url: users.avatar_url
       })
       .from(users)
       .where(eq(users.id, payload.userId as string))
@@ -80,10 +79,11 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
       full_name: user.full_name,
       name: user.full_name,
       username: user.username,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-      subscription_tier: user.subscription_tier ?? 'free',
-      subscription_status: user.subscription_status ?? 'active',
+      avatar_url: user.avatar_url,
+      created_at: user.created_at ?? new Date(),
+      updated_at: user.updated_at ?? new Date(),
+      subscription_tier: (user.subscription_tier ?? 'free') as string,
+      subscription_status: (user.subscription_status ?? 'active') as string,
     }
   } catch (err) {
     logError('JWT authentication error:', err)

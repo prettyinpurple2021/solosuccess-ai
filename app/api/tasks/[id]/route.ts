@@ -1,13 +1,12 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextRequest, NextResponse} from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/database-client'
-import { authenticateRequest} from '@/lib/auth-server'
-import { z} from 'zod'
+import { getSql } from '@/lib/api-utils'
+import { authenticateRequest } from '@/lib/auth-server'
+import { z } from 'zod'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
-
-
 
 export async function PUT(
   request: NextRequest,
@@ -15,7 +14,7 @@ export async function PUT(
 ) {
   try {
     const { user, error } = await authenticateRequest()
-    
+
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -31,52 +30,54 @@ export async function PUT(
       estimated_minutes: z.number().optional(),
       actual_minutes: z.number().optional(),
     })
-    
+
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
     }
+    const { title, description, status, priority, due_date, category } = parsed.data
 
     const db = getDb()
-    
+
     // First verify the task belongs to the user
     const params = await context.params
-    const { id } = params
-    const { rows: existingTask } = await client.query(
-      'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
-      [id, user.id]
+    const sql = getSql()
+    const rows = await sql(
+      `SELECT * FROM tasks WHERE id = $1 AND user_id = $2`,
+      [params.id, user.id]
     )
+    const existingTask = rows[0]
 
-    if (existingTask.length === 0) {
+    if (!existingTask) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 })
     }
 
-    // Build update query dynamically
-    const updateFields: string[] = []
-    const updateValues: any[] = []
-    let paramIndex = 1
-
-    Object.entries(parsed.data).forEach(([key, value]) => {
-      if (value !== undefined) {
-        updateFields.push(`${key} = $${paramIndex}`)
-        updateValues.push(value)
-        paramIndex++
-      }
-    })
-
-    if (updateFields.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
-    }
-
-    updateFields.push('updated_at = NOW()')
-    updateValues.push(id, user.id)
-
-    const { rows } = await client.query(
-      `UPDATE tasks SET ${updateFields.join(', ')} WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`,
-      updateValues
+    // Update task
+    const updateResult = await sql(
+      `UPDATE tasks 
+       SET title = COALESCE($1, title), 
+           description = COALESCE($2, description), 
+           priority = COALESCE($3, priority), 
+           due_date = COALESCE($4, due_date), 
+           category = COALESCE($5, category), 
+           status = COALESCE($6, status), 
+           updated_at = NOW()
+       WHERE id = $7 AND user_id = $8
+       RETURNING *`,
+      [
+        title,
+        description,
+        priority,
+        due_date,
+        category,
+        status,
+        params.id,
+        user.id
+      ]
     )
+    const updatedTask = updateResult[0]
 
-    return NextResponse.json({ task: rows[0] })
+    return NextResponse.json({ task: updatedTask })
   } catch (error) {
     logError('Error updating task:', error)
     return NextResponse.json(
@@ -92,22 +93,22 @@ export async function DELETE(
 ) {
   try {
     const { user, error } = await authenticateRequest()
-    
+
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const db = getDb()
-    
+
     // Verify the task belongs to the user and delete it in one step
     const params = await context.params
-    const { id } = params
-    const { rowCount } = await client.query(
-      'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
-      [id, user.id]
+    const sql = getSql()
+    const result = await sql(
+      `DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING id`,
+      [params.id, user.id]
     )
 
-    if (rowCount === 0) {
+    if (result.length === 0) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 })
     }
 

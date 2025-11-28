@@ -26,11 +26,11 @@ export async function getUserSubscription(userId: string): Promise<SubscriptionI
       [userId]
     )
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       throw new Error('User not found')
     }
 
-    const { subscription_tier, subscription_status } = result.rows[0]
+    const { subscription_tier, subscription_status } = result[0]
     const tier = subscription_tier || 'launch'
     const status = subscription_status || 'active'
 
@@ -91,7 +91,7 @@ function getFeaturesByTier(tier: string): SubscriptionInfo['features'] {
  * Check if user has access to a specific feature
  */
 export async function hasFeatureAccess(
-  userId: string, 
+  userId: string,
   feature: keyof SubscriptionInfo['features']
 ): Promise<boolean> {
   const subscription = await getUserSubscription(userId)
@@ -106,7 +106,7 @@ export async function checkUsageLimit(
   limitType: 'agents' | 'conversations' | 'teamMembers'
 ): Promise<{ allowed: boolean; current: number; limit: number }> {
   const subscription = await getUserSubscription(userId)
-  
+
   // Get current usage from database
   let current = 0
   let limit = 0
@@ -119,7 +119,7 @@ export async function checkUsageLimit(
          WHERE user_id = $1 AND created_at >= CURRENT_DATE`,
         [userId]
       )
-      current = parseInt(agentsResult.rows[0]?.count || '0')
+      current = parseInt(agentsResult[0]?.count || '0')
       limit = subscription.features.maxAgents
       break
     case 'conversations':
@@ -129,7 +129,7 @@ export async function checkUsageLimit(
          WHERE user_id = $1 AND created_at >= CURRENT_DATE`,
         [userId]
       )
-      current = parseInt(conversationResult.rows[0]?.count || '0')
+      current = parseInt(conversationResult[0]?.count || '0')
       limit = subscription.features.maxConversationsPerDay
       break
     case 'teamMembers':
@@ -137,7 +137,7 @@ export async function checkUsageLimit(
         `SELECT COUNT(*) AS count FROM team_members WHERE user_id = $1`,
         [userId]
       )
-      current = parseInt(teamResult.rows[0]?.count || '0')
+      current = parseInt(teamResult[0]?.count || '0')
       limit = subscription.features.maxTeamMembers
       break
   }

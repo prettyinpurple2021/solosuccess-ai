@@ -1,5 +1,6 @@
 "use client"
 
+import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 
 export interface NotificationPermissionState {
   supported: boolean
@@ -36,10 +37,10 @@ export interface ScheduledNotification {
 export class WebPushNotificationManager {
   private static instance: WebPushNotificationManager
   private scheduledNotifications: Map<string, NodeJS.Timeout> = new Map()
-  
+
   // VAPID keys for web push (replace with your own)
   private readonly VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa40HvcCXvbdliMKvaV4MV8A3wfUFHVN1oNPROl56W4gNqVIwOqhH7nJ1EIIvg'
-  
+
   static getInstance(): WebPushNotificationManager {
     if (!WebPushNotificationManager.instance) {
       WebPushNotificationManager.instance = new WebPushNotificationManager()
@@ -52,6 +53,7 @@ export class WebPushNotificationManager {
    */
   isSupported(): boolean {
     return (
+      typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
       'PushManager' in window &&
       'Notification' in window
@@ -89,7 +91,7 @@ export class WebPushNotificationManager {
     }
 
     const permission = await Notification.requestPermission()
-    
+
     // Store permission preference in database via preferences API
     try {
       const response = await fetch('/api/preferences', {
@@ -97,19 +99,19 @@ export class WebPushNotificationManager {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          key: 'notificationPermission', 
-          value: permission 
+        body: JSON.stringify({
+          key: 'notificationPermission',
+          value: permission
         })
       })
-      
+
       if (!response.ok) {
         logWarn('Failed to save notification permission to database')
       }
     } catch (error) {
       logWarn('Failed to save notification permission:', error)
     }
-    
+
     return permission
   }
 
@@ -118,7 +120,7 @@ export class WebPushNotificationManager {
    */
   async subscribe(): Promise<PushSubscription> {
     const permission = await this.requestPermission()
-    
+
     if (permission !== 'granted') {
       throw new Error('Notification permission not granted')
     }
@@ -130,18 +132,18 @@ export class WebPushNotificationManager {
 
     // Check if already subscribed
     let subscription = await registration.pushManager.getSubscription()
-    
+
     if (!subscription) {
       // Create new subscription
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlB64ToUint8Array(this.VAPID_PUBLIC_KEY)
+        applicationServerKey: this.urlB64ToUint8Array(this.VAPID_PUBLIC_KEY) as any
       })
     }
 
     // Send subscription to server (database)
     await this.sendSubscriptionToServer(subscription)
-    
+
     return subscription
   }
 
@@ -156,12 +158,12 @@ export class WebPushNotificationManager {
     if (!subscription) return false
 
     const success = await subscription.unsubscribe()
-    
+
     if (success) {
       // Notify server
       await this.removeSubscriptionFromServer(subscription)
     }
-    
+
     return success
   }
 
@@ -193,7 +195,7 @@ export class WebPushNotificationManager {
         icon: payload.icon || '/images/logo.png',
         badge: payload.badge || '/images/logo.png',
         data: payload.data,
-        actions: payload.actions || [],
+        actions: payload.actions as any,
         tag: payload.tag,
         requireInteraction: payload.requireInteraction,
         silent: payload.silent
@@ -206,7 +208,7 @@ export class WebPushNotificationManager {
    */
   async scheduleNotification(notification: ScheduledNotification): Promise<void> {
     const timeUntilNotification = notification.scheduledTime.getTime() - Date.now()
-    
+
     if (timeUntilNotification <= 0) {
       // Show immediately
       this.showNotification(notification.payload)
@@ -215,31 +217,31 @@ export class WebPushNotificationManager {
 
     // Clear existing scheduled notification with same ID
     this.cancelScheduledNotification(notification.id)
-    
+
     // Schedule new notification
     const timeout = setTimeout(() => {
       this.showNotification(notification.payload)
       this.scheduledNotifications.delete(notification.id)
     }, timeUntilNotification)
-    
+
     this.scheduledNotifications.set(notification.id, timeout)
-    
+
     // Store in database via preferences API
     try {
       const scheduled = await this.getScheduledNotifications()
       scheduled.push(notification)
-      
+
       const response = await fetch('/api/preferences', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          key: 'scheduledNotifications', 
-          value: scheduled 
+        body: JSON.stringify({
+          key: 'scheduledNotifications',
+          value: scheduled
         })
       })
-      
+
       if (!response.ok) {
         logWarn('Failed to save scheduled notifications to database')
       }
@@ -257,22 +259,22 @@ export class WebPushNotificationManager {
       clearTimeout(timeout)
       this.scheduledNotifications.delete(id)
     }
-    
+
     // Remove from database via preferences API
     try {
       const scheduled = (await this.getScheduledNotifications()).filter(n => n.id !== id)
-      
+
       const response = await fetch('/api/preferences', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          key: 'scheduledNotifications', 
-          value: scheduled 
+        body: JSON.stringify({
+          key: 'scheduledNotifications',
+          value: scheduled
         })
       })
-      
+
       if (!response.ok) {
         logWarn('Failed to update scheduled notifications in database')
       }
@@ -294,13 +296,13 @@ export class WebPushNotificationManager {
           return stored.map((n: { scheduledTime: string }) => ({
             ...n,
             scheduledTime: new Date(n.scheduledTime)
-          }))
+          })) as ScheduledNotification[]
         }
       }
     } catch (error) {
       logError('Error fetching scheduled notifications from database:', error)
     }
-    
+
     return []
   }
 
@@ -310,7 +312,7 @@ export class WebPushNotificationManager {
   async restoreScheduledNotifications(): Promise<void> {
     const notifications = await this.getScheduledNotifications()
     const now = new Date()
-    
+
     notifications.forEach(notification => {
       if (notification.scheduledTime > now) {
         this.scheduleNotification(notification)
@@ -323,11 +325,11 @@ export class WebPushNotificationManager {
    */
   scheduleTaskReminder(taskId: string, taskTitle: string, dueDate: Date, priority: string): void {
     const reminderTime = new Date(dueDate.getTime() - (60 * 60 * 1000)) // 1 hour before
-    
+
     if (reminderTime <= new Date()) return // Don't schedule past reminders
-    
+
     const urgencyEmoji = priority === 'urgent' ? '🚨' : priority === 'high' ? '⚡' : '📋'
-    
+
     this.scheduleNotification({
       id: `task_reminder_${taskId}`,
       type: 'task_reminder',
@@ -367,9 +369,9 @@ export class WebPushNotificationManager {
    */
   scheduleWorkloadAlert(workloadScore: number, recommendations: string[]): void {
     if (workloadScore < 80) return // Only alert for high workload
-    
+
     const alertTime = new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes from now
-    
+
     this.scheduleNotification({
       id: `workload_alert_${Date.now()}`,
       type: 'workload_alert',
@@ -408,8 +410,8 @@ export class WebPushNotificationManager {
    * Private helper methods
    */
   private async getServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | null> {
-    if (!('serviceWorker' in navigator)) return null
-    
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return null
+
     try {
       const registration = await navigator.serviceWorker.getRegistration()
       return registration || null
@@ -437,7 +439,7 @@ export class WebPushNotificationManager {
           deviceInfo
         })
       })
-      
+
       if (!response.ok) {
         throw new Error('Failed to send subscription to server')
       }
@@ -464,18 +466,17 @@ export class WebPushNotificationManager {
   private urlB64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - base64String.length % 4) % 4)
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-    
+
     const rawData = window.atob(base64)
     const outputArray = new Uint8Array(rawData.length)
-    
+
     for (let i = 0; i < rawData.length; ++i) {
       outputArray[i] = rawData.charCodeAt(i)
     }
-    
+
     return outputArray
   }
 }
 
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 // Export singleton instance
 export const webPushManager = WebPushNotificationManager.getInstance()

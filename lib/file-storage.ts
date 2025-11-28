@@ -1,5 +1,7 @@
 
 // File storage system using Neon database - stores files as BLOB data in PostgreSQL
+import { neon } from '@neondatabase/serverless'
+import { logInfo, logError } from '@/lib/logger'
 export interface FileUploadResult {
   url: string
   pathname: string
@@ -30,7 +32,7 @@ function getSql() {
 class NeonFileStorage implements FileStorageProvider {
   private async ensureTablesExist() {
     const sql = getSql()
-    
+
     // Create file storage table if it doesn't exist
     await sql`
       CREATE TABLE IF NOT EXISTS file_storage (
@@ -44,7 +46,7 @@ class NeonFileStorage implements FileStorageProvider {
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `
-    
+
     // Create index for faster lookups
     await sql`
       CREATE INDEX IF NOT EXISTS idx_file_storage_pathname 
@@ -55,13 +57,13 @@ class NeonFileStorage implements FileStorageProvider {
   async upload(file: File, pathname: string): Promise<FileUploadResult> {
     try {
       await this.ensureTablesExist()
-      
+
       const sql = getSql()
-      
+
       // Convert file to Uint8Array (Edge-compatible, no Buffer)
       const arrayBuffer = await file.arrayBuffer()
       const uint8Array = new Uint8Array(arrayBuffer)
-      
+
       // Store file in database
       await sql`
         INSERT INTO file_storage (pathname, filename, content_type, file_size, file_data)
@@ -73,12 +75,12 @@ class NeonFileStorage implements FileStorageProvider {
           file_data = EXCLUDED.file_data,
           updated_at = NOW()
       `
-      
+
       // Return a data URL that points to our API endpoint
       const url = `/api/files/${encodeURIComponent(pathname)}`
-      
+
       logInfo(`File uploaded to Neon database: ${pathname}`)
-      
+
       return {
         url,
         pathname,
@@ -94,13 +96,13 @@ class NeonFileStorage implements FileStorageProvider {
   async delete(pathname: string): Promise<void> {
     try {
       await this.ensureTablesExist()
-      
+
       const sql = getSql()
-      
+
       await sql`
         DELETE FROM file_storage WHERE pathname = ${pathname}
       `
-      
+
       logInfo(`File deleted from Neon database: ${pathname}`)
     } catch (error) {
       logError('Error deleting file from Neon:', { error })
@@ -116,16 +118,16 @@ class NeonFileStorage implements FileStorageProvider {
   }>> {
     try {
       await this.ensureTablesExist()
-      
+
       const sql = getSql()
-      
+
       const files = await sql`
         SELECT pathname, file_size, created_at
         FROM file_storage
         WHERE pathname LIKE ${prefix + '%'}
         ORDER BY created_at DESC
       `
-      
+
       return files.map(file => ({
         url: `/api/files/${encodeURIComponent(file.pathname)}`,
         pathname: file.pathname,
@@ -180,7 +182,7 @@ const getStorageProvider = (): FileStorageProvider => {
   if (process.env.DATABASE_URL) {
     return new NeonFileStorage()
   }
-  
+
   // Fallback to local storage for development
   return new LocalFileStorage()
 }

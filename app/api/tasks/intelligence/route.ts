@@ -2,6 +2,7 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { getDb } from '@/lib/database-client'
+import { getSql } from '@/lib/api-utils'
 import { TaskIntelligenceEngine, TaskIntelligenceData, TaskOptimizationResult } from '@/lib/ai-task-intelligence'
 import { z } from 'zod'
 
@@ -53,10 +54,10 @@ export async function POST(request: NextRequest) {
     // Parse and validate request body
     const body = await request.json()
     const validatedData = TaskIntelligenceRequestSchema.parse(body)
-    
+
     // Initialize AI task intelligence engine
     const engine = new TaskIntelligenceEngine(validatedData.userContext)
-    
+
     // Optimize task list using AI
     const optimizationResult: TaskOptimizationResult = await engine.optimizeTaskList(
       validatedData.tasks as TaskIntelligenceData[]
@@ -64,7 +65,8 @@ export async function POST(request: NextRequest) {
 
     // Log usage for analytics in Postgres (Neon)
     const db = getDb()
-    await client.query(
+    const sql = getSql()
+    await sql(
       'INSERT INTO ai_usage_logs (user_id, feature, request_type, task_count, created_at) VALUES ($1, $2, $3, $4, $5)',
       [user.id, 'task_intelligence', 'optimize_tasks', validatedData.tasks.length, new Date().toISOString()]
     )
@@ -81,22 +83,22 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logError('Task intelligence error:', error)
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { 
-          error: 'Invalid request data', 
-          details: error.errors 
-        }, 
+        {
+          error: 'Invalid request data',
+          details: error.errors
+        },
         { status: 400 }
       )
     }
 
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
-        message: 'Failed to process task intelligence request' 
-      }, 
+        message: 'Failed to process task intelligence request'
+      },
       { status: 500 }
     )
   }
@@ -112,7 +114,8 @@ export async function GET(request: NextRequest) {
 
     // Get user's recent AI usage stats from Postgres (Neon)
     const db = getDb()
-    const { rows: usageStats } = await client.query(
+    const sql = getSql()
+    const usageStats = await sql(
       'SELECT * FROM ai_usage_logs WHERE user_id = $1 AND feature = $2 ORDER BY created_at DESC LIMIT 10',
       [user.id, 'task_intelligence']
     )
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
       data: {
         availableFeatures: [
           'task_prioritization',
-          'smart_deadlines', 
+          'smart_deadlines',
           'category_suggestions',
           'workload_analysis',
           'productivity_tips',
@@ -139,7 +142,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logError('Task intelligence info error:', error)
     return NextResponse.json(
-      { error: 'Failed to retrieve task intelligence info' }, 
+      { error: 'Failed to retrieve task intelligence info' },
       { status: 500 }
     )
   }
@@ -150,7 +153,7 @@ export async function GET(request: NextRequest) {
  */
 function calculateOverallConfidence(suggestions: TaskOptimizationResult['suggestions']): number {
   if (suggestions.length === 0) return 0
-  
+
   const totalConfidence = suggestions.reduce((sum, suggestion) => sum + suggestion.confidence, 0)
   return Math.round((totalConfidence / suggestions.length) * 100) / 100
 }
