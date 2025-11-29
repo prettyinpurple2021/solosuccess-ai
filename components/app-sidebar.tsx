@@ -2,15 +2,16 @@
 
 import type * as React from "react"
 import {
-  AudioWaveform, Bot, Command, GalleryVerticalEnd, SquareTerminal, Briefcase, Palette, Target, Shield, CheckSquare, FileText, Eye, Focus, } from "lucide-react"
+  AudioWaveform, Bot, Command, GalleryVerticalEnd, SquareTerminal, Briefcase, Palette, Target, Shield, CheckSquare, FileText, Eye, Focus,
+} from "lucide-react"
 
-import { NavMain} from "@/components/nav-main"
-import { NavProjects} from "@/components/nav-projects"
-import { NavUser} from "@/components/nav-user"
-import { TeamSwitcher} from "@/components/team-switcher"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail} from "@/components/ui/sidebar"
-import { useAuth} from "@/hooks/use-auth"
-import { TipSettingsButton} from "@/components/ui/tip-settings-button"
+import { NavMain } from "@/components/nav-main"
+import { NavProjects } from "@/components/nav-projects"
+import { NavUser } from "@/components/nav-user"
+import { TeamSwitcher } from "@/components/team-switcher"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
+import { useAuth } from "@/hooks/use-auth"
+import { TipSettingsButton } from "@/components/ui/tip-settings-button"
 
 // Production data - will be fetched from user's actual teams
 const data = {
@@ -68,12 +69,17 @@ const data = {
       url: "/dashboard/burnout",
       icon: Shield,
     },
+    {
+      title: "Idea Incinerator",
+      url: "/dashboard/incinerator",
+      icon: Target,
+    },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
-  
+
   // Create user data with fallbacks for missing information
   const userData = {
     name: (user as any)?.name || (user as any)?.full_name || user?.email?.split('@')[0] || "SoloSuccess User",

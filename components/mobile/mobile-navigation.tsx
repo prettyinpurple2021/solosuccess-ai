@@ -121,6 +121,16 @@ const navigationItems: NavigationItem[] = [
     ]
   },
   {
+    id: 'incinerator',
+    label: 'Incinerator',
+    icon: Target,
+    href: '/dashboard/incinerator',
+    color: 'text-red-600',
+    quickActions: [
+      { id: 'new_idea', label: 'New Idea', icon: Plus, action: () => { } }
+    ]
+  },
+  {
     id: 'analytics',
     label: 'Analytics',
     icon: BarChart3,
