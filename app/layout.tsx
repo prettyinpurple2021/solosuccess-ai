@@ -1,10 +1,10 @@
 import "./globals.css"
 import type { ReactNode } from 'react'
-import { Inter as FontSans} from "next/font/google"
+import { Inter as FontSans } from "next/font/google"
 import Script from 'next/script'
-import { cn} from "@/lib/utils"
-import { ThemeProvider} from "@/components/theme-provider"
-import { AuthProvider} from "@/hooks/use-auth"
+import { cn } from "@/lib/utils"
+import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/hooks/use-auth"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
 import { PerformanceMonitor } from "@/components/performance/performance-monitor"
 import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"
@@ -15,6 +15,7 @@ import { SmartTipManager } from "@/components/ui/smart-tip"
 import { Analytics } from "@vercel/analytics/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google'
+import { OfflineProvider } from "@/components/providers/offline-provider"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -123,14 +124,14 @@ export default function RootLayout({
   children: ReactNode
 }) {
   // GA4 is injected manually; no env var needed
-  
+
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable}`} suppressHydrationWarning>
       <head>
         {/* Optimize font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
+
         {/* Search engine verification placeholders */}
         <meta name="google-site-verification" content="CHANGE_ME" />
         <meta name="msvalidate.01" content="CHANGE_ME" />
@@ -151,9 +152,9 @@ export default function RootLayout({
         )}
       >
         {/* Structured Data */}
-        <Script 
-          id="ld-org" 
-          type="application/ld+json" 
+        <Script
+          id="ld-org"
+          type="application/ld+json"
           strategy="afterInteractive"
         >
           {JSON.stringify({
@@ -168,15 +169,15 @@ export default function RootLayout({
             ]
           })}
         </Script>
-        
+
         {/* Analytics Scripts - Load after page is interactive */}
         <Script
           id="ga4-gtag-src"
           src="https://www.googletagmanager.com/gtag/js?id=G-W174T4ZFNF"
           strategy="afterInteractive"
         />
-        <Script 
-          id="ga4-gtag-init" 
+        <Script
+          id="ga4-gtag-init"
           strategy="afterInteractive"
         >
           {`
@@ -230,16 +231,18 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <AccessibilityProvider>
-              <ChatProvider>
-                {children}
-              </ChatProvider>
-              <PerformanceMonitor />
-              {/* Ensure this client component that calls useAuth is inside AuthProvider */}
-              <ServiceWorkerRegister />
-              <ExitIntentSurvey />
-              <SmartTipManager />
-            </AccessibilityProvider>
+            <OfflineProvider>
+              <AccessibilityProvider>
+                <ChatProvider>
+                  {children}
+                </ChatProvider>
+                <PerformanceMonitor />
+                {/* Ensure this client component that calls useAuth is inside AuthProvider */}
+                <ServiceWorkerRegister />
+                <ExitIntentSurvey />
+                <SmartTipManager />
+              </AccessibilityProvider>
+            </OfflineProvider>
           </AuthProvider>
         </ThemeProvider>
         <Analytics />

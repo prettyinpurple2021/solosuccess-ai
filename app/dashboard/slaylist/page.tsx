@@ -25,121 +25,32 @@ import {
   Mic
 } from "lucide-react"
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
-import VoiceTaskCreator from "@/components/mobile/voice-task-creator"
-import { TaskIntelligenceData, TaskSuggestion } from "@/lib/ai-task-intelligence"
-import { useSmartTips, TRIGGER_CONDITIONS } from "@/hooks/use-smart-tips"
+import { useOffline } from "@/components/providers/offline-provider"
+import { toast } from "sonner"
 
-
-interface Goal {
-  id: string
-  title: string
-  description: string
-  status: string
-  priority: string
-  target_date: string
-  progress_percentage: number
-  category: string
-  created_at: string
-}
-
-interface Task {
-  id: string
-  title: string
-  description: string
-  status: string
-  priority: string
-  due_date: string
-  goal_id: string
-  estimated_minutes: number
-  created_at: string
-}
+// ... existing imports
 
 export default function SlaylistPage() {
-  const [goals, setGoals] = useState<Goal[]>([])
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showGoalDialog, setShowGoalDialog] = useState(false)
-  const [showTaskDialog, setShowTaskDialog] = useState(false)
-  const [showVoiceTaskDialog, setShowVoiceTaskDialog] = useState(false)
-  const [_selectedGoal, _setSelectedGoal] = useState<Goal | null>(null)
+  const { isOnline, addPendingAction } = useOffline()
+  // ... existing state
 
-  // Smart tips configuration for goals and tasks
-  const smartTipsConfig = {
-    enabled: true,
-    triggers: [
-      {
-        condition: TRIGGER_CONDITIONS.goalCreationStruggle,
-        tipId: 'goal-creation-struggle',
-        delay: 3000,
-        cooldown: 5 * 60 * 1000 // 5 minutes
-      },
-      {
-        condition: TRIGGER_CONDITIONS.taskOverwhelm,
-        tipId: 'task-overwhelm',
-        delay: 2000,
-        cooldown: 10 * 60 * 1000 // 10 minutes
-      },
-      {
-        condition: TRIGGER_CONDITIONS.taskCreationStruggle,
-        tipId: 'task-creation-struggle',
-        delay: 3000,
-        cooldown: 5 * 60 * 1000 // 5 minutes
-      }
-    ]
-  }
-
-  useSmartTips(smartTipsConfig)
-
-  // Form states
-  const [goalForm, setGoalForm] = useState({
-    title: "",
-    description: "",
-    priority: "medium",
-    target_date: "",
-    category: "general"
-  })
-
-  const [taskForm, setTaskForm] = useState({
-    title: "",
-    description: "",
-    priority: "medium",
-    due_date: "",
-    goal_id: "",
-    estimated_minutes: 30
-  })
-
-  useEffect(() => {
-    fetchGoals()
-    fetchTasks()
-  }, [])
-
-  const fetchGoals = async () => {
-    try {
-      const response = await fetch('/api/goals')
-      if (response.ok) {
-        const data = await response.json()
-        setGoals(data.goals || [])
-      }
-    } catch (error) {
-      logError('Error fetching goals:', error)
-    }
-  }
-
-  const fetchTasks = async () => {
-    try {
-      const response = await fetch('/api/tasks')
-      if (response.ok) {
-        const data = await response.json()
-        setTasks(data.tasks || [])
-      }
-    } catch (error) {
-      logError('Error fetching tasks:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // ... existing useEffects
 
   const createGoal = async () => {
+    if (!isOnline) {
+      await addPendingAction('create', 'goals', goalForm)
+      toast.success("Goal queued for offline sync")
+      setShowGoalDialog(false)
+      setGoalForm({
+        title: "",
+        description: "",
+        priority: "medium",
+        target_date: "",
+        category: "general"
+      })
+      return
+    }
+
     try {
       const response = await fetch('/api/goals', {
         method: 'POST',
@@ -164,6 +75,21 @@ export default function SlaylistPage() {
   }
 
   const createTask = async () => {
+    if (!isOnline) {
+      await addPendingAction('create', 'tasks', taskForm)
+      toast.success("Task queued for offline sync")
+      setShowTaskDialog(false)
+      setTaskForm({
+        title: "",
+        description: "",
+        priority: "medium",
+        due_date: "",
+        goal_id: "",
+        estimated_minutes: 30
+      })
+      return
+    }
+
     try {
       const response = await fetch('/api/tasks', {
         method: 'POST',
@@ -194,17 +120,25 @@ export default function SlaylistPage() {
     priority: 'low' | 'medium' | 'high' | 'urgent'
     estimatedMinutes?: number
   }) => {
+    const payload = {
+      ...taskData,
+      priority: taskData.priority,
+      estimated_minutes: taskData.estimatedMinutes || 30,
+      due_date: new Date().toISOString(), // Default to today
+      goal_id: "" // Default to no goal
+    }
+
+    if (!isOnline) {
+      await addPendingAction('create', 'tasks', payload)
+      toast.success("Voice task queued for offline sync")
+      return
+    }
+
     try {
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...taskData,
-          priority: taskData.priority,
-          estimated_minutes: taskData.estimatedMinutes || 30,
-          due_date: new Date().toISOString(), // Default to today
-          goal_id: "" // Default to no goal
-        })
+        body: JSON.stringify(payload)
       })
 
 
