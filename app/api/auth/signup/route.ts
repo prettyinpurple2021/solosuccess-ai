@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        userId: newUser.id, 
+      {
+        userId: newUser.id,
         email: newUser.email,
-        username: newUser.username 
+        username: newUser.username
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
@@ -132,6 +132,16 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     logError('Signup error:', error)
+
+    // Temporary debug logging
+    try {
+      const fs = require('fs');
+      const debugMsg = `[${new Date().toISOString()}] Signup Error: ${error instanceof Error ? error.message : String(error)}\nStack: ${error instanceof Error ? error.stack : 'No stack'}\n\n`;
+      fs.appendFileSync('debug-auth.log', debugMsg);
+    } catch (e) {
+      // ignore
+    }
+
     logError('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
@@ -139,10 +149,10 @@ export async function POST(request: NextRequest) {
     })
     const message = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { 
-        error: 'Internal server error', 
-        message: process.env.NODE_ENV === 'development' ? message : undefined,
-        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
+      {
+        error: 'Internal server error',
+        message: message,
+        details: error instanceof Error ? error.stack : undefined
       },
       { status: 500 }
     )
