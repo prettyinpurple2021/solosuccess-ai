@@ -1332,3 +1332,27 @@ export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one
     references: [users.id],
   }),
 }));
+
+// Analytics Events table
+export const analyticsEvents = pgTable('analytics_events', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'set null' }),
+  event: varchar('event', { length: 100 }).notNull(),
+  properties: jsonb('properties').default('{}'),
+  timestamp: timestamp('timestamp').defaultNow(),
+  session_id: varchar('session_id', { length: 255 }),
+  metadata: jsonb('metadata').default('{}'),
+}, (table) => ({
+  userIdIdx: index('analytics_events_user_id_idx').on(table.user_id),
+  eventIdx: index('analytics_events_event_idx').on(table.event),
+  timestampIdx: index('analytics_events_timestamp_idx').on(table.timestamp),
+}));
+
+export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => ({
+  user: one(users, {
+    fields: [analyticsEvents.user_id],
+    references: [users.id],
+  }),
+}));
+
+

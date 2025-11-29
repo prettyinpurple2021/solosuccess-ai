@@ -2,19 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { logError, logInfo } from '@/lib/logger'
 import { rateLimitByIp } from '@/lib/rate-limit'
-import { neon } from '@neondatabase/serverless'
+import { workflowEngine, WorkflowExecution } from '@/lib/workflow-engine'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
+// Edge runtime enabled
 export const runtime = 'edge'
-
-
-function getSql() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error('DATABASE_URL is not set')
-  }
-  return neon(url)
-}
 
 // POST /api/workflows/[id]/execute - Execute workflow
 export async function POST(
@@ -42,20 +33,26 @@ export async function POST(
     const workflowId = resolvedParams.id
 
     // Get workflow
-    const sql = getSql()
-    const workflows = await sql`
-      SELECT * FROM workflows 
-      WHERE id = ${workflowId} AND user_id = ${user.id}
-    `
+    const workflow = await workflowEngine.getWorkflow(workflowId)
 
-    if (workflows.length === 0) {
+    if (!workflow) {
       return NextResponse.json(
         { error: 'Workflow not found' },
         { status: 404 }
       )
     }
 
-    const workflow = workflows[0]
+    // Check ownership
+    if (workflow.metadata.createdBy !== user.id) {
+      // Ideally check permissions, but for now strict ownership
+      // Or maybe check if public?
+      // For now, assume strict ownership or admin
+      // But wait, getWorkflow doesn't check user_id.
+      // I should verify user_id.
+      if (workflow.metadata.createdBy !== user.id) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      }
+    }
 
     // Check if workflow is active
     if (workflow.status !== 'active') {
@@ -66,16 +63,17 @@ export async function POST(
     }
 
     // Check if there are running executions
-    const runningExecutions = await sql`
-      SELECT COUNT(*) as count FROM workflow_executions 
-      WHERE workflow_id = ${workflowId} AND status = 'running'
-    `
+    const executions = await workflowEngine.getWorkflowExecutions(workflowId)
+    const runningExecutions = executions.filter(e => e.status === 'running')
 
-    if (parseInt(runningExecutions[0]?.count || '0') > 0) {
-      return NextResponse.json(
-        { error: 'Workflow is already running' },
-        { status: 400 }
-      )
+    if (runningExecutions.length > 0) {
+      // Optional: Allow parallel executions based on settings
+      if (!workflow.settings.parallelExecution) {
+        return NextResponse.json(
+          { error: 'Workflow is already running' },
+          { status: 400 }
+        )
+      }
     }
 
     // Get execution parameters from request body
@@ -83,35 +81,27 @@ export async function POST(
     const { input, variables, options } = body || {}
 
     // Create execution record
-    const execution = await sql`
-      INSERT INTO workflow_executions (
-        workflow_id, user_id, status, started_at, input, variables, options
-      ) VALUES (
-        ${workflowId}, ${user.id}, 'running', NOW(), 
-        ${JSON.stringify(input || {})}, 
-        ${JSON.stringify(variables || {})}, 
-        ${JSON.stringify(options || {})}
-      ) RETURNING *
-    `
-
-    const executionId = execution[0].id
+    const execution = await workflowEngine.createExecution(workflowId, input || {}, user.id)
 
     logInfo('Workflow execution started', {
-      executionId,
+      executionId: execution.id,
       workflowId,
       userId: user.id,
       workflowName: workflow.name
     })
 
     // Execute workflow asynchronously
-    executeWorkflowAsync(executionId, workflow, input, variables, options)
+    // We don't await this to return response immediately
+    workflowEngine.runExecution(execution.id).catch(error => {
+      logError('Background workflow execution failed', error)
+    })
 
     return NextResponse.json({
       execution: {
-        id: executionId,
+        id: execution.id,
         workflowId,
         status: 'running',
-        startedAt: execution[0].started_at
+        startedAt: execution.startedAt
       }
     }, { status: 202 })
 
@@ -143,36 +133,46 @@ export async function GET(
     const executionId = searchParams.get('executionId')
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50)
 
-    let executions
+    let executions: WorkflowExecution[]
 
     if (executionId) {
       // Get specific execution
-      const sql = getSql()
-      executions = await sql`
-        SELECT * FROM workflow_executions 
-        WHERE id = ${executionId} AND workflow_id = ${workflowId} AND user_id = ${user.id}
-      `
+      const execution = await workflowEngine.getExecution(executionId)
+      if (execution && execution.workflowId == workflowId) { // loose equality for string/number
+        // Check ownership
+        const workflow = await workflowEngine.getWorkflow(workflowId)
+        if (workflow && workflow.metadata.createdBy === user.id) {
+          executions = [execution]
+        } else {
+          executions = []
+        }
+      } else {
+        executions = []
+      }
     } else {
       // Get recent executions for workflow
-      const sql = getSql()
-      executions = await sql`
-        SELECT * FROM workflow_executions 
-        WHERE workflow_id = ${workflowId} AND user_id = ${user.id}
-        ORDER BY started_at DESC
-        LIMIT ${limit}
-      `
+      // workflowEngine.getWorkflowExecutions returns all.
+      // I should probably add pagination to getWorkflowExecutions or slice here.
+      // And verify ownership.
+      const workflow = await workflowEngine.getWorkflow(workflowId)
+      if (!workflow || workflow.metadata.createdBy !== user.id) {
+        return NextResponse.json({ error: 'Workflow not found or unauthorized' }, { status: 404 })
+      }
+
+      const allExecutions = await workflowEngine.getWorkflowExecutions(workflowId)
+      executions = allExecutions.slice(0, limit)
     }
 
     return NextResponse.json({
       executions: executions.map(exec => ({
         id: exec.id,
-        workflowId: exec.workflow_id,
+        workflowId: exec.workflowId,
         status: exec.status,
-        startedAt: exec.started_at,
-        completedAt: exec.completed_at,
-        duration: exec.duration,
-        input: exec.input,
-        output: exec.output,
+        startedAt: exec.startedAt,
+        completedAt: exec.completedAt,
+        duration: exec.executionTime, // mapped from duration
+        input: exec.variables, // variables includes input
+        output: Object.fromEntries(exec.nodeResults),
         error: exec.error,
         logs: exec.logs
       }))
@@ -184,51 +184,5 @@ export async function GET(
       { error: 'Internal server error' },
       { status: 500 }
     )
-  }
-}
-
-// Async workflow execution function
-async function executeWorkflowAsync(
-  executionId: string,
-  workflow: any,
-  input: any,
-  variables: any,
-  options: any
-) {
-  try {
-    logInfo('Starting workflow execution', { executionId, workflowId: workflow.id })
-
-    // Simulate workflow execution
-    // In a real implementation, this would use the WorkflowEngine
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Update execution status to completed
-    const sql = getSql()
-    await sql`
-      UPDATE workflow_executions 
-      SET 
-        status = 'completed',
-        completed_at = NOW(),
-        duration = EXTRACT(EPOCH FROM (NOW() - started_at)) * 1000,
-        output = ${JSON.stringify({ result: 'Workflow executed successfully', input, variables })}
-      WHERE id = ${executionId}
-    `
-
-    logInfo('Workflow execution completed', { executionId })
-
-  } catch (error) {
-    logError('Workflow execution failed', { executionId, error })
-
-    // Update execution status to failed
-    const sql = getSql()
-    await sql`
-      UPDATE workflow_executions 
-      SET 
-        status = 'failed',
-        completed_at = NOW(),
-        duration = EXTRACT(EPOCH FROM (NOW() - started_at)) * 1000,
-        error = ${JSON.stringify({ message: error instanceof Error ? error.message : 'Unknown error' })}
-      WHERE id = ${executionId}
-    `
   }
 }

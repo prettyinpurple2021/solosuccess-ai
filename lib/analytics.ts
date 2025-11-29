@@ -1,9 +1,11 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
+import { logger, logInfo } from '@/lib/logger'
 import { NextRequest } from 'next/server'
-
+import { db } from '@/db'
+import { analyticsEvents, users } from '@/db/schema'
+import { desc, eq, sql, and, gte } from 'drizzle-orm'
 
 // Analytics event types
-export type AnalyticsEvent = 
+export type AnalyticsEvent =
   | 'user_signup'
   | 'user_login'
   | 'user_logout'
@@ -76,11 +78,6 @@ export interface BusinessMetrics {
 }
 
 class AnalyticsService {
-  private events: AnalyticsEventData[] = []
-  private userMetrics: Map<string, UserMetrics> = new Map()
-  private performanceMetrics: PerformanceMetrics[] = []
-  private businessMetrics: BusinessMetrics | null = null
-
   /**
    * Track an analytics event
    */
@@ -89,218 +86,148 @@ class AnalyticsService {
     properties: Record<string, any> = {},
     request?: NextRequest
   ): Promise<void> {
-    const eventData: AnalyticsEventData = {
-      event,
-      timestamp: new Date(),
-      properties,
-      metadata: request ? {
-        userAgent: request.headers.get('user-agent') || undefined,
-        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
-        referrer: request.headers.get('referer') || undefined,
-        url: request.url
-      } : undefined
-    }
+    const metadata = request ? {
+      userAgent: request.headers.get('user-agent') || undefined,
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+      referrer: request.headers.get('referer') || undefined,
+      url: request.url
+    } : undefined
 
-    // Store event
-    this.events.push(eventData)
+    try {
+      await db.insert(analyticsEvents).values({
+        user_id: properties.userId,
+        event,
+        properties,
+        metadata,
+        session_id: properties.sessionId,
+        timestamp: new Date()
+      })
 
-    // Update user metrics if userId is provided
-    if (properties.userId) {
-      await this.updateUserMetrics(properties.userId, event, properties)
-    }
-
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      logInfo('📊 Analytics Event', { event, properties })
-    }
-
-    // Note: PostHog integration was removed. Events are only stored internally now.
-  }
-
-  /**
-   * Update user metrics based on events
-   */
-  private async updateUserMetrics(
-    userId: string,
-    event: AnalyticsEvent,
-    properties: Record<string, any>
-  ): Promise<void> {
-    let metrics = this.userMetrics.get(userId)
-    
-    if (!metrics) {
-      metrics = {
-        userId,
-        totalSessions: 0,
-        totalPageViews: 0,
-        totalAIInteractions: 0,
-        goalsCreated: 0,
-        goalsCompleted: 0,
-        tasksCreated: 0,
-        tasksCompleted: 0,
-        filesUploaded: 0,
-        templatesSaved: 0,
-        lastActiveAt: new Date(),
-        firstSeenAt: new Date(),
-        averageSessionDuration: 0,
-        retentionScore: 0
+      // Log to console in development
+      if (process.env.NODE_ENV === 'development') {
+        logInfo('📊 Analytics Event', { event, properties })
       }
+    } catch (error) {
+      console.error('Failed to track analytics event:', error)
     }
-
-    // Update metrics based on event type
-    switch (event) {
-      case 'user_signup':
-        metrics.firstSeenAt = new Date()
-        break
-      case 'user_login':
-        metrics.totalSessions++
-        break
-      case 'page_view':
-        metrics.totalPageViews++
-        break
-      case 'ai_agent_interaction':
-        metrics.totalAIInteractions++
-        break
-      case 'goal_created':
-        metrics.goalsCreated++
-        break
-      case 'goal_completed':
-        metrics.goalsCompleted++
-        break
-      case 'task_created':
-        metrics.tasksCreated++
-        break
-      case 'task_completed':
-        metrics.tasksCompleted++
-        break
-      case 'file_uploaded':
-        metrics.filesUploaded++
-        break
-      case 'template_saved':
-        metrics.templatesSaved++
-        break
-    }
-
-    metrics.lastActiveAt = new Date()
-    this.userMetrics.set(userId, metrics)
   }
 
   /**
    * Track performance metrics
    */
   async trackPerformance(metrics: Partial<PerformanceMetrics>): Promise<void> {
-    const performanceData: PerformanceMetrics = {
-      pageLoadTime: metrics.pageLoadTime || 0,
-      apiResponseTime: metrics.apiResponseTime || 0,
-      errorRate: metrics.errorRate || 0,
-      uptime: metrics.uptime || 100,
-      memoryUsage: metrics.memoryUsage || 0,
-      cpuUsage: metrics.cpuUsage || 0,
-      databaseQueryTime: metrics.databaseQueryTime || 0,
-      ...metrics
-    }
-
-    this.performanceMetrics.push(performanceData)
-
-    // Keep only last 1000 performance metrics
-    if (this.performanceMetrics.length > 1000) {
-      this.performanceMetrics = this.performanceMetrics.slice(-1000)
-    }
+    // For now, we'll log performance metrics as standard events
+    // In a real production app, you might want a dedicated time-series DB or table
+    await this.trackEvent('performance_metric', metrics)
   }
 
   /**
    * Get user metrics
+   * Note: This is a heavy operation and should be optimized or cached in production
    */
-  getUserMetrics(userId: string): UserMetrics | null {
-    return this.userMetrics.get(userId) || null
+  async getUserMetrics(userId: string): Promise<UserMetrics | null> {
+    // This is a simplified implementation. In production, you'd want to aggregate this 
+    // in a background job or materialized view.
+    const events = await db.select()
+      .from(analyticsEvents)
+      .where(eq(analyticsEvents.user_id, userId))
+
+    if (events.length === 0) return null
+
+    const metrics: UserMetrics = {
+      userId,
+      totalSessions: events.filter(e => e.event === 'user_login').length,
+      totalPageViews: events.filter(e => e.event === 'page_view').length,
+      totalAIInteractions: events.filter(e => e.event === 'ai_agent_interaction').length,
+      goalsCreated: events.filter(e => e.event === 'goal_created').length,
+      goalsCompleted: events.filter(e => e.event === 'goal_completed').length,
+      tasksCreated: events.filter(e => e.event === 'task_created').length,
+      tasksCompleted: events.filter(e => e.event === 'task_completed').length,
+      filesUploaded: events.filter(e => e.event === 'file_uploaded').length,
+      templatesSaved: events.filter(e => e.event === 'template_saved').length,
+      lastActiveAt: events[events.length - 1]?.timestamp || new Date(),
+      firstSeenAt: events[0]?.timestamp || new Date(),
+      averageSessionDuration: 0, // Complex to calculate without session tracking
+      retentionScore: 0 // Placeholder
+    }
+
+    return metrics
   }
 
   /**
    * Get all user metrics
    */
-  getAllUserMetrics(): UserMetrics[] {
-    return Array.from(this.userMetrics.values())
+  async getAllUserMetrics(): Promise<UserMetrics[]> {
+    // Fetch all users and calculate metrics
+    // WARNING: Very inefficient for large user bases. Use with caution.
+    const allUsers = await db.select({ id: users.id }).from(users)
+    const metrics: UserMetrics[] = []
+
+    for (const user of allUsers) {
+      const userMetric = await this.getUserMetrics(user.id)
+      if (userMetric) metrics.push(userMetric)
+    }
+
+    return metrics
   }
 
   /**
    * Get performance metrics
    */
-  getPerformanceMetrics(): PerformanceMetrics[] {
-    return this.performanceMetrics
-  }
+  async getPerformanceMetrics(): Promise<PerformanceMetrics[]> {
+    const events = await db.select()
+      .from(analyticsEvents)
+      .where(eq(analyticsEvents.event, 'performance_metric'))
+      .orderBy(desc(analyticsEvents.timestamp))
+      .limit(50)
 
-  /**
-   * Get business metrics
-   */
-  getBusinessMetrics(): BusinessMetrics | null {
-    return this.businessMetrics
+    return events.map(e => e.properties as unknown as PerformanceMetrics)
   }
 
   /**
    * Calculate business metrics
    */
   async calculateBusinessMetrics(): Promise<BusinessMetrics> {
-    const allUserMetrics = this.getAllUserMetrics()
     const now = new Date()
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-    const totalUsers = allUserMetrics.length
-    const activeUsers = allUserMetrics.filter(
-      user => user.lastActiveAt > weekAgo
-    ).length
-
-    const newUsersToday = allUserMetrics.filter(
-      user => user.firstSeenAt >= today
-    ).length
-
-    const newUsersThisWeek = allUserMetrics.filter(
-      user => user.firstSeenAt >= weekAgo
-    ).length
-
-    const newUsersThisMonth = allUserMetrics.filter(
-      user => user.firstSeenAt >= monthAgo
-    ).length
-
-    // Calculate retention rate (users active in last 7 days / total users)
-    const userRetentionRate = totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0
-
-    // Calculate feature adoption rates
-    const featureAdoptionRate: Record<string, number> = {
-      ai_agents: (allUserMetrics.filter(user => user.totalAIInteractions > 0).length / totalUsers) * 100,
-      goals: (allUserMetrics.filter(user => user.goalsCreated > 0).length / totalUsers) * 100,
-      tasks: (allUserMetrics.filter(user => user.tasksCreated > 0).length / totalUsers) * 100,
-      files: (allUserMetrics.filter(user => user.filesUploaded > 0).length / totalUsers) * 100,
-      templates: (allUserMetrics.filter(user => user.templatesSaved > 0).length / totalUsers) * 100
+    // Helper to count users created after a date
+    const countNewUsers = async (date: Date) => {
+      const result = await db.select({ count: sql<number>`count(*)` })
+        .from(users)
+        .where(gte(users.created_at, date))
+      return Number(result[0]?.count || 0)
     }
 
-    // Calculate conversion rate (users who completed at least one goal / total users)
-    const conversionRate = totalUsers > 0 ? 
-      (allUserMetrics.filter(user => user.goalsCompleted > 0).length / totalUsers) * 100 : 0
+    const totalUsersResult = await db.select({ count: sql<number>`count(*)` }).from(users)
+    const totalUsers = Number(totalUsersResult[0]?.count || 0)
 
-    // Calculate churn rate (users inactive for 30+ days / total users)
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-    const churnedUsers = allUserMetrics.filter(
-      user => user.lastActiveAt < thirtyDaysAgo
-    ).length
-    const churnRate = totalUsers > 0 ? (churnedUsers / totalUsers) * 100 : 0
+    const newUsersToday = await countNewUsers(oneDayAgo)
+    const newUsersThisWeek = await countNewUsers(oneWeekAgo)
+    const newUsersThisMonth = await countNewUsers(oneMonthAgo)
 
-    const businessMetrics: BusinessMetrics = {
+    // Active users (active in last 7 days)
+    // We check analytics events for activity
+    const activeUsersResult = await db.select({ count: sql<number>`count(distinct ${analyticsEvents.user_id})` })
+      .from(analyticsEvents)
+      .where(gte(analyticsEvents.timestamp, oneWeekAgo))
+    const activeUsers = Number(activeUsersResult[0]?.count || 0)
+
+    return {
       totalUsers,
       activeUsers,
       newUsersToday,
       newUsersThisWeek,
       newUsersThisMonth,
-      userRetentionRate,
-      featureAdoptionRate,
-      conversionRate,
-      churnRate,
-      revenue: 0, // TODO: Implement revenue tracking
-      mrr: 0 // TODO: Implement MRR tracking
+      userRetentionRate: totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0,
+      featureAdoptionRate: {}, // TODO: Implement
+      conversionRate: 0, // TODO: Implement
+      churnRate: 0, // TODO: Implement
+      revenue: 0,
+      mrr: 0
     }
-
-    this.businessMetrics = businessMetrics
-    return businessMetrics
   }
 
   /**
@@ -313,29 +240,39 @@ class AnalyticsService {
     businessMetrics: BusinessMetrics
   }> {
     const businessMetrics = await this.calculateBusinessMetrics()
-    
+    const performanceMetrics = await this.getPerformanceMetrics()
+
+    const recentEvents = await db.select()
+      .from(analyticsEvents)
+      .orderBy(desc(analyticsEvents.timestamp))
+      .limit(100)
+
+    const events = recentEvents.map(e => ({
+      event: e.event as AnalyticsEvent,
+      timestamp: e.timestamp!,
+      properties: e.properties as Record<string, any>,
+      metadata: e.metadata as any,
+      userId: e.user_id || undefined,
+      sessionId: e.session_id || undefined
+    }))
+
+    // For dashboard, we might want top users or something, but for now let's return empty or basic
+    // to avoid performance issues with getAllUserMetrics()
+    const userMetrics: UserMetrics[] = []
+
     return {
-      events: this.events.slice(-100), // Last 100 events
-      userMetrics: this.getAllUserMetrics(),
-      performanceMetrics: this.getPerformanceMetrics().slice(-50), // Last 50 performance metrics
+      events,
+      userMetrics,
+      performanceMetrics,
       businessMetrics
     }
   }
 
   /**
-   * Clear old data (for memory management)
+   * Clear old data (for memory management) - No longer needed for DB, but could be a cleanup job
    */
-  clearOldData(): void {
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    
-    // Keep only events from last week
-    this.events = this.events.filter(event => event.timestamp > oneWeekAgo)
-    
-    // Keep only performance metrics from last 24 hours
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    this.performanceMetrics = this.performanceMetrics.filter(
-      metric => new Date() > oneDayAgo
-    )
+  async clearOldData(): Promise<void> {
+    // Implementation for DB cleanup if needed
   }
 }
 
@@ -378,3 +315,4 @@ export const trackError = (userId: string, error: string, properties: Record<str
 
 export const trackPerformance = (metrics: Partial<PerformanceMetrics>) =>
   analytics.trackPerformance(metrics)
+

@@ -51,7 +51,7 @@ import type { WorkflowExecution, WorkflowExecutionStep } from '@/lib/workflow-en
 
 // Types
 interface WorkflowExecutionMonitorProps {
-  executionId?: string
+  executionId?: string | number
   onStopExecution?: (executionId: string) => void
   onRetryExecution?: (executionId: string) => void
   onViewDetails?: (executionId: string) => void
@@ -81,7 +81,7 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
     completedAt: null,
     duration: null,
     executionTime: 300000,
-  nodeResults: new Map<string, unknown>(),
+    nodeResults: new Map<string, unknown>(),
     progress: 65,
     currentStep: 'Sending follow-up email',
     steps: [
@@ -117,7 +117,7 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
     completedAt: new Date(Date.now() - 600000), // 10 minutes ago
     duration: 1200000, // 20 minutes
     executionTime: 1200000,
-  nodeResults: new Map<string, unknown>(),
+    nodeResults: new Map<string, unknown>(),
     progress: 100,
     currentStep: null,
     steps: [
@@ -134,7 +134,7 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
       { timestamp: new Date(Date.now() - 1700000), level: 'info', message: 'User account created' },
       { timestamp: new Date(Date.now() - 1600000), level: 'info', message: 'Onboarding tasks setup completed' },
       { timestamp: new Date(Date.now() - 700000), level: 'info', message: 'Getting started guide sent' },
-  { timestamp: new Date(Date.now() - 600000), level: 'success', message: 'Customer onboarding completed successfully' }
+      { timestamp: new Date(Date.now() - 600000), level: 'success', message: 'Customer onboarding completed successfully' }
     ],
     metadata: {
       executedBy: 'user-1',
@@ -153,7 +153,7 @@ const MOCK_EXECUTIONS: WorkflowExecution[] = [
     completedAt: new Date(Date.now() - 3300000), // 30 minutes ago
     duration: 300000, // 5 minutes
     executionTime: 300000,
-  nodeResults: new Map<string, unknown>(),
+    nodeResults: new Map<string, unknown>(),
     progress: 33,
     currentStep: null,
     steps: [
@@ -236,7 +236,7 @@ export function WorkflowExecutionMonitor({
   const [activeTab, setActiveTab] = useState<'overview' | 'executions' | 'logs' | 'analytics'>('overview')
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [loading, setLoading] = useState(false)
-  
+
   const { toast } = useToast()
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -268,7 +268,7 @@ export function WorkflowExecutionMonitor({
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(exec => {
         const name = (exec.workflowName ?? 'Untitled workflow').toLowerCase()
-        return name.includes(query) || exec.id.toLowerCase().includes(query)
+        return name.includes(query) || String(exec.id).toLowerCase().includes(query)
       })
     }
 
@@ -298,16 +298,16 @@ export function WorkflowExecutionMonitor({
   }, [])
 
   // Handle stop execution
-  const handleStopExecution = useCallback((execId: string) => {
+  const handleStopExecution = useCallback((execId: string | number) => {
     setExecutions(prev => prev.map(exec =>
       exec.id === execId
         ? { ...exec, status: 'cancelled' as const, completedAt: new Date() }
         : exec
     ))
-    
-    onStopExecution?.(execId)
+
+    onStopExecution?.(String(execId))
     logInfo('Workflow execution stopped', { executionId: execId })
-    
+
     toast({
       title: 'Execution Stopped',
       description: 'Workflow execution has been stopped',
@@ -316,10 +316,10 @@ export function WorkflowExecutionMonitor({
   }, [onStopExecution, toast])
 
   // Handle retry execution
-  const handleRetryExecution = useCallback((execId: string) => {
-    onRetryExecution?.(execId)
+  const handleRetryExecution = useCallback((execId: string | number) => {
+    onRetryExecution?.(String(execId))
     logInfo('Workflow execution retry requested', { executionId: execId })
-    
+
     toast({
       title: 'Retrying Execution',
       description: 'Workflow execution is being retried',
@@ -328,12 +328,12 @@ export function WorkflowExecutionMonitor({
   }, [onRetryExecution, toast])
 
   // Handle view details
-  const handleViewDetails = useCallback((execId: string) => {
+  const handleViewDetails = useCallback((execId: string | number) => {
     const execution = executions.find(e => e.id === execId)
     if (execution) {
       setSelectedExecution(execution)
     }
-    onViewDetails?.(execId)
+    onViewDetails?.(String(execId))
     logInfo('Viewing execution details', { executionId: execId })
   }, [executions, onViewDetails])
 
@@ -353,11 +353,11 @@ export function WorkflowExecutionMonitor({
   // Format duration
   const formatDuration = useCallback((ms: number | null) => {
     if (!ms) return 'N/A'
-    
+
     const seconds = Math.floor(ms / 1000)
     const minutes = Math.floor(seconds / 60)
     const hours = Math.floor(minutes / 60)
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes % 60}m ${seconds % 60}s`
     } else if (minutes > 0) {
@@ -374,7 +374,7 @@ export function WorkflowExecutionMonitor({
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(diff / 3600000)
     const days = Math.floor(diff / 86400000)
-    
+
     if (days > 0) return `${days}d ago`
     if (hours > 0) return `${hours}h ago`
     if (minutes > 0) return `${minutes}m ago`
@@ -383,12 +383,12 @@ export function WorkflowExecutionMonitor({
 
   // Render execution card
   const renderExecutionCard = useCallback((execution: WorkflowExecution) => {
-  const StatusIcon = STATUS_ICONS[execution.status]
+    const StatusIcon = STATUS_ICONS[execution.status]
     const isRunning = execution.status === 'running'
-  const steps = execution.steps ?? []
-  const completedSteps = steps.filter(s => s.status === 'completed').length
-  const retryCount = Number(execution.metadata?.retryCount ?? 0)
-  const maxRetries = Number(execution.metadata?.maxRetries ?? 0)
+    const steps = execution.steps ?? []
+    const completedSteps = steps.filter(s => s.status === 'completed').length
+    const retryCount = Number(execution.metadata?.retryCount ?? 0)
+    const maxRetries = Number(execution.metadata?.maxRetries ?? 0)
     const durationLabel = execution.duration ? formatDuration(execution.duration) : 'Running'
 
     return (
@@ -403,10 +403,10 @@ export function WorkflowExecutionMonitor({
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div 
+                <div
                   className={`w-3 h-3 rounded-full animate-pulse badge-status-${execution.status}`}
                 />
-                <StatusIcon 
+                <StatusIcon
                   className={`h-5 w-5 ${isRunning ? 'animate-spin' : ''} text-status-${execution.status}`}
                 />
                 <div>
@@ -416,15 +416,15 @@ export function WorkflowExecutionMonitor({
                   </CardDescription>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <Badge 
+                <Badge
                   variant="secondary"
                   className={`badge-status-${execution.status} bg-opacity-20`}
                 >
                   {execution.status}
                 </Badge>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -499,7 +499,7 @@ export function WorkflowExecutionMonitor({
                     Stop
                   </Button>
                 )}
-                
+
                 {execution.status === 'failed' && (
                   <Button
                     variant="outline"
@@ -511,7 +511,7 @@ export function WorkflowExecutionMonitor({
                     Retry
                   </Button>
                 )}
-                
+
                 <HolographicButton
                   variant="outline"
                   size="sm"
@@ -571,7 +571,7 @@ export function WorkflowExecutionMonitor({
                       <div className="w-6 h-6 bg-purple-900/50 rounded-full flex items-center justify-center text-xs font-semibold">
                         {index + 1}
                       </div>
-                      <StatusIcon 
+                      <StatusIcon
                         className={`h-4 w-4 text-status-${step.status}`}
                       />
                       <div className="flex-1">
@@ -594,7 +594,7 @@ export function WorkflowExecutionMonitor({
                       </div>
                     </div>
                   </button>
-                  
+
                   {isExpanded && step.output !== undefined && step.output !== null && (
                     <div className="px-3 pb-3 border-t border-purple-800/30">
                       <div className="mt-3">
@@ -621,8 +621,8 @@ export function WorkflowExecutionMonitor({
                   <span className="text-gray-500 min-w-[60px]">
                     {log.timestamp.toLocaleTimeString()}
                   </span>
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className={`text-xs min-w-[60px] justify-center badge-log-${log.level}`}
                   >
                     {log.level}
@@ -646,7 +646,7 @@ export function WorkflowExecutionMonitor({
             <h2 className="text-2xl font-bold boss-heading">Execution Monitor</h2>
             <p className="text-gray-300 mt-1">Monitor and manage workflow executions</p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -661,7 +661,7 @@ export function WorkflowExecutionMonitor({
               )}
               Refresh
             </Button>
-            
+
             <Button
               variant={autoRefresh ? 'default' : 'outline'}
               size="sm"
@@ -730,7 +730,7 @@ export function WorkflowExecutionMonitor({
                     className="form-input-dark-lg pl-10"
                   />
                 </div>
-                
+
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}

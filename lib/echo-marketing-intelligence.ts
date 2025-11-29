@@ -2,13 +2,13 @@ import { generateText } from "ai"
 import { getTeamMemberConfig } from "./ai-config"
 import { db } from '@/db'
 import { intelligenceData, competitorProfiles } from '@/db/schema'
-import { eq, and, gte, desc } from 'drizzle-orm'
-import type { 
-  CompetitorProfile, 
-  IntelligenceData, 
-  AnalysisResult, 
-  Insight, 
-  Recommendation 
+import { eq, and, gte, desc, like } from 'drizzle-orm'
+import type {
+  CompetitorProfile,
+  IntelligenceData,
+  AnalysisResult,
+  Insight,
+  Recommendation
 } from './competitor-intelligence-types'
 
 // Echo-specific marketing intelligence types
@@ -299,6 +299,24 @@ export class EchoMarketingIntelligence {
     return (result[0] as unknown) as CompetitorProfile
   }
 
+  private async getAllIntelligenceData(competitorId: number, days: number): Promise<IntelligenceData[]> {
+    const dateThreshold = new Date()
+    dateThreshold.setDate(dateThreshold.getDate() - days)
+
+    const rows = await db
+      .select()
+      .from(intelligenceData)
+      .where(
+        and(
+          eq(intelligenceData.competitor_id, competitorId),
+          gte(intelligenceData.collected_at, dateThreshold)
+        )
+      )
+      .orderBy(desc(intelligenceData.collected_at))
+
+    return (rows as unknown) as IntelligenceData[]
+  }
+
   private async getSocialMediaIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
@@ -314,7 +332,8 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
-    return rows as unknown as IntelligenceData[]
+
+    return (rows as unknown) as IntelligenceData[]
   }
 
   private async getWebsiteIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
@@ -332,7 +351,8 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
-    return rows as unknown as IntelligenceData[]
+
+    return (rows as unknown) as IntelligenceData[]
   }
 
   private async getNewsIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
@@ -350,29 +370,13 @@ export class EchoMarketingIntelligence {
         )
       )
       .orderBy(desc(intelligenceData.collected_at))
-    return rows as unknown as IntelligenceData[]
-  }
 
-  private async getAllIntelligenceData(competitorId: number, days: number): Promise<IntelligenceData[]> {
-    const dateThreshold = new Date()
-    dateThreshold.setDate(dateThreshold.getDate() - days)
-
-    const rows = await db
-      .select()
-      .from(intelligenceData)
-      .where(
-        and(
-          eq(intelligenceData.competitor_id, competitorId),
-          gte(intelligenceData.collected_at, dateThreshold)
-        )
-      )
-      .orderBy(desc(intelligenceData.collected_at))
-    return rows as unknown as IntelligenceData[]
+    return (rows as unknown) as IntelligenceData[]
   }
 
   private buildContentStrategyPrompt(
-    competitor: CompetitorProfile, 
-    socialMediaData: IntelligenceData[], 
+    competitor: CompetitorProfile,
+    socialMediaData: IntelligenceData[],
     websiteData: IntelligenceData[]
   ): string {
     return `${this.echoConfig.systemPrompt}
@@ -412,9 +416,17 @@ As Echo, analyze this competitor's marketing strategy and provide insights on:
 5. CONTENT GAPS: Identify opportunities they're missing
 6. STRATEGIC RECOMMENDATIONS: Provide actionable marketing recommendations
 
-Format your response as a detailed marketing analysis with specific examples and actionable insights. Focus on what we can learn from their strategy and how to compete effectively.
+Format your response as a valid JSON object matching this structure:
+{
+  "contentThemes": [{ "theme": string, "frequency": number, "engagement": number, "platforms": string[], "examples": string[], "effectiveness": "high"|"medium"|"low" }],
+  "messagingPatterns": [{ "pattern": string, "usage": number, "sentiment": "positive"|"neutral"|"negative", "targetAudience": string, "effectiveness": number, "examples": string[] }],
+  "contentGaps": [{ "gapType": "topic"|"format"|"platform"|"audience", "description": string, "opportunity": string, "priority": "high"|"medium"|"low", "estimatedImpact": string }],
+  "brandVoice": { "tone": string[], "personality": string[], "values": string[], "consistency": number, "differentiation": string[], "weaknesses": string[] },
+  "contentPerformance": { "avgEngagement": number, "topPerformingContent": string[], "underperformingContent": string[], "optimalPostingTimes": string[], "bestPerformingFormats": string[] },
+  "strategicRecommendations": string[]
+}
 
-MARKETING ANALYSIS:`
+Return ONLY the JSON object, no markdown formatting or explanation.`
   }
 
   private buildBrandPositioningPrompt(competitor: CompetitorProfile, allData: IntelligenceData[]): string {
@@ -450,14 +462,24 @@ As Echo, analyze their brand positioning and provide:
 6. MARKET OPPORTUNITIES: Positioning opportunities they're missing
 7. REPOSITIONING RECOMMENDATIONS: How we can position against them
 
-Provide specific examples from their messaging and actionable competitive positioning strategies.
+Format your response as a valid JSON object matching this structure:
+{
+  "positioningStatement": string,
+  "targetMarket": string[],
+  "valueProposition": string[],
+  "differentiators": string[],
+  "competitiveAdvantages": string[],
+  "positioningGaps": string[],
+  "marketOpportunities": string[],
+  "repositioningRecommendations": string[]
+}
 
-BRAND POSITIONING ANALYSIS:`
+Return ONLY the JSON object, no markdown formatting or explanation.`
   }
 
   private buildCampaignEffectivenessPrompt(
-    competitor: CompetitorProfile, 
-    socialMediaData: IntelligenceData[], 
+    competitor: CompetitorProfile,
+    socialMediaData: IntelligenceData[],
     newsData: IntelligenceData[]
   ): string {
     return `${this.echoConfig.systemPrompt}
@@ -491,14 +513,22 @@ As Echo, analyze their campaign effectiveness:
 5. PERFORMANCE METRICS: Assess engagement, reach, and conversion patterns
 6. CAMPAIGN RECOMMENDATIONS: How to compete with or counter their campaigns
 
-Focus on actionable insights for creating more effective campaigns.
+Format your response as a valid JSON object matching this structure:
+{
+  "campaigns": [{ "id": string, "name": string, "type": string, "startDate": string, "endDate": string, "platforms": string[], "content": { "themes": string[], "messages": string[], "hashtags": string[], "visualStyle": string[], "callToActions": string[] }, "performance": { "totalEngagement": number, "avgEngagementRate": number, "reach": number }, "effectiveness": "high" | "medium" | "low", "keyTakeaways": string[] }],
+  "campaignTypes": [{ "type": string, "frequency": number, "avgEffectiveness": number, "successRate": number, "bestPractices": string[], "commonMistakes": string[] }],
+  "overallEffectiveness": number,
+  "successFactors": string[],
+  "failurePatterns": string[],
+  "campaignRecommendations": string[]
+}
 
-CAMPAIGN EFFECTIVENESS ANALYSIS:`
+Return ONLY the JSON object, no markdown formatting or explanation.`
   }
 
   private buildContentGapAnalysisPrompt(
-    competitors: CompetitorProfile[], 
-    competitorIntelligence: IntelligenceData[][], 
+    competitors: CompetitorProfile[],
+    competitorIntelligence: IntelligenceData[][],
     userCompanyData?: any
   ): string {
     return `${this.echoConfig.systemPrompt}
@@ -528,13 +558,14 @@ As Echo, identify content and marketing gaps:
 5. MESSAGING GAPS: Messaging angles they're not using
 6. OPPORTUNITY PRIORITY: Rank opportunities by potential impact
 
-Provide specific, actionable content gap opportunities.
+Format your response as a valid JSON array of objects matching this structure:
+[{ "gapType": "topic" | "format" | "platform" | "audience", "description": string, "opportunity": string, "priority": "high" | "medium" | "low", "estimatedImpact": string }]
 
-CONTENT GAP ANALYSIS:`
+Return ONLY the JSON object, no markdown formatting or explanation.`
   }
 
   private buildMarketingBriefingPrompt(
-    briefingData: Array<{ competitor: CompetitorProfile; intelligence: IntelligenceData[] }>, 
+    briefingData: Array<{ competitor: CompetitorProfile; intelligence: IntelligenceData[] }>,
     timeframe: string
   ): string {
     return `${this.echoConfig.systemPrompt}
@@ -560,79 +591,123 @@ As Echo, create a comprehensive marketing briefing with:
 2. COMPETITOR HIGHLIGHTS: Most significant activities by competitor
 3. MARKETING TRENDS: Emerging patterns and trends
 4. THREAT ASSESSMENT: Marketing threats and opportunities
-5. STRATEGIC RECOMMENDATIONS: Immediate actions to take
-6. UPCOMING WATCH ITEMS: What to monitor next ${timeframe}
+5. STRATEGIC ADVICE: Recommended actions for the user
 
-Write in your signature punk rock marketing style with actionable insights.
-
-MARKETING INTELLIGENCE BRIEFING:`
+Format your response as a professional marketing briefing document (Markdown).`
   }
 
-  // Parsing methods for structured analysis
-
   private parseContentStrategyAnalysis(analysisText: string, competitorId: number): ContentStrategyAnalysis {
-    // This would parse Echo's response into structured data
-    // For now, returning a basic structure - in production, implement proper parsing
-    return {
-      competitorId,
-      contentThemes: [],
-      messagingPatterns: [],
-      contentGaps: [],
-      brandVoice: {
-        tone: [],
-        personality: [],
-        values: [],
-        consistency: 0,
-        differentiation: [],
-        weaknesses: []
-      },
-      contentPerformance: {
-        avgEngagement: 0,
-        topPerformingContent: [],
-        underperformingContent: [],
-        optimalPostingTimes: [],
-        bestPerformingFormats: []
-      },
-      strategicRecommendations: [],
-      analyzedAt: new Date()
+    try {
+      const jsonMatch = analysisText.match(/\{[\s\S]*\}/)
+      const jsonString = jsonMatch ? jsonMatch[0] : analysisText
+      const parsed = JSON.parse(jsonString)
+
+      return {
+        competitorId,
+        contentThemes: parsed.contentThemes || [],
+        messagingPatterns: parsed.messagingPatterns || [],
+        contentGaps: parsed.contentGaps || [],
+        brandVoice: parsed.brandVoice || { tone: [], personality: [], values: [], consistency: 0, differentiation: [], weaknesses: [] },
+        contentPerformance: parsed.contentPerformance || { avgEngagement: 0, topPerformingContent: [], underperformingContent: [], optimalPostingTimes: [], bestPerformingFormats: [] },
+        strategicRecommendations: parsed.strategicRecommendations || [],
+        analyzedAt: new Date()
+      }
+    } catch (error) {
+      console.error('Failed to parse content strategy analysis:', error)
+      return {
+        competitorId,
+        contentThemes: [],
+        messagingPatterns: [],
+        contentGaps: [],
+        brandVoice: { tone: [], personality: [], values: [], consistency: 0, differentiation: [], weaknesses: [] },
+        contentPerformance: { avgEngagement: 0, topPerformingContent: [], underperformingContent: [], optimalPostingTimes: [], bestPerformingFormats: [] },
+        strategicRecommendations: ['Analysis parsing failed.'],
+        analyzedAt: new Date()
+      }
     }
   }
 
   private parseBrandPositioningAnalysis(analysisText: string, competitorId: number): BrandPositioningAnalysis {
-    return {
-      competitorId,
-      positioningStatement: '',
-      targetMarket: [],
-      valueProposition: [],
-      differentiators: [],
-      competitiveAdvantages: [],
-      positioningGaps: [],
-      marketOpportunities: [],
-      repositioningRecommendations: [],
-      analyzedAt: new Date()
+    try {
+      const jsonMatch = analysisText.match(/\{[\s\S]*\}/)
+      const jsonString = jsonMatch ? jsonMatch[0] : analysisText
+      const parsed = JSON.parse(jsonString)
+
+      return {
+        competitorId,
+        positioningStatement: parsed.positioningStatement || '',
+        targetMarket: parsed.targetMarket || [],
+        valueProposition: parsed.valueProposition || [],
+        differentiators: parsed.differentiators || [],
+        competitiveAdvantages: parsed.competitiveAdvantages || [],
+        positioningGaps: parsed.positioningGaps || [],
+        marketOpportunities: parsed.marketOpportunities || [],
+        repositioningRecommendations: parsed.repositioningRecommendations || [],
+        analyzedAt: new Date()
+      }
+    } catch (error) {
+      console.error('Failed to parse brand positioning analysis:', error)
+      return {
+        competitorId,
+        positioningStatement: 'Analysis parsing failed.',
+        targetMarket: [],
+        valueProposition: [],
+        differentiators: [],
+        competitiveAdvantages: [],
+        positioningGaps: [],
+        marketOpportunities: [],
+        repositioningRecommendations: [],
+        analyzedAt: new Date()
+      }
     }
   }
 
   private parseCampaignEffectivenessAnalysis(analysisText: string, competitorId: number): CampaignEffectivenessAnalysis {
-    return {
-      competitorId,
-      campaigns: [],
-      campaignTypes: [],
-      overallEffectiveness: 0,
-      successFactors: [],
-      failurePatterns: [],
-      campaignRecommendations: [],
-      analyzedAt: new Date()
+    try {
+      const jsonMatch = analysisText.match(/\{[\s\S]*\}/)
+      const jsonString = jsonMatch ? jsonMatch[0] : analysisText
+      const parsed = JSON.parse(jsonString)
+
+      return {
+        competitorId,
+        campaigns: parsed.campaigns || [],
+        campaignTypes: parsed.campaignTypes || [],
+        overallEffectiveness: parsed.overallEffectiveness || 0,
+        successFactors: parsed.successFactors || [],
+        failurePatterns: parsed.failurePatterns || [],
+        campaignRecommendations: parsed.campaignRecommendations || [],
+        analyzedAt: new Date()
+      }
+    } catch (error) {
+      console.error('Failed to parse campaign effectiveness analysis:', error)
+      return {
+        competitorId,
+        campaigns: [],
+        campaignTypes: [],
+        overallEffectiveness: 0,
+        successFactors: [],
+        failurePatterns: [],
+        campaignRecommendations: ['Analysis parsing failed.'],
+        analyzedAt: new Date()
+      }
     }
   }
 
   private parseContentGapAnalysis(analysisText: string): ContentGap[] {
-    return []
+    try {
+      const jsonMatch = analysisText.match(/\[[\s\S]*\]/)
+      const jsonString = jsonMatch ? jsonMatch[0] : analysisText
+      const parsed = JSON.parse(jsonString)
+      return Array.isArray(parsed) ? parsed : []
+    } catch (error) {
+      console.error('Failed to parse content gap analysis:', error)
+      return []
+    }
   }
 
   private async storeMarketingIntelligence(
-    competitorId: number, 
-    analysisType: string, 
+    competitorId: number,
+    analysisType: string,
     analysis: any
   ): Promise<void> {
     // Derive user_id from competitor profile to avoid placeholders
@@ -641,6 +716,7 @@ MARKETING INTELLIGENCE BRIEFING:`
       .from(competitorProfiles)
       .where(eq(competitorProfiles.id, competitorId))
       .limit(1)
+
     const owningUserId = compRows[0]?.user_id as string
 
     const analysisResult: AnalysisResult = {
