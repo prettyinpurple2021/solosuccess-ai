@@ -110,7 +110,7 @@ export default function VoiceTaskCreator({
     if (!isSupported || !isOpen) return
 
     try {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
       const recognition = new SpeechRecognition()
 
       recognition.continuous = true

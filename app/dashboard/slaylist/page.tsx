@@ -1,6 +1,5 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect } from "react"
@@ -27,14 +26,94 @@ import {
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
 import { useOffline } from "@/components/providers/offline-provider"
 import { toast } from "sonner"
+import { VoiceTaskCreator } from "@/components/voice/voice-task-creator"
+import { TaskSuggestion, TaskIntelligenceData } from "@/lib/ai-task-intelligence"
 
-// ... existing imports
+// Define interfaces locally to match usage
+interface Goal {
+  id: string
+  title: string
+  description?: string
+  priority: 'low' | 'medium' | 'high'
+  target_date?: string
+  category: string
+  status: 'active' | 'completed' | 'archived'
+  progress_percentage: number
+  created_at: string
+}
+
+interface Task {
+  id: string
+  title: string
+  description?: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: 'todo' | 'in_progress' | 'completed'
+  due_date?: string
+  estimated_minutes: number
+  goal_id?: string
+  created_at: string
+}
 
 export default function SlaylistPage() {
   const { isOnline, addPendingAction } = useOffline()
-  // ... existing state
 
-  // ... existing useEffects
+  const [goals, setGoals] = useState<Goal[]>([])
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const [showGoalDialog, setShowGoalDialog] = useState(false)
+  const [showTaskDialog, setShowTaskDialog] = useState(false)
+  const [showVoiceTaskDialog, setShowVoiceTaskDialog] = useState(false)
+
+  const [goalForm, setGoalForm] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    target_date: "",
+    category: "general"
+  })
+
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    due_date: "",
+    goal_id: "",
+    estimated_minutes: 30
+  })
+
+  const fetchGoals = async () => {
+    try {
+      const response = await fetch('/api/goals')
+      if (response.ok) {
+        const data = await response.json()
+        setGoals(data)
+      }
+    } catch (error) {
+      logError('Error fetching goals:', error)
+    }
+  }
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch('/api/tasks')
+      if (response.ok) {
+        const data = await response.json()
+        setTasks(data)
+      }
+    } catch (error) {
+      logError('Error fetching tasks:', error)
+    }
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true)
+      await Promise.all([fetchGoals(), fetchTasks()])
+      setLoading(false)
+    }
+    loadData()
+  }, [])
 
   const createGoal = async () => {
     if (!isOnline) {
@@ -68,9 +147,11 @@ export default function SlaylistPage() {
           target_date: "",
           category: "general"
         })
+        toast.success("Goal created successfully")
       }
     } catch (error) {
       logError('Error creating goal:', error)
+      toast.error("Failed to create goal")
     }
   }
 
@@ -108,9 +189,11 @@ export default function SlaylistPage() {
           goal_id: "",
           estimated_minutes: 30
         })
+        toast.success("Task created successfully")
       }
     } catch (error) {
       logError('Error creating task:', error)
+      toast.error("Failed to create task")
     }
   }
 
@@ -185,9 +268,11 @@ export default function SlaylistPage() {
 
       if (response.ok) {
         await fetchTasks()
+        toast.success("AI suggestion applied")
       }
     } catch (error) {
       logError('Error applying AI suggestion:', error)
+      toast.error("Failed to apply suggestion")
     }
   }
 
@@ -207,9 +292,11 @@ export default function SlaylistPage() {
 
       if (response.ok) {
         await fetchTasks()
+        toast.success("Tasks reordered")
       }
     } catch (error) {
       logError('Error reordering tasks:', error)
+      toast.error("Failed to reorder tasks")
     }
   }
 
