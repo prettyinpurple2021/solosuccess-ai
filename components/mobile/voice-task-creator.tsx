@@ -7,13 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { 
-  Mic, 
-  MicOff, 
-  Square, 
-  Play, 
-  Pause, 
-  Volume2, 
+import {
+  Mic,
+  MicOff,
+  Square,
+  Play,
+  Pause,
+  Volume2,
   VolumeX,
   Send,
   X,
@@ -47,6 +47,8 @@ interface VoiceState {
   audioBlob?: Blob
 }
 
+
+
 const VOICE_COMMANDS = [
   { command: "Create task", description: "Start a new task" },
   { command: "High priority", description: "Mark as high priority" },
@@ -55,11 +57,11 @@ const VOICE_COMMANDS = [
   { command: "Complete", description: "Finish voice input" }
 ]
 
-export default function VoiceTaskCreator({ 
-  isOpen, 
-  onClose, 
+export default function VoiceTaskCreator({
+  isOpen,
+  onClose,
   onTaskCreate,
-  className = "" 
+  className = ""
 }: VoiceTaskCreatorProps) {
   const [voiceState, setVoiceState] = useState<VoiceState>({
     isRecording: false,
@@ -80,8 +82,8 @@ export default function VoiceTaskCreator({
 
   const [isSupported, setIsSupported] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+
+  const recognitionRef = useRef<any>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -92,9 +94,9 @@ export default function VoiceTaskCreator({
       const hasSpeechRecognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window
       const hasMediaRecorder = 'MediaRecorder' in window
       const hasGetUserMedia = 'getUserMedia' in navigator.mediaDevices
-      
+
       setIsSupported(hasSpeechRecognition && hasMediaRecorder && hasGetUserMedia)
-      
+
       if (!hasSpeechRecognition) {
         setError('Speech recognition not supported in this browser')
       }
@@ -110,7 +112,7 @@ export default function VoiceTaskCreator({
     try {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       const recognition = new SpeechRecognition()
-      
+
       recognition.continuous = true
       recognition.interimResults = true
       recognition.lang = 'en-US'
@@ -121,7 +123,7 @@ export default function VoiceTaskCreator({
         setError(null)
       }
 
-      recognition.onresult = (event) => {
+      recognition.onresult = (event: any) => {
         let finalTranscript = ''
         let interimTranscript = ''
         let confidence = 0
@@ -146,7 +148,7 @@ export default function VoiceTaskCreator({
         processVoiceCommands(finalTranscript || interimTranscript)
       }
 
-      recognition.onerror = (event) => {
+      recognition.onerror = (event: any) => {
         setError(`Speech recognition error: ${event.error}`)
         setVoiceState(prev => ({ ...prev, isRecording: false }))
       }
@@ -164,7 +166,7 @@ export default function VoiceTaskCreator({
   // Process voice commands for task creation
   const processVoiceCommands = (transcript: string) => {
     const lowerTranscript = transcript.toLowerCase()
-    
+
     // Extract task title
     if (lowerTranscript.includes('create task') || lowerTranscript.includes('new task')) {
       const taskMatch = transcript.match(/(?:create task|new task)\s+(.+)/i)
@@ -185,9 +187,9 @@ export default function VoiceTaskCreator({
     if (timeMatch) {
       const time = parseInt(timeMatch[1])
       const isHours = lowerTranscript.includes('hour') || lowerTranscript.includes('hr')
-      setTaskData(prev => ({ 
-        ...prev, 
-        estimatedMinutes: isHours ? time * 60 : time 
+      setTaskData(prev => ({
+        ...prev,
+        estimatedMinutes: isHours ? time * 60 : time
       }))
     }
 
@@ -206,10 +208,10 @@ export default function VoiceTaskCreator({
     try {
       // Request microphone permission
       await navigator.mediaDevices.getUserMedia({ audio: true })
-      
+
       setError(null)
       recognitionRef.current.start()
-      
+
       // Start duration timer
       intervalRef.current = setInterval(() => {
         setVoiceState(prev => ({ ...prev, duration: prev.duration + 1 }))
@@ -223,7 +225,7 @@ export default function VoiceTaskCreator({
     if (recognitionRef.current) {
       recognitionRef.current.stop()
     }
-    
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
@@ -318,8 +320,8 @@ export default function VoiceTaskCreator({
                   <motion.div
                     className={cn(
                       "w-24 h-24 mx-auto rounded-full flex items-center justify-center transition-all duration-300",
-                      voiceState.isRecording 
-                        ? "bg-red-500 animate-pulse" 
+                      voiceState.isRecording
+                        ? "bg-red-500 animate-pulse"
                         : "bg-purple-100 hover:bg-purple-200"
                     )}
                     animate={voiceState.isRecording ? { scale: [1, 1.1, 1] } : {}}
@@ -331,7 +333,7 @@ export default function VoiceTaskCreator({
                       <Mic className="h-8 w-8 text-purple-600" />
                     )}
                   </motion.div>
-                  
+
                   {voiceState.isRecording && (
                     <motion.div
                       className="absolute inset-0 rounded-full border-4 border-red-300"
@@ -348,8 +350,8 @@ export default function VoiceTaskCreator({
                       disabled={!isSupported}
                       className={cn(
                         "touch-target",
-                        voiceState.isRecording 
-                          ? "bg-red-500 hover:bg-red-600" 
+                        voiceState.isRecording
+                          ? "bg-red-500 hover:bg-red-600"
                           : "bg-purple-500 hover:bg-purple-600"
                       )}
                     >

@@ -5,13 +5,13 @@ export const dynamic = 'force-dynamic'
 import Link from "next/link"
 import React, { useState } from "react"
 import { motion } from "framer-motion"
-import { 
-  ArrowLeft, 
-  Crown, 
-  Calendar, 
-  BookOpen, 
-  Sparkles, 
-  Bell, 
+import {
+  ArrowLeft,
+  Crown,
+  Calendar,
+  BookOpen,
+  Sparkles,
+  Bell,
   Mail,
   Target,
   Users,
@@ -25,11 +25,11 @@ import {
   Clock,
   Tag
 } from "lucide-react"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid,
@@ -41,6 +41,7 @@ export default function BlogComingSoonPage() {
   const [email, setEmail] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
 
   const submitNewsletter = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -112,7 +113,7 @@ export default function BlogComingSoonPage() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               <Link href="/" className="flex items-center gap-3">
-                <motion.div 
+                <motion.div
                   className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -120,7 +121,7 @@ export default function BlogComingSoonPage() {
                 </motion.div>
                 <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              
+
               <div className="flex items-center gap-4">
                 <Link href="/signin">
                   <TacticalButton variant="outline" size="sm">
@@ -152,16 +153,16 @@ export default function BlogComingSoonPage() {
                   Elite Intelligence Briefings
                 </span>
               </div>
-              
+
               <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
                 Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Intelligence</span>
               </h1>
-              
+
               <p className="text-xl text-military-storm-grey mb-8 max-w-3xl mx-auto leading-relaxed">
-                Elite strategies, proven tactics, and cutting-edge insights for solo entrepreneurs 
+                Elite strategies, proven tactics, and cutting-edge insights for solo entrepreneurs
                 who refuse to settle for mediocrity. Learn from the best, dominate your market.
               </p>
-              
+
               <div className="flex flex-wrap justify-center gap-4">
                 <TacticalButton size="lg" className="group">
                   Explore Intelligence
@@ -183,16 +184,16 @@ export default function BlogComingSoonPage() {
                 <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                   <Bell className="w-10 h-10 text-white" />
                 </div>
-                
+
                 <h2 className="font-heading text-4xl font-bold text-white mb-6">
                   Elite Intelligence Briefings
                 </h2>
-                
+
                 <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
-                  Get exclusive tactical insights, proven strategies, and elite business intelligence 
+                  Get exclusive tactical insights, proven strategies, and elite business intelligence
                   delivered directly to your command center.
                 </p>
-                
+
                 <form onSubmit={submitNewsletter} className="max-w-md mx-auto">
                   <div className="flex gap-4">
                     <Input
@@ -203,8 +204,8 @@ export default function BlogComingSoonPage() {
                       className="flex-1 bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
                       required
                     />
-                    <TacticalButton 
-                      type="submit" 
+                    <TacticalButton
+                      type="submit"
                       disabled={submitting}
                       className="group"
                     >
@@ -221,9 +222,9 @@ export default function BlogComingSoonPage() {
                       )}
                     </TacticalButton>
                   </div>
-                  
+
                   {message && (
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`mt-4 text-sm ${message.includes('subscribed') ? 'text-green-400' : 'text-red-400'}`}
@@ -248,7 +249,7 @@ export default function BlogComingSoonPage() {
                 Tactical insights from the front lines of business domination
               </p>
             </div>
-            
+
             {/* Featured Post */}
             <div className="max-w-6xl mx-auto mb-16">
               {blogPosts.filter(post => post.featured).map((post, index) => (
@@ -270,15 +271,15 @@ export default function BlogComingSoonPage() {
                             <span className="text-sm">{post.readTime}</span>
                           </div>
                         </div>
-                        
+
                         <h3 className="font-heading text-3xl font-bold text-white mb-4 group-hover:text-military-hot-pink transition-colors">
                           {post.title}
                         </h3>
-                        
+
                         <p className="text-lg text-military-storm-grey mb-6 leading-relaxed">
                           {post.excerpt}
                         </p>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
@@ -290,16 +291,16 @@ export default function BlogComingSoonPage() {
                               <span className="text-military-storm-grey text-sm">{new Date(post.date).toLocaleDateString()}</span>
                             </div>
                           </div>
-                          
+
                           <TacticalButton variant="outline" className="group">
                             Read Intelligence
                             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </TacticalButton>
                         </div>
-                        
+
                         <div className="flex flex-wrap gap-2 mt-6">
                           {post.tags.map((tag, tagIndex) => (
-                            <span 
+                            <span
                               key={tagIndex}
                               className="px-2 py-1 bg-military-tactical/50 text-military-storm-grey text-xs rounded-full"
                             >
@@ -313,7 +314,7 @@ export default function BlogComingSoonPage() {
                 </motion.div>
               ))}
             </div>
-            
+
             {/* Other Posts */}
             <TacticalGrid className="max-w-6xl mx-auto">
               {blogPosts.filter(post => !post.featured).map((post, index) => (
@@ -333,21 +334,21 @@ export default function BlogComingSoonPage() {
                           <span className="text-military-storm-grey text-xs">{post.readTime}</span>
                         </div>
                       </div>
-                      
+
                       <h3 className="font-heading text-xl font-bold text-white mb-4 group-hover:text-military-hot-pink transition-colors">
                         {post.title}
                       </h3>
-                      
+
                       <p className="text-military-storm-grey mb-6 leading-relaxed">
                         {post.excerpt}
                       </p>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-military-storm-grey text-sm">
                           <Calendar className="w-3 h-3" />
                           <span>{new Date(post.date).toLocaleDateString()}</span>
                         </div>
-                        
+
                         <TacticalButton variant="outline" size="sm" className="group">
                           Read
                           <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -372,13 +373,14 @@ export default function BlogComingSoonPage() {
                 Explore tactical insights by specialization
               </p>
             </div>
-            
+
             <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
               {categories.map((category, index) => (
                 <TacticalButton
                   key={category}
-                  variant={category === "All" ? "default" : "outline"}
+                  variant={selectedCategory === category ? "primary" : "outline"}
                   size="sm"
+                  onClick={() => setSelectedCategory(category)}
                   className="group"
                 >
                   {category}
@@ -405,16 +407,16 @@ export default function BlogComingSoonPage() {
                 <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                   <BookOpen className="w-10 h-10 text-white" />
                 </div>
-                
+
                 <h2 className="font-heading text-4xl font-bold text-white mb-6">
                   Ready to Dominate Your Market?
                 </h2>
-                
+
                 <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
-                  Stop reading about success and start building it. Get access to the same 
+                  Stop reading about success and start building it. Get access to the same
                   AI-powered tools and strategies used by elite entrepreneurs.
                 </p>
-                
+
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link href="/signup">
                     <TacticalButton size="lg" className="group">
@@ -443,7 +445,7 @@ export default function BlogComingSoonPage() {
                 </div>
                 <span className="font-heading text-lg font-bold text-white">SoloSuccess AI</span>
               </div>
-              
+
               <div className="flex items-center gap-6 text-military-storm-grey">
                 <Link href="/privacy" className="hover:text-military-hot-pink transition-colors">Privacy</Link>
                 <Link href="/terms" className="hover:text-military-hot-pink transition-colors">Terms</Link>

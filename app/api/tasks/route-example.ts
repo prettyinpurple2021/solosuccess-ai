@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server'
-import { 
-  createSuccessResponse, 
+import {
+  createSuccessResponse,
   createPaginatedResponse,
-  createErrorResponse, 
-  handleApiError 
+  createErrorResponse,
+  handleApiError
 } from '@/lib/api-response'
 import { withApiMiddleware } from '@/lib/api-middleware'
 import { getDb } from '@/lib/database-client'
@@ -47,7 +47,7 @@ export const GET = withApiMiddleware(
     try {
       const { searchParams } = new URL(request.url)
       const queryResult = TaskQuerySchema.safeParse(Object.fromEntries(searchParams.entries()))
-      
+
       if (!queryResult.success) {
         return createErrorResponse('Invalid query parameters', 400)
       }
@@ -72,7 +72,7 @@ export const GET = withApiMiddleware(
 
       // Build where conditions
       const conditions = []
-      
+
       // Note: In a real implementation, you'd get the user from authentication
       // For now, we'll use a placeholder
       const userId = 'user-id-from-auth' // This would come from authenticateRequest()
@@ -89,9 +89,18 @@ export const GET = withApiMiddleware(
       }
 
       // Build order by clause
-      const orderBy = sort_order === 'asc' 
-        ? asc(tasks[sort_by as keyof typeof tasks])
-        : desc(tasks[sort_by as keyof typeof tasks])
+      const sortColumns = {
+        created_at: tasks.created_at,
+        updated_at: tasks.updated_at,
+        due_date: tasks.due_date,
+        priority: tasks.priority
+      }
+
+      const sortColumn = sortColumns[sort_by as keyof typeof sortColumns] || tasks.created_at
+
+      const orderBy = sort_order === 'asc'
+        ? asc(sortColumn)
+        : desc(sortColumn)
 
       // Get total count
       const totalResult = await db

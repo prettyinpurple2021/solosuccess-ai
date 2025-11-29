@@ -7,16 +7,16 @@ import { useAuth } from "@/hooks/use-auth"
 import { Loading } from "@/components/ui/loading"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Trash2, 
-  LogOut, 
-  Save, 
-  AlertTriangle, 
-  Crown, 
-  Heart, 
+import {
+  User,
+  Mail,
+  Lock,
+  Trash2,
+  LogOut,
+  Save,
+  AlertTriangle,
+  Crown,
+  Heart,
   Sparkles,
   Shield,
   Target,
@@ -32,11 +32,11 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid,
@@ -56,7 +56,7 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [activeTab, setActiveTab] = useState('profile')
-  
+
   const [formData, setFormData] = useState({
     displayName: (user as any)?.name || "",
     email: user?.email || "",
@@ -138,7 +138,7 @@ export default function SettingsPage() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               <Link href="/dashboard" className="flex items-center gap-3">
-                <motion.div 
+                <motion.div
                   className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -146,7 +146,7 @@ export default function SettingsPage() {
                 </motion.div>
                 <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              
+
               <div className="flex items-center gap-4">
                 <Link href="/dashboard">
                   <TacticalButton variant="outline" size="sm">
@@ -177,13 +177,13 @@ export default function SettingsPage() {
                   Command Center
                 </span>
               </div>
-              
+
               <h1 className="font-heading text-5xl font-bold text-white mb-6">
                 Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Settings</span>
               </h1>
-              
+
               <p className="text-xl text-military-storm-grey max-w-2xl">
-                Configure your elite command center settings and tactical preferences. 
+                Configure your elite command center settings and tactical preferences.
                 Customize your experience for maximum efficiency.
               </p>
             </motion.div>
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                 <TabsContent value="profile" className="space-y-8">
                   <GlassCard className="p-8">
                     <h2 className="font-heading text-3xl font-bold text-white mb-6">Tactical Profile</h2>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8">
                       <div>
                         <Label htmlFor="displayName" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
@@ -229,7 +229,7 @@ export default function SettingsPage() {
                           className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
                         />
                       </div>
-                      
+
                       <div>
                         <Label htmlFor="email" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
                           Tactical Email
@@ -248,7 +248,7 @@ export default function SettingsPage() {
 
                   <GlassCard className="p-8">
                     <h2 className="font-heading text-3xl font-bold text-white mb-6">Account Information</h2>
-                    
+
                     <div className="grid md:grid-cols-3 gap-6">
                       <div className="text-center">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
@@ -257,7 +257,7 @@ export default function SettingsPage() {
                         <h3 className="font-heading text-lg font-bold text-white mb-2">Launch Tier</h3>
                         <p className="text-military-storm-grey text-sm">Current subscription</p>
                       </div>
-                      
+
                       <div className="text-center">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                           <Target className="w-8 h-8 text-white" />
@@ -265,7 +265,7 @@ export default function SettingsPage() {
                         <h3 className="font-heading text-lg font-bold text-white mb-2">2 AI Agents</h3>
                         <p className="text-military-storm-grey text-sm">Active agents</p>
                       </div>
-                      
+
                       <div className="text-center">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                           <Heart className="w-8 h-8 text-white" />
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                 <TabsContent value="security" className="space-y-8">
                   <GlassCard className="p-8">
                     <h2 className="font-heading text-3xl font-bold text-white mb-6">Password Security</h2>
-                    
+
                     <div className="space-y-6">
                       <div>
                         <Label htmlFor="currentPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
@@ -306,7 +306,7 @@ export default function SettingsPage() {
                           </button>
                         </div>
                       </div>
-                      
+
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
                           <Label htmlFor="newPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
@@ -321,7 +321,7 @@ export default function SettingsPage() {
                             className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
                           />
                         </div>
-                        
+
                         <div>
                           <Label htmlFor="confirmPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
                             Confirm Password
@@ -341,7 +341,7 @@ export default function SettingsPage() {
 
                   <GlassCard className="p-8">
                     <h2 className="font-heading text-3xl font-bold text-white mb-6">Security Features</h2>
-                    
+
                     <div className="grid md:grid-cols-2 gap-8">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
@@ -351,7 +351,7 @@ export default function SettingsPage() {
                           </div>
                           <Switch />
                         </div>
-                        
+
                         <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
                           <div className="flex items-center gap-3">
                             <Smartphone className="w-5 h-5 text-military-hot-pink" />
@@ -360,7 +360,7 @@ export default function SettingsPage() {
                           <Switch />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-4">
                         <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
                           <div className="flex items-center gap-3">
@@ -372,7 +372,7 @@ export default function SettingsPage() {
                             <span className="text-green-400 text-sm">Active</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
                           <div className="flex items-center gap-3">
                             <Globe className="w-5 h-5 text-military-hot-pink" />
@@ -389,7 +389,7 @@ export default function SettingsPage() {
                 <TabsContent value="notifications" className="space-y-8">
                   <GlassCard className="p-8">
                     <h2 className="font-heading text-3xl font-bold text-white mb-6">Tactical Communications</h2>
-                    
+
                     <div className="space-y-6">
                       {Object.entries(notificationSettings).map(([key, value], index) => (
                         <div key={key} className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                               {key === 'productUpdates' && 'New features and improvements'}
                             </p>
                           </div>
-                          <Switch 
+                          <Switch
                             checked={value}
                             onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, [key]: checked }))}
                           />
@@ -420,13 +420,208 @@ export default function SettingsPage() {
                 <TabsContent value="privacy" className="space-y-8">
                   <GlassCard className="p-8">
                     <h2 className="font-heading text-3xl font-bold text-white mb-6">Privacy Controls</h2>
-                    
+
                     <div className="space-y-6">
                       <div>
                         <Label className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
                           Profile Visibility
                         </Label>
-                        <select 
+                        <Label htmlFor="email" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Tactical Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="your.email@domain.com"
+                          className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                        />
+                      </div>
+                    </div>
+                  </GlassCard>
+
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Account Information</h2>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <Crown className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-heading text-lg font-bold text-white mb-2">Launch Tier</h3>
+                        <p className="text-military-storm-grey text-sm">Current subscription</p>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <Target className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-heading text-lg font-bold text-white mb-2">2 AI Agents</h3>
+                        <p className="text-military-storm-grey text-sm">Active agents</p>
+                      </div>
+
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <Heart className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-heading text-lg font-bold text-white mb-2">Member Since</h3>
+                        <p className="text-military-storm-grey text-sm">January 2024</p>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                {/* Security Tab */}
+                <TabsContent value="security" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Password Security</h2>
+
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="currentPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Current Password
+                        </Label>
+                        <div className="relative">
+                          <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-military-storm-grey" />
+                          <Input
+                            id="currentPassword"
+                            type={showPassword ? "text" : "password"}
+                            value={formData.currentPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                            placeholder="Enter current password"
+                            className="pl-12 pr-12 py-4 bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-military-storm-grey hover:text-military-hot-pink transition-colors"
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <Label htmlFor="newPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                            New Password
+                          </Label>
+                          <Input
+                            id="newPassword"
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                            placeholder="Enter new password"
+                            className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="confirmPassword" className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                            Confirm Password
+                          </Label>
+                          <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                            placeholder="Confirm new password"
+                            className="bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </GlassCard>
+
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Security Features</h2>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Shield className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">Two-Factor Authentication</span>
+                          </div>
+                          <Switch />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Smartphone className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">SMS Verification</span>
+                          </div>
+                          <Switch />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Mail className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">Email Verification</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                            <span className="text-green-400 text-sm">Active</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Globe className="w-5 h-5 text-military-hot-pink" />
+                            <span className="text-white font-medium">Login Notifications</span>
+                          </div>
+                          <Switch />
+                        </div>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                {/* Notifications Tab */}
+                <TabsContent value="notifications" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Tactical Communications</h2>
+
+                    <div className="space-y-6">
+                      {Object.entries(notificationSettings).map(([key, value], index) => (
+                        <div key={key} className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
+                          <div>
+                            <h3 className="text-white font-medium capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
+                            </h3>
+                            <p className="text-military-storm-grey text-sm">
+                              {key === 'emailNotifications' && 'Receive tactical updates via email'}
+                              {key === 'pushNotifications' && 'Get real-time notifications'}
+                              {key === 'marketingEmails' && 'Receive promotional content'}
+                              {key === 'securityAlerts' && 'Get security and safety alerts'}
+                              {key === 'weeklyReports' && 'Weekly performance summaries'}
+                              {key === 'productUpdates' && 'New features and improvements'}
+                            </p>
+                          </div>
+                          <Switch
+                            checked={value}
+                            onCheckedChange={(checked) => setNotificationSettings(prev => ({ ...prev, [key]: checked }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </TabsContent>
+
+                {/* Privacy Tab */}
+                <TabsContent value="privacy" className="space-y-8">
+                  <GlassCard className="p-8">
+                    <h2 className="font-heading text-3xl font-bold text-white mb-6">Privacy Controls</h2>
+
+                    <div className="space-y-6">
+                      <div>
+                        <Label className="block text-white font-tactical text-sm uppercase tracking-wider mb-3">
+                          Profile Visibility
+                        </Label>
+                        <select
                           value={privacySettings.profileVisibility}
                           onChange={(e) => setPrivacySettings(prev => ({ ...prev, profileVisibility: e.target.value }))}
                           className="w-full bg-military-tactical/50 border-military-hot-pink/30 text-white rounded-lg px-4 py-3 focus:border-military-hot-pink focus:outline-none"
@@ -436,7 +631,7 @@ export default function SettingsPage() {
                           <option value="friends">Friends Only</option>
                         </select>
                       </div>
-                      
+
                       {Object.entries(privacySettings).filter(([key]) => key !== 'profileVisibility').map(([key, value], index) => (
                         <div key={key} className="flex items-center justify-between p-4 bg-military-tactical/20 rounded-lg">
                           <div>
@@ -449,8 +644,8 @@ export default function SettingsPage() {
                               {key === 'cookieConsent' && 'Accept cookies for functionality'}
                             </p>
                           </div>
-                          <Switch 
-                            checked={value}
+                          <Switch
+                            checked={value as boolean}
                             onCheckedChange={(checked) => setPrivacySettings(prev => ({ ...prev, [key]: checked }))}
                           />
                         </div>
@@ -468,7 +663,7 @@ export default function SettingsPage() {
                   <AlertTriangle className="w-8 h-8 text-red-400" />
                   <h2 className="font-heading text-3xl font-bold text-white">Danger Zone</h2>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                     <div>
@@ -480,7 +675,7 @@ export default function SettingsPage() {
                       Sign Out
                     </TacticalButton>
                   </div>
-                  
+
                   <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                     <div>
                       <h3 className="text-white font-medium">Delete Account</h3>
@@ -497,7 +692,7 @@ export default function SettingsPage() {
                         <AlertDialogHeader>
                           <AlertDialogTitle className="text-white">Terminate Tactical Account</AlertDialogTitle>
                           <AlertDialogDescription className="text-military-storm-grey">
-                            This action cannot be undone. This will permanently delete your account 
+                            This action cannot be undone. This will permanently delete your account
                             and remove all tactical data from our servers.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -505,7 +700,7 @@ export default function SettingsPage() {
                           <AlertDialogCancel className="bg-military-tactical/50 border-military-hot-pink/30 text-white hover:bg-military-tactical">
                             Cancel
                           </AlertDialogCancel>
-                          <AlertDialogAction 
+                          <AlertDialogAction
                             onClick={handleDeleteAccount}
                             disabled={isDeleting}
                             className="bg-red-500 hover:bg-red-600 text-white"

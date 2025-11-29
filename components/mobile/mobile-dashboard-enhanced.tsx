@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Zap, 
-  Target, 
-  CheckCircle, 
-  Clock, 
+import {
+  Zap,
+  Target,
+  CheckCircle,
+  Clock,
   TrendingUp,
   Sparkles,
   Crown,
@@ -187,8 +187,8 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
                   {dashboardData?.todaysStats.tasks_completed || 0}/{dashboardData?.todaysStats.total_tasks || 0}
                 </Badge>
               </div>
-              <Progress 
-                value={(dashboardData?.todaysStats.tasks_completed || 0) / Math.max(dashboardData?.todaysStats.total_tasks || 1, 1) * 100} 
+              <Progress
+                value={(dashboardData?.todaysStats.tasks_completed || 0) / Math.max(dashboardData?.todaysStats.total_tasks || 1, 1) * 100}
                 className="h-2"
               />
             </CardContent>
@@ -222,8 +222,8 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
                   {dashboardData?.todaysStats.productivity_score || 0}%
                 </Badge>
               </div>
-              <Progress 
-                value={dashboardData?.todaysStats.productivity_score || 0} 
+              <Progress
+                value={dashboardData?.todaysStats.productivity_score || 0}
                 className="h-2"
               />
             </CardContent>
@@ -273,9 +273,19 @@ function MobileDashboardContent({ user, dashboardData, className = "" }: MobileD
           </CardContent>
         </Card>
         {/* Enhanced Mobile Dashboard */}
-        <MobileDashboard 
+        <MobileDashboard
           user={user}
-          dashboardData={dashboardData}
+          dashboardData={dashboardData ? {
+            ...dashboardData,
+            activeGoals: dashboardData.todaysGoals.map(g => ({
+              id: g.id,
+              title: g.title,
+              progress_percentage: g.progress,
+              target_date: g.deadline
+            })),
+            recentConversations: [], // Add default or map if available
+            insights: [] // Add default or map if available
+          } : undefined}
           className="border-2 border-gray-200"
         />
       </div>

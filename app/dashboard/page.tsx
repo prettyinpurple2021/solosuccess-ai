@@ -762,7 +762,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <StatsBadge
-                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'info' : 'secondary'}
+                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'info' : 'default'}
                           size="sm"
                         >
                           {briefcase.status}

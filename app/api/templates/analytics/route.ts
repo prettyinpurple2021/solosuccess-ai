@@ -2,6 +2,7 @@ import { logger, logError, logInfo } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/auth-server'
 import { rateLimitByIp } from '@/lib/rate-limit'
+import { sql } from 'drizzle-orm'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -42,17 +43,17 @@ async function getUserTemplateAnalytics(userId: string) {
     const db = getDb()
 
     // Query real template usage data
-    const templateUsage = await db.query(`
+    const templateUsage = await db.execute(sql`
       SELECT 
         COUNT(*) as total_templates_used,
         SUM(CASE WHEN completed = true THEN 1 ELSE 0 END) as completed_templates,
         COUNT(DISTINCT template_id) as unique_templates,
         AVG(CASE WHEN completed = true THEN time_spent ELSE NULL END) as avg_time_spent
       FROM template_usage 
-      WHERE user_id = $1
-    `, [userId])
+      WHERE user_id = ${userId}
+    `)
 
-    const usage = templateUsage.rows[0] || {}
+    const usage = (templateUsage.rows[0] as any) || {}
 
     const analytics = {
       overview: {
@@ -107,17 +108,18 @@ async function getUserTemplateAnalytics(userId: string) {
 // Helper functions for real database queries
 async function getTemplatesByCategory(db: any, userId: string) {
   try {
-    const result = await db.query(`
+    const result = await db.execute(sql`
       SELECT category, COUNT(*) as count
       FROM template_usage tu
       JOIN templates t ON tu.template_id = t.id
-      WHERE tu.user_id = $1
+      WHERE tu.user_id = ${userId}
       GROUP BY category
       ORDER BY count DESC
-    `, [userId])
+    `)
 
-    const total = result.rows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0)
-    return result.rows.map(row => ({
+    const rows = result.rows as any[]
+    const total = rows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0)
+    return rows.map(row => ({
       category: row.category,
       count: parseInt(row.count),
       percentage: total > 0 ? Math.round((parseInt(row.count) / total) * 100) : 0
@@ -130,17 +132,18 @@ async function getTemplatesByCategory(db: any, userId: string) {
 
 async function getTemplatesByDifficulty(db: any, userId: string) {
   try {
-    const result = await db.query(`
+    const result = await db.execute(sql`
       SELECT difficulty, COUNT(*) as count
       FROM template_usage tu
       JOIN templates t ON tu.template_id = t.id
-      WHERE tu.user_id = $1
+      WHERE tu.user_id = ${userId}
       GROUP BY difficulty
       ORDER BY count DESC
-    `, [userId])
+    `)
 
-    const total = result.rows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0)
-    return result.rows.map(row => ({
+    const rows = result.rows as any[]
+    const total = rows.reduce((sum: number, row: any) => sum + parseInt(row.count), 0)
+    return rows.map(row => ({
       difficulty: row.difficulty,
       count: parseInt(row.count),
       percentage: total > 0 ? Math.round((parseInt(row.count) / total) * 100) : 0
@@ -153,18 +156,18 @@ async function getTemplatesByDifficulty(db: any, userId: string) {
 
 async function getMonthlyUsage(db: any, userId: string) {
   try {
-    const result = await db.query(`
+    const result = await db.execute(sql`
       SELECT 
         TO_CHAR(created_at, 'Mon') as month,
         COUNT(*) as count
       FROM template_usage
-      WHERE user_id = $1 
+      WHERE user_id = ${userId} 
         AND created_at >= NOW() - INTERVAL '6 months'
       GROUP BY TO_CHAR(created_at, 'Mon'), DATE_TRUNC('month', created_at)
       ORDER BY DATE_TRUNC('month', created_at)
-    `, [userId])
+    `)
 
-    return result.rows.map(row => ({
+    return (result.rows as any[]).map(row => ({
       month: row.month,
       count: parseInt(row.count)
     }))
@@ -176,16 +179,16 @@ async function getMonthlyUsage(db: any, userId: string) {
 
 async function getProductivityStats(db: any, userId: string) {
   try {
-    const result = await db.query(`
+    const result = await db.execute(sql`
       SELECT 
         AVG(CASE WHEN completed = true THEN time_spent ELSE NULL END) as avg_completion_time,
         COUNT(CASE WHEN completed = true AND created_at >= CURRENT_DATE THEN 1 END) as completed_today,
         COUNT(CASE WHEN completed = true THEN 1 END) as total_completed
       FROM template_usage
-      WHERE user_id = $1
-    `, [userId])
+      WHERE user_id = ${userId}
+    `)
 
-    const stats = result.rows[0] || {}
+    const stats = (result.rows[0] as any) || {}
     return {
       averageCompletionTime: Math.round(parseFloat(stats.avg_completion_time) || 0),
       timeSavedPerTemplate: Math.round((parseFloat(stats.avg_completion_time) || 0) / 60), // hours
@@ -205,20 +208,20 @@ async function getProductivityStats(db: any, userId: string) {
 
 async function getTemplateInsights(db: any, userId: string) {
   try {
-    const topTemplates = await db.query(`
+    const topTemplates = await db.execute(sql`
       SELECT t.name, COUNT(*) as usage, 
              AVG(CASE WHEN tu.completed = true THEN 1.0 ELSE 0.0 END) as completion_rate,
              AVG(tu.rating) as avg_rating
       FROM template_usage tu
       JOIN templates t ON tu.template_id = t.id
-      WHERE tu.user_id = $1
+      WHERE tu.user_id = ${userId}
       GROUP BY t.id, t.name
       ORDER BY usage DESC
       LIMIT 3
-    `, [userId])
+    `)
 
     return {
-      topPerformingTemplates: topTemplates.rows.map(row => ({
+      topPerformingTemplates: (topTemplates.rows as any[]).map(row => ({
         name: row.name,
         usage: parseInt(row.usage),
         completion: Math.round(parseFloat(row.completion_rate) * 100),
@@ -239,20 +242,20 @@ async function getTemplateInsights(db: any, userId: string) {
 
 async function calculateStreakDays(db: any, userId: string) {
   try {
-    const result = await db.query(`
+    const result = await db.execute(sql`
       WITH daily_completions AS (
         SELECT DATE(created_at) as date, COUNT(*) as count
         FROM template_usage
-        WHERE user_id = $1 AND completed = true
+        WHERE user_id = ${userId} AND completed = true
         GROUP BY DATE(created_at)
         ORDER BY date DESC
       )
       SELECT COUNT(*) as streak
       FROM daily_completions
       WHERE date >= CURRENT_DATE - INTERVAL '30 days'
-    `, [userId])
+    `)
 
-    return parseInt(result.rows[0]?.streak) || 0
+    return parseInt((result.rows[0] as any)?.streak) || 0
   } catch (error) {
     return 0
   }

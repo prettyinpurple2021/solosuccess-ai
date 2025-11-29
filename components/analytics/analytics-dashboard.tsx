@@ -6,11 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { 
-  Users, 
-  TrendingUp, 
-  DollarSign, 
-  Activity, 
+import {
+  Users,
+  TrendingUp,
+  DollarSign,
+  Activity,
   Target,
   BarChart3,
   PieChart,
@@ -40,7 +40,7 @@ export default function AnalyticsDashboard() {
       logInfo('Analytics dashboard refreshed')
     } catch (error) {
       toast.error('Failed to refresh analytics data', { icon: '❌' })
-      logger.error('Analytics refresh error:', error)
+      logError('Analytics refresh error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -56,7 +56,7 @@ export default function AnalyticsDashboard() {
     logInfo('Custom report saved:', report.name)
   }
 
-  const handleExportReport = (report: any, format: 'csv' | 'pdf' | 'json') => {
+  const handleExportReport = (report: any, format: 'csv' | 'pdf' | 'excel') => {
     toast.info(`Exporting "${report.name}" as ${format.toUpperCase()}...`, { icon: '📤' })
     logInfo(`Custom report exported: ${report.name} as ${format}`)
   }

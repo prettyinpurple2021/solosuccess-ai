@@ -244,6 +244,114 @@ export function useUser() {
   }
 }
 
+/**
+ * Approve a device
+ */
+export async function approveDevice(data: {
+  deviceFingerprint: string;
+  deviceName: string;
+  deviceType: string;
+  trustDevice: boolean
+}): Promise<{ data: boolean; error: any }> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch('/api/auth/device/approve', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { data: false, error }
+    }
+
+    return { data: true, error: null }
+  } catch (error) {
+    return { data: false, error }
+  }
+}
+
+/**
+ * Get active sessions
+ */
+export async function getSessions(): Promise<{ data: { sessions: any[] } | null; error: any }> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch('/api/auth/sessions', {
+      method: 'GET',
+      headers,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { data: null, error }
+    }
+
+    const data = await response.json()
+    return { data, error: null }
+  } catch (error) {
+    return { data: null, error }
+  }
+}
+
+/**
+ * Revoke a session
+ */
+export async function revokeSession(data: { sessionId: string }): Promise<{ data: boolean; error: any }> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch('/api/auth/sessions/revoke', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { data: false, error }
+    }
+
+    return { data: true, error: null }
+  } catch (error) {
+    return { data: false, error }
+  }
+}
+
+/**
+ * Revoke all other sessions
+ */
+export async function revokeOtherSessions(): Promise<{ data: boolean; error: any }> {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch('/api/auth/sessions/revoke-others', {
+      method: 'POST',
+      headers,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { data: false, error }
+    }
+
+    return { data: true, error: null }
+  } catch (error) {
+    return { data: false, error }
+  }
+}
+
 // Export for compatibility
 export const authClient = {
   signIn,
@@ -255,5 +363,11 @@ export const authClient = {
   twoFactor: {
     verifyTOTP,
     resendCode: resend2FACode
+  },
+  multiSession: {
+    approveDevice,
+    getSessions,
+    revokeSession,
+    revokeOtherSessions
   }
 }

@@ -21,7 +21,7 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
   const { templateSlug } = await params;
 
   // Get template information from JSON data
-  const template: TemplateSummary | undefined = getTemplateBySlug(templateSlug);
+  const template: TemplateSummary | undefined = getTemplateBySlug(templateSlug) || undefined;
 
   if (!template) {
     notFound();

@@ -3,6 +3,8 @@ import { authenticateRequest } from '@/lib/auth-server'
 import { getDb } from '@/lib/database-client'
 import { z } from 'zod'
 import { logger, logError, logInfo } from '@/lib/logger'
+import { eq } from 'drizzle-orm'
+import { users } from '@/db/schema'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -24,13 +26,28 @@ export async function GET(request: NextRequest) {
     }
 
     const db = getDb()
-    const { rows } = await db.query(
-      `SELECT id, email, full_name, avatar_url, subscription_tier, subscription_status,
-              stripe_customer_id, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end,
-              level, total_points, current_streak, wellness_score, focus_minutes, onboarding_completed, preferred_ai_agent
-         FROM users WHERE id = $1`,
-      [user.id]
-    )
+    const rows = await db.select({
+      id: users.id,
+      email: users.email,
+      full_name: users.full_name,
+      avatar_url: users.avatar_url,
+      subscription_tier: users.subscription_tier,
+      subscription_status: users.subscription_status,
+      stripe_customer_id: users.stripe_customer_id,
+      stripe_subscription_id: users.stripe_subscription_id,
+      current_period_start: users.current_period_start,
+      current_period_end: users.current_period_end,
+      cancel_at_period_end: users.cancel_at_period_end,
+      // level: users.level, // Not in schema currently
+      // total_points: users.total_points, // Not in schema currently
+      // current_streak: users.current_streak, // Not in schema currently
+      // wellness_score: users.wellness_score, // Not in schema currently
+      // focus_minutes: users.focus_minutes, // Not in schema currently
+      onboarding_completed: users.onboarding_completed,
+      // preferred_ai_agent: users.preferred_ai_agent // Not in schema currently
+    })
+      .from(users)
+      .where(eq(users.id, user.id))
 
     if (rows.length === 0) {
       logInfo('Profile not found', {
@@ -100,57 +117,41 @@ export async function PATCH(request: NextRequest) {
     const { full_name, avatar_url, onboarding_completed, onboarding_data } = parsed.data
 
     const shouldUpdateOnboardingData = typeof onboarding_data !== 'undefined'
-    let onboardingDataJson: string | null = null
 
-    if (shouldUpdateOnboardingData) {
-      if (onboarding_data === null) {
-        onboardingDataJson = null
-      } else {
-        try {
-          onboardingDataJson = JSON.stringify(onboarding_data)
-        } catch (serializationError) {
-          logInfo('Invalid onboarding_data payload', {
-            route,
-            userId: user.id,
-            status: 400,
-            meta: {
-              serializationError: serializationError instanceof Error ? serializationError.message : 'Unknown error',
-              ip: request.headers.get('x-forwarded-for') || 'unknown'
-            }
-          })
-          return NextResponse.json({ error: 'Invalid onboarding_data payload' }, { status: 400 })
-        }
+    // Prepare update object
+    const updateData: any = {
+      updated_at: new Date()
+    }
+
+    if (full_name !== undefined) updateData.full_name = full_name
+    if (avatar_url !== undefined) updateData.avatar_url = avatar_url
+    if (onboarding_completed !== undefined) {
+      updateData.onboarding_completed = onboarding_completed
+      if (onboarding_completed === true) {
+        updateData.onboarding_completed_at = new Date()
+      } else if (onboarding_completed === false) {
+        updateData.onboarding_completed_at = null
       }
+    }
+    if (shouldUpdateOnboardingData) {
+      updateData.onboarding_data = onboarding_data
     }
 
     const db = getDb()
-    const { rows } = await db.query(
-      `UPDATE users
-          SET 
-            full_name = COALESCE($1, full_name),
-            avatar_url = COALESCE($2, avatar_url),
-            onboarding_completed = COALESCE($3, onboarding_completed),
-            onboarding_completed_at = CASE 
-              WHEN $3 = true THEN NOW()
-              WHEN $3 = false THEN NULL
-              ELSE onboarding_completed_at 
-            END,
-            onboarding_data = CASE 
-              WHEN $4 THEN $5::jsonb 
-              ELSE onboarding_data 
-            END,
-            updated_at = NOW()
-        WHERE id = $6
-        RETURNING id, email, full_name, avatar_url, subscription_tier, subscription_status, onboarding_completed, onboarding_completed_at, onboarding_data`,
-      [
-        full_name ?? null,
-        avatar_url ?? null,
-        onboarding_completed ?? null,
-        shouldUpdateOnboardingData,
-        onboardingDataJson,
-        user.id
-      ]
-    )
+    const rows = await db.update(users)
+      .set(updateData)
+      .where(eq(users.id, user.id))
+      .returning({
+        id: users.id,
+        email: users.email,
+        full_name: users.full_name,
+        avatar_url: users.avatar_url,
+        subscription_tier: users.subscription_tier,
+        subscription_status: users.subscription_status,
+        onboarding_completed: users.onboarding_completed,
+        onboarding_completed_at: users.onboarding_completed_at,
+        onboarding_data: users.onboarding_data
+      })
 
     logInfo('Profile updated successfully', {
       route,

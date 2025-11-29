@@ -54,17 +54,6 @@ interface SpeechRecognitionErrorEvent extends Event {
   message: string
 }
 
-declare global {
-  interface Window {
-    SpeechRecognition: {
-      new(): SpeechRecognition
-    }
-    webkitSpeechRecognition: {
-      new(): SpeechRecognition
-    }
-  }
-}
-
 export default function VoiceInput({
   onTranscript,
   onFinalTranscript,
@@ -80,38 +69,38 @@ export default function VoiceInput({
   const [interimTranscript, setInterimTranscript] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [confidence, setConfidence] = useState(0)
-  
+
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Check if Speech Recognition is supported
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+
     if (SpeechRecognition) {
       setIsSupported(true)
-      
+
       const recognition = new SpeechRecognition()
       recognition.continuous = continuous
       recognition.interimResults = interimResults
       recognition.lang = language
       recognition.maxAlternatives = 1
-      
+
       recognition.onstart = () => {
         setIsListening(true)
         setError(null)
         setTranscript("")
         setInterimTranscript("")
       }
-      
+
       recognition.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = ""
         let finalTranscript = ""
-        
+
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i]
           const transcript = result[0].transcript
-          
+
           if (result.isFinal) {
             finalTranscript += transcript
             setConfidence(result[0].confidence)
@@ -119,12 +108,12 @@ export default function VoiceInput({
             interimTranscript += transcript
           }
         }
-        
+
         if (interimTranscript) {
           setInterimTranscript(interimTranscript)
           onTranscript(interimTranscript)
         }
-        
+
         if (finalTranscript) {
           setTranscript(prev => prev + finalTranscript)
           setInterimTranscript("")
@@ -132,23 +121,23 @@ export default function VoiceInput({
           onFinalTranscript?.(finalTranscript)
         }
       }
-      
+
       recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         setError(getErrorMessage(event.error))
         setIsListening(false)
       }
-      
+
       recognition.onend = () => {
         setIsListening(false)
         setInterimTranscript("")
       }
-      
+
       recognitionRef.current = recognition
     } else {
       setIsSupported(false)
       setError("Speech recognition is not supported in your browser")
     }
-    
+
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop()
@@ -178,11 +167,11 @@ export default function VoiceInput({
 
   const startListening = () => {
     if (!recognitionRef.current || isListening) return
-    
+
     try {
       setError(null)
       recognitionRef.current.start()
-      
+
       // Auto-stop after 30 seconds of continuous listening
       if (continuous) {
         timeoutRef.current = setTimeout(() => {
@@ -196,7 +185,7 @@ export default function VoiceInput({
 
   const stopListening = () => {
     if (!recognitionRef.current) return
-    
+
     try {
       recognitionRef.current.stop()
       if (timeoutRef.current) {
@@ -250,15 +239,15 @@ export default function VoiceInput({
               {isListening ? "Listening... speak now" : placeholder}
             </CardDescription>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {confidence > 0 && (
               <Badge variant="outline" className="text-xs">
                 {Math.round(confidence * 100)}% confidence
               </Badge>
             )}
-            <Badge 
-              variant={isListening ? "default" : "outline"} 
+            <Badge
+              variant={isListening ? "default" : "outline"}
               className={cn(
                 "text-xs transition-colors",
                 isListening && "bg-red-500 text-white animate-pulse"
@@ -269,7 +258,7 @@ export default function VoiceInput({
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Current Transcript */}
         <div className="min-h-[60px] p-3 border rounded-lg bg-gray-50">
@@ -285,14 +274,14 @@ export default function VoiceInput({
             )}
           </div>
         </div>
-        
+
         {/* Error Display */}
         {error && (
           <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">
             {error}
           </div>
         )}
-        
+
         {/* Controls */}
         <div className="flex items-center justify-between">
           <Button
@@ -317,7 +306,7 @@ export default function VoiceInput({
               </>
             )}
           </Button>
-          
+
           {(transcript || interimTranscript) && (
             <Button
               onClick={clearTranscript}
@@ -328,7 +317,7 @@ export default function VoiceInput({
             </Button>
           )}
         </div>
-        
+
         {/* Language Info */}
         <div className="text-xs text-gray-500 flex items-center justify-between">
           <span>Language: {language}</span>

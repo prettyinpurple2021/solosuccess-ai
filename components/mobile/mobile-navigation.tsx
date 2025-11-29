@@ -5,15 +5,15 @@ import { motion, AnimatePresence, PanInfo } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { 
-  Home, 
-  Target, 
-  Users, 
-  FileText, 
-  BarChart3, 
-  Settings, 
-  Menu, 
-  X, 
+import {
+  Home,
+  Target,
+  Users,
+  FileText,
+  BarChart3,
+  Settings,
+  Menu,
+  X,
   Search,
   Plus,
   Bell,
@@ -45,6 +45,7 @@ interface NavigationItem {
 interface QuickAction {
   id: string
   label: string
+
   icon: React.ComponentType<{ className?: string }>
   action: () => void
 }
@@ -52,7 +53,7 @@ interface QuickAction {
 interface MobileNavigationProps {
   user?: {
     name: string
-    email: string
+    email?: string
     avatar?: string
     level?: number
     points?: number
@@ -70,8 +71,8 @@ const navigationItems: NavigationItem[] = [
     href: '/dashboard',
     color: 'text-purple-600',
     quickActions: [
-      { id: 'overview', label: 'Overview', icon: BarChart3, action: () => {} },
-      { id: 'insights', label: 'Insights', icon: Zap, action: () => {} }
+      { id: 'overview', label: 'Overview', icon: BarChart3, action: () => { } },
+      { id: 'insights', label: 'Insights', icon: Zap, action: () => { } }
     ]
   },
   {
@@ -81,8 +82,8 @@ const navigationItems: NavigationItem[] = [
     href: '/dashboard/slaylist',
     color: 'text-green-600',
     quickActions: [
-      { id: 'add_task', label: 'New Task', icon: Plus, action: () => {} },
-      { id: 'today', label: "Today's Tasks", icon: Calendar, action: () => {} }
+      { id: 'add_task', label: 'New Task', icon: Plus, action: () => { } },
+      { id: 'today', label: "Today's Tasks", icon: Calendar, action: () => { } }
     ]
   },
   {
@@ -92,8 +93,8 @@ const navigationItems: NavigationItem[] = [
     href: '/dashboard/goals',
     color: 'text-orange-600',
     quickActions: [
-      { id: 'add_goal', label: 'New Goal', icon: Target, action: () => {} },
-      { id: 'progress', label: 'Progress', icon: BarChart3, action: () => {} }
+      { id: 'add_goal', label: 'New Goal', icon: Target, action: () => { } },
+      { id: 'progress', label: 'Progress', icon: BarChart3, action: () => { } }
     ]
   },
   {
@@ -104,8 +105,8 @@ const navigationItems: NavigationItem[] = [
     color: 'text-blue-600',
     badge: 2,
     quickActions: [
-      { id: 'roxy', label: 'Chat Roxy', icon: MessageCircle, action: () => {} },
-      { id: 'blaze', label: 'Chat Blaze', icon: Zap, action: () => {} }
+      { id: 'roxy', label: 'Chat Roxy', icon: MessageCircle, action: () => { } },
+      { id: 'blaze', label: 'Chat Blaze', icon: Zap, action: () => { } }
     ]
   },
   {
@@ -115,8 +116,8 @@ const navigationItems: NavigationItem[] = [
     href: '/dashboard/briefcase',
     color: 'text-indigo-600',
     quickActions: [
-      { id: 'upload', label: 'Upload File', icon: Plus, action: () => {} },
-      { id: 'recent', label: 'Recent Files', icon: Clock, action: () => {} }
+      { id: 'upload', label: 'Upload File', icon: Plus, action: () => { } },
+      { id: 'recent', label: 'Recent Files', icon: Clock, action: () => { } }
     ]
   },
   {
@@ -126,19 +127,19 @@ const navigationItems: NavigationItem[] = [
     href: '/dashboard/analytics',
     color: 'text-teal-600',
     quickActions: [
-      { id: 'overview', label: 'Overview', icon: Home, action: () => {} },
-      { id: 'reports', label: 'Reports', icon: FileText, action: () => {} }
+      { id: 'overview', label: 'Overview', icon: Home, action: () => { } },
+      { id: 'reports', label: 'Reports', icon: FileText, action: () => { } }
     ]
   }
 ]
 
 const SWIPE_THRESHOLD = 150
 
-export default function MobileNavigation({ 
-  user, 
-  notifications = 0, 
+export default function MobileNavigation({
+  user,
+  notifications = 0,
   onNotificationClick,
-  className = "" 
+  className = ""
 }: MobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeItem, setActiveItem] = useState<string | null>(null)
@@ -216,7 +217,7 @@ export default function MobileNavigation({
   return (
     <>
       {/* Mobile Header */}
-      <motion.div 
+      <motion.div
         className={cn(
           "lg:hidden sticky top-0 z-40 w-full bg-white/90 backdrop-blur-sm border-b border-gray-200",
           className
@@ -233,7 +234,7 @@ export default function MobileNavigation({
             >
               <Menu className="h-5 w-5" />
             </Button>
-            
+
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
                 <Crown className="h-4 w-4 text-white" />
@@ -368,19 +369,19 @@ export default function MobileNavigation({
                       >
                         <item.icon className={cn("h-5 w-5", item.color)} />
                         <span className="flex-1 font-medium">{item.label}</span>
-                        
+
                         {item.badge && (
                           <Badge className="h-5 px-2 text-xs bg-red-500 text-white">
                             {item.badge}
                           </Badge>
                         )}
-                        
+
                         {item.isNew && (
                           <Badge className="h-5 px-2 text-xs bg-green-500 text-white">
                             New
                           </Badge>
                         )}
-                        
+
                         {item.quickActions && (
                           <ChevronRight className={cn(
                             "h-4 w-4 transition-transform",
@@ -431,7 +432,7 @@ export default function MobileNavigation({
                   <Settings className="h-5 w-5" />
                   Settings
                 </Button>
-                
+
                 {/* Quick Stats */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
                   <div className="p-2 bg-gray-50 rounded">
@@ -454,7 +455,7 @@ export default function MobileNavigation({
       </AnimatePresence>
 
       {/* Bottom Navigation for Mobile */}
-      <motion.div 
+      <motion.div
         className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-area-pb"
         initial={false}
       >

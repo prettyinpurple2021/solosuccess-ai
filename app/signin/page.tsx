@@ -3,22 +3,22 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { 
-  Loader2, 
-  Mail, 
-  Lock, 
-  Github, 
+import {
+  Loader2,
+  Mail,
+  Lock,
+  Github,
   Target,
   Eye,
   EyeOff,
   Shield,
   ArrowRight
 } from "lucide-react"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid
@@ -85,7 +85,7 @@ export default function SignInPage() {
     <div className="min-h-screen bg-military-midnight">
       {/* Camo Background */}
       <CamoBackground />
-      
+
       {/* Tactical Grid Overlay */}
       <TacticalGrid />
 
@@ -101,16 +101,16 @@ export default function SignInPage() {
                 SoloSuccess AI
               </span>
             </div>
-            
+
             <div className="flex items-center space-x-4">
-              <a 
-                href="/signup" 
+              <a
+                href="/signup"
                 className="text-military-glass-white hover:text-military-hot-pink transition-colors"
               >
                 Sign Up
               </a>
-              <a 
-                href="/" 
+              <a
+                href="/"
                 className="text-military-glass-white hover:text-military-hot-pink transition-colors"
               >
                 Home
@@ -130,7 +130,7 @@ export default function SignInPage() {
         >
           <GlassCard className="p-8" glow>
             <div className="text-center mb-8">
-              <RankStars rank="Sergeant" size="large" className="justify-center mb-4" />
+              <RankStars count={3} size="lg" className="justify-center mb-4" />
               <h1 className="text-3xl font-heading font-bold text-military-glass-white mb-2">
                 Mission Briefing
               </h1>
@@ -196,8 +196,8 @@ export default function SignInPage() {
                     Remember me for 30 days
                   </label>
                 </div>
-                <a 
-                  href="/forgot-password" 
+                <a
+                  href="/forgot-password"
                   className="text-sm text-military-hot-pink hover:text-military-blush-pink transition-colors"
                 >
                   Forgot password?
@@ -237,7 +237,7 @@ export default function SignInPage() {
 
             <div className="mt-8">
               <SergeantDivider />
-              
+
               <div className="mt-6">
                 <TacticalButton
                   type="button"
@@ -256,8 +256,8 @@ export default function SignInPage() {
             <div className="mt-8 text-center">
               <p className="text-military-storm-grey text-sm">
                 Don't have clearance?{" "}
-                <a 
-                  href="/signup" 
+                <a
+                  href="/signup"
                   className="text-military-hot-pink hover:text-military-blush-pink font-semibold transition-colors"
                 >
                   Request Access
@@ -304,7 +304,7 @@ export default function SignInPage() {
                 SoloSuccess AI
               </span>
             </div>
-            
+
             <div className="flex space-x-6">
               <a href="/privacy" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Privacy</a>
               <a href="/terms" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Terms</a>

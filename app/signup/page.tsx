@@ -3,12 +3,12 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { 
-  Loader2, 
-  Mail, 
-  Lock, 
-  User, 
-  Github, 
+import {
+  Loader2,
+  Mail,
+  Lock,
+  User,
+  Github,
   Target,
   Eye,
   EyeOff,
@@ -17,11 +17,11 @@ import {
   Check,
   AlertTriangle
 } from "lucide-react"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid
@@ -42,7 +42,7 @@ export default function SignUpPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+
   // Get plan selection from URL params
   const plan = searchParams.get('plan') || 'launch'
   const priceId = searchParams.get('price')
@@ -75,28 +75,28 @@ export default function SignUpPage() {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name, 
-          email, 
+        body: JSON.stringify({
+          name,
+          email,
           password,
           plan,
           priceId,
           billing
         }),
       })
-      
+
       const contentType = res.headers.get('content-type') || ''
       const body = contentType.includes('application/json') ? await res.json() : null
-      
+
       if (!res.ok) {
         setError(body?.error || 'Sign up failed')
         return
       }
-      
+
       if (typeof window !== 'undefined') {
         if (body?.token) localStorage.setItem('authToken', body.token)
       }
-      
+
       // Redirect to dashboard or onboarding
       window.location.href = '/dashboard'
     } catch (err) {
@@ -128,11 +128,11 @@ export default function SignUpPage() {
   const getPlanDisplay = () => {
     switch (plan) {
       case 'accelerator':
-        return { name: 'Accelerator', rank: 'Sergeant', color: 'text-military-hot-pink' }
+        return { name: 'Accelerator', rank: 'Sergeant', stars: 3, color: 'text-military-hot-pink' }
       case 'dominator':
-        return { name: 'Dominator', rank: 'Commander', color: 'text-military-blush-pink' }
+        return { name: 'Dominator', rank: 'Commander', stars: 5, color: 'text-military-blush-pink' }
       default:
-        return { name: 'Launch', rank: 'Private', color: 'text-military-storm-grey' }
+        return { name: 'Launch', rank: 'Private', stars: 1, color: 'text-military-storm-grey' }
     }
   }
 
@@ -142,7 +142,7 @@ export default function SignUpPage() {
     <div className="min-h-screen bg-military-midnight">
       {/* Camo Background */}
       <CamoBackground />
-      
+
       {/* Tactical Grid Overlay */}
       <TacticalGrid />
 
@@ -158,16 +158,16 @@ export default function SignUpPage() {
                 SoloSuccess AI
               </span>
             </div>
-            
+
             <div className="flex items-center space-x-4">
-              <a 
-                href="/signin" 
+              <a
+                href="/signin"
                 className="text-military-glass-white hover:text-military-hot-pink transition-colors"
               >
                 Sign In
               </a>
-              <a 
-                href="/" 
+              <a
+                href="/"
                 className="text-military-glass-white hover:text-military-hot-pink transition-colors"
               >
                 Home
@@ -187,14 +187,14 @@ export default function SignUpPage() {
         >
           <GlassCard className="p-8" glow>
             <div className="text-center mb-8">
-              <RankStars rank={planInfo.rank} size="large" className="justify-center mb-4" />
+              <RankStars count={planInfo.stars} size="lg" className="justify-center mb-4" />
               <h1 className="text-3xl font-heading font-bold text-military-glass-white mb-2">
                 Request Clearance
               </h1>
               <p className="text-military-storm-grey mb-4">
                 Join the tactical command center
               </p>
-              
+
               {/* Plan Selection Display */}
               {plan !== 'launch' && (
                 <div className="bg-military-tactical/50 border border-military-hot-pink/30 rounded-lg p-4 mb-6">
@@ -355,7 +355,7 @@ export default function SignUpPage() {
 
             <div className="mt-8">
               <SergeantDivider />
-              
+
               <div className="mt-6">
                 <TacticalButton
                   type="button"
@@ -374,8 +374,8 @@ export default function SignUpPage() {
             <div className="mt-8 text-center">
               <p className="text-military-storm-grey text-sm">
                 Already have clearance?{" "}
-                <a 
-                  href="/signin" 
+                <a
+                  href="/signin"
                   className="text-military-hot-pink hover:text-military-blush-pink font-semibold transition-colors"
                 >
                   Sign In
@@ -422,7 +422,7 @@ export default function SignUpPage() {
                 SoloSuccess AI
               </span>
             </div>
-            
+
             <div className="flex space-x-6">
               <a href="/privacy" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Privacy</a>
               <a href="/terms" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Terms</a>

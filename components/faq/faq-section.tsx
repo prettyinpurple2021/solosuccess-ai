@@ -12,10 +12,10 @@ export type FaqItem = {
 interface FaqSectionProps {
   id?: string
   title?: string
-  items: FaqItem[]
+  items?: FaqItem[]
 }
 
-export function FaqSection({ id = "faq", title = "Frequently Asked Questions", items }: FaqSectionProps) {
+export function FaqSection({ id = "faq", title = "Frequently Asked Questions", items = [] }: FaqSectionProps) {
   const faqJsonLd = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "FAQPage",

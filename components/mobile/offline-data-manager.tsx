@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Wifi, 
-  WifiOff, 
-  Database, 
-  CheckCircle, 
+import {
+  Wifi,
+  WifiOff,
+  Database,
+  CheckCircle,
   AlertTriangle,
   Clock,
   Cloud,
@@ -45,11 +45,17 @@ interface PendingAction {
   retries: number
 }
 
-export default function OfflineDataManager({ 
-  className = "", 
+export interface OfflineDataManagerRef {
+  addPendingAction: (action: Omit<PendingAction, 'id' | 'timestamp' | 'retries'>) => Promise<void>
+  cacheData: (key: string, resource: string, data: any) => Promise<void>
+  getCachedData: (key: string) => Promise<any>
+}
+
+const OfflineDataManager = React.forwardRef<OfflineDataManagerRef, OfflineDataManagerProps>(({
+  className = "",
   onSyncComplete,
-  onSyncError 
-}: OfflineDataManagerProps) {
+  onSyncError
+}, ref) => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     isOnline: navigator.onLine,
     isSyncing: false,
@@ -61,6 +67,141 @@ export default function OfflineDataManager({
 
   const [pendingActions, setPendingActions] = useState<PendingAction[]>([])
   const [showDetails, setShowDetails] = useState(false)
+
+  // ... (keep existing useEffects and helper functions) ...
+
+  // Open IndexedDB connection
+  const openIndexedDB = useCallback(() => {
+    return new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('SoloSuccessOffline', 1)
+
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => resolve(request.result)
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result
+
+        // Create pending actions store
+        if (!db.objectStoreNames.contains('pendingActions')) {
+          const store = db.createObjectStore('pendingActions', {
+            keyPath: 'id',
+            autoIncrement: false
+          })
+          store.createIndex('timestamp', 'timestamp', { unique: false })
+          store.createIndex('resource', 'resource', { unique: false })
+        }
+
+        // Create offline cache store
+        if (!db.objectStoreNames.contains('offlineCache')) {
+          const store = db.createObjectStore('offlineCache', {
+            keyPath: 'key'
+          })
+          store.createIndex('resource', 'resource', { unique: false })
+          store.createIndex('timestamp', 'timestamp', { unique: false })
+        }
+      }
+    })
+  }, [])
+
+  // Add action to pending queue
+  const addPendingAction = useCallback(async (action: Omit<PendingAction, 'id' | 'timestamp' | 'retries'>) => {
+    const pendingAction: PendingAction = {
+      ...action,
+      id: `${action.type}_${action.resource}_${Date.now()}`,
+      timestamp: new Date(),
+      retries: 0
+    }
+
+    try {
+      const db = await openIndexedDB()
+      const transaction = db.transaction(['pendingActions'], 'readwrite')
+      const store = transaction.objectStore('pendingActions')
+
+      await new Promise<void>((resolve, reject) => {
+        const request = store.add(pendingAction)
+        request.onsuccess = () => resolve()
+        request.onerror = () => reject(request.error)
+      })
+
+      setPendingActions(prev => [...prev, pendingAction])
+      setSyncStatus(prev => ({
+        ...prev,
+        pendingActions: prev.pendingActions + 1
+      }))
+    } catch (error) {
+      logError('Failed to add pending action', error as any)
+    }
+  }, [openIndexedDB])
+
+  // Cache data for offline use
+  const cacheData = useCallback(async (key: string, resource: string, data: any) => {
+    try {
+      const db = await openIndexedDB()
+      const transaction = db.transaction(['offlineCache'], 'readwrite')
+      const store = transaction.objectStore('offlineCache')
+
+      const cacheEntry = {
+        key,
+        resource,
+        data,
+        timestamp: new Date()
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        const request = store.put(cacheEntry)
+        request.onsuccess = () => resolve()
+        request.onerror = () => reject(request.error)
+      })
+    } catch (error) {
+      logError('Failed to cache data', error as any)
+    }
+  }, [openIndexedDB])
+
+  // Get cached data
+  const getCachedData = useCallback(async (key: string) => {
+    try {
+      const db = await openIndexedDB()
+      const transaction = db.transaction(['offlineCache'], 'readonly')
+      const store = transaction.objectStore('offlineCache')
+
+      return new Promise<any>((resolve, reject) => {
+        const request = store.get(key)
+        request.onsuccess = () => resolve(request.result?.data || null)
+        request.onerror = () => reject(request.error)
+      })
+    } catch (error) {
+      logError('Failed to get cached data', error as any)
+      return null
+    }
+  }, [openIndexedDB])
+
+  // Expose methods via ref
+  React.useImperativeHandle(ref, () => ({
+    addPendingAction,
+    cacheData,
+    getCachedData
+  }))
+
+  // Load pending actions from IndexedDB
+  const loadPendingActions = useCallback(async () => {
+    try {
+      const db = await openIndexedDB()
+      const transaction = db.transaction(['pendingActions'], 'readonly')
+      const store = transaction.objectStore('pendingActions')
+      const request = store.getAll()
+
+      request.onsuccess = () => {
+        const actions = request.result || []
+        setPendingActions(actions)
+        setSyncStatus(prev => ({
+          ...prev,
+          pendingActions: actions.length
+        }))
+      }
+    } catch (error) {
+      logError('Failed to load pending actions', error as any)
+    }
+  }, [openIndexedDB])
 
   // Listen for online/offline status
   useEffect(() => {
@@ -84,160 +225,12 @@ export default function OfflineDataManager({
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [])
-
-  // Load pending actions from IndexedDB
-  const loadPendingActions = useCallback(async () => {
-    try {
-      const db = await openIndexedDB()
-      const transaction = db.transaction(['pendingActions'], 'readonly')
-      const store = transaction.objectStore('pendingActions')
-      const request = store.getAll()
-      
-      request.onsuccess = () => {
-        const actions = request.result || []
-        setPendingActions(actions)
-        setSyncStatus(prev => ({ 
-          ...prev, 
-          pendingActions: actions.length 
-        }))
-      }
-    } catch (error) {
-      logError('Failed to load pending actions', error as any)
-    }
-  }, [])
-
-  // Open IndexedDB connection
-  const openIndexedDB = useCallback(() => {
-    return new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('SoloSuccessOffline', 1)
-      
-      request.onerror = () => reject(request.error)
-      request.onsuccess = () => resolve(request.result)
-      
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        
-        // Create pending actions store
-        if (!db.objectStoreNames.contains('pendingActions')) {
-          const store = db.createObjectStore('pendingActions', { 
-            keyPath: 'id',
-            autoIncrement: false 
-          })
-          store.createIndex('timestamp', 'timestamp', { unique: false })
-          store.createIndex('resource', 'resource', { unique: false })
-        }
-        
-        // Create offline cache store
-        if (!db.objectStoreNames.contains('offlineCache')) {
-          const store = db.createObjectStore('offlineCache', { 
-            keyPath: 'key' 
-          })
-          store.createIndex('resource', 'resource', { unique: false })
-          store.createIndex('timestamp', 'timestamp', { unique: false })
-        }
-      }
-    })
-  }, [])
-
-  // Add action to pending queue
-  const addPendingAction = useCallback(async (action: Omit<PendingAction, 'id' | 'timestamp' | 'retries'>) => {
-    const pendingAction: PendingAction = {
-      ...action,
-      id: `${action.type}_${action.resource}_${Date.now()}`,
-      timestamp: new Date(),
-      retries: 0
-    }
-
-    try {
-      const db = await openIndexedDB()
-      const transaction = db.transaction(['pendingActions'], 'readwrite')
-      const store = transaction.objectStore('pendingActions')
-      
-      await new Promise<void>((resolve, reject) => {
-        const request = store.add(pendingAction)
-        request.onsuccess = () => resolve()
-        request.onerror = () => reject(request.error)
-      })
-
-      setPendingActions(prev => [...prev, pendingAction])
-      setSyncStatus(prev => ({ 
-        ...prev, 
-        pendingActions: prev.pendingActions + 1 
-      }))
-    } catch (error) {
-      logError('Failed to add pending action', error as any)
-    }
-  }, [openIndexedDB])
-
-  // Sync pending actions with server
-  const syncPendingActions = useCallback(async () => {
-    if (!syncStatus.isOnline || syncStatus.isSyncing || pendingActions.length === 0) {
-      return
-    }
-
-    setSyncStatus(prev => ({ 
-      ...prev, 
-      isSyncing: true, 
-      syncProgress: 0,
-      error: null 
-    }))
-
-    const totalActions = pendingActions.length
-    let completedActions = 0
-    const errors: string[] = []
-
-    try {
-      for (const action of pendingActions) {
-        try {
-          await syncAction(action)
-          completedActions++
-          
-          // Remove successful action from pending list
-          await removePendingAction(action.id)
-          
-          setSyncStatus(prev => ({ 
-            ...prev, 
-            syncProgress: (completedActions / totalActions) * 100 
-          }))
-        } catch (error) {
-          logError(`Failed to sync action ${action.id}`, error as any)
-          errors.push(`${action.type} ${action.resource}: ${error}`)
-          
-          // Increment retry count
-          await updatePendingActionRetries(action.id, action.retries + 1)
-        }
-      }
-
-      if (errors.length === 0) {
-        setSyncStatus(prev => ({ 
-          ...prev, 
-          lastSync: new Date(),
-          pendingActions: 0,
-          error: null 
-        }))
-        onSyncComplete?.()
-      } else {
-        setSyncStatus(prev => ({ 
-          ...prev, 
-          error: `${errors.length} actions failed to sync` 
-        }))
-        onSyncError?.(errors.join(', '))
-      }
-    } finally {
-      setSyncStatus(prev => ({ 
-        ...prev, 
-        isSyncing: false,
-        syncProgress: 0 
-      }))
-      loadPendingActions() // Refresh the list
-    }
-  }, [syncStatus.isOnline, pendingActions, onSyncComplete, onSyncError, loadPendingActions])
+  }, [loadPendingActions]) // Added loadPendingActions to dependency array
 
   // Sync individual action
   const syncAction = async (action: PendingAction) => {
     const { type, resource, data } = action
-    
+
     switch (type) {
       case 'create':
         return fetch(`/api/${resource}`, {
@@ -266,7 +259,7 @@ export default function OfflineDataManager({
       const db = await openIndexedDB()
       const transaction = db.transaction(['pendingActions'], 'readwrite')
       const store = transaction.objectStore('pendingActions')
-      
+
       await new Promise<void>((resolve, reject) => {
         const request = store.delete(id)
         request.onsuccess = () => resolve()
@@ -285,7 +278,7 @@ export default function OfflineDataManager({
       const db = await openIndexedDB()
       const transaction = db.transaction(['pendingActions'], 'readwrite')
       const store = transaction.objectStore('pendingActions')
-      
+
       const action = pendingActions.find(a => a.id === id)
       if (action) {
         action.retries = retries
@@ -300,54 +293,76 @@ export default function OfflineDataManager({
     }
   }
 
-  // Cache data for offline use
-  const cacheData = useCallback(async (key: string, resource: string, data: any) => {
-    try {
-      const db = await openIndexedDB()
-      const transaction = db.transaction(['offlineCache'], 'readwrite')
-      const store = transaction.objectStore('offlineCache')
-      
-      const cacheEntry = {
-        key,
-        resource,
-        data,
-        timestamp: new Date()
-      }
-      
-      await new Promise<void>((resolve, reject) => {
-        const request = store.put(cacheEntry)
-        request.onsuccess = () => resolve()
-        request.onerror = () => reject(request.error)
-      })
-    } catch (error) {
-      logError('Failed to cache data', error as any)
+  // Sync pending actions with server
+  const syncPendingActions = useCallback(async () => {
+    if (!syncStatus.isOnline || syncStatus.isSyncing || pendingActions.length === 0) {
+      return
     }
-  }, [openIndexedDB])
 
-  // Get cached data
-  const getCachedData = useCallback(async (key: string) => {
+    setSyncStatus(prev => ({
+      ...prev,
+      isSyncing: true,
+      syncProgress: 0,
+      error: null
+    }))
+
+    const totalActions = pendingActions.length
+    let completedActions = 0
+    const errors: string[] = []
+
     try {
-      const db = await openIndexedDB()
-      const transaction = db.transaction(['offlineCache'], 'readonly')
-      const store = transaction.objectStore('offlineCache')
-      
-      return new Promise<any>((resolve, reject) => {
-        const request = store.get(key)
-        request.onsuccess = () => resolve(request.result?.data || null)
-        request.onerror = () => reject(request.error)
-      })
-    } catch (error) {
-      logError('Failed to get cached data', error as any)
-      return null
+      for (const action of pendingActions) {
+        try {
+          await syncAction(action)
+          completedActions++
+
+          // Remove successful action from pending list
+          await removePendingAction(action.id)
+
+          setSyncStatus(prev => ({
+            ...prev,
+            syncProgress: (completedActions / totalActions) * 100
+          }))
+        } catch (error) {
+          logError(`Failed to sync action ${action.id}`, error as any)
+          errors.push(`${action.type} ${action.resource}: ${error}`)
+
+          // Increment retry count
+          await updatePendingActionRetries(action.id, action.retries + 1)
+        }
+      }
+
+      if (errors.length === 0) {
+        setSyncStatus(prev => ({
+          ...prev,
+          lastSync: new Date(),
+          pendingActions: 0,
+          error: null
+        }))
+        onSyncComplete?.()
+      } else {
+        setSyncStatus(prev => ({
+          ...prev,
+          error: `${errors.length} actions failed to sync`
+        }))
+        onSyncError?.(errors.join(', '))
+      }
+    } finally {
+      setSyncStatus(prev => ({
+        ...prev,
+        isSyncing: false,
+        syncProgress: 0
+      }))
+      loadPendingActions() // Refresh the list
     }
-  }, [openIndexedDB])
+  }, [syncStatus.isOnline, pendingActions, onSyncComplete, onSyncError, loadPendingActions]) // Added loadPendingActions
 
   const formatLastSync = (date: Date | null) => {
     if (!date) return 'Never'
     const now = new Date()
     const diff = now.getTime() - date.getTime()
     const minutes = Math.floor(diff / 60000)
-    
+
     if (minutes < 1) return 'Just now'
     if (minutes < 60) return `${minutes}m ago`
     const hours = Math.floor(minutes / 60)
@@ -365,8 +380,8 @@ export default function OfflineDataManager({
             <div className="flex items-center gap-3">
               <div className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center",
-                syncStatus.isOnline 
-                  ? "bg-green-100 text-green-600" 
+                syncStatus.isOnline
+                  ? "bg-green-100 text-green-600"
                   : "bg-red-100 text-red-600"
               )}>
                 {syncStatus.isOnline ? <Wifi className="w-5 h-5" /> : <WifiOff className="w-5 h-5" />}
@@ -376,14 +391,14 @@ export default function OfflineDataManager({
                   {syncStatus.isOnline ? 'Online' : 'Offline'}
                 </CardTitle>
                 <CardDescription>
-                  {syncStatus.pendingActions > 0 
+                  {syncStatus.pendingActions > 0
                     ? `${syncStatus.pendingActions} actions pending sync`
                     : 'All data synced'
                   }
                 </CardDescription>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {syncStatus.pendingActions > 0 && (
                 <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
@@ -391,7 +406,7 @@ export default function OfflineDataManager({
                   {syncStatus.pendingActions}
                 </Badge>
               )}
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -439,7 +454,7 @@ export default function OfflineDataManager({
               <RefreshCw className={cn("w-4 h-4 mr-2", syncStatus.isSyncing && "animate-spin")} />
               Sync Now
             </Button>
-            
+
             <Button
               variant="outline"
               size="sm"
@@ -468,7 +483,7 @@ export default function OfflineDataManager({
                   Manage offline data and pending actions
                 </CardDescription>
               </CardHeader>
-              
+
               <CardContent className="space-y-4">
                 {/* Last Sync Info */}
                 <div className="flex items-center justify-between text-sm">
@@ -510,11 +525,13 @@ export default function OfflineDataManager({
       </AnimatePresence>
     </div>
   )
-}
+})
+
+export default OfflineDataManager
 
 // Hook for offline data management
 export function useOfflineData() {
-  const manager = React.useRef<OfflineDataManagerProps>(null)
+  const manager = React.useRef<OfflineDataManagerRef>(null)
 
   const addPendingAction = useCallback(async (
     type: 'create' | 'update' | 'delete',
@@ -540,6 +557,7 @@ export function useOfflineData() {
   }, [])
 
   return {
+    manager, // Export the ref to be attached to the component
     addPendingAction,
     cacheData,
     getCachedData

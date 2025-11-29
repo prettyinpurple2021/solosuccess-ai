@@ -2,13 +2,13 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { 
-  Check, 
-  Star, 
-  Zap, 
-  Shield, 
-  Clock, 
-  Users, 
+import {
+  Check,
+  Star,
+  Zap,
+  Shield,
+  Clock,
+  Users,
   TrendingUp,
   ArrowRight,
   Crown,
@@ -17,11 +17,11 @@ import {
   Award,
   ChevronRight
 } from 'lucide-react';
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid
@@ -51,7 +51,8 @@ const pricingPlans = [
     ctaText: 'Start Free',
     stripePriceId: 'price_1S46IjPpYfwm37m7EKFi7H4C',
     popular: false,
-    rank: 'Private'
+    rank: 'Private',
+    stars: 1
   },
   {
     id: 'accelerator',
@@ -75,7 +76,8 @@ const pricingPlans = [
     ctaText: 'Deploy Now',
     stripePriceId: 'price_1S46LyPpYfwm37m7M5nOAYW7',
     popular: true,
-    rank: 'Sergeant'
+    rank: 'Sergeant',
+    stars: 3
   },
   {
     id: 'dominator',
@@ -101,7 +103,8 @@ const pricingPlans = [
     ctaText: 'Take Command',
     stripePriceId: 'price_1S46P6PpYfwm37m76hqohIw0',
     popular: false,
-    rank: 'Commander'
+    rank: 'Commander',
+    stars: 5
   }
 ];
 
@@ -167,7 +170,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-military-midnight">
       {/* Camo Background */}
       <CamoBackground />
-      
+
       {/* Tactical Grid Overlay */}
       <TacticalGrid />
 
@@ -183,7 +186,7 @@ export default function PricingPage() {
                 SoloSuccess AI
               </span>
             </div>
-            
+
             <div className="hidden md:flex items-center space-x-8">
               <a href="/" className="text-military-glass-white hover:text-military-hot-pink transition-colors">
                 Home
@@ -203,8 +206,8 @@ export default function PricingPage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <a 
-                href="/signin" 
+              <a
+                href="/signin"
                 className="text-military-glass-white hover:text-military-hot-pink transition-colors"
               >
                 Sign In
@@ -236,7 +239,7 @@ export default function PricingPage() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="mb-6"
             >
-              <RankStars rank="Commander" size="large" className="justify-center mb-4" />
+              <RankStars count={5} size="lg" className="justify-center mb-4" />
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-6">
                 <span className="bg-gradient-to-r from-military-hot-pink via-military-blush-pink to-military-dusty-rose bg-clip-text text-transparent">
                   Choose Your Mission Plan
@@ -262,10 +265,10 @@ export default function PricingPage() {
             >
               <span className="text-sm font-medium text-military-glass-white">Monthly</span>
               <div className="relative">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   id="billing-toggle"
-                  className="sr-only" 
+                  className="sr-only"
                   checked={isYearly}
                   onChange={(e) => setIsYearly(e.target.checked)}
                   aria-label="Toggle between monthly and yearly billing"
@@ -309,9 +312,9 @@ export default function PricingPage() {
                       </StatsBadge>
                     </div>
                   )}
-                  
+
                   <div className="text-center mb-6">
-                    <RankStars rank={plan.rank} size="medium" className="justify-center mb-4" />
+                    <RankStars count={plan.stars} size="md" className="justify-center mb-4" />
                     <h3 className="text-2xl font-heading font-bold text-military-glass-white mb-2">
                       {plan.title}
                     </h3>
@@ -343,24 +346,22 @@ export default function PricingPage() {
                   <div className="space-y-3 mb-8">
                     {plan.features.map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-start gap-3">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${
-                          feature.included 
-                            ? 'bg-military-hot-pink/20 text-military-hot-pink' 
-                            : 'bg-military-gunmetal/20 text-military-storm-grey'
-                        }`}>
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${feature.included
+                          ? 'bg-military-hot-pink/20 text-military-hot-pink'
+                          : 'bg-military-gunmetal/20 text-military-storm-grey'
+                          }`}>
                           {feature.included ? (
                             <Check className="w-3 h-3" />
                           ) : (
                             <div className="w-2 h-2 rounded-full bg-military-storm-grey" />
                           )}
                         </div>
-                        <span className={`text-sm ${
-                          feature.included 
-                            ? feature.highlight 
-                              ? 'text-military-hot-pink font-semibold' 
-                              : 'text-military-glass-white'
-                            : 'text-military-storm-grey'
-                        }`}>
+                        <span className={`text-sm ${feature.included
+                          ? feature.highlight
+                            ? 'text-military-hot-pink font-semibold'
+                            : 'text-military-glass-white'
+                          : 'text-military-storm-grey'
+                          }`}>
                           {feature.text}
                         </span>
                       </div>
@@ -393,7 +394,7 @@ export default function PricingPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <RankStars rank="Commander" size="large" className="justify-center mb-4" />
+            <RankStars count={5} size="lg" className="justify-center mb-4" />
             <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6">
               <span className="bg-gradient-to-r from-military-hot-pink via-military-blush-pink to-military-dusty-rose bg-clip-text text-transparent">
                 Military-Grade Features
@@ -488,7 +489,7 @@ export default function PricingPage() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
             >
-              <RankStars rank="Commander" size="large" className="justify-center mb-6" />
+              <RankStars count={5} size="lg" className="justify-center mb-6" />
               <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6">
                 <span className="bg-gradient-to-r from-military-hot-pink via-military-blush-pink to-military-dusty-rose bg-clip-text text-transparent">
                   Ready to Deploy?
@@ -497,7 +498,7 @@ export default function PricingPage() {
               <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
                 Join thousands of solo founders who've already transformed their businesses with SoloSuccess AI.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <TacticalButton
                   variant="primary"
@@ -508,7 +509,7 @@ export default function PricingPage() {
                   Start Your Mission
                   <Rocket className="w-5 h-5 ml-2" />
                 </TacticalButton>
-                
+
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   className="flex items-center gap-2 text-sm text-military-storm-grey"
@@ -539,7 +540,7 @@ export default function PricingPage() {
                 Transform your solo business with AI-powered tactical tools.
               </p>
             </div>
-            
+
             <div>
               <h3 className="font-heading font-semibold text-military-glass-white mb-4">Product</h3>
               <ul className="space-y-2">
@@ -549,7 +550,7 @@ export default function PricingPage() {
                 <li><a href="/#integrations" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Integrations</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-heading font-semibold text-military-glass-white mb-4">Company</h3>
               <ul className="space-y-2">
@@ -559,7 +560,7 @@ export default function PricingPage() {
                 <li><a href="/#contact" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Contact</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-heading font-semibold text-military-glass-white mb-4">Resources</h3>
               <ul className="space-y-2">
@@ -570,9 +571,9 @@ export default function PricingPage() {
               </ul>
             </div>
           </div>
-          
+
           <SergeantDivider className="my-8" />
-          
+
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-military-storm-grey text-sm">
               © 2025 SoloSuccess AI. All rights reserved.

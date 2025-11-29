@@ -12,11 +12,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { logInfo } from '@/lib/logger'
 import { useDashboardData } from '@/hooks/use-dashboard-data'
-import { 
-  Mic, 
-  Plus, 
-  Bell, 
-  Search, 
+import {
+  Mic,
+  Plus,
+  Bell,
+  Search,
   Settings,
   Zap,
   Target,
@@ -75,6 +75,12 @@ interface MobileDashboardProps {
       description: string
       action: string
     }>
+    user?: {
+      level: number
+      total_points: number
+      email?: string
+      full_name?: string
+    }
   }
   className?: string
 }
@@ -87,10 +93,10 @@ interface Widget {
   data: any
 }
 
-export default function MobileDashboard({ 
-  user, 
+export default function MobileDashboard({
+  user,
   dashboardData,
-  className = "" 
+  className = ""
 }: MobileDashboardProps) {
   const isMobile = useIsMobile()
   const { data: fetchedDashboard, loading: dashboardLoading, error: dashboardError } = useDashboardData()
@@ -171,7 +177,7 @@ export default function MobileDashboard({
   // Handle widget actions
   const handleWidgetAction = (widgetId: string, action: string, data?: any) => {
     logInfo('Widget action triggered', { widgetId, action, data })
-    
+
     switch (action) {
       case 'add_task':
         setShowVoiceCreator(true)
@@ -202,7 +208,7 @@ export default function MobileDashboard({
 
   const handleSwipe = (gesture: any) => {
     logInfo('Swipe gesture detected', { direction: gesture.direction, velocity: gesture.velocity })
-    
+
     switch (gesture.direction) {
       case 'up':
         // Show quick actions
@@ -233,10 +239,10 @@ export default function MobileDashboard({
   useEffect(() => {
     const handleOnline = () => setIsOnline(true)
     const handleOffline = () => setIsOnline(false)
-    
+
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
-    
+
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
@@ -251,7 +257,7 @@ export default function MobileDashboard({
     <div className={cn("min-h-screen bg-gray-50", className)}>
       {/* Mobile Navigation */}
       <MobileNavigation
-        user={user || (resolvedData ? { name: resolvedData.user.full_name || 'Boss', email: resolvedData.user.email } : undefined)}
+        user={user || (resolvedData?.user ? { name: resolvedData.user.full_name || 'Boss', email: resolvedData.user.email } : undefined)}
         notifications={notifications}
         onNotificationClick={() => setNotifications(0)}
       />
@@ -291,12 +297,12 @@ export default function MobileDashboard({
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-bold">
-                      {dashboardLoading ? 'Loading your dashboard…' : `Welcome back, ${user?.name || resolvedData?.user.full_name || 'Boss'}! 👑`}
+                      {dashboardLoading ? 'Loading your dashboard…' : `Welcome back, ${user?.name || resolvedData?.user?.full_name || 'Boss'}! 👑`}
                     </h2>
                     <p className="text-sm opacity-90">
                       {dashboardLoading
                         ? 'Fetching stats…'
-                        : `Level ${user?.level ||  (resolvedData ? resolvedData.user.level : 1)} • ${user?.points || (resolvedData ? resolvedData.user.total_points : 0)} points`}
+                        : `Level ${user?.level || (resolvedData?.user ? resolvedData.user.level : 1)} • ${user?.points || (resolvedData?.user ? resolvedData.user.total_points : 0)} points`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

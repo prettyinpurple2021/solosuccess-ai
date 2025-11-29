@@ -3,20 +3,20 @@
 
 export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { useState, useEffect} from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import { Button} from "@/components/ui/button"
-import { Badge} from "@/components/ui/badge"
-import { Progress} from "@/components/ui/progress"
-import { Input} from "@/components/ui/input"
-import { Textarea} from "@/components/ui/textarea"
-import { Label} from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
-import { 
-  Target, 
-  CheckSquare, 
-  Plus, 
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Target,
+  CheckSquare,
+  Plus,
   Calendar,
   Flag,
   Clock,
@@ -89,7 +89,7 @@ export default function SlaylistPage() {
   }
 
   useSmartTips(smartTipsConfig)
-  
+
   // Form states
   const [goalForm, setGoalForm] = useState({
     title: "",
@@ -98,7 +98,7 @@ export default function SlaylistPage() {
     target_date: "",
     category: "general"
   })
-  
+
   const [taskForm, setTaskForm] = useState({
     title: "",
     description: "",
@@ -146,7 +146,7 @@ export default function SlaylistPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(goalForm)
       })
-      
+
       if (response.ok) {
         await fetchGoals()
         setShowGoalDialog(false)
@@ -170,7 +170,7 @@ export default function SlaylistPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskForm)
       })
-      
+
       if (response.ok) {
         await fetchTasks()
         setShowTaskDialog(false)
@@ -190,19 +190,24 @@ export default function SlaylistPage() {
 
   const createVoiceTask = async (taskData: {
     title: string
-    description: string
-    priority: string
-    due_date: string
-    goal_id: string
-    estimated_minutes: number
+    description?: string
+    priority: 'low' | 'medium' | 'high' | 'urgent'
+    estimatedMinutes?: number
   }) => {
     try {
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskData)
+        body: JSON.stringify({
+          ...taskData,
+          priority: taskData.priority,
+          estimated_minutes: taskData.estimatedMinutes || 30,
+          due_date: new Date().toISOString(), // Default to today
+          goal_id: "" // Default to no goal
+        })
       })
-      
+
+
       if (response.ok) {
         await fetchTasks()
       } else {
@@ -221,7 +226,7 @@ export default function SlaylistPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       })
-      
+
       if (response.ok) {
         await fetchTasks()
         await fetchGoals() // Refresh goals to update progress
@@ -243,7 +248,7 @@ export default function SlaylistPage() {
           estimated_minutes: suggestion.estimatedCompletionTime
         })
       })
-      
+
       if (response.ok) {
         await fetchTasks()
       }
@@ -259,13 +264,13 @@ export default function SlaylistPage() {
         id: taskId,
         sort_order: index
       }))
-      
+
       const response = await fetch('/api/tasks/bulk-update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ updates })
       })
-      
+
       if (response.ok) {
         await fetchTasks()
       }
@@ -316,14 +321,14 @@ export default function SlaylistPage() {
           <p className="text-gray-600">Manage your goals and tasks to dominate your empire</p>
         </div>
         <div className="flex gap-2">
-          <Button 
+          <Button
             onClick={() => setShowVoiceTaskDialog(true)}
             className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
           >
             <Mic className="w-4 h-4 mr-2" />
             Voice Task
           </Button>
-          
+
           <Dialog open={showGoalDialog} onOpenChange={setShowGoalDialog}>
             <DialogTrigger asChild>
               <Button className="bg-purple-600 hover:bg-purple-700">
@@ -345,7 +350,7 @@ export default function SlaylistPage() {
                     id="goal-title"
                     data-goal-input
                     value={goalForm.title}
-                    onChange={(e) => setGoalForm({...goalForm, title: e.target.value})}
+                    onChange={(e) => setGoalForm({ ...goalForm, title: e.target.value })}
                     placeholder="Enter goal title"
                   />
                 </div>
@@ -354,14 +359,14 @@ export default function SlaylistPage() {
                   <Textarea
                     id="goal-description"
                     value={goalForm.description}
-                    onChange={(e) => setGoalForm({...goalForm, description: e.target.value})}
+                    onChange={(e) => setGoalForm({ ...goalForm, description: e.target.value })}
                     placeholder="Describe your goal"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="goal-priority">Priority</Label>
-                    <Select value={goalForm.priority} onValueChange={(value) => setGoalForm({...goalForm, priority: value})}>
+                    <Select value={goalForm.priority} onValueChange={(value) => setGoalForm({ ...goalForm, priority: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -374,7 +379,7 @@ export default function SlaylistPage() {
                   </div>
                   <div>
                     <Label htmlFor="goal-category">Category</Label>
-                    <Select value={goalForm.category} onValueChange={(value) => setGoalForm({...goalForm, category: value})}>
+                    <Select value={goalForm.category} onValueChange={(value) => setGoalForm({ ...goalForm, category: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -393,7 +398,7 @@ export default function SlaylistPage() {
                     id="goal-date"
                     type="date"
                     value={goalForm.target_date}
-                    onChange={(e) => setGoalForm({...goalForm, target_date: e.target.value})}
+                    onChange={(e) => setGoalForm({ ...goalForm, target_date: e.target.value })}
                   />
                 </div>
                 <Button onClick={createGoal} className="w-full">Create Goal</Button>
@@ -422,7 +427,7 @@ export default function SlaylistPage() {
                     id="task-title"
                     data-task-input
                     value={taskForm.title}
-                    onChange={(e) => setTaskForm({...taskForm, title: e.target.value})}
+                    onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                     placeholder="Enter task title"
                   />
                 </div>
@@ -431,14 +436,14 @@ export default function SlaylistPage() {
                   <Textarea
                     id="task-description"
                     value={taskForm.description}
-                    onChange={(e) => setTaskForm({...taskForm, description: e.target.value})}
+                    onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                     placeholder="Describe your task"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="task-priority">Priority</Label>
-                    <Select value={taskForm.priority} onValueChange={(value) => setTaskForm({...taskForm, priority: value})}>
+                    <Select value={taskForm.priority} onValueChange={(value) => setTaskForm({ ...taskForm, priority: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -451,7 +456,7 @@ export default function SlaylistPage() {
                   </div>
                   <div>
                     <Label htmlFor="task-goal">Goal (Optional)</Label>
-                    <Select value={taskForm.goal_id} onValueChange={(value) => setTaskForm({...taskForm, goal_id: value})}>
+                    <Select value={taskForm.goal_id} onValueChange={(value) => setTaskForm({ ...taskForm, goal_id: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a goal" />
                       </SelectTrigger>
@@ -470,7 +475,7 @@ export default function SlaylistPage() {
                       id="task-date"
                       type="date"
                       value={taskForm.due_date}
-                      onChange={(e) => setTaskForm({...taskForm, due_date: e.target.value})}
+                      onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })}
                     />
                   </div>
                   <div>
@@ -479,7 +484,7 @@ export default function SlaylistPage() {
                       id="task-time"
                       type="number"
                       value={taskForm.estimated_minutes}
-                      onChange={(e) => setTaskForm({...taskForm, estimated_minutes: parseInt(e.target.value)})}
+                      onChange={(e) => setTaskForm({ ...taskForm, estimated_minutes: parseInt(e.target.value) })}
                     />
                   </div>
                 </div>
@@ -572,9 +577,9 @@ export default function SlaylistPage() {
               <div className="text-center py-8 text-gray-500">
                 <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                 <p>No goals yet</p>
-                <Button 
-                  onClick={() => setShowGoalDialog(true)} 
-                  className="mt-4" 
+                <Button
+                  onClick={() => setShowGoalDialog(true)}
+                  className="mt-4"
                   variant="outline"
                 >
                   Create Your First Goal
@@ -633,9 +638,9 @@ export default function SlaylistPage() {
               <div className="text-center py-8 text-gray-500">
                 <CheckSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                 <p>No tasks yet</p>
-                <Button 
-                  onClick={() => setShowTaskDialog(true)} 
-                  className="mt-4" 
+                <Button
+                  onClick={() => setShowTaskDialog(true)}
+                  className="mt-4"
                   variant="outline"
                 >
                   Create Your First Task
@@ -689,16 +694,13 @@ export default function SlaylistPage() {
       </div>
 
       {/* Voice Task Creator Dialog */}
-      <VoiceTaskCreator
-        open={showVoiceTaskDialog}
-        onOpenChange={setShowVoiceTaskDialog}
-        onCreateTask={createVoiceTask}
-        goals={goals.map(goal => ({
-          id: goal.id,
-          title: goal.title,
-          category: goal.category || 'general'
-        }))}
-      />
+      {showVoiceTaskDialog && (
+        <VoiceTaskCreator
+          isOpen={showVoiceTaskDialog}
+          onClose={() => setShowVoiceTaskDialog(false)}
+          onTaskCreate={createVoiceTask}
+        />
+      )}
     </div>
   )
 }

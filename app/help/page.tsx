@@ -5,19 +5,19 @@ export const dynamic = 'force-dynamic'
 import Link from "next/link"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { 
-  ArrowLeft, 
-  Search, 
-  MessageCircle, 
-  Video, 
-  Mail, 
-  ExternalLink, 
-  ChevronDown, 
-  ChevronRight, 
-  HelpCircle, 
-  Lightbulb, 
-  Zap, 
-  Users, 
+import {
+  ArrowLeft,
+  Search,
+  MessageCircle,
+  Video,
+  Mail,
+  ExternalLink,
+  ChevronDown,
+  ChevronRight,
+  HelpCircle,
+  Lightbulb,
+  Zap,
+  Users,
   Settings,
   Crown,
   Target,
@@ -30,11 +30,11 @@ import {
   FileText,
   Star
 } from "lucide-react"
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
+import {
+  TacticalButton,
+  GlassCard,
+  RankStars,
+  CamoBackground,
   SergeantDivider,
   StatsBadge,
   TacticalGrid,
@@ -140,7 +140,7 @@ export default function HelpPage() {
 
   const filteredFAQs = faqData.filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === "all" || faq.category === selectedCategory
     return matchesSearch && matchesCategory
   })
@@ -157,12 +157,12 @@ export default function HelpPage() {
   return (
     <div className="min-h-screen bg-military-midnight relative overflow-hidden">
       <CamoBackground opacity={0.1} withGrid>
-      {/* Navigation */}
+        {/* Navigation */}
         <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               <Link href="/" className="flex items-center gap-3">
-                <motion.div 
+                <motion.div
                   className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -170,7 +170,7 @@ export default function HelpPage() {
                 </motion.div>
                 <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              
+
               <div className="flex items-center gap-4">
                 <Link href="/signin">
                   <TacticalButton variant="outline" size="sm">
@@ -181,13 +181,13 @@ export default function HelpPage() {
                   <TacticalButton size="sm">
                     Get Started
                   </TacticalButton>
-              </Link>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Hero Section */}
+        {/* Hero Section */}
         <section className="pt-32 pb-20">
           <div className="container mx-auto px-4">
             <motion.div
@@ -201,35 +201,35 @@ export default function HelpPage() {
                 <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
                   Tactical Support Center
                 </span>
-            </div>
-              
+              </div>
+
               <h1 className="font-heading text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
                 Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Support</span>
-          </h1>
-              
+              </h1>
+
               <p className="text-xl text-military-storm-grey mb-8 max-w-3xl mx-auto leading-relaxed">
-                Master the art of business domination with our comprehensive guides, 
+                Master the art of business domination with our comprehensive guides,
                 tutorials, and elite support resources.
-          </p>
-          
-          {/* Search Bar */}
+              </p>
+
+              {/* Search Bar */}
               <div className="max-w-2xl mx-auto">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-military-storm-grey" />
-            <Input
-              type="text"
+                  <Input
+                    type="text"
                     placeholder="Search for help topics, guides, or FAQs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-12 pr-4 py-4 bg-military-tactical/50 border-military-hot-pink/30 text-white placeholder-military-storm-grey focus:border-military-hot-pink text-lg"
-            />
-          </div>
+                  />
+                </div>
               </div>
             </motion.div>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      {/* Quick Actions */}
+        {/* Quick Actions */}
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
@@ -240,7 +240,7 @@ export default function HelpPage() {
                 Get immediate access to the most common support resources
               </p>
             </div>
-            
+
             <TacticalGrid className="max-w-6xl mx-auto">
               <TacticalGridItem>
                 <GlassCard className="h-full p-8 text-center group cursor-pointer hover:scale-105 transition-transform">
@@ -256,7 +256,7 @@ export default function HelpPage() {
                   </TacticalButton>
                 </GlassCard>
               </TacticalGridItem>
-              
+
               <TacticalGridItem>
                 <GlassCard className="h-full p-8 text-center group cursor-pointer hover:scale-105 transition-transform">
                   <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -267,11 +267,11 @@ export default function HelpPage() {
                     Step-by-step video guides for all features
                   </p>
                   <TacticalButton variant="outline" size="sm">
-                  Watch Videos
+                    Watch Videos
                   </TacticalButton>
                 </GlassCard>
               </TacticalGridItem>
-              
+
               <TacticalGridItem>
                 <GlassCard className="h-full p-8 text-center group cursor-pointer hover:scale-105 transition-transform">
                   <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -287,21 +287,21 @@ export default function HelpPage() {
                 </GlassCard>
               </TacticalGridItem>
             </TacticalGrid>
-        </div>
-      </section>
+          </div>
+        </section>
 
         {/* Learning Guides */}
         <section className="py-20">
           <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+            <div className="text-center mb-12">
               <h2 className="font-heading text-4xl font-bold text-white mb-4">
                 Elite Learning Paths
               </h2>
               <p className="text-xl text-military-storm-grey">
                 Master SoloSuccess AI with our structured learning programs
               </p>
-          </div>
-            
+            </div>
+
             <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
               {guideData.map((guide, index) => (
                 <motion.div
@@ -315,7 +315,7 @@ export default function HelpPage() {
                       <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center group-hover:scale-110 transition-transform">
                         <guide.icon className="w-8 h-8 text-white" />
                       </div>
-                      
+
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-3">
                           <h3 className="font-heading text-2xl font-bold text-white">{guide.title}</h3>
@@ -323,17 +323,17 @@ export default function HelpPage() {
                             {guide.difficulty}
                           </span>
                         </div>
-                        
+
                         <p className="text-military-storm-grey mb-6 leading-relaxed">
                           {guide.description}
                         </p>
-                        
+
                         <div className="flex items-center gap-4">
                           <TacticalButton variant="outline" size="sm" className="group">
                             Start Guide
                             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </TacticalButton>
-                          
+
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                               <Star key={i} className="w-4 h-4 text-military-hot-pink fill-current" />
@@ -344,15 +344,15 @@ export default function HelpPage() {
                     </div>
                   </GlassCard>
                 </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* FAQ Section */}
+        {/* FAQ Section */}
         <section className="py-20">
           <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+            <div className="text-center mb-12">
               <h2 className="font-heading text-4xl font-bold text-white mb-4">
                 Frequently Asked Questions
               </h2>
@@ -360,12 +360,12 @@ export default function HelpPage() {
                 Quick answers to the most common tactical questions
               </p>
 
-          {/* Category Filter */}
+              {/* Category Filter */}
               <div className="flex flex-wrap justify-center gap-4 mb-8">
                 {["all", "getting-started", "billing", "features", "security"].map((category) => (
                   <TacticalButton
-                key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
+                    key={category}
+                    variant={selectedCategory === category ? "primary" : "outline"}
                     size="sm"
                     onClick={() => setSelectedCategory(category)}
                     className="capitalize"
@@ -374,7 +374,7 @@ export default function HelpPage() {
                   </TacticalButton>
                 ))}
               </div>
-          </div>
+            </div>
 
             <div className="max-w-4xl mx-auto space-y-4">
               {filteredFAQs.map((faq, index) => (
@@ -387,27 +387,27 @@ export default function HelpPage() {
                   <GlassCard className="p-6">
                     <Collapsible open={openFAQ === faq.id} onOpenChange={(open) => setOpenFAQ(open ? faq.id : null)}>
                       <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                           <h3 className="font-heading text-xl font-bold text-white text-left">
                             {faq.question}
                           </h3>
                           <ChevronDown className={`w-6 h-6 text-military-hot-pink transition-transform ${openFAQ === faq.id ? 'rotate-180' : ''}`} />
-                    </div>
-                  </CollapsibleTrigger>
-                      
+                        </div>
+                      </CollapsibleTrigger>
+
                       <CollapsibleContent className="mt-4">
                         <SergeantDivider className="mb-4" />
                         <p className="text-military-storm-grey leading-relaxed">
-                      {faq.answer}
+                          {faq.answer}
                         </p>
-                  </CollapsibleContent>
-                </Collapsible>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </GlassCard>
                 </motion.div>
               ))}
             </div>
-        </div>
-      </section>
+          </div>
+        </section>
 
         {/* Contact Support */}
         <section className="py-20">
@@ -421,28 +421,28 @@ export default function HelpPage() {
                 <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                   <MessageCircle className="w-10 h-10 text-white" />
                 </div>
-                
+
                 <h2 className="font-heading text-4xl font-bold text-white mb-6">
                   Still Need Tactical Support?
                 </h2>
-                
+
                 <p className="text-xl text-military-storm-grey mb-8 max-w-2xl mx-auto">
-                  Our elite support team is standing by to assist with your mission. 
+                  Our elite support team is standing by to assist with your mission.
                   Get personalized help from our experts.
                 </p>
-                
+
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link href="/contact">
                     <TacticalButton size="lg" className="group">
-                Contact Support
+                      Contact Support
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </TacticalButton>
-            </Link>
+                  </Link>
                   <Link href="/dashboard">
                     <TacticalButton variant="outline" size="lg">
                       Access Dashboard
                     </TacticalButton>
-            </Link>
+                  </Link>
                 </div>
               </motion.div>
             </GlassCard>
@@ -459,14 +459,14 @@ export default function HelpPage() {
                 </div>
                 <span className="font-heading text-lg font-bold text-white">SoloSuccess AI</span>
               </div>
-              
+
               <div className="flex items-center gap-6 text-military-storm-grey">
                 <Link href="/privacy" className="hover:text-military-hot-pink transition-colors">Privacy</Link>
                 <Link href="/terms" className="hover:text-military-hot-pink transition-colors">Terms</Link>
                 <Link href="/contact" className="hover:text-military-hot-pink transition-colors">Contact</Link>
               </div>
+            </div>
           </div>
-        </div>
         </footer>
       </CamoBackground>
     </div>

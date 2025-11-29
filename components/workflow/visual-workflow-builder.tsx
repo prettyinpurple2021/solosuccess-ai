@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react'
+import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,12 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { 
-  Play, 
-  Save, 
-  Settings, 
-  Plus, 
-  Trash2, 
+import {
+  Play,
+  Save,
+  Settings,
+  Plus,
+  Trash2,
   Edit,
   Zap,
   Workflow as WorkflowIcon,
@@ -77,11 +78,11 @@ const NODE_TYPE_COLORS = {
   notification: '#06B6D4'
 }
 
-export function VisualWorkflowBuilder({ 
-  workflow: initialWorkflow, 
-  onSave, 
-  onExecute, 
-  className = "" 
+export function VisualWorkflowBuilder({
+  workflow: initialWorkflow,
+  onSave,
+  onExecute,
+  className = ""
 }: WorkflowBuilderProps) {
   const [workflow, setWorkflow] = React.useState<Workflow>(initialWorkflow || {
     id: crypto.randomUUID(),
@@ -123,7 +124,7 @@ export function VisualWorkflowBuilder({
   const [showNodeLibrary, setShowNodeLibrary] = React.useState(false)
   const [_showWorkflowSettings, _setShowWorkflowSettings] = React.useState(false)
   const [activeTab, setActiveTab] = React.useState<'design' | 'settings' | 'variables' | 'preview'>('design')
-  
+
   const { toast } = useToast()
   const canvasRef = React.useRef<HTMLDivElement>(null)
   const [_canvasOffset, _setCanvasOffset] = React.useState({ x: 0, y: 0 })
@@ -140,7 +141,7 @@ export function VisualWorkflowBuilder({
       color: '#10B981',
       inputs: [],
       outputs: [{ id: 'output', name: 'Trigger', type: 'object', required: true }],
-      configSchema: {} as unknown,
+      configSchema: z.object({}),
       execute: async () => ({ triggered: true })
     },
     {
@@ -152,7 +153,7 @@ export function VisualWorkflowBuilder({
       color: '#F59E0B',
       inputs: [{ id: 'input', name: 'Data', type: 'object', required: true }],
       outputs: [{ id: 'output', name: 'Result', type: 'object', required: true }],
-      configSchema: {} as unknown,
+      configSchema: z.object({}),
       execute: async () => ({ sent: true })
     },
     {
@@ -164,7 +165,7 @@ export function VisualWorkflowBuilder({
       color: '#EC4899',
       inputs: [{ id: 'input', name: 'Input Data', type: 'object', required: true }],
       outputs: [{ id: 'output', name: 'AI Result', type: 'object', required: true }],
-      configSchema: {} as unknown,
+      configSchema: z.object({}),
       execute: async () => ({ result: 'AI task completed' })
     },
     {
@@ -179,7 +180,7 @@ export function VisualWorkflowBuilder({
         { id: 'true', name: 'True', type: 'object', required: true },
         { id: 'false', name: 'False', type: 'object', required: true }
       ],
-      configSchema: {} as unknown,
+      configSchema: z.object({}),
       execute: async () => ({ condition: true })
     },
     {
@@ -191,7 +192,7 @@ export function VisualWorkflowBuilder({
       color: '#6B7280',
       inputs: [{ id: 'input', name: 'Input', type: 'object', required: true }],
       outputs: [{ id: 'output', name: 'Output', type: 'object', required: true }],
-      configSchema: {} as unknown,
+      configSchema: z.object({}),
       execute: async () => ({ delayed: true })
     }
   ], [])
@@ -248,11 +249,11 @@ export function VisualWorkflowBuilder({
       nodes: prev.nodes.filter((node: WorkflowNode) => node.id !== nodeId),
       edges: prev.edges.filter((edge: WorkflowEdge) => edge.source !== nodeId && edge.target !== nodeId)
     }))
-    
+
     if (selectedNode?.id === nodeId) {
       setSelectedNode(null)
     }
-    
+
     logInfo('Node deleted from workflow', { nodeId })
   }, [selectedNode])
 
@@ -281,11 +282,11 @@ export function VisualWorkflowBuilder({
       ...prev,
       edges: prev.edges.filter((edge: WorkflowEdge) => edge.id !== edgeId)
     }))
-    
+
     if (selectedEdge?.id === edgeId) {
       setSelectedEdge(null)
     }
-    
+
     logInfo('Edge deleted from workflow', { edgeId })
   }, [selectedEdge])
 
@@ -300,16 +301,16 @@ export function VisualWorkflowBuilder({
           updatedAt: new Date()
         }
       }
-      
+
       setWorkflow(updatedWorkflow)
       onSave?.(updatedWorkflow)
-      
+
       toast({
         title: 'Workflow Saved',
         description: 'Your workflow has been saved successfully',
         variant: 'success'
       })
-      
+
       logInfo('Workflow saved', { workflowId: workflow.id, name: workflow.name })
     } catch (error) {
       logError('Failed to save workflow:', error instanceof Error ? error : new Error(String(error)))
@@ -328,13 +329,13 @@ export function VisualWorkflowBuilder({
     setIsExecuting(true)
     try {
       onExecute?.(workflow)
-      
+
       toast({
         title: 'Workflow Started',
         description: 'Your workflow is now executing',
         variant: 'success'
       })
-      
+
       logInfo('Workflow execution started', { workflowId: workflow.id })
     } catch (error) {
       logError('Failed to execute workflow:', error instanceof Error ? error : new Error(String(error)))
@@ -376,7 +377,7 @@ export function VisualWorkflowBuilder({
 
     const deltaX = event.clientX - dragState.dragStart.x
     const deltaY = event.clientY - dragState.dragStart.y
-    
+
     const newPosition = {
       x: Math.max(0, dragState.dragOffset.x + deltaX / zoom),
       y: Math.max(0, dragState.dragOffset.y + deltaY / zoom)
@@ -398,7 +399,7 @@ export function VisualWorkflowBuilder({
   React.useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (dragState.isDragging) {
-        handleNodeDrag(event as React.MouseEvent<HTMLDivElement>)
+        handleNodeDrag(event as unknown as React.MouseEvent<HTMLDivElement>)
       }
     }
 
@@ -446,26 +447,26 @@ export function VisualWorkflowBuilder({
       >
         <HolographicCard className="w-48 p-3">
           <div className="flex items-center gap-2 mb-2">
-            <div 
-              className="node-color-indicator" 
+            <div
+              className="node-color-indicator"
               style={{ backgroundColor: color }}
             />
             <IconComponent className="node-icon" style={{ color }} />
             <span className="text-sm font-medium truncate">{node.name}</span>
           </div>
-          
+
           {node.description && (
             <p className="text-xs text-gray-500 mb-2 line-clamp-2">{node.description}</p>
           )}
-          
+
           <div className="flex items-center justify-between">
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className="text-xs"
             >
               {nodeType.category}
             </Badge>
-            
+
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
@@ -514,7 +515,7 @@ export function VisualWorkflowBuilder({
   const renderEdge = React.useCallback((edge: WorkflowEdge) => {
     const sourceNode = workflow.nodes.find((n: WorkflowNode) => n.id === edge.source)
     const targetNode = workflow.nodes.find((n: WorkflowNode) => n.id === edge.target)
-    
+
     if (!sourceNode || !targetNode) return null
 
     const startX = sourceNode.position.x + 192 // Node width
@@ -548,7 +549,7 @@ export function VisualWorkflowBuilder({
             />
           </marker>
         </defs>
-        
+
         <path
           d={`M ${startX} ${startY} Q ${midX} ${midY} ${endX} ${endY}`}
           stroke={isSelected ? '#8B5CF6' : '#6B7280'}
@@ -571,7 +572,7 @@ export function VisualWorkflowBuilder({
             <h2 className="text-xl font-bold boss-heading">Workflow Builder</h2>
             <p className="text-sm text-gray-300">Create and manage automated workflows</p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Input
               value={workflow.name}
@@ -594,7 +595,7 @@ export function VisualWorkflowBuilder({
             <Plus className="h-4 w-4 mr-1" />
             Add Node
           </HolographicButton>
-          
+
           <HolographicButton
             variant="outline"
             size="sm"
@@ -603,7 +604,7 @@ export function VisualWorkflowBuilder({
             <Settings className="h-4 w-4 mr-1" />
             Settings
           </HolographicButton>
-          
+
           <HolographicButton
             variant="outline"
             size="sm"
@@ -617,7 +618,7 @@ export function VisualWorkflowBuilder({
             )}
             Execute
           </HolographicButton>
-          
+
           <HolographicButton
             size="sm"
             onClick={handleSave}
@@ -636,7 +637,7 @@ export function VisualWorkflowBuilder({
       <div className="flex-1 flex">
         {/* Sidebar */}
         <div className="w-80 border-r border-purple-800/30 bg-black/10 backdrop-blur-sm p-4">
-            <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as 'design' | 'settings' | 'variables' | 'preview')}>
+          <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as 'design' | 'settings' | 'variables' | 'preview')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="design" className="flex items-center gap-1">
                 <WorkflowIcon className="h-3 w-3" />
@@ -664,7 +665,7 @@ export function VisualWorkflowBuilder({
                       className="text-sm"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="trigger-type">Trigger Type</Label>
                     <Select
@@ -708,7 +709,7 @@ export function VisualWorkflowBuilder({
                           className="text-sm"
                         />
                       </div>
-                      
+
                       <div>
                         <Label htmlFor="node-description">Description</Label>
                         <Textarea
@@ -778,7 +779,7 @@ export function VisualWorkflowBuilder({
                       className="text-sm"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="retry-attempts">Retry Attempts</Label>
                     <Input
@@ -792,7 +793,7 @@ export function VisualWorkflowBuilder({
                       className="text-sm"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="error-handling">Error Handling</Label>
                     <Select
@@ -887,7 +888,7 @@ export function VisualWorkflowBuilder({
               Select a node type to add to your workflow
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {nodeTypes.map(nodeType => (
               <button
@@ -896,8 +897,8 @@ export function VisualWorkflowBuilder({
                 className="p-4 border border-purple-800/30 rounded-lg hover:border-purple-500 hover:bg-purple-900/20 transition-colors text-left group"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div 
-                    className="node-type-color" 
+                  <div
+                    className="node-type-color"
                     style={{ backgroundColor: nodeType.color }}
                   />
                   {React.createElement(NODE_TYPE_ICONS[nodeType.category as keyof typeof NODE_TYPE_ICONS] || WorkflowIcon, {
