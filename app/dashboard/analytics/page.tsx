@@ -4,120 +4,84 @@ export const dynamic = 'force-dynamic'
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  BarChart3, 
-  PieChart, 
-  LineChart, 
-  TrendingUp,
-  Activity,
-  Target,
-  Users,
-  DollarSign,
-  Clock,
-  Zap,
-  Sparkles,
-  Download,
-  RefreshCw,
-  Settings,
-  Eye,
-  Filter,
-  Maximize2,
-  Crown,
-  Shield,
-  Trophy,
-  Star,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  Calendar,
-  TrendingDown
+import {
+  BarChart3, PieChart, LineChart, TrendingUp, Activity, Target, Users, DollarSign, Clock, Zap, Sparkles, Download, RefreshCw, Settings, Eye, Filter, Maximize2, Crown, Shield, Trophy, Star, ArrowRight, ArrowUp, ArrowDown, Calendar, TrendingDown
 } from 'lucide-react'
-import { 
-  TacticalButton, 
-  GlassCard, 
-  RankStars, 
-  CamoBackground, 
-  SergeantDivider,
-  StatsBadge,
-  TacticalGrid,
-  TacticalGridItem
+import {
+  TacticalButton, GlassCard, RankStars, CamoBackground, SergeantDivider, StatsBadge, TacticalGrid, TacticalGridItem
 } from '@/components/military'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Link from 'next/link'
+import { useAuth } from "@/hooks/use-auth"
 
 export default function AnalyticsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('7d')
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
+  const { user } = useAuth()
 
-  // Mock data - replace with real data from your API
-  const analyticsData = {
-    overview: {
-      totalRevenue: 125000,
-      revenueGrowth: 23.5,
-      activeUsers: 2847,
-      userGrowth: 18.2,
-      conversionRate: 12.4,
-      conversionGrowth: 5.1,
-      avgSessionTime: 24.5,
-      sessionGrowth: -2.3
-    },
-    metrics: [
-      {
-        title: "Revenue Generated",
-        value: "$125,000",
-        change: "+23.5%",
-        trend: "up",
-        icon: DollarSign,
-        color: "text-green-400"
-      },
-      {
-        title: "Active Users",
-        value: "2,847",
-        change: "+18.2%",
-        trend: "up",
-        icon: Users,
-        color: "text-blue-400"
-      },
-      {
-        title: "Conversion Rate",
-        value: "12.4%",
-        change: "+5.1%",
-        trend: "up",
-        icon: Target,
-        color: "text-purple-400"
-      },
-      {
-        title: "Session Duration",
-        value: "24.5m",
-        change: "-2.3%",
-        trend: "down",
-        icon: Clock,
-        color: "text-orange-400"
-      }
-    ],
-    topPages: [
-      { page: "/dashboard", views: 1247, growth: 12.3 },
-      { page: "/templates", views: 892, growth: 8.7 },
-      { page: "/analytics", views: 654, growth: 15.2 },
-      { page: "/settings", views: 423, growth: -3.1 }
-    ],
-    recentActivity: [
-      { action: "New user registered", time: "2 minutes ago", type: "user" },
-      { action: "Template generated", time: "5 minutes ago", type: "template" },
-      { action: "Analytics updated", time: "12 minutes ago", type: "analytics" },
-      { action: "Payment processed", time: "18 minutes ago", type: "payment" }
-    ]
-  }
+  const [analyticsData, setAnalyticsData] = useState<any>({
+    overview: { totalRevenue: 0, revenueGrowth: 0, activeUsers: 0, userGrowth: 0, conversionRate: 0, conversionGrowth: 0, avgSessionTime: 0, sessionGrowth: 0 },
+    metrics: [],
+    topPages: [],
+    recentActivity: []
+  })
 
-  const handleRefresh = useCallback(async () => {
+  const fetchAnalytics = useCallback(async () => {
     setIsLoading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
+    try {
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch('/api/analytics', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      if (response.ok) {
+        const { data } = await response.json()
+        const mappedData = {
+          overview: {
+            totalRevenue: data.businessMetrics.revenue || 0,
+            revenueGrowth: 0,
+            activeUsers: data.businessMetrics.activeUsers || 0,
+            userGrowth: 0,
+            conversionRate: data.businessMetrics.conversionRate || 0,
+            conversionGrowth: 0,
+            avgSessionTime: 0,
+            sessionGrowth: 0
+          },
+          metrics: [
+            { title: "Revenue Generated", value: `$${data.businessMetrics.revenue || 0}`, change: "+0%", trend: "up", icon: DollarSign, color: "text-green-400" },
+            { title: "Active Users", value: (data.businessMetrics.activeUsers || 0).toLocaleString(), change: "+0%", trend: "up", icon: Users, color: "text-blue-400" },
+            { title: "Conversion Rate", value: `${data.businessMetrics.conversionRate || 0}%`, change: "+0%", trend: "up", icon: Target, color: "text-purple-400" },
+            { title: "Total Events", value: (data.events?.length || 0).toLocaleString(), change: "+0%", trend: "up", icon: Activity, color: "text-orange-400" }
+          ],
+          topPages: [
+            { page: "/dashboard", views: 0, growth: 0 },
+            { page: "/analytics", views: 0, growth: 0 }
+          ],
+          recentActivity: data.events?.slice(0, 10).map((e: any) => ({
+            action: e.event.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+            time: new Date(e.timestamp).toLocaleString(),
+            type: e.event.includes('user') ? 'user' : 'system'
+          })) || []
+        }
+        setAnalyticsData(mappedData)
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    fetchAnalytics()
+  }, [fetchAnalytics])
+
+  const handleRefresh = useCallback(() => {
+    fetchAnalytics()
+  }, [fetchAnalytics])
 
   return (
     <div className="min-h-screen bg-military-midnight relative overflow-hidden">
@@ -127,7 +91,7 @@ export default function AnalyticsPage() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               <Link href="/dashboard" className="flex items-center gap-3">
-                <motion.div 
+                <motion.div
                   className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -135,7 +99,7 @@ export default function AnalyticsPage() {
                 </motion.div>
                 <span className="font-heading text-xl font-bold text-white">SoloSuccess AI</span>
               </Link>
-              
+
               <div className="flex items-center gap-4">
                 <TacticalButton variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
                   <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -166,19 +130,19 @@ export default function AnalyticsPage() {
                       Elite Intelligence Center
                     </span>
                   </div>
-                  
+
                   <h1 className="font-heading text-5xl font-bold text-white mb-4">
                     Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Analytics</span>
                   </h1>
-                  
+
                   <p className="text-xl text-military-storm-grey max-w-2xl">
-                    Monitor your business performance with elite intelligence and tactical insights. 
+                    Monitor your business performance with elite intelligence and tactical insights.
                     Track every metric that matters for domination.
                   </p>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
-                  <select 
+                  <select
                     value={selectedPeriod}
                     onChange={(e) => setSelectedPeriod(e.target.value)}
                     className="bg-military-tactical/50 border-military-hot-pink/30 text-white rounded-lg px-4 py-2 focus:border-military-hot-pink focus:outline-none"
@@ -195,7 +159,7 @@ export default function AnalyticsPage() {
             {/* Key Metrics */}
             <div className="mb-12">
               <TacticalGrid className="max-w-7xl mx-auto">
-                {analyticsData.metrics.map((metric, index) => (
+                {analyticsData.metrics.map((metric: any, index: number) => (
                   <TacticalGridItem key={index}>
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -218,11 +182,11 @@ export default function AnalyticsPage() {
                             </span>
                           </div>
                         </div>
-                        
+
                         <h3 className="font-heading text-3xl font-bold text-white mb-2">
                           {metric.value}
                         </h3>
-                        
+
                         <p className="text-military-storm-grey text-sm uppercase tracking-wider">
                           {metric.title}
                         </p>
@@ -266,7 +230,7 @@ export default function AnalyticsPage() {
                           Export
                         </TacticalButton>
                       </div>
-                      
+
                       <div className="h-64 flex items-center justify-center bg-military-tactical/20 rounded-lg">
                         <div className="text-center">
                           <BarChart3 className="w-16 h-16 text-military-hot-pink mx-auto mb-4" />
@@ -278,9 +242,9 @@ export default function AnalyticsPage() {
                     {/* Top Pages */}
                     <GlassCard className="p-8">
                       <h3 className="font-heading text-2xl font-bold text-white mb-6">Top Performing Pages</h3>
-                      
+
                       <div className="space-y-4">
-                        {analyticsData.topPages.map((page, index) => (
+                        {analyticsData.topPages.map((page: any, index: number) => (
                           <div key={index} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-lg bg-military-hot-pink/20 flex items-center justify-center">
@@ -288,7 +252,7 @@ export default function AnalyticsPage() {
                               </div>
                               <span className="text-white font-medium">{page.page}</span>
                             </div>
-                            
+
                             <div className="flex items-center gap-4">
                               <span className="text-military-storm-grey">{page.views} views</span>
                               <div className="flex items-center gap-1">
@@ -311,9 +275,9 @@ export default function AnalyticsPage() {
                   {/* Recent Activity */}
                   <GlassCard className="p-8">
                     <h3 className="font-heading text-2xl font-bold text-white mb-6">Recent Activity</h3>
-                    
+
                     <div className="space-y-4">
-                      {analyticsData.recentActivity.map((activity, index) => (
+                      {analyticsData.recentActivity.map((activity: any, index: number) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, x: -20 }}
@@ -324,12 +288,12 @@ export default function AnalyticsPage() {
                           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
                             <Activity className="w-5 h-5 text-white" />
                           </div>
-                          
+
                           <div className="flex-1">
                             <p className="text-white font-medium">{activity.action}</p>
                             <p className="text-military-storm-grey text-sm">{activity.time}</p>
                           </div>
-                          
+
                           <div className="px-3 py-1 bg-military-hot-pink/20 text-military-hot-pink text-xs rounded-full uppercase tracking-wider">
                             {activity.type}
                           </div>
