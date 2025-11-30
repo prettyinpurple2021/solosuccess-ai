@@ -1,0 +1,9 @@
+---
+globs: **/*.{ts,tsx,js,jsx}
+description: Prefer structured logging and no console logs in production code
+---
+# Logging
+
+- Do not use `console.*` in application/runtime code.
+- Use the project logger from `@/lib/logger`.
+- Remove stray logs before commit; tests and scripts may log with explicit flags.
