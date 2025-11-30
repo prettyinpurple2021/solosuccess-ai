@@ -1,57 +1,88 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { z } from 'zod'
-import { rateLimitByIp } from '@/lib/rate-limit'
-import { getIdempotencyKeyFromRequest, reserveIdempotencyKeyNeon } from '@/lib/idempotency'
-import { getSql } from '@/lib/api-utils'
 
-// DELETE /api/templates/:id → delete a saved user template
-const IdParamSchema = z.object({ id: z.string().regex(/^\d+$/) })
+import { NextRequest, NextResponse } from 'next/server'
+import { getSql } from '@/lib/db'
+import { templates } from '@/db/schema'
+import * as jose from 'jose'
 
+export const dynamic = 'force-dynamic'
 
-export async function DELETE(
-  _request: Request,
-  context: unknown
-) {
+async function getUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null
+  }
+  const token = authHeader.substring(7)
   try {
-    const req = _request as Request
-    const ip = req.headers.get('x-forwarded-for') || 'unknown'
-    const { allowed } = rateLimitByIp('templates:delete', ip, 60_000, 60)
-    if (!allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
-    const parsed = IdParamSchema.safeParse({ id: (context as { params?: { id?: string } })?.params?.id })
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid id' }, { status: 400 })
-    }
-    const { id } = parsed.data
-    const { user, error } = await authenticateRequest()
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const sql = getSql()
-
-    const key = getIdempotencyKeyFromRequest(req)
-    if (key) {
-      const reserved = await reserveIdempotencyKeyNeon(sql, `tpl-del:${id}:${user.id}:${key}`)
-      if (!reserved) {
-        return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
-      }
-    }
-    const result = await sql`
-      DELETE FROM user_templates WHERE id = ${id} AND user_id = ${user.id}
-      RETURNING id
-    `
-
-    if (result.length === 0) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    }
-
-    return new NextResponse(null, { status: 204 })
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload
   } catch (error) {
-    logError('Delete template error:', error)
-    return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
+    return null
   }
 }
 
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const user = await getUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
+    const { id } = params
+    const body = await request.json()
+    const { title, description, content, category } = body
+
+    const sql = getSql()
+
+    // Verify ownership
+    const existing = await sql`
+      SELECT * FROM templates WHERE id = ${id} AND user_id = ${user.userId as string}
+    `
+
+    if (existing.length === 0) {
+      return NextResponse.json({ error: 'Template not found or unauthorized' }, { status: 404 })
+    }
+
+    const updatedTemplate = await sql`
+      UPDATE templates 
+      SET title = ${title}, description = ${description}, content = ${content}, category = ${category}, updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING *
+    `
+
+    return NextResponse.json(updatedTemplate[0])
+  } catch (error) {
+    console.error('Error updating template:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const user = await getUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = params
+    const sql = getSql()
+
+    // Verify ownership
+    const existing = await sql`
+      SELECT * FROM templates WHERE id = ${id} AND user_id = ${user.userId as string}
+    `
+
+    if (existing.length === 0) {
+      return NextResponse.json({ error: 'Template not found or unauthorized' }, { status: 404 })
+    }
+
+    await sql`
+      DELETE FROM templates WHERE id = ${id}
+    `
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting template:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}

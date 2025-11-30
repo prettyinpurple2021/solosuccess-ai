@@ -10,14 +10,14 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
-import { 
-  Search, 
-  TrendingUp, 
-  AlertTriangle, 
-  Target, 
-  Users, 
-  Globe, 
-  BarChart3, 
+import {
+  Search,
+  TrendingUp,
+  AlertTriangle,
+  Target,
+  Users,
+  Globe,
+  BarChart3,
   Lightbulb,
   Brain,
   Zap,
@@ -71,90 +71,29 @@ export default function IntelligencePage() {
   const [filterType, setFilterType] = useState<string>('all')
   const [timeframe, setTimeframe] = useState<string>('30d')
   const [refreshing, setRefreshing] = useState(false)
-  
+
   const [insights, setInsights] = useState<IntelligenceInsight[]>([])
   const [stats, setStats] = useState<IntelligenceStats | null>(null)
-
-  // Mock data - in production, this would come from API
-  useEffect(() => {
-    loadIntelligenceData()
-  }, [])
 
   const loadIntelligenceData = useCallback(async () => {
     try {
       setIsLoading(true)
-      
-      // Mock intelligence insights
-      const mockInsights: IntelligenceInsight[] = [
-        {
-          id: '1',
-          type: 'opportunity',
-          title: 'AI Integration Gap in Competitor Solutions',
-          description: 'Major competitors are lagging behind in AI-powered automation features, creating a significant market opportunity.',
-          importance: 'high',
-          confidence: 85,
-          source: 'Competitive Analysis',
-          timestamp: new Date().toISOString(),
-          competitor: 'TechCorp Inc',
-          impact_score: 8.5,
-          action_required: true,
-          recommendations: [
-            'Accelerate AI feature development',
-            'Launch targeted marketing campaign highlighting AI advantages',
-            'Partner with AI technology providers'
-          ]
-        },
-        {
-          id: '2',
-          type: 'threat',
-          title: 'Competitor Pricing Strategy Change',
-          description: 'Key competitor has reduced pricing by 25%, potentially affecting market share.',
-          importance: 'critical',
-          confidence: 92,
-          source: 'Market Intelligence',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          competitor: 'InnovateTech',
-          impact_score: 9.2,
-          action_required: true,
-          recommendations: [
-            'Analyze pricing model optimization',
-            'Enhance value proposition messaging',
-            'Consider targeted price adjustments'
-          ]
-        },
-        {
-          id: '3',
-          type: 'trend',
-          title: 'Mobile-First Business Solutions Demand',
-          description: 'Market research shows 40% increase in demand for mobile-first business solutions.',
-          importance: 'medium',
-          confidence: 78,
-          source: 'Industry Reports',
-          timestamp: new Date(Date.now() - 7200000).toISOString(),
-          impact_score: 7.0,
-          action_required: false,
-          recommendations: [
-            'Prioritize mobile app development',
-            'Enhance mobile user experience',
-            'Develop mobile-specific features'
-          ]
+      const token = localStorage.getItem('auth_token')
+
+      const response = await fetch('/api/competitors/intelligence', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      ]
+      })
 
-      // Mock stats
-      const mockStats: IntelligenceStats = {
-        total_insights: 47,
-        critical_alerts: 3,
-        opportunities_identified: 12,
-        threats_monitored: 8,
-        market_trends_tracked: 15,
-        competitive_moves_detected: 9
+      if (response.ok) {
+        const data = await response.json()
+        setInsights(data.insights)
+        setStats(data.stats)
+        logInfo('Intelligence data loaded successfully')
+      } else {
+        throw new Error('Failed to fetch intelligence data')
       }
-
-      setInsights(mockInsights)
-      setStats(mockStats)
-      
-      logInfo('Intelligence data loaded successfully')
     } catch (error) {
       logError('Error loading intelligence data:', error)
       toast.error('Failed to load intelligence data', { icon: '❌' })
@@ -162,6 +101,10 @@ export default function IntelligencePage() {
       setIsLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    loadIntelligenceData()
+  }, [loadIntelligenceData])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -192,12 +135,12 @@ export default function IntelligencePage() {
 
   const filteredInsights = insights.filter(insight => {
     const matchesSearch = insight.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         insight.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         insight.competitor?.toLowerCase().includes(searchTerm.toLowerCase())
-    
+      insight.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      insight.competitor?.toLowerCase().includes(searchTerm.toLowerCase())
+
     const matchesImportance = filterImportance === 'all' || insight.importance === filterImportance
     const matchesType = filterType === 'all' || insight.type === filterType
-    
+
     return matchesSearch && matchesImportance && matchesType
   })
 
@@ -376,7 +319,7 @@ export default function IntelligencePage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="flex gap-4">
                   <div>
                     <Label className="text-purple-200">Importance</Label>
@@ -568,7 +511,7 @@ export default function IntelligencePage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <h4 className="font-semibold text-white flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 text-red-400" />
@@ -626,7 +569,7 @@ export default function IntelligencePage() {
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <p className="text-purple-100">{insight.description}</p>
-                        
+
                         {insight.competitor && (
                           <div className="flex items-center gap-2 text-sm">
                             <Users className="w-4 h-4 text-purple-300" />
@@ -726,13 +669,13 @@ export default function IntelligencePage() {
                       <div className="flex items-center justify-between">
                         <span className="text-purple-200">Avg Confidence</span>
                         <span className="text-white font-medium">
-                          {Math.round(insights.reduce((acc, i) => acc + i.confidence, 0) / insights.length)}%
+                          {insights.length > 0 ? Math.round(insights.reduce((acc, i) => acc + i.confidence, 0) / insights.length) : 0}%
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-purple-200">Avg Impact Score</span>
                         <span className="text-white font-medium">
-                          {(insights.reduce((acc, i) => acc + i.impact_score, 0) / insights.length).toFixed(1)}/10
+                          {insights.length > 0 ? (insights.reduce((acc, i) => acc + i.impact_score, 0) / insights.length).toFixed(1) : 0}/10
                         </span>
                       </div>
                     </div>
@@ -778,7 +721,7 @@ export default function IntelligencePage() {
                         </ul>
                       </div>
                     </div>
-                    
+
                     <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
                       <h4 className="font-semibold text-purple-300 mb-2">Strategic Recommendations</h4>
                       <ol className="text-sm text-purple-200 space-y-2">

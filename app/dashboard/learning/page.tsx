@@ -1,6 +1,5 @@
 "use client"
 
-
 export const dynamic = 'force-dynamic'
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
@@ -107,123 +106,55 @@ export default function LearningDashboard() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    loadLearningData()
-  }, [])
-
   const loadLearningData = useCallback(async () => {
     try {
       setLoading(true)
+      const token = localStorage.getItem('auth_token')
+      const headers = { 'Authorization': `Bearer ${token}` }
 
-      // Mock data - in production, this would come from API
-      const mockAnalytics: LearningAnalytics = {
-        total_modules_completed: 23,
-        total_time_spent: 1240, // minutes
-        average_quiz_score: 87,
-        skills_improved: 15,
-        current_streak: 12,
-        learning_velocity: 3.2,
-        certifications_earned: 4,
-        peer_rank: 8,
-        weekly_goal_progress: 75,
+      // Fetch modules
+      const modulesRes = await fetch('/api/learning/modules', { headers })
+      const modules = await modulesRes.json()
+
+      // Fetch progress
+      const progressRes = await fetch('/api/learning/progress', { headers })
+      const userProgress = await progressRes.json()
+
+      // Calculate analytics from real data
+      const totalModules = modules.length
+      const completedModules = userProgress.filter((p: any) => p.status === 'completed').length
+      const totalTimeSpent = userProgress.reduce((acc: number, curr: any) => acc + (curr.time_spent || 0), 0)
+
+      const realAnalytics: LearningAnalytics = {
+        total_modules_completed: completedModules,
+        total_time_spent: totalTimeSpent,
+        average_quiz_score: 85, // Placeholder until quiz system is fully implemented
+        skills_improved: completedModules * 2, // Estimate
+        current_streak: 5, // Placeholder
+        learning_velocity: 2.5, // Placeholder
+        certifications_earned: Math.floor(completedModules / 5),
+        peer_rank: 12, // Placeholder
+        weekly_goal_progress: Math.min(100, (completedModules / 5) * 100),
         top_categories: [
-          { category: 'Business Strategy', time_spent: 320, modules_completed: 8 },
-          { category: 'Marketing & Sales', time_spent: 280, modules_completed: 6 },
-          { category: 'Financial Management', time_spent: 240, modules_completed: 5 },
-          { category: 'Leadership & Team Building', time_spent: 200, modules_completed: 4 }
+          { category: 'Business', time_spent: 120, modules_completed: 2 }, // Placeholder
         ]
       }
 
-      const mockSkillGaps: SkillGap[] = [
-        {
-          skill: {
-            id: '1',
-            name: 'Data Analytics',
-            description: 'Ability to analyze and interpret business data',
-            category: 'Technical Skills',
-            level: 3,
-            experience_points: 750
-          },
-          gap_score: 65,
-          priority: 'high',
-          recommended_modules: [
-            {
-              id: 'mod1',
-              title: 'Introduction to Business Analytics',
-              description: 'Learn the fundamentals of data analysis for business decisions',
-              duration_minutes: 45,
-              difficulty: 'intermediate',
-              category: 'Technical Skills',
-              skills_covered: ['Data Analytics'],
-              prerequisites: [],
-              completion_rate: 0,
-              rating: 4.5
-            }
-          ]
-        },
-        {
-          skill: {
-            id: '2',
-            name: 'Negotiation',
-            description: 'Skills for effective business negotiations',
-            category: 'Soft Skills',
-            level: 4,
-            experience_points: 920
-          },
-          gap_score: 40,
-          priority: 'medium',
-          recommended_modules: [
-            {
-              id: 'mod2',
-              title: 'Advanced Negotiation Techniques',
-              description: 'Master complex negotiation scenarios and strategies',
-              duration_minutes: 60,
-              difficulty: 'advanced',
-              category: 'Soft Skills',
-              skills_covered: ['Negotiation'],
-              prerequisites: ['Basic Negotiation'],
-              completion_rate: 0,
-              rating: 4.8
-            }
-          ]
-        }
-      ]
+      // Map progress to UI model
+      const mappedProgress: UserProgress[] = userProgress.map((p: any) => ({
+        module_id: p.module_id.toString(),
+        completion_percentage: p.completion_percentage,
+        time_spent: p.time_spent,
+        quiz_scores: [], // Placeholder
+        exercises_completed: [], // Placeholder
+        last_accessed: p.last_accessed,
+        started_at: p.started_at
+      }))
 
-      const mockRecommendations: LearningRecommendation[] = [
-        {
-          module_id: 'mod1',
-          priority: 'high',
-          reason: 'Based on your business goals and current skill gaps',
-          estimated_impact: 85,
-          prerequisites_met: true,
-          estimated_completion_time: 45
-        },
-        {
-          module_id: 'mod2',
-          priority: 'medium',
-          reason: 'Will help improve your leadership capabilities',
-          estimated_impact: 70,
-          prerequisites_met: false,
-          estimated_completion_time: 60
-        }
-      ]
-
-      const mockProgress: UserProgress[] = [
-        {
-          module_id: 'mod3',
-          completion_percentage: 75,
-          time_spent: 35,
-          quiz_scores: [{ quiz_id: 'q1', score: 85 }],
-          exercises_completed: ['ex1', 'ex2'],
-          last_accessed: new Date().toISOString(),
-          started_at: new Date(Date.now() - 86400000).toISOString()
-        }
-      ]
-
-      setAnalytics(mockAnalytics)
-      setSkillGaps(mockSkillGaps)
-      setRecommendations(mockRecommendations)
-      setProgress(mockProgress)
+      setAnalytics(realAnalytics)
+      setSkillGaps([]) // Placeholder until skill gap analysis is implemented
+      setRecommendations([]) // Placeholder until recommendation engine is implemented
+      setProgress(mappedProgress)
 
       logInfo('Learning data loaded successfully')
     } catch (error) {
@@ -233,6 +164,10 @@ export default function LearningDashboard() {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    loadLearningData()
+  }, [loadLearningData])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -259,6 +194,22 @@ export default function LearningDashboard() {
       transition: {
         duration: 0.5
       }
+    }
+  }
+
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    if (hours > 0) return `${hours}h ${mins}m`
+    return `${mins}m`
+  }
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-500/20 text-red-500 border-red-500/30'
+      case 'medium': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+      case 'low': return 'bg-green-500/20 text-green-500 border-green-500/30'
+      default: return 'bg-gray-500/20 text-gray-500 border-gray-500/30'
     }
   }
 
@@ -356,27 +307,27 @@ export default function LearningDashboard() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              {analytics && <OverviewTab analytics={analytics} />}
+              {analytics && <OverviewTab analytics={analytics} formatTime={formatTime} />}
             </TabsContent>
 
             {/* Skill Gaps Tab */}
             <TabsContent value="skill-gaps" className="space-y-6">
-              <SkillGapsTab skillGaps={skillGaps} />
+              <SkillGapsTab skillGaps={skillGaps} getPriorityColor={getPriorityColor} />
             </TabsContent>
 
             {/* Recommendations Tab */}
             <TabsContent value="recommendations" className="space-y-6">
-              <RecommendationsTab recommendations={recommendations} />
+              <RecommendationsTab recommendations={recommendations} getPriorityColor={getPriorityColor} />
             </TabsContent>
 
             {/* Progress Tab */}
             <TabsContent value="progress" className="space-y-6">
-              <ProgressTab progress={progress} />
+              <ProgressTab progress={progress} formatTime={formatTime} />
             </TabsContent>
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
-              {analytics && <AnalyticsTab analytics={analytics} />}
+              {analytics && <AnalyticsTab analytics={analytics} formatTime={formatTime} />}
             </TabsContent>
 
             {/* Achievements Tab */}
@@ -390,7 +341,7 @@ export default function LearningDashboard() {
   )
 }
 
-function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
+function OverviewTab({ analytics, formatTime }: { analytics: LearningAnalytics, formatTime: (m: number) => string }) {
   return (
     <div className="space-y-8">
       {/* Stats Grid */}
@@ -524,7 +475,7 @@ function OverviewTab({ analytics }: { analytics: LearningAnalytics }) {
   )
 }
 
-function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
+function SkillGapsTab({ skillGaps, getPriorityColor }: { skillGaps: SkillGap[], getPriorityColor: (p: string) => string }) {
   if (skillGaps.length === 0) {
     return (
       <Card>
@@ -604,7 +555,7 @@ function SkillGapsTab({ skillGaps }: { skillGaps: SkillGap[] }) {
   )
 }
 
-function RecommendationsTab({ recommendations }: { recommendations: LearningRecommendation[] }) {
+function RecommendationsTab({ recommendations, getPriorityColor }: { recommendations: LearningRecommendation[], getPriorityColor: (p: string) => string }) {
   if (recommendations.length === 0) {
     return (
       <Card>
@@ -675,7 +626,7 @@ function RecommendationsTab({ recommendations }: { recommendations: LearningReco
   )
 }
 
-function ProgressTab({ progress }: { progress: UserProgress[] }) {
+function ProgressTab({ progress, formatTime }: { progress: UserProgress[], formatTime: (m: number) => string }) {
   if (progress.length === 0) {
     return (
       <Card>
@@ -756,7 +707,7 @@ function ProgressTab({ progress }: { progress: UserProgress[] }) {
   )
 }
 
-function AnalyticsTab({ analytics }: { analytics: LearningAnalytics }) {
+function AnalyticsTab({ analytics, formatTime }: { analytics: LearningAnalytics, formatTime: (m: number) => string }) {
   return (
     <div className="space-y-8">
       {/* Performance Metrics */}
@@ -932,7 +883,7 @@ function AchievementsTab({ analytics }: { analytics: LearningAnalytics | null })
                     <span className="text-purple-200">Progress</span>
                     <span className="text-white">{Math.round(achievement.progress)}%</span>
                   </div>
-                  <Progress value={achievement.progress} className="h-2" indicatorClassName={achievement.unlocked ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gray-600'} />
+                  <Progress value={achievement.progress} className="h-2" indicatorClassName={`bg-gradient-to-r ${achievement.unlocked ? 'from-green-500 to-emerald-500' : 'from-gray-600 to-gray-500'}`} />
                 </div>
               </CardContent>
             </Card>
@@ -941,22 +892,4 @@ function AchievementsTab({ analytics }: { analytics: LearningAnalytics | null })
       </div>
     </div>
   )
-}
-
-function formatTime(minutes: number): string {
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  if (hours > 0) {
-    return `${hours}h ${mins}m`
-  }
-  return `${mins}m`
-}
-
-function getPriorityColor(priority: string) {
-  switch (priority) {
-    case 'high': return 'bg-red-500/20 text-red-500 border-red-500/30'
-    case 'medium': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
-    case 'low': return 'bg-green-500/20 text-green-500 border-green-500/30'
-    default: return 'bg-gray-500/20 text-gray-500 border-gray-500/30'
-  }
 }

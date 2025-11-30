@@ -867,6 +867,7 @@ export const userProgress = pgTable('user_progress', {
   started_at: timestamp('started_at').defaultNow(),
   completed_at: timestamp('completed_at'),
   status: varchar('status', { length: 20 }).default('not_started'), // not_started, in_progress, completed
+  data: jsonb('data').default('{}'), // Store interactive state/answers
 }, (table) => ({
   userIdIdx: index('user_progress_user_id_idx').on(table.user_id),
   moduleIdIdx: index('user_progress_module_id_idx').on(table.module_id),

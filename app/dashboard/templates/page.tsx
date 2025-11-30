@@ -1,19 +1,18 @@
 "use client"
 
-const React = require("react")
-const { useState, useEffect } = React
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { 
-  FileText, 
-  Search, 
-  Clock, 
-  Users, 
-  Zap, 
-  Target, 
-  Briefcase, 
+import {
+  FileText,
+  Search,
+  Clock,
+  Users,
+  Zap,
+  Target,
+  Briefcase,
   TrendingUp,
   Lightbulb,
   Crown,
@@ -50,13 +49,31 @@ interface Template {
   isPopular: boolean
 }
 
+const categories = [
+  { id: "all", label: "All Categories", icon: FileText },
+  { id: "business", label: "Business Strategy", icon: Target },
+  { id: "marketing", label: "Marketing & Sales", icon: TrendingUp },
+  { id: "finance", label: "Financial Planning", icon: Briefcase },
+  { id: "operations", label: "Operations", icon: Zap },
+  { id: "legal", label: "Legal & Compliance", icon: FileText },
+  { id: "hr", label: "HR & Team", icon: Users },
+  { id: "innovation", label: "Innovation", icon: Lightbulb },
+]
+
+const tiers = [
+  { id: "all", label: "All Tiers" },
+  { id: "launch", label: "Launch Plan" },
+  { id: "accelerator", label: "Accelerator Plan" },
+  { id: "dominator", label: "Dominator Plan" },
+]
+
 export default function TemplatesDashboard() {
   const { user } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const { saveTemplate, isSaving } = useTemplateSave()
-  const [templates, setTemplates] = useState([])
-  const [filteredTemplates, setFilteredTemplates] = useState([])
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedTier, setSelectedTier] = useState("all")
@@ -80,139 +97,48 @@ export default function TemplatesDashboard() {
 
   useSmartTips(smartTipsConfig)
 
-  // Mock templates data - in production, this would come from your API
-  const mockTemplates: Template[] = [
-    {
-      id: "business-plan",
-      title: "Business Plan Template",
-      description: "Complete business plan with market analysis, financial projections, and growth strategy",
-      category: "business",
-      tier: "launch",
-      estimatedTime: "2-3 hours",
-      difficulty: "intermediate",
-      tags: ["business", "planning", "strategy"],
-      preview: "Executive Summary, Market Analysis, Financial Projections, Marketing Strategy...",
-      content: {},
-      usageCount: 1250,
-      rating: 4.8,
-      isPremium: false,
-      isNew: false,
-      isPopular: true
-    },
-    {
-      id: "content-calendar",
-      title: "Content Calendar Template",
-      description: "Social media and content planning calendar with posting schedules",
-      category: "marketing",
-      tier: "launch",
-      estimatedTime: "30 minutes",
-      difficulty: "beginner",
-      tags: ["content", "social-media", "planning"],
-      preview: "Monthly calendar, content themes, posting schedule, engagement tracking...",
-      content: {},
-      usageCount: 890,
-      rating: 4.6,
-      isPremium: false,
-      isNew: false,
-      isPopular: true
-    },
-    {
-      id: "saas-metrics",
-      title: "SaaS Metrics Dashboard",
-      description: "Comprehensive SaaS KPIs and metrics tracking template",
-      category: "analytics",
-      tier: "accelerator",
-      estimatedTime: "1 hour",
-      difficulty: "intermediate",
-      tags: ["saas", "metrics", "kpis", "analytics"],
-      preview: "MRR, Churn Rate, CAC, LTV, User Growth, Revenue Tracking...",
-      content: {},
-      usageCount: 450,
-      rating: 4.9,
-      isPremium: true,
-      isNew: false,
-      isPopular: false
-    },
-    {
-      id: "product-roadmap",
-      title: "Product Roadmap Template",
-      description: "Strategic product development roadmap with feature prioritization",
-      category: "product",
-      tier: "dominator",
-      estimatedTime: "3-4 hours",
-      difficulty: "advanced",
-      tags: ["product", "roadmap", "strategy", "features"],
-      preview: "Vision, Goals, Features, Timeline, Resources, Risk Assessment...",
-      content: {},
-      usageCount: 320,
-      rating: 4.7,
-      isPremium: true,
-      isNew: true,
-      isPopular: false
-    },
-    {
-      id: "customer-interview",
-      title: "Customer Interview Guide",
-      description: "Structured customer interview questions and analysis framework",
-      category: "research",
-      tier: "launch",
-      estimatedTime: "45 minutes",
-      difficulty: "beginner",
-      tags: ["customer", "research", "interviews", "feedback"],
-      preview: "Pre-interview prep, Question framework, Analysis template, Action items...",
-      content: {},
-      usageCount: 670,
-      rating: 4.5,
-      isPremium: false,
-      isNew: false,
-      isPopular: false
-    },
-    {
-      id: "fundraising-pitch",
-      title: "Fundraising Pitch Deck",
-      description: "Investor pitch deck template with financial models and growth projections",
-      category: "fundraising",
-      tier: "dominator",
-      estimatedTime: "4-5 hours",
-      difficulty: "advanced",
-      tags: ["fundraising", "pitch", "investors", "financial"],
-      preview: "Problem, Solution, Market, Business Model, Financials, Team, Ask...",
-      content: {},
-      usageCount: 180,
-      rating: 4.9,
-      isPremium: true,
-      isNew: false,
-      isPopular: false
-    }
-  ]
-
-  const categories = [
-    { id: "all", label: "All Templates", icon: FileText },
-    { id: "business", label: "Business", icon: Briefcase },
-    { id: "marketing", label: "Marketing", icon: TrendingUp },
-    { id: "product", label: "Product", icon: Target },
-    { id: "analytics", label: "Analytics", icon: Zap },
-    { id: "research", label: "Research", icon: Lightbulb },
-    { id: "fundraising", label: "Fundraising", icon: Crown }
-  ]
-
-  const tiers = [
-    { id: "all", label: "All Tiers", color: "bg-gray-100" },
-    { id: "launch", label: "Launch", color: "bg-green-100 text-green-800" },
-    { id: "accelerator", label: "Accelerator", color: "bg-blue-100 text-blue-800" },
-    { id: "dominator", label: "Dominator", color: "bg-purple-100 text-purple-800" }
-  ]
-
   useEffect(() => {
-    setTemplates(mockTemplates)
-    setFilteredTemplates(mockTemplates)
-    
-    // Load used templates from localStorage
-    const used = localStorage.getItem('used-templates')
-    if (used) {
-      setUsedTemplates(new Set(JSON.parse(used)))
+    const fetchTemplates = async () => {
+      try {
+        const token = localStorage.getItem('auth_token')
+        const response = await fetch('/api/templates', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (response.ok) {
+          const data = await response.json()
+          // Map API data to UI model if necessary, or ensure API returns matching shape
+          // For now assuming API returns compatible data or we map it here
+          // Adding placeholder values for missing fields for now
+          const mappedTemplates = data.map((t: any) => ({
+            ...t,
+            tier: t.tier || 'launch',
+            estimatedTime: t.estimatedTime || '15 min',
+            difficulty: t.difficulty || 'beginner',
+            tags: t.tags || [],
+            preview: t.preview || 'No preview available',
+            usageCount: t.usageCount || 0,
+            rating: t.rating || 0,
+            isPremium: t.isPremium || false,
+            isNew: t.isNew || false,
+            isPopular: t.isPopular || false
+          }))
+          setTemplates(mappedTemplates)
+          setFilteredTemplates(mappedTemplates)
+        }
+      } catch (error) {
+        console.error('Failed to fetch templates:', error)
+        toast({
+          title: "Error",
+          description: "Failed to load templates. Please try again.",
+          variant: "destructive"
+        })
+      }
     }
-  }, [])
+
+    fetchTemplates()
+  }, [toast])
 
   useEffect(() => {
     let filtered = templates
@@ -240,35 +166,40 @@ export default function TemplatesDashboard() {
   }, [templates, searchQuery, selectedCategory, selectedTier])
 
   const handleUseTemplate = async (template: Template) => {
-    logInfo('Using template:', { templateId: template.id })
-    
     try {
-      // Save template to user's workspace
-      await saveTemplate({
-        template_slug: template.id,
-        template_data: template.content || {},
-        title: template.title,
-        description: template.description
+      // Call API to save template to user workspace
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch('/api/templates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: template.title,
+          description: template.description,
+          content: template.content,
+          category: template.category,
+          is_public: false
+        })
       })
-      
-      // Track usage
-      const newUsedTemplates = new Set(usedTemplates)
-      newUsedTemplates.add(template.id)
-      setUsedTemplates(newUsedTemplates)
-      localStorage.setItem('used-templates', JSON.stringify(Array.from(newUsedTemplates)))
-      
-      toast({
-        title: "Template Added!",
-        description: `"${template.title}" has been added to your workspace.`,
-      })
-      
-      // Redirect to workspace to view saved templates
-      router.push('/dashboard/workspace')
+
+      if (response.ok) {
+        setUsedTemplates(prev => new Set(prev).add(template.id))
+        toast({
+          title: "Template Added",
+          description: "Template has been added to your workspace.",
+        })
+        // Optionally redirect to edit page
+        // router.push(`/dashboard/templates/${newTemplateId}`)
+      } else {
+        throw new Error('Failed to save template')
+      }
     } catch (error) {
-      logInfo('Error saving template:', error)
+      console.error('Error using template:', error)
       toast({
         title: "Error",
-        description: "Failed to save template. Please try again.",
+        description: "Failed to add template to workspace.",
         variant: "destructive"
       })
     }
@@ -283,16 +214,8 @@ export default function TemplatesDashboard() {
     }
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner": return "bg-green-100 text-green-800"
-      case "intermediate": return "bg-yellow-100 text-yellow-800"
-      case "advanced": return "bg-red-100 text-red-800"
-      default: return "bg-gray-100 text-gray-800"
-    }
-  }
-
   const userTier = user?.subscription_tier || "launch"
+
   const canAccessTemplate = (template: Template) => {
     if (template.tier === "launch") return true
     if (template.tier === "accelerator" && (userTier === "accelerator" || userTier === "dominator")) return true
@@ -304,7 +227,7 @@ export default function TemplatesDashboard() {
     <div className="min-h-screen bg-military-midnight relative overflow-hidden p-6">
       <CamoBackground opacity={0.1} withGrid />
       <TacticalGrid />
-      
+
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
@@ -373,18 +296,17 @@ export default function TemplatesDashboard() {
           {filteredTemplates.map((template: Template) => {
             const hasAccess = canAccessTemplate(template)
             const isUsed = usedTemplates.has(template.id)
-            
+
             return (
               <GlassCard key={template.id} className="p-6 hover:shadow-lg transition-all duration-200" glow>
                 <div className="space-y-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {getTierIcon(template.tier)}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        template.difficulty === "beginner" ? "bg-green-500/20 text-green-400" :
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${template.difficulty === "beginner" ? "bg-green-500/20 text-green-400" :
                         template.difficulty === "intermediate" ? "bg-yellow-500/20 text-yellow-400" :
-                        "bg-red-500/20 text-red-400"
-                      }`}>
+                          "bg-red-500/20 text-red-400"
+                        }`}>
                         {template.difficulty}
                       </span>
                     </div>
@@ -398,7 +320,7 @@ export default function TemplatesDashboard() {
                   <p className="text-sm text-military-storm-grey">
                     {template.description}
                   </p>
-                  
+
                   <div className="flex items-center gap-4 text-xs text-military-storm-grey">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
@@ -476,7 +398,7 @@ export default function TemplatesDashboard() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    
+
                     <Button
                       onClick={() => handleUseTemplate(template)}
                       disabled={!hasAccess || isSaving}

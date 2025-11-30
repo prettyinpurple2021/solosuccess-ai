@@ -1,198 +1,77 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { authenticateRequest } from '@/lib/auth-server'
-import { neon } from '@neondatabase/serverless'
-import { z } from 'zod'
-import { getIdempotencyKeyFromRequest, reserveIdempotencyKey } from '@/lib/idempotency'
-import { info, error as logError } from '@/lib/log'
-import { templateCategories } from '@/lib/template-catalog'
 
-// Force dynamic rendering
+import { NextRequest, NextResponse } from 'next/server'
+import { getSql } from '@/lib/db'
+import { templates } from '@/db/schema'
+import { eq, or, and } from 'drizzle-orm'
+import { headers } from 'next/headers'
+import * as jose from 'jose'
+
 export const dynamic = 'force-dynamic'
 
-export const runtime = 'edge'
-
-export async function GET(request: NextRequest) {
-  const route = '/api/templates'
+async function getUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null
+  }
+  const token = authHeader.substring(7)
   try {
-    const { user, error } = await authenticateRequest()
-    
-    if (error || !user) {
-      info('Unauthorized templates request', { 
-        route, 
-        status: 401,
-        meta: { ip: request.headers.get('x-forwarded-for') || 'unknown' }
-      })
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const url = process.env.DATABASE_URL
-    if (!url) return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 })
-    const sql = neon(url)
-    const rows = await sql`
-      SELECT id, name, content, description, created_at, updated_at 
-      FROM user_templates WHERE user_id = ${user.id} ORDER BY created_at DESC
-    `
-
-    const userTemplates = rows.map((r) => {
-      let parsed: any
-      try {
-        parsed = r.content ? JSON.parse(r.content) : null
-      } catch {
-        parsed = { value: r.content }
-      }
-      const slug: string = r.name
-      // Generate title from slug but don't store it separately as we don't use it
-      const displayTitle = slug?.replace(/[-_]/g, ' ').replace(/\b\w/g, (m: string) => m.toUpperCase()) || 'Template'
-      return {
-        id: r.id,
-        template_slug: slug,
-        template_data: parsed,
-        title: displayTitle,
-        description: r.description || undefined,
-        created_at: r.created_at,
-        updated_at: r.updated_at,
-      }
-    })
-
-    // Get system templates (from normalized catalog)
-    const systemTemplates = templateCategories.map((category) => ({
-      category: category.name,
-      icon: category.icon,
-      description: category.description,
-      templates: category.templates.map((template) => ({
-        title: template.title,
-        description: template.description,
-        slug: template.slug,
-        isInteractive: template.isInteractive,
-        requiredRole: template.requiredRole,
-        difficulty: template.difficulty,
-        estimatedTime: template.estimatedTime,
-        tags: template.tags,
-        isAiGenerated: template.isAiGenerated,
-        generatedAt: template.generatedAt,
-        generatedBy: template.generatedBy,
-        aiInsights: template.aiInsights,
-        recommendations: template.recommendations,
-      })),
-    }))
-
-    info('Templates fetched successfully', { 
-      route, 
-      userId: user.id,
-      status: 200,
-      meta: { 
-        templateCount: userTemplates.length,
-        ip: request.headers.get('x-forwarded-for') || 'unknown'
-      }
-    })
-
-    return NextResponse.json({ 
-      templates: userTemplates,
-      systemTemplates 
-    })
-  } catch (err) {
-    logError('Error fetching templates', {
-      route,
-      status: 500,
-      error: err,
-      meta: { 
-        errorMessage: err instanceof Error ? err.message : String(err),
-        ip: request.headers.get('x-forwarded-for') || 'unknown'
-      }
-    })
-    return NextResponse.json(
-      { error: 'Failed to fetch templates' },
-      { status: 500 }
-    )
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload
+  } catch (error) {
+    return null
   }
 }
 
-const SaveTemplateSchema = z.object({
-  templateSlug: z.string().min(1),
-  templateData: z.record(z.any()),
-  title: z.string().min(1).optional(),
-  description: z.string().max(1000).optional(),
-})
-
-export async function POST(request: NextRequest) {
-  const route = '/api/templates'
+export async function GET(request: NextRequest) {
   try {
-    const { user, error } = await authenticateRequest()
-    
-    if (error || !user) {
-      info('Unauthorized template save attempt', { 
-        route, 
-        status: 401,
-        meta: { ip: request.headers.get('x-forwarded-for') || 'unknown' }
-      })
+    const user = await getUser(request)
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const parse = SaveTemplateSchema.safeParse(await request.json())
-    if (!parse.success) {
-      info('Invalid template payload', { 
-        route, 
-        userId: user.id,
-        status: 400,
-        meta: { 
-          validationErrors: parse.error.flatten(),
-          ip: request.headers.get('x-forwarded-for') || 'unknown'
-        }
-      })
-      return NextResponse.json({ error: 'Invalid payload', details: parse.error.flatten() }, { status: 400 })
-    }
-    const { templateSlug, templateData, description } = parse.data
+    const sql = getSql()
 
-    const url = process.env.DATABASE_URL
-    if (!url) return NextResponse.json({ error: 'DATABASE_URL not set' }, { status: 500 })
-    const sql = neon(url)
-
-    // Idempotency support
-    const key = getIdempotencyKeyFromRequest(request)
-    if (key) {
-      const reserved = await reserveIdempotencyKey(sql as any, key)
-      if (!reserved) {
-        info('Duplicate template save request', { 
-          route, 
-          userId: user.id,
-          status: 409,
-          meta: { 
-            idempotencyKey: key,
-            ip: request.headers.get('x-forwarded-for') || 'unknown'
-          }
-        })
-        return NextResponse.json({ error: 'Duplicate request' }, { status: 409 })
-      }
-    }
-    await sql`
-      INSERT INTO user_templates (user_id, name, content, description)
-      VALUES (${user.id}, ${templateSlug}, ${JSON.stringify(templateData)}, ${description || ''})
+    // Fetch system templates (is_public = true) AND user's templates
+    const allTemplates = await sql`
+      SELECT * FROM templates 
+      WHERE is_public = true 
+      OR user_id = ${user.userId as string}
+      ORDER BY created_at DESC
     `
 
-    info('Template saved successfully', { 
-      route, 
-      userId: user.id,
-      status: 201,
-      meta: { 
-        templateSlug,
-        ip: request.headers.get('x-forwarded-for') || 'unknown'
-      }
-    })
+    return NextResponse.json(allTemplates)
+  } catch (error) {
+    console.error('Error fetching templates:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
 
-    return NextResponse.json({ ok: true }, { status: 201 })
-  } catch (err) {
-    logError('Error creating template', {
-      route,
-      status: 500,
-      error: err,
-      meta: { 
-        errorMessage: err instanceof Error ? err.message : String(err),
-        ip: request.headers.get('x-forwarded-for') || 'unknown'
-      }
-    })
-    return NextResponse.json(
-      { error: 'Failed to create template' },
-      { status: 500 }
-    )
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { title, description, content, category } = body
+
+    if (!title || !content) {
+      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
+    }
+
+    const sql = getSql()
+
+    const newTemplate = await sql`
+      INSERT INTO templates (user_id, title, description, content, category, is_public)
+      VALUES (${user.userId as string}, ${title}, ${description || ''}, ${content}, ${category || 'general'}, false)
+      RETURNING *
+    `
+
+    return NextResponse.json(newTemplate[0])
+  } catch (error) {
+    console.error('Error creating template:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
