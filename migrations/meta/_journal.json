@@ -50,6 +50,13 @@
       "when": 1762755600000,
       "tag": "0006_add_onboarding_data_to_users",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764489051517,
+      "tag": "0007_chemical_harpoon",
+      "breakpoints": true
     }
   ]
 }
