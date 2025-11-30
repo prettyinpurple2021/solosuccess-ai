@@ -110,21 +110,18 @@ export default function TemplatesDashboard() {
         })
         if (response.ok) {
           const data = await response.json()
-          // Map API data to UI model if necessary, or ensure API returns matching shape
-          // For now assuming API returns compatible data or we map it here
-          // Adding placeholder values for missing fields for now
           const mappedTemplates = data.map((t: any) => ({
             ...t,
             tier: t.tier || 'launch',
-            estimatedTime: t.estimatedTime || '15 min',
+            estimatedTime: t.estimated_minutes ? `${t.estimated_minutes} min` : '15 min',
             difficulty: t.difficulty || 'beginner',
             tags: t.tags || [],
-            preview: t.preview || 'No preview available',
-            usageCount: t.usageCount || 0,
-            rating: t.rating || 0,
-            isPremium: t.isPremium || false,
-            isNew: t.isNew || false,
-            isPopular: t.isPopular || false
+            preview: t.content ? t.content.substring(0, 100) + '...' : 'No preview available',
+            usageCount: t.usage_count || 0,
+            rating: t.rating ? Number(t.rating) : 0,
+            isPremium: t.is_premium || false,
+            isNew: t.created_at ? new Date(t.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000 : false,
+            isPopular: (t.usage_count || 0) > 50
           }))
           setTemplates(mappedTemplates)
           setFilteredTemplates(mappedTemplates)

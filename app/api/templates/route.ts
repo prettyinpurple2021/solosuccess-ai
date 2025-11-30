@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     const userId = authResult.user.id
     const body = await req.json()
-    const { title, description, content, category } = body
+    const { title, description, content, category, tags, difficulty, estimated_minutes } = body
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
@@ -56,6 +56,9 @@ export async function POST(req: NextRequest) {
         description: description || '',
         content,
         category: category || 'general',
+        tags: tags || [],
+        difficulty: difficulty || 'Beginner',
+        estimated_minutes: estimated_minutes || 0,
         is_public: false,
         created_at: new Date(),
         updated_at: new Date()
