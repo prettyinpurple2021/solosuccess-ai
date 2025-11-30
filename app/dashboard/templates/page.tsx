@@ -21,7 +21,8 @@ import {
   Download,
   Copy,
   CheckCircle,
-  Star
+  Star,
+  Trash2
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { logger, logInfo } from "@/lib/logger"
@@ -47,6 +48,7 @@ interface Template {
   isPremium: boolean
   isNew: boolean
   isPopular: boolean
+  user_id: string
 }
 
 const categories = [
@@ -200,6 +202,67 @@ export default function TemplatesDashboard() {
       toast({
         title: "Error",
         description: "Failed to add template to workspace.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleEditTemplate = async (id: string, updates: Partial<Template>) => {
+    try {
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch(`/api/templates/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updates)
+      })
+
+      if (response.ok) {
+        const updated = await response.json()
+        setTemplates(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t))
+        toast({
+          title: "Template Updated",
+          description: "Your template has been updated successfully.",
+        })
+      } else {
+        throw new Error('Failed to update template')
+      }
+    } catch (error) {
+      console.error('Error updating template:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update template.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleDeleteTemplate = async (id: string) => {
+    try {
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch(`/api/templates/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        setTemplates(prev => prev.filter(t => t.id !== id))
+        toast({
+          title: "Template Deleted",
+          description: "Your template has been deleted.",
+        })
+      } else {
+        throw new Error('Failed to delete template')
+      }
+    } catch (error) {
+      console.error('Error deleting template:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete template.",
         variant: "destructive"
       })
     }
@@ -418,6 +481,57 @@ export default function TemplatesDashboard() {
                       )}
                     </Button>
                   </div>
+
+                  {template.user_id === user?.id && (
+                    <div className="flex gap-2 pt-2 border-t border-white/10 mt-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="flex-1 border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black">
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-military-tactical-black border-military-storm-grey">
+                          <DialogHeader>
+                            <DialogTitle className="text-military-glass-white">Edit Template</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <label className="text-sm text-military-storm-grey">Title</label>
+                              <Input
+                                defaultValue={template.title}
+                                onChange={(e) => template.title = e.target.value} // Note: This is a quick hack for the dialog, ideally use state
+                                className="bg-military-tactical-black/50 border-military-storm-grey text-white"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm text-military-storm-grey">Description</label>
+                              <Input
+                                defaultValue={template.description}
+                                onChange={(e) => template.description = e.target.value}
+                                className="bg-military-tactical-black/50 border-military-storm-grey text-white"
+                              />
+                            </div>
+                            <Button
+                              onClick={() => handleEditTemplate(template.id, { title: template.title, description: template.description })}
+                              className="w-full bg-military-hot-pink hover:bg-military-hot-pink/90"
+                            >
+                              Save Changes
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleDeleteTemplate(template.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </Button>
+                    </div>
+                  )}
 
                   {!hasAccess && (
                     <div className="text-xs text-military-storm-grey text-center pt-2">

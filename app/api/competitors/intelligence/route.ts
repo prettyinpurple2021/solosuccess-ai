@@ -1,26 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSql } from '@/lib/db'
+import { db } from '@/db'
 import {
     competitiveOpportunities,
     competitorAlerts,
-    competitorProfiles,
-    intelligenceData,
-    users
+    competitorProfiles
 } from '@/db/schema'
-import { eq, desc, and, sql } from 'drizzle-orm'
+import { eq, desc, sql } from 'drizzle-orm'
 import { verifyAuth } from '@/lib/auth-server'
 
+
 export const dynamic = 'force-dynamic'
+
+interface OpportunityResult {
+    id: string
+    title: string
+    description: string
+    confidence: string | null
+    priority_score: string | null
+    recommendations: unknown
+    created_at: Date | null
+    competitor_name: string | null
+    source: string
+}
+
+interface AlertResult {
+    id: number
+    title: string
+    description: string | null
+    severity: string
+    alert_type: string
+    recommended_actions: unknown
+    created_at: Date | null
+    competitor_name: string | null
+    source: string
+}
+
 
 export async function GET(req: NextRequest) {
     try {
         const authResult = await verifyAuth(req)
-        if (!authResult.isAuthenticated || !authResult.user) {
+        if (!authResult.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
         const userId = authResult.user.id
-        const db = await getSql()
 
         // Fetch Opportunities
         const opportunities = await db
@@ -29,7 +52,6 @@ export async function GET(req: NextRequest) {
                 title: competitiveOpportunities.title,
                 description: competitiveOpportunities.description,
                 confidence: competitiveOpportunities.confidence,
-                impact: competitiveOpportunities.impact,
                 priority_score: competitiveOpportunities.priority_score,
                 recommendations: competitiveOpportunities.recommendations,
                 created_at: competitiveOpportunities.created_at,
@@ -60,7 +82,7 @@ export async function GET(req: NextRequest) {
             .orderBy(desc(competitorAlerts.created_at))
 
         // Map to IntelligenceInsight interface
-        const mappedOpportunities = opportunities.map(op => ({
+        const mappedOpportunities = opportunities.map((op: OpportunityResult) => ({
             id: op.id,
             type: 'opportunity',
             title: op.title,
@@ -75,7 +97,7 @@ export async function GET(req: NextRequest) {
             recommendations: op.recommendations as string[] || []
         }))
 
-        const mappedAlerts = alerts.map(alert => {
+        const mappedAlerts = alerts.map((alert: AlertResult) => {
             let type = 'threat'
             if (alert.alert_type === 'move') type = 'competitive_move'
             if (alert.alert_type === 'trend') type = 'trend'

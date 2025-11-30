@@ -1,44 +1,30 @@
-
 import { NextRequest, NextResponse } from 'next/server'
-import { getSql } from '@/lib/db'
+import { db } from '@/db'
 import { templates } from '@/db/schema'
-import { eq, or, and } from 'drizzle-orm'
-import { headers } from 'next/headers'
-import * as jose from 'jose'
+import { eq, desc, or } from 'drizzle-orm'
+import { verifyAuth } from '@/lib/auth-server'
 
 export const dynamic = 'force-dynamic'
 
-async function getUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-  const token = authHeader.substring(7)
+export async function GET(req: NextRequest) {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-    const { payload } = await jose.jwtVerify(token, secret)
-    return payload
-  } catch (error) {
-    return null
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const user = await getUser(request)
-    if (!user) {
+    const authResult = await verifyAuth(req)
+    if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const sql = getSql()
+    const userId = authResult.user.id
 
-    // Fetch system templates (is_public = true) AND user's templates
-    const allTemplates = await sql`
-      SELECT * FROM templates 
-      WHERE is_public = true 
-      OR user_id = ${user.userId as string}
-      ORDER BY created_at DESC
-    `
+    const allTemplates = await db
+      .select()
+      .from(templates)
+      .where(
+        or(
+          eq(templates.is_public, true),
+          eq(templates.user_id, userId)
+        )
+      )
+      .orderBy(desc(templates.created_at))
 
     return NextResponse.json(allTemplates)
   } catch (error) {
@@ -47,27 +33,34 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const user = await getUser(request)
-    if (!user) {
+    const authResult = await verifyAuth(req)
+    if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    const userId = authResult.user.id
+    const body = await req.json()
     const { title, description, content, category } = body
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
     }
 
-    const sql = getSql()
-
-    const newTemplate = await sql`
-      INSERT INTO templates (user_id, title, description, content, category, is_public)
-      VALUES (${user.userId as string}, ${title}, ${description || ''}, ${content}, ${category || 'general'}, false)
-      RETURNING *
-    `
+    const newTemplate = await db
+      .insert(templates)
+      .values({
+        user_id: userId,
+        title,
+        description: description || '',
+        content,
+        category: category || 'general',
+        is_public: false,
+        created_at: new Date(),
+        updated_at: new Date()
+      })
+      .returning()
 
     return NextResponse.json(newTemplate[0])
   } catch (error) {

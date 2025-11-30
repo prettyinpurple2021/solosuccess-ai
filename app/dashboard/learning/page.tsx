@@ -120,25 +120,9 @@ export default function LearningDashboard() {
       const progressRes = await fetch('/api/learning/progress', { headers })
       const userProgress = await progressRes.json()
 
-      // Calculate analytics from real data
-      const totalModules = modules.length
-      const completedModules = userProgress.filter((p: any) => p.status === 'completed').length
-      const totalTimeSpent = userProgress.reduce((acc: number, curr: any) => acc + (curr.time_spent || 0), 0)
-
-      const realAnalytics: LearningAnalytics = {
-        total_modules_completed: completedModules,
-        total_time_spent: totalTimeSpent,
-        average_quiz_score: 85, // Placeholder until quiz system is fully implemented
-        skills_improved: completedModules * 2, // Estimate
-        current_streak: 5, // Placeholder
-        learning_velocity: 2.5, // Placeholder
-        certifications_earned: Math.floor(completedModules / 5),
-        peer_rank: 12, // Placeholder
-        weekly_goal_progress: Math.min(100, (completedModules / 5) * 100),
-        top_categories: [
-          { category: 'Business', time_spent: 120, modules_completed: 2 }, // Placeholder
-        ]
-      }
+      // Fetch analytics
+      const analyticsRes = await fetch('/api/learning/analytics', { headers })
+      const realAnalytics = await analyticsRes.json()
 
       // Map progress to UI model
       const mappedProgress: UserProgress[] = userProgress.map((p: any) => ({

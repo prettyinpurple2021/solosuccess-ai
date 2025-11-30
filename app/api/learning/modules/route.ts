@@ -1,40 +1,23 @@
-
 import { NextRequest, NextResponse } from 'next/server'
-import { getSql } from '@/lib/db'
-import * as jose from 'jose'
+import { db } from '@/db'
+import { learningModules } from '@/db/schema'
+import { eq, desc } from 'drizzle-orm'
+import { verifyAuth } from '@/lib/auth-server'
 
 export const dynamic = 'force-dynamic'
 
-async function getUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-  const token = authHeader.substring(7)
+export async function GET(req: NextRequest) {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-    const { payload } = await jose.jwtVerify(token, secret)
-    return payload
-  } catch (error) {
-    return null
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const user = await getUser(request)
-    if (!user) {
+    const authResult = await verifyAuth(req)
+    if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const sql = getSql()
-
-    // Fetch all published learning modules
-    const modules = await sql`
-      SELECT * FROM learning_modules 
-      WHERE is_published = true 
-      ORDER BY created_at DESC
-    `
+    const modules = await db
+      .select()
+      .from(learningModules)
+      .where(eq(learningModules.is_published, true))
+      .orderBy(desc(learningModules.created_at))
 
     return NextResponse.json(modules)
   } catch (error) {
