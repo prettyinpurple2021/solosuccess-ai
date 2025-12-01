@@ -49,6 +49,8 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
+    "@react-email/components": "^1.0.1",
+    "@react-email/render": "^2.0.0",
     "@stackframe/stack": "^2.8.52",
     "@stripe/stripe-js": "^8.5.2",
     "@upstash/qstash": "latest",
