@@ -1,0 +1,314 @@
+"use client"
+
+import Link from "next/link"
+import Image from "next/image"
+import Script from "next/script"
+
+import { useState, type FormEvent} from "react"
+import { Crown, Heart, Sparkles, Twitter, Instagram, Linkedin, Github, Mail, CheckCircle} from "lucide-react"
+import { Button} from "@/components/ui/button"
+import { Input} from "@/components/ui/input"
+import { Separator} from "@/components/ui/separator"
+
+const footerLinks = {
+  product: [
+    { name: "Features", href: "/features" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "System Status", href: "/status" },
+  ],
+  popular: [
+    { name: "Launch (Free)", href: "/pricing/launch" },
+    { name: "Accelerator ($19/mo)", href: "/pricing/accelerator" },
+    { name: "Dominator ($29/mo)", href: "/pricing/dominator" },
+  ],
+  company: [
+    { name: "About SoloSuccess", href: "/about" },
+    { name: "Boss Blog", href: "/blog" },
+    { name: "Contact Us", href: "/contact" },
+  ],
+  resources: [
+    { name: "Help Center", href: "/help" },
+    { name: "Boss Community", href: "/community" },
+    { name: "Templates", href: "/templates" },
+  ],
+  legal: [
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" },
+    { name: "Cookie Policy", href: "/cookies" },
+    { name: "GDPR", href: "/gdpr" },
+  ],
+}
+
+const socialLinks = [
+  { name: "Twitter", href: "https://twitter.com/SoloSuccessai", icon: Twitter },
+  { name: "Instagram", href: "https://instagram.com/SoloSuccessai", icon: Instagram },
+  { name: "LinkedIn", href: "https://linkedin.com/company/SoloSuccessai", icon: Linkedin },
+  { name: "GitHub", href: "https://github.com/SoloSuccessai", icon: Github },
+]
+
+export function AppFooter() {
+  const [email, setEmail] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const handleNewsletterSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!email || isSubmitting) return
+
+    setIsSubmitting(true)
+    setErrorMessage("")
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setIsSubscribed(true)
+        setEmail("")
+        // Reset success state after 5 seconds
+        setTimeout(() => setIsSubscribed(false), 5000)
+      } else {
+        setErrorMessage(data.error || 'Something went wrong. Please try again.')
+      }
+    } catch {
+      setErrorMessage('Network error. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+    <footer className="bg-gradient-to-b from-purple-50 to-white border-t-2 border-purple-200">
+      {/* Newsletter Section */}
+      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Sparkles className="h-6 w-6" />
+              <h3 className="text-2xl font-bold boss-heading">Join the Boss Revolution!</h3>
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
+              Get exclusive boss tips, AI updates, and empire-building strategies delivered to your inbox. No spam, just
+              pure boss energy! 💪✨
+            </p>
+            {isSubscribed ? (
+              <div className="flex items-center justify-center gap-2 text-white">
+                <CheckCircle className="w-6 h-6" />
+                <span className="text-lg font-semibold">Welcome to the Boss Revolution! 🎉</span>
+              </div>
+            ) : (
+              <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your boss email..."
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/70 focus:bg-white/20"
+                    disabled={isSubmitting}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    disabled={isSubmitting || !email}
+                    className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 bounce-on-hover disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                        Joining...
+                      </div>
+                    ) : (
+                      "Subscribe 🚀"
+                    )}
+                  </Button>
+                </div>
+                {errorMessage && (
+                  <p className="text-red-200 text-sm mt-2 text-center">{errorMessage}</p>
+                )}
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Footer Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+          {/* Brand Section */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="relative">
+                <Image
+                  src="/images/logo.png"
+                  alt="SoloSuccess AI"
+                  width={48}
+                  height={48}
+                  className="rounded-xl object-contain punk-shadow"
+                />
+                <Crown className="absolute -top-1 -right-1 h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold boss-heading bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  SoloSuccess AI
+                </h2>
+                <p className="text-sm text-gray-600 font-medium">Solo Entrepreneur Empire</p>
+              </div>
+            </div>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              Empowering solo entrepreneurs to build their empires with AI-powered virtual teams. Turn your solo hustle
+              into a boss-level business with our punk rock productivity platform! 👑
+            </p>
+            <div className="flex gap-4">
+              {socialLinks.map((social) => (
+                <Link
+                  key={social.name}
+                  href={social.href}
+                  className="p-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg hover:from-purple-200 hover:to-pink-200 transition-all duration-200 bounce-on-hover"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <social.icon className="h-5 w-5 text-purple-600" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Links */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 empowering-text">Product 🚀</h3>
+            <ul className="space-y-3">
+              {footerLinks.product.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Popular Plans */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 empowering-text">Popular Plans ⭐</h3>
+            <ul className="space-y-3">
+              {footerLinks.popular.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company Links */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 empowering-text">Company 🏢</h3>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources Links */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 empowering-text">Resources 📚</h3>
+            <ul className="space-y-3">
+              {footerLinks.resources.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 empowering-text">Legal ⚖️</h3>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <Separator className="bg-purple-200" />
+
+      {/* Bottom Footer */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2 text-gray-600">
+            <span>© 2025 SoloSuccess AI. Made with</span>
+            <Heart className="h-4 w-4 text-red-500 fill-current" />
+            <span>for boss babes everywhere.</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-gray-600">
+            <Link href="/status" className="hover:text-purple-600 transition-colors font-medium">
+              System Status
+            </Link>
+            <Link href="/security" className="hover:text-purple-600 transition-colors font-medium">
+              Security
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-purple-600 transition-colors font-medium flex items-center gap-1"
+            >
+              <Mail className="h-4 w-4" />
+              Contact
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+    {/* Metricool Tracking */}
+    <Script
+      id="metricool-tracker"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"c3b56672bacfe8e1e7f2c4938b5d7e46"})});`
+      }}
+    />
+    </>
+  )
+}
