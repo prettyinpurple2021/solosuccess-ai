@@ -16,6 +16,8 @@ import { Analytics } from "@vercel/analytics/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
+import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
+import { getClientContext } from "./devcycle"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -224,27 +226,29 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <OfflineProvider>
-              <AccessibilityProvider>
-                <ChatProvider>
-                  {children}
-                </ChatProvider>
-                <PerformanceMonitor />
-                {/* Ensure this client component that calls useAuth is inside AuthProvider */}
-                <ServiceWorkerRegister />
-                <ExitIntentSurvey />
-                <SmartTipManager />
-              </AccessibilityProvider>
-            </OfflineProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <DevCycleClientsideProvider context={getClientContext()}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <OfflineProvider>
+                <AccessibilityProvider>
+                  <ChatProvider>
+                    {children}
+                  </ChatProvider>
+                  <PerformanceMonitor />
+                  {/* Ensure this client component that calls useAuth is inside AuthProvider */}
+                  <ServiceWorkerRegister />
+                  <ExitIntentSurvey />
+                  <SmartTipManager />
+                </AccessibilityProvider>
+              </OfflineProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </DevCycleClientsideProvider>
         <Analytics />
       </body>
     </html>
