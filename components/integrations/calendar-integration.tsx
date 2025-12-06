@@ -34,55 +34,175 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
   const [syncEnabled, setSyncEnabled] = useState(true)
   const [autoSync, setAutoSync] = useState(true)
   const [events, setEvents] = useState<CalendarEvent[]>([])
-  const [_selectedCalendar, _setSelectedCalendar] = useState<string>('primary')
+  const [calendarInfo, setCalendarInfo] = useState<{ email?: string; name?: string }>({})
   const { toast } = useToast()
 
   const checkCalendarConnection = useCallback(async () => {
     try {
-      // Simulate checking calendar connection
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Mock data - in real app, this would check actual calendar API
-      const hasConnection = Math.random() > 0.5
-      setIsConnected(hasConnection)
-      
-      if (hasConnection) {
-        setConnectedCalendars(['primary', 'work', 'personal'])
-        loadCalendarEvents()
+      const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
+      if (!token) return
+
+      const response = await fetch('/api/integrations/google/calendar?action=status', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setIsConnected(data.connected)
+        
+        if (data.connected) {
+          setCalendarInfo({
+            email: data.email,
+            name: data.name
+          })
+          // Fetch calendars and events
+          await loadCalendarEvents()
+        }
+      } else {
+        setIsConnected(false)
       }
-    } catch {
-      logError('Failed to check calendar connection')
+    } catch (error) {
+      logError('Failed to check calendar connection:', error)
+      setIsConnected(false)
     }
   }, [])
 
   useEffect(() => {
     // Check if user has connected calendars
     checkCalendarConnection()
+
+    // Handle OAuth callback
+    const handleOAuthCallback = async () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('calendar_code')
+      const state = urlParams.get('calendar_state')
+      
+      if (code && state) {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
+        if (!token) return
+
+        try {
+          const response = await fetch('/api/integrations/google/calendar', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code, state })
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            setIsConnected(true)
+            setCalendarInfo({
+              email: data.email,
+              name: data.name
+            })
+            
+            toast({
+              title: `✅ Connected to Google Calendar!`,
+              description: "Your calendar is now synced with SoloSuccess AI",
+            })
+            
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname)
+            
+            // Load events
+            await loadCalendarEvents()
+          } else {
+            throw new Error('Failed to connect')
+          }
+        } catch (error) {
+          logError('Failed to complete calendar connection:', error)
+          toast({
+            title: "❌ Connection failed",
+            description: "Please try again",
+            variant: "destructive",
+          })
+        }
+      }
+    }
+
+    handleOAuthCallback()
   }, [checkCalendarConnection])
 
   const connectCalendar = async (provider: 'google' | 'outlook') => {
+    if (provider !== 'google') {
+      toast({
+        title: "Coming soon",
+        description: "Outlook integration is coming soon",
+        variant: "default",
+      })
+      return
+    }
+
     setIsLoading(true)
     
     try {
-      // Simulate OAuth flow
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      setIsConnected(true)
-      setConnectedCalendars(['primary', 'work', 'personal'])
-      
-      toast({
-        title: `✅ Connected to ${provider === 'google' ? 'Google' : 'Outlook'} Calendar!`,
-        description: "Your calendar is now synced with SoloSuccess AI",
+      const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
+      if (!token) {
+        throw new Error('Not authenticated')
+      }
+
+      // Get OAuth URL
+      const response = await fetch('/api/integrations/google/calendar?action=auth_url', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       })
+
+      if (!response.ok) {
+        throw new Error('Failed to get auth URL')
+      }
+
+      const { url } = await response.json()
       
-      loadCalendarEvents()
-    } catch {
+      // Open OAuth popup
+      const width = 600
+      const height = 700
+      const left = window.screen.width / 2 - width / 2
+      const top = window.screen.height / 2 - height / 2
+      
+      const popup = window.open(
+        url,
+        'Google Calendar Auth',
+        `width=${width},height=${height},left=${left},top=${top}`
+      )
+
+      // Listen for OAuth callback
+      const checkPopup = setInterval(async () => {
+        if (popup?.closed) {
+          clearInterval(checkPopup)
+          setIsLoading(false)
+          
+          // Check connection status
+          await checkCalendarConnection()
+        }
+      }, 1000)
+
+      // Timeout after 5 minutes
+      setTimeout(() => {
+        if (popup && !popup.closed) {
+          popup.close()
+          clearInterval(checkPopup)
+          setIsLoading(false)
+          toast({
+            title: "Connection timeout",
+            description: "Please try again",
+            variant: "destructive",
+          })
+        }
+      }, 5 * 60 * 1000)
+
+    } catch (error) {
+      logError('Failed to connect calendar:', error)
       toast({
         title: "❌ Connection failed",
         description: "Please try again or check your credentials",
         variant: "destructive",
       })
-    } finally {
       setIsLoading(false)
     }
   }
@@ -90,8 +210,24 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
   const disconnectCalendar = async () => {
     try {
       setIsLoading(true)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
+      if (!token) {
+        throw new Error('Not authenticated')
+      }
+
+      const response = await fetch('/api/integrations/google/calendar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ disconnect: true })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to disconnect')
+      }
+
       setIsConnected(false)
       setConnectedCalendars([])
       setEvents([])
@@ -100,7 +236,8 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
         title: "Calendar disconnected",
         description: "Your calendar sync has been disabled",
       })
-    } catch {
+    } catch (error) {
+      logError('Failed to disconnect calendar:', error)
       toast({
         title: "Failed to disconnect",
         description: "Please try again",
@@ -113,47 +250,59 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
 
   const loadCalendarEvents = async () => {
     try {
-      // Simulate loading calendar events
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      const mockEvents: CalendarEvent[] = [
+      const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
+      if (!token) return
+
+      const timeMin = new Date().toISOString()
+      const timeMax = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Next 7 days
+
+      const response = await fetch(
+        `/api/integrations/google/calendar?action=events&timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}&maxResults=50`,
         {
-          id: '1',
-          title: 'Team Standup',
-          description: 'Daily team sync meeting',
-          startTime: '2024-01-15T09:00:00Z',
-          endTime: '2024-01-15T09:30:00Z',
-          calendarId: 'work',
-          calendarName: 'Work Calendar',
-          isRecurring: true,
-          attendees: ['team@company.com']
-        },
-        {
-          id: '2',
-          title: 'Client Meeting',
-          description: 'Quarterly review with client',
-          startTime: '2024-01-15T14:00:00Z',
-          endTime: '2024-01-15T15:00:00Z',
-          calendarId: 'work',
-          calendarName: 'Work Calendar',
-          isRecurring: false,
-          attendees: ['client@example.com']
-        },
-        {
-          id: '3',
-          title: 'Focus Time',
-          description: 'Deep work session',
-          startTime: '2024-01-15T10:00:00Z',
-          endTime: '2024-01-15T12:00:00Z',
-          calendarId: 'personal',
-          calendarName: 'Personal Calendar',
-          isRecurring: false
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         }
-      ]
+      )
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setIsConnected(false)
+          return
+        }
+        throw new Error('Failed to load events')
+      }
+
+      const data = await response.json()
       
-      setEvents(mockEvents)
-    } catch {
-      logError('Failed to load calendar events')
+      // Transform API events to component format
+      const transformedEvents: CalendarEvent[] = data.events.map((event: any) => ({
+        id: event.id || Math.random().toString(),
+        title: event.title,
+        description: event.description || '',
+        startTime: event.startTime,
+        endTime: event.endTime,
+        calendarId: event.calendarId || 'primary',
+        calendarName: event.calendarName || 'Calendar',
+        isRecurring: event.isRecurring || false,
+        attendees: event.attendees || []
+      }))
+
+      setEvents(transformedEvents)
+      
+      // Update connected calendars list
+      if (data.calendars && data.calendars.length > 0) {
+        setConnectedCalendars(data.calendars.map((cal: any) => cal.id))
+      }
+
+      logInfo('Calendar events loaded', { count: transformedEvents.length })
+    } catch (error) {
+      logError('Failed to load calendar events:', error)
+      toast({
+        title: "Failed to load events",
+        description: "Please try refreshing",
+        variant: "destructive",
+      })
     }
   }
 
@@ -161,14 +310,16 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
     try {
       setIsLoading(true)
       
-      // Simulate syncing tasks to calendar
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // TODO: Implement task sync to calendar
+      // This would fetch tasks and create calendar events for them
+      // For now, show a message that this feature is in development
       
       toast({
-        title: "✅ Tasks synced to calendar!",
-        description: "Your tasks have been added to your calendar",
+        title: "Feature in development",
+        description: "Task sync to calendar is coming soon",
       })
-    } catch {
+    } catch (error) {
+      logError('Failed to sync tasks:', error)
       toast({
         title: "❌ Sync failed",
         description: "Please try again",
@@ -183,14 +334,16 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
     try {
       setIsLoading(true)
       
-      // Simulate creating calendar event
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // TODO: Implement calendar event creation
+      // This would open a dialog to create a new event and POST to Google Calendar API
+      // For now, show a message that this feature is in development
       
       toast({
-        title: "✅ Event created!",
-        description: "New event added to your calendar",
+        title: "Feature in development",
+        description: "Event creation is coming soon",
       })
-    } catch {
+    } catch (error) {
+      logError('Failed to create event:', error)
       toast({
         title: "❌ Failed to create event",
         description: "Please try again",
@@ -315,27 +468,27 @@ export function CalendarIntegration({ className = "" }: CalendarIntegrationProps
         )}
 
         {/* Connected Calendars */}
-        {isConnected && connectedCalendars.length > 0 && (
+        {isConnected && (connectedCalendars.length > 0 || calendarInfo.email) && (
           <div className="space-y-3">
-            <h4 className="font-medium">Connected Calendars</h4>
+            <h4 className="font-medium">Connected Calendar</h4>
             <div className="space-y-2">
-              {connectedCalendars.map((calendar) => (
-                <div 
-                  key={calendar}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-blue-600" />
-                    <span className="capitalize">{calendar} Calendar</span>
-                    <Badge variant="secondary" className="text-xs">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-4 h-4 text-blue-600" />
+                  <div>
+                    <span className="font-medium">{calendarInfo.name || calendarInfo.email || 'Google Calendar'}</span>
+                    {calendarInfo.email && (
+                      <p className="text-sm text-gray-600">{calendarInfo.email}</p>
+                    )}
+                    <Badge variant="secondary" className="text-xs mt-1">
                       Active
                     </Badge>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    <Settings className="w-4 h-4" />
-                  </Button>
                 </div>
-              ))}
+                <Button variant="ghost" size="sm">
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         )}

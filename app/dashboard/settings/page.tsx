@@ -21,7 +21,8 @@ import {
   Globe,
   Smartphone,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Settings as SettingsIcon
 } from 'lucide-react'
 import {
   TacticalButton,
@@ -45,6 +46,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import Link from 'next/link'
+import { SocialMediaIntegration } from '@/components/integrations/social-media-integration'
+import { CalendarIntegration } from '@/components/integrations/calendar-integration'
 
 export default function SettingsPage() {
   const { user, signOut, loading } = useAuth()
@@ -241,6 +244,10 @@ export default function SettingsPage() {
                   <TabsTrigger value="notifications" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
                     <Bell className="w-4 h-4 mr-2" />
                     Notifications
+                  </TabsTrigger>
+                  <TabsTrigger value="integrations" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
+                    <SettingsIcon className="w-4 h-4 mr-2" />
+                    Integrations
                   </TabsTrigger>
                   <TabsTrigger value="billing" className="data-[state=active]:bg-military-hot-pink/20 data-[state=active]:text-white">
                     <CreditCard className="w-4 h-4 mr-2" />
@@ -485,6 +492,28 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </GlassCard>
+                </TabsContent>
+
+                {/* Integrations Tab */}
+                <TabsContent value="integrations">
+                  <div className="space-y-6">
+                    <GlassCard className="p-8" glow>
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="w-12 h-12 rounded-lg bg-military-hot-pink/20 flex items-center justify-center border border-military-hot-pink/30">
+                          <SettingsIcon className="w-6 h-6 text-military-hot-pink" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-heading font-bold text-white">Third-Party Integrations</h3>
+                          <p className="text-military-storm-grey">Connect your accounts and services for enhanced functionality</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <SocialMediaIntegration />
+                        <CalendarIntegration />
+                      </div>
+                    </GlassCard>
+                  </div>
                 </TabsContent>
 
                 {/* Billing Tab Redirect */}

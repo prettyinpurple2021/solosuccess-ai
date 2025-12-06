@@ -844,6 +844,30 @@ export const calendarConnections = pgTable('calendar_connections', {
   providerIdx: index('calendar_connections_provider_idx').on(table.provider),
 }));
 
+// Social Media Connections table - for users to connect their own accounts
+export const socialMediaConnections = pgTable('social_media_connections', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  platform: varchar('platform', { length: 50 }).notNull(), // linkedin, twitter, facebook, instagram, youtube
+  access_token: text('access_token').notNull(),
+  refresh_token: text('refresh_token'),
+  expires_at: timestamp('expires_at'),
+  token_secret: text('token_secret'), // For OAuth 1.0a (Twitter)
+  account_id: varchar('account_id', { length: 255 }), // Platform-specific account ID
+  account_handle: varchar('account_handle', { length: 255 }), // Username/handle
+  account_email: varchar('account_email', { length: 255 }),
+  account_name: varchar('account_name', { length: 255 }),
+  scopes: text('scopes'), // Comma-separated list of granted scopes
+  is_active: boolean('is_active').default(true),
+  last_synced_at: timestamp('last_synced_at'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('social_media_connections_user_id_idx').on(table.user_id),
+  platformIdx: index('social_media_connections_platform_idx').on(table.platform),
+  userPlatformIdx: index('social_media_connections_user_platform_idx').on(table.user_id, table.platform),
+}));
+
 // Learning Modules table
 export const learningModules = pgTable('learning_modules', {
   id: varchar('id', { length: 255 }).primaryKey(),

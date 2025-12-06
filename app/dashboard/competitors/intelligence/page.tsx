@@ -63,6 +63,21 @@ interface IntelligenceStats {
   competitive_moves_detected: number
 }
 
+interface MarketPosition {
+  market_share: number
+  competitive_advantage: string
+  innovation_index: string
+  customer_satisfaction: string
+}
+
+interface StrategicAnalysis {
+  strengths: string[]
+  weaknesses: string[]
+  opportunities: string[]
+  threats: string[]
+  recommendations: string[]
+}
+
 export default function IntelligencePage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -74,6 +89,8 @@ export default function IntelligencePage() {
 
   const [insights, setInsights] = useState<IntelligenceInsight[]>([])
   const [stats, setStats] = useState<IntelligenceStats | null>(null)
+  const [marketPosition, setMarketPosition] = useState<MarketPosition | null>(null)
+  const [strategicAnalysis, setStrategicAnalysis] = useState<StrategicAnalysis | null>(null)
 
   const loadIntelligenceData = useCallback(async () => {
     try {
@@ -88,9 +105,15 @@ export default function IntelligencePage() {
 
       if (response.ok) {
         const data = await response.json()
-        setInsights(data.insights)
-        setStats(data.stats)
-        logInfo('Intelligence data loaded successfully')
+        setInsights(data.insights || [])
+        setStats(data.stats || null)
+        setMarketPosition(data.market_position || null)
+        setStrategicAnalysis(data.strategic_analysis || null)
+        logInfo('Intelligence data loaded successfully', { 
+          insightsCount: data.insights?.length || 0,
+          hasMarketPosition: !!data.market_position,
+          hasStrategicAnalysis: !!data.strategic_analysis
+        })
       } else {
         throw new Error('Failed to fetch intelligence data')
       }
@@ -236,7 +259,7 @@ export default function IntelligencePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">{stats.total_insights}</div>
-                <p className="text-xs text-green-400">+12% from last week</p>
+                <p className="text-xs text-purple-300">Total insights collected</p>
               </CardContent>
             </Card>
 
@@ -451,31 +474,47 @@ export default function IntelligencePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <span className="text-purple-200">Market Share</span>
-                      <div className="flex items-center gap-2">
-                        <Progress value={35} className="w-20 h-2" />
-                        <span className="text-white font-medium">35%</span>
+                    {marketPosition ? (
+                      <>
+                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                          <span className="text-purple-200">Market Share</span>
+                          <div className="flex items-center gap-2">
+                            <Progress value={marketPosition.market_share} className="w-20 h-2" />
+                            <span className="text-white font-medium">{marketPosition.market_share}%</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                          <span className="text-purple-200">Competitive Advantage</span>
+                          <Badge className={`${
+                            marketPosition.competitive_advantage === 'strong' ? 'bg-green-500/20 text-green-500 border-green-500/30' :
+                            marketPosition.competitive_advantage === 'moderate' ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30' :
+                            'bg-orange-500/20 text-orange-500 border-orange-500/30'
+                          }`}>
+                            {marketPosition.competitive_advantage.charAt(0).toUpperCase() + marketPosition.competitive_advantage.slice(1)}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                          <span className="text-purple-200">Innovation Index</span>
+                          <Badge className={`${
+                            marketPosition.innovation_index === 'high' ? 'bg-blue-500/20 text-blue-500 border-blue-500/30' :
+                            marketPosition.innovation_index === 'moderate' ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30' :
+                            'bg-orange-500/20 text-orange-500 border-orange-500/30'
+                          }`}>
+                            {marketPosition.innovation_index.charAt(0).toUpperCase() + marketPosition.innovation_index.slice(1)}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                          <span className="text-purple-200">Customer Satisfaction</span>
+                          <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">
+                            {marketPosition.customer_satisfaction.charAt(0).toUpperCase() + marketPosition.customer_satisfaction.slice(1)}
+                          </Badge>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-8 text-purple-300">
+                        <p>Market position data loading...</p>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <span className="text-purple-200">Competitive Advantage</span>
-                      <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
-                        Strong
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <span className="text-purple-200">Innovation Index</span>
-                      <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/30">
-                        High
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <span className="text-purple-200">Customer Satisfaction</span>
-                      <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/30">
-                        Excellent
-                      </Badge>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -492,45 +531,53 @@ export default function IntelligencePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-white flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-400" />
-                        Opportunities
-                      </h4>
-                      <div className="space-y-3">
-                        <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/30">
-                          <p className="text-sm text-green-200">
-                            <strong>AI Integration Gap:</strong> Competitors are lagging in AI features. Accelerate development to capture market share.
-                          </p>
-                        </div>
-                        <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/30">
-                          <p className="text-sm text-blue-200">
-                            <strong>Mobile Market:</strong> 40% increase in mobile-first demand. Prioritize mobile app development.
-                          </p>
+                  {strategicAnalysis ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-white flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          Opportunities
+                        </h4>
+                        <div className="space-y-3">
+                          {strategicAnalysis.opportunities.length > 0 ? (
+                            strategicAnalysis.opportunities.slice(0, 3).map((opp, idx) => (
+                              <div key={idx} className="p-3 bg-green-500/10 rounded-lg border border-green-500/30">
+                                <p className="text-sm text-green-200">
+                                  <strong>{opp}</strong>
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-purple-300">No opportunities identified yet</p>
+                          )}
                         </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-white flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-red-400" />
-                        Threats
-                      </h4>
-                      <div className="space-y-3">
-                        <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/30">
-                          <p className="text-sm text-red-200">
-                            <strong>Price War:</strong> Competitor reduced prices by 25%. Review pricing strategy and enhance value proposition.
-                          </p>
-                        </div>
-                        <div className="p-3 bg-orange-500/10 rounded-lg border border-orange-500/30">
-                          <p className="text-sm text-orange-200">
-                            <strong>Partnership Risk:</strong> Competitor formed strategic alliance. Monitor impact and consider counter-moves.
-                          </p>
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-white flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-red-400" />
+                          Threats
+                        </h4>
+                        <div className="space-y-3">
+                          {strategicAnalysis.threats.length > 0 ? (
+                            strategicAnalysis.threats.slice(0, 3).map((threat, idx) => (
+                              <div key={idx} className="p-3 bg-red-500/10 rounded-lg border border-red-500/30">
+                                <p className="text-sm text-red-200">
+                                  <strong>{threat}</strong>
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-purple-300">No threats identified yet</p>
+                          )}
                         </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="text-center py-8 text-purple-300">
+                      <p>Strategic analysis loading...</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -694,45 +741,65 @@ export default function IntelligencePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/30">
-                        <h4 className="font-semibold text-green-300 mb-2">Strengths</h4>
-                        <ul className="text-sm text-green-200 space-y-1">
-                          <li>• Superior AI integration</li>
-                          <li>• Strong customer satisfaction</li>
-                          <li>• Innovative product features</li>
-                        </ul>
+                  {strategicAnalysis ? (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/30">
+                          <h4 className="font-semibold text-green-300 mb-2">Strengths</h4>
+                          {strategicAnalysis.strengths.length > 0 ? (
+                            <ul className="text-sm text-green-200 space-y-1">
+                              {strategicAnalysis.strengths.map((strength, idx) => (
+                                <li key={idx}>• {strength}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-purple-300">No strengths identified yet</p>
+                          )}
+                        </div>
+                        <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/30">
+                          <h4 className="font-semibold text-red-300 mb-2">Weaknesses</h4>
+                          {strategicAnalysis.weaknesses.length > 0 ? (
+                            <ul className="text-sm text-red-200 space-y-1">
+                              {strategicAnalysis.weaknesses.map((weakness, idx) => (
+                                <li key={idx}>• {weakness}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-purple-300">No weaknesses identified yet</p>
+                          )}
+                        </div>
+                        <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                          <h4 className="font-semibold text-blue-300 mb-2">Opportunities</h4>
+                          {strategicAnalysis.opportunities.length > 0 ? (
+                            <ul className="text-sm text-blue-200 space-y-1">
+                              {strategicAnalysis.opportunities.map((opp, idx) => (
+                                <li key={idx}>• {opp}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-purple-300">No opportunities identified yet</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/30">
-                        <h4 className="font-semibold text-red-300 mb-2">Weaknesses</h4>
-                        <ul className="text-sm text-red-200 space-y-1">
-                          <li>• Higher pricing than competitors</li>
-                          <li>• Limited mobile presence</li>
-                          <li>• Smaller market share</li>
-                        </ul>
-                      </div>
-                      <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
-                        <h4 className="font-semibold text-blue-300 mb-2">Opportunities</h4>
-                        <ul className="text-sm text-blue-200 space-y-1">
-                          <li>• AI market gap</li>
-                          <li>• Mobile-first demand</li>
-                          <li>• Partnership opportunities</li>
-                        </ul>
-                      </div>
-                    </div>
 
-                    <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
-                      <h4 className="font-semibold text-purple-300 mb-2">Strategic Recommendations</h4>
-                      <ol className="text-sm text-purple-200 space-y-2">
-                        <li>1. Accelerate AI feature development to maintain competitive advantage</li>
-                        <li>2. Develop mobile-first solution to capture growing market demand</li>
-                        <li>3. Form strategic partnerships to expand market reach</li>
-                        <li>4. Optimize pricing strategy to remain competitive while maintaining value</li>
-                        <li>5. Enhance customer success programs to improve retention</li>
-                      </ol>
+                      <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
+                        <h4 className="font-semibold text-purple-300 mb-2">Strategic Recommendations</h4>
+                        {strategicAnalysis.recommendations.length > 0 ? (
+                          <ol className="text-sm text-purple-200 space-y-2">
+                            {strategicAnalysis.recommendations.map((rec, idx) => (
+                              <li key={idx}>{idx + 1}. {rec}</li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="text-sm text-purple-300">No recommendations available yet. Add competitors and intelligence data to get AI-generated recommendations.</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="text-center py-8 text-purple-300">
+                      <p>Strategic analysis loading...</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

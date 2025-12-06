@@ -62,7 +62,8 @@ export class NotificationJobQueue {
    * Initialize the job queue tables
    */
   async initialize(): Promise<void> {
-    await query(`
+    const sql = getSql()
+    await sql`
       CREATE TABLE IF NOT EXISTS notification_jobs (
         id VARCHAR(255) PRIMARY KEY,
         title TEXT NOT NULL,
@@ -87,12 +88,12 @@ export class NotificationJobQueue {
         error TEXT,
         processed_at TIMESTAMP WITH TIME ZONE
       )
-    `)
+    `
 
     // Create indexes separately
-    await query(`CREATE INDEX IF NOT EXISTS idx_notification_jobs_scheduled_time ON notification_jobs(scheduled_time)`)
-    await query(`CREATE INDEX IF NOT EXISTS idx_notification_jobs_status ON notification_jobs(status)`)
-    await query(`CREATE INDEX IF NOT EXISTS idx_notification_jobs_created_by ON notification_jobs(created_by)`)
+    await sql`CREATE INDEX IF NOT EXISTS idx_notification_jobs_scheduled_time ON notification_jobs(scheduled_time)`
+    await sql`CREATE INDEX IF NOT EXISTS idx_notification_jobs_status ON notification_jobs(status)`
+    await sql`CREATE INDEX IF NOT EXISTS idx_notification_jobs_created_by ON notification_jobs(created_by)`
 
     logInfo('Notification job queue initialized')
   }
@@ -103,35 +104,36 @@ export class NotificationJobQueue {
   async addJob(job: Omit<NotificationJob, 'id' | 'createdAt' | 'attempts' | 'status'>): Promise<string> {
     const jobId = `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     const now = new Date()
+    const sql = getSql()
 
-    await query(`
+    await sql`
       INSERT INTO notification_jobs (
         id, title, body, icon, badge, image, data, actions, tag,
         require_interaction, silent, vibrate, user_ids, all_users,
         scheduled_time, created_at, created_by, attempts, max_attempts, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
-    `, [
-      jobId,
-      job.title,
-      job.body,
-      job.icon,
-      job.badge,
-      job.image,
-      job.data ? JSON.stringify(job.data) : null,
-      job.actions ? JSON.stringify(job.actions) : null,
-      job.tag,
-      job.requireInteraction || false,
-      job.silent || false,
-      job.vibrate || null,
-      job.userIds || null,
-      job.allUsers || false,
-      job.scheduledTime,
-      now,
-      job.createdBy,
-      0,
-      job.maxAttempts || 3,
-      'pending'
-    ])
+      ) VALUES (
+        ${jobId},
+        ${job.title},
+        ${job.body},
+        ${job.icon || null},
+        ${job.badge || null},
+        ${job.image || null},
+        ${job.data ? JSON.stringify(job.data) : null},
+        ${job.actions ? JSON.stringify(job.actions) : null},
+        ${job.tag || null},
+        ${job.requireInteraction || false},
+        ${job.silent || false},
+        ${job.vibrate || null},
+        ${job.userIds || null},
+        ${job.allUsers || false},
+        ${job.scheduledTime},
+        ${now},
+        ${job.createdBy},
+        0,
+        ${job.maxAttempts || 3},
+        'pending'
+      )
+    `
 
     logInfo(`Added notification job ${jobId} scheduled for ${job.scheduledTime}`)
 
@@ -187,22 +189,24 @@ export class NotificationJobQueue {
    * Mark a job as processing
    */
   async markJobProcessing(jobId: string): Promise<void> {
-    await query(`
+    const sql = getSql()
+    await sql`
       UPDATE notification_jobs 
       SET status = 'processing', attempts = attempts + 1
-      WHERE id = $1
-    `, [jobId])
+      WHERE id = ${jobId}
+    `
   }
 
   /**
    * Mark a job as completed
    */
   async markJobCompleted(jobId: string): Promise<void> {
-    await query(`
+    const sql = getSql()
+    await sql`
       UPDATE notification_jobs 
       SET status = 'completed', processed_at = NOW()
-      WHERE id = $1
-    `, [jobId])
+      WHERE id = ${jobId}
+    `
 
     this.lastProcessedAt = new Date()
   }
@@ -303,30 +307,83 @@ export class NotificationJobQueue {
       paramIndex++
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-
-    // Get total count
-    const countResult = await query(`
-      SELECT COUNT(*) as total FROM notification_jobs ${whereClause}
-    `, params)
-
-    // Get jobs
-    const jobsResult = await query(`
-      SELECT * FROM notification_jobs 
-      ${whereClause}
-      ORDER BY created_at DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `, [...params, limit, offset])
-
-    const jobs = jobsResult.map((row: any) => ({
+    const sql = getSql()
+    const sqlClient = sql as any
+    
+    // Build safe queries using template literals when possible, unsafe when needed for dynamic WHERE
+    let countRows: any[]
+    let jobsRows: any[]
+    
+    if (conditions.length === 0) {
+      // No conditions - safe to use template literal
+      const countResult = await sql`SELECT COUNT(*) as total FROM notification_jobs`
+      const jobsResult = await sql`
+        SELECT * FROM notification_jobs 
+        ORDER BY created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `
+      countRows = Array.isArray(countResult) ? countResult : []
+      jobsRows = Array.isArray(jobsResult) ? jobsResult : []
+    } else if (typeof sqlClient.unsafe === 'function') {
+      // Use unsafe for dynamic WHERE clauses (values are parameterized in conditions)
+      const whereClause = conditions.join(' AND ')
+      const countResult = await sqlClient.unsafe(
+        `SELECT COUNT(*) as total FROM notification_jobs WHERE ${whereClause}`,
+        params
+      )
+      const jobsResult = await sqlClient.unsafe(
+        `SELECT * FROM notification_jobs WHERE ${whereClause} ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+        [...params, limit, offset]
+      )
+      countRows = Array.isArray(countResult) ? countResult : []
+      jobsRows = Array.isArray(jobsResult) ? jobsResult : []
+    } else {
+      // Fallback: build query safely with template literal for known conditions
+      if (status && !createdBy) {
+        const countResult = await sql`SELECT COUNT(*) as total FROM notification_jobs WHERE status = ${status}`
+        const jobsResult = await sql`
+          SELECT * FROM notification_jobs 
+          WHERE status = ${status}
+          ORDER BY created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+        countRows = Array.isArray(countResult) ? countResult : []
+        jobsRows = Array.isArray(jobsResult) ? jobsResult : []
+      } else if (createdBy && !status) {
+        const countResult = await sql`SELECT COUNT(*) as total FROM notification_jobs WHERE created_by = ${createdBy}`
+        const jobsResult = await sql`
+          SELECT * FROM notification_jobs 
+          WHERE created_by = ${createdBy}
+          ORDER BY created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+        countRows = Array.isArray(countResult) ? countResult : []
+        jobsRows = Array.isArray(jobsResult) ? jobsResult : []
+      } else {
+        const countResult = await sql`
+          SELECT COUNT(*) as total FROM notification_jobs 
+          WHERE status = ${status} AND created_by = ${createdBy}
+        `
+        const jobsResult = await sql`
+          SELECT * FROM notification_jobs 
+          WHERE status = ${status} AND created_by = ${createdBy}
+          ORDER BY created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+        countRows = Array.isArray(countResult) ? countResult : []
+        jobsRows = Array.isArray(jobsResult) ? jobsResult : []
+      }
+    }
+    
+    const jobs = (jobsRows || []).map((row: any) => ({
       id: row.id,
       title: row.title,
       body: row.body,
       icon: row.icon,
       badge: row.badge,
       image: row.image,
-      data: row.data ? JSON.parse(row.data) : undefined,
-      actions: row.actions ? JSON.parse(row.actions) : undefined,
+      data: row.data ? (typeof row.data === 'string' ? JSON.parse(row.data) : row.data) : undefined,
+      actions: row.actions ? (typeof row.actions === 'string' ? JSON.parse(row.actions) : row.actions) : undefined,
       tag: row.tag,
       requireInteraction: row.require_interaction,
       silent: row.silent,
@@ -343,9 +400,11 @@ export class NotificationJobQueue {
       processedAt: row.processed_at ? new Date(row.processed_at) : undefined
     }))
 
+    const totalCount = countRows && countRows[0] ? (countRows[0].total || 0) : 0
+
     return {
       jobs,
-      total: parseInt(countResult[0].total)
+      total: typeof totalCount === 'string' ? parseInt(totalCount) : totalCount
     }
   }
 
@@ -354,23 +413,24 @@ export class NotificationJobQueue {
    */
   async cleanup(olderThanDays: number = 30): Promise<number> {
     // Validate input to prevent injection
-    if (typeof olderThanDays !== 'number' || olderThanDays < 0 || olderThanDays > 365) {
-      throw new Error('Invalid olderThanDays parameter: must be a number between 0 and 365')
+    if (typeof olderThanDays !== 'number' || olderThanDays < 0 || olderThanDays > 365 || !Number.isInteger(olderThanDays)) {
+      throw new Error('Invalid olderThanDays parameter: must be an integer between 0 and 365')
     }
 
     // Use parameterized query with proper INTERVAL syntax to prevent SQL injection
-    // olderThanDays is validated as a number, so we can safely use it in interval arithmetic
+    // olderThanDays is validated as an integer, and we use makeInterval for safety
     const sql = getSql()
+    // Use make_interval function which safely handles integer multiplication
     const result = await sql`
       DELETE FROM notification_jobs 
       WHERE status IN ('completed', 'failed', 'cancelled')
-        AND processed_at < NOW() - (INTERVAL '1 day' * ${olderThanDays})
+        AND processed_at < NOW() - make_interval(days => ${olderThanDays})
       RETURNING id
     `
 
     const deletedCount = result.length
     if (deletedCount > 0) {
-      logInfo(`Cleaned up ${deletedCount} old notification jobs`)
+      logInfo(`Cleaned up ${deletedCount} old notification jobs older than ${olderThanDays} days`)
     }
 
     return deletedCount

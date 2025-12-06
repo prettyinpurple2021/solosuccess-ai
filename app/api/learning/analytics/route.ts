@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/db'
-import { learningModules, userProgress } from '@/db/schema'
-import { eq, and, desc, gte } from 'drizzle-orm'
+import { learningModules, userProgress, achievements, userAchievements } from '@/db/schema'
+import { eq, and, desc, gte, sql } from 'drizzle-orm'
 import { verifyAuth } from '@/lib/auth-server'
+import { logError } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -121,6 +122,46 @@ export async function GET(req: NextRequest) {
     const weeklyGoal = 5
     const weeklyGoalProgress = Math.min(100, Math.round((learningVelocity / weeklyGoal) * 100))
 
+    // Calculate real certifications earned from user achievements
+    // Certifications are achievements with category 'certification' or 'certificate'
+    const certificationsEarned = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(userAchievements)
+      .innerJoin(achievements, eq(userAchievements.achievement_id, achievements.id))
+      .where(and(
+        eq(userAchievements.user_id, userId),
+        sql`${achievements.category} IN ('certification', 'certificate')`
+      ))
+    const certificationCount = certificationsEarned[0]?.count || 0
+
+    // Calculate peer rank based on total modules completed (relative to all users)
+    const rankResult = await db
+      .select({
+        rank: sql<number>`
+          RANK() OVER (ORDER BY COUNT(DISTINCT ${userProgress.module_id}) DESC)
+        `
+      })
+      .from(userProgress)
+      .where(eq(userProgress.user_id, userId))
+      .groupBy(userProgress.user_id)
+
+    // Alternative approach: get all user completion counts and calculate rank
+    const allUserCompletions = await db
+      .select({
+        user_id: userProgress.user_id,
+        completed_count: sql<number>`COUNT(DISTINCT ${userProgress.module_id})`
+      })
+      .from(userProgress)
+      .where(eq(userProgress.status, 'completed'))
+      .groupBy(userProgress.user_id)
+
+    // Sort and find rank
+    const sortedCompletions = allUserCompletions
+      .sort((a, b) => Number(b.completed_count) - Number(a.completed_count))
+    const userCompletionCount = totalModulesCompleted
+    const userRank = sortedCompletions.findIndex(u => Number(u.completed_count) > userCompletionCount) + 1
+    const peerRank = userRank > 0 ? userRank : sortedCompletions.length
+
     const analytics = {
       total_modules_completed: totalModulesCompleted,
       total_time_spent: totalTimeSpent,
@@ -129,14 +170,14 @@ export async function GET(req: NextRequest) {
       current_streak: currentStreak,
       learning_velocity: learningVelocity,
       top_categories: topCategories,
-      certifications_earned: Math.floor(totalModulesCompleted / 5), // Mock logic: 1 cert per 5 modules
-      peer_rank: 12, // Placeholder as we don't have global leaderboard yet
+      certifications_earned: Number(certificationCount),
+      peer_rank: peerRank,
       weekly_goal_progress: weeklyGoalProgress
     }
 
     return NextResponse.json(analytics)
   } catch (error) {
-    console.error('Error calculating learning analytics:', error)
+    logError('Error calculating learning analytics:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
