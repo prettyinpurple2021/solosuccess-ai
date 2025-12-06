@@ -130,16 +130,39 @@ export async function POST(
       updated_at: new Date()
     }
 
-    // Store provider-specific credentials
-    if (data.storeUrl) connectionData.account_id = data.storeUrl
-    if (data.apiKey) connectionData.access_token = data.apiKey
-    if (data.apiSecret) connectionData.refresh_token = data.apiSecret
-    if (data.clientId) connectionData.access_token = data.clientId
-    if (data.clientSecret) connectionData.refresh_token = data.clientSecret
-    if (data.applicationId) connectionData.access_token = data.applicationId
-    if (data.applicationSecret) connectionData.refresh_token = data.applicationSecret
-    if (data.consumerKey) connectionData.access_token = data.consumerKey
-    if (data.consumerSecret) connectionData.refresh_token = data.consumerSecret
+    // Store provider-specific credentials based on provider type
+    // Each provider uses different credential naming conventions
+    switch (provider) {
+      case 'shopify':
+        if (data.storeUrl) connectionData.account_id = data.storeUrl
+        if (data.apiKey) connectionData.access_token = data.apiKey
+        if (data.apiSecret) connectionData.refresh_token = data.apiSecret
+        break
+      
+      case 'paypal':
+        if (data.clientId) connectionData.access_token = data.clientId
+        if (data.clientSecret) connectionData.refresh_token = data.clientSecret
+        break
+      
+      case 'square':
+        if (data.applicationId) connectionData.access_token = data.applicationId
+        if (data.applicationSecret) connectionData.refresh_token = data.applicationSecret
+        break
+      
+      case 'woocommerce':
+        if (data.storeUrl) connectionData.account_id = data.storeUrl
+        if (data.consumerKey) connectionData.access_token = data.consumerKey
+        if (data.consumerSecret) connectionData.refresh_token = data.consumerSecret
+        break
+      
+      default:
+        // For unknown providers, try to map common patterns
+        if (data.apiKey) connectionData.access_token = data.apiKey
+        if (data.apiSecret) connectionData.refresh_token = data.apiSecret
+        if (data.clientId && !connectionData.access_token) connectionData.access_token = data.clientId
+        if (data.clientSecret && !connectionData.refresh_token) connectionData.refresh_token = data.clientSecret
+        if (data.storeUrl) connectionData.account_id = data.storeUrl
+    }
 
     if (existing.length > 0) {
       await db

@@ -99,14 +99,21 @@ export class RevenueTrackingService {
         limit: 100
       })
 
+      // Track payment intent IDs that have associated charges to avoid double counting
+      const countedPaymentIntentIds = new Set<string>()
+
       let totalRevenue = 0
       for (const charge of charges.data) {
         if (charge.status === 'succeeded' && charge.paid) {
           totalRevenue += charge.amount / 100 // Convert from cents to dollars
+          // Track the payment intent ID if this charge has one
+          if (charge.payment_intent && typeof charge.payment_intent === 'string') {
+            countedPaymentIntentIds.add(charge.payment_intent)
+          }
         }
       }
 
-      // Also check payment intents
+      // Also check payment intents that don't have associated charges
       const paymentIntents = await stripe.paymentIntents.list({
         created: {
           gte: Math.floor(startDate.getTime() / 1000),
@@ -117,8 +124,10 @@ export class RevenueTrackingService {
 
       for (const pi of paymentIntents.data) {
         if (pi.status === 'succeeded' && pi.amount) {
-          // Avoid double counting if already counted as charge
-          totalRevenue += pi.amount / 100
+          // Only count if this payment intent wasn't already counted via a charge
+          if (!countedPaymentIntentIds.has(pi.id)) {
+            totalRevenue += pi.amount / 100
+          }
         }
       }
 

@@ -139,6 +139,7 @@ export async function POST(request: NextRequest) {
       const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/integrations/stripe/connect/callback`
       
       // Exchange code for Stripe Connect access token
+      // Stripe OAuth requires: grant_type, code, client_id, and client_secret
       const tokenResponse = await fetch(STRIPE_CONNECT_TOKEN_URL, {
         method: 'POST',
         headers: {
@@ -147,6 +148,7 @@ export async function POST(request: NextRequest) {
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           code,
+          client_id: clientId,
           client_secret: clientSecret
         })
       })
