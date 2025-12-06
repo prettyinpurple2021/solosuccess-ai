@@ -1,0 +1,221 @@
+
+> solosuccess-ai@0.0.0 lint
+> next lint
+
+
+./app/api/briefcase/search/route.ts
+55:9  Warning: 'whereConditions' is never reassigned. Use 'const' instead.  prefer-const
+57:9  Warning: 'params' is never reassigned. Use 'const' instead.  prefer-const
+
+./app/api/dashboard/route.ts
+91:9  Warning: 'userData' is never reassigned. Use 'const' instead.  prefer-const
+312:5  Warning: 'userStatsRes' is never reassigned. Use 'const' instead.  prefer-const
+314:5  Warning: 'todaysStatsRes' is never reassigned. Use 'const' instead.  prefer-const
+316:5  Warning: 'todaysTasksRes' is never reassigned. Use 'const' instead.  prefer-const
+318:5  Warning: 'briefcasesRes' is never reassigned. Use 'const' instead.  prefer-const
+320:5  Warning: 'activeGoalsRes' is never reassigned. Use 'const' instead.  prefer-const
+322:5  Warning: 'conversationsRes' is never reassigned. Use 'const' instead.  prefer-const
+324:5  Warning: 'achievementsRes' is never reassigned. Use 'const' instead.  prefer-const
+326:5  Warning: 'weeklyFocusRes' is never reassigned. Use 'const' instead.  prefer-const
+
+./app/api/learning/analytics/route.ts
+56:7  Error: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+80:11  Warning: 'checkDate' is never reassigned. Use 'const' instead.  prefer-const
+87:11  Warning: 'checkDate' is never reassigned. Use 'const' instead.  prefer-const
+103:7  Error: Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable  @next/next/no-assign-module-variable
+
+./app/auth/device-approval/page.tsx
+42:6  Warning: React Hook useEffect has a missing dependency: 'loadDeviceInfo'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/dashboard/brand/page.tsx
+874:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/dashboard/briefcase/page.tsx
+206:16  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./app/dashboard/competitors/[id]/edit/page.tsx
+128:6  Warning: React Hook useEffect has a missing dependency: 'fetchCompetitorData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/dashboard/settings/page.tsx
+90:6  Warning: React Hook useEffect has a missing dependency: 'apiKeys'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/debug-auth/page.tsx
+19:29  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+20:35  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+21:45  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+22:33  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+23:29  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+25:3  Error: React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+
+./app/pricing/page.tsx
+191:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+194:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+200:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+203:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+547:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+549:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+550:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+557:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+558:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+559:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+560:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+567:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+568:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+569:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+570:21  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./app/signin/page.tsx
+112:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./app/signup/page.tsx
+169:15  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./app/test-auth/page.tsx
+18:18  Error: React Hook "useRouter" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+19:39  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+20:35  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+21:29  Error: React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+23:3  Error: React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks
+
+./components/AgentChat.tsx
+37:8  Warning: React Hook useEffect has a missing dependency: 'onMessageConsumed'. Either include it or remove the dependency array. If 'onMessageConsumed' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+58:8  Warning: React Hook useEffect has missing dependencies: 'loadTasks' and 'resetChat'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+143:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/ai/task-intelligence-panel.tsx
+65:6  Warning: React Hook useEffect has a missing dependency: 'handleOptimize'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/analytics/predictive-insights-dashboard.tsx
+104:6  Warning: React Hook useEffect has a missing dependency: 'fetchPredictiveInsights'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/auth/simple-auth.tsx
+53:6  Warning: React Hook useEffect has a missing dependency: 'verifyToken'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/briefcase/bulk-operations-panel.tsx
+125:11  Warning: 'requestBody' is never reassigned. Use 'const' instead.  prefer-const
+
+./components/briefcase/enhanced-file-preview-modal.tsx
+255:41  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+307:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/briefcase/file-metadata-panel.tsx
+88:40  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/briefcase/version-history-modal.tsx
+72:6  Warning: React Hook useEffect has a missing dependency: 'loadVersions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/competitors/blaze-growth-intelligence.tsx
+75:6  Warning: React Hook useEffect has a missing dependency: 'analyzePricingStrategy'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/competitors/pricing-intelligence-dashboard.tsx
+63:6  Warning: React Hook useEffect has a missing dependency: 'loadPricingIntelligence'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/competitors/scraping-manager.tsx
+115:6  Warning: React Hook useEffect has a missing dependency: 'fetchJobs'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/dashboard/competitor-comparison-charts.tsx
+62:6  Warning: React Hook useEffect has a missing dependency: 'fetchCompetitorMetrics'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/dashboard/intelligence-dashboard.tsx
+81:6  Warning: React Hook useEffect has a missing dependency: 'fetchDashboardData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/dashboard/intelligence-timeline.tsx
+66:6  Warning: React Hook useEffect has a missing dependency: 'fetchTimelineEvents'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/Dashboard.tsx
+469:57  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/DashboardHeader.tsx
+171:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/file-preview-modal.tsx
+229:41  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/FocusMode.tsx
+29:8  Warning: React Hook useEffect has a missing dependency: 'soundEnabled'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/GlobalSearch.tsx
+134:6  Warning: React Hook useEffect has a missing dependency: 'performSearch'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/integrations/calendar-integration.tsx
+32:6  Warning: React Hook useEffect has a missing dependency: 'checkConnection'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/intelligence/intelligence-search.tsx
+154:6  Warning: React Hook useEffect has missing dependencies: 'handleSearch' and 'initialFilters.query'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/mobile/mobile-dashboard-widgets.tsx
+394:22  Error: React Hook "useAnimation" is called in function "renderWidget" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use".  react-hooks/rules-of-hooks
+
+./components/mobile/offline-data-manager.tsx
+228:6  Warning: React Hook useEffect has a missing dependency: 'syncPendingActions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+358:6  Warning: React Hook useCallback has missing dependencies: 'removePendingAction', 'syncStatus.isSyncing', and 'updatePendingActionRetries'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/onboarding/interactive-tutorial.tsx
+486:86  Warning: React Hook useMemo has a missing dependency: 'tutorialSteps'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+512:9  Warning: The 'currentTutorialProgress' logical expression could make the dependencies of useEffect Hook (at line 535) change on every render. Move it inside the useEffect callback. Alternatively, wrap the initialization of 'currentTutorialProgress' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+648:6  Warning: React Hook useEffect has a missing dependency: 'trackTutorialEvent'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+683:6  Warning: React Hook useEffect has missing dependencies: 'nextStep', 'onSkipAction', and 'prevStep'. Either include them or remove the dependency array. If 'onSkipAction' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+696:6  Warning: React Hook useEffect has a missing dependency: 'nextStep'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/onboarding/onboarding-wizard.tsx
+416:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+515:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/onboarding/progressive-onboarding.tsx
+217:6  Warning: React Hook useEffect has a missing dependency: 'nextStep'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+248:6  Warning: React Hook useEffect has missing dependencies: 'nextStep', 'onSkip', and 'prevStep'. Either include them or remove the dependency array. If 'onSkip' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+
+./components/onboarding/welcome-dashboard.tsx
+110:6  Warning: React Hook useEffect has a missing dependency: 'dailyTips.length'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/shared/shared-landing-page.tsx
+162:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+355:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+401:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+506:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/social/boss-community.tsx
+385:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/subscription/subscription-guard.tsx
+34:6  Warning: React Hook useEffect has a missing dependency: 'checkAccess'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/templates/email-campaign-builder.tsx
+718:25  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./components/templates/strategic-business-plan.tsx
+343:6  Warning: React Hook useEffect has a missing dependency: 'generateFinancialProjections'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/TemplateSaveIntegration.tsx
+65:6  Warning: React Hook useEffect has a missing dependency: 'handleAutoSave'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/TheBoardroom.tsx
+108:37  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+154:45  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/TheStudio.tsx
+167:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/TheVault.tsx
+272:45  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/Treasury.tsx
+47:8  Warning: React Hook useEffect has a missing dependency: 'calculateProjection'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/ui/accessibility.tsx
+51:9  Warning: The 'accessibilityPrefs' logical expression could make the dependencies of useEffect Hook (at line 74) change on every render. To fix this, wrap the initialization of 'accessibilityPrefs' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+
+./components/UnifiedBriefcase.tsx
+203:6  Warning: React Hook useEffect has a missing dependency: 'loadItems'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/voice/voice-chat.tsx
+208:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/WarRoom.tsx
+82:8  Warning: React Hook useEffect has a missing dependency: 'displayedDialogue.length'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+282:49  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/workflow/workflow-execution-monitor.tsx
+255:6  Warning: React Hook useEffect has a missing dependency: 'refreshExecutions'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
