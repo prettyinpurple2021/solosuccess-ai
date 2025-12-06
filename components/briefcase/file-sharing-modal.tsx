@@ -349,7 +349,10 @@ export default function FileSharingModal({
         method: 'DELETE'
       })
 
-      if (!response.ok) throw new Error('Failed to delete sharing link')
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to delete sharing link')
+      }
 
       setShareLinks(prev => prev.filter(link => link.id !== linkId))
 
@@ -358,10 +361,10 @@ export default function FileSharingModal({
         description: "Share link has been revoked",
       })
 
-    } catch (_error) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete sharing link",
+        description: error instanceof Error ? error.message : "Failed to delete sharing link",
         variant: "destructive"
       })
     }

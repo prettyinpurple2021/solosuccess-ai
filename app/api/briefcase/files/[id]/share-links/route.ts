@@ -151,7 +151,7 @@ export const DELETE = withDocumentAuth(
       await sql`
         UPDATE document_share_links 
         SET is_active = false 
-        WHERE id = ${linkId} AND document_id = ${documentId}
+        WHERE id = ${linkId} AND document_id = ${documentId} AND created_by = ${user.id}
       `
 
       // Log activity
