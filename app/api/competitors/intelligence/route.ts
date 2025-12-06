@@ -206,7 +206,7 @@ export async function GET(req: NextRequest) {
             .map(a => a.title)
             .slice(0, 3)
 
-        const opportunities = mappedOpportunities
+        const opportunityTitles = mappedOpportunities
             .map(op => op.title)
             .slice(0, 3)
 
@@ -225,7 +225,7 @@ export async function GET(req: NextRequest) {
         const strategicAnalysis = {
             strengths,
             weaknesses,
-            opportunities,
+            opportunities: opportunityTitles,
             threats,
             recommendations: strategicRecommendations.slice(0, 5)
         }
