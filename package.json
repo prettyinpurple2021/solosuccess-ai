@@ -29,7 +29,7 @@
     "@upstash/qstash": "^2.8.4",
     "@upstash/redis": "^1.35.6",
     "@vercel/analytics": "^1.6.1",
-    "ai": "^4.0.20",
+    "ai": "^5.0.52",
     "cheerio": "^1.1.2",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
