@@ -123,3 +123,52 @@ export const POST = withDocumentAuth(
     }
   }
 )
+
+export const DELETE = withDocumentAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async (request: NextRequest, user: any, documentId: string) => {
+    try {
+      const { searchParams } = new URL(request.url)
+      const linkId = searchParams.get('linkId')
+
+      if (!linkId) {
+        return createErrorResponse('Link ID is required', 400)
+      }
+
+      const sql = getSql()
+
+      // Verify the share link belongs to this document and was created by this user
+      const existingLink = await sql`
+        SELECT id FROM document_share_links 
+        WHERE id = ${linkId} AND document_id = ${documentId} AND created_by = ${user.id}
+      ` as any[] // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      if (!existingLink || existingLink.length === 0) {
+        return createErrorResponse('Share link not found', 404)
+      }
+
+      // Soft delete by setting is_active to false
+      await sql`
+        UPDATE document_share_links 
+        SET is_active = false 
+        WHERE id = ${linkId} AND document_id = ${documentId}
+      `
+
+      // Log activity
+      const detailsJson = JSON.stringify({
+        shareId: linkId,
+        action: 'deleted'
+      })
+      await sql`
+        INSERT INTO document_activity (document_id, user_id, action, details, created_at)
+        VALUES (${documentId}, ${user.id}, ${'share_link_deleted'}, ${detailsJson}::jsonb, NOW())
+      `
+
+      return NextResponse.json({ success: true, message: 'Share link deleted successfully' })
+
+    } catch (error) {
+      logError('Delete share link error:', error)
+      return createErrorResponse('Failed to delete share link', 500)
+    }
+  }
+)

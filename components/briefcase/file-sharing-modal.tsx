@@ -340,6 +340,33 @@ export default function FileSharingModal({
     }
   }, [toast])
 
+  // Delete share link
+  const deleteShareLink = useCallback(async (linkId: string) => {
+    if (!file) return
+
+    try {
+      const response = await fetch(`/api/briefcase/files/${file.id}/share-links?linkId=${linkId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) throw new Error('Failed to delete sharing link')
+
+      setShareLinks(prev => prev.filter(link => link.id !== linkId))
+
+      toast({
+        title: "Link deleted",
+        description: "Share link has been revoked",
+      })
+
+    } catch (_error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete sharing link",
+        variant: "destructive"
+      })
+    }
+  }, [file, toast])
+
   // Search for team members
   const searchTeamMembers = useCallback(async (query: string) => {
     if (!query.trim() || query.length < 2) {
@@ -730,7 +757,7 @@ export default function FileSharingModal({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {/* TODO: Delete link */}}
+                          onClick={() => deleteShareLink(link.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
