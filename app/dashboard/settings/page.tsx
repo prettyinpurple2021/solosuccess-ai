@@ -48,6 +48,7 @@ import {
 import Link from 'next/link'
 import { SocialMediaIntegration } from '@/components/integrations/social-media-integration'
 import { CalendarIntegration } from '@/components/integrations/calendar-integration'
+import { RevenueIntegration } from '@/components/integrations/revenue-integration'
 
 export default function SettingsPage() {
   const { user, signOut, loading } = useAuth()
@@ -509,6 +510,7 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="space-y-6">
+                        <RevenueIntegration />
                         <SocialMediaIntegration />
                         <CalendarIntegration />
                       </div>

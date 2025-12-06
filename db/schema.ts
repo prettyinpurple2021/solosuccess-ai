@@ -861,6 +861,28 @@ export const socialMediaConnections = pgTable('social_media_connections', {
   userPlatformIdx: index('social_media_connections_user_platform_idx').on(table.user_id, table.platform),
 }));
 
+// Payment Provider Connections table - for users to connect their own payment processors
+export const paymentProviderConnections = pgTable('payment_provider_connections', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  provider: varchar('provider', { length: 50 }).notNull(), // stripe, paypal, square, etc.
+  account_id: varchar('account_id', { length: 255 }), // Provider account ID (e.g., Stripe Account ID)
+  access_token: text('access_token'), // For OAuth providers
+  refresh_token: text('refresh_token'),
+  expires_at: timestamp('expires_at'),
+  account_email: varchar('account_email', { length: 255 }),
+  account_name: varchar('account_name', { length: 255 }),
+  webhook_secret: text('webhook_secret'), // For receiving webhooks
+  is_active: boolean('is_active').default(true),
+  last_synced_at: timestamp('last_synced_at'),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('payment_provider_connections_user_id_idx').on(table.user_id),
+  providerIdx: index('payment_provider_connections_provider_idx').on(table.provider),
+  userProviderIdx: index('payment_provider_connections_user_provider_idx').on(table.user_id, table.provider),
+}));
+
 // Learning Modules table
 export const learningModules = pgTable('learning_modules', {
   id: varchar('id', { length: 255 }).primaryKey(),
