@@ -1,27 +1,20 @@
 import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid, foreignKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-// Users table
+// Users table - matches actual database structure
 export const users = pgTable('users', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  password_hash: varchar('password_hash', { length: 255 }).notNull(),
-  full_name: varchar('full_name', { length: 255 }),
-  username: varchar('username', { length: 100 }).unique(),
-  date_of_birth: timestamp('date_of_birth'),
-  avatar_url: varchar('avatar_url', { length: 500 }),
-  subscription_tier: varchar('subscription_tier', { length: 50 }).default('free'),
-  subscription_status: varchar('subscription_status', { length: 50 }).default('active'),
-  stripe_customer_id: varchar('stripe_customer_id', { length: 255 }),
-  stripe_subscription_id: varchar('stripe_subscription_id', { length: 255 }),
-  current_period_start: timestamp('current_period_start'),
-  current_period_end: timestamp('current_period_end'),
-  cancel_at_period_end: boolean('cancel_at_period_end').default(false),
-  is_verified: boolean('is_verified').default(false),
-  onboarding_completed: boolean('onboarding_completed').default(false),
-  onboarding_completed_at: timestamp('onboarding_completed_at'),
-  onboarding_data: jsonb('onboarding_data'),
-  // role: varchar('role', { length: 20 }).default('user'),
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  email: text('email'),
+  password: text('password'),
+  stack_user_id: text('stack_user_id'),
+  role: text('role').default('user'),
+  admin_pin_hash: text('admin_pin_hash'),
+  xp: integer('xp').default(0),
+  level: integer('level').default(1),
+  total_actions: integer('total_actions').default(0),
+  suspended: boolean('suspended').default(false),
+  suspended_at: timestamp('suspended_at'),
+  suspended_reason: text('suspended_reason'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });
@@ -29,7 +22,7 @@ export const users = pgTable('users', {
 // Briefcase/Projects table
 export const briefcases = pgTable('briefcases', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   status: varchar('status', { length: 50 }).default('active'),
@@ -41,7 +34,7 @@ export const briefcases = pgTable('briefcases', {
 // Goals table
 export const goals = pgTable('goals', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   briefcase_id: integer('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
@@ -56,7 +49,7 @@ export const goals = pgTable('goals', {
 // Tasks table (enhanced)
 export const tasks = pgTable('tasks', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   goal_id: integer('goal_id').references(() => goals.id, { onDelete: 'cascade' }),
   briefcase_id: integer('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
   parent_task_id: integer('parent_task_id'),
@@ -86,7 +79,7 @@ export const tasks = pgTable('tasks', {
 // Templates table
 export const templates = pgTable('templates', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   content: text('content').notNull(),
@@ -106,7 +99,7 @@ export const templates = pgTable('templates', {
 // Task Categories table
 export const taskCategories = pgTable('task_categories', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 100 }).notNull(),
   color: varchar('color', { length: 7 }).default('#8B5CF6'),
   icon: varchar('icon', { length: 50 }),
@@ -118,7 +111,7 @@ export const taskCategories = pgTable('task_categories', {
 // Competitors table
 export const competitors = pgTable('competitors', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   website: varchar('website', { length: 500 }),
   description: text('description'),
@@ -134,7 +127,7 @@ export const competitors = pgTable('competitors', {
 // Task Analytics table
 export const taskAnalytics = pgTable('task_analytics', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   task_id: integer('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
   action: varchar('action', { length: 50 }).notNull(),
   timestamp: timestamp('timestamp').defaultNow(),
@@ -144,7 +137,7 @@ export const taskAnalytics = pgTable('task_analytics', {
 // Productivity Insights table
 export const productivityInsights = pgTable('productivity_insights', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   insight_type: varchar('insight_type', { length: 50 }).notNull(),
   date: timestamp('date', { mode: 'date' }).notNull(),
   metrics: jsonb('metrics').notNull(),
@@ -162,7 +155,7 @@ export const posts = pgTable('posts', {
 // User Competitive Stats table for gamification
 export const userCompetitiveStats = pgTable('user_competitive_stats', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   competitors_monitored: integer('competitors_monitored').default(0),
   intelligence_gathered: integer('intelligence_gathered').default(0),
   alerts_processed: integer('alerts_processed').default(0),
@@ -179,7 +172,7 @@ export const userCompetitiveStats = pgTable('user_competitive_stats', {
 // Competitor Profiles table
 export const competitorProfiles = pgTable('competitor_profiles', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   domain: varchar('domain', { length: 255 }),
   description: text('description'),
@@ -213,7 +206,7 @@ export const competitorProfiles = pgTable('competitor_profiles', {
 export const intelligenceData = pgTable('intelligence_data', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   source_type: varchar('source_type', { length: 50 }).notNull(),
   source_url: varchar('source_url', { length: 1000 }),
   data_type: varchar('data_type', { length: 100 }).notNull(),
@@ -242,7 +235,7 @@ export const intelligenceData = pgTable('intelligence_data', {
 export const competitorAlerts = pgTable('competitor_alerts', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   intelligence_id: integer('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
   alert_type: varchar('alert_type', { length: 100 }).notNull(),
   severity: varchar('severity', { length: 20 }).notNull().default('info'),
@@ -270,7 +263,7 @@ export const competitorAlerts = pgTable('competitor_alerts', {
 export const scrapingJobs = pgTable('scraping_jobs', {
   id: varchar('id', { length: 255 }).primaryKey(),
   competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   job_type: varchar('job_type', { length: 50 }).notNull(),
   url: varchar('url', { length: 1000 }).notNull(),
   priority: varchar('priority', { length: 20 }).notNull().default('medium'),
@@ -315,7 +308,7 @@ export const scrapingJobResults = pgTable('scraping_job_results', {
 // Competitive Opportunities table
 export const competitiveOpportunities = pgTable('competitive_opportunities', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
   intelligence_id: integer('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
   opportunity_type: varchar('opportunity_type', { length: 50 }).notNull(),
@@ -356,7 +349,7 @@ export const competitiveOpportunities = pgTable('competitive_opportunities', {
 export const opportunityActions = pgTable('opportunity_actions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   opportunity_id: varchar('opportunity_id', { length: 255 }).notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   action_type: varchar('action_type', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
@@ -384,7 +377,7 @@ export const opportunityActions = pgTable('opportunity_actions', {
 export const opportunityMetrics = pgTable('opportunity_metrics', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   opportunity_id: varchar('opportunity_id', { length: 255 }).notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   metric_name: varchar('metric_name', { length: 100 }).notNull(),
   metric_type: varchar('metric_type', { length: 50 }).notNull(),
   baseline_value: decimal('baseline_value', { precision: 15, scale: 4 }),
@@ -405,7 +398,7 @@ export const opportunityMetrics = pgTable('opportunity_metrics', {
 // Documents table for Briefcase
 export const documents = pgTable('documents', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   folder_id: integer('folder_id').references(() => documentFolders.id, { onDelete: 'set null' }),
   name: varchar('name', { length: 255 }).notNull(),
   original_name: varchar('original_name', { length: 255 }).notNull(),
@@ -438,7 +431,7 @@ export const documents = pgTable('documents', {
 // Document Folders table
 export const documentFolders = pgTable('document_folders', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   parent_id: integer('parent_id'),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
@@ -481,7 +474,7 @@ export const documentVersions = pgTable('document_versions', {
 export const documentPermissions = pgTable('document_permissions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 255 }),
   role: varchar('role', { length: 20 }).notNull().default('viewer'),
   granted_by: varchar('granted_by', { length: 255 }).notNull().references(() => users.id),
@@ -521,7 +514,7 @@ export const documentShareLinks = pgTable('document_share_links', {
 export const documentActivity = pgTable('document_activity', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   action: varchar('action', { length: 50 }).notNull(),
   details: jsonb('details').default('{}'),
   ip_address: varchar('ip_address', { length: 45 }),
@@ -828,7 +821,7 @@ export const documentActivityRelations = relations(documentActivity, ({ one }) =
 // Calendar Connections table
 export const calendarConnections = pgTable('calendar_connections', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   provider: varchar('provider', { length: 50 }).notNull(), // google, outlook, apple
   access_token: text('access_token').notNull(),
   refresh_token: text('refresh_token'),
@@ -847,7 +840,7 @@ export const calendarConnections = pgTable('calendar_connections', {
 // Social Media Connections table - for users to connect their own accounts
 export const socialMediaConnections = pgTable('social_media_connections', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   platform: varchar('platform', { length: 50 }).notNull(), // linkedin, twitter, facebook, instagram, youtube
   access_token: text('access_token').notNull(),
   refresh_token: text('refresh_token'),
@@ -890,7 +883,7 @@ export const learningModules = pgTable('learning_modules', {
 // User Learning Progress table
 export const userProgress = pgTable('user_progress', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   module_id: varchar('module_id', { length: 255 }).notNull().references(() => learningModules.id, { onDelete: 'cascade' }),
   completion_percentage: integer('completion_percentage').default(0),
   time_spent: integer('time_spent').default(0), // in minutes
@@ -908,7 +901,7 @@ export const userProgress = pgTable('user_progress', {
 // Skill Assessments table
 export const skillAssessments = pgTable('skill_assessments', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   skill_name: varchar('skill_name', { length: 255 }).notNull(),
   category: varchar('category', { length: 100 }),
   current_level: integer('current_level').default(1),
@@ -924,7 +917,7 @@ export const skillAssessments = pgTable('skill_assessments', {
 // Quiz Scores table
 export const quizScores = pgTable('quiz_scores', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   module_id: varchar('module_id', { length: 255 }).references(() => learningModules.id, { onDelete: 'cascade' }),
   score: integer('score').notNull(),
   max_score: integer('max_score').default(100),
@@ -938,7 +931,7 @@ export const quizScores = pgTable('quiz_scores', {
 // User Brand Settings table
 export const userBrandSettings = pgTable('user_brand_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   company_name: varchar('company_name', { length: 255 }),
   tagline: varchar('tagline', { length: 500 }),
   description: text('description'),
@@ -968,7 +961,7 @@ export const userBrandSettingsRelations = relations(userBrandSettings, ({ one })
 // Push Subscriptions table
 export const pushSubscriptions = pgTable('push_subscriptions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   endpoint: varchar('endpoint', { length: 1000 }).notNull(),
   p256dh_key: varchar('p256dh_key', { length: 500 }).notNull(),
   auth_key: varchar('auth_key', { length: 500 }).notNull(),
@@ -994,7 +987,7 @@ export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one })
 export const competitorActivities = pgTable('competitor_activities', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   activity_type: varchar('activity_type', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
@@ -1030,7 +1023,7 @@ export const competitorActivitiesRelations = relations(competitorActivities, ({ 
 // Chat Conversations table
 export const chatConversations = pgTable('chat_conversations', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   agent_id: varchar('agent_id', { length: 50 }).notNull(),
   agent_name: varchar('agent_name', { length: 100 }).notNull(),
@@ -1061,7 +1054,7 @@ export const chatConversationsRelations = relations(chatConversations, ({ one, m
 export const chatMessages = pgTable('chat_messages', {
   id: varchar('id', { length: 255 }).primaryKey(),
   conversation_id: varchar('conversation_id', { length: 255 }).notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 20 }).notNull(), // 'user' or 'assistant'
   content: text('content').notNull(),
   metadata: jsonb('metadata').default('{}'),
@@ -1088,7 +1081,7 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
 // Workflows table
 export const workflows = pgTable('workflows', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   version: varchar('version', { length: 50 }).default('1.0.0'),
@@ -1110,7 +1103,7 @@ export const workflows = pgTable('workflows', {
 export const workflowExecutions = pgTable('workflow_executions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   workflow_id: integer('workflow_id').notNull().references(() => workflows.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   status: varchar('status', { length: 50 }).default('running'),
   started_at: timestamp('started_at').defaultNow(),
   completed_at: timestamp('completed_at'),
@@ -1144,7 +1137,7 @@ export const workflowTemplates = pgTable('workflow_templates', {
 export const templateDownloads = pgTable('template_downloads', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   template_id: integer('template_id').notNull().references(() => workflowTemplates.id, { onDelete: 'cascade' }),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   downloaded_at: timestamp('downloaded_at').defaultNow(),
 });
 
@@ -1165,7 +1158,7 @@ export const achievements = pgTable('achievements', {
 // User achievements table
 export const userAchievements = pgTable('user_achievements', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   achievement_id: integer('achievement_id').notNull().references(() => achievements.id, { onDelete: 'cascade' }),
   earned_at: timestamp('earned_at').defaultNow(),
   metadata: jsonb('metadata').default('{}'),
@@ -1174,7 +1167,7 @@ export const userAchievements = pgTable('user_achievements', {
 // Focus sessions table
 export const focusSessions = pgTable('focus_sessions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   started_at: timestamp('started_at').defaultNow(),
   ended_at: timestamp('ended_at'),
   duration_minutes: integer('duration_minutes'),
@@ -1210,7 +1203,7 @@ export const notificationJobs = pgTable('notification_jobs', {
 // User Sessions table for cookie-based auth
 export const userSessions = pgTable('user_sessions', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   refresh_token: varchar('refresh_token', { length: 500 }).notNull().unique(),
   device_fingerprint: varchar('device_fingerprint', { length: 255 }).notNull(),
   device_name: varchar('device_name', { length: 255 }),
@@ -1234,7 +1227,7 @@ export const userSessions = pgTable('user_sessions', {
 // Password reset tokens table
 export const passwordResetTokens = pgTable('password_reset_tokens', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: varchar('token', { length: 255 }).notNull().unique(),
   expires_at: timestamp('expires_at').notNull(),
   used_at: timestamp('used_at'),
@@ -1251,7 +1244,7 @@ export const passwordResetTokens = pgTable('password_reset_tokens', {
 // User 2FA/MFA settings table
 export const userMfaSettings = pgTable('user_mfa_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   totp_secret: varchar('totp_secret', { length: 255 }),
   totp_enabled: boolean('totp_enabled').default(false),
   totp_backup_codes: jsonb('totp_backup_codes').default('[]'),
@@ -1270,7 +1263,7 @@ export const userMfaSettings = pgTable('user_mfa_settings', {
 // Device approvals table
 export const deviceApprovals = pgTable('device_approvals', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   device_fingerprint: varchar('device_fingerprint', { length: 255 }).notNull(),
   device_name: varchar('device_name', { length: 255 }),
   device_type: varchar('device_type', { length: 50 }),
@@ -1368,7 +1361,7 @@ export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one
 // Analytics Events table
 export const analyticsEvents = pgTable('analytics_events', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'set null' }),
+  user_id: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   event: varchar('event', { length: 100 }).notNull(),
   properties: jsonb('properties').default('{}'),
   timestamp: timestamp('timestamp').defaultNow(),
