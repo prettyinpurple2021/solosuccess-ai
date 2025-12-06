@@ -929,7 +929,7 @@
 
 /* Dynamic color utilities */
 .badge-complexity-low {
-  background-color: rgba(34, 197, 94, 0.2);
+  background-color: rgba(0, 201, 80, 0.2);
   @apply text-green-500;
 }
 
@@ -990,7 +990,7 @@
 }
 
 .badge-log-success {
-  background-color: rgba(34, 197, 94, 0.2);
+  background-color: rgba(0, 201, 80, 0.2);
   @apply border-green-500 text-green-500;
 }
 
