@@ -1402,4 +1402,17 @@ export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => 
   }),
 }));
 
+// User API Keys table - for users to store their own API keys
+export const userApiKeys = pgTable('user_api_keys', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  service: varchar('service', { length: 100 }).notNull(), // e.g., 'openai', 'anthropic', 'google'
+  key_value: text('key_value').notNull(), // Encrypted/hashed API key
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('user_api_keys_user_id_idx').on(table.user_id),
+  serviceIdx: index('user_api_keys_service_idx').on(table.service),
+  userServiceIdx: index('user_api_keys_user_service_idx').on(table.user_id, table.service),
+}));
 
