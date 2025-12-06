@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Next.js build output
+.next
+/.next/
+.next/
+out
+
 # Environment files (NEVER commit these!)
 .env
 .env.local

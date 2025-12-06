@@ -34,7 +34,8 @@
     "react-is": "^19.2.0",
     "recharts": "^3.4.1",
     "resend": "^6.5.2",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "sonner": "^1.7.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
