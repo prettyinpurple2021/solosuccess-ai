@@ -1,4 +1,5 @@
 import { setupDevCycle } from "@devcycle/nextjs-sdk/server";
+import { logWarn } from "@/lib/logger";
 
 const getUserIdentity = async () => {
   return { user_id: "anonymous" };
@@ -23,7 +24,7 @@ if (isDevCycleEnabled) {
   } catch (error) {
     // Silently fail in build environment - DevCycle will work at runtime when keys are provided
     if (process.env.NODE_ENV === 'development') {
-      console.warn('DevCycle initialization failed:', error);
+      logWarn('DevCycle initialization failed', { error: error instanceof Error ? error.message : String(error) });
     }
     devCycleInstance = null;
   }
