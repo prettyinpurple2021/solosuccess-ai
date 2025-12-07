@@ -35,3 +35,6 @@ server/.env.local
 *.njsproj
 *.sln
 *.sw?
+
+
+VERCEL_ENV_SETUP.md
