@@ -1,9 +1,11 @@
 import 'dotenv/config';
+import * as Sentry from '@sentry/node';
 import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server as SocketServer, Socket } from 'socket.io';
 import cors from 'cors';
 import { db } from './db';
+
 import { users, tasks, chatHistory, competitorReports, businessContext } from './db/schema';
 import { eq, desc, and, or } from 'drizzle-orm';
 import { z } from 'zod';
@@ -25,6 +27,18 @@ import rateLimit from 'express-rate-limit';
 const app = express();
 // Trust proxy for correct IP identification behind reverse proxies (e.g., Render, Heroku, AWS)
 app.set('trust proxy', 1);
+
+// Initialize Sentry for Express backend (after app creation)
+Sentry.init({
+  dsn: process.env.SENTRY_DSN || "https://c658e25682ffbbce0cd373c74bf48f1d@o4510500686331904.ingest.us.sentry.io/4510500686659584",
+  environment: process.env.NODE_ENV || 'development',
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+    new Sentry.Integrations.Express({ app }),
+  ],
+});
+
 const httpServer = createServer(app);
 // Allow localhost when NODE_ENV is undefined (local dev) or explicitly 'development'
 // Block localhost when NODE_ENV is 'production', 'staging', 'test', etc.
@@ -55,6 +69,10 @@ const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL!,
     token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
+
+// Sentry request handler must be first
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
 
 app.use(cors({
     origin: allowedOrigins,
@@ -706,6 +724,15 @@ if (process.env.NODE_ENV === 'production') {
         }
     });
 }
+
+// Sentry error handler must be last, before any other error middleware
+app.use(Sentry.Handlers.errorHandler());
+
+// Express error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+});
 
 httpServer.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
