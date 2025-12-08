@@ -1,4 +1,5 @@
 // Notification Service
+import { logError } from '@/lib/logger';
 export interface Notification {
     id: string;
     type: 'email' | 'sms' | 'in_app';
@@ -49,7 +50,7 @@ class NotificationService {
             if (!response.ok) throw new Error('Failed to fetch notifications');
             return await response.json();
         } catch (error) {
-            console.error('Get notifications error:', error);
+            logError('Get notifications error', error as Error);
             return [];
         }
     }
@@ -73,7 +74,7 @@ class NotificationService {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
         } catch (error) {
-            console.error('Mark read error:', error);
+            logError('Mark notification as read failed', error as Error, { notificationId: id });
         }
     }
 
@@ -88,7 +89,7 @@ class NotificationService {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
         } catch (error) {
-            console.error('Mark all read error:', error);
+            logError('Mark all notifications as read failed', error as Error);
         }
     }
 
@@ -103,7 +104,7 @@ class NotificationService {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
         } catch (error) {
-            console.error('Delete notification error:', error);
+            logError('Delete notification error', error as Error, { notificationId });
         }
     }
 
@@ -119,7 +120,7 @@ class NotificationService {
             if (!response.ok) throw new Error('Failed to fetch preferences');
             return await response.json();
         } catch (error) {
-            console.error('Get preferences error:', error);
+            logError('Get preferences error', error as Error);
             return {
                 emailEnabled: true,
                 smsEnabled: false,
@@ -148,7 +149,7 @@ class NotificationService {
                 body: JSON.stringify(prefs)
             });
         } catch (error) {
-            console.error('Update preferences error:', error);
+            logError('Update preferences error', error as Error);
         }
     }
 

@@ -1,39 +1,39 @@
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { CompetitorAlert } from '@/hooks/use-competitor-alerts';
+import React from 'react';
+import { io, Socket } from 'socket.io-client';
+import { logError, logInfo, logWarn } from '@/lib/logger';
 
+type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
-export interface WebSocketMessage {
-  type: 'competitor_alert' | 'alert_update' | 'connection_status' | 'ping' | 'pong';
-  data?: any;
-  timestamp: string;
-}
+type NotificationPayload = {
+  id: number;
+  userId: number;
+  type: string;
+  category: string;
+  title: string;
+  message: string;
+  priority: string;
+  read: boolean;
+  actionUrl?: string | null;
+  sentAt?: string | null;
+  createdAt?: string | null;
+};
 
-export interface AlertWebSocketMessage extends WebSocketMessage {
-  type: 'competitor_alert';
-  data: {
-    alert: CompetitorAlert;
-    userId: string;
-  };
-}
+type NotificationUpdatePayload = {
+  id?: number;
+  read?: boolean;
+  all?: boolean;
+};
 
-export interface AlertUpdateMessage extends WebSocketMessage {
-  type: 'alert_update';
-  data: {
-    alertId: number;
-    action: 'read' | 'archived' | 'updated';
-    userId: string;
-  };
-}
+type NotificationDeletedPayload = { id: number };
 
-export class WebSocketNotificationService {
+type Listener<T> = (data: T) => void;
+
+class WebSocketNotificationService {
   private static instance: WebSocketNotificationService;
-  private ws: WebSocket | null = null;
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
-  private reconnectDelay = 1000; // Start with 1 second
-  private heartbeatInterval: NodeJS.Timeout | null = null;
-  private listeners: Map<string, Set<(message: WebSocketMessage) => void>> = new Map();
-  private connectionStatus: 'connecting' | 'connected' | 'disconnected' | 'error' = 'disconnected';
+  private socket: Socket | null = null;
+  private listeners: Map<string, Set<Listener<any>>> = new Map();
+  private status: ConnectionStatus = 'disconnected';
+  private userId: string | null = null;
 
   static getInstance(): WebSocketNotificationService {
     if (!WebSocketNotificationService.instance) {
@@ -42,319 +42,138 @@ export class WebSocketNotificationService {
     return WebSocketNotificationService.instance;
   }
 
-  constructor() {
-    // Initialize listeners map
-    this.listeners.set('competitor_alert', new Set());
-    this.listeners.set('alert_update', new Set());
-    this.listeners.set('connection_status', new Set());
-  }
-
-  connect(userId: string): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      return; // Already connected
+  connect(userId: string) {
+    if (typeof window === 'undefined') {
+      return;
     }
-
-    this.connectionStatus = 'connecting';
-    this.notifyConnectionStatus();
-
-    try {
-      // In a real implementation, you would connect to your WebSocket server
-      // For now, we'll simulate the connection
-      const wsUrl = this.getWebSocketUrl(userId);
-      
-      // Simulate WebSocket connection
-      logInfo(`Connecting to WebSocket: ${wsUrl}`);
-      
-      // For development, we'll simulate a successful connection
-      setTimeout(() => {
-        this.connectionStatus = 'connected';
-        this.reconnectAttempts = 0;
-        this.notifyConnectionStatus();
-        this.startHeartbeat();
-        logInfo('WebSocket connected (simulated)');
-      }, 1000);
-
-      // In a real implementation:
-      // this.ws = new WebSocket(wsUrl);
-      // this.setupEventListeners();
-      
-    } catch (error) {
-      logError('WebSocket connection error:', error);
-      this.connectionStatus = 'error';
-      this.notifyConnectionStatus();
-      this.scheduleReconnect(userId);
-    }
-  }
-
-  private getWebSocketUrl(userId: string): string {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    return `${protocol}//${host}/ws/notifications?userId=${userId}`;
-  }
-
-  private setupEventListeners(): void {
-    if (!this.ws) return;
-
-    this.ws.onopen = () => {
-      logInfo('WebSocket connected');
-      this.connectionStatus = 'connected';
-      this.reconnectAttempts = 0;
-      this.notifyConnectionStatus();
-      this.startHeartbeat();
-    };
-
-    this.ws.onmessage = (event) => {
-      try {
-        const message: WebSocketMessage = JSON.parse(event.data);
-        this.handleMessage(message);
-      } catch (error) {
-        logError('Error parsing WebSocket message:', error);
-      }
-    };
-
-    this.ws.onclose = (event) => {
-      logInfo('WebSocket disconnected', { code: event.code, reason: event.reason });
-      this.connectionStatus = 'disconnected';
-      this.notifyConnectionStatus();
-      this.stopHeartbeat();
-      
-      // Attempt to reconnect unless it was a clean close
-      if (event.code !== 1000) {
-        this.scheduleReconnect();
-      }
-    };
-
-    this.ws.onerror = (error) => {
-      logError('WebSocket error:', error);
-      this.connectionStatus = 'error';
-      this.notifyConnectionStatus();
-    };
-  }
-
-  private handleMessage(message: WebSocketMessage): void {
-    logInfo('Received WebSocket message:', message);
-
-    switch (message.type) {
-      case 'competitor_alert':
-        this.notifyListeners('competitor_alert', message);
-        break;
-      
-      case 'alert_update':
-        this.notifyListeners('alert_update', message);
-        break;
-      
-      case 'ping':
-        this.sendPong();
-        break;
-      
-      case 'pong':
-        // Heartbeat response received
-        break;
-      
-      default:
-        logWarn('Unknown message type:', message.type);
-    }
-  }
-
-  private notifyListeners(type: string, message: WebSocketMessage): void {
-    const listeners = this.listeners.get(type);
-    if (listeners) {
-      listeners.forEach(listener => {
-        try {
-          listener(message);
-        } catch (error) {
-          logError('Error in WebSocket listener:', error);
-        }
-      });
-    }
-  }
-
-  private notifyConnectionStatus(): void {
-    const message: WebSocketMessage = {
-      type: 'connection_status',
-      data: { status: this.connectionStatus },
-      timestamp: new Date().toISOString(),
-    };
-    this.notifyListeners('connection_status', message);
-  }
-
-  private startHeartbeat(): void {
-    this.stopHeartbeat();
-    this.heartbeatInterval = setInterval(() => {
-      this.sendPing();
-    }, 30000); // Send ping every 30 seconds
-  }
-
-  private stopHeartbeat(): void {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
-    }
-  }
-
-  private sendPing(): void {
-    const message: WebSocketMessage = {
-      type: 'ping',
-      timestamp: new Date().toISOString(),
-    };
-    this.sendMessage(message);
-  }
-
-  private sendPong(): void {
-    const message: WebSocketMessage = {
-      type: 'pong',
-      timestamp: new Date().toISOString(),
-    };
-    this.sendMessage(message);
-  }
-
-  private sendMessage(message: WebSocketMessage): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(message));
-    }
-  }
-
-  private scheduleReconnect(userId?: string): void {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      logError('Max reconnection attempts reached');
+    if (this.socket?.connected && this.userId === userId) {
       return;
     }
 
-    this.reconnectAttempts++;
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
+    this.userId = userId;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL ||
+      `${window.location.protocol}//${window.location.host}`;
 
-    logInfo(`Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
-    
-    setTimeout(() => {
-      if (userId) {
-        this.connect(userId);
+    this.status = 'connecting';
+    this.emitStatus();
+
+    this.socket?.disconnect();
+    this.socket = io(baseUrl, {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+    });
+
+    this.socket.on('connect', () => {
+      logInfo('WebSocket connected (notifications)', { baseUrl });
+      this.status = 'connected';
+      this.emitStatus();
+      this.socket?.emit('join', userId);
+    });
+
+    this.socket.on('connect_error', (error) => {
+      logError('WebSocket connect_error (notifications)', error);
+      this.status = 'error';
+      this.emitStatus();
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      logWarn('WebSocket disconnected (notifications)', { reason });
+      this.status = 'disconnected';
+      this.emitStatus();
+    });
+
+    this.socket.on('notification:new', (payload: NotificationPayload) => {
+      this.notify('notification:new', payload);
+    });
+
+    this.socket.on('notification:updated', (payload: NotificationUpdatePayload) => {
+      this.notify('notification:updated', payload);
+    });
+
+    this.socket.on('notification:deleted', (payload: NotificationDeletedPayload) => {
+      this.notify('notification:deleted', payload);
+    });
+  }
+
+  disconnect() {
+    this.socket?.disconnect();
+    this.socket = null;
+    this.status = 'disconnected';
+    this.emitStatus();
+  }
+
+  addListener<T>(event: string, listener: Listener<T>) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+    this.listeners.get(event)!.add(listener as Listener<any>);
+  }
+
+  removeListener<T>(event: string, listener: Listener<T>) {
+    const listeners = this.listeners.get(event);
+    if (listeners) listeners.delete(listener as Listener<any>);
+  }
+
+  getStatus(): ConnectionStatus {
+    return this.status;
+  }
+
+  private emitStatus() {
+    this.notify('connection_status', { status: this.status });
+  }
+
+  private notify(event: string, data: any) {
+    const listeners = this.listeners.get(event);
+    if (!listeners) return;
+    listeners.forEach((listener) => {
+      try {
+        listener(data);
+      } catch (error) {
+        logError('WebSocket listener error (notifications)', error);
       }
-    }, delay);
-  }
-
-  // Public methods for managing listeners
-  addListener(type: string, listener: (message: WebSocketMessage) => void): void {
-    if (!this.listeners.has(type)) {
-      this.listeners.set(type, new Set());
-    }
-    this.listeners.get(type)!.add(listener);
-  }
-
-  removeListener(type: string, listener: (message: WebSocketMessage) => void): void {
-    const listeners = this.listeners.get(type);
-    if (listeners) {
-      listeners.delete(listener);
-    }
-  }
-
-  // Simulate receiving a competitor alert (for development/testing)
-  simulateAlert(alert: CompetitorAlert, userId: string): void {
-    const message: AlertWebSocketMessage = {
-      type: 'competitor_alert',
-      data: { alert, userId },
-      timestamp: new Date().toISOString(),
-    };
-    
-    // Simulate receiving the message after a short delay
-    setTimeout(() => {
-      this.handleMessage(message);
-    }, 100);
-  }
-
-  // Simulate an alert update (for development/testing)
-  simulateAlertUpdate(alertId: number, action: 'read' | 'archived' | 'updated', userId: string): void {
-    const message: AlertUpdateMessage = {
-      type: 'alert_update',
-      data: { alertId, action, userId },
-      timestamp: new Date().toISOString(),
-    };
-    
-    setTimeout(() => {
-      this.handleMessage(message);
-    }, 100);
-  }
-
-  disconnect(): void {
-    this.stopHeartbeat();
-    
-    if (this.ws) {
-      this.ws.close(1000, 'Client disconnect');
-      this.ws = null;
-    }
-    
-    this.connectionStatus = 'disconnected';
-    this.notifyConnectionStatus();
-  }
-
-  getConnectionStatus(): string {
-    return this.connectionStatus;
-  }
-
-  isConnected(): boolean {
-    return this.connectionStatus === 'connected';
+    });
   }
 }
 
-// Export singleton instance
 export const wsNotificationService = WebSocketNotificationService.getInstance();
 
-// React hook for using WebSocket notifications
 export function useWebSocketNotifications(userId: string | null) {
-  const [connectionStatus, setConnectionStatus] = React.useState<string>('disconnected');
-  const [lastAlert, setLastAlert] = React.useState<CompetitorAlert | null>(null);
+  const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('disconnected');
+  const [lastNotification, setLastNotification] = React.useState<NotificationPayload | null>(null);
+  const [lastUpdate, setLastUpdate] = React.useState<NotificationUpdatePayload | null>(null);
+  const [lastDeleted, setLastDeleted] = React.useState<NotificationDeletedPayload | null>(null);
 
   React.useEffect(() => {
     if (!userId) return;
-
-    // Connect to WebSocket
     wsNotificationService.connect(userId);
 
-    // Set up listeners
-    const handleConnectionStatus = (message: WebSocketMessage) => {
-      if (message.data?.status) {
-        setConnectionStatus(message.data.status);
-      }
-    };
+    const handleStatus = (data: { status: ConnectionStatus }) => setConnectionStatus(data.status);
+    const handleNew = (payload: NotificationPayload) => setLastNotification(payload);
+    const handleUpdated = (payload: NotificationUpdatePayload) => setLastUpdate(payload);
+    const handleDeleted = (payload: NotificationDeletedPayload) => setLastDeleted(payload);
 
-    const handleAlert = (message: WebSocketMessage) => {
-      if (message.type === 'competitor_alert' && message.data?.alert) {
-        setLastAlert(message.data.alert);
-      }
-    };
+    wsNotificationService.addListener('connection_status', handleStatus);
+    wsNotificationService.addListener('notification:new', handleNew);
+    wsNotificationService.addListener('notification:updated', handleUpdated);
+    wsNotificationService.addListener('notification:deleted', handleDeleted);
 
-    wsNotificationService.addListener('connection_status', handleConnectionStatus);
-    wsNotificationService.addListener('competitor_alert', handleAlert);
-
-    // Cleanup
     return () => {
-      wsNotificationService.removeListener('connection_status', handleConnectionStatus);
-      wsNotificationService.removeListener('competitor_alert', handleAlert);
+      wsNotificationService.removeListener('connection_status', handleStatus);
+      wsNotificationService.removeListener('notification:new', handleNew);
+      wsNotificationService.removeListener('notification:updated', handleUpdated);
+      wsNotificationService.removeListener('notification:deleted', handleDeleted);
+      wsNotificationService.disconnect();
     };
   }, [userId]);
 
-  // Disconnect when component unmounts
-  React.useEffect(() => {
-    return () => {
-      wsNotificationService.disconnect();
-    };
-  }, []);
-
   return {
     connectionStatus,
-    lastAlert,
+    lastNotification,
+    lastUpdate,
+    lastDeleted,
     isConnected: connectionStatus === 'connected',
-    simulateAlert: (alert: CompetitorAlert) => {
-      if (userId) {
-        wsNotificationService.simulateAlert(alert, userId);
-      }
-    },
   };
-}
-
-// Note: This would need React import in a real implementation
-// For now, we'll assume React is available globally
-declare global {
-  namespace React {
-    // React types would go here if needed
-  }
 }

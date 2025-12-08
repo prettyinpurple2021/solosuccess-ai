@@ -3,8 +3,21 @@ import { db } from '../db';
 import { notifications, notificationPreferences } from '../db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
+import { broadcastToUser } from '../realtime';
+import { z } from 'zod';
+import { logError } from '../utils/logger';
 
 const router = Router();
+
+const CreateNotificationSchema = z.object({
+    type: z.enum(['email', 'sms', 'in_app']).default('in_app'),
+    category: z.string().min(1).max(50),
+    title: z.string().min(1).max(200),
+    message: z.string().min(1),
+    priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+    actionUrl: z.string().url().optional(),
+    sentAt: z.coerce.date().optional(),
+});
 
 // Get all notifications
 router.get('/', authMiddleware, async (req: any, res: any) => {
@@ -16,10 +29,42 @@ router.get('/', authMiddleware, async (req: any, res: any) => {
             .orderBy(desc(notifications.createdAt))
             .limit(50);
 
-        res.json(userNotifications);
+        return res.json(userNotifications);
     } catch (error) {
-        console.error('Error fetching notifications:', error);
-        res.status(500).json({ error: 'Failed to fetch notifications' });
+        logError('Error fetching notifications', error);
+        return res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+});
+
+// Create notification and emit real-time event
+router.post('/create', authMiddleware, async (req: any, res: any) => {
+    try {
+        const userId = (req as AuthRequest).userId!;
+        const parsed = CreateNotificationSchema.safeParse(req.body);
+
+        if (!parsed.success) {
+            return res.status(400).json({ error: 'Invalid payload', details: parsed.error.flatten() });
+        }
+
+        const payload = parsed.data;
+        const [created] = await db.insert(notifications).values({
+            userId: Number(userId),
+            type: payload.type,
+            category: payload.category,
+            title: payload.title,
+            message: payload.message,
+            priority: payload.priority,
+            actionUrl: payload.actionUrl,
+            read: false,
+            sentAt: payload.sentAt ?? new Date(),
+            createdAt: new Date(),
+        }).returning();
+
+        broadcastToUser(String(userId), 'notification:new', created);
+        return res.json(created);
+    } catch (error) {
+        logError('Error creating notification', error);
+        return res.status(500).json({ error: 'Failed to create notification' });
     }
 });
 
@@ -29,13 +74,16 @@ router.post('/:id/read', authMiddleware, async (req: any, res: any) => {
         const userId = (req as AuthRequest).userId!;
         const notificationId = Number(req.params.id);
 
-        await db.update(notifications)
+        const [updated] = await db.update(notifications)
             .set({ read: true })
-            .where(and(eq(notifications.id, notificationId), eq(notifications.userId, Number(userId))));
+            .where(and(eq(notifications.id, notificationId), eq(notifications.userId, Number(userId))))
+            .returning();
 
-        res.json({ success: true });
+        broadcastToUser(String(userId), 'notification:updated', { id: notificationId, read: true });
+        return res.json(updated ?? { success: true });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to mark as read' });
+        logError('Failed to mark notification as read', error);
+        return res.status(500).json({ error: 'Failed to mark as read' });
     }
 });
 
@@ -48,9 +96,11 @@ router.post('/read-all', authMiddleware, async (req: any, res: any) => {
             .set({ read: true })
             .where(eq(notifications.userId, Number(userId)));
 
-        res.json({ success: true });
+        broadcastToUser(String(userId), 'notification:updated', { read: true, all: true });
+        return res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to mark all as read' });
+        logError('Failed to mark all as read', error);
+        return res.status(500).json({ error: 'Failed to mark all as read' });
     }
 });
 
@@ -63,9 +113,11 @@ router.delete('/:id', authMiddleware, async (req: any, res: any) => {
         await db.delete(notifications)
             .where(and(eq(notifications.id, notificationId), eq(notifications.userId, Number(userId))));
 
-        res.json({ success: true });
+        broadcastToUser(String(userId), 'notification:deleted', { id: notificationId });
+        return res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete notification' });
+        logError('Failed to delete notification', error);
+        return res.status(500).json({ error: 'Failed to delete notification' });
     }
 });
 

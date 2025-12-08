@@ -18,6 +18,7 @@ import contactsRouter from './routes/contacts';
 import pitchDecksRouter from './routes/pitchDecks';
 import stripeRouter from './routes/stripe';
 import path from 'path';
+import { setIo, broadcastToUser } from './realtime';
 import rateLimit from 'express-rate-limit';
 
 const app = express();
@@ -30,6 +31,7 @@ const io = new SocketServer(httpServer, {
         methods: ["GET", "POST"]
     }
 });
+setIo(io);
 
 const PORT = process.env.PORT || 3000;
 
@@ -102,10 +104,7 @@ io.on('connection', (socket: Socket) => {
     });
 });
 
-// Broadcast update to user's room
-function broadcastToUser(userId: string, event: string, data: any) {
-    io.to(`user:${userId}`).emit(event, data);
-}
+// Broadcast helper now provided by realtime.ts (setIo called above)
 
 // --- Routes ---
 
