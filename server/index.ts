@@ -21,7 +21,7 @@ import pitchDecksRouter from './routes/pitchDecks';
 import stripeRouter from './routes/stripe';
 import path from 'path';
 import { setIo, broadcastToUser } from './realtime';
-import { logWarn } from './utils/logger';
+import { logWarn, logError } from './utils/logger';
 import rateLimit from 'express-rate-limit';
 
 const app = express();
@@ -730,7 +730,7 @@ app.use(Sentry.Handlers.errorHandler());
 
 // Express error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Unhandled error:', err);
+    logError('Unhandled error in Express middleware', err, { path: req.path, method: req.method });
     res.status(500).json({ error: 'Internal server error' });
 });
 
