@@ -130,10 +130,17 @@ hooks/
 lib/
 public/
 styles/
-*.config.{js,mjs,ts}
-next.config.*
-tailwind.config.*
-postcss.config.*
+
+# Exclude only root-level Next.js/frontend config files
+# Using / prefix ensures patterns only match root-level files, not server/drizzle.config.ts
+/next.config.*
+/tailwind.config.*
+/postcss.config.*
+/eslint.config.*
+/playwright.config.*
+/jest.config.*
+/stackbit.config.*
+# Note: server/drizzle.config.ts and server/tsconfig.json are explicitly copied by Dockerfile and must NOT be excluded
 # Note: Root package.json is not excluded - Dockerfile explicitly copies server/package.json
 
 # CI/CD
