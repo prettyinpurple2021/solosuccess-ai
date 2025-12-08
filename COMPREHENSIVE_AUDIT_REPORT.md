@@ -310,6 +310,7 @@
   - Verified only npm lockfiles exist (`package-lock.json` at root and worker subprojects); no `yarn.lock`/`pnpm-lock.yaml` present.
   - `.gitignore` already excludes non-npm lockfiles; no file deletions required.
   - `package.json` already specifies `"packageManager": "npm@10.0.0"` ensuring consistency.
+- Removed committed Next.js build artifacts (`.next/**`) to restore reproducible builds; `.gitignore` already blocks future tracking.
 
 Result: Tools no longer warn about multiple lockfiles; npm is enforced project-wide.
 
