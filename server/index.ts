@@ -26,7 +26,7 @@ const app = express();
 // Trust proxy for correct IP identification behind reverse proxies (e.g., Render, Heroku, AWS)
 app.set('trust proxy', 1);
 const httpServer = createServer(app);
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
 const allowedOrigins = Array.from(
     new Set(
         [
