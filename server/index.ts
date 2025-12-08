@@ -26,13 +26,14 @@ const app = express();
 // Trust proxy for correct IP identification behind reverse proxies (e.g., Render, Heroku, AWS)
 app.set('trust proxy', 1);
 const httpServer = createServer(app);
+const isDevelopment = process.env.NODE_ENV !== 'production';
 const allowedOrigins = Array.from(
     new Set(
         [
             process.env.CLIENT_URL || "https://solosuccessai.fun",
             "https://solosuccessai.fun",
-            "http://localhost:3000",
-            "http://localhost:3001",
+            // Only allow localhost in development
+            ...(isDevelopment ? ["http://localhost:3000", "http://localhost:3001"] : []),
         ].filter(Boolean)
     )
 );
