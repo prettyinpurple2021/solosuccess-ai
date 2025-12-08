@@ -228,9 +228,9 @@ export default function HomePage() {
               <span className="text-xs font-tech text-cyber-cyan uppercase tracking-widest mb-8">No Validation Required</span>
               
               <ul className="space-y-3 mb-8 text-sm font-tech text-gray-400 w-full text-left pl-8">
-                <li className="flex items-center"><span className="text-cyber-cyan mr-2">>></span> Basic Agent Access</li>
-                <li className="flex items-center"><span className="text-cyber-cyan mr-2">>></span> Neural Hub Lite</li>
-                <li className="flex items-center"><span className="text-cyber-cyan mr-2">>></span> Network Support</li>
+                <li className="flex items-center"><span className="text-cyber-cyan mr-2">{'>>'}</span> Basic Agent Access</li>
+                <li className="flex items-center"><span className="text-cyber-cyan mr-2">{'>>'}</span> Neural Hub Lite</li>
+                <li className="flex items-center"><span className="text-cyber-cyan mr-2">{'>>'}</span> Network Support</li>
               </ul>
 
               <Link href="/signup" className="w-full">
@@ -249,10 +249,10 @@ export default function HomePage() {
               <span className="text-xs font-tech text-cyber-purple uppercase tracking-widest mb-8">Full System Suite</span>
               
               <ul className="space-y-3 mb-8 text-sm font-tech text-gray-300 w-full text-left pl-8">
-                <li className="flex items-center"><span className="text-cyber-purple mr-2">>></span> 8 Specialized Agents</li>
-                <li className="flex items-center"><span className="text-cyber-purple mr-2">>></span> Unlimited Processes</li>
-                <li className="flex items-center"><span className="text-cyber-purple mr-2">>></span> Priority Data Streams</li>
-                <li className="flex items-center"><span className="text-cyber-purple mr-2">>></span> Quantum Encryption+</li>
+                <li className="flex items-center"><span className="text-cyber-purple mr-2">{'>>'}</span> 8 Specialized Agents</li>
+                <li className="flex items-center"><span className="text-cyber-purple mr-2">{'>>'}</span> Unlimited Processes</li>
+                <li className="flex items-center"><span className="text-cyber-purple mr-2">{'>>'}</span> Priority Data Streams</li>
+                <li className="flex items-center"><span className="text-cyber-purple mr-2">{'>>'}</span> Quantum Encryption+</li>
               </ul>
 
               <Link href="/signup" className="w-full">

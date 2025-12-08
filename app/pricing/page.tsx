@@ -77,7 +77,7 @@ export default function PricingPage() {
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center">
                       <span className={`mr-2 ${plan.popular ? 'text-cyber-purple' : 'text-cyber-cyan'}`}>
-                        >>
+                        {'>>'}
                       </span>
                       {feature}
                     </li>

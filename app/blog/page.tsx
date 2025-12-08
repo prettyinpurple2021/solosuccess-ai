@@ -32,6 +32,16 @@ const blogPosts = [
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
+  const filteredPosts = blogPosts.filter((post) => {
+    if (!searchQuery.trim()) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      post.title.toLowerCase().includes(query) ||
+      post.excerpt.toLowerCase().includes(query) ||
+      post.category.toLowerCase().includes(query)
+    )
+  })
+
   return (
     <CyberPageLayout>
       <div className="pt-32 pb-20">
@@ -62,7 +72,7 @@ export default function BlogPage() {
           </HudBorder>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blogPosts.map((post) => (
+            {filteredPosts.map((post) => (
               <Link key={post.id} href={`/blog/${post.id}`}>
                 <HudBorder variant="hover" className="p-6 h-full cursor-pointer">
                   <div className="flex items-center gap-2 mb-4">
