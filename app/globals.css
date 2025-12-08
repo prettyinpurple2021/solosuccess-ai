@@ -12,8 +12,12 @@
 /* Optimized font loading with preconnect */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
-/* Military Glassmorphic Design System */
+/* Cyberpunk Design System */
+@import '../styles/cyberpunk.css';
+
+/* Military Glassmorphic Design System (kept for backward compatibility) */
 @import '../styles/military-glassmorphic.css';
 
 @layer base {
@@ -166,16 +170,13 @@
 
     /* Smooth scrolling */
     scroll-behavior: smooth;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
-    background: linear-gradient(135deg, rgba(182, 33, 255, 0.03) 0%, rgba(24, 255, 255, 0.03) 25%, rgba(255, 31, 175, 0.03) 50%, rgba(24, 255, 255, 0.03) 75%, rgba(182, 33, 255, 0.03) 100%);
-    background-size: 400% 400%;
-    animation: holographic-shift 20s ease infinite;
-    font-family: 'Inter', system-ui, sans-serif;
+    color: #fff;
+    background-color: #020005;
+    font-family: 'Rajdhani', system-ui, sans-serif;
   }
 
   .dark body {
-    background: linear-gradient(135deg, rgba(182, 33, 255, 0.08) 0%, rgba(24, 255, 255, 0.08) 25%, rgba(255, 31, 175, 0.08) 50%, rgba(24, 255, 255, 0.08) 75%, rgba(182, 33, 255, 0.08) 100%);
+    background-color: #020005;
   }
   
   /* Custom scrollbar */

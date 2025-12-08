@@ -90,17 +90,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="bg-military-midnight backdrop-blur-md border-0"
+      className="bg-cyber-black backdrop-blur-md border-r border-cyber-cyan/20"
       {...props}
     >
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
-      <SidebarContent className="text-military-glass-white">
+      <SidebarContent className="text-gray-300">
         <NavMain items={data.navMain} />
         <NavProjects />
       </SidebarContent>
-      <SidebarFooter className="text-military-glass-white">
+      <SidebarFooter className="text-gray-300">
         <div className="p-2">
           <TipSettingsButton />
         </div>

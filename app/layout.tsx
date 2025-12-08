@@ -14,7 +14,7 @@ import { ChatProvider } from "@/components/providers/chat-provider"
 import { SmartTipManager } from "@/components/ui/smart-tip"
 import { Analytics } from "@vercel/analytics/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
-import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google'
+import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
 import { getClientContext } from "./devcycle"
@@ -23,6 +23,11 @@ import { getClientContext } from "./devcycle"
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-boss' })
+const rajdhani = Rajdhani({ 
+  subsets: ['latin'], 
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-tech' 
+})
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -128,7 +133,7 @@ export default function RootLayout({
   // GA4 is injected manually; no env var needed
 
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
       <head>
         {/* Optimize font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -143,14 +148,17 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-cyber-black font-tech text-gray-300 antialiased",
           fontSans.variable,
           inter.variable,
           jetbrains.variable,
-          orbitron.variable
+          orbitron.variable,
+          rajdhani.variable
         )}
       >
         {/* Structured Data */}

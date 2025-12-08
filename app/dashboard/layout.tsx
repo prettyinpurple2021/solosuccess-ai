@@ -28,7 +28,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="min-h-screen bg-military-midnight border-0">
+      <SidebarInset className="min-h-screen bg-cyber-black border-0">
         <DashboardHeader />
         <main className="flex-1 p-0 pb-20 lg:pb-0">
           {children}

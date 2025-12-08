@@ -1,37 +1,24 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { motion } from "framer-motion"
-import {
-  Loader2,
-  Mail,
-  Lock,
-  Github,
-  Target,
-  Eye,
-  EyeOff,
-  Shield,
-  ArrowRight
-} from "lucide-react"
-import {
-  TacticalButton,
-  GlassCard,
-  RankStars,
-  CamoBackground,
-  SergeantDivider,
-  StatsBadge,
-  TacticalGrid
-} from '@/components/military'
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { CyberPageLayout } from '@/components/cyber/CyberPageLayout'
+import { HudBorder } from '@/components/cyber/HudBorder'
+import { CyberButton } from '@/components/cyber/CyberButton'
+import { SoloSuccessLogo } from '@/components/cyber/SoloSuccessLogo'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
-// Disable static generation for auth pages
 export const dynamic = 'force-dynamic'
 
 export default function SignInPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
@@ -41,7 +28,7 @@ export default function SignInPage() {
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
+    setError('')
 
     try {
       const isEmail = email.includes('@')
@@ -62,121 +49,63 @@ export default function SignInPage() {
       }
       window.location.href = redirectTo
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.")
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleSocialSignIn = async (provider: "github") => {
-    setIsLoading(true)
-    setError("")
-
-    try {
-      // Redirect to GitHub OAuth
-      window.location.href = `/api/auth/github?redirect=${encodeURIComponent(redirectTo)}`
-    } catch (err) {
-      setError("Failed to sign in with " + provider)
-      setIsLoading(false)
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-military-midnight">
-      {/* Camo Background */}
-      <CamoBackground />
-
-      {/* Tactical Grid Overlay */}
-      <TacticalGrid />
-
-      {/* Navigation */}
-      <nav className="relative z-50 backdrop-blur-xl bg-military-tactical/80 border-b border-military-hot-pink/20">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-heading text-xl font-bold text-military-glass-white">
-                SoloSuccess AI
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <a
-                href="/signup"
-                className="text-military-glass-white hover:text-military-hot-pink transition-colors"
-              >
-                Sign Up
-              </a>
-              <a
-                href="/"
-                className="text-military-glass-white hover:text-military-hot-pink transition-colors"
-              >
-                Home
-              </a>
-            </div>
+    <CyberPageLayout showNav={false}>
+      <div className="min-h-screen flex items-center justify-center pt-20 pb-20">
+        <div className="max-w-md w-full px-6">
+          <div className="text-center mb-8">
+            <SoloSuccessLogo size={64} animated={true} className="mx-auto mb-4" />
+            <h1 className="font-sci text-3xl font-bold text-white mb-2">
+              USER_LOGIN
+            </h1>
+            <p className="text-gray-400 font-tech">
+              Access your neural network interface
+            </p>
           </div>
-        </div>
-      </nav>
 
-      {/* Main Content */}
-      <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-md"
-        >
-          <GlassCard className="p-8" glow>
-            <div className="text-center mb-8">
-              <RankStars count={3} size="lg" className="justify-center mb-4" />
-              <h1 className="text-3xl font-heading font-bold text-military-glass-white mb-2">
-                Mission Briefing
-              </h1>
-              <p className="text-military-storm-grey">
-                Sign in to access your tactical command center
-              </p>
-            </div>
-
+          <HudBorder className="p-8">
             <form onSubmit={handleEmailSignIn} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-semibold text-military-glass-white flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-military-hot-pink" />
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 bg-military-tactical/50 border border-military-gunmetal/50 rounded-lg text-military-glass-white placeholder:text-military-storm-grey focus:outline-none focus:ring-2 focus:ring-military-hot-pink/50 focus:border-military-hot-pink/50 transition-all"
-                  autoComplete="email"
-                  required
-                />
+              <div>
+                <Label className="text-cyber-cyan font-sci text-xs uppercase tracking-widest mb-2 block">
+                  EMAIL_ADDRESS
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 bg-cyber-dark/50 border-cyber-cyan/30 text-white placeholder:text-gray-500 focus:border-cyber-cyan"
+                    placeholder="user@example.com"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-semibold text-military-glass-white flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-military-hot-pink" />
-                  Password
-                </label>
+              <div>
+                <Label className="text-cyber-cyan font-sci text-xs uppercase tracking-widest mb-2 block">
+                  PASSWORD
+                </Label>
                 <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-3 pr-12 bg-military-tactical/50 border border-military-gunmetal/50 rounded-lg text-military-glass-white placeholder:text-military-storm-grey focus:outline-none focus:ring-2 focus:ring-military-hot-pink/50 focus:border-military-hot-pink/50 transition-all"
-                    autoComplete="current-password"
+                    className="pl-10 pr-10 bg-cyber-dark/50 border-cyber-cyan/30 text-white placeholder:text-gray-500 focus:border-cyber-cyan"
+                    placeholder="••••••••"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-military-storm-grey hover:text-military-hot-pink transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-cyber-cyan"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -185,35 +114,27 @@ export default function SignInPage() {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <input
+                  <Checkbox
                     id="remember"
-                    type="checkbox"
                     checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-military-gunmetal/50 bg-military-tactical/50 text-military-hot-pink focus:ring-military-hot-pink/50 focus:ring-2"
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
                   />
-                  <label htmlFor="remember" className="text-sm text-military-storm-grey">
-                    Remember me for 30 days
-                  </label>
+                  <Label htmlFor="remember" className="text-sm text-gray-400 font-tech cursor-pointer">
+                    Remember me
+                  </Label>
                 </div>
-                <a
-                  href="/forgot-password"
-                  className="text-sm text-military-hot-pink hover:text-military-blush-pink transition-colors"
-                >
+                <Link href="/forgot-password" className="text-sm text-cyber-cyan hover:text-cyber-purple font-tech">
                   Forgot password?
-                </a>
+                </Link>
               </div>
 
               {error && (
-                <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-red-300 text-sm">
-                    <Shield className="w-4 h-4" />
-                    {error}
-                  </div>
+                <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 font-tech text-sm">
+                  {error}
                 </div>
               )}
 
-              <TacticalButton
+              <CyberButton
                 type="submit"
                 variant="primary"
                 size="lg"
@@ -222,97 +143,26 @@ export default function SignInPage() {
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Authenticating...
+                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                    CONNECTING...
                   </>
                 ) : (
-                  <>
-                    <Lock className="w-5 h-5 mr-2" />
-                    Access Command Center
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
+                  'AUTHENTICATE'
                 )}
-              </TacticalButton>
+              </CyberButton>
             </form>
 
-            <div className="mt-8">
-              <SergeantDivider />
-
-              <div className="mt-6">
-                <TacticalButton
-                  type="button"
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => handleSocialSignIn("github")}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  <Github className="w-5 h-5 mr-2" />
-                  Continue with GitHub
-                </TacticalButton>
-              </div>
-            </div>
-
-            <div className="mt-8 text-center">
-              <p className="text-military-storm-grey text-sm">
-                Don't have clearance?{" "}
-                <a
-                  href="/signup"
-                  className="text-military-hot-pink hover:text-military-blush-pink font-semibold transition-colors"
-                >
-                  Request Access
-                </a>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-400 font-tech">
+                Don't have an account?{' '}
+                <Link href="/signup" className="text-cyber-cyan hover:text-cyber-purple font-sci">
+                  INITIALIZE_ACCOUNT
+                </Link>
               </p>
             </div>
-          </GlassCard>
-
-          {/* Security Notice */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="mt-6"
-          >
-            <GlassCard className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-military-glass-white">
-                    Military-Grade Security
-                  </h3>
-                  <p className="text-xs text-military-storm-grey">
-                    Your data is protected with bank-level encryption and SOC 2 compliance.
-                  </p>
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
-        </motion.div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-military-tactical/30 backdrop-blur-xl border-t border-military-hot-pink/20 py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded flex items-center justify-center">
-                <Target className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-heading font-bold text-military-glass-white">
-                SoloSuccess AI
-              </span>
-            </div>
-
-            <div className="flex space-x-6">
-              <a href="/privacy" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Privacy</a>
-              <a href="/terms" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Terms</a>
-              <a href="/security" className="text-military-storm-grey hover:text-military-hot-pink transition-colors text-sm">Security</a>
-            </div>
-          </div>
+          </HudBorder>
         </div>
-      </footer>
-    </div>
+      </div>
+    </CyberPageLayout>
   )
 }

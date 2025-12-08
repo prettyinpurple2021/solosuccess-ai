@@ -1,57 +1,63 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { SoloSuccessLogo } from '@/components/cyber/SoloSuccessLogo'
+import { CyberButton } from '@/components/cyber/CyberButton'
 
 export function Navbar() {
-    const navigate = useNavigate();
-    const location = useLocation();
+  const pathname = usePathname()
 
-    const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path
 
-    return (
-        <nav className="relative z-50 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto w-full">
-            <div
-                className="flex items-center gap-2 cursor-pointer group"
-                onClick={() => navigate('/')}
-            >
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                    <span className="font-bold text-black text-lg">S</span>
-                </div>
-                <span className="font-bold text-xl tracking-tight text-white">SOLO_SUCCESS<span className="text-emerald-400">_AI</span></span>
-            </div>
+  return (
+    <nav className="fixed w-full z-50 top-0 bg-cyber-black/80 backdrop-blur-md border-b border-cyber-cyan/20">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3">
+          <SoloSuccessLogo size={48} animated={true} />
+          <div className="flex flex-col">
+            <span className="font-sci font-bold text-xl tracking-widest text-white">
+              SOLO<span className="text-cyber-cyan">SUCCESS</span>.AI
+            </span>
+            <span className="text-[10px] text-cyber-purple tracking-[0.3em] uppercase">
+              System: Operational
+            </span>
+          </div>
+        </Link>
 
-            <div className="hidden md:flex items-center gap-8">
-                <NavLink label="Features" path="/features" isActive={isActive('/features')} onClick={() => navigate('/features')} />
-                <NavLink label="Pricing" path="/pricing" isActive={isActive('/pricing')} onClick={() => navigate('/pricing')} />
-                <NavLink label="About" path="/about" isActive={isActive('/about')} onClick={() => navigate('/about')} />
-                <NavLink label="Contact" path="/contact" isActive={isActive('/contact')} onClick={() => navigate('/contact')} />
-            </div>
+        <div className="hidden md:flex items-center gap-8">
+          <NavLink label="Features" path="/features" isActive={isActive('/features')} />
+          <NavLink label="Pricing" path="/pricing" isActive={isActive('/pricing')} />
+          <NavLink label="About" path="/about" isActive={isActive('/about')} />
+          <NavLink label="Contact" path="/contact" isActive={isActive('/contact')} />
+        </div>
 
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={() => navigate('/login')}
-                    className="hidden sm:block px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
-                >
-                    Log In
-                </button>
-                <button
-                    onClick={() => navigate('/signup')}
-                    className="px-4 py-2 text-sm font-medium bg-white text-black rounded-lg hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95"
-                >
-                    Get Started
-                </button>
-            </div>
-        </nav>
-    );
+        <div className="flex items-center gap-4">
+          <Link href="/signin" className="hidden sm:block">
+            <span className="text-sm font-bold uppercase tracking-widest hover:text-cyber-cyan transition-colors text-gray-400">
+              LOGIN
+            </span>
+          </Link>
+          <Link href="/signup">
+            <CyberButton variant="ghost" size="sm">
+              GET_STARTED
+            </CyberButton>
+          </Link>
+        </div>
+      </div>
+    </nav>
+  )
 }
 
-function NavLink({ label, path, isActive, onClick }: { label: string, path: string, isActive: boolean, onClick: () => void }) {
-    return (
-        <button
-            onClick={onClick}
-            className={`text-sm font-medium transition-colors ${isActive ? 'text-emerald-400' : 'text-zinc-400 hover:text-white'
-                }`}
-        >
-            {label}
-        </button>
-    );
+function NavLink({ label, path, isActive }: { label: string, path: string, isActive: boolean }) {
+  return (
+    <Link
+      href={path}
+      className={`text-sm font-bold uppercase tracking-widest transition-colors ${
+        isActive ? 'text-cyber-cyan' : 'text-gray-400 hover:text-cyber-cyan'
+      }`}
+    >
+      {label}
+    </Link>
+  )
 }

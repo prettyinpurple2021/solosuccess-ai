@@ -208,9 +208,7 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-military-midnight">
-        <CamoBackground />
-        <TacticalGrid />
+      <div className="min-h-screen bg-cyber-black">
 
         <SimpleOnboarding
           open={showOnboarding}
@@ -220,13 +218,13 @@ export default function DashboardPage() {
 
         <div className="flex items-center justify-center min-h-[60vh]">
           <GlassCard className="p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center mx-auto mb-4">
               <Shield className="w-8 h-8 text-white animate-pulse" />
             </div>
-            <h2 className="text-xl font-heading font-bold text-military-glass-white mb-2">
+            <h2 className="text-xl font-sci font-bold text-white mb-2">
               Loading Command Center...
             </h2>
-            <p className="text-military-storm-grey">
+            <p className="text-gray-400 font-tech">
               Preparing your tactical dashboard
             </p>
           </GlassCard>
@@ -237,9 +235,7 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-military-midnight">
-        <CamoBackground />
-        <TacticalGrid />
+      <div className="min-h-screen bg-cyber-black">
 
         <SimpleOnboarding
           open={showOnboarding}
@@ -252,10 +248,10 @@ export default function DashboardPage() {
             <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Flame className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-2xl font-heading font-bold text-military-glass-white mb-2">
+            <h2 className="text-2xl font-sci font-bold text-white mb-2">
               Mission Critical Error
             </h2>
-            <p className="text-military-storm-grey mb-6">{error}</p>
+            <p className="text-gray-400 mb-6 font-tech">{error}</p>
             <TacticalButton
               onClick={() => window.location.reload()}
               variant="primary"
@@ -272,9 +268,7 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-military-midnight">
-        <CamoBackground />
-        <TacticalGrid />
+      <div className="min-h-screen bg-cyber-black">
 
         <SimpleOnboarding
           open={showOnboarding}
@@ -285,10 +279,10 @@ export default function DashboardPage() {
         <div className="flex items-center justify-center min-h-[60vh] p-4">
           <GlassCard className="max-w-md p-8 text-center" glow>
             <RankStars count={5} size="lg" className="justify-center mb-4" />
-            <h2 className="text-2xl font-heading font-bold text-military-glass-white mb-2">
+            <h2 className="text-2xl font-sci font-bold text-white mb-2">
               Welcome to SoloSuccess AI
             </h2>
-            <p className="text-military-storm-grey mb-6">Begin your tactical mission</p>
+            <p className="text-gray-400 mb-6 font-tech">Begin your tactical mission</p>
             <div className="space-y-3">
               <Link href="/dashboard/slaylist">
                 <TacticalButton
@@ -360,7 +354,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-military-midnight" role="main">
+    <main className="min-h-screen bg-cyber-black" role="main">
       <CamoBackground />
       <TacticalGrid />
 
@@ -390,15 +384,15 @@ export default function DashboardPage() {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center"
+                className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center"
               >
                 <Crown className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h1 className="text-4xl font-heading font-bold text-military-glass-white">
+                <h1 className="text-4xl font-sci font-bold text-white">
                   Welcome back, {data.user.full_name || data.user.email.split('@')[0]}! 👑
                 </h1>
-                <p className="text-lg text-military-storm-grey">
+                <p className="text-lg text-gray-400 font-tech">
                   Command center status report
                 </p>
               </div>
@@ -427,10 +421,10 @@ export default function DashboardPage() {
                   +15%
                 </StatsBadge>
               </div>
-              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">
                 {todaysStats.tasks_completed}/{todaysStats.total_tasks}
               </h3>
-              <p className="text-military-storm-grey text-sm">Tasks Completed</p>
+              <p className="text-gray-400 text-sm font-tech">Tasks Completed</p>
             </GlassCard>
 
             <GlassCard className="p-6" glow>
@@ -442,10 +436,10 @@ export default function DashboardPage() {
                   +8%
                 </StatsBadge>
               </div>
-              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">
                 {todaysStats.focus_minutes}m
               </h3>
-              <p className="text-military-storm-grey text-sm">Focus Time</p>
+              <p className="text-gray-400 text-sm font-tech">Focus Time</p>
             </GlassCard>
 
             <GlassCard className="p-6" glow>
@@ -457,7 +451,7 @@ export default function DashboardPage() {
                   +12%
                 </StatsBadge>
               </div>
-              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">
                 {todaysStats.ai_interactions}
               </h3>
               <p className="text-military-storm-grey text-sm">AI Interactions</p>
@@ -472,7 +466,7 @@ export default function DashboardPage() {
                   +5%
                 </StatsBadge>
               </div>
-              <h3 className="text-2xl font-bold text-military-glass-white mb-1">
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">
                 {todaysStats.productivity_score}%
               </h3>
               <p className="text-military-storm-grey text-sm">Productivity Score</p>

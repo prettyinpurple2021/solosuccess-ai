@@ -60,7 +60,15 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // Military Glassmorphic Design System Colors
+        // Cyberpunk Design System Colors
+        cyber: {
+          black: '#020005',
+          dark: '#0a0514',
+          cyan: '#00f3ff',
+          purple: '#bd00ff',
+          dim: 'rgba(0, 243, 255, 0.1)',
+        },
+        // Military Glassmorphic Design System Colors (kept for backward compatibility)
         military: {
           'hot-pink': '#FF71B5',
           'blush-pink': '#FFB3D9',
@@ -98,7 +106,32 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        // Military glassmorphic animations
+        // Cyberpunk animations
+        "pulse-fast": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "spin-logo": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "glitch-anim": {
+          "0%": { clip: "rect(14px, 9999px, 122px, 0)" },
+          "5%": { clip: "rect(69px, 9999px, 36px, 0)" },
+          "10%": { clip: "rect(26px, 9999px, 20px, 0)" },
+          "100%": { clip: "rect(0, 0, 0, 0)" },
+        },
+        "glitch-anim-2": {
+          "0%": { clip: "rect(12px, 9999px, 66px, 0)" },
+          "5%": { clip: "rect(98px, 9999px, 4px, 0)" },
+          "10%": { clip: "rect(23px, 9999px, 93px, 0)" },
+          "100%": { clip: "rect(0, 0, 0, 0)" },
+        },
+        // Military glassmorphic animations (kept for backward compatibility)
         "glass-shine": {
           "0%": { transform: "translateX(-100%) skewX(-15deg)" },
           "100%": { transform: "translateX(200%) skewX(-15deg)" },
@@ -111,9 +144,19 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        // Military glassmorphic animations
+        // Cyberpunk animations
+        "pulse-fast": "pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "spin-slow": "spin-slow 12s linear infinite",
+        "spin-logo": "spin-logo 20s linear infinite",
+        "glitch-anim": "glitch-anim 2.5s infinite linear alternate-reverse",
+        "glitch-anim-2": "glitch-anim-2 3s infinite linear alternate-reverse",
+        // Military glassmorphic animations (kept for backward compatibility)
         "glass-shine": "glass-shine 2.5s ease-in-out infinite",
         "tactical-pulse": "tactical-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
+      boxShadow: {
+        'neon-cyan': '0 0 10px #00f3ff, 0 0 20px #00f3ff',
+        'neon-purple': '0 0 10px #bd00ff, 0 0 20px #bd00ff',
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -127,9 +170,11 @@ const config: Config = {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
-        // ✨ NEW: Add the custom 'boss' font family here
+        // Cyberpunk fonts
+        sci: ["Orbitron", "sans-serif"],
+        tech: ["Rajdhani", "sans-serif"],
+        // Legacy font aliases (kept for backward compatibility)
         boss: ["Orbitron", "sans-serif"],
-        // Military Design System Fonts
         heading: ["Orbitron", "Rajdhani", "sans-serif"],
         tactical: ["Chakra Petch", "Rajdhani", "monospace"],
       },

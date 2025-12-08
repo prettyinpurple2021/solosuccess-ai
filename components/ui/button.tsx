@@ -8,18 +8,20 @@ import { cn} from "@/lib/utils"
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
-    variants: {
-      variant: {
-        default: "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-md",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border-2 border-purple-200 bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-pink-600 underline-offset-4 hover:underline",
-      },
+      variants: {
+        variant: {
+          default: "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-md",
+          cyberpunk: "bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-white font-sci font-bold tracking-widest transition-all duration-300",
+          cyberpunkSecondary: "border border-gray-600 hover:border-cyber-purple text-gray-300 hover:text-cyber-purple font-sci font-bold tracking-widest",
+          destructive:
+            "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          outline:
+            "border-2 border-purple-200 bg-background hover:bg-accent hover:text-accent-foreground",
+          secondary:
+            "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          ghost: "hover:bg-accent hover:text-accent-foreground",
+          link: "text-pink-600 underline-offset-4 hover:underline",
+        },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",

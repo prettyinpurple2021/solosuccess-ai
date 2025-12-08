@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter, usePathname } from 'next/navigation'
+import { SoloSuccessLogo } from '@/components/cyber/SoloSuccessLogo'
 
 interface NavigationItem {
   id: string
@@ -229,7 +230,7 @@ export default function MobileNavigation({
       {/* Mobile Header */}
       <motion.div
         className={cn(
-          "lg:hidden sticky top-0 z-40 w-full bg-white/90 backdrop-blur-sm border-b border-gray-200",
+          "lg:hidden sticky top-0 z-40 w-full bg-cyber-black/90 backdrop-blur-md border-b border-cyber-cyan/20",
           className
         )}
         initial={false}
@@ -246,12 +247,12 @@ export default function MobileNavigation({
             </Button>
 
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                <Crown className="h-4 w-4 text-white" />
-              </div>
+              <SoloSuccessLogo size={32} animated={false} />
               <div>
-                <h1 className="font-bold text-lg boss-heading">SoloSuccess AI</h1>
-                <div className="text-xs text-gray-500">
+                <h1 className="font-sci font-bold text-lg text-white">
+                  SOLO<span className="text-cyber-cyan">SUCCESS</span>
+                </h1>
+                <div className="text-xs text-cyber-purple">
                   {navigationItems.find(item => item.id === activeItem)?.label || 'Dashboard'}
                 </div>
               </div>
