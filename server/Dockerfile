@@ -1,4 +1,7 @@
 # syntax=docker/dockerfile:1.6
+# Backend server Dockerfile (Express + Socket.io)
+# This is NOT a Next.js app - it's the standalone backend API server
+# Build context is set to 'server' directory in fly.toml
 
 FROM node:20-slim AS base
 WORKDIR /app
