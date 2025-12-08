@@ -26,13 +26,15 @@ const app = express();
 // Trust proxy for correct IP identification behind reverse proxies (e.g., Render, Heroku, AWS)
 app.set('trust proxy', 1);
 const httpServer = createServer(app);
-const isDevelopment = process.env.NODE_ENV === 'development';
+// Allow localhost when NODE_ENV is undefined (local dev) or explicitly 'development'
+// Block localhost when NODE_ENV is 'production', 'staging', 'test', etc.
+const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 const allowedOrigins = Array.from(
     new Set(
         [
             process.env.CLIENT_URL || "https://solosuccessai.fun",
             "https://solosuccessai.fun",
-            // Only allow localhost in development
+            // Only allow localhost in development (undefined or 'development')
             ...(isDevelopment ? ["http://localhost:3000", "http://localhost:3001"] : []),
         ].filter(Boolean)
     )
@@ -266,7 +268,7 @@ app.post('/api/generate', async (req: Request, res: Response) => {
 });
 
 // Root route for developer convenience (Development only)
-if (process.env.NODE_ENV !== 'production') {
+if (isDevelopment) {
     app.get('/', (req: Request, res: Response) => {
         res.send(`
             <h1>SoloSuccess AI Backend is Running 🚀</h1>
