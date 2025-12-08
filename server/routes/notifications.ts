@@ -79,8 +79,12 @@ router.post('/:id/read', authMiddleware, async (req: any, res: any) => {
             .where(and(eq(notifications.id, notificationId), eq(notifications.userId, Number(userId))))
             .returning();
 
+        if (!updated) {
+            return res.status(404).json({ error: 'Notification not found' });
+        }
+
         broadcastToUser(String(userId), 'notification:updated', { id: notificationId, read: true });
-        return res.json(updated ?? { success: true });
+        return res.json(updated);
     } catch (error) {
         logError('Failed to mark notification as read', error);
         return res.status(500).json({ error: 'Failed to mark as read' });
@@ -92,12 +96,15 @@ router.post('/read-all', authMiddleware, async (req: any, res: any) => {
     try {
         const userId = (req as AuthRequest).userId!;
 
-        await db.update(notifications)
+        const updated = await db.update(notifications)
             .set({ read: true })
-            .where(eq(notifications.userId, Number(userId)));
+            .where(eq(notifications.userId, Number(userId)))
+            .returning({ id: notifications.id });
 
-        broadcastToUser(String(userId), 'notification:updated', { read: true, all: true });
-        return res.json({ success: true });
+        if (updated.length > 0) {
+            broadcastToUser(String(userId), 'notification:updated', { read: true, all: true });
+        }
+        return res.json({ success: true, updated: updated.length });
     } catch (error) {
         logError('Failed to mark all as read', error);
         return res.status(500).json({ error: 'Failed to mark all as read' });
@@ -110,8 +117,13 @@ router.delete('/:id', authMiddleware, async (req: any, res: any) => {
         const userId = (req as AuthRequest).userId!;
         const notificationId = Number(req.params.id);
 
-        await db.delete(notifications)
-            .where(and(eq(notifications.id, notificationId), eq(notifications.userId, Number(userId))));
+        const deleted = await db.delete(notifications)
+            .where(and(eq(notifications.id, notificationId), eq(notifications.userId, Number(userId))))
+            .returning({ id: notifications.id });
+
+        if (deleted.length === 0) {
+            return res.status(404).json({ error: 'Notification not found' });
+        }
 
         broadcastToUser(String(userId), 'notification:deleted', { id: notificationId });
         return res.json({ success: true });

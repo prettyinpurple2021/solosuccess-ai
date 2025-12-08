@@ -19,16 +19,28 @@ import pitchDecksRouter from './routes/pitchDecks';
 import stripeRouter from './routes/stripe';
 import path from 'path';
 import { setIo, broadcastToUser } from './realtime';
+import { logWarn } from './utils/logger';
 import rateLimit from 'express-rate-limit';
 
 const app = express();
 // Trust proxy for correct IP identification behind reverse proxies (e.g., Render, Heroku, AWS)
 app.set('trust proxy', 1);
 const httpServer = createServer(app);
+const allowedOrigins = Array.from(
+    new Set(
+        [
+            process.env.CLIENT_URL || "https://solosuccessai.fun",
+            "https://solosuccessai.fun",
+            "http://localhost:3000",
+            "http://localhost:3001",
+        ].filter(Boolean)
+    )
+);
+
 const io = new SocketServer(httpServer, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:3001",
-        methods: ["GET", "POST"]
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
     }
 });
 setIo(io);
@@ -41,8 +53,25 @@ const redis = new Redis({
     token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-app.use(cors());
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 app.use(express.json());
+
+// Sanity check for critical env vars (log only, do not crash)
+const requiredEnv = [
+    'DATABASE_URL',
+    'UPSTASH_REDIS_REST_URL',
+    'UPSTASH_REDIS_REST_TOKEN',
+    'CLIENT_URL',
+    'OPENAI_API_KEY',
+    'STRIPE_SECRET_KEY',
+];
+const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+if (missingEnv.length > 0) {
+    logWarn('Missing critical environment variables', { missingEnv });
+}
 
 // Middleware to extract user from Auth headers
 const getUserId = (req: express.Request): string | null => {

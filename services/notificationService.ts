@@ -74,7 +74,7 @@ class NotificationService {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
         } catch (error) {
-            logError('Mark notification as read failed', error as Error, { notificationId: id });
+            logError('Mark notification as read failed', { notificationId: id }, error as Error);
         }
     }
 
@@ -104,7 +104,7 @@ class NotificationService {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
         } catch (error) {
-            logError('Delete notification error', error as Error, { notificationId });
+            logError('Delete notification error', { notificationId }, error as Error);
         }
     }
 
@@ -120,7 +120,7 @@ class NotificationService {
             if (!response.ok) throw new Error('Failed to fetch preferences');
             return await response.json();
         } catch (error) {
-            logError('Get preferences error', error as Error);
+            logError('Get preferences error', undefined, error as Error);
             return {
                 emailEnabled: true,
                 smsEnabled: false,
@@ -149,7 +149,7 @@ class NotificationService {
                 body: JSON.stringify(prefs)
             });
         } catch (error) {
-            logError('Update preferences error', error as Error);
+            logError('Update preferences error', undefined, error as Error);
         }
     }
 
