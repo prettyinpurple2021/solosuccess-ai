@@ -120,6 +120,21 @@ temp/
 Dockerfile*
 docker-compose*
 .dockerignore
+# Note: server/.dockerignore is ignored - Docker only reads .dockerignore from build context root
+# The Dockerfile explicitly copies server/ files, so we exclude frontend directories here
+
+# Exclude Next.js frontend directories (we only build the server)
+app/
+components/
+hooks/
+lib/
+public/
+styles/
+*.config.{js,mjs,ts}
+next.config.*
+tailwind.config.*
+postcss.config.*
+# Note: Root package.json is not excluded - Dockerfile explicitly copies server/package.json
 
 # CI/CD
 .github/
