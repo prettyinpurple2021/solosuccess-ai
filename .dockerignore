@@ -140,8 +140,8 @@ styles/
 /playwright.config.*
 /jest.config.*
 /stackbit.config.*
-/drizzle.config.*
-# Note: server/drizzle.config.ts and server/tsconfig.json are explicitly copied by Dockerfile and must NOT be excluded
+# Note: /drizzle.config.* is NOT excluded - root Dockerfile (line 53) copies it, and server/Dockerfile copies server/drizzle.config.ts
+# Note: server/drizzle.config.ts and server/tsconfig.json are explicitly copied by server/Dockerfile and must NOT be excluded
 # Note: Root package.json is not excluded - Dockerfile explicitly copies server/package.json
 
 # CI/CD
