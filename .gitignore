@@ -40,3 +40,6 @@ server/.env.local
 VERCEL_ENV_SETUP.md
 # Sentry Config File
 .env.sentry-build-plugin
+
+.vercel
+.env*.local

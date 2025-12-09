@@ -18,7 +18,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
-import { getClientContext, isDevCycleEnabled } from "./devcycle"
+import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -257,7 +257,7 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        {isDevCycleEnabled ? (
+        {isDevCycleEnabled && !isStaticBuild ? (
           <DevCycleClientsideProvider context={getClientContext()}>
             {appShell}
           </DevCycleClientsideProvider>
