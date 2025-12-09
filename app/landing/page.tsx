@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { Button} from "@/components/ui/button"
 
+// Avoid static prerender failures when feature-flag SDK keys are absent in build envs
+export const dynamic = 'force-dynamic'
+
 export default function SimpleLandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">

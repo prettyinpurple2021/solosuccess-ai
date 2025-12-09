@@ -9,7 +9,7 @@
 
 ## 🚨 CRITICAL COMPILATION ERRORS (44 Total) - **FIXED ✅**
 
-### **✅ RESOLVED BUILD ERRORS (9 Fixed)**
+### **✅ RESOLVED BUILD ERRORS (10 Fixed)**
 
 #### **1. Missing Component Import - FIXED ✅**
 - **File:** `app/dashboard/competitors/[id]/page.tsx`
@@ -56,6 +56,12 @@
 - **File:** `app/layout.tsx`, `app/devcycle.ts`, `app/admin/page.tsx`
 - **Issue:** Vercel build failed while prerendering `/admin` with `Missing SDK key! Call initialize with a valid SDK key` due to the DevCycle client provider initializing without required keys during static generation.
 - **Fix:** Exported the DevCycle enablement guard, wrapped the client provider conditionally so pages render without SDK keys, and forced `/admin` to be dynamic to avoid prerender. Admin experience remains intact while builds no longer require DevCycle keys.
+- **Status:** ✅ RESOLVED
+
+#### **9. DevCycle SDK Key Failure During /landing Prerender - FIXED ✅**
+- **File:** `app/landing/page.tsx`
+- **Issue:** Static prerender of `/landing` failed when DevCycle keys were not present in the build environment, surfacing `Missing SDK key! Call initialize with a valid SDK key`.
+- **Fix:** Marked `/landing` as dynamic to bypass static generation when feature-flag keys are absent while preserving runtime behavior.
 - **Status:** ✅ RESOLVED
 
 ### **✅ Resolved Data Integrity Issues**
