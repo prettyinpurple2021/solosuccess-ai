@@ -58,10 +58,10 @@ export function middleware(request: NextRequest) {
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://www.chatbase.co",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
     "img-src 'self' data: https: blob:",
-    "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self' https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
+    "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+    "connect-src 'self' https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://sse.devcycle.com https://www.chatbase.co",
     "frame-src https://js.stripe.com https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",

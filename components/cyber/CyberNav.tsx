@@ -15,7 +15,7 @@ export function CyberNav() {
               SOLO<span className="text-cyber-cyan">SUCCESS</span>.AI
             </span>
             <span className="text-[10px] text-cyber-purple tracking-[0.3em] uppercase">
-              System: Operational
+              SYSTEM_OPERATIONAL
             </span>
           </div>
         </div>

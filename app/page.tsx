@@ -10,6 +10,7 @@ import { CyberFooter } from '@/components/cyber/CyberFooter';
 import { HudBorder } from '@/components/cyber/HudBorder';
 import { GlitchText } from '@/components/cyber/GlitchText';
 import { CyberButton } from '@/components/cyber/CyberButton';
+import { Server, Lock, Zap, Crosshair, Brain, Building2 } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -151,7 +152,7 @@ export default function HomePage() {
             <HudBorder variant="hover" className="p-6 group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">01</span>
-                <i className="fas fa-server text-cyber-purple"></i>
+                <Server className="w-5 h-5 text-cyber-purple" />
               </div>
               <h3 className="font-sci text-lg text-white mb-2">Central Neural Hub</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">8 specialized autonomous agents ready for input. Centralized control for all data streams.</p>
@@ -161,7 +162,7 @@ export default function HomePage() {
             <HudBorder variant="hover" className="p-6 group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">02</span>
-                <i className="fas fa-lock text-cyber-purple"></i>
+                <Lock className="w-5 h-5 text-cyber-purple" />
               </div>
               <h3 className="font-sci text-lg text-white mb-2">Quantum-Grade Encryption</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">Advanced security protocols. Your proprietary data is secured behind layers of digital armor.</p>
@@ -171,7 +172,7 @@ export default function HomePage() {
             <HudBorder variant="hover" className="p-6 group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">03</span>
-                <i className="fas fa-bolt text-cyber-purple"></i>
+                <Zap className="w-5 h-5 text-cyber-purple" />
               </div>
               <h3 className="font-sci text-lg text-white mb-2">Instant Implementation</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">Launch protocols in under 60 seconds. Zero latency. Instant execution of business logic.</p>
@@ -181,7 +182,7 @@ export default function HomePage() {
             <HudBorder variant="hover" className="p-6 group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">04</span>
-                <i className="fas fa-crosshairs text-cyber-purple"></i>
+                <Crosshair className="w-5 h-5 text-cyber-purple" />
               </div>
               <h3 className="font-sci text-lg text-white mb-2">Algorithmic Targeting</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">Hit business objectives with calculated accuracy. Eliminate wasted compute and effort.</p>
@@ -191,7 +192,7 @@ export default function HomePage() {
             <HudBorder variant="hover" className="p-6 group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">05</span>
-                <i className="fas fa-brain text-cyber-purple"></i>
+                <Brain className="w-5 h-5 text-cyber-purple" />
               </div>
               <h3 className="font-sci text-lg text-white mb-2">Predictive Analytics</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">Real-time market intelligence streams. Analyze the dataset clearly before you execute.</p>
@@ -201,7 +202,7 @@ export default function HomePage() {
             <HudBorder variant="hover" className="p-6 group cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">06</span>
-                <i className="fas fa-city text-cyber-purple"></i>
+                <Building2 className="w-5 h-5 text-cyber-purple" />
               </div>
               <h3 className="font-sci text-lg text-white mb-2">Ecosystem Scaling</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">Scale from single node to full network seamlessly. The system adapts as you expand.</p>
