@@ -229,15 +229,22 @@ export default function RootLayout({
           strategy="beforeInteractive"
         >{`
           try {
-            const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
-              try {
-                const url = new URL(el.getAttribute('src') || '', window.location.href);
-                return url.pathname.endsWith('.css');
-              } catch {
-                return false;
-              }
-            });
-            nodes.forEach((el) => el.parentElement?.removeChild(el));
+            const removeCssScripts = () => {
+              const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+                try {
+                  const url = new URL(el.getAttribute('src') || '', window.location.href);
+                  return url.pathname.endsWith('.css');
+                } catch {
+                  return false;
+                }
+              });
+              nodes.forEach((el) => el.parentElement?.removeChild(el));
+            };
+            // Initial pass
+            removeCssScripts();
+            // Watch for future insertions during streaming/hydration
+            const observer = new MutationObserver(() => removeCssScripts());
+            observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
           } catch (err) {
             // no-op
           }
