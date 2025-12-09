@@ -229,7 +229,14 @@ export default function RootLayout({
           strategy="beforeInteractive"
         >{`
           try {
-            const nodes = Array.from(document.querySelectorAll('script[src$=".css"]'));
+            const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+              try {
+                const url = new URL(el.getAttribute('src') || '', window.location.href);
+                return url.pathname.endsWith('.css');
+              } catch {
+                return false;
+              }
+            });
             nodes.forEach((el) => el.parentElement?.removeChild(el));
           } catch (err) {
             // no-op
