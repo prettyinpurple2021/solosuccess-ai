@@ -12,6 +12,7 @@ import ExitIntentSurvey from "@/components/marketing/exit-intent-survey"
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ChatProvider } from "@/components/providers/chat-provider"
 import { SmartTipManager } from "@/components/ui/smart-tip"
+import { HolographicFeedbackWidget } from "@/components/feedback/holographic-feedback-widget"
 import { Analytics } from "@vercel/analytics/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
@@ -250,6 +251,7 @@ export default function RootLayout({
                   <ServiceWorkerRegister />
                   <ExitIntentSurvey />
                   <SmartTipManager />
+                  <HolographicFeedbackWidget />
                 </AccessibilityProvider>
               </OfflineProvider>
             </AuthProvider>
