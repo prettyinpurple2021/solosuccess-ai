@@ -62,7 +62,7 @@ export function middleware(request: NextRequest) {
     "img-src 'self' data: https: blob:",
     "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
     "connect-src 'self' https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://sse.devcycle.com https://www.chatbase.co",
-    "frame-src https://js.stripe.com https://challenges.cloudflare.com https://www.chatbase.co",
+    "frame-src https://js.stripe.com https://www.chatbase.co",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self' https://api.stripe.com",
