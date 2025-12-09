@@ -34,8 +34,8 @@ Sentry.init({
   environment: process.env.NODE_ENV || 'development',
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
   integrations: [
-    Sentry.httpIntegration({ tracing: true }),
-    Sentry.expressIntegration({ app }),
+    Sentry.httpIntegration(),
+    Sentry.expressIntegration(),
   ],
 });
 
@@ -71,7 +71,7 @@ const redis = new Redis({
 });
 
 // Sentry request middleware must be first
-app.use(Sentry.expressRequestMiddleware());
+app.use(Sentry.expressRequestHandler());
 
 app.use(cors({
     origin: allowedOrigins,
