@@ -23,7 +23,7 @@ import {
   Lock,
   Bolt,
   Crosshair,
-  City
+  Building2
 } from 'lucide-react'
 
 export default function FeaturesPage() {
@@ -60,7 +60,7 @@ export default function FeaturesPage() {
     },
     {
       number: '06',
-      icon: City,
+      icon: Building2,
       title: 'Ecosystem Scaling',
       description: 'Scale from single node to full network seamlessly. The system adapts as you expand.',
     },
