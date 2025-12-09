@@ -225,6 +225,17 @@ export default function RootLayout({
           `}
         </Script>
         <Script
+          id="strip-css-scripts"
+          strategy="beforeInteractive"
+        >{`
+          try {
+            const nodes = Array.from(document.querySelectorAll('script[src$=".css"]'));
+            nodes.forEach((el) => el.parentElement?.removeChild(el));
+          } catch (err) {
+            // no-op
+          }
+        `}</Script>
+        <Script
           id="chatbase-widget-loader"
           strategy="afterInteractive"
         >

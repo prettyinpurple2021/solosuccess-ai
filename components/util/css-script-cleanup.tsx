@@ -8,7 +8,7 @@ import { useEffect } from "react";
  */
 export function CssScriptCleanup() {
   useEffect(() => {
-    const scripts = Array.from(document.querySelectorAll('script[src*=".css"]'));
+    const scripts = Array.from(document.querySelectorAll('script[src$=".css"]'));
     scripts.forEach((el) => el.parentElement?.removeChild(el));
   }, []);
 

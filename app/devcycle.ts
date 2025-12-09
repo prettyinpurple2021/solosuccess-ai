@@ -46,6 +46,15 @@ const fallbackGetVariableValue = async <T>(key: string, defaultValue: T): Promis
 const fallbackGetClientContext = () => {
   return {
     user_id: "anonymous",
+    clientSDKKey: "",
+    enableStreaming: false,
+    realtimeDelay: 0,
+    options: {},
+    serverDataPromise: Promise.resolve({
+      user: { user_id: "anonymous" } as any,
+      config: {} as any,
+      userAgent: "",
+    }),
   };
 };
 
