@@ -8,7 +8,14 @@ import { useEffect } from "react";
  */
 export function CssScriptCleanup() {
   useEffect(() => {
-    const scripts = Array.from(document.querySelectorAll('script[src$=".css"]'));
+    const scripts = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+      try {
+        const url = new URL(el.getAttribute('src') || '', window.location.href);
+        return url.pathname.endsWith('.css');
+      } catch {
+        return false;
+      }
+    });
     scripts.forEach((el) => el.parentElement?.removeChild(el));
   }, []);
 
