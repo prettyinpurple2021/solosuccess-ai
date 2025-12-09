@@ -62,9 +62,10 @@ export function HolographicFeedbackWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
+    const url = previewUrl
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
+      if (url) {
+        URL.revokeObjectURL(url)
       }
     }
   }, [previewUrl])
