@@ -19,6 +19,7 @@ import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
 import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
+import { CssScriptCleanup } from "@/components/util/css-script-cleanup"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -150,6 +151,7 @@ export default function RootLayout({
             <PerformanceMonitor />
             {/* Ensure this client component that calls useAuth is inside AuthProvider */}
             <ServiceWorkerRegister />
+            <CssScriptCleanup />
             {!exitIntentDisabled && <ExitIntentSurvey />}
             <SmartTipManager />
             <HolographicFeedbackWidget />
