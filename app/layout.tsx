@@ -131,6 +131,8 @@ export default function RootLayout({
 }: {
   children: ReactNode
 }) {
+  const exitIntentDisabled = process.env.NEXT_PUBLIC_DISABLE_EXIT_INTENT === 'true'
+
   // GA4 is injected manually; no env var needed
   const appShell = (
     <ThemeProvider
@@ -148,7 +150,7 @@ export default function RootLayout({
             <PerformanceMonitor />
             {/* Ensure this client component that calls useAuth is inside AuthProvider */}
             <ServiceWorkerRegister />
-            <ExitIntentSurvey />
+            {!exitIntentDisabled && <ExitIntentSurvey />}
             <SmartTipManager />
             <HolographicFeedbackWidget />
           </AccessibilityProvider>

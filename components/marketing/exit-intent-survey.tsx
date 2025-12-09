@@ -7,6 +7,10 @@ import { useAuth } from '@/hooks/use-auth'
 
 
 export default function ExitIntentSurvey() {
+  // Allow disabling via env toggle
+  const exitIntentDisabled = process.env.NEXT_PUBLIC_DISABLE_EXIT_INTENT === 'true'
+  if (exitIntentDisabled) return null
+
   const [open, setOpen] = useState(false)
   const [role, setRole] = useState('')
   const [goal, setGoal] = useState('')
