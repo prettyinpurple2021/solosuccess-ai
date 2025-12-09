@@ -34,8 +34,8 @@ Sentry.init({
   environment: process.env.NODE_ENV || 'development',
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
   integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Express({ app }),
+    Sentry.httpIntegration({ tracing: true }),
+    Sentry.expressIntegration({ app }),
   ],
 });
 
@@ -70,9 +70,8 @@ const redis = new Redis({
     token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-// Sentry request handler must be first
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
+// Sentry request middleware must be first
+app.use(Sentry.expressRequestMiddleware());
 
 app.use(cors({
     origin: allowedOrigins,
@@ -726,7 +725,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Sentry error handler must be last, before any other error middleware
-app.use(Sentry.Handlers.errorHandler());
+app.use(Sentry.expressErrorHandler());
 
 // Express error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
