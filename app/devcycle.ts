@@ -9,8 +9,13 @@ const serverSDKKey = process.env.DEVCYCLE_SERVER_SDK_KEY?.trim() || "";
 const clientSDKKey = process.env.NEXT_PUBLIC_DEVCYCLE_CLIENT_SDK_KEY?.trim() || "";
 
 // Only initialize DevCycle if valid SDK keys are provided (not empty strings)
-const isDevCycleEnabled = Boolean(serverSDKKey && clientSDKKey && serverSDKKey.length > 0 && clientSDKKey.length > 0);
-const isStaticBuild = process.env.NEXT_PHASE === "phase-production-build";
+export const isDevCycleEnabled = Boolean(
+  serverSDKKey &&
+  clientSDKKey &&
+  serverSDKKey.length > 0 &&
+  clientSDKKey.length > 0
+);
+export const isStaticBuild = process.env.NEXT_PHASE === "phase-production-build";
 
 let devCycleInstance: ReturnType<typeof setupDevCycle> | null = null;
 

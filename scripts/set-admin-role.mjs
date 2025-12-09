@@ -5,10 +5,7 @@
  * Usage: node scripts/set-admin-role.mjs <email>
  */
 
-import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { eq } from 'drizzle-orm';
-import { users } from '../db/schema.js';
 
 const email = process.argv[2];
 
@@ -25,35 +22,37 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const sql = postgres(connectionString);
-const db = drizzle(sql);
+const sql = postgres(connectionString, { prepare: true });
 
 try {
   console.log(`🔍 Looking for user with email: ${email}`);
-  
-  // Find the user
-  const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
-  
+
+  const user = await sql/* sql */`
+    SELECT id, email, role
+    FROM users
+    WHERE email = ${email}
+    LIMIT 1
+  `;
+
   if (user.length === 0) {
     console.error(`❌ User with email ${email} not found`);
     process.exit(1);
   }
-  
-  console.log(`✅ Found user: ${user[0].full_name || user[0].email}`);
-  console.log(`📧 Email: ${user[0].email}`);
-  console.log(`👤 Current role: ${user[0].role || 'not set'}`);
-  
-  // Update the user's role to admin
-  await db.update(users)
-    .set({ 
-      role: 'admin',
-      updated_at: new Date()
-    })
-    .where(eq(users.id, user[0].id));
-  
+
+  const target = user[0];
+  console.log(`✅ Found user: ${target.email}`);
+  console.log(`📧 Email: ${target.email}`);
+  console.log(`👤 Current role: ${target.role || 'not set'}`);
+
+  await sql/* sql */`
+    UPDATE users
+    SET role = 'admin',
+        updated_at = NOW()
+    WHERE id = ${target.id}
+  `;
+
   console.log('✅ Successfully updated user role to admin');
   console.log('🎉 You can now access the admin panel at /admin');
-  
 } catch (error) {
   console.error('❌ Error updating user role:', error);
   process.exit(1);

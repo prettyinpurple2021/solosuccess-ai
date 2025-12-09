@@ -18,7 +18,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
-import { getClientContext } from "./devcycle"
+import { getClientContext, isDevCycleEnabled } from "./devcycle"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -132,6 +132,30 @@ export default function RootLayout({
   children: ReactNode
 }) {
   // GA4 is injected manually; no env var needed
+  const appShell = (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <AuthProvider>
+        <OfflineProvider>
+          <AccessibilityProvider>
+            <ChatProvider>
+              {children}
+            </ChatProvider>
+            <PerformanceMonitor />
+            {/* Ensure this client component that calls useAuth is inside AuthProvider */}
+            <ServiceWorkerRegister />
+            <ExitIntentSurvey />
+            <SmartTipManager />
+            <HolographicFeedbackWidget />
+          </AccessibilityProvider>
+        </OfflineProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  )
 
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
@@ -233,30 +257,13 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        <DevCycleClientsideProvider context={getClientContext()}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AuthProvider>
-              <OfflineProvider>
-                <AccessibilityProvider>
-                  <ChatProvider>
-                    {children}
-                  </ChatProvider>
-                  <PerformanceMonitor />
-                  {/* Ensure this client component that calls useAuth is inside AuthProvider */}
-                  <ServiceWorkerRegister />
-                  <ExitIntentSurvey />
-                  <SmartTipManager />
-                  <HolographicFeedbackWidget />
-                </AccessibilityProvider>
-              </OfflineProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </DevCycleClientsideProvider>
+        {isDevCycleEnabled ? (
+          <DevCycleClientsideProvider context={getClientContext()}>
+            {appShell}
+          </DevCycleClientsideProvider>
+        ) : (
+          appShell
+        )}
         <Analytics />
       </body>
     </html>

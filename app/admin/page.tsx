@@ -51,6 +51,8 @@ import {
 } from '@/components/military'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 type AdminStatus = {
   uptimeSeconds: number
   serverTime: string
