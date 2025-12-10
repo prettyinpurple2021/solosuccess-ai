@@ -66,8 +66,9 @@ export function NeuralNetworkCanvas({
       constructor() {
         this.x = Math.random() * width
         this.y = Math.random() * height
-        this.vx = (Math.random() - 0.5) * 0.5
-        this.vy = (Math.random() - 0.5) * 0.5
+        // Slow the background animation slightly for a calmer effect
+        this.vx = (Math.random() - 0.5) * 0.25
+        this.vy = (Math.random() - 0.5) * 0.25
         this.size = Math.random() * 2 + 1
         this.color = Math.random() > 0.5 ? '#00f3ff' : '#bd00ff'
       }

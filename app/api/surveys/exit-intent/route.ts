@@ -14,9 +14,14 @@ export const dynamic = 'force-dynamic'
 function getSql() {
   const url = process.env.DATABASE_URL
   if (!url) {
-    throw new Error('DATABASE_URL is not set')
+    return null
   }
-  return neon(url)
+  try {
+    return neon(url)
+  } catch (error) {
+    logError('Failed to initialize Neon client', { error })
+    return null
+  }
 }
 
 async function getUserIdFromToken(request: NextRequest): Promise<string | null> {
@@ -37,6 +42,10 @@ async function getUserIdFromToken(request: NextRequest): Promise<string | null> 
 export async function GET(req: NextRequest) {
   try {
     const sql = getSql()
+    if (!sql) {
+      logError('DATABASE_URL missing or Neon client init failed for exit-intent GET')
+      return NextResponse.json({ error: 'Database unavailable', canShow: false, status: null }, { status: 503 })
+    }
     const userId = await getUserIdFromToken(req)
 
     // Create table if it doesn't exist
@@ -66,7 +75,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ status, canShow })
   } catch (error) {
     logError('Survey status check error:', { error })
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Server error', canShow: false, status: null }, { status: 500 })
   }
 }
 
@@ -74,6 +83,10 @@ export async function POST(req: NextRequest) {
   try {
     const { role, goal, blocker, email, action } = await req.json().catch(() => ({}))
     const sql = getSql()
+    if (!sql) {
+      logError('DATABASE_URL missing or Neon client init failed for exit-intent POST')
+      return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
+    }
     const userId = await getUserIdFromToken(req)
 
     logDebug('Survey submission data:', { role, goal, blocker, email, action, userId })

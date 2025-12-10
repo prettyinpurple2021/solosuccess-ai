@@ -1,3 +1,6 @@
+// Avoid static prerender failures when feature-flag SDK keys are absent in build envs
+export const dynamic = 'force-dynamic'
+
 export default function ProfilePage() {
   return (
     <div style={{ 

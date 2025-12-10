@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = 'force-dynamic'
-
 import { useState } from "react";
 import { Button} from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
@@ -11,7 +9,7 @@ import { Alert, AlertDescription} from "@/components/ui/alert";
 import { Mail, AlertCircle, CheckCircle} from "lucide-react";
 import Link from "next/link";
 
-export default function AccountRecoveryPage() {
+export default function AccountRecoveryClient() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -118,3 +116,4 @@ export default function AccountRecoveryPage() {
     </div>
   );
 }
+

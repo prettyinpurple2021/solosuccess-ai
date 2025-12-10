@@ -18,7 +18,8 @@ import { Analytics } from "@vercel/analytics/next"
 import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
-import { getClientContext } from "./devcycle"
+import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
+import { CssScriptCleanup } from "@/components/util/css-script-cleanup"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -131,7 +132,34 @@ export default function RootLayout({
 }: {
   children: ReactNode
 }) {
+  const exitIntentDisabled = process.env.NEXT_PUBLIC_DISABLE_EXIT_INTENT === 'true'
+
   // GA4 is injected manually; no env var needed
+  const appShell = (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <AuthProvider>
+        <OfflineProvider>
+          <AccessibilityProvider>
+            <ChatProvider>
+              {children}
+            </ChatProvider>
+            <PerformanceMonitor />
+            {/* Ensure this client component that calls useAuth is inside AuthProvider */}
+            <ServiceWorkerRegister />
+            <CssScriptCleanup />
+            {!exitIntentDisabled && <ExitIntentSurvey />}
+            <SmartTipManager />
+            <HolographicFeedbackWidget />
+          </AccessibilityProvider>
+        </OfflineProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  )
 
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
@@ -197,6 +225,31 @@ export default function RootLayout({
           `}
         </Script>
         <Script
+          id="strip-css-scripts"
+          strategy="beforeInteractive"
+        >{`
+          try {
+            const removeCssScripts = () => {
+              const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+                try {
+                  const url = new URL(el.getAttribute('src') || '', window.location.href);
+                  return url.pathname.endsWith('.css');
+                } catch {
+                  return false;
+                }
+              });
+              nodes.forEach((el) => el.parentElement?.removeChild(el));
+            };
+            // Initial pass
+            removeCssScripts();
+            // Watch for future insertions during streaming/hydration
+            const observer = new MutationObserver(() => removeCssScripts());
+            observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+          } catch (err) {
+            // no-op
+          }
+        `}</Script>
+        <Script
           id="chatbase-widget-loader"
           strategy="afterInteractive"
         >
@@ -233,30 +286,13 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        <DevCycleClientsideProvider context={getClientContext()}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AuthProvider>
-              <OfflineProvider>
-                <AccessibilityProvider>
-                  <ChatProvider>
-                    {children}
-                  </ChatProvider>
-                  <PerformanceMonitor />
-                  {/* Ensure this client component that calls useAuth is inside AuthProvider */}
-                  <ServiceWorkerRegister />
-                  <ExitIntentSurvey />
-                  <SmartTipManager />
-                  <HolographicFeedbackWidget />
-                </AccessibilityProvider>
-              </OfflineProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </DevCycleClientsideProvider>
+        {isDevCycleEnabled && !isStaticBuild ? (
+          <DevCycleClientsideProvider context={getClientContext()}>
+            {appShell}
+          </DevCycleClientsideProvider>
+        ) : (
+          appShell
+        )}
         <Analytics />
       </body>
     </html>

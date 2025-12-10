@@ -324,6 +324,19 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self';",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://www.chatbase.co blob:;",
+              "worker-src 'self' blob:;",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://use.typekit.net https://p.typekit.net;",
+              "font-src 'self' https://fonts.gstatic.com https://use.typekit.net data:;",
+              "img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com;",
+              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com;",
+              "frame-src https://js.stripe.com https://challenges.cloudflare.com;",
+            ].join(" "),
+          },
         ],
       },
     ];
@@ -340,9 +353,9 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: "frances-loggins",
+  org: "solosuccess-ai",
 
-  project: "solosuccess-api",
+  project: "solosuccess-ai",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

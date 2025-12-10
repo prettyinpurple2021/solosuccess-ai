@@ -9,12 +9,19 @@ const serverSDKKey = process.env.DEVCYCLE_SERVER_SDK_KEY?.trim() || "";
 const clientSDKKey = process.env.NEXT_PUBLIC_DEVCYCLE_CLIENT_SDK_KEY?.trim() || "";
 
 // Only initialize DevCycle if valid SDK keys are provided (not empty strings)
-const isDevCycleEnabled = Boolean(serverSDKKey && clientSDKKey && serverSDKKey.length > 0 && clientSDKKey.length > 0);
-const isStaticBuild = process.env.NEXT_PHASE === "phase-production-build";
+export const isStaticBuild = process.env.NEXT_PHASE === "phase-production-build";
+export const isDevCycleEnabled = Boolean(
+  serverSDKKey &&
+  clientSDKKey &&
+  serverSDKKey.length > 0 &&
+  clientSDKKey.length > 0
+);
+const isDevCycleRuntimeEnabled = isDevCycleEnabled && !isStaticBuild;
 
 let devCycleInstance: ReturnType<typeof setupDevCycle> | null = null;
 
-if (isDevCycleEnabled) {
+// Never initialize during static build; only at runtime when keys are present
+if (isDevCycleRuntimeEnabled) {
   try {
     devCycleInstance = setupDevCycle({
       serverSDKKey,
@@ -39,6 +46,15 @@ const fallbackGetVariableValue = async <T>(key: string, defaultValue: T): Promis
 const fallbackGetClientContext = () => {
   return {
     user_id: "anonymous",
+    clientSDKKey: "",
+    enableStreaming: false,
+    realtimeDelay: 0,
+    options: {},
+    serverDataPromise: Promise.resolve({
+      user: { user_id: "anonymous" } as any,
+      config: {} as any,
+      userAgent: "",
+    }),
   };
 };
 
