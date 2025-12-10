@@ -71,7 +71,7 @@ const redis = new Redis({
 });
 
 // Sentry request middleware must be first
-app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.requestHandler());
 
 app.use(cors({
     origin: allowedOrigins,
@@ -725,7 +725,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Sentry error handler must be last, before any other error middleware
-app.use(Sentry.Handlers.errorHandler());
+app.use(Sentry.errorHandler());
 
 // Express error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
