@@ -1,11 +1,8 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
-import { Inter } from "next/font/google";
 import { AlertCircle } from "lucide-react";
 import { useEffect } from "react";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function GlobalError({
   error,
@@ -20,7 +17,7 @@ export default function GlobalError({
   return (
     <html>
       <body
-        className={`${inter.className} min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-pink-50`}
+        className="font-sans min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-pink-50"
       >
         <div className="w-full max-w-lg bg-white rounded-lg shadow-lg border-2 border-red-200 overflow-hidden">
           <div className="p-6 border-b border-gray-200">

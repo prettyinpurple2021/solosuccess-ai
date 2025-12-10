@@ -15,26 +15,18 @@ import { SmartTipManager } from "@/components/ui/smart-tip"
 import { HolographicFeedbackWidget } from "@/components/feedback/holographic-feedback-widget"
 import { Analytics } from "@vercel/analytics/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
-import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
 import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
 import { CssScriptCleanup } from "@/components/util/css-script-cleanup"
 
-// Configure the fonts
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
-const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
-const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-boss' })
-const rajdhani = Rajdhani({ 
-  subsets: ['latin'], 
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-tech' 
-})
-
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+// Use system fonts as fallbacks - these work in all environments including offline builds
+// The actual Google Fonts are loaded via CSS in globals.css when network is available
+const inter = { variable: '--font-sans', className: 'font-sans' }
+const jetbrains = { variable: '--font-mono', className: 'font-mono' }
+const orbitron = { variable: '--font-boss', className: 'font-sci' }
+const rajdhani = { variable: '--font-tech', className: 'font-tech' }
+const fontSans = { variable: '--font-sans', className: 'font-sans' }
 
 export const metadata = {
   title: {
@@ -164,18 +156,20 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
       <head>
-        {/* Optimize font loading */}
+        {/* Google Fonts - loaded at runtime, doesn't block build */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" 
+          rel="stylesheet" 
+        />
+        
         {/* Search engine verification placeholders */}
         <meta name="google-site-verification" content="CHANGE_ME" />
         <meta name="msvalidate.01" content="CHANGE_ME" />
         {/* Analytics scripts moved to afterInteractive to prevent chunk loading issues */}
         {/* Move canonical & prefetch links into head to avoid incorrect tag handling */}
         <link rel="canonical" href="https://www.solosuccessai.fun/" />
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
       </head>
       <body
