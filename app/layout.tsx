@@ -19,7 +19,6 @@ import { Inter, JetBrains_Mono, Orbitron, Rajdhani } from 'next/font/google'
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
 import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
-import { CssScriptCleanup } from "@/components/util/css-script-cleanup"
 
 // Configure the fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -151,7 +150,6 @@ export default function RootLayout({
             <PerformanceMonitor />
             {/* Ensure this client component that calls useAuth is inside AuthProvider */}
             <ServiceWorkerRegister />
-            <CssScriptCleanup />
             {!exitIntentDisabled && <ExitIntentSurvey />}
             <SmartTipManager />
             <HolographicFeedbackWidget />
@@ -177,31 +175,6 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-        {/* Guard against any accidental CSS files injected as <script src="...css"> */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const removeCssScripts = () => {
-                  const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
-                    try {
-                      const url = new URL(el.getAttribute('src') || '', window.location.href);
-                      return url.pathname.endsWith('.css');
-                    } catch {
-                      return false;
-                    }
-                  });
-                  nodes.forEach((el) => el.parentElement?.removeChild(el));
-                };
-                removeCssScripts();
-                const observer = new MutationObserver(() => removeCssScripts());
-                observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
-              } catch (err) {
-                // no-op
-              }
-            `,
-          }}
-        />
       </head>
       <body
         className={cn(
@@ -249,6 +222,31 @@ export default function RootLayout({
             gtag('config', 'G-W174T4ZFNF');
           `}
         </Script>
+        <Script
+          id="strip-css-scripts"
+          strategy="beforeInteractive"
+        >{`
+          try {
+            const removeCssScripts = () => {
+              const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+                try {
+                  const url = new URL(el.getAttribute('src') || '', window.location.href);
+                  return url.pathname.endsWith('.css');
+                } catch {
+                  return false;
+                }
+              });
+              nodes.forEach((el) => el.parentElement?.removeChild(el));
+            };
+            // Initial pass
+            removeCssScripts();
+            // Watch for future insertions during streaming/hydration
+            const observer = new MutationObserver(() => removeCssScripts());
+            observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+          } catch (err) {
+            // no-op
+          }
+        `}</Script>
         <Script
           id="chatbase-widget-loader"
           strategy="afterInteractive"
