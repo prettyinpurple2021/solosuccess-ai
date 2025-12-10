@@ -60,25 +60,20 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // Cyberpunk Design System Colors
+        // Cyberpunk Futuristic Brand Colors (from SS logo)
         cyber: {
-          black: '#020005',
-          dark: '#0a0514',
-          cyan: '#00f3ff',
-          purple: '#bd00ff',
-          dim: 'rgba(0, 243, 255, 0.1)',
+          black: '#04060c',
+          dark: '#0a1020',
+          cyan: '#00f0ff',
+          purple: '#ff00b7',
+          dim: 'rgba(0, 240, 255, 0.12)',
         },
-        // Military Glassmorphic Design System Colors (kept for backward compatibility)
-        military: {
-          'hot-pink': '#FF71B5',
-          'blush-pink': '#FFB3D9',
-          'dusty-rose': '#F7BAC8',
-          'gunmetal': '#5D5C61',
-          'storm-grey': '#B2B2B2',
-          'charcoal': '#454547',
-          'midnight': '#18181A',
-          'tactical': '#232325',
-          'glass-white': '#FAFAFA',
+        brand: {
+          cyan: '#00f0ff',
+          magenta: '#ff00b7',
+          graphite: '#0a1020',
+          slate: '#10182a',
+          steel: '#8aa4b5',
         },
         // AI Agent Colors
         agent: {

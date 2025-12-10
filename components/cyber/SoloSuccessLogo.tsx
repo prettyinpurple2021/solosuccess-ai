@@ -31,12 +31,12 @@ export function SoloSuccessLogo({
     >
       <defs>
         <linearGradient id="logo-grad-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#00f3ff', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#0088ff', stopOpacity: 1 }} />
+          <stop offset="0%" style={{ stopColor: '#00f0ff', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#00c8ff', stopOpacity: 1 }} />
         </linearGradient>
         <linearGradient id="logo-grad-purple" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#bd00ff', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#7000ff', stopOpacity: 1 }} />
+          <stop offset="0%" style={{ stopColor: '#ff00b7', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#b1008a', stopOpacity: 1 }} />
         </linearGradient>
         {variant === 'footer' && (
           <linearGradient id="footer-grad" x1="0%" y1="0%" x2="100%" y2="100%">
