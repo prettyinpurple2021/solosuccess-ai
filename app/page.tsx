@@ -21,7 +21,7 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <div className="relative pt-32 pb-20 lg:min-h-screen flex items-center z-10">
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           
           {/* Hero Text */}
           <div className="space-y-8">
@@ -71,7 +71,7 @@ export default function HomePage() {
           </div>
 
           {/* Hero Graphic (3D HUD Element) */}
-          <div className="relative hidden lg:block">
+          <div className="relative">
             {/* Outer Ring */}
             <div className="absolute inset-0 border border-dashed border-cyber-cyan/20 rounded-full animate-spin-slow"></div>
             {/* Inner Ring */}
