@@ -20,13 +20,12 @@ import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
 import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
 import { CssScriptCleanup } from "@/components/util/css-script-cleanup"
 
-// Use system fonts as fallbacks - these work in all environments including offline builds
-// The actual Google Fonts are loaded via CSS in globals.css when network is available
-const inter = { variable: '--font-sans', className: 'font-sans' }
+// Font configuration - using runtime-loaded fonts via link tags
+// These objects define CSS variables that map to font families in globals.css
+const inter = { variable: '--font-inter', className: 'font-sans' }
 const jetbrains = { variable: '--font-mono', className: 'font-mono' }
-const orbitron = { variable: '--font-boss', className: 'font-sci' }
+const orbitron = { variable: '--font-sci', className: 'font-sci' }
 const rajdhani = { variable: '--font-tech', className: 'font-tech' }
-const fontSans = { variable: '--font-sans', className: 'font-sans' }
 
 export const metadata = {
   title: {
@@ -160,7 +159,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link 
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" 
+          href={`https://fonts.googleapis.com/css2?` +
+                `family=Inter:wght@300;400;500;600;700;800;900&` +
+                `family=Orbitron:wght@400;500;600;700;800;900&` +
+                `family=Rajdhani:wght@300;400;500;600;700&` +
+                `display=swap`} 
           rel="stylesheet" 
         />
         
@@ -175,7 +178,6 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-cyber-black font-tech text-gray-300 antialiased",
-          fontSans.variable,
           inter.variable,
           jetbrains.variable,
           orbitron.variable,
