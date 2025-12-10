@@ -177,6 +177,31 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        {/* Guard against any accidental CSS files injected as <script src="...css"> */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const removeCssScripts = () => {
+                  const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+                    try {
+                      const url = new URL(el.getAttribute('src') || '', window.location.href);
+                      return url.pathname.endsWith('.css');
+                    } catch {
+                      return false;
+                    }
+                  });
+                  nodes.forEach((el) => el.parentElement?.removeChild(el));
+                };
+                removeCssScripts();
+                const observer = new MutationObserver(() => removeCssScripts());
+                observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+              } catch (err) {
+                // no-op
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={cn(
@@ -224,31 +249,6 @@ export default function RootLayout({
             gtag('config', 'G-W174T4ZFNF');
           `}
         </Script>
-        <Script
-          id="strip-css-scripts"
-          strategy="beforeInteractive"
-        >{`
-          try {
-            const removeCssScripts = () => {
-              const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
-                try {
-                  const url = new URL(el.getAttribute('src') || '', window.location.href);
-                  return url.pathname.endsWith('.css');
-                } catch {
-                  return false;
-                }
-              });
-              nodes.forEach((el) => el.parentElement?.removeChild(el));
-            };
-            // Initial pass
-            removeCssScripts();
-            // Watch for future insertions during streaming/hydration
-            const observer = new MutationObserver(() => removeCssScripts());
-            observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
-          } catch (err) {
-            // no-op
-          }
-        `}</Script>
         <Script
           id="chatbase-widget-loader"
           strategy="afterInteractive"

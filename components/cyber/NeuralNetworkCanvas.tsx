@@ -153,7 +153,7 @@ export function NeuralNetworkCanvas({
     <canvas
       ref={canvasRef}
       id="neural-network"
-      className="fixed top-0 left-0 w-full h-full z-[-1]"
+      className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none"
       style={{
         background: 'radial-gradient(circle at 50% 50%, transparent 0%, #020005 100%)',
       }}
