@@ -131,7 +131,7 @@ export default function RootLayout({
 }: {
   children: ReactNode
 }) {
-  const exitIntentDisabled = process.env.NEXT_PUBLIC_DISABLE_EXIT_INTENT === 'true'
+  const exitIntentDisabled = process.env.NEXT_PUBLIC_DISABLE_EXIT_INTENT !== 'false'
 
   // GA4 is injected manually; no env var needed
   const appShell = (
@@ -162,6 +162,57 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
       <head>
+        <Script
+          id="strip-css-scripts"
+          strategy="beforeInteractive"
+        >{`
+          try {
+            // Reuse a single observer and clean it up on unload/pagehide to avoid leaks
+            if (window.__ssCssScriptObserver) {
+              window.__ssCssScriptObserver.disconnect();
+              window.__ssCssScriptObserver = undefined;
+            }
+            const removeCssScripts = () => {
+              const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+                try {
+                  const url = new URL(el.getAttribute('src') || '', window.location.href);
+                  return url.pathname.endsWith('.css');
+                } catch {
+                  return false;
+                }
+              });
+              nodes.forEach((el) => el.parentElement?.removeChild(el));
+            };
+            // Initial pass
+            removeCssScripts();
+            // Watch for future insertions during streaming/hydration
+            const observer = new MutationObserver(() => removeCssScripts());
+            window.__ssCssScriptObserver = observer;
+            const target = document.documentElement || document.body;
+            if (target) {
+              observer.observe(target, { childList: true, subtree: true });
+            }
+            const teardown = () => {
+              if (window.__ssCssScriptObserver) {
+                window.__ssCssScriptObserver.disconnect();
+                window.__ssCssScriptObserver = undefined;
+              }
+              window.removeEventListener('pagehide', teardown);
+              window.removeEventListener('beforeunload', teardown);
+              document.removeEventListener('visibilitychange', onHidden);
+            };
+            const onHidden = () => {
+              if (document.visibilityState === 'hidden') {
+                teardown();
+              }
+            };
+            window.addEventListener('pagehide', teardown);
+            window.addEventListener('beforeunload', teardown);
+            document.addEventListener('visibilitychange', onHidden);
+          } catch (err) {
+            // no-op
+          }
+        `}</Script>
         {/* Optimize font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -227,6 +278,11 @@ export default function RootLayout({
           strategy="beforeInteractive"
         >{`
           try {
+            // Reuse a single observer and clean it up on unload/pagehide to avoid leaks
+            if (window.__ssCssScriptObserver) {
+              window.__ssCssScriptObserver.disconnect();
+              window.__ssCssScriptObserver = undefined;
+            }
             const removeCssScripts = () => {
               const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
                 try {
@@ -242,7 +298,28 @@ export default function RootLayout({
             removeCssScripts();
             // Watch for future insertions during streaming/hydration
             const observer = new MutationObserver(() => removeCssScripts());
-            observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+            window.__ssCssScriptObserver = observer;
+            const target = document.documentElement || document.body;
+            if (target) {
+              observer.observe(target, { childList: true, subtree: true });
+            }
+            const teardown = () => {
+              if (window.__ssCssScriptObserver) {
+                window.__ssCssScriptObserver.disconnect();
+                window.__ssCssScriptObserver = undefined;
+              }
+              window.removeEventListener('pagehide', teardown);
+              window.removeEventListener('beforeunload', teardown);
+              document.removeEventListener('visibilitychange', onHidden);
+            };
+            const onHidden = () => {
+              if (document.visibilityState === 'hidden') {
+                teardown();
+              }
+            };
+            window.addEventListener('pagehide', teardown);
+            window.addEventListener('beforeunload', teardown);
+            document.addEventListener('visibilitychange', onHidden);
           } catch (err) {
             // no-op
           }
