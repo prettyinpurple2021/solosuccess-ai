@@ -56,18 +56,18 @@ export function middleware(request: NextRequest) {
   // CSP (Content Security Policy) - adjust as needed for your app
   // Applied to ALL routes to ensure chatbase.co is always allowed
   const csp = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://www.chatbase.co blob:",
-    "worker-src 'self' blob:",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://use.typekit.net https://p.typekit.net",
-    "img-src 'self' data: https: blob:",
-    "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://use.typekit.net",
-    "connect-src 'self' https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://sse.devcycle.com https://www.chatbase.co",
-    "frame-src https://js.stripe.com https://www.chatbase.co",
+    "default-src 'self' https: data: blob:",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:",
+    "style-src 'self' 'unsafe-inline' https:",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data: https:",
+    "connect-src 'self' https: wss: blob:",
+    "frame-src 'self' https:",
+    "media-src 'self' https: data: blob:",
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self' https://api.stripe.com",
-    "frame-ancestors 'none'",
+    "form-action 'self' https:",
+    "frame-ancestors 'self'",
     "upgrade-insecure-requests"
   ].join('; ')
   

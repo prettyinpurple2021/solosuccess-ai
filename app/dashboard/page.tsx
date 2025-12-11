@@ -1,15 +1,14 @@
 "use client"
 
 export const dynamic = 'force-dynamic'
-import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { logError, logInfo } from '@/lib/logger'
+import { useState, useEffect, useMemo, useCallback, ReactNode } from "react"
 import { useDashboardData } from "@/hooks/use-dashboard-data"
 import { useAuth } from "@/hooks/use-auth"
 import { useSmartTips, TRIGGER_CONDITIONS } from "@/hooks/use-smart-tips"
 import { useAnalytics, usePageTracking, usePerformanceTracking } from "@/hooks/use-analytics"
 import { SimpleOnboarding } from "@/components/onboarding/simple-onboarding"
 import { WelcomeDashboard } from "@/components/onboarding/welcome-dashboard"
-import { Loading } from "@/components/ui/loading"
 import { motion, easeOut } from "framer-motion"
 import {
   CheckCircle,
@@ -24,28 +23,38 @@ import {
   BarChart3,
   Plus,
   Briefcase,
-  Shield,
-  Zap,
-  TrendingUp,
-  Users,
-  Award
+  Shield
 } from "lucide-react"
 import Link from "next/link"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import MobileDashboardEnhanced from "@/components/mobile/mobile-dashboard-enhanced"
-import {
-  TacticalButton,
-  GlassCard,
-  RankStars,
-  CamoBackground,
-  SergeantDivider,
-  StatsBadge,
-  TacticalGrid
-} from '@/components/military'
+import { HudBorder } from "@/components/cyber/HudBorder"
+import { CyberButton } from "@/components/cyber/CyberButton"
+import { NeuralNetworkCanvas } from "@/components/cyber/NeuralNetworkCanvas"
+import { UIOverlayLines } from "@/components/cyber/UIOverlayLines"
 
 // Note: Metadata cannot be exported from client components
 // SEO metadata is handled in the layout.tsx file
+
+type BadgeVariant = 'cyan' | 'purple' | 'muted' | 'danger' | 'success' | 'warning'
+
+function Badge({ children, variant = 'muted' }: { children: ReactNode; variant?: BadgeVariant }) {
+  const styles: Record<BadgeVariant, string> = {
+    cyan: 'border-cyber-cyan/60 bg-cyber-dim text-cyber-cyan',
+    purple: 'border-cyber-purple/60 bg-cyber-purple/10 text-cyber-purple',
+    muted: 'border-white/10 bg-white/5 text-gray-300',
+    danger: 'border-rose-400/50 bg-rose-500/10 text-rose-100',
+    success: 'border-emerald-400/50 bg-emerald-500/10 text-emerald-100',
+    warning: 'border-amber-400/50 bg-amber-500/10 text-amber-100',
+  }
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-[11px] font-tech tracking-[0.18em] uppercase border ${styles[variant]}`}>
+      {children}
+    </span>
+  )
+}
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -75,7 +84,6 @@ export default function DashboardPage() {
 
   useSmartTips(smartTipsConfig)
   const searchParams = useSearchParams()
-  const _router = useRouter()
   const isMobile = useIsMobile()
 
   // Track page views and performance
@@ -208,7 +216,9 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-cyber-black">
+      <div className="relative min-h-screen bg-cyber-black overflow-hidden">
+        <NeuralNetworkCanvas />
+        <UIOverlayLines />
 
         <SimpleOnboarding
           open={showOnboarding}
@@ -216,18 +226,18 @@ export default function DashboardPage() {
           onSkipAction={handleOnboardingSkip}
         />
 
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <GlassCard className="p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-8 h-8 text-white animate-pulse" />
+        <div className="relative z-10 flex items-center justify-center min-h-[60vh] px-6">
+          <HudBorder className="max-w-md w-full p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center mx-auto mb-4 shadow-neon-cyan">
+              <Shield className="w-8 h-8 text-black animate-pulse" />
             </div>
             <h2 className="text-xl font-sci font-bold text-white mb-2">
               Loading Command Center...
             </h2>
             <p className="text-gray-400 font-tech">
-              Preparing your tactical dashboard
+              Preparing your dashboard
             </p>
-          </GlassCard>
+          </HudBorder>
         </div>
       </div>
     )
@@ -235,7 +245,9 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-cyber-black">
+      <div className="relative min-h-screen bg-cyber-black overflow-hidden">
+        <NeuralNetworkCanvas />
+        <UIOverlayLines />
 
         <SimpleOnboarding
           open={showOnboarding}
@@ -243,24 +255,24 @@ export default function DashboardPage() {
           onSkipAction={handleOnboardingSkip}
         />
 
-        <div className="flex items-center justify-center min-h-[60vh] p-4">
-          <GlassCard className="max-w-md p-8 text-center" glow>
-            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+        <div className="relative z-10 flex items-center justify-center min-h-[60vh] p-4">
+          <HudBorder className="max-w-md w-full p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-rose-600 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Flame className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-2xl font-sci font-bold text-white mb-2">
               Mission Critical Error
             </h2>
             <p className="text-gray-400 mb-6 font-tech">{error}</p>
-            <TacticalButton
+            <CyberButton
               onClick={() => window.location.reload()}
               variant="primary"
               className="w-full"
             >
               <Shield className="w-4 h-4 mr-2" />
               Retry Mission
-            </TacticalButton>
-          </GlassCard>
+            </CyberButton>
+          </HudBorder>
         </div>
       </div>
     )
@@ -268,7 +280,9 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-cyber-black">
+      <div className="relative min-h-screen bg-cyber-black overflow-hidden">
+        <NeuralNetworkCanvas />
+        <UIOverlayLines />
 
         <SimpleOnboarding
           open={showOnboarding}
@@ -276,34 +290,36 @@ export default function DashboardPage() {
           onSkipAction={handleOnboardingSkip}
         />
 
-        <div className="flex items-center justify-center min-h-[60vh] p-4">
-          <GlassCard className="max-w-md p-8 text-center" glow>
-            <RankStars count={5} size="lg" className="justify-center mb-4" />
+        <div className="relative z-10 flex items-center justify-center min-h-[60vh] p-4">
+          <HudBorder className="max-w-md w-full p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center mx-auto mb-4 shadow-neon-cyan">
+              <Sparkles className="w-8 h-8 text-black" />
+            </div>
             <h2 className="text-2xl font-sci font-bold text-white mb-2">
               Welcome to SoloSuccess AI
             </h2>
-            <p className="text-gray-400 mb-6 font-tech">Begin your tactical mission</p>
+            <p className="text-gray-400 mb-6 font-tech">Initialize your first mission to unlock insights.</p>
             <div className="space-y-3">
               <Link href="/dashboard/slaylist">
-                <TacticalButton
+                <CyberButton
                   variant="primary"
                   className="w-full"
                 >
                   <Target className="w-4 h-4 mr-2" />
                   Create Mission
-                </TacticalButton>
+                </CyberButton>
               </Link>
               <Link href="/dashboard/agents">
-                <TacticalButton
+                <CyberButton
                   variant="secondary"
                   className="w-full"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Contact Command
-                </TacticalButton>
+                </CyberButton>
               </Link>
             </div>
-          </GlassCard>
+          </HudBorder>
         </div>
       </div>
     )
@@ -354,9 +370,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-cyber-black" role="main">
-      <CamoBackground />
-      <TacticalGrid />
+    <main className="relative min-h-screen bg-cyber-black text-white overflow-hidden" role="main">
+      <NeuralNetworkCanvas />
+      <UIOverlayLines />
 
       <SimpleOnboarding
         open={showOnboarding}
@@ -368,109 +384,96 @@ export default function DashboardPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="p-6 space-y-8"
+        className="relative z-10 max-w-7xl mx-auto px-6 py-10 space-y-10"
       >
         {/* Welcome Header */}
-        <motion.div variants={itemVariants} className="flex items-center justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center"
-              >
-                <Crown className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h1 className="text-4xl font-sci font-bold text-white">
-                  Welcome back, {data.user.full_name || data.user.email.split('@')[0]}! 👑
-                </h1>
-                <p className="text-lg text-gray-400 font-tech">
-                  Command center status report
-                </p>
-              </div>
+        <motion.div variants={itemVariants} className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <motion.div
+              animate={{
+                rotate: [0, 6, -6, 0],
+                scale: [1, 1.06, 1]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-14 h-14 rounded-xl border border-cyber-cyan/50 bg-cyber-dim flex items-center justify-center shadow-neon-cyan"
+            >
+              <Crown className="w-7 h-7 text-cyber-cyan" />
+            </motion.div>
+            <div>
+              <p className="text-xs font-tech uppercase tracking-[0.2em] text-cyber-cyan">Command Center</p>
+              <h1 className="text-3xl md:text-4xl font-sci font-bold text-white">
+                Welcome back, {data.user.full_name || data.user.email.split('@')[0]}!
+              </h1>
+              <p className="text-sm text-gray-400 font-tech">
+                Systems stable. Here is your live productivity intel.
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <StatsBadge variant="warning" size="lg">
-              Level {data.user.level}
-            </StatsBadge>
-            <StatsBadge variant="success" size="lg">
-              {data.user.total_points} pts
-            </StatsBadge>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="cyan">Level {data.user.level}</Badge>
+            <Badge variant="purple">{data.user.total_points} pts</Badge>
           </div>
         </motion.div>
 
         {/* Today's Stats */}
         <section aria-labelledby="stats-heading">
           <h2 id="stats-heading" className="sr-only">Today's Statistics</h2>
-          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <GlassCard className="p-6" glow>
+          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                  <CheckCircle className="w-6 h-6 text-black" />
                 </div>
-                <StatsBadge variant="success" size="sm">
-                  +15%
-                </StatsBadge>
+                <Badge variant="cyan">+15%</Badge>
               </div>
-              <h3 className="text-2xl font-sci font-bold text-white mb-1">
+              <h3 className="text-2xl font-sci font-bold mb-1">
                 {todaysStats.tasks_completed}/{todaysStats.total_tasks}
               </h3>
               <p className="text-gray-400 text-sm font-tech">Tasks Completed</p>
-            </GlassCard>
+            </HudBorder>
 
-            <GlassCard className="p-6" glow>
+            <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                  <Clock className="w-6 h-6 text-black" />
                 </div>
-                <StatsBadge variant="success" size="sm">
-                  +8%
-                </StatsBadge>
+                <Badge variant="cyan">+8%</Badge>
               </div>
-              <h3 className="text-2xl font-sci font-bold text-white mb-1">
+              <h3 className="text-2xl font-sci font-bold mb-1">
                 {todaysStats.focus_minutes}m
               </h3>
               <p className="text-gray-400 text-sm font-tech">Focus Time</p>
-            </GlassCard>
+            </HudBorder>
 
-            <GlassCard className="p-6" glow>
+            <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                  <MessageCircle className="w-6 h-6 text-black" />
                 </div>
-                <StatsBadge variant="success" size="sm">
-                  +12%
-                </StatsBadge>
+                <Badge variant="cyan">+12%</Badge>
               </div>
-              <h3 className="text-2xl font-sci font-bold text-white mb-1">
+              <h3 className="text-2xl font-sci font-bold mb-1">
                 {todaysStats.ai_interactions}
               </h3>
-              <p className="text-military-storm-grey text-sm">AI Interactions</p>
-            </GlassCard>
+              <p className="text-gray-400 text-sm font-tech">AI Interactions</p>
+            </HudBorder>
 
-            <GlassCard className="p-6" glow>
+            <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                  <BarChart3 className="w-6 h-6 text-black" />
                 </div>
-                <StatsBadge variant="success" size="sm">
-                  +5%
-                </StatsBadge>
+                <Badge variant="cyan">+5%</Badge>
               </div>
-              <h3 className="text-2xl font-sci font-bold text-white mb-1">
+              <h3 className="text-2xl font-sci font-bold mb-1">
                 {todaysStats.productivity_score}%
               </h3>
-              <p className="text-military-storm-grey text-sm">Productivity Score</p>
-            </GlassCard>
+              <p className="text-gray-400 text-sm font-tech">Productivity Score</p>
+            </HudBorder>
           </motion.div>
         </section>
 
@@ -480,15 +483,15 @@ export default function DashboardPage() {
           <section aria-labelledby="tasks-heading" className="lg:col-span-2">
             <h2 id="tasks-heading" className="sr-only">Today's Tasks</h2>
             <motion.div variants={itemVariants}>
-              <GlassCard className="p-6" glow>
+              <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
-                    <Target className="w-6 h-6 text-military-hot-pink" />
+                  <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
+                    <Target className="w-6 h-6 text-cyber-cyan" />
                     <span>Today's Missions</span>
                   </h2>
-                  <TacticalButton variant="secondary" size="sm">
+                  <CyberButton variant="secondary" size="sm">
                     View All
-                  </TacticalButton>
+                  </CyberButton>
                 </div>
 
                 <div className="space-y-4">
@@ -499,51 +502,50 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all"
+                        className="flex items-center justify-between p-4 bg-white/5 border border-cyber-cyan/10 rounded-lg hover:border-cyber-cyan/50 transition-all"
                       >
                         <div className="flex items-center space-x-3">
                           <motion.div
-                            whileHover={{ scale: 1.2 }}
-                            className={`w-3 h-3 rounded-full ${task.status === 'completed' ? 'bg-military-hot-pink' : 'bg-military-storm-grey'
-                              }`}
+                            whileHover={{ scale: 1.15 }}
+                            className={`w-3 h-3 rounded-full ${task.status === 'completed' ? 'bg-cyber-cyan' : 'bg-cyber-purple/60'}`}
+                            aria-hidden="true"
                           />
                           <div>
-                            <p className="font-medium text-military-glass-white">{task.title}</p>
+                            <p className="font-medium text-white">{task.title}</p>
                             {task.goal && (
-                              <p className="text-sm text-military-storm-grey">
+                              <p className="text-sm text-gray-400">
                                 Goal: {task.goal.title}
                               </p>
                             )}
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <StatsBadge
+                          <Badge
                             variant={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'success'}
-                            size="sm"
                           >
                             {task.priority}
-                          </StatsBadge>
+                          </Badge>
                           {task.status === 'completed' && (
-                            <CheckCircle className="w-5 h-5 text-military-hot-pink" />
+                            <CheckCircle className="w-5 h-5 text-cyber-cyan" />
                           )}
                         </div>
                       </motion.div>
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <Target className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
-                      <p className="text-military-storm-grey mb-4">No missions for today</p>
-                      <TacticalButton
+                      <Target className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-400 mb-4">No missions for today</p>
+                      <CyberButton
                         variant="primary"
                         size="sm"
                       >
                         <Plus className="w-4 h-4 mr-2" />
                         Add Mission
-                      </TacticalButton>
+                      </CyberButton>
                     </div>
                   )}
                 </div>
-              </GlassCard>
+              </HudBorder>
             </motion.div>
           </section>
 
@@ -551,15 +553,15 @@ export default function DashboardPage() {
           <section aria-labelledby="goals-heading">
             <h2 id="goals-heading" className="sr-only">Active Goals</h2>
             <motion.div variants={itemVariants}>
-              <GlassCard className="p-6" glow>
+              <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
-                    <Trophy className="w-6 h-6 text-military-hot-pink" />
+                  <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
+                    <Trophy className="w-6 h-6 text-cyber-cyan" />
                     <span>Active Objectives</span>
                   </h2>
-                  <TacticalButton size="sm" variant="primary">
+                  <CyberButton size="sm" variant="primary">
                     View All
-                  </TacticalButton>
+                  </CyberButton>
                 </div>
 
                 <div className="space-y-4">
@@ -570,22 +572,22 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="p-4 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg"
+                        className="p-4 bg-white/5 border border-cyber-cyan/10 rounded-lg"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold text-military-glass-white">{goal.title}</h3>
-                          <span className="text-sm font-bold text-military-hot-pink">
+                          <h3 className="font-semibold text-white">{goal.title}</h3>
+                          <Badge variant="purple">
                             {goal.progress_percentage}%
-                          </span>
+                          </Badge>
                         </div>
-                        <div className="w-full bg-military-gunmetal/30 rounded-full h-2 mb-2">
+                        <div className="w-full bg-white/10 rounded-full h-2 mb-2">
                           <div
-                            className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-cyber-cyan to-cyber-purple h-2 rounded-full transition-all duration-300"
                             style={{ width: `${goal.progress_percentage}%` }}
                           />
                         </div>
                         {goal.target_date && (
-                          <p className="text-xs text-military-storm-grey">
+                          <p className="text-xs text-gray-400">
                             Due: {new Date(goal.target_date).toLocaleDateString()}
                           </p>
                         )}
@@ -593,19 +595,19 @@ export default function DashboardPage() {
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <Trophy className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
-                      <p className="text-military-storm-grey mb-4">No active objectives</p>
-                      <TacticalButton
+                      <Trophy className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-400 mb-4">No active objectives</p>
+                      <CyberButton
                         variant="primary"
                         size="sm"
                       >
                         <Crown className="w-4 h-4 mr-2" />
                         Create Objective
-                      </TacticalButton>
+                      </CyberButton>
                     </div>
                   )}
                 </div>
-              </GlassCard>
+              </HudBorder>
             </motion.div>
           </section>
         </div>
@@ -616,15 +618,15 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Conversations */}
             <motion.div variants={itemVariants}>
-              <GlassCard className="p-6" glow>
+              <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
-                    <MessageCircle className="w-6 h-6 text-military-hot-pink" />
+                  <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
+                    <MessageCircle className="w-6 h-6 text-cyber-cyan" />
                     <span>Recent Intel</span>
                   </h2>
-                  <TacticalButton size="sm" variant="primary">
+                  <CyberButton size="sm" variant="primary">
                     View All
-                  </TacticalButton>
+                  </CyberButton>
                 </div>
 
                 <div className="space-y-3">
@@ -635,7 +637,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center space-x-3 p-3 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all cursor-pointer"
+                        className="flex items-center space-x-3 p-3 bg-white/5 border border-cyber-cyan/10 rounded-lg hover:border-cyber-cyan/50 transition-all cursor-pointer"
                       >
                         <div
                           className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
@@ -644,41 +646,41 @@ export default function DashboardPage() {
                           {conversation.agent.display_name.charAt(0)}
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium text-military-glass-white">{conversation.agent.display_name}</p>
-                          <p className="text-sm text-military-storm-grey">
+                          <p className="font-medium text-white">{conversation.agent.display_name}</p>
+                          <p className="text-sm text-gray-400">
                             {new Date(conversation.last_message_at).toLocaleDateString()}
                           </p>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-military-storm-grey" />
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
                       </motion.div>
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <MessageCircle className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
-                      <p className="text-military-storm-grey mb-4">No recent intel</p>
-                      <TacticalButton
+                      <MessageCircle className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-400 mb-4">No recent intel</p>
+                      <CyberButton
                         variant="primary"
                         size="sm"
                       >
                         Start Communication
-                      </TacticalButton>
+                      </CyberButton>
                     </div>
                   )}
                 </div>
-              </GlassCard>
+              </HudBorder>
             </motion.div>
 
             {/* Insights */}
             <motion.div variants={itemVariants}>
-              <GlassCard className="p-6" glow>
+              <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
-                    <Sparkles className="w-6 h-6 text-military-hot-pink" />
+                  <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
+                    <Sparkles className="w-6 h-6 text-cyber-cyan" />
                     <span>AI Intelligence</span>
                   </h2>
-                  <TacticalButton size="sm" variant="primary">
+                  <CyberButton size="sm" variant="primary">
                     View All
-                  </TacticalButton>
+                  </CyberButton>
                 </div>
 
                 <div className="space-y-4">
@@ -689,28 +691,28 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="p-4 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg"
+                        className="p-4 bg-white/5 border border-cyber-cyan/10 rounded-lg"
                       >
-                        <h3 className="font-semibold text-military-glass-white mb-2">{insight.title}</h3>
-                        <p className="text-sm text-military-storm-grey mb-3">
+                        <h3 className="font-semibold text-white mb-2">{insight.title}</h3>
+                        <p className="text-sm text-gray-400 mb-3">
                           {insight.description}
                         </p>
-                        <TacticalButton size="sm" variant="primary">
+                        <CyberButton size="sm" variant="secondary">
                           {insight.action}
-                        </TacticalButton>
+                        </CyberButton>
                       </motion.div>
                     ))
                   ) : (
                     <div className="text-center py-8">
-                      <Sparkles className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
-                      <p className="text-military-storm-grey mb-2">No intelligence yet</p>
-                      <p className="text-sm text-military-storm-grey">
+                      <Sparkles className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-400 mb-2">No intelligence yet</p>
+                      <p className="text-sm text-gray-400">
                         Complete more missions to get AI insights
                       </p>
                     </div>
                   )}
                 </div>
-              </GlassCard>
+              </HudBorder>
             </motion.div>
           </div>
         </section>
@@ -719,16 +721,16 @@ export default function DashboardPage() {
         <section aria-labelledby="briefcase-heading">
           <h2 id="briefcase-heading" className="sr-only">Recent Briefcases</h2>
           <motion.div variants={itemVariants}>
-            <GlassCard className="p-6" glow>
+            <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-heading font-bold text-military-glass-white flex items-center space-x-2">
-                  <Briefcase className="w-6 h-6 text-military-hot-pink" />
+                <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
+                  <Briefcase className="w-6 h-6 text-cyber-cyan" />
                   <span>Mission Briefcases</span>
                 </h2>
                 <Link href="/dashboard/briefcase">
-                  <TacticalButton size="sm" variant="primary">
+                  <CyberButton size="sm" variant="primary">
                     View All
-                  </TacticalButton>
+                  </CyberButton>
                 </Link>
               </div>
 
@@ -740,51 +742,50 @@ export default function DashboardPage() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-center space-x-3 p-3 bg-military-tactical/30 border border-military-gunmetal/30 rounded-lg hover:bg-military-tactical/50 transition-all cursor-pointer"
+                      className="flex items-center space-x-3 p-3 bg-white/5 border border-cyber-cyan/10 rounded-lg hover:border-cyber-cyan/50 transition-all cursor-pointer"
                     >
-                      <div className="w-10 h-10 bg-gradient-to-r from-military-hot-pink to-military-blush-pink rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-white" />
+                      <div className="w-10 h-10 bg-gradient-to-r from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                        <Briefcase className="w-5 h-5 text-black" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-military-glass-white">{briefcase.title}</p>
-                        <p className="text-sm text-military-storm-grey">
+                        <p className="font-medium text-white">{briefcase.title}</p>
+                        <p className="text-sm text-gray-400">
                           {briefcase.goal_count} objectives • {briefcase.task_count} missions
                         </p>
-                        <p className="text-xs text-military-storm-grey">
+                        <p className="text-xs text-gray-500">
                           Updated {new Date(briefcase.updated_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <StatsBadge
-                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'info' : 'default'}
-                          size="sm"
+                        <Badge
+                          variant={briefcase.status === 'active' ? 'success' : briefcase.status === 'completed' ? 'cyan' : 'muted'}
                         >
                           {briefcase.status}
-                        </StatsBadge>
-                        <ArrowRight className="w-4 h-4 text-military-storm-grey" />
+                        </Badge>
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
                       </div>
                     </motion.div>
                   ))
                 ) : (
                   <div className="text-center py-8">
-                    <Briefcase className="w-12 h-12 text-military-storm-grey mx-auto mb-4" />
-                    <p className="text-military-storm-grey mb-2">No briefcases yet</p>
-                    <p className="text-sm text-military-storm-grey mb-4">
+                    <Briefcase className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-400 mb-2">No briefcases yet</p>
+                    <p className="text-sm text-gray-400 mb-4">
                       Create your first briefcase to organize your missions and objectives
                     </p>
                     <Link href="/dashboard/briefcase">
-                      <TacticalButton
+                      <CyberButton
                         variant="primary"
                         size="sm"
                       >
                         <Plus className="w-4 h-4 mr-2" />
                         Create Briefcase
-                      </TacticalButton>
+                      </CyberButton>
                     </Link>
                   </div>
                 )}
               </div>
-            </GlassCard>
+            </HudBorder>
           </motion.div>
         </section>
       </motion.div>

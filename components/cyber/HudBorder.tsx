@@ -14,11 +14,11 @@ export function HudBorder({ children, className, variant = 'default' }: HudBorde
     <div
       className={cn(
         'relative',
-        'bg-[rgba(10,5,20,0.6)]',
+        'bg-[rgba(8,12,24,0.7)]',
         'backdrop-blur-[5px]',
         'border border-cyber-cyan/20',
         'transition-all duration-300',
-        variant === 'hover' && 'hover:border-cyber-cyan/80 hover:shadow-[0_0_15px_rgba(0,243,255,0.2)] hover:-translate-y-0.5',
+        variant === 'hover' && 'hover:border-cyber-cyan/80 hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] hover:-translate-y-0.5',
         'clip-path-hud',
         className
       )}

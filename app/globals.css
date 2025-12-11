@@ -3,11 +3,8 @@
 /* Fonts: Using system fonts as base, with Google Fonts loaded via link tags in HTML head
    This avoids build-time network dependencies while allowing runtime font loading */
 
-/* Cyberpunk Design System */
+/* Core cyberpunk utilities */
 @import '../styles/cyberpunk.css';
-
-/* Military Glassmorphic Design System (kept for backward compatibility) */
-@import '../styles/military-glassmorphic.css';
 
 /* Tailwind directives follow imports to satisfy @import ordering rules */
 /* stylelint-disable-next-line at-rule-no-unknown */
@@ -19,101 +16,58 @@
 
 @layer base {
   :root {
-    /* Military Glassmorphic Color Palette */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 330 81% 60%; /* Military Hot Pink */
+    --background: 225 62% 6%;
+    --foreground: 210 15% 92%;
+    --card: 225 60% 8%;
+    --card-foreground: 210 15% 92%;
+    --popover: 225 60% 8%;
+    --popover-foreground: 210 15% 92%;
+    --primary: 312 100% 50%; /* brand magenta */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 35%; /* Military Gunmetal */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 330 81% 60%; /* Military Hot Pink */
+    --secondary: 183 100% 50%; /* brand cyan */
+    --secondary-foreground: 0 0% 12%;
+    --muted: 222 18% 22%;
+    --muted-foreground: 215 12% 72%;
+    --accent: 260 70% 60%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 72% 45%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 330 81% 60%; /* Military Hot Pink */
+    --border: 222 18% 18%;
+    --input: 222 18% 18%;
+    --ring: 312 100% 50%;
     --radius: 0.75rem;
-    --chart-1: 330 81% 60%; /* Military Hot Pink */
-    --chart-2: 0 0% 35%; /* Military Gunmetal */
-    --chart-3: 0 0% 14%; /* Military Midnight */
-    --chart-4: 0 0% 0%; /* Military Black */
-    --chart-5: 330 81% 60%; /* Military Hot Pink */
-
-    /* Sidebar Layout Variables */
-    --sidebar-width: 13.5rem;
-    --sidebar-width-mobile: 16.5rem;
-    --sidebar-width-icon: 3rem;
-
-    /* Military Glassmorphic Gradient Variables */
-    --gradient-primary: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
-    --gradient-secondary: linear-gradient(135deg, #FFB3D9 0%, #B2B2B2 50%, #454547 100%);
-    --gradient-accent: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
-    --gradient-background: linear-gradient(135deg, rgba(255, 113, 181, 0.05) 0%, rgba(93, 92, 97, 0.05) 25%, rgba(35, 35, 37, 0.05) 50%, rgba(178, 178, 178, 0.05) 75%, rgba(255, 113, 181, 0.05) 100%);
-    --gradient-tactical: linear-gradient(135deg, #FF71B5 0%, #5D5C61 25%, #232325 50%, #B2B2B2 75%, #454547 100%);
-    --gradient-success: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
-    --gradient-warning: linear-gradient(135deg, #FF71B5 0%, #5D5C61 50%, #232325 100%);
-    --gradient-danger: linear-gradient(135deg, #FF71B5 0%, #232325 50%, #18181A 100%);
-    
-    /* Skull & Crown Gradients */
-    --gradient-skull: linear-gradient(135deg, #1F2937 0%, #374151 50%, #4B5563 100%);
-    --gradient-crown: linear-gradient(135deg, #F59E0B 0%, #FCD34D 50%, #FBBF24 100%);
-    --gradient-boss: linear-gradient(135deg, #8B5CF6 0%, #EC4899 25%, #06B6D4 50%, #F59E0B 75%, #10B981 100%);
-    
-    /* Shimmer Effects */
-    --shimmer-light: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    --shimmer-dark: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+    --chart-1: 312 100% 50%;
+    --chart-2: 183 100% 50%;
+    --chart-3: 200 80% 56%;
+    --chart-4: 260 70% 60%;
+    --chart-5: 183 100% 70%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 330 81% 60%; /* Military Hot Pink */
+    --background: 225 62% 6%;
+    --foreground: 210 15% 92%;
+    --card: 225 60% 8%;
+    --card-foreground: 210 15% 92%;
+    --popover: 225 60% 8%;
+    --popover-foreground: 210 15% 92%;
+    --primary: 312 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 35%; /* Military Gunmetal */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 330 81% 60%; /* Military Hot Pink */
+    --secondary: 183 100% 50%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 222 18% 22%;
+    --muted-foreground: 215 12% 72%;
+    --accent: 260 70% 60%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 72% 45%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 330 81% 60%; /* Military Hot Pink */
-    --chart-1: 330 81% 60%; /* Military Hot Pink */
-    --chart-2: 0 0% 35%; /* Military Gunmetal */
-    --chart-3: 0 0% 14%; /* Military Midnight */
-    --chart-4: 0 0% 100%; /* Military Glass White */
-    --chart-5: 330 81% 60%; /* Military Hot Pink */
-
-    /* Sidebar Layout Variables - Same for dark mode */
-    --sidebar-width: 13.5rem;
-    --sidebar-width-mobile: 16.5rem;
-    --sidebar-width-icon: 3rem;
-
-    /* Dark Mode Holographic Gradients */
-    --gradient-primary: linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%);
-    --gradient-secondary: linear-gradient(135deg, #D946EF 0%, #67E8F9 50%, #FF6BB3 100%);
-    --gradient-accent: linear-gradient(135deg, #18FFFF 0%, #B621FF 50%, #FF1FAF 100%);
-    --gradient-background: linear-gradient(135deg, rgba(182, 33, 255, 0.08) 0%, rgba(24, 255, 255, 0.08) 25%, rgba(255, 31, 175, 0.08) 50%, rgba(24, 255, 255, 0.08) 75%, rgba(182, 33, 255, 0.08) 100%);
-    --gradient-empowerment: linear-gradient(135deg, #B621FF 0%, #18FFFF 25%, #FF1FAF 50%, #18FFFF 75%, #B621FF 100%);
-    --gradient-success: linear-gradient(135deg, #18FFFF 0%, #B621FF 50%, #18FFFF 100%);
-    --gradient-warning: linear-gradient(135deg, #FF1FAF 0%, #B621FF 50%, #FF1FAF 100%);
-    --gradient-danger: linear-gradient(135deg, #FF1FAF 0%, #000000 50%, #B621FF 100%);
-    --gradient-skull: linear-gradient(135deg, #111827 0%, #1F2937 50%, #374151 100%);
-    --gradient-crown: linear-gradient(135deg, #D97706 0%, #F59E0B 50%, #FCD34D 100%);
-    --gradient-boss: linear-gradient(135deg, #B621FF 0%, #18FFFF 25%, #FF1FAF 50%, #000000 75%, #B621FF 100%);
+    --border: 222 18% 18%;
+    --input: 222 18% 18%;
+    --ring: 312 100% 50%;
+    --chart-1: 312 100% 50%;
+    --chart-2: 183 100% 50%;
+    --chart-3: 200 80% 56%;
+    --chart-4: 260 70% 60%;
+    --chart-5: 183 100% 70%;
   }
 }
 

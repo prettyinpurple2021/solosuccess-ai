@@ -43,3 +43,6 @@ VERCEL_ENV_SETUP.md
 
 .vercel
 .env*.local
+
+# Local/temporary inspection artifacts
+tmp_solosuccess.html
