@@ -2,7 +2,10 @@
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import FloatingChatButton from '@/components/chat/floating-chat-button'
+import dynamic from 'next/dynamic'
+const FloatingChatButton = dynamic(() => import('@/components/chat/floating-chat-button'), {
+  ssr: false
+})
 import { useToast } from '@/hooks/use-toast'
 import { useUserPreferences } from '@/hooks/use-user-preferences'
 import { useAuth } from '@/hooks/use-auth'

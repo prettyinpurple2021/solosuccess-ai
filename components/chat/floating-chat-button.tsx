@@ -6,7 +6,14 @@ import { Badge } from "@/components/ui/badge"
 import { MessageCircle, X, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
-import MobileChatInterface from './mobile-chat-interface'
+import dynamic from 'next/dynamic'
+
+const MobileChatInterface = dynamic(() => import('./mobile-chat-interface'), {
+  loading: () => <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>,
+  ssr: false
+})
 
 interface Message {
   id: string

@@ -1,6 +1,6 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
+// export const dynamic = 'force-dynamic' // Removed for static optimization
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -59,7 +59,7 @@ const fadeIn = {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-cyber-black relative overflow-hidden text-gray-100">
-      <NeuralNetworkCanvas particleCount={90} connectionDistance={170} mouseDistance={240} />
+      <NeuralNetworkCanvas particleCount={50} connectionDistance={170} mouseDistance={240} />
       <UIOverlayLines />
 
       <div className="pointer-events-none absolute inset-0">
