@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           inArray(competitorProfiles.id, competitor_ids),
-          eq(competitorProfiles.user_id, user.id)
+          eq(competitorProfiles.user_id, Number(user.id))
         )
       );
 
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
       .where(
         and(
           inArray(competitorProfiles.id, competitor_ids),
-          eq(competitorProfiles.user_id, user.id)
+          eq(competitorProfiles.user_id, Number(user.id))
         )
       );
 
@@ -453,36 +453,70 @@ function generateBenchmarkSummary(benchmarks: any[]) {
 }
 
 // Placeholder functions for different benchmark types
-async function generatePerformanceBenchmarks(competitorIds: number[], platform?: string, _days: number = 30, metrics: string[] = []) {
-  // Implementation for performance benchmarks
+async function generatePerformanceBenchmarks(competitorIds: number[], platform?: string, days: number = 30, metrics: string[] = []) {
+  // Use the main competitive benchmarking method
+  const benchmarks = await socialMediaAnalysisEngine.createCompetitiveBenchmarks(
+    competitorIds,
+    platform,
+    days
+  );
+  
   return {
     type: 'performance',
     metrics: metrics,
-    data: []
+    data: benchmarks
   };
 }
 
-async function generateContentBenchmarks(competitorIds: number[], platform?: string, _days: number = 30) {
-  // Implementation for content benchmarks
+async function generateContentBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+  const results = [];
+  
+  for (const id of competitorIds) {
+    // Content analysis is part of engagement patterns
+    const patterns = await socialMediaAnalysisEngine.analyzeEngagementPatterns(id, platform, days);
+    results.push({
+      competitorId: id,
+      content_analysis: patterns
+    });
+  }
+
   return {
     type: 'content',
-    data: []
+    data: results
   };
 }
 
-async function generateTimingBenchmarks(competitorIds: number[], platform?: string, _days: number = 30) {
-  // Implementation for timing benchmarks
+async function generateTimingBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+  const results = [];
+  
+  for (const id of competitorIds) {
+    const timing = await socialMediaAnalysisEngine.analyzePostingFrequency(id, platform, days);
+    results.push({
+      competitorId: id,
+      timing_analysis: timing
+    });
+  }
+
   return {
     type: 'timing',
-    data: []
+    data: results
   };
 }
 
-async function generateAudienceBenchmarks(competitorIds: number[], platform?: string, _days: number = 30) {
-  // Implementation for audience benchmarks
+async function generateAudienceBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+  const results = [];
+  
+  for (const id of competitorIds) {
+    const audience = await socialMediaAnalysisEngine.analyzeAudience(id, platform, days);
+    results.push({
+      competitorId: id,
+      audience_analysis: audience
+    });
+  }
+
   return {
     type: 'audience',
-    data: []
+    data: results
   };
 }
 

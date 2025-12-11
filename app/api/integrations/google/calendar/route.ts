@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
                     'https://www.googleapis.com/auth/calendar.events'
                 ],
                 prompt: 'consent', // Force consent to get refresh token
-                state: userId // Pass user ID in state for security
+                state: String(userId) // Pass user ID in state for security
             })
             return NextResponse.json({ url })
         }
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
 
         if (code) {
             // Verify state matches user ID for security
-            if (state && state !== userId) {
+            if (state && state !== String(userId)) {
                 return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 })
             }
 
