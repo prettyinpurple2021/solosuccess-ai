@@ -1,23 +1,98 @@
-import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid, foreignKey } from 'drizzle-orm/pg-core';
+import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid, foreignKey, primaryKey } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { randomUUID } from "crypto";
 
 // Users table - matches actual database structure
+// Users table - NextAuth compatible
 export const users = pgTable('users', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  email: text('email'),
-  password: text('password'),
-  stack_user_id: text('stack_user_id'),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  name: text('name'),
+  email: text('email').notNull(),
+  emailVerified: timestamp('emailVerified', { mode: 'date' }),
+  image: text('image'),
+  password: text('password'), // For Credentials provider
+  username: text('username'),
+  full_name: text('full_name'),
   role: text('role').default('user'),
-  admin_pin_hash: text('admin_pin_hash'),
   xp: integer('xp').default(0),
   level: integer('level').default(1),
   total_actions: integer('total_actions').default(0),
   suspended: boolean('suspended').default(false),
   suspended_at: timestamp('suspended_at'),
   suspended_reason: text('suspended_reason'),
+  stripe_customer_id: text('stripe_customer_id'),
+  subscription_tier: text('subscription_tier').default('free'),
+  subscription_status: text('subscription_status').default('active'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });
+
+export const accounts = pgTable(
+  "account",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("providerAccountId").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (account) => ({
+    compoundKey: primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  })
+)
+
+export const sessions = pgTable("session", {
+  sessionToken: text("sessionToken").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+})
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (verificationToken) => ({
+    compositePk: primaryKey({
+      columns: [verificationToken.identifier, verificationToken.token],
+    }),
+  })
+)
+
+export const authenticators = pgTable(
+  "authenticator",
+  {
+    credentialID: text("credentialID").notNull().unique(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    providerAccountId: text("providerAccountId").notNull(),
+    credentialPublicKey: text("credentialPublicKey").notNull(),
+    counter: integer("counter").notNull(),
+    credentialDeviceType: text("credentialDeviceType").notNull(),
+    credentialBackedUp: boolean("credentialBackedUp").notNull(),
+    transports: text("transports"),
+  },
+  (authenticator) => ({
+    compositePK: primaryKey({
+      columns: [authenticator.userId, authenticator.credentialID],
+    }),
+  })
+)
 
 // User Settings table
 export const userSettings = pgTable('user_settings', {
@@ -342,7 +417,7 @@ export const competitiveOpportunities = pgTable('competitive_opportunities', {
   evidence: jsonb('evidence').default('[]'),
   recommendations: jsonb('recommendations').default('[]'),
   status: varchar('status', { length: 50 }).default('identified'),
-  assigned_to: varchar('assigned_to', { length: 255 }).references(() => users.id, { onDelete: 'set null' }),
+  assigned_to: text('assigned_to').references(() => users.id, { onDelete: 'set null' }),
   implementation_notes: text('implementation_notes'),
   roi_estimate: decimal('roi_estimate', { precision: 10, scale: 2 }),
   actual_roi: decimal('actual_roi', { precision: 10, scale: 2 }),
@@ -482,7 +557,7 @@ export const documentVersions = pgTable('document_versions', {
   size: integer('size').notNull(),
   file_data: text('file_data').notNull(), // Store file content directly in database
   change_summary: text('change_summary'),
-  created_by: varchar('created_by', { length: 255 }).notNull().references(() => users.id),
+  created_by: text('created_by').notNull().references(() => users.id),
   created_at: timestamp('created_at').defaultNow(),
 }, (table) => ({
   documentIdIdx: index('document_versions_document_id_idx').on(table.document_id),
@@ -497,7 +572,7 @@ export const documentPermissions = pgTable('document_permissions', {
   user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 255 }),
   role: varchar('role', { length: 20 }).notNull().default('viewer'),
-  granted_by: varchar('granted_by', { length: 255 }).notNull().references(() => users.id),
+  granted_by: text('granted_by').notNull().references(() => users.id),
   granted_at: timestamp('granted_at').defaultNow(),
   expires_at: timestamp('expires_at'),
   is_active: boolean('is_active').default(true),
@@ -512,7 +587,7 @@ export const documentPermissions = pgTable('document_permissions', {
 export const documentShareLinks = pgTable('document_share_links', {
   id: varchar('id', { length: 255 }).primaryKey(),
   document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
-  created_by: varchar('created_by', { length: 255 }).notNull().references(() => users.id),
+  created_by: text('created_by').notNull().references(() => users.id),
   url: varchar('url', { length: 1000 }).notNull(),
   password_hash: varchar('password_hash', { length: 255 }),
   permissions: varchar('permissions', { length: 20 }).notNull().default('view'),
@@ -1435,4 +1510,5 @@ export const userApiKeys = pgTable('user_api_keys', {
   serviceIdx: index('user_api_keys_service_idx').on(table.service),
   userServiceIdx: index('user_api_keys_user_service_idx').on(table.user_id, table.service),
 }));
+
 

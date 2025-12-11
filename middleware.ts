@@ -1,44 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
+import NextAuth from "next-auth"
+import { authConfig } from "./auth.config"
+import { NextResponse } from "next/server"
 
-// Simplified middleware to avoid Edge runtime issues
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+const { auth } = NextAuth(authConfig)
 
-  // Public routes that don't require authentication
-  const publicRoutes = [
-    '/',
-    '/signin', 
-    '/signup',
-    '/about',
-    '/features',
-    '/pricing',
-    '/contact',
-    '/privacy',
-    '/terms',
-    '/cookies',
-    '/gdpr',
-    '/blog',
-    '/landing',
-    '/status',
-    '/help',
-    '/security',
-    '/compliance',
-    '/careers',
-    '/forgot-password',
-    '/api/auth',
-    '/api/health',
-    '/manifest.json',
-    '/sw.js',
-    '/favicon.ico',
-    '/robots.txt'
-  ]
-
-  // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
-  )
-
-  // Create response with security headers for ALL routes
+export default auth((req) => {
+  const { nextUrl } = req
+  const isLoggedIn = !!req.auth
+  
+  // Public routes logic is handled in auth.config.ts authorized callback mostly, 
+  // but we can add handle headers here.
+  
   const response = NextResponse.next()
   
   // Security headers (production-ready)
@@ -53,8 +25,7 @@ export function middleware(request: NextRequest) {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   }
 
-  // CSP (Content Security Policy) - adjust as needed for your app
-  // Applied to ALL routes to ensure chatbase.co is always allowed
+  // CSP (Content Security Policy)
   const csp = [
     "default-src 'self' https: data: blob:",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:",
@@ -73,37 +44,11 @@ export function middleware(request: NextRequest) {
   
   response.headers.set('Content-Security-Policy', csp)
   
-  // For protected routes, check authentication
-  if (!isPublicRoute && !pathname.startsWith('/api/')) {
-    const allCookies = request.cookies.getAll()
-    const hasAuthCookie = allCookies.some(cookie => 
-      cookie.name.includes('session') || 
-      cookie.name.includes('auth') ||
-      cookie.name.includes('token') ||
-      cookie.name.includes('better-auth')
-    )
-    
-    // Temporarily disable auth check for debugging
-    // if (!hasAuthCookie) {
-    //   const url = request.nextUrl.clone()
-    //   url.pathname = '/signin'
-    //   url.searchParams.set('redirect', pathname)
-    //   return NextResponse.redirect(url)
-    // }
-  }
-  
   return response
-}
+})
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
     '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],
 }

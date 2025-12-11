@@ -1,22 +1,18 @@
-import { NextRequest } from 'next/server'
-import * as jose from 'jose'
+import { auth } from "@/lib/auth"
+import { NextRequest } from "next/server"
 import { logError } from '@/lib/logger'
+import { User } from "next-auth"
 
 /**
- * Authenticated user type
+ * Authenticated user type extending NextAuth User
  */
-export interface AuthenticatedUser {
-  id: string
-  email: string
-  full_name: string | null
-  name: string | null
-  username: string | null
-  avatar_url: string | null
-  created_at: Date
-  updated_at: Date
-  subscription_tier: string
-  subscription_status: string
-  stripe_customer_id: string | null
+export interface AuthenticatedUser extends User {
+  role?: string
+  username?: string | null
+  full_name?: string | null
+  subscription_tier?: string
+  subscription_status?: string
+  stripe_customer_id?: string | null
 }
 
 /**
@@ -28,36 +24,12 @@ export interface AuthResult {
 }
 
 /**
- * Extract user ID from JWT session token
+ * Extract user ID from session
  */
-export async function getUserIdFromSession(request: NextRequest): Promise<string | null> {
+export async function getUserIdFromSession(request?: NextRequest): Promise<string | null> {
   try {
-    // Try to get session token from Authorization header or cookie
-    const authHeader = request.headers.get('authorization')
-    let token: string | undefined
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7)
-    } else {
-      // Try to get from cookie
-      const cookies = request.cookies
-      token = cookies.get('session')?.value
-    }
-
-    if (!token) {
-      return null
-    }
-
-    const jwtSecret = process.env.JWT_SECRET
-    if (!jwtSecret) {
-      logError('JWT_SECRET is not configured')
-      return null
-    }
-
-    // Verify and decode JWT using jose (Edge Runtime compatible)
-    const secret = new TextEncoder().encode(jwtSecret)
-    const { payload } = await jose.jwtVerify(token, secret)
-    return payload.userId as string || null
+    const session = await auth()
+    return session?.user?.id || null
   } catch (error) {
     logError('Error extracting user ID from session:', error)
     return null
@@ -68,7 +40,7 @@ export async function getUserIdFromSession(request: NextRequest): Promise<string
  * Extract user ID from request (supports both JWT and simple user ID header)
  */
 export async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
-  // First try JWT session
+  // First try session
   const userId = await getUserIdFromSession(request)
   if (userId) return userId
 
@@ -79,35 +51,15 @@ export async function getUserIdFromRequest(request: NextRequest): Promise<string
   return null
 }
 
-/**
- * Create JWT token for user authentication
- */
+// Deprecated functions that we keep for signature compatibility but stub
 export async function createToken(userId: string, email: string): Promise<string> {
-  const jwtSecret = process.env.JWT_SECRET
-  if (!jwtSecret) {
-    throw new Error('JWT_SECRET is not configured')
-  }
-
-  const secret = new TextEncoder().encode(jwtSecret)
-  const token = await new jose.SignJWT({ userId, email })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(secret)
-
-  return token
+  return "mock-token"
 }
 
-/**
- * Verify JWT token (alias for getUserIdFromSession for backward compatibility)
- */
 export async function verifyToken(request: NextRequest): Promise<string | null> {
   return await getUserIdFromSession(request)
 }
 
-/**
- * Cookie options for authentication
- */
 export const AUTH_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',

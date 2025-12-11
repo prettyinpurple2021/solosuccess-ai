@@ -4,7 +4,7 @@ import { Inter as FontSans } from "next/font/google"
 import Script from 'next/script'
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/theme-provider"
-import { AuthProvider } from "@/hooks/use-auth"
+import { AuthProvider } from "@/components/auth-provider"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
 import { PerformanceMonitor } from "@/components/performance/performance-monitor"
 import { ServiceWorkerRegister } from "@/components/performance/service-worker-register"

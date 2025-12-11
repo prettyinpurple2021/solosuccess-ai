@@ -30,7 +30,7 @@ export const AgentMessageSchema = z.object({
 
 export const CollaborationSessionSchema = z.object({
   id: z.string().uuid(),
-  userId: z.number(),
+  userId: z.string(),
   projectName: z.string().optional(),
   participatingAgents: z.array(z.string()),
   sessionStatus: z.enum(['active', 'paused', 'completed', 'cancelled']).default('active'),
@@ -61,7 +61,7 @@ export type CollaborationSession = z.infer<typeof CollaborationSessionSchema>
 export type AgentDefinition = z.infer<typeof AgentDefinitionSchema>
 
 export interface CollaborationRequest {
-  userId: number
+  userId: string
   requestType: 'chat' | 'project' | 'handoff' | 'consultation'
   primaryAgent?: string
   requiredAgents?: string[]
@@ -348,7 +348,7 @@ export class CollaborationHub {
   /**
    * Get all active sessions for a user
    */
-  getUserSessions(userId: number): CollaborationSession[] {
+  getUserSessions(userId: string): CollaborationSession[] {
     return Array.from(this.activeSessions.values())
       .filter(session => session.userId === userId && session.sessionStatus === 'active')
   }
@@ -413,7 +413,7 @@ export class CollaborationHub {
   /**
    * Transfer session ownership to another user
    */
-  transferSession(sessionId: string, newUserId: number): boolean {
+  transferSession(sessionId: string, newUserId: string): boolean {
     const session = this.activeSessions.get(sessionId)
     if (!session) {
       return false

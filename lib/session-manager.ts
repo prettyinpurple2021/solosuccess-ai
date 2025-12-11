@@ -133,7 +133,7 @@ export class SessionManager {
 
       // Create session using collaboration hub
       const collaborationResponse = await this.collaborationHub.initiateCollaboration({
-        userId: parseInt(config.userId, 10) || 0,
+        userId: config.userId,
         requestType: 'project',
         requiredAgents: availableAgents,
         projectName: config.goal,
@@ -378,7 +378,7 @@ export class SessionManager {
   /**
    * Transfer session ownership
    */
-  async transferSession(sessionId: string, newUserId: number, reason?: string): Promise<boolean> {
+  async transferSession(sessionId: string, newUserId: string, reason?: string): Promise<boolean> {
     try {
       const session = this.activeSessions.get(sessionId)
       if (!session) {
@@ -575,9 +575,8 @@ export class SessionManager {
    * Get sessions by user
    */
   getUserSessions(userId: string): CollaborationSession[] {
-    const numericUserId = parseInt(userId, 10)
     return Array.from(this.activeSessions.values())
-      .filter(session => session.userId === numericUserId)
+      .filter(session => session.userId === userId)
   }
 
   /**
