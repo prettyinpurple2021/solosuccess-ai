@@ -6,6 +6,9 @@
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { z } from 'zod'
 import { MessageRouter } from './message-router'
+import { db } from '@/db'
+import { chatConversations } from '@/db/schema'
+import { eq, sql } from 'drizzle-orm'
 import { ContextManager } from './context-manager'
 
 
@@ -358,11 +361,77 @@ export class CollaborationHub {
   }
 
   /**
-   * Get all available agents
+   * Get all available agents with real-time status from DB
    */
-  getAvailableAgents(): AgentDefinition[] {
-    return Array.from(this.agents.values())
-      .filter(agent => agent.status === 'available')
+  async getAvailableAgents(): Promise<AgentDefinition[]> {
+    try {
+      // Get active session counts from DB to determine real availability
+      const activeConversations = await db
+        .select({
+          agentId: chatConversations.agent_id,
+          count: sql<number>`count(*)`
+        })
+        .from(chatConversations)
+        .where(eq(chatConversations.is_archived, false))
+        .groupBy(chatConversations.agent_id);
+
+      // Create a map of agent load
+      const agentLoad = new Map<string, number>();
+      activeConversations.forEach(row => {
+        agentLoad.set(row.agentId, Number(row.count));
+      });
+
+      // Update in-memory agents with DB status
+      return Array.from(this.agents.values()).map(agent => {
+        const load = agentLoad.get(agent.id) || 0;
+        
+        // Update status based on load
+        // Note: We don't modify the stored agent definition permanently to avoid side effects
+        // but return a fresh object with updated status
+        const status = load >= agent.maxConcurrentSessions ? 'busy' : agent.status;
+        
+        return {
+          ...agent,
+          status,
+          // We might not have the exact session IDs here without a heavier query, 
+          // but we can simulate the "load" by filling the array with placeholders if needed
+          // or just assume consumers look at status.
+          // For now, let's keep currentSessions as is (in-memory) or empty if we don't sync fully.
+          // Better approach: If we want real "currentSessions", we need to fetch them.
+          // But for "available agents" list, status is the most important.
+        };
+      }).filter(agent => agent.status === 'available');
+      
+    } catch (error) {
+      logError('Error fetching agent availability:', error);
+      // Fallback to in-memory state
+      return Array.from(this.agents.values())
+        .filter(agent => agent.status === 'available');
+    }
+  }
+
+  /**
+   * Transfer session ownership to another user
+   */
+  transferSession(sessionId: string, newUserId: number): boolean {
+    const session = this.activeSessions.get(sessionId)
+    if (!session) {
+      return false
+    }
+
+    const oldUserId = session.userId
+    session.userId = newUserId
+    session.updatedAt = new Date()
+
+    this.activeSessions.set(sessionId, session)
+    
+    this.emitEvent('session_transferred', { 
+      sessionId, 
+      oldUserId, 
+      newUserId 
+    })
+
+    return true
   }
 
   /**
@@ -434,7 +503,7 @@ export class CollaborationHub {
 
     // For project-type collaborations, suggest complementary agents
     if (request.requestType === 'project' && selectedAgents.length < 3) {
-      const availableAgents = this.getAvailableAgents()
+      const availableAgents = (await this.getAvailableAgents())
         .filter(agent => !selectedAgents.find(a => a.id === agent.id))
         .sort((a, b) => a.currentSessions.length - b.currentSessions.length) // Prefer less busy agents
 
@@ -455,7 +524,7 @@ export class CollaborationHub {
 
     // Ensure we have at least one agent
     if (selectedAgents.length === 0) {
-      const availableAgents = this.getAvailableAgents()
+      const availableAgents = await this.getAvailableAgents()
       if (availableAgents.length > 0) {
         // Default to Roxy (executive assistant) or first available
         const defaultAgent = availableAgents.find(a => a.id === 'roxy') || availableAgents[0]
@@ -502,14 +571,15 @@ export class CollaborationHub {
   /**
    * Get collaboration hub statistics
    */
-  getStats(): {
+
+  async getStats(): Promise<{
     totalAgents: number
     availableAgents: number
     activeSessions: number
     totalMessages: number
-  } {
-    const availableAgents = Array.from(this.agents.values())
-      .filter(agent => agent.status === 'available').length
+  }> {
+    const agents = await this.getAvailableAgents()
+    const availableAgents = agents.filter(agent => agent.status === 'available').length
 
     const activeSessions = Array.from(this.activeSessions.values())
       .filter(session => session.sessionStatus === 'active').length

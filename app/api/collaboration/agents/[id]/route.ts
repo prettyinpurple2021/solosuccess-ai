@@ -10,6 +10,8 @@ import { CollaborationHub } from '@/lib/collaboration-hub'
 import { SessionManager } from '@/lib/session-manager'
 import { MessageRouter } from '@/lib/message-router'
 import { verifyAuth } from '@/lib/auth-server'
+import { generateText } from 'ai'
+import { getTeamMemberConfig } from '@/lib/ai-config'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -177,9 +179,8 @@ export async function POST(
       }, { status: 423 }) // 423 Locked
     }
 
-    // For now, we'll simulate capability execution
-    // In a real implementation, this would interface with the actual AI agent
-    const executionResult = await simulateCapabilityExecution(
+    // Execute using real AI agent
+    const executionResult = await executeAgentCapability(
       agent,
       validatedData.capability,
       validatedData.input,
@@ -224,63 +225,61 @@ export async function POST(
 }
 
 /**
- * Simulate capability execution
- * In a real implementation, this would interface with the actual AI agents
+ * Execute capability using the actual AI agent model
  */
-async function simulateCapabilityExecution(
+async function executeAgentCapability(
   agent: any,
   capability: string,
   input: any,
   context?: any
 ): Promise<any> {
-  // Simulate processing time based on agent's response time
-  await new Promise(resolve => setTimeout(resolve, agent.responseTimeMs / 10))
+  const agentConfig = getTeamMemberConfig(agent.id)
+  
+  const prompt = `
+    Execute the following capability: "${capability}"
+    
+    Input Data:
+    ${JSON.stringify(input, null, 2)}
+    
+    Context:
+    ${JSON.stringify(context || {}, null, 2)}
+    
+    Task:
+    Perform the requested capability tailored to your personality and expertise.
+    Provide a structured JSON response with the results.
+  `
 
-  // Return simulated results based on capability type
-  switch (capability) {
-    case 'Strategic Planning':
-      return {
-        strategy: 'Generated strategic plan based on current market conditions',
-        keyActions: ['Market analysis', 'Resource allocation', 'Risk assessment'],
-        timeline: '3-6 months',
-        confidence: 0.85
-      }
+  try {
+    const { text } = await generateText({
+      model: agentConfig.model as any,
+      messages: [
+        { role: 'system', content: agentConfig.systemPrompt },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7,
+      maxOutputTokens: 2000
+    })
 
-    case 'Data Analysis':
-      return {
-        insights: 'Data analysis reveals positive trends',
-        metrics: {
-          growth: '+12%',
-          efficiency: '+8%',
-          satisfaction: '92%'
-        },
-        recommendations: ['Focus on high-performing segments', 'Optimize resource allocation']
-      }
+    // improved JSON parsing to handle potential markdown fences
+    let cleanText = text.trim()
+    if (cleanText.startsWith('```')) {
+      cleanText = cleanText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/, '').trim()
+    }
 
-    case 'Content Creation':
+    try {
+      return JSON.parse(cleanText)
+    } catch (e) {
+      // If not valid JSON, return as text wrapped in structure
       return {
-        content: 'Generated high-quality content based on brand guidelines',
-        format: 'blog_post',
-        wordCount: 1200,
-        tone: 'professional',
-        seoScore: 87
+        result: cleanText,
+        refined: true, // indicates raw text fallback
+        metadata: {
+          executionTime: new Date().toISOString()
+        }
       }
-
-    case 'Risk Assessment':
-      return {
-        riskLevel: 'Medium',
-        factors: ['Market volatility', 'Regulatory changes', 'Competition'],
-        mitigationStrategies: ['Diversification', 'Compliance monitoring', 'Competitive analysis'],
-        confidence: 0.78
-      }
-
-    default:
-      return {
-        result: `Capability ${capability} executed successfully`,
-        input: input,
-        context: context,
-        processedBy: agent.displayName,
-        timestamp: new Date().toISOString()
-      }
+    }
+  } catch (error) {
+    logError(`Error executing capability for ${agent.displayName}:`, error)
+    throw new Error('Failed to generate AI response')
   }
 }

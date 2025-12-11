@@ -195,6 +195,51 @@ export class WebScrapingService {
   }
 
   /**
+   * Check if a URL exists and returns a success status
+   * Uses HEAD request or lightweight GET
+   */
+  async checkUrlExists(url: string): Promise<boolean> {
+    try {
+      // First try HEAD method
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // Short timeout for checking
+      
+      try {
+        const response = await fetch(url, {
+          method: 'HEAD',
+          headers: { 'User-Agent': this.config.userAgent },
+          signal: controller.signal
+        })
+        clearTimeout(timeoutId)
+        if (response.ok) return true
+        if (response.status === 405) { // Method Not Allowed, fallback to GET
+            // proceed to GET
+        } else {
+            return false
+        }
+      } catch (e) {
+        clearTimeout(timeoutId)
+        // proceed to GET if HEAD fails network-wise or method not allowed
+      }
+
+      // Fallback to GET with minimal bytes if possible, but fetch usually downloads
+      // We rely on aborting early if we get headers, but fetch doesn't expose headers-only easily without streaming
+      // So just a standard GET with short timeout
+      const controllerGet = new AbortController()
+      const timeoutIdGet = setTimeout(() => controllerGet.abort(), 10000)
+      
+      const response = await fetch(url, {
+        headers: { 'User-Agent': this.config.userAgent },
+        signal: controllerGet.signal
+      })
+      clearTimeout(timeoutIdGet)
+      return response.ok
+    } catch (error) {
+      return false
+    }
+  }
+
+  /**
    * Detect changes in website content
    */
   async detectWebsiteChanges(url: string, previousContent?: string): Promise<ScrapingResult<ChangeDetection[]>> {

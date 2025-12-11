@@ -9,6 +9,7 @@ export interface CompetitiveIntelligenceContext {
     threat_level: string
     recent_activities: string[]
     key_metrics: Record<string, any>
+    key_personnel: { name: string; role: string }[]
   }[]
   recent_alerts: {
     id: number
@@ -93,7 +94,7 @@ export class CompetitiveIntelligenceContextService {
       
       // Get active competitors with recent activity
       const competitors = await sql`
-        SELECT cp.id, cp.name, cp.threat_level, cp.market_position,
+        SELECT cp.id, cp.name, cp.threat_level, cp.market_position, cp.key_personnel,
                 COUNT(id.id) as recent_intelligence_count,
                 COUNT(ca.id) as recent_alerts_count
          FROM competitor_profiles cp
@@ -102,7 +103,7 @@ export class CompetitiveIntelligenceContextService {
          LEFT JOIN competitor_alerts ca ON ca.competitor_id = cp.id 
            AND ca.created_at > NOW() - INTERVAL '7 days'
          WHERE cp.user_id = ${userId} AND cp.monitoring_status = 'active'
-         GROUP BY cp.id, cp.name, cp.threat_level, cp.market_position
+         GROUP BY cp.id, cp.name, cp.threat_level, cp.market_position, cp.key_personnel
          ORDER BY cp.threat_level DESC, recent_intelligence_count DESC
          LIMIT 5
       ` as any[]
@@ -163,7 +164,8 @@ export class CompetitiveIntelligenceContextService {
           return {
             ...competitor,
             recent_activities: activities.map((a: { data_type: string; importance: string }) => `${a.data_type} (${a.importance})`),
-            key_metrics: competitor.market_position || {}
+            key_metrics: competitor.market_position || {},
+            key_personnel: (competitor as any).key_personnel || []
           }
         })
       )

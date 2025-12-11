@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     const capability = searchParams.get('capability')
 
     // Get all agents
-    let agents = collaborationHub.getAvailableAgents()
+    let agents = await collaborationHub.getAvailableAgents()
 
     // Add busy and offline agents if no status filter or status includes them
     if (!status || status !== 'available') {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     }))
 
     // Get collaboration hub statistics
-    const hubStats = collaborationHub.getStats()
+    const hubStats = await collaborationHub.getStats()
 
     return NextResponse.json({
       success: true,

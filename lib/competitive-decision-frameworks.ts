@@ -229,8 +229,35 @@ export class CompetitiveDecisionFrameworks {
   }
   
   private static extractCompetitorPersonnel(context: CompetitiveIntelligenceContext): string[] {
-    // In a real implementation, this would extract key personnel from competitor profiles
-    return context.competitors.slice(0, 3).map(c => `${c.name} Leadership Team`)
+    // Extract key personnel from competitor profiles
+    const personnel: string[] = []
+    
+    // Sort competitors by threat level to prioritize high-threat ones
+    const sortedCompetitors = [...context.competitors].sort((a, b) => {
+        const threatScore: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 }
+        return (threatScore[b.threat_level] || 0) - (threatScore[a.threat_level] || 0)
+    })
+
+    for (const competitor of sortedCompetitors) {
+        // key_personnel is now available in context
+        if (competitor.key_personnel && competitor.key_personnel.length > 0) {
+            // Add up to 3 key people per competitor
+            competitor.key_personnel.slice(0, 3).forEach(person => {
+                personnel.push(`${person.name} (${person.role}) - ${competitor.name}`)
+            })
+        } else {
+             // Fallback if no specific personnel found but competitor exists
+             personnel.push(`${competitor.name} Leadership Team`)
+        }
+    }
+    
+    // If no data at all
+    if (personnel.length === 0) {
+        return ['Competitor Key Personnel not yet identified']
+    }
+
+    // Return top 10 relevant personnel
+    return personnel.slice(0, 10)
   }
   
   private static analyzeCompetitiveImplications(alternative: string, context: CompetitiveIntelligenceContext): string {

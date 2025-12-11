@@ -444,10 +444,23 @@ const MessageInterface: React.FC<{ sessionId: string }> = ({ sessionId }) => {
   }
 
   // Handle delete (placeholder)
-  const handleDelete = (message: Message) => {
-    // In a real app, this would call an API
-    setMessages(prev => prev.filter(msg => msg.id !== message.id))
-    toast.success('Message deleted')
+  // Handle delete
+  const handleDelete = async (message: Message) => {
+    try {
+      const response = await fetch(`/api/collaboration/sessions/${sessionId}/messages/${message.id}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        setMessages(prev => prev.filter(msg => msg.id !== message.id))
+        toast.success('Message deleted')
+      } else {
+        toast.error('Failed to delete message')
+      }
+    } catch (error) {
+      logError('Error deleting message:', error)
+      toast.error('Failed to delete message')
+    }
   }
 
   if (loading) {

@@ -5,6 +5,9 @@ import { rateLimitByIp} from '@/lib/rate-limit';
 import { socialMediaJobProcessor} from '@/lib/social-media-job-processor';
 import { socialMediaScheduler} from '@/lib/social-media-scheduler';
 import { z} from 'zod';
+import { db } from '@/db';
+import { userSettings } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -202,10 +205,38 @@ export async function PUT(request: NextRequest) {
     const config = configSchema.parse(body);
 
     // Update processor configuration
-    // Note: In a real implementation, you'd store this configuration in a database
-    // and the processor would read from it
+    // Persist configuration to database
+    // Check if settings exist for this user and category 'processor'
+
+    const existingSettings = await db.select().from(userSettings).where(
+        and(
+            eq(userSettings.user_id, parseInt(user.id)), // Ensure number
+            eq(userSettings.category, 'processor')
+        )
+    ).limit(1);
+
+    let currentSettingsData: any = {};
+    if (existingSettings.length > 0) {
+        currentSettingsData = existingSettings[0].settings || {};
+    }
+
+    // Merge new config with existing
+    const newSettingsData = { ...currentSettingsData, ...config };
+
+    if (existingSettings.length > 0) {
+        await db.update(userSettings)
+            .set({ settings: newSettingsData, updated_at: new Date() })
+            .where(eq(userSettings.id, existingSettings[0].id));
+    } else {
+        await db.insert(userSettings).values({
+            user_id: parseInt(user.id),
+            category: 'processor',
+            settings: newSettingsData
+        });
+    }
+
     
-    let message = 'Processor configuration updated';
+    let message = 'Processor configuration updated and saved';
     const updates: string[] = [];
 
     if (config.interval_minutes) {
@@ -226,7 +257,7 @@ export async function PUT(request: NextRequest) {
       data: {
         message,
         updates,
-        current_config: config,
+        current_config: newSettingsData,
         processor_status: socialMediaJobProcessor.getStatus()
       }
     });

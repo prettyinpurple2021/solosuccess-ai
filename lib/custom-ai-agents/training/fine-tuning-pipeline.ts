@@ -2,6 +2,9 @@ import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } 
 import { SimpleTrainingCollector } from "./simple-training-collector"
 import type { TrainingInteraction } from "./simple-training-collector"
 import { PerformanceAnalytics, TrainingRecommendation } from "./performance-analytics"
+import { db } from '@/db'
+import { workflows, workflowExecutions, users } from '@/db/schema'
+import { eq, and, desc } from 'drizzle-orm'
 
 
 export interface FineTuningJob {
@@ -69,7 +72,7 @@ export interface TrainingDataset {
 export class FineTuningPipeline {
   private dataCollector: SimpleTrainingCollector
   private analytics: PerformanceAnalytics
-  private jobs: Map<string, FineTuningJob> = new Map()
+
 
   constructor() {
     this.dataCollector = SimpleTrainingCollector.getInstance()
@@ -171,10 +174,73 @@ export class FineTuningPipeline {
     return shuffled
   }
 
-  private async storeFineTuningJob(job: FineTuningJob): Promise<void> {
-    // Store in memory (in a real implementation, store in database)
-    this.jobs.set(job.id, job)
-    logInfo('Storing fine-tuning job:', job.id)
+  private async getOrCreateWorkflowId(userId: number, agentId: string): Promise<number> {
+    const workflowName = `Fine-Tune Agent: ${agentId}`
+    
+    // Check if workflow exists
+    const existing = await db.select().from(workflows).where(
+      and(
+        eq(workflows.user_id, userId),
+        eq(workflows.name, workflowName)
+      )
+    ).limit(1)
+
+    if (existing.length > 0) {
+      return existing[0].id
+    }
+
+    // Create new workflow definition
+    const [newWorkflow] = await db.insert(workflows).values({
+      user_id: userId,
+      name: workflowName,
+      description: `System workflow for fine-tuning agent ${agentId}`,
+      trigger_type: 'manual',
+      status: 'active',
+      category: 'system'
+    }).returning()
+
+    return newWorkflow.id
+  }
+
+  private async storeFineTuningJob(job: FineTuningJob): Promise<string> {
+    try {
+      const userIdNum = parseInt(job.userId)
+      const workflowId = await this.getOrCreateWorkflowId(userIdNum, job.agentId)
+
+      const [execution] = await db.insert(workflowExecutions).values({
+        workflow_id: workflowId,
+        user_id: userIdNum,
+        status: job.status,
+        input: job.parameters as any,
+        started_at: job.createdAt,
+        options: { agentId: job.agentId }
+      }).returning()
+
+      job.id = execution.id.toString()
+      return job.id
+    } catch (error) {
+      logError('Error storing fine-tuning job in DB:', error)
+      // Fallback for demo/dev if DB fails (though strict mode says no, fail hard is better)
+      throw error
+    }
+  }
+
+  private async updateJobStatus(job: FineTuningJob): Promise<void> {
+    try {
+      const id = parseInt(job.id)
+      if (isNaN(id)) return // Should not happen if stored correctly
+
+      await db.update(workflowExecutions).set({
+        status: job.status,
+        completed_at: job.completedAt,
+        output: job.results as any,
+        error: job.error ? { message: job.error } : null
+      }).where(eq(workflowExecutions.id, id))
+
+      logInfo(`Job ${job.id} status updated to: ${job.status}`)
+    } catch (error) {
+      logError('Error updating fine-tuning job:', error)
+    }
   }
 
   private async startFineTuningProcess(job: FineTuningJob, trainingData: TrainingInteraction[]): Promise<void> {
@@ -331,22 +397,86 @@ export class FineTuningPipeline {
     }
   }
 
-  private async updateJobStatus(job: FineTuningJob): Promise<void> {
-    // Update in memory (in real implementation, update in database)
-    this.jobs.set(job.id, job)
-    logInfo(`Job ${job.id} status updated to: ${job.status}`)
-  }
-
   async getFineTuningJob(jobId: string): Promise<FineTuningJob | null> {
-    // Fetch from memory (in real implementation, fetch from database)
-    logInfo(`Fetching fine-tuning job: ${jobId}`)
-    return this.jobs.get(jobId) || null
+    try {
+      const id = parseInt(jobId)
+      if (isNaN(id)) return null
+
+      // Use db.select to avoid type issues if query relation is missing
+      const result = await db.select().from(workflowExecutions)
+        .where(eq(workflowExecutions.id, id))
+        .limit(1)
+
+      if (result.length === 0) return null
+
+      // Since we don't have 'with' relation in basic select, we might miss workflow name
+      // But mapExecutionToJob doesn't strictly need workflow name for mapping fields,
+      // except maybe for filtering list.
+      // For get single job, it's fine.
+
+      return this.mapExecutionToJob(result[0])
+    } catch (error) {
+      logError('Error fetching fine-tuning job:', error)
+      return null
+    }
   }
 
   async listFineTuningJobs(userId: string): Promise<FineTuningJob[]> {
-    // Fetch from memory (in real implementation, fetch from database)
-    logInfo(`Listing fine-tuning jobs for user: ${userId}`)
-    return Array.from(this.jobs.values()).filter(job => job.userId === userId)
+    try {
+      const userIdNum = parseInt(userId)
+      if (isNaN(userIdNum)) return []
+
+      // Detailed query to filter by workflow name
+      const results = await db.select({
+          execution: workflowExecutions,
+          workflow: workflows
+        })
+        .from(workflowExecutions)
+        .innerJoin(workflows, eq(workflowExecutions.workflow_id, workflows.id))
+        .where(
+          and(
+            eq(workflowExecutions.user_id, userIdNum)
+            // We can add filter for workflow name here directly?
+            // like: like(workflows.name, 'Fine-Tune Agent:%')
+          )
+        )
+        .orderBy(desc(workflowExecutions.created_at))
+        .limit(50)
+
+      // Filter in memory for now to ensure it's a fine-tuning job
+      // or filter in query if possible.
+      // Drizzle 'like' operator import needed?
+      // For now, filter in memory is safer if I don't import 'like'.
+      
+      const filtered = results.filter(r => r.workflow.name.startsWith('Fine-Tune Agent:'))
+      
+      return filtered.map(r => this.mapExecutionToJob(r.execution))
+
+    } catch (error) {
+      logError('Error listing fine-tuning jobs:', error)
+      return []
+    }
+  }
+
+  private mapExecutionToJob(execution: any): FineTuningJob {
+    const options = execution.options as any
+    const input = execution.input as any
+    const output = execution.output as any
+
+    return {
+      id: execution.id.toString(),
+      agentId: options?.agentId || 'unknown',
+      userId: execution.user_id.toString(),
+      status: (execution.status as any) || 'pending',
+      createdAt: execution.created_at || new Date(),
+      startedAt: execution.started_at || undefined,
+      completedAt: execution.completed_at || undefined,
+      trainingDataSize: 0, // Not persisted directly in execution top-level
+      validationDataSize: 0,
+      parameters: input as FineTuningParameters,
+      results: output as FineTuningResults,
+      error: (execution.error as any)?.message
+    }
   }
 
   async generateFineTuningRecommendations(

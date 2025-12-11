@@ -565,6 +565,61 @@ Received: ${new Date(alert.created_at).toLocaleString()}
     }
   }
 
+  async getNotificationPreferences(userId: string): Promise<NotificationPreferences> {
+    try {
+      // Lazy load DB imports to avoid circular dependencies if any
+      const { db } = await import('@/db');
+      const { userSettings } = await import('@/db/schema');
+      const { eq, and } = await import('drizzle-orm');
+
+      const settings = await db.select().from(userSettings).where(
+        and(
+          eq(userSettings.user_id, parseInt(userId)),
+          eq(userSettings.category, 'notification_preferences')
+        )
+      ).limit(1);
+
+      if (settings.length > 0 && settings[0].settings) {
+        return settings[0].settings as NotificationPreferences;
+      }
+    } catch (error) {
+      logError('Error fetching notification preferences from DB:', error);
+    }
+
+    return this.getDefaultNotificationPreferences(userId);
+  }
+
+  async updateNotificationPreferences(userId: string, preferences: NotificationPreferences): Promise<boolean> {
+    try {
+      const { db } = await import('@/db');
+      const { userSettings } = await import('@/db/schema');
+      const { eq, and } = await import('drizzle-orm');
+
+      const existingSettings = await db.select().from(userSettings).where(
+        and(
+          eq(userSettings.user_id, parseInt(userId)),
+          eq(userSettings.category, 'notification_preferences')
+        )
+      ).limit(1);
+
+      if (existingSettings.length > 0) {
+        await db.update(userSettings)
+          .set({ settings: preferences, updated_at: new Date() })
+          .where(eq(userSettings.id, existingSettings[0].id));
+      } else {
+        await db.insert(userSettings).values({
+          user_id: parseInt(userId),
+          category: 'notification_preferences',
+          settings: preferences
+        });
+      }
+      return true;
+    } catch (error) {
+      logError('Error updating notification preferences in DB:', error);
+      return false;
+    }
+  }
+
   async getDefaultNotificationPreferences(userId: string): Promise<NotificationPreferences> {
     return {
       userId,

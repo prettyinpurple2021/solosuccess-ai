@@ -233,13 +233,30 @@ export async function POST(
           )
         }
 
-        // Mock transfer implementation - in a real app, this would update the session ownership
-        // For now, we'll just return success without actually transferring
+        const transferResult = await sessionManager.transferSession(
+          sessionId, 
+          validatedAction.newOwnerId, 
+          validatedAction.reason
+        )
+
+        if (!transferResult) {
+           return NextResponse.json({
+            error: 'Bad Request',
+            message: 'Failed to transfer session'
+          }, { status: 400 })
+        }
+
         return NextResponse.json({
-          success: false,
-          data: null,
-          message: 'Session transfer functionality not yet implemented'
-        }, { status: 501 }) // Not Implemented
+          success: true,
+          data: {
+            sessionId,
+            previousOwnerId: userId,
+            newOwnerId: validatedAction.newOwnerId,
+            transferredAt: new Date().toISOString(),
+            reason: validatedAction.reason
+          },
+          message: 'Session transferred successfully'
+        })
 
       default:
         return NextResponse.json({
@@ -350,11 +367,15 @@ export async function GET(
         isOwner,
         isParticipant,
         availableActions,
-        participants: session.participatingAgents.map(agentId => ({
-          agentId,
-          // Note: In a real implementation, you'd fetch full agent details
-          status: 'active'
-        })),
+        participants: session.participatingAgents.map(agentId => {
+          const agent = collaborationHub.getAgent(agentId)
+          return {
+            agentId,
+            name: agent?.displayName || agentId,
+            status: agent?.status || 'unknown',
+            role: agent?.specializations[0] || 'assistant'
+          }
+        }),
         controlHistory: [] // Not implemented yet
       },
       message: 'Session control status retrieved successfully'

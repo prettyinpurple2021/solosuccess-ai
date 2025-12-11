@@ -376,6 +376,51 @@ export class SessionManager {
   }
 
   /**
+   * Transfer session ownership
+   */
+  async transferSession(sessionId: string, newUserId: number, reason?: string): Promise<boolean> {
+    try {
+      const session = this.activeSessions.get(sessionId)
+      if (!session) {
+        throw new Error(`Session ${sessionId} not found`)
+      }
+
+      const oldUserId = session.userId
+      
+      // Update in collaboration hub
+      const success = this.collaborationHub.transferSession(sessionId, newUserId)
+      if (!success) {
+        throw new Error('Failed to transfer session in collaboration hub')
+      }
+
+      // Update session state
+      const sessionState = this.sessionStates.get(sessionId)
+      if (sessionState) {
+        sessionState.updatedAt = new Date()
+        this.sessionStates.set(sessionId, sessionState)
+      }
+
+      // Notify agents
+      await this.sendSystemMessage(
+        sessionId,
+        `Session ownership transferred from User ${oldUserId} to User ${newUserId}.${reason ? ` Reason: ${reason}` : ''}`,
+        { transfer: { oldUserId, newUserId, reason } }
+      )
+
+      // Create checkpoint
+      await this.createCheckpoint(sessionId, `Session transferred to User ${newUserId}`)
+
+      logInfo(`🔄 Session ${sessionId} transferred from user ${oldUserId} to ${newUserId}`)
+      
+      return true
+
+    } catch (error) {
+      logError(`Error transferring session: ${error}`)
+      return false
+    }
+  }
+
+  /**
    * Resume a paused session
    */
   async resumeSession(sessionId: string): Promise<boolean> {

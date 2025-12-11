@@ -7,6 +7,23 @@ import { getDb } from './database-client'
 import { users } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 
+/**
+ * Verify a JWT token and return the payload if valid
+ */
+export async function verifyToken(token: string) {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not configured')
+  }
+
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jose.jwtVerify(token, secret)
+    return payload
+  } catch (err) {
+    return null
+  }
+}
+
 async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   try {
     const headersList = await headers()
@@ -35,13 +52,7 @@ async function getJWTAuthenticatedUser(): Promise<AuthenticatedUser | null> {
       return null
     }
 
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET is not configured')
-    }
-
-    // Use jose for Edge-compatible JWT verification
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-    const { payload } = await jose.jwtVerify(token, secret)
+    const payload = await verifyToken(token)
 
     if (!payload || !payload.userId) {
       return null

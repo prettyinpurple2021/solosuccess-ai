@@ -180,7 +180,7 @@ export class ScrapingScheduler {
       jobIds.push(websiteJobId)
 
       // Schedule pricing page monitoring if likely to have pricing
-      const pricingUrl = this.guessPricingUrl(competitor.domain)
+      const pricingUrl = await this.findPricingUrl(competitor.domain)
       if (pricingUrl) {
         const pricingJobId = await this.scheduleJob(
           competitor.id,
@@ -193,7 +193,7 @@ export class ScrapingScheduler {
       }
 
       // Schedule product page monitoring
-      const productUrl = this.guessProductUrl(competitor.domain)
+      const productUrl = await this.findProductUrl(competitor.domain)
       if (productUrl) {
         const productJobId = await this.scheduleJob(
           competitor.id,
@@ -206,7 +206,7 @@ export class ScrapingScheduler {
       }
 
       // Schedule job posting monitoring
-      const jobsUrl = this.guessJobsUrl(competitor.domain)
+      const jobsUrl = await this.findJobsUrl(competitor.domain)
       if (jobsUrl) {
         const jobsJobId = await this.scheduleJob(
           competitor.id,
@@ -638,20 +638,37 @@ export class ScrapingScheduler {
     return new Date(Date.now() + delayMinutes * 60 * 1000)
   }
 
-  private guessPricingUrl(domain: string): string | null {
+  private async findPricingUrl(domain: string): Promise<string | null> {
     const commonPaths = ['/pricing', '/plans', '/subscribe', '/buy', '/purchase']
-    // Return the first common path (in a real implementation, we might check which exists)
-    return `https://${domain}${commonPaths[0]}`
+    for (const path of commonPaths) {
+        const url = `https://${domain}${path}`
+        if (await webScrapingService.checkUrlExists(url)) {
+            return url
+        }
+    }
+    return null
   }
 
-  private guessProductUrl(domain: string): string | null {
+  private async findProductUrl(domain: string): Promise<string | null> {
     const commonPaths = ['/products', '/features', '/solutions', '/services']
-    return `https://${domain}${commonPaths[0]}`
+    for (const path of commonPaths) {
+        const url = `https://${domain}${path}`
+        if (await webScrapingService.checkUrlExists(url)) {
+            return url
+        }
+    }
+    return null
   }
 
-  private guessJobsUrl(domain: string): string | null {
-    const commonPaths = ['/careers', '/jobs', '/hiring', '/join', '/work-with-us']
-    return `https://${domain}${commonPaths[0]}`
+  private async findJobsUrl(domain: string): Promise<string | null> {
+    const commonPaths = ['/careers', '/jobs', '/hiring', '/about/careers', '/join-us']
+    for (const path of commonPaths) {
+        const url = `https://${domain}${path}`
+        if (await webScrapingService.checkUrlExists(url)) {
+            return url
+        }
+    }
+    return null
   }
 
   private validateWebsiteData(data: any): number {

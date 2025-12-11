@@ -5,6 +5,11 @@
 
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { z } from 'zod'
+import { db } from '@/db'
+import { chatMessages, chatConversations } from '@/db/schema'
+import { eq, desc, and } from 'drizzle-orm'
+import { generateText } from 'ai'
+import { getTeamMemberConfig } from '@/lib/ai-config'
 import type { AgentMessage, AgentDefinition, CollaborationHub } from './collaboration-hub'
 
 // Message routing types
@@ -420,6 +425,96 @@ export class MessageRouter {
   }
 
   /**
+   * Process a message for an AI agent and generate a response
+   */
+  private async processAgentResponse(agentId: string, message: AgentMessage): Promise<void> {
+    try {
+      // Don't respond to own messages, broadcasts (unless tagged), or system notifications
+      if (message.fromAgent === agentId || message.messageType === 'notification') {
+        return
+      }
+
+      const agentConfig = getTeamMemberConfig(agentId)
+      const agent = this.collaborationHub.getAgent(agentId)
+      if (!agent) return
+
+      // Get conversation history (context)
+      // Limit to last 10 messages for context window
+      const history = await db.query.chatMessages.findMany({
+        where: eq(chatMessages.conversation_id, message.sessionId),
+        orderBy: [desc(chatMessages.created_at)],
+        limit: 10
+      })
+
+      // Format history for AI
+      const contextMessages = history.reverse().map(msg => {
+          const content = msg.metadata && (msg.metadata as any).fromAgent 
+            ? `${(msg.metadata as any).fromAgent}: ${msg.content}`
+            : `${msg.role}: ${msg.content}`;
+          
+          return {
+            role: (msg.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant' | 'system',
+            content
+          }
+      })
+
+      // Prepare system prompt with specific instructions
+      const systemPrompt = `${agentConfig.systemPrompt}
+      
+      You are participating in a group collaboration session.
+      Current context: responding to ${message.fromAgent}.
+      Session ID: ${message.sessionId}
+      
+      Respond directly to the last message if relevant to your expertise.
+      If the message is not relevant to you, you can choose to stay silent or provide a brief acknowledgement.
+      Keep responses concise and action-oriented.
+      `
+
+      // Generate response
+      const { text } = await generateText({
+        model: agentConfig.model as any,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...contextMessages,
+          { role: 'user', content: `${message.fromAgent}: ${message.content}` }
+        ],
+        temperature: 0.7,
+        maxOutputTokens: 1000
+      })
+
+      if (!text || text.trim().length === 0) return
+
+      // Create response message
+      const responseMessage: AgentMessage = {
+        id: crypto.randomUUID(),
+        sessionId: message.sessionId,
+        fromAgent: agentId,
+        toAgent: message.messageType === 'broadcast' ? null : message.fromAgent, // Reply to sender or broadcast back
+        messageType: message.messageType === 'broadcast' ? 'broadcast' : 'response',
+        content: text,
+        timestamp: new Date(),
+        priority: 'medium',
+        metadata: {
+          replyTo: message.id,
+          processingTime: 0 // Could calculate
+        }
+      }
+
+      // Route the response (recursive but safe due to fromAgent check at start)
+      // We route it asynchronously to avoid infinite await chains if multiple agents talk
+      // But we need to ensure it's at least started. 
+      // Actually, since we are inside `deliverMessage`, calling `routeMessage` > `deliverMessage` again 
+      // is fine as long as we don't await indefinitely.
+      // However, `routeMessage` persists and delivers.
+      
+      await this.routeMessage(responseMessage)
+
+    } catch (error) {
+       logError(`Error processing agent response for ${agentId}:`, error)
+    }
+  }
+
+  /**
    * Add message to agent's queue
    */
   private addToQueue(agentId: string, message: AgentMessage): void {
@@ -468,12 +563,39 @@ export class MessageRouter {
   }
 
   /**
-   * Persist message to database (placeholder for API integration)
+   * Persist message to database
    */
   private async persistMessage(message: AgentMessage, deliveryResult: MessageDeliveryResult): Promise<void> {
-    // This will be implemented when we create the API endpoints
-    // For now, just log the message
-    logInfo(`📨 Message routed: ${message.fromAgent} -> ${deliveryResult.successful.join(', ')}`)
+    try {
+      const session = this.collaborationHub.getSession(message.sessionId)
+      if (!session) return
+
+      // Determine role based on fromAgent
+      // If fromAgent is 'user' or matches session owner, it's 'user'
+      // Otherwise it's 'assistant'
+      const role = message.fromAgent === 'user' ? 'user' : 'assistant'
+      
+      await db.insert(chatMessages).values({
+        id: message.id,
+        conversation_id: message.sessionId,
+        user_id: session.userId, // This links the message to the session owner
+        role: role,
+        content: message.content,
+        metadata: {
+          ...message.metadata,
+          fromAgent: message.fromAgent,
+          toAgent: message.toAgent,
+          messageType: message.messageType,
+          deliveryStatus: deliveryResult.failed.length === 0 ? 'delivered' : 'partial'
+        },
+        created_at: message.timestamp
+      })
+
+      logInfo(`📨 Message persisted: ${message.id} (${message.fromAgent} -> ${message.toAgent || 'broadcast'})`)
+    } catch (error) {
+      logError('Error persisting message:', error)
+      // Don't throw, just log - routing was successful even if persistence failed
+    }
   }
 
   /**

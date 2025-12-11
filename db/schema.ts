@@ -19,6 +19,26 @@ export const users = pgTable('users', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
+// User Settings table
+export const userSettings = pgTable('user_settings', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  category: varchar('category', { length: 100 }).notNull(), // e.g., 'processor', 'notifications'
+  settings: jsonb('settings').default('{}'),
+  updated_at: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('user_settings_user_id_idx').on(table.user_id),
+  categoryIdx: index('user_settings_category_idx').on(table.category),
+  userCategoryIdx: index('user_settings_user_category_idx').on(table.user_id, table.category),
+}));
+
+export const userSettingsRelations = relations(userSettings, ({ one }) => ({
+  user: one(users, {
+    fields: [userSettings.user_id],
+    references: [users.id],
+  }),
+}));
+
 // Briefcase/Projects table
 export const briefcases = pgTable('briefcases', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),

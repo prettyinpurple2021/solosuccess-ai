@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     // Get user's notification preferences
     // In a real implementation, this would come from the database
     // For now, we'll return default preferences
-    const preferences = await notificationDelivery.getDefaultNotificationPreferences(user.id);
+    const preferences = await notificationDelivery.getNotificationPreferences(user.id);
 
     return NextResponse.json({
       preferences,
@@ -101,12 +101,17 @@ export async function PUT(request: NextRequest) {
     // Add user ID to preferences
     const fullPreferences: NotificationPreferences = {
       userId: user.id,
-      ...preferences,
+      ...(preferences as any),
     };
 
-    // In a real implementation, save to database
-    // For now, we'll just validate and return success
-    logInfo('Saving notification preferences for user:', { userId: user.id, preferences: fullPreferences });
+    const success = await notificationDelivery.updateNotificationPreferences(user.id, fullPreferences);
+
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Failed to update preferences' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
