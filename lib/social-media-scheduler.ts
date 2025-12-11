@@ -164,16 +164,16 @@ export class SocialMediaScheduler {
       let result;
       switch (platform) {
         case 'linkedin':
-          result = await socialMediaMonitor.monitorLinkedInActivity(job.competitor_id);
+          result = await socialMediaMonitor.monitorLinkedInActivity(job.competitor_id, job.user_id);
           break;
         case 'twitter':
-          result = await socialMediaMonitor.monitorTwitterActivity(job.competitor_id);
+          result = await socialMediaMonitor.monitorTwitterActivity(job.competitor_id, job.user_id);
           break;
         case 'facebook':
-          result = await socialMediaMonitor.monitorFacebookActivity(job.competitor_id);
+          result = await socialMediaMonitor.monitorFacebookActivity(job.competitor_id, job.user_id);
           break;
         case 'instagram':
-          result = await socialMediaMonitor.monitorInstagramActivity(job.competitor_id);
+          result = await socialMediaMonitor.monitorInstagramActivity(job.competitor_id, job.user_id);
           break;
         default:
           throw new Error(`Unsupported platform: ${platform}`);

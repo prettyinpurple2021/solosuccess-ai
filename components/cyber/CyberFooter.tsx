@@ -12,6 +12,10 @@ export function CyberFooter() {
       <p className="font-tech text-gray-500 text-sm">
         SYSTEM STATUS: ONLINE <br />
         © 2025 SoloSuccess AI. All rights reserved. <br />
+        <div className="flex justify-center gap-6 my-4 text-xs tracking-widest uppercase">
+          <Link href="/privacy" className="hover:text-cyber-cyan transition-colors">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-cyber-cyan transition-colors">Terms of Service</Link>
+        </div>
         <span className="text-[10px] text-cyber-dim mt-2 block">
           ENCHANTED NIGHTMARE INDUSTRIES
         </span>

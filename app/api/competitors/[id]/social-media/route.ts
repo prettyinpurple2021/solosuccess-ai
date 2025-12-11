@@ -72,7 +72,7 @@ export async function GET(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, user.id)
+          eq(competitorProfiles.user_id, Number(user.id))
         )
       )
       .limit(1);
@@ -87,7 +87,7 @@ export async function GET(
     // Build query conditions
     let whereConditions = and(
       eq(intelligenceData.competitor_id, competitorId),
-      eq(intelligenceData.user_id, user.id),
+      eq(intelligenceData.user_id, Number(user.id)),
       eq(intelligenceData.source_type, 'social_media')
     );
 
@@ -204,7 +204,7 @@ export async function POST(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, user.id)
+          eq(competitorProfiles.user_id, Number(user.id))
         )
       )
       .limit(1);
@@ -235,16 +235,16 @@ export async function POST(
           let platformData;
           switch (platform) {
             case 'linkedin':
-              platformData = await socialMediaMonitor.monitorLinkedInActivity(competitorId);
+              platformData = await socialMediaMonitor.monitorLinkedInActivity(competitorId, Number(user.id));
               break;
             case 'twitter':
-              platformData = await socialMediaMonitor.monitorTwitterActivity(competitorId);
+              platformData = await socialMediaMonitor.monitorTwitterActivity(competitorId, Number(user.id));
               break;
             case 'facebook':
-              platformData = await socialMediaMonitor.monitorFacebookActivity(competitorId);
+              platformData = await socialMediaMonitor.monitorFacebookActivity(competitorId, Number(user.id));
               break;
             case 'instagram':
-              platformData = await socialMediaMonitor.monitorInstagramActivity(competitorId);
+              platformData = await socialMediaMonitor.monitorInstagramActivity(competitorId, Number(user.id));
               break;
           }
           

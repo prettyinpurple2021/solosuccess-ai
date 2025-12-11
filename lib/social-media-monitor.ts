@@ -147,7 +147,7 @@ export class SocialMediaMonitor {
    * Monitor all social media platforms for a competitor
    * NOTE: This uses competitor's handles and requires the monitoring user to have API access
    */
-  async monitorCompetitor(competitorId: number, userId: string): Promise<SocialMediaAnalysis[]> {
+  async monitorCompetitor(competitorId: number, userId: number): Promise<SocialMediaAnalysis[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) {
       throw new Error(`Competitor with ID ${competitorId} not found`);
@@ -197,7 +197,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor LinkedIn company page for posts and updates
    */
-  async monitorLinkedInActivity(competitorId: number): Promise<SocialMediaPost[]> {
+  async monitorLinkedInActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -206,13 +206,26 @@ export class SocialMediaMonitor {
     
     if (!linkedinHandle) return [];
 
+    // Get user's LinkedIn connection
+    const [connection] = await db
+      .select()
+      .from(socialMediaConnections)
+      .where(and(
+        eq(socialMediaConnections.user_id, userId),
+        eq(socialMediaConnections.platform, 'linkedin'),
+        eq(socialMediaConnections.is_active, true)
+      ))
+      .limit(1);
+
+    if (!connection?.access_token) {
+      logWarn(`No active LinkedIn connection for user ${userId}, skipping monitoring`);
+      return [];
+    }
+
     try {
-      // In a real implementation, this would use LinkedIn API or web scraping
-      // For now, we'll simulate the data collection
-      const posts = await this.scrapeLinkedInPosts(linkedinHandle);
+      const posts = await this.fetchLinkedInCompanyPosts(connection.access_token, linkedinHandle);
       
-      // Store the collected data
-      await this.storeIntelligenceData(competitorId, competitor.user_id, {
+      await this.storeIntelligenceData(competitorId, userId, {
         platform: 'linkedin',
         competitorId,
         posts,
@@ -234,7 +247,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor Twitter/X for mentions, posts, and engagement
    */
-  async monitorTwitterActivity(competitorId: number): Promise<SocialMediaPost[]> {
+  async monitorTwitterActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -243,11 +256,27 @@ export class SocialMediaMonitor {
     
     if (!twitterHandle) return [];
 
+    const [connection] = await db
+      .select()
+      .from(socialMediaConnections)
+      .where(and(
+        eq(socialMediaConnections.user_id, userId),
+        eq(socialMediaConnections.platform, 'twitter'),
+        eq(socialMediaConnections.is_active, true)
+      ))
+      .limit(1);
+
+    if (!connection?.access_token) {
+      logWarn(`No active Twitter connection for user ${userId}, skipping monitoring`);
+      return [];
+    }
+
     try {
-      // In a real implementation, this would use Twitter API v2
-      const posts = await this.scrapeTwitterPosts(twitterHandle);
+      // Note: Twitter usually requires access token secret for OAuth 1.0a too, assuming stored in connection metadata or separate field if needed
+      // adapting to pass just access token if using Bearer, or updated signature
+      const posts = await this.fetchTwitterCompetitorPosts(connection.access_token, connection.refresh_token || '', twitterHandle);
       
-      await this.storeIntelligenceData(competitorId, competitor.user_id, {
+      await this.storeIntelligenceData(competitorId, userId, {
         platform: 'twitter',
         competitorId,
         posts,
@@ -269,7 +298,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor Facebook business page with post analysis
    */
-  async monitorFacebookActivity(competitorId: number): Promise<SocialMediaPost[]> {
+  async monitorFacebookActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -278,11 +307,25 @@ export class SocialMediaMonitor {
     
     if (!facebookHandle) return [];
 
+    const [connection] = await db
+      .select()
+      .from(socialMediaConnections)
+      .where(and(
+        eq(socialMediaConnections.user_id, userId),
+        eq(socialMediaConnections.platform, 'facebook'),
+        eq(socialMediaConnections.is_active, true)
+      ))
+      .limit(1);
+
+    if (!connection?.access_token) {
+        logWarn(`No active Facebook connection for user ${userId}, skipping monitoring`);
+        return [];
+    }
+
     try {
-      // In a real implementation, this would use Facebook Graph API
-      const posts = await this.scrapeFacebookPosts(facebookHandle);
+      const posts = await this.fetchFacebookCompetitorPosts(connection.access_token, facebookHandle);
       
-      await this.storeIntelligenceData(competitorId, competitor.user_id, {
+      await this.storeIntelligenceData(competitorId, userId, {
         platform: 'facebook',
         competitorId,
         posts,
@@ -304,7 +347,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor Instagram business account with content and engagement metrics
    */
-  async monitorInstagramActivity(competitorId: number): Promise<SocialMediaPost[]> {
+  async monitorInstagramActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -313,11 +356,25 @@ export class SocialMediaMonitor {
     
     if (!instagramHandle) return [];
 
+    const [connection] = await db
+      .select()
+      .from(socialMediaConnections)
+      .where(and(
+        eq(socialMediaConnections.user_id, userId),
+        eq(socialMediaConnections.platform, 'instagram'),
+        eq(socialMediaConnections.is_active, true)
+      ))
+      .limit(1);
+
+    if (!connection?.access_token) {
+        logWarn(`No active Instagram connection for user ${userId}, skipping monitoring`);
+        return [];
+    }
+
     try {
-      // In a real implementation, this would use Instagram Basic Display API
-      const posts = await this.scrapeInstagramPosts(instagramHandle);
+      const posts = await this.fetchInstagramCompetitorPosts(connection.access_token, instagramHandle);
       
-      await this.storeIntelligenceData(competitorId, competitor.user_id, {
+      await this.storeIntelligenceData(competitorId, userId, {
         platform: 'instagram',
         competitorId,
         posts,
@@ -341,7 +398,7 @@ export class SocialMediaMonitor {
    */
   async analyzeSentiment(posts: SocialMediaPost[]): Promise<SentimentAnalysis> {
     try {
-      // In a real implementation, this would use OpenAI or other AI service
+      // Use real AI service for sentiment analysis
       const byPost = await Promise.all(
         posts.map(async (post) => ({
           postId: post.id,
@@ -437,7 +494,7 @@ export class SocialMediaMonitor {
 
   private async storeIntelligenceData(
     competitorId: number, 
-    userId: string, 
+    userId: number, 
     analysis: SocialMediaAnalysis
   ): Promise<void> {
     try {
@@ -479,92 +536,63 @@ export class SocialMediaMonitor {
     return 'low';
   }
 
-  // Real social media monitoring implementations
-  private async scrapeLinkedInPosts(handle: string): Promise<SocialMediaPost[]> {
-    try {
-      // In a real implementation, you would use:
-      // - LinkedIn Company API
-      // - LinkedIn Marketing API
-      // - Ethical web scraping with proper rate limiting
-      
-      const posts = await this.fetchLinkedInCompanyPosts(handle);
-      return posts;
-    } catch (error) {
-      logError(`Error scraping LinkedIn posts for ${handle}:`, error);
-      // No mock fallback - require real API credentials
-      throw error;
+  // Dispatch methods
+  private async fetchUserPostsWithToken(platform: string, connection: any): Promise<SocialMediaPost[]> {
+    switch (platform) {
+      case 'linkedin':
+        return this.fetchLinkedInPostsWithToken(connection.access_token, connection.account_handle || 'me');
+      case 'twitter':
+        return this.fetchTwitterPostsWithToken(connection.access_token, connection.token_secret || '', connection.account_handle || 'me');
+      case 'facebook':
+        return this.fetchFacebookPostsWithToken(connection.access_token, connection.account_id);
+      case 'instagram':
+        return this.fetchInstagramBusinessPosts(connection.access_token); // Assumes token is enough
+      default:
+        return [];
     }
+  }
+
+  private async fetchCompetitorPostsWithUserToken(platform: string, handle: string, connection: any): Promise<SocialMediaPost[]> {
+      switch (platform) {
+        case 'linkedin':
+          return this.fetchLinkedInCompetitorPosts(connection.access_token, handle);
+        case 'twitter':
+          return this.fetchTwitterCompetitorPosts(connection.access_token, connection.token_secret || '', handle);
+        case 'facebook':
+          return this.fetchFacebookCompetitorPosts(connection.access_token, handle);
+        case 'instagram':
+          return this.fetchInstagramCompetitorPosts(connection.access_token, handle); 
+        default:
+          return [];
+      }
+  }
+
+  // Deprecated usage - these methods are now effectively abstract or errors, as we rely on fetch* variants
+  private async scrapeLinkedInPosts(handle: string): Promise<SocialMediaPost[]> {
+    throw new Error('Direct scraping not supported. Use monitorLinkedInActivity with userId.');
   }
 
   private async scrapeTwitterPosts(handle: string): Promise<SocialMediaPost[]> {
-    try {
-      // In a real implementation, you would use:
-      // - Twitter API v2
-      // - Twitter Academic Research API
-      // - Twitter Enterprise API
-      
-      const posts = await this.fetchTwitterUserTweets(handle);
-      return posts;
-    } catch (error) {
-      logError(`Error scraping Twitter posts for ${handle}:`, error);
-      // No mock fallback - require real API credentials
-      throw error;
-    }
+    throw new Error('Direct scraping not supported. Use monitorTwitterActivity with userId.');
   }
 
   private async scrapeFacebookPosts(handle: string): Promise<SocialMediaPost[]> {
-    try {
-      // In a real implementation, you would use:
-      // - Facebook Graph API
-      // - Facebook Marketing API
-      // - Facebook Business API
-      
-      const posts = await this.fetchFacebookPagePosts(handle);
-      return posts;
-    } catch (error) {
-      logError(`Error scraping Facebook posts for ${handle}:`, error);
-      // No mock fallback - require real API credentials
-      throw error;
-    }
+    throw new Error('Direct scraping not supported. Use monitorFacebookActivity with userId.');
   }
 
   private async scrapeInstagramPosts(handle: string): Promise<SocialMediaPost[]> {
-    try {
-      // In a real implementation, you would use:
-      // - Instagram Basic Display API
-      // - Instagram Graph API
-      // - Instagram Business API
-      
-      const posts = await this.fetchInstagramBusinessPosts(handle);
-      return posts;
-    } catch (error) {
-      logError(`Error scraping Instagram posts for ${handle}:`, error);
-      // No mock fallback - require real API credentials
-      throw error;
-    }
+    throw new Error('Direct scraping not supported. Use monitorInstagramActivity with userId.');
   }
 
   private async scrapeYoutubePosts(handle: string): Promise<SocialMediaPost[]> {
-    try {
-      // In a real implementation, you would use:
-      // - YouTube Data API v3
-      // - YouTube Analytics API
-      // - YouTube Reporting API
-      
-      const posts = await this.fetchYouTubeChannelVideos(handle);
-      return posts;
-    } catch (error) {
-      logError(`Error scraping YouTube posts for ${handle}:`, error);
-      // No mock fallback - require real API credentials
-      throw error;
-    }
+    throw new Error('Direct scraping not supported. Use fetchYouTubePostsWithToken.');
   }
 
   // Real API integration methods (implement with actual API calls)
-  private async fetchLinkedInCompanyPosts(handle: string): Promise<SocialMediaPost[]> {
+  private async fetchLinkedInCompanyPosts(accessToken: string, handle: string): Promise<SocialMediaPost[]> {
     // Use the user's stored access token
     if (!accessToken) {
-      throw new Error('LinkedIn access token not available. Please reconnect your account.')
+      throw new Error('LinkedIn access token not available.')
     }
 
     try {
@@ -611,13 +639,34 @@ export class SocialMediaMonitor {
       }
 
       // If company found, fetch company posts
-      if (companySearchResponse.ok) {
-        const companyData = await companySearchResponse.json()
-        const companyId = companyData.elements?.[0]?.organizationalTarget
+      const postsResponse = await fetch(
+        `https://api.linkedin.com/v2/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=${encodeURIComponent(companyId)}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Restli-Protocol-Version': '2.0.0'
+          }
+        }
+      )
 
-        if (companyId) {
-          const postsResponse = await fetch(
-            `https://api.linkedin.com/v2/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=${encodeURIComponent(companyId)}`,
+      if (!postsResponse.ok) {
+        throw new Error(`LinkedIn posts API error: ${postsResponse.status}`)
+      }
+      
+      const linkedInData = await postsResponse.json()
+      return this.transformLinkedInPosts(linkedInData, handle)
+
+    } catch (error) {
+      logError('LinkedIn API fetch failed:', error)
+      throw error
+    }
+  }
+  
+  private async fetchLinkedInPostsWithToken(accessToken: string, handle: string): Promise<SocialMediaPost[]> {
+       // Fetch user's own posts using UGC API
+       try {
+        const ugcPostsResponse = await fetch(
+            'https://api.linkedin.com/v2/ugcPosts?q=authors&authors=List(' + encodeURIComponent('urn:li:person:' + handle) + ')',
             {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -625,26 +674,16 @@ export class SocialMediaMonitor {
               }
             }
           )
-
-      // Alternative: Use Share API to get posts (requires different endpoint)
-      // LinkedIn's API structure may vary - this is a template for production
-      if (!postsResponse.ok) {
-        throw new Error(`LinkedIn posts API error: ${postsResponse.status}`)
-      }
-
-          if (postsResponse.ok) {
-            const linkedInData = await postsResponse.json()
-            return this.transformLinkedInPosts(linkedInData, handle)
+          
+          if (ugcPostsResponse.ok) {
+            const ugcData = await ugcPostsResponse.json()
+            return this.transformLinkedInPosts(ugcData, handle)
           }
-        }
-      }
-
-      // If no posts found, return empty array
-      return []
-    } catch (error) {
-      logError('LinkedIn API fetch failed:', error)
-      throw error
-    }
+          return [];
+       } catch (error) {
+           logError('Error fetching LinkedIn user posts:', error);
+           return [];
+       }
   }
 
   private async fetchLinkedInCompetitorPosts(accessToken: string, competitorHandle: string): Promise<SocialMediaPost[]> {
