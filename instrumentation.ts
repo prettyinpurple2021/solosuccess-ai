@@ -1,7 +1,6 @@
-// Instrumentation for Sentry across runtimes
 import * as Sentry from '@sentry/nextjs';
 
-export async function register(): Promise<void> {
+export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     await import('./sentry.server.config');
   }
