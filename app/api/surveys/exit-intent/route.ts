@@ -3,12 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import * as jose from 'jose'
 
-// Edge runtime enabled after refactoring to jose and Neon HTTP
-export const runtime = 'edge'
+// Edge runtime removed for better stability with DB connections
+// export const runtime = 'edge'
 
-
-
-// // Force dynamic rendering
+// Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 function getSql() {
