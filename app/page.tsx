@@ -85,7 +85,7 @@ export default function HomePage() {
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-sci tracking-tight leading-[1.1] text-white">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-sci tracking-tight leading-[1.1] text-white">
               YOUR AI <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] to-[#BC13FE] animate-pulse">
                 CO-FOUNDER
@@ -133,7 +133,7 @@ export default function HomePage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="w-full lg:w-[45%] relative z-10"
+          className="w-full max-w-lg lg:max-w-full lg:w-[45%] relative z-10"
         >
           {/* HUD Container */}
           <div className="relative bg-[#020204]/90 border border-[#00F0FF]/50 p-6 md:p-8 backdrop-blur-md shadow-[0_0_40px_rgba(0,240,255,0.1)] group hover:border-[#00F0FF] transition-colors duration-500">
