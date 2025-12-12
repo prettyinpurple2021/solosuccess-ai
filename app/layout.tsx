@@ -14,6 +14,7 @@ import { ChatProvider } from "@/components/providers/chat-provider"
 import { SmartTipManager } from "@/components/ui/smart-tip"
 import { HolographicFeedbackWidget } from "@/components/feedback/holographic-feedback-widget"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
@@ -316,6 +317,7 @@ export default function RootLayout({
           appShell
         )}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
