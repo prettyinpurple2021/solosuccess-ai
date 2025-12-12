@@ -174,7 +174,7 @@ export class FineTuningPipeline {
     return shuffled
   }
 
-  private async getOrCreateWorkflowId(userId: number, agentId: string): Promise<number> {
+  private async getOrCreateWorkflowId(userId: string, agentId: string): Promise<number> {
     const workflowName = `Fine-Tune Agent: ${agentId}`
     
     // Check if workflow exists
@@ -204,12 +204,12 @@ export class FineTuningPipeline {
 
   private async storeFineTuningJob(job: FineTuningJob): Promise<string> {
     try {
-      const userIdNum = parseInt(job.userId)
-      const workflowId = await this.getOrCreateWorkflowId(userIdNum, job.agentId)
+      const userIdStr = job.userId
+      const workflowId = await this.getOrCreateWorkflowId(userIdStr, job.agentId)
 
       const [execution] = await db.insert(workflowExecutions).values({
         workflow_id: workflowId,
-        user_id: userIdNum,
+        user_id: userIdStr,
         status: job.status,
         input: job.parameters as any,
         started_at: job.createdAt,
@@ -423,8 +423,8 @@ export class FineTuningPipeline {
 
   async listFineTuningJobs(userId: string): Promise<FineTuningJob[]> {
     try {
-      const userIdNum = parseInt(userId)
-      if (isNaN(userIdNum)) return []
+      // const userIdNum = parseInt(userId)
+      // if (isNaN(userIdNum)) return []
 
       // Detailed query to filter by workflow name
       const results = await db.select({
@@ -435,7 +435,7 @@ export class FineTuningPipeline {
         .innerJoin(workflows, eq(workflowExecutions.workflow_id, workflows.id))
         .where(
           and(
-            eq(workflowExecutions.user_id, userIdNum)
+            eq(workflowExecutions.user_id, userId)
             // We can add filter for workflow name here directly?
             // like: like(workflows.name, 'Fine-Tune Agent:%')
           )

@@ -23,6 +23,13 @@ export const users = pgTable('users', {
   stripe_customer_id: text('stripe_customer_id'),
   subscription_tier: text('subscription_tier').default('free'),
   subscription_status: text('subscription_status').default('active'),
+  stripe_subscription_id: text('stripe_subscription_id'),
+  current_period_start: timestamp('current_period_start'),
+  current_period_end: timestamp('current_period_end'),
+  cancel_at_period_end: boolean('cancel_at_period_end').default(false),
+  date_of_birth: timestamp('date_of_birth'),
+  is_verified: boolean('is_verified').default(false),
+  onboarding_completed: boolean('onboarding_completed').default(false),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });

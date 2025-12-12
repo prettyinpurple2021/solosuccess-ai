@@ -29,6 +29,11 @@ export function RegisterForm() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="dateOfBirth" className="text-pink-400 font-mono uppercase text-xs">Date of Birth (18+)</Label>
+              <Input id="dateOfBirth" name="dateOfBirth" type="date" required className="bg-black/50 border-white/10 focus:border-pink-500/50 text-white" />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-pink-400 font-mono uppercase text-xs">Email Address</Label>
               <Input id="email" name="email" type="email" required className="bg-black/50 border-white/10 focus:border-pink-500/50" />
             </div>

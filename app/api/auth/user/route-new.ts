@@ -49,7 +49,7 @@ export const GET = withAuth(async (request: Request, user) => {
         cancel_at_period_end: users.cancel_at_period_end
       }),
       ...(include_metadata && {
-        avatar_url: users.avatar_url,
+        avatar_url: users.image,
         is_verified: users.is_verified,
         onboarding_completed: users.onboarding_completed
       })

@@ -32,24 +32,35 @@ const RegisterSchema = z.object({
   lastName: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
+  dateOfBirth: z.string().refine((date) => {
+    const today = new Date();
+    const birthDate = new Date(date);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 18;
+  }, { message: "You must be 18+ to register." }),
 });
 
 export async function register(prevState: any, formData: FormData) {
   const validatedFields = RegisterSchema.safeParse(Object.fromEntries(formData));
 
   if (!validatedFields.success) {
+    // Return the first error message
+    const firstError = validatedFields.error.errors[0]?.message || 'Invalid fields.';
     return {
-      error: 'Invalid fields. Please check your inputs.',
+      error: firstError,
     };
   }
 
-  const { firstName, lastName, email, password } = validatedFields.data;
+  const { firstName, lastName, email, password, dateOfBirth } = validatedFields.data;
   const fullName = `${firstName} ${lastName}`.trim();
 
   // Check if user exists
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
+  const existingUserResult = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const existingUser = existingUserResult[0];
 
   if (existingUser) {
     return {
@@ -67,6 +78,7 @@ export async function register(prevState: any, formData: FormData) {
       name: fullName, // Fallback
       username: email.split('@')[0], // Simple username generation
       role: 'user',
+      date_of_birth: new Date(dateOfBirth),
     });
   } catch (error) {
     console.error('Registration error:', error);
