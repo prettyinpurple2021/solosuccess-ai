@@ -916,7 +916,7 @@ export const documentActivityRelations = relations(documentActivity, ({ one }) =
 // Calendar Connections table
 export const calendarConnections = pgTable('calendar_connections', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   provider: varchar('provider', { length: 50 }).notNull(), // google, outlook, apple
   access_token: text('access_token').notNull(),
   refresh_token: text('refresh_token'),
@@ -935,7 +935,7 @@ export const calendarConnections = pgTable('calendar_connections', {
 // Social Media Connections table - for users to connect their own accounts
 export const socialMediaConnections = pgTable('social_media_connections', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   platform: varchar('platform', { length: 50 }).notNull(), // linkedin, twitter, facebook, instagram, youtube
   access_token: text('access_token').notNull(),
   refresh_token: text('refresh_token'),
@@ -959,7 +959,7 @@ export const socialMediaConnections = pgTable('social_media_connections', {
 // Payment Provider Connections table - for users to connect their own payment processors
 export const paymentProviderConnections = pgTable('payment_provider_connections', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   provider: varchar('provider', { length: 50 }).notNull(), // stripe, paypal, square, etc.
   account_id: varchar('account_id', { length: 255 }), // Provider account ID (e.g., Stripe Account ID)
   access_token: text('access_token'), // For OAuth providers
@@ -1000,7 +1000,7 @@ export const learningModules = pgTable('learning_modules', {
 // User Learning Progress table
 export const userProgress = pgTable('user_progress', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   module_id: varchar('module_id', { length: 255 }).notNull().references(() => learningModules.id, { onDelete: 'cascade' }),
   completion_percentage: integer('completion_percentage').default(0),
   time_spent: integer('time_spent').default(0), // in minutes
@@ -1018,7 +1018,7 @@ export const userProgress = pgTable('user_progress', {
 // Skill Assessments table
 export const skillAssessments = pgTable('skill_assessments', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   skill_name: varchar('skill_name', { length: 255 }).notNull(),
   category: varchar('category', { length: 100 }),
   current_level: integer('current_level').default(1),
@@ -1034,7 +1034,7 @@ export const skillAssessments = pgTable('skill_assessments', {
 // Quiz Scores table
 export const quizScores = pgTable('quiz_scores', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   module_id: varchar('module_id', { length: 255 }).references(() => learningModules.id, { onDelete: 'cascade' }),
   score: integer('score').notNull(),
   max_score: integer('max_score').default(100),
@@ -1048,7 +1048,7 @@ export const quizScores = pgTable('quiz_scores', {
 // User Brand Settings table
 export const userBrandSettings = pgTable('user_brand_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   company_name: varchar('company_name', { length: 255 }),
   tagline: varchar('tagline', { length: 500 }),
   description: text('description'),
@@ -1078,7 +1078,7 @@ export const userBrandSettingsRelations = relations(userBrandSettings, ({ one })
 // Push Subscriptions table
 export const pushSubscriptions = pgTable('push_subscriptions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   endpoint: varchar('endpoint', { length: 1000 }).notNull(),
   p256dh_key: varchar('p256dh_key', { length: 500 }).notNull(),
   auth_key: varchar('auth_key', { length: 500 }).notNull(),
@@ -1103,8 +1103,8 @@ export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one })
 // Competitor Activities table
 export const competitorActivities = pgTable('competitor_activities', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  competitor_id: text('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   activity_type: varchar('activity_type', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
@@ -1140,7 +1140,7 @@ export const competitorActivitiesRelations = relations(competitorActivities, ({ 
 // Chat Conversations table
 export const chatConversations = pgTable('chat_conversations', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   agent_id: varchar('agent_id', { length: 50 }).notNull(),
   agent_name: varchar('agent_name', { length: 100 }).notNull(),
@@ -1171,7 +1171,7 @@ export const chatConversationsRelations = relations(chatConversations, ({ one, m
 export const chatMessages = pgTable('chat_messages', {
   id: varchar('id', { length: 255 }).primaryKey(),
   conversation_id: varchar('conversation_id', { length: 255 }).notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   role: varchar('role', { length: 20 }).notNull(), // 'user' or 'assistant'
   content: text('content').notNull(),
   metadata: jsonb('metadata').default('{}'),
@@ -1198,7 +1198,7 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
 // Workflows table
 export const workflows = pgTable('workflows', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   version: varchar('version', { length: 50 }).default('1.0.0'),
@@ -1220,7 +1220,7 @@ export const workflows = pgTable('workflows', {
 export const workflowExecutions = pgTable('workflow_executions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   workflow_id: integer('workflow_id').notNull().references(() => workflows.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   status: varchar('status', { length: 50 }).default('running'),
   started_at: timestamp('started_at').defaultNow(),
   completed_at: timestamp('completed_at'),
@@ -1254,7 +1254,7 @@ export const workflowTemplates = pgTable('workflow_templates', {
 export const templateDownloads = pgTable('template_downloads', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   template_id: integer('template_id').notNull().references(() => workflowTemplates.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   downloaded_at: timestamp('downloaded_at').defaultNow(),
 });
 
@@ -1275,7 +1275,7 @@ export const achievements = pgTable('achievements', {
 // User achievements table
 export const userAchievements = pgTable('user_achievements', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   achievement_id: integer('achievement_id').notNull().references(() => achievements.id, { onDelete: 'cascade' }),
   earned_at: timestamp('earned_at').defaultNow(),
   metadata: jsonb('metadata').default('{}'),
@@ -1284,11 +1284,11 @@ export const userAchievements = pgTable('user_achievements', {
 // Focus sessions table
 export const focusSessions = pgTable('focus_sessions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   started_at: timestamp('started_at').defaultNow(),
   ended_at: timestamp('ended_at'),
   duration_minutes: integer('duration_minutes'),
-  task_id: integer('task_id').references(() => tasks.id),
+  task_id: text('task_id').references(() => tasks.id),
   notes: text('notes'),
   created_at: timestamp('created_at').defaultNow(),
 });
@@ -1320,7 +1320,7 @@ export const notificationJobs = pgTable('notification_jobs', {
 // User Sessions table for cookie-based auth
 export const userSessions = pgTable('user_sessions', {
   id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   refresh_token: varchar('refresh_token', { length: 500 }).notNull().unique(),
   device_fingerprint: varchar('device_fingerprint', { length: 255 }).notNull(),
   device_name: varchar('device_name', { length: 255 }),
@@ -1344,7 +1344,7 @@ export const userSessions = pgTable('user_sessions', {
 // Password reset tokens table
 export const passwordResetTokens = pgTable('password_reset_tokens', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: varchar('token', { length: 255 }).notNull().unique(),
   expires_at: timestamp('expires_at').notNull(),
   used_at: timestamp('used_at'),
@@ -1361,7 +1361,7 @@ export const passwordResetTokens = pgTable('password_reset_tokens', {
 // User 2FA/MFA settings table
 export const userMfaSettings = pgTable('user_mfa_settings', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   totp_secret: varchar('totp_secret', { length: 255 }),
   totp_enabled: boolean('totp_enabled').default(false),
   totp_backup_codes: jsonb('totp_backup_codes').default('[]'),
@@ -1380,7 +1380,7 @@ export const userMfaSettings = pgTable('user_mfa_settings', {
 // Device approvals table
 export const deviceApprovals = pgTable('device_approvals', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   device_fingerprint: varchar('device_fingerprint', { length: 255 }).notNull(),
   device_name: varchar('device_name', { length: 255 }),
   device_type: varchar('device_type', { length: 50 }),
@@ -1478,7 +1478,7 @@ export const passwordResetTokenRelations = relations(passwordResetTokens, ({ one
 // Analytics Events table
 export const analyticsEvents = pgTable('analytics_events', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  user_id: text('user_id').references(() => users.id, { onDelete: 'set null' }),
   event: varchar('event', { length: 100 }).notNull(),
   properties: jsonb('properties').default('{}'),
   timestamp: timestamp('timestamp').defaultNow(),
@@ -1500,7 +1500,7 @@ export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => 
 // User API Keys table - for users to store their own API keys
 export const userApiKeys = pgTable('user_api_keys', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   service: varchar('service', { length: 100 }).notNull(), // e.g., 'openai', 'anthropic', 'google'
   key_value: text('key_value').notNull(), // Encrypted/hashed API key
   created_at: timestamp('created_at').defaultNow(),
@@ -1510,5 +1510,3 @@ export const userApiKeys = pgTable('user_api_keys', {
   serviceIdx: index('user_api_keys_service_idx').on(table.service),
   userServiceIdx: index('user_api_keys_user_service_idx').on(table.user_id, table.service),
 }));
-
-

@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
+import { handleSignOut } from '@/lib/auth-actions';
 import { LayoutDashboard, Users, Eye, ShieldAlert, Swords, Flame, KanbanSquare, Power, Search, Command, Settings, Trophy, ChevronUp, NotebookPen, X, Menu, Coins, Radio, Palette, Presentation, BookTemplate, Archive, Terminal, GitBranch, Scale, Mic, Crown, Compass, Moon, Box, GraduationCap, Flag, Megaphone, Rocket, UserPlus } from 'lucide-react';
 import { AGENTS } from '../constants';
 import { AgentId, BusinessContext } from '../types';
@@ -38,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCloseMobile,
     onToggleScratchpad
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [companyName, setCompanyName] = useState('SOLO_SUCCESS');
     const [progress, setProgress] = useState({
         level: 1,
@@ -169,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     label: 'Admin Control',
                     icon: <ShieldAlert size={18} className="text-emerald-500" />,
                     colorClass: 'text-emerald-500',
-                    onClick: () => navigate('/app/admin/login')
+                    onClick: () => router.push('/app/admin/login')
                 }] : [])
             ]
         }
@@ -374,13 +377,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {/* Footer / User Profile */}
                 <div className="p-4 border-t border-white/5 shrink-0 bg-black/20">
-                    <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-zinc-500 transition-all group"
-                    >
-                        <Power size={16} className="group-hover:rotate-90 transition-transform" />
-                        <span className="text-xs font-medium">System Reboot</span>
-                    </button>
+                    <form action={handleSignOut}>
+                        <button
+                            type="submit"
+                            onClick={() => {
+                                soundService.playClick();
+                                localStorage.removeItem('solo_business_context');
+                            }}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-zinc-500 transition-all group"
+                        >
+                            <Power size={16} className="group-hover:rotate-90 transition-transform" />
+                            <span className="text-xs font-medium">System Reboot</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </>
