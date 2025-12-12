@@ -33,11 +33,8 @@ export function InlineSSLogo({ className, size = 48, animated = false }: InlineS
         </linearGradient>
       </defs>
       
-      {/* Outer Rotating Ring - Only animates if animated prop is true */}
-      <g 
-        className={cn('origin-center', animated && 'animate-spin-logo')} 
-        style={{ transformOrigin: '50% 50%' }}
-      >
+      {/* Outer Rotating Ring - Always rotates */}
+      <g className="origin-center animate-spin-logo" style={{ transformOrigin: '50% 50%' }}>
         <circle cx="50" cy="50" r="45" stroke="#333" strokeWidth="1" fill="none" strokeDasharray="10 15" opacity="0.8" />
         <circle cx="50" cy="50" r="45" stroke="url(#logo-grad-cyan)" strokeWidth="1" fill="none" strokeDasharray="20 70" opacity="1" />
       </g>
