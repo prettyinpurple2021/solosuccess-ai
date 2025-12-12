@@ -1,6 +1,6 @@
 import NextAuth from "next-auth"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
-import { db } from "@/db"
+import { db, getDb } from "@/db"
 import { users, accounts, sessions, verificationTokens } from "@/db/schema"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
@@ -12,12 +12,22 @@ import { authConfig } from "@/auth.config"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  // Use getDb() to bypass the Proxy issues, fallback to mock/null for build time
+  adapter: (() => {
+    try {
+      return DrizzleAdapter(getDb(), {
+        usersTable: users,
+        accountsTable: accounts,
+        sessionsTable: sessions,
+        verificationTokensTable: verificationTokens,
+      })
+    } catch (e) {
+      // During build time or if DB is not available, return a partial/mock adapter
+      // This prevents the "Unsupported database type" error from crashing the build
+      console.warn("Database not available for NextAuth adapter initialization (likely build time).")
+      return undefined
+    }
+  })(),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
