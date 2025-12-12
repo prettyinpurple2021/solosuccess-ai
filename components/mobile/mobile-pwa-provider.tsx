@@ -42,7 +42,7 @@ interface MobilePWAProviderProps {
 
 export function MobilePWAProvider({ children, className = "" }: MobilePWAProviderProps) {
   const [isInstalled, setIsInstalled] = useState(false)
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [isOnline, setIsOnline] = useState(true)
   const [canInstall, setCanInstall] = useState(false)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)

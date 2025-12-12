@@ -57,7 +57,7 @@ const OfflineDataManager = React.forwardRef<OfflineDataManagerRef, OfflineDataMa
   onSyncError
 }, ref) => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
-    isOnline: navigator.onLine,
+    isOnline: true, // Default to true for SSR, update on mount
     isSyncing: false,
     lastSync: null,
     pendingActions: 0,
