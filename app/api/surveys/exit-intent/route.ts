@@ -41,8 +41,8 @@ export async function GET(req: NextRequest) {
   try {
     const sql = getSql()
     if (!sql) {
-      logError('DATABASE_URL missing or Neon client init failed for exit-intent GET')
-      return NextResponse.json({ error: 'Database unavailable', canShow: false, status: null }, { status: 503 })
+      // Fail gracefully if DB is not configured (e.g. build time or missing env)
+      return NextResponse.json({ status: null, canShow: true })
     }
     const userId = await getUserIdFromToken(req)
 
@@ -72,8 +72,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ status, canShow })
   } catch (error) {
-    logError('Survey status check error:', { error })
-    return NextResponse.json({ error: 'Server error', canShow: false, status: null }, { status: 500 })
+    // Log but fail open so the user isn't bothered by a console error
+    logError('Survey status check error (handled):', { error })
+    return NextResponse.json({ status: null, canShow: true })
   }
 }
 
