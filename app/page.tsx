@@ -1,261 +1,208 @@
 'use client'
 
-// export const dynamic = 'force-dynamic' // Removed for static optimization
-
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { NeuralNetworkCanvas } from '@/components/cyber/NeuralNetworkCanvas'
-import { UIOverlayLines } from '@/components/cyber/UIOverlayLines'
-import { CyberNav } from '@/components/cyber/CyberNav'
-import { CyberFooter } from '@/components/cyber/CyberFooter'
-import { CyberButton } from '@/components/cyber/CyberButton'
-import { Server, Lock, Zap, Crosshair, Brain, Building2 } from 'lucide-react'
+import { Server, Zap, Brain, ChevronRight } from 'lucide-react'
 
-const heroStats = [
-  { label: 'Active Nodes', value: '10k+' },
-  { label: 'Tasks Executed', value: '500k+' },
-  { label: 'System Uptime', value: '99.9%' },
-]
+// --- Types & Interfaces ---
+interface HudMetricProps {
+  label: string
+  value: string
+  status: 'active' | 'stabilizing' | 'offline'
+  pcolor: string
+}
 
-const modules = [
-  { id: '01', title: 'Central Neural Hub', description: '8 specialized autonomous agents ready for input. Centralized control for all data streams.', icon: Server },
-  { id: '02', title: 'Quantum-Grade Encryption', description: 'Advanced security protocols. Your proprietary data is secured behind layers of digital armor.', icon: Lock },
-  { id: '03', title: 'Instant Implementation', description: 'Launch protocols in under 60 seconds. Zero latency. Instant execution of business logic.', icon: Zap },
-  { id: '04', title: 'Algorithmic Targeting', description: 'Hit business objectives with calculated accuracy. Eliminate wasted compute and effort.', icon: Crosshair },
-  { id: '05', title: 'Predictive Analytics', description: 'Real-time market intelligence streams. Analyze the dataset clearly before you execute.', icon: Brain },
-  { id: '06', title: 'Ecosystem Scaling', description: 'Scale from single node to full network seamlessly. The system adapts as you expand.', icon: Building2 },
-]
+// --- Components ---
 
-const tiers = [
-  {
-    id: 'core',
-    title: 'CORE_ACCESS',
-    price: 'FREE',
-    subtitle: 'No Validation Required',
-    bullets: ['Basic Agent Access', 'Neural Hub Lite', 'Network Support'],
-    href: '/signup',
-    accent: 'cyan',
-    badge: null,
-  },
-  {
-    id: 'pro',
-    title: 'ARCHITECT_PRO',
-    price: 'SCALE',
-    subtitle: 'Full System Suite',
-    bullets: ['8 Specialized Agents', 'Unlimited Processes', 'Priority Data Streams', 'Quantum Encryption+'],
-    href: '/signup',
-    accent: 'purple',
-    badge: 'RECOMMENDED',
-  },
-]
+const HudMetric = ({ label, value, status, pcolor }: HudMetricProps) => (
+  <div className="space-y-1 font-mono text-xs tracking-wider">
+    <div className="flex justify-between items-end text-[#8892b0]">
+      <span>{label}</span>
+      <span className={status === 'active' ? 'text-[#00F0FF]' : 'text-[#BC13FE]'}>
+        {value}
+      </span>
+    </div>
+    <div className="h-1 w-full bg-[#1a1b26] relative overflow-hidden">
+      <div 
+        className={`absolute top-0 left-0 h-full ${pcolor === 'cyan' ? 'bg-[#00F0FF]' : 'bg-[#BC13FE]'}`} 
+        style={{ width: status === 'active' ? '100%' : '60%' }}
+      >
+        {status === 'stabilizing' && (
+          <div className="absolute inset-0 bg-white/30 animate-[shimmer_1s_infinite]" />
+        )}
+      </div>
+    </div>
+  </div>
+)
 
-const fadeIn = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.2 },
-  transition: { duration: 0.6, ease: 'easeOut' },
+const BracketCorner = ({ position }: { position: string }) => {
+  const styles = {
+    'tl': 'top-0 left-0 border-t-2 border-l-2',
+    'tr': 'top-0 right-0 border-t-2 border-r-2',
+    'bl': 'bottom-0 left-0 border-b-2 border-l-2',
+    'br': 'bottom-0 right-0 border-b-2 border-r-2',
+  }
+  return (
+    <div className={`absolute w-3 h-3 border-[#00F0FF] ${styles[position as keyof typeof styles]}`} />
+  )
 }
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-cyber-black relative overflow-hidden text-gray-100">
-      <NeuralNetworkCanvas particleCount={50} connectionDistance={170} mouseDistance={240} />
-      <UIOverlayLines />
-
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,240,255,0.08),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(255,0,183,0.08),transparent_35%),radial-gradient(circle_at_50%_70%,rgba(0,240,255,0.06),transparent_45%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(0,240,255,0.05),rgba(255,0,183,0.08),rgba(0,240,255,0.05))]" />
+    <main className="min-h-screen bg-[#020204] relative overflow-hidden flex flex-col items-center justify-center selection:bg-[#00F0FF] selection:text-black">
+      {/* 1. Global Background Effects */}
+      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
+        <NeuralNetworkCanvas particleCount={60} connectionDistance={150} mouseDistance={200} />
       </div>
+      
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none opacity-20" />
 
-      <CyberNav />
+      {/* Main Content Container */}
+      <div className="relative z-10 w-full max-w-[1200px] px-6 lg:px-8 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-[calc(100vh-80px)] pt-20 lg:pt-0">
+        
+        {/* --- LEFT COLUMN: CONTENT --- */}
+        <motion.div 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="space-y-8 text-center lg:text-left order-2 lg:order-1"
+        >
+          {/* Headline */}
+          <div className="space-y-2">
+            <div className="inline-block px-3 py-1 mb-4 border border-[#00F0FF]/30 bg-[#00F0FF]/5 rounded-sm">
+              <span className="font-mono text-[10px] text-[#00F0FF] tracking-[0.2em] uppercase flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#00F0FF] rounded-full animate-pulse" />
+                System initialized
+              </span>
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-sci tracking-tight leading-none text-white">
+              YOUR AI <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] to-[#BC13FE] animate-pulse">
+                CO-FOUNDER
+              </span>
+            </h1>
+          </div>
 
-      <main className="relative z-10">
-        <section className="pt-28 lg:pt-32 pb-20">
-          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1.08fr,0.92fr] gap-12 items-center">
-            <motion.div {...fadeIn} className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 border border-cyber-cyan/40 bg-cyber-cyan/10 uppercase tracking-[0.25em] text-[11px] text-cyber-cyan">
-                <span className="w-1.5 h-1.5 bg-cyber-cyan rounded-full animate-pulse" aria-hidden="true" />
-                Neural Link Established
+          {/* Subtext */}
+          <p className="text-[#8892b0] text-lg md:text-xl max-w-[500px] mx-auto lg:mx-0 leading-relaxed font-sans">
+            Deploy an autonomous workforce. Scale your operations with a neural network of specialized AI agents working 24/7.
+          </p>
+
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+            <Link href="/register">
+              <button className="group relative px-8 py-3 bg-transparent border border-[#00F0FF] text-[#00F0FF] font-sci tracking-widest uppercase text-sm transition-all hover:bg-[#00F0FF]/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+                <span className="relative z-10">Initialize_Core</span>
+              </button>
+            </Link>
+            
+            <Link href="/about">
+              <button className="group px-8 py-3 bg-transparent text-white font-sci tracking-widest uppercase text-sm border border-transparent hover:border-white/20 transition-all opacity-70 hover:opacity-100">
+                System_Overview
+              </button>
+            </Link>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/5 mt-8">
+            {[
+              { label: 'Active Nodes', value: '10K+' },
+              { label: 'Uptime', value: '99.9%' },
+              { label: 'Tasks', value: '500K+' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center lg:text-left">
+                <div className="text-2xl font-mono text-white mb-1">{stat.value}</div>
+                <div className="text-[10px] text-[#8892b0] uppercase tracking-widest font-mono">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* --- RIGHT COLUMN: HUD VISUAL --- */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="order-1 lg:order-2 w-full max-w-md mx-auto lg:max-w-full"
+        >
+          {/* HUD Container */}
+          <div className="relative bg-[#020204]/80 border border-[#00F0FF]/50 p-6 md:p-8 backdrop-blur-sm shadow-[0_0_30px_rgba(0,240,255,0.15)] group hover:border-[#00F0FF] transition-colors duration-500">
+            
+            {/* Corner Accents */}
+            <BracketCorner position="tl" />
+            <BracketCorner position="tr" />
+            <BracketCorner position="bl" />
+            <BracketCorner position="br" />
+
+            {/* Header */}
+            <div className="flex justify-between items-center mb-8 border-b border-[#00F0FF]/20 pb-4">
+              <div className="font-mono text-xs text-[#00F0FF] tracking-[0.2em] flex items-center gap-2">
+                <Server size={14} />
+                <span>TERMINAL_01</span>
+              </div>
+              <div className="flex gap-1">
+                <div className="w-2 h-2 bg-[#00F0FF] rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-[#00F0FF]/30 rounded-full" />
+                <div className="w-2 h-2 bg-[#00F0FF]/30 rounded-full" />
+              </div>
+            </div>
+
+            {/* Main Visual Content */}
+            <div className="space-y-6">
+              <div className="text-center py-6 relative">
+                 <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                    <Brain size={120} className="text-[#BC13FE] animate-pulse" />
+                 </div>
+                 <h3 className="relative z-10 font-mono text-lg text-white mb-1 tracking-widest">
+                   OBJECTIVE:
+                 </h3>
+                 <p className="relative z-10 font-sci text-2xl text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] via-white to-[#00F0FF] font-bold">
+                   MARKET SINGULARITY
+                 </p>
               </div>
 
+              {/* Progress Bars */}
               <div className="space-y-4">
-                <h1 className="font-sci font-bold leading-[1.05] text-white text-5xl md:text-7xl">
-                  YOUR AI CO-
-                  <span className="block bg-gradient-to-r from-cyber-cyan via-white to-cyber-purple text-transparent bg-clip-text">
-                    CO-FOUNDER
-                  </span>
-                </h1>
-                <p className="text-lg md:text-xl text-gray-300 max-w-xl border-l-2 border-cyber-purple/70 pl-6">
-                  Upgrade your business infrastructure with autonomous intelligence. Automate your workflow, optimize your sector, and scale with algorithmic precision.
-                </p>
+                <HudMetric 
+                  label="DEDICATED AGENTS" 
+                  value="8/8 ONLINE" 
+                  status="active" 
+                  pcolor="cyan" 
+                />
+                <HudMetric 
+                  label="NEURAL SYNC" 
+                  value="STABILIZING..." 
+                  status="stabilizing" 
+                  pcolor="purple" 
+                />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                <Link href="#deploy">
-                  <CyberButton variant="secondary" size="lg" className="rounded-none">
-                    INITIALIZE_SYSTEM
-                  </CyberButton>
-                </Link>
-                <Link href="#features">
-                  <CyberButton variant="ghost" size="lg" className="rounded-none">
-                    VIEW_ARCHITECTURE
-                  </CyberButton>
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-8 pt-6">
-                {heroStats.map((stat) => (
-                  <div key={stat.label} className="space-y-1">
-                    <div className="text-3xl font-sci font-bold text-white">{stat.value}</div>
-                    <div className="text-[11px] uppercase tracking-[0.3em] text-cyber-cyan/80">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div {...fadeIn} transition={{ ...fadeIn.transition, delay: 0.1 }}>
-              <div className="relative border border-cyber-cyan/40 bg-cyber-dark/80 shadow-[0_0_30px_rgba(0,240,255,0.12)] p-8">
-                <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                  <span className="font-sci text-xs uppercase tracking-[0.25em] text-cyber-cyan">
-                    Objective: Market Singularity
-                  </span>
-                  <div className="w-7 h-7 rounded-full border border-cyber-purple/40 flex items-center justify-center">
-                    <div className="w-3 h-3 bg-cyber-cyan rounded-full" />
-                  </div>
-                </div>
-
-                <div className="space-y-5 mt-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-[11px] font-semibold uppercase tracking-[0.18em]">
-                      <span className="text-gray-300">Modules_Active</span>
-                      <span className="text-cyber-cyan">8/8 Online</span>
-                    </div>
-                    <div className="h-1.5 bg-white/5 overflow-hidden">
-                      <div className="h-full w-full bg-cyber-cyan shadow-[0_0_20px_rgba(0,240,255,0.35)]" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-[11px] font-semibold uppercase tracking-[0.18em]">
-                      <span className="text-gray-300">Scale_Velocity</span>
-                      <span className="text-cyber-purple">Stabilizing</span>
-                    </div>
-                    <div className="h-1.5 bg-white/5 overflow-hidden">
-                      <div className="h-full w-2/3 bg-gradient-to-r from-cyber-purple to-cyber-cyan animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mt-8">
-                  <div className="rounded-none bg-cyber-cyan/5 border border-cyber-cyan/30 p-3">
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-gray-400">Mode</div>
-                    <div className="font-sci text-lg text-white">Autonomous</div>
-                  </div>
-                  <div className="rounded-none bg-cyber-purple/5 border border-cyber-purple/30 p-3">
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-gray-400">Encryption</div>
-                    <div className="font-sci text-lg text-cyber-purple">Quantum</div>
-                  </div>
+              {/* Terminal Log Output */}
+              <div className="mt-6 p-3 bg-black/50 border border-white/5 font-mono text-[10px] text-[#8892b0] h-24 overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-[#020204]/90 pointer-events-none" />
+                <div className="space-y-1 opacity-70">
+                  <p><span className="text-[#00F0FF]">{'>'}</span> Initializing core protocols...</p>
+                  <p><span className="text-[#00F0FF]">{'>'}</span> Loading competitor_data.json...</p>
+                  <p><span className="text-[#00F0FF]">{'>'}</span> Optimizing neural pathways...</p>
+                  <p><span className="text-[#BC13FE]">{'>'}</span> Connection established.</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
+
           </div>
-        </section>
+        </motion.div>
 
-        <section id="features" className="py-20 relative">
-          <div className="absolute top-0 w-full h-px bg-gradient-to-r from-transparent via-cyber-cyan/50 to-transparent" />
-          <div className="max-w-7xl mx-auto px-6 space-y-10">
-            <div className="space-y-2">
-              <span className="text-cyber-purple font-sci text-sm tracking-[0.3em]">/// SYSTEM_CAPABILITIES</span>
-              <h2 className="text-4xl font-sci font-bold text-white">
-                NEURAL_MODULES <span className="text-cyber-cyan align-middle">_</span>
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {modules.map(({ id, title, description, icon: Icon }) => (
-                <div
-                  key={id}
-                  className="rounded-none border border-cyber-cyan/20 bg-cyber-dark/70 p-6 hover:border-cyber-cyan/60 transition-colors"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="font-sci text-2xl font-bold text-white/30">{id}</span>
-                    <Icon className="w-5 h-5 text-cyber-purple" aria-hidden="true" />
-                  </div>
-                  <h3 className="font-sci text-lg text-white mb-2">{title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="deploy" className="py-20">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="text-center mb-14 space-y-3">
-              <h2 className="text-3xl font-sci font-bold text-white">INITIALIZE SEQUENCE</h2>
-              <p className="text-cyber-cyan font-tech tracking-[0.28em] uppercase">
-                Join the network of autonomous founders.
-              </p>
-              <div className="w-24 h-1 bg-cyber-purple mx-auto shadow-[0_0_15px_#ff00b7]" />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {tiers.map((tier) => (
-                <div
-                  key={tier.id}
-                  className={`rounded-none border border-white/10 bg-cyber-dark/70 text-center relative overflow-hidden ${
-                    tier.id === 'pro' ? 'shadow-[0_0_25px_rgba(255,0,183,0.2)] border-cyber-purple/40' : ''
-                  }`}
-                >
-                  {tier.badge ? (
-                    <div className="absolute top-0 right-0 bg-cyber-purple text-white text-[10px] font-bold px-3 py-1 font-sci tracking-[0.2em]">
-                      {tier.badge}
-                    </div>
-                  ) : null}
-
-                  <h3 className={`font-sci text-xl ${tier.accent === 'purple' ? 'text-cyber-purple' : 'text-cyber-cyan'}`}>
-                    {tier.title}
-                  </h3>
-                  <div className="text-4xl font-sci font-bold text-white mt-4 mb-2">{tier.price}</div>
-                  <span
-                    className={`text-xs font-tech uppercase tracking-[0.25em] mb-8 block ${
-                      tier.accent === 'purple' ? 'text-cyber-purple' : 'text-cyber-cyan'
-                    }`}
-                  >
-                    {tier.subtitle}
-                  </span>
-
-                  <ul className="space-y-3 mb-8 text-sm font-tech text-gray-300 text-left max-w-xs mx-auto">
-                    {tier.bullets.map((bullet) => (
-                      <li key={bullet} className="flex items-center gap-2">
-                        <span
-                          className={`${tier.accent === 'purple' ? 'text-cyber-purple' : 'text-cyber-cyan'} text-base leading-none`}
-                          aria-hidden="true"
-                        >
-                          {'>>'}
-                        </span>
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link href={tier.href}>
-                    <CyberButton
-                      variant={tier.id === 'pro' ? 'primary' : 'secondary'}
-                      size="md"
-                      className="rounded-none px-8"
-                    >
-                      {tier.id === 'pro' ? 'Full Upgrade' : 'Start Sequence'}
-                    </CyberButton>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <CyberFooter />
-    </div>
+      </div>
+    </main>
   )
 }
