@@ -52,13 +52,14 @@ export default function LandingPage() {
             >
               Initialize
             </Link>
-            <Link href="/signin">
-              <button className="relative px-6 py-2 overflow-hidden group bg-transparent border border-cyber-purple/50">
-                <span className="absolute w-0 h-full bg-cyber-purple left-0 top-0 transition-all duration-300 group-hover:w-full opacity-20" />
-                <span className="font-sci text-xs font-bold text-cyber-purple tracking-widest group-hover:text-white relative z-10">
-                  USER_LOGIN
-                </span>
-              </button>
+            <Link 
+              href="/signin"
+              className="relative px-6 py-2 overflow-hidden group bg-transparent border border-cyber-purple/50 inline-block"
+            >
+              <span className="absolute w-0 h-full bg-cyber-purple left-0 top-0 transition-all duration-300 group-hover:w-full opacity-20" />
+              <span className="font-sci text-xs font-bold text-cyber-purple tracking-widest group-hover:text-white relative z-10">
+                USER_LOGIN
+              </span>
             </Link>
           </div>
         </div>
@@ -304,10 +305,11 @@ export default function LandingPage() {
                 </li>
               </ul>
 
-              <Link href="/register" className="w-full">
-                <button className="w-full py-3 border border-gray-600 hover:border-cyber-cyan text-white font-sci text-sm font-bold uppercase transition-colors">
-                  Start Sequence
-                </button>
+              <Link 
+                href="/register" 
+                className="w-full py-3 border border-gray-600 hover:border-cyber-cyan text-white font-sci text-sm font-bold uppercase transition-colors block text-center"
+              >
+                Start Sequence
               </Link>
             </div>
 
@@ -338,10 +340,11 @@ export default function LandingPage() {
                 </li>
               </ul>
 
-              <Link href="/register" className="w-full">
-                <button className="w-full py-3 bg-cyber-purple/20 border border-cyber-purple hover:bg-cyber-purple hover:text-white text-cyber-purple font-sci text-sm font-bold uppercase transition-all shadow-[0_0_15px_rgba(189,0,255,0.2)]">
-                  Full Upgrade
-                </button>
+              <Link 
+                href="/register" 
+                className="w-full py-3 bg-cyber-purple/20 border border-cyber-purple hover:bg-cyber-purple hover:text-white text-cyber-purple font-sci text-sm font-bold uppercase transition-all shadow-[0_0_15px_rgba(189,0,255,0.2)] block text-center"
+              >
+                Full Upgrade
               </Link>
             </div>
           </div>
