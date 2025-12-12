@@ -1,244 +1,366 @@
-import Link from "next/link"
-import { Button} from "@/components/ui/button"
+'use client'
+
+import Link from 'next/link'
+import { NeuralNetworkCanvas } from '@/components/cyber/NeuralNetworkCanvas'
+import { UIOverlayLines } from '@/components/cyber/UIOverlayLines'
+import { InlineSSLogo } from '@/components/cyber/InlineSSLogo'
+import { 
+  FaServer, 
+  FaLock, 
+  FaBolt, 
+  FaCrosshairs, 
+  FaBrain,
+  FaCity 
+} from 'react-icons/fa'
 
 // Avoid static prerender failures when feature-flag SDK keys are absent in build envs
 export const dynamic = 'force-dynamic'
 
-export default function SimpleLandingPage() {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
-      {/* Hero Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto text-center">
-          <div className="mb-6 inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-full">
-            🚀 AI-Powered Productivity Revolution
+    <div className="min-h-screen bg-cyber-black text-gray-300 font-tech overflow-x-hidden relative">
+      {/* Canvas Background */}
+      <NeuralNetworkCanvas particleCount={60} connectionDistance={150} mouseDistance={200} />
+
+      {/* UI Overlay Lines */}
+      <UIOverlayLines />
+
+      {/* Navigation */}
+      <nav className="fixed w-full z-50 top-0 bg-cyber-black/80 backdrop-blur-md border-b border-cyber-cyan/20">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <InlineSSLogo size={48} animated={true} />
+            <div className="flex flex-col">
+              <span className="font-sci font-bold text-xl tracking-widest text-white">
+                SOLO<span className="text-cyber-cyan">SUCCESS</span>.AI
+              </span>
+              <span className="text-[10px] text-cyber-purple tracking-[0.3em] uppercase">
+                System: Operational
+              </span>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            Become the Ultimate
-            <br />
-            <span className="text-5xl md:text-7xl">SoloSuccess</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Transform your productivity with AI agents that work 24/7. Automate everything, achieve more, and dominate
-            your industry like never before.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-10">
-            <Link href="/signup">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-3"
-              >
-                Start Your Empire
-              </Button>
+          <div className="hidden md:flex items-center gap-8">
+            <Link 
+              href="#features" 
+              className="text-sm font-bold uppercase tracking-widest hover:text-cyber-cyan transition-colors text-gray-400"
+            >
+              Core_Functions
             </Link>
-            <Link href="/auth-example">
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-8 py-3 border-pink-300 dark:border-purple-600 bg-transparent"
-              >
-                Learn More
-              </Button>
+            <Link 
+              href="#deploy" 
+              className="text-sm font-bold uppercase tracking-widest hover:text-cyber-cyan transition-colors text-gray-400"
+            >
+              Initialize
             </Link>
+            <Link href="/signin">
+              <button className="relative px-6 py-2 overflow-hidden group bg-transparent border border-cyber-purple/50">
+                <span className="absolute w-0 h-full bg-cyber-purple left-0 top-0 transition-all duration-300 group-hover:w-full opacity-20" />
+                <span className="font-sci text-xs font-bold text-cyber-purple tracking-widest group-hover:text-white relative z-10">
+                  USER_LOGIN
+                </span>
+              </button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="relative pt-32 pb-20 lg:min-h-screen flex items-center z-10">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Hero Text */}
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 border border-cyber-cyan/30 bg-cyber-cyan/5 rounded-none">
+              <span className="w-1.5 h-1.5 bg-cyber-cyan rounded-full animate-ping" />
+              <span className="text-xs font-bold tracking-widest text-cyber-cyan uppercase">
+                Neural Link Established ⚡
+              </span>
+            </div>
+
+            <h1 className="font-sci text-5xl md:text-7xl font-bold leading-tight text-white glitch-text" data-text="YOUR AI CO-FOUNDER">
+              YOUR AI <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-white to-cyber-purple">
+                CO-FOUNDER
+              </span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-gray-400 max-w-lg border-l-2 border-cyber-purple pl-6">
+              Upgrade your business infrastructure with autonomous intelligence. Automate your workflow, optimize your sector, and scale with algorithmic precision.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Link href="#deploy" className="group relative px-8 py-4 bg-cyber-cyan/10 border border-cyber-cyan overflow-hidden">
+                <div className="absolute inset-0 w-0 bg-cyber-cyan transition-all duration-[250ms] ease-out group-hover:w-full opacity-20" />
+                <span className="relative font-sci font-bold tracking-widest text-cyber-cyan group-hover:text-white">
+                  INITIALIZE_SYSTEM
+                </span>
+              </Link>
+              <Link href="#features" className="group relative px-8 py-4 border border-gray-600 hover:border-cyber-purple overflow-hidden">
+                <span className="relative font-sci font-bold tracking-widest text-gray-300 group-hover:text-cyber-purple">
+                  VIEW_ARCHITECTURE
+                </span>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-8 pt-8 opacity-70">
+              <div>
+                <div className="text-2xl font-sci font-bold text-white">10k+</div>
+                <div className="text-[10px] uppercase tracking-widest text-cyber-cyan">Active Nodes</div>
+              </div>
+              <div>
+                <div className="text-2xl font-sci font-bold text-white">500k+</div>
+                <div className="text-[10px] uppercase tracking-widest text-cyber-cyan">Tasks Executed</div>
+              </div>
+              <div>
+                <div className="text-2xl font-sci font-bold text-white">99.9%</div>
+                <div className="text-[10px] uppercase tracking-widest text-cyber-cyan">System Uptime</div>
+              </div>
+            </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-pink-600 dark:text-pink-400">300%</div>
-              <div className="text-gray-600 dark:text-gray-300">Productivity Increase</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400">50K+</div>
-              <div className="text-gray-600 dark:text-gray-300">Active Users</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">$2M+</div>
-              <div className="text-gray-600 dark:text-gray-300">Revenue Generated</div>
+          {/* Hero Graphic (3D HUD Element) */}
+          <div className="relative hidden lg:block">
+            {/* Outer Ring */}
+            <div className="absolute inset-0 border border-dashed border-cyber-cyan/20 rounded-full animate-spin-slow" />
+            {/* Inner Ring */}
+            <div className="absolute inset-10 border border-cyber-purple/20 rounded-full animate-spin-slow" style={{ animationDirection: 'reverse' }} />
+            
+            <div className="relative bg-cyber-dark/80 backdrop-blur-xl border border-cyber-cyan/30 p-1">
+              {/* Decorative Corners */}
+              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyber-cyan" />
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-cyber-cyan" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-cyber-cyan" />
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyber-cyan" />
+
+              {/* Inner Content */}
+              <div className="p-8 space-y-6">
+                <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                  <span className="font-sci text-xs text-cyber-cyan">OBJECTIVE: MARKET SINGULARITY</span>
+                  {/* SVG Mini Logo in Dashboard */}
+                  <svg viewBox="0 0 100 100" className="w-6 h-6 animate-pulse">
+                    <circle cx="50" cy="50" r="40" stroke="#bd00ff" strokeWidth="4" fill="none" />
+                    <circle cx="50" cy="50" r="20" fill="#00f3ff" />
+                  </svg>
+                </div>
+                
+                {/* Progress Bars */}
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-1">
+                      <span>MODULES_ACTIVE</span>
+                      <span className="text-cyber-cyan">8/8 ONLINE</span>
+                    </div>
+                    <div className="h-1 bg-gray-800 w-full overflow-hidden">
+                      <div className="h-full bg-cyber-cyan w-full shadow-[0_0_10px_#00f3ff]" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-1">
+                      <span>SCALE_VELOCITY</span>
+                      <span className="text-cyber-purple">CALCULATING...</span>
+                    </div>
+                    <div className="h-1 bg-gray-800 w-full overflow-hidden">
+                      <div className="h-full bg-cyber-purple w-2/3 animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Data Grid */}
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  <div className="bg-cyber-cyan/5 p-3 border border-cyber-cyan/10">
+                    <div className="text-[10px] text-gray-500">MODE</div>
+                    <div className="font-sci text-sm">AUTONOMOUS</div>
+                  </div>
+                  <div className="bg-cyber-purple/5 p-3 border border-cyber-purple/10">
+                    <div className="text-[10px] text-gray-500">ENCRYPTION</div>
+                    <div className="font-sci text-sm text-cyber-purple">QUANTUM</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-white/50 dark:bg-slate-800/50">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Supercharge Your Success
+      <div id="features" className="py-24 relative z-10">
+        <div className="absolute top-0 w-full h-px bg-gradient-to-r from-transparent via-cyber-cyan/50 to-transparent" />
+        
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="mb-16">
+            <span className="text-cyber-purple font-sci text-sm tracking-widest">/// SYSTEM_CAPABILITIES</span>
+            <h2 className="text-4xl font-sci font-bold text-white mt-2">
+              NEURAL_MODULES <span className="text-cyber-cyan blinking">_</span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Our AI-powered platform gives you everything you need to dominate your market and achieve unprecedented
-              growth.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "AI-Powered Productivity",
-                description: "Leverage cutting-edge AI to automate tasks, generate insights, and boost your efficiency by 300%.",
-              },
-              {
-                title: "Goal Achievement System",
-                description: "Set, track, and crush your goals with our intelligent goal-setting framework and progress analytics.",
-              },
-              {
-                title: "Instant Automation",
-                description: "Automate repetitive tasks and workflows with our no-code automation engine.",
-              },
-              {
-                title: "Performance Analytics",
-                description: "Get detailed insights into your productivity patterns and optimize your workflow.",
-              },
-              {
-                title: "Team Collaboration",
-                description: "Seamlessly collaborate with your team using our advanced collaboration tools.",
-              },
-              {
-                title: "Enterprise Security",
-                description: "Bank-level security with end-to-end encryption and compliance certifications.",
-              },
-            ].map((feature, index) => (
-              <div key={index} className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md border border-pink-200 dark:border-purple-800">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Card 1 */}
+            <div className="hud-border p-6 group cursor-pointer">
+              <div className="flex justify-between items-start mb-4">
+                <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">01</span>
+                <FaServer className="text-cyber-purple text-xl" />
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <h3 className="font-sci text-lg text-white mb-2">Central Neural Hub</h3>
+              <p className="text-sm text-gray-400 font-tech leading-relaxed">
+                8 specialized autonomous agents ready for input. Centralized control for all data streams.
+              </p>
+            </div>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Ready to Become a SoloSuccess?
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of
-            productivity.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/signup">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-lg px-8 py-4"
-              >
-                Start for free
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-lg px-8 py-4 border-pink-300 dark:border-purple-600 bg-transparent"
-              >
-                Contact Us
-              </Button>
-            </Link>
+            {/* Card 2 */}
+            <div className="hud-border p-6 group cursor-pointer">
+              <div className="flex justify-between items-start mb-4">
+                <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">02</span>
+                <FaLock className="text-cyber-purple text-xl" />
+              </div>
+              <h3 className="font-sci text-lg text-white mb-2">Quantum-Grade Encryption</h3>
+              <p className="text-sm text-gray-400 font-tech leading-relaxed">
+                Advanced security protocols. Your proprietary data is secured behind layers of digital armor.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="hud-border p-6 group cursor-pointer">
+              <div className="flex justify-between items-start mb-4">
+                <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">03</span>
+                <FaBolt className="text-cyber-purple text-xl" />
+              </div>
+              <h3 className="font-sci text-lg text-white mb-2">Instant Implementation</h3>
+              <p className="text-sm text-gray-400 font-tech leading-relaxed">
+                Launch protocols in under 60 seconds. Zero latency. Instant execution of business logic.
+              </p>
+            </div>
+
+            {/* Card 4 */}
+            <div className="hud-border p-6 group cursor-pointer">
+              <div className="flex justify-between items-start mb-4">
+                <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">04</span>
+                <FaCrosshairs className="text-cyber-purple text-xl" />
+              </div>
+              <h3 className="font-sci text-lg text-white mb-2">Algorithmic Targeting</h3>
+              <p className="text-sm text-gray-400 font-tech leading-relaxed">
+                Hit business objectives with calculated accuracy. Eliminate wasted compute and effort.
+              </p>
+            </div>
+
+            {/* Card 5 */}
+            <div className="hud-border p-6 group cursor-pointer">
+              <div className="flex justify-between items-start mb-4">
+                <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">05</span>
+                <FaBrain className="text-cyber-purple text-xl" />
+              </div>
+              <h3 className="font-sci text-lg text-white mb-2">Predictive Analytics</h3>
+              <p className="text-sm text-gray-400 font-tech leading-relaxed">
+                Real-time market intelligence streams. Analyze the dataset clearly before you execute.
+              </p>
+            </div>
+
+            {/* Card 6 */}
+            <div className="hud-border p-6 group cursor-pointer">
+              <div className="flex justify-between items-start mb-4">
+                <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">06</span>
+                <FaCity className="text-cyber-purple text-xl" />
+              </div>
+              <h3 className="font-sci text-lg text-white mb-2">Ecosystem Scaling</h3>
+              <p className="text-sm text-gray-400 font-tech leading-relaxed">
+                Scale from single node to full network seamlessly. The system adapts as you expand.
+              </p>
+            </div>
+
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Deployment / Pricing Section */}
+      <div id="deploy" className="py-24 relative z-10">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-sci font-bold text-white">INITIALIZE SEQUENCE</h2>
+            <p className="text-cyber-cyan mt-2 font-tech tracking-widest uppercase">
+              Join the network of autonomous founders.
+            </p>
+            <div className="w-24 h-1 bg-cyber-purple mx-auto mt-4 shadow-[0_0_15px_#bd00ff]" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Free Tier */}
+            <div className="hud-border p-8 flex flex-col items-center text-center">
+              <h3 className="font-sci text-xl text-gray-400">CORE_ACCESS</h3>
+              <div className="text-4xl font-sci font-bold text-white mt-4 mb-2">FREE</div>
+              <span className="text-xs font-tech text-cyber-cyan uppercase tracking-widest mb-8">
+                No Validation Required
+              </span>
+              
+              <ul className="space-y-3 mb-8 text-sm font-tech text-gray-400 w-full text-left pl-8">
+                <li className="flex items-center">
+                  <span className="text-cyber-cyan mr-2">&gt;&gt;</span> Basic Agent Access
+                </li>
+                <li className="flex items-center">
+                  <span className="text-cyber-cyan mr-2">&gt;&gt;</span> Neural Hub Lite
+                </li>
+                <li className="flex items-center">
+                  <span className="text-cyber-cyan mr-2">&gt;&gt;</span> Network Support
+                </li>
+              </ul>
+
+              <Link href="/register" className="w-full">
+                <button className="w-full py-3 border border-gray-600 hover:border-cyber-cyan text-white font-sci text-sm font-bold uppercase transition-colors">
+                  Start Sequence
+                </button>
+              </Link>
+            </div>
+
+            {/* Pro Tier */}
+            <div className="hud-border p-8 flex flex-col items-center text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-cyber-purple text-white text-[10px] font-bold px-3 py-1 font-sci">
+                RECOMMENDED
+              </div>
+              
+              <h3 className="font-sci text-xl text-cyber-purple">ARCHITECT_PRO</h3>
+              <div className="text-4xl font-sci font-bold text-white mt-4 mb-2">SCALE</div>
+              <span className="text-xs font-tech text-cyber-purple uppercase tracking-widest mb-8">
+                Full System Suite
+              </span>
+              
+              <ul className="space-y-3 mb-8 text-sm font-tech text-gray-300 w-full text-left pl-8">
+                <li className="flex items-center">
+                  <span className="text-cyber-purple mr-2">&gt;&gt;</span> 8 Specialized Agents
+                </li>
+                <li className="flex items-center">
+                  <span className="text-cyber-purple mr-2">&gt;&gt;</span> Unlimited Processes
+                </li>
+                <li className="flex items-center">
+                  <span className="text-cyber-purple mr-2">&gt;&gt;</span> Priority Data Streams
+                </li>
+                <li className="flex items-center">
+                  <span className="text-cyber-purple mr-2">&gt;&gt;</span> Quantum Encryption+
+                </li>
+              </ul>
+
+              <Link href="/register" className="w-full">
+                <button className="w-full py-3 bg-cyber-purple/20 border border-cyber-purple hover:bg-cyber-purple hover:text-white text-cyber-purple font-sci text-sm font-bold uppercase transition-all shadow-[0_0_15px_rgba(189,0,255,0.2)]">
+                  Full Upgrade
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg"></div>
-                <span className="text-xl font-bold">SoloSuccess AI</span>
-              </div>
-              <p className="text-gray-400">Empowering entrepreneurs with AI-powered productivity tools.</p>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="#features" className="hover:text-white transition-colors">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/pricing" className="hover:text-white transition-colors">
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/help" className="hover:text-white transition-colors">
-                    API
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/features" className="hover:text-white transition-colors">
-                    Integrations
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/about" className="hover:text-white transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog" className="hover:text-white transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-white transition-colors">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/help" className="hover:text-white transition-colors">
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/help" className="hover:text-white transition-colors">
-                    Documentation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/community" className="hover:text-white transition-colors">
-                    Community
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/status" className="hover:text-white transition-colors">
-                    Status
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="h-px bg-gray-800 my-8"></div>
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">© 2024 SoloSuccess AI. All rights reserved.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">
-                Cookies
-              </Link>
-            </div>
-          </div>
+      <footer className="border-t border-white/5 bg-black py-12 relative z-10 text-center">
+        {/* Footer Logo */}
+        <div className="flex justify-center mb-6">
+          <InlineSSLogo size={48} animated={false} />
         </div>
+        <p className="font-tech text-gray-500 text-sm">
+          SYSTEM STATUS: ONLINE <br />
+          © 2025 SoloSuccess AI. All rights reserved. <br />
+          <span className="text-[10px] text-cyber-dim mt-2 block">
+            ENCHANTED NIGHTMARE INDUSTRIES
+          </span>
+        </p>
       </footer>
     </div>
   )

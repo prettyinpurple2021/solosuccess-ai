@@ -60,13 +60,13 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // Cyberpunk Futuristic Brand Colors (from SS logo)
+        // Cyberpunk Futuristic Brand Colors (matching index.html exactly)
         cyber: {
-          black: '#04060c',
-          dark: '#0a1020',
-          cyan: '#00f0ff',
-          purple: '#ff00b7',
-          dim: 'rgba(0, 240, 255, 0.12)',
+          black: '#020005',
+          dark: '#0a0514',
+          cyan: '#00f3ff',
+          purple: '#bd00ff',
+          dim: 'rgba(0, 243, 255, 0.1)',
         },
         brand: {
           cyan: '#00f0ff',
