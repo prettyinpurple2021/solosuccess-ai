@@ -96,8 +96,8 @@ export const authenticators = pgTable(
 
 // User Settings table
 export const userSettings = pgTable('user_settings', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   category: varchar('category', { length: 100 }).notNull(), // e.g., 'processor', 'notifications'
   settings: jsonb('settings').default('{}'),
   updated_at: timestamp('updated_at').defaultNow(),
@@ -116,8 +116,8 @@ export const userSettingsRelations = relations(userSettings, ({ one }) => ({
 
 // Briefcase/Projects table
 export const briefcases = pgTable('briefcases', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   status: varchar('status', { length: 50 }).default('active'),
@@ -128,9 +128,9 @@ export const briefcases = pgTable('briefcases', {
 
 // Goals table
 export const goals = pgTable('goals', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  briefcase_id: integer('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  briefcase_id: text('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   status: varchar('status', { length: 50 }).default('pending'),
@@ -143,11 +143,11 @@ export const goals = pgTable('goals', {
 
 // Tasks table (enhanced)
 export const tasks = pgTable('tasks', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  goal_id: integer('goal_id').references(() => goals.id, { onDelete: 'cascade' }),
-  briefcase_id: integer('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
-  parent_task_id: integer('parent_task_id'),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  goal_id: text('goal_id').references(() => goals.id, { onDelete: 'cascade' }),
+  briefcase_id: text('briefcase_id').references(() => briefcases.id, { onDelete: 'cascade' }),
+  parent_task_id: text('parent_task_id'),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   status: varchar('status', { length: 50 }).default('pending'),
@@ -173,8 +173,8 @@ export const tasks = pgTable('tasks', {
 
 // Templates table
 export const templates = pgTable('templates', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   content: text('content').notNull(),
@@ -193,8 +193,8 @@ export const templates = pgTable('templates', {
 
 // Task Categories table
 export const taskCategories = pgTable('task_categories', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 100 }).notNull(),
   color: varchar('color', { length: 7 }).default('#8B5CF6'),
   icon: varchar('icon', { length: 50 }),
@@ -205,8 +205,8 @@ export const taskCategories = pgTable('task_categories', {
 
 // Competitors table
 export const competitors = pgTable('competitors', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   website: varchar('website', { length: 500 }),
   description: text('description'),
@@ -221,9 +221,9 @@ export const competitors = pgTable('competitors', {
 
 // Task Analytics table
 export const taskAnalytics = pgTable('task_analytics', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  task_id: integer('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  task_id: text('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
   action: varchar('action', { length: 50 }).notNull(),
   timestamp: timestamp('timestamp').defaultNow(),
   metadata: jsonb('metadata').default('{}'),
@@ -231,8 +231,8 @@ export const taskAnalytics = pgTable('task_analytics', {
 
 // Productivity Insights table
 export const productivityInsights = pgTable('productivity_insights', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   insight_type: varchar('insight_type', { length: 50 }).notNull(),
   date: timestamp('date', { mode: 'date' }).notNull(),
   metrics: jsonb('metrics').notNull(),
@@ -242,15 +242,15 @@ export const productivityInsights = pgTable('productivity_insights', {
 
 // Posts table (existing)
 export const posts = pgTable('posts', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
   title: varchar('title', { length: 255 }).notNull(),
   content: text('content').notNull().default(''),
 });
 
 // User Competitive Stats table for gamification
 export const userCompetitiveStats = pgTable('user_competitive_stats', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   competitors_monitored: integer('competitors_monitored').default(0),
   intelligence_gathered: integer('intelligence_gathered').default(0),
   alerts_processed: integer('alerts_processed').default(0),
@@ -266,8 +266,8 @@ export const userCompetitiveStats = pgTable('user_competitive_stats', {
 
 // Competitor Profiles table
 export const competitorProfiles = pgTable('competitor_profiles', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   domain: varchar('domain', { length: 255 }),
   description: text('description'),
@@ -299,9 +299,9 @@ export const competitorProfiles = pgTable('competitor_profiles', {
 
 // Intelligence Data table
 export const intelligenceData = pgTable('intelligence_data', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  competitor_id: text('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   source_type: varchar('source_type', { length: 50 }).notNull(),
   source_url: varchar('source_url', { length: 1000 }),
   data_type: varchar('data_type', { length: 100 }).notNull(),
@@ -328,10 +328,10 @@ export const intelligenceData = pgTable('intelligence_data', {
 
 // Competitor Alerts table
 export const competitorAlerts = pgTable('competitor_alerts', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  intelligence_id: integer('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  competitor_id: text('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  intelligence_id: text('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
   alert_type: varchar('alert_type', { length: 100 }).notNull(),
   severity: varchar('severity', { length: 20 }).notNull().default('info'),
   title: varchar('title', { length: 255 }).notNull(),
@@ -356,9 +356,9 @@ export const competitorAlerts = pgTable('competitor_alerts', {
 
 // Scraping Jobs table
 export const scrapingJobs = pgTable('scraping_jobs', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  competitor_id: text('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   job_type: varchar('job_type', { length: 50 }).notNull(),
   url: varchar('url', { length: 1000 }).notNull(),
   priority: varchar('priority', { length: 20 }).notNull().default('medium'),
@@ -384,8 +384,8 @@ export const scrapingJobs = pgTable('scraping_jobs', {
 
 // Scraping Job Results table
 export const scrapingJobResults = pgTable('scraping_job_results', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  job_id: varchar('job_id', { length: 255 }).notNull().references(() => scrapingJobs.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  job_id: text('job_id').notNull().references(() => scrapingJobs.id, { onDelete: 'cascade' }),
   success: boolean('success').notNull(),
   data: jsonb('data'),
   error: text('error'),
@@ -402,10 +402,10 @@ export const scrapingJobResults = pgTable('scraping_job_results', {
 
 // Competitive Opportunities table
 export const competitiveOpportunities = pgTable('competitive_opportunities', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  competitor_id: integer('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
-  intelligence_id: integer('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  competitor_id: text('competitor_id').notNull().references(() => competitorProfiles.id, { onDelete: 'cascade' }),
+  intelligence_id: text('intelligence_id').references(() => intelligenceData.id, { onDelete: 'set null' }),
   opportunity_type: varchar('opportunity_type', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description').notNull(),
@@ -442,9 +442,9 @@ export const competitiveOpportunities = pgTable('competitive_opportunities', {
 
 // Opportunity Actions table
 export const opportunityActions = pgTable('opportunity_actions', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  opportunity_id: varchar('opportunity_id', { length: 255 }).notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  opportunity_id: text('opportunity_id').notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   action_type: varchar('action_type', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
@@ -470,9 +470,9 @@ export const opportunityActions = pgTable('opportunity_actions', {
 
 // Opportunity Metrics table
 export const opportunityMetrics = pgTable('opportunity_metrics', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  opportunity_id: varchar('opportunity_id', { length: 255 }).notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  opportunity_id: text('opportunity_id').notNull().references(() => competitiveOpportunities.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   metric_name: varchar('metric_name', { length: 100 }).notNull(),
   metric_type: varchar('metric_type', { length: 50 }).notNull(),
   baseline_value: decimal('baseline_value', { precision: 15, scale: 4 }),
@@ -492,9 +492,9 @@ export const opportunityMetrics = pgTable('opportunity_metrics', {
 
 // Documents table for Briefcase
 export const documents = pgTable('documents', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  folder_id: integer('folder_id').references(() => documentFolders.id, { onDelete: 'set null' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  folder_id: text('folder_id').references(() => documentFolders.id, { onDelete: 'set null' }),
   name: varchar('name', { length: 255 }).notNull(),
   original_name: varchar('original_name', { length: 255 }).notNull(),
   file_type: varchar('file_type', { length: 50 }).notNull(),
@@ -525,9 +525,9 @@ export const documents = pgTable('documents', {
 
 // Document Folders table
 export const documentFolders = pgTable('document_folders', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  parent_id: integer('parent_id'),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  parent_id: text('parent_id'),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   color: varchar('color', { length: 7 }).default('#8B5CF6'),
@@ -549,8 +549,8 @@ export const documentFolders = pgTable('document_folders', {
 
 // Document Versions table
 export const documentVersions = pgTable('document_versions', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  document_id: text('document_id').notNull().references(() => documents.id, { onDelete: 'cascade' }),
   version_number: integer('version_number').notNull(),
   name: varchar('name', { length: 255 }).notNull(),
   file_type: varchar('file_type', { length: 50 }).notNull(),
@@ -567,9 +567,9 @@ export const documentVersions = pgTable('document_versions', {
 
 // Document Permissions table
 export const documentPermissions = pgTable('document_permissions', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  document_id: text('document_id').notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 255 }),
   role: varchar('role', { length: 20 }).notNull().default('viewer'),
   granted_by: text('granted_by').notNull().references(() => users.id),
@@ -585,8 +585,8 @@ export const documentPermissions = pgTable('document_permissions', {
 
 // Document Share Links table
 export const documentShareLinks = pgTable('document_share_links', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  document_id: text('document_id').notNull().references(() => documents.id, { onDelete: 'cascade' }),
   created_by: text('created_by').notNull().references(() => users.id),
   url: varchar('url', { length: 1000 }).notNull(),
   password_hash: varchar('password_hash', { length: 255 }),
@@ -607,9 +607,9 @@ export const documentShareLinks = pgTable('document_share_links', {
 
 // Document Activity table
 export const documentActivity = pgTable('document_activity', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-  document_id: varchar('document_id', { length: 255 }).notNull().references(() => documents.id, { onDelete: 'cascade' }),
-  user_id: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  document_id: text('document_id').notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   action: varchar('action', { length: 50 }).notNull(),
   details: jsonb('details').default('{}'),
   ip_address: varchar('ip_address', { length: 45 }),
