@@ -18,12 +18,7 @@ export function RegisterForm() {
        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FF1FAF] to-[#B621FF] rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
        
        <div className="relative bg-[#0a0a0f]/90 backdrop-blur-xl p-8 rounded-2xl border border-white/10 space-y-6">
-         <div className="text-center">
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500 mb-2">
-              Create Your Account
-            </h1>
-            <p className="text-gray-400 text-sm">Join the SoloSuccess AI platform</p>
-         </div>
+
 
          <form action={formAction} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

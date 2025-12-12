@@ -26,12 +26,7 @@ export function LoginForm() {
       <div className="absolute -inset-0.5 bg-gradient-to-r from-[#B621FF] to-[#18FFFF] rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
       
       <div className="relative bg-[#0a0a0f]/90 backdrop-blur-xl p-8 rounded-2xl border border-white/10">
-        <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#18FFFF] to-[#B621FF] mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-400 text-sm font-mono">Initiate session access</p>
-         </div>
+
 
         <form action={formAction} className="space-y-6">
           <div className="space-y-2">
