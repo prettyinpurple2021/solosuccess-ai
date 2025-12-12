@@ -27,11 +27,27 @@ export async function authenticate(
   }
 }
 
+export async function socialLogin(provider: string) {
+  try {
+    await signIn(provider, { redirectTo: '/dashboard' });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      throw error; // Let NextAuth handle its errors
+    }
+    // Rethrow to allow redirect
+    throw error;
+  }
+}
+
 const RegisterSchema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
+  firstName: z.string().min(2, "First name is too short"),
+  lastName: z.string().min(2, "Last name is too short"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+  terms: z.string().optional().refine((val) => val === 'on', {
+    message: "You must agree to the terms and conditions"
+  }),
   dateOfBirth: z.string().refine((date) => {
     const today = new Date();
     const birthDate = new Date(date);
@@ -42,10 +58,14 @@ const RegisterSchema = z.object({
     }
     return age >= 18;
   }, { message: "You must be 18+ to register." }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 export async function register(prevState: any, formData: FormData) {
-  const validatedFields = RegisterSchema.safeParse(Object.fromEntries(formData));
+  const rawData = Object.fromEntries(formData);
+  const validatedFields = RegisterSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
     // Return the first error message
@@ -87,28 +107,6 @@ export async function register(prevState: any, formData: FormData) {
     };
   }
 
-  // Auto sign in after registration not supported directly in server action easily without redirect, 
-  // users usually redirect to login or dashboard.
-  // For now, let's redirect to login with success message? Or allow frontend to handle redirect.
-  // Since useActionState expects a return value, we return success.
-  
-  // Note: We can't call signIn() here easily if it redirects. 
-  // Let's return success and let component redirect.
-  // actually signIn works in server actions.
-  
-  try {
-     // await signIn('credentials', { email, password, redirectTo: '/dashboard' });
-     // For now, let's just return success so user can login manually or auto-login logic can be added.
-  } catch (err) {
-      // ignore redirect error if signIn throws
-      if ((err as Error).message.includes('NEXT_REDIRECT')) throw err;
-  }
-  
-  // Return undefined or success object? usage in component decides.
-  // The component expects { error?: string } or similar.
-  // Returning nothing implies success?
-  
-  // To auto-login:
   try {
     await signIn('credentials', { email, password, redirectTo: '/dashboard' });
   } catch (error) {

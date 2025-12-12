@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { authenticate } from '@/lib/auth-actions';
+import { authenticate, socialLogin } from '@/lib/auth-actions';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,11 +21,18 @@ export function LoginForm() {
   );
 
   return (
-    <div className="card-boss relative group">
+    <div className="card-boss relative group max-w-md mx-auto">
       {/* Glow check */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-[#B621FF] to-[#18FFFF] rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
       
       <div className="relative bg-[#0a0a0f]/90 backdrop-blur-xl p-8 rounded-2xl border border-white/10">
+        <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#18FFFF] to-[#B621FF] mb-2">
+              Welcome Back
+            </h1>
+            <p className="text-gray-400 text-sm font-mono">Initiate session access</p>
+         </div>
+
         <form action={formAction} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-cyan-400 font-mono uppercase text-xs tracking-wider">
@@ -65,7 +72,8 @@ export function LoginForm() {
           {error && (
             <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm font-mono flex items-center gap-2">
               <span className="text-lg">⚠️</span>
-              {error === 'CredentialsSignin' ? 'Invalid credentials provided.' : 'Authentication failed.'}
+              {error === 'Configuration' ? 'Server Configuration Error. Check Provider Secrets.' : 
+               error === 'CredentialsSignin' ? 'Invalid credentials provided.' : 'Authentication failed.'}
             </div>
           )}
            
@@ -104,16 +112,26 @@ export function LoginForm() {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-             <Button variant="outline" type="button" className="border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all">
+             <Button 
+                variant="outline" 
+                type="button" 
+                onClick={() => socialLogin('google')} 
+                className="border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all font-mono"
+             >
                 Google
              </Button>
-             <Button variant="outline" type="button" className="border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all">
+             <Button 
+                variant="outline" 
+                type="button" 
+                onClick={() => socialLogin('github')} 
+                className="border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all font-mono"
+             >
                 GitHub
              </Button>
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6 font-mono">
-            New Agent?{' '}
+            New here?{' '}
             <Link href="/register" className="text-[#18FFFF] hover:text-[#B621FF] transition-colors underline decoration-dashed underline-offset-4">
               Register Credentials
             </Link>
