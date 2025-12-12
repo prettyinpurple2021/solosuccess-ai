@@ -333,7 +333,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://use.typekit.net https://p.typekit.net;",
               "font-src 'self' https://fonts.gstatic.com https://use.typekit.net data:;",
               "img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://app.bytesroute.com blob:;",
-              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://use.typekit.net https://fonts.gstatic.com https://app.bytesroute.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://sse.devcycle.com https://www.chatbase.co;",
+              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://use.typekit.net https://p.typekit.net https://fonts.gstatic.com https://app.bytesroute.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://sse.devcycle.com https://www.chatbase.co;",
               "frame-src 'self' https://js.stripe.com https://challenges.cloudflare.com https://www.chatbase.co;",
             ].join(" "),
           },
