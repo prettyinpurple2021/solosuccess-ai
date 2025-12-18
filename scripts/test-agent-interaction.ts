@@ -1,6 +1,6 @@
 
-import { CollaborationHub } from '../lib/collaboration-hub'
-import { logger } from '../lib/logger'
+import { CollaborationHub } from '../src/lib/collaboration-hub'
+import { logger } from '../src/lib/logger'
 
 async function testAgentInteraction() {
     console.log('🚀 Starting Agent Interaction Test')

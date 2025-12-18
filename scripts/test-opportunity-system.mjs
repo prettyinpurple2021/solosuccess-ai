@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { competitiveOpportunityDetector } from '../lib/competitive-opportunity-detection.js'
-import { opportunityRecommendationSystem } from '../lib/opportunity-recommendation-system.js'
+import { competitiveOpportunityDetector } from '../src/lib/competitive-opportunity-detection.js'
+import { opportunityRecommendationSystem } from '../src/lib/opportunity-recommendation-system.js'
 import dotenv from 'dotenv'
 
 // Load environment variables

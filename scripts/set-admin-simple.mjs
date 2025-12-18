@@ -42,8 +42,8 @@ console.log('🔗 Connecting to database...');
 console.log(`📍 Database: ${process.env.DATABASE_URL.split('@')[1]?.split('/')[0] || 'Unknown'}`);
 
 // Use the existing database client
-import { getDb } from '../lib/database-client.ts';
-import { users } from '../db/schema.ts';
+import { getDb } from '../src/lib/database-client.ts';
+import { users } from '../src/db/schema.ts';
 import { eq } from 'drizzle-orm';
 
 async function setAdminRole() {

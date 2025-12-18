@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { getDb } from './lib/database-client';
+import { getDb } from './src/lib/database-client';
 import { sql } from 'drizzle-orm';
 
 async function reset() {

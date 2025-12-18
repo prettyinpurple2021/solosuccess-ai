@@ -5,7 +5,7 @@
  * This script shows how to list customers using the existing Stripe configuration
  */
 
-import { listStripeCustomers, getStripeCustomersPaginated, isStripeConfigured } from '../lib/stripe.js'
+import { listStripeCustomers, getStripeCustomersPaginated, isStripeConfigured } from '../src/lib/stripe.js'
 
 async function main() {
   console.log('🔍 Checking Stripe configuration...')

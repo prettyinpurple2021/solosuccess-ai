@@ -154,7 +154,7 @@ const nextConfig = {
     // Add path alias resolution for Vercel build environment
     config.resolve.alias = {
       ...config.resolve.alias,
-      "@": __dirname,
+      "@": path.resolve(__dirname, 'src'),
     };
 
     // Server-side optimizations for Vercel deployment
@@ -165,7 +165,7 @@ const nextConfig = {
       config.plugins.push(
         new webpack.NormalModuleReplacementPlugin(
           /^pdfjs-dist\/legacy\/build\/pdf\.worker\.mjs$/,
-          path.resolve(__dirname, 'lib/pdf-worker-shim.js')
+          path.resolve(__dirname, 'src/lib/pdf-worker-shim.js')
         )
       );
 
@@ -332,9 +332,9 @@ const nextConfig = {
               "worker-src 'self' blob:;",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://use.typekit.net https://p.typekit.net;",
               "font-src 'self' https://fonts.gstatic.com https://use.typekit.net data:;",
-              "img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://app.bytesroute.com blob:;",
-              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://use.typekit.net https://p.typekit.net https://fonts.gstatic.com https://app.bytesroute.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://sse.devcycle.com https://www.chatbase.co;",
-              "frame-src 'self' https://js.stripe.com https://challenges.cloudflare.com https://www.chatbase.co;",
+              "img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://app.bytesroute.com blob: https://*.vercel.com;",
+              "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://use.typekit.net https://p.typekit.net https://fonts.googleapis.com https://fonts.gstatic.com https://app.bytesroute.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.neon.tech https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.stripe.com https://sse.devcycle.com https://www.chatbase.co;",
+              "frame-src 'self' https://js.stripe.com https://challenges.cloudflare.com https://www.chatbase.co https://vercel.live;",
             ].join(" "),
           },
         ],

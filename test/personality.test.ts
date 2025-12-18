@@ -1,5 +1,5 @@
-import { getTeamMemberConfig } from '../lib/ai-config'
-import { agentPersonalities } from '../lib/ai-personality-system'
+import { getTeamMemberConfig } from '../src/lib/ai-config'
+import { agentPersonalities } from '../src/lib/ai-personality-system'
 
 describe('Agent configs and personalities', () => {
   const agents = [

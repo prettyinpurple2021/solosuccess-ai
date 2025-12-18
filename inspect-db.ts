@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config(); // Try default .env
 console.log('DATABASE_URL set:', !!process.env.DATABASE_URL);
-import { getDb } from './lib/database-client';
+import { getDb } from './src/lib/database-client';
 import { sql } from 'drizzle-orm';
 
 async function inspect() {
