@@ -118,7 +118,7 @@ export default function AnalyticsDashboard() {
         <TabsContent value="overview" className="space-y-6">
           {/* Key Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -131,7 +131,7 @@ export default function AnalyticsDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Revenue</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -144,7 +144,7 @@ export default function AnalyticsDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
@@ -157,7 +157,7 @@ export default function AnalyticsDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground" />
@@ -173,7 +173,7 @@ export default function AnalyticsDashboard() {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader>
                 <CardTitle>User Growth</CardTitle>
                 <CardDescription>
@@ -187,7 +187,7 @@ export default function AnalyticsDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader>
                 <CardTitle>Revenue Trends</CardTitle>
                 <CardDescription>
@@ -203,7 +203,7 @@ export default function AnalyticsDashboard() {
           </div>
 
           {/* Recent Activity */}
-          <Card className="holographic-card">
+          <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
               <CardDescription>
@@ -244,7 +244,7 @@ export default function AnalyticsDashboard() {
         {/* Performance Tab */}
         <TabsContent value="performance" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="holographic-card">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
               <CardHeader>
                 <CardTitle>Performance Metrics</CardTitle>
                 <CardDescription>
@@ -276,7 +276,7 @@ export default function AnalyticsDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="holographic-card lg:col-span-2">
+            <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm lg:col-span-2">
               <CardHeader>
                 <CardTitle>System Performance</CardTitle>
                 <CardDescription>
@@ -307,7 +307,7 @@ export default function AnalyticsDashboard() {
 
         {/* Insights Tab */}
         <TabsContent value="insights" className="space-y-6">
-          <Card className="holographic-card">
+          <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
             <CardHeader>
               <CardTitle>Business Insights</CardTitle>
               <CardDescription>
@@ -338,7 +338,7 @@ export default function AnalyticsDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="holographic-card">
+          <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm">
             <CardHeader>
               <CardTitle>Historical Trends</CardTitle>
               <CardDescription>

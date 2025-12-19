@@ -27,9 +27,9 @@ import {
   Timer,
   AlertCircle
 } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicLoader } from '@/components/ui/holographic-loader'
+import { PrimaryButton } from '@/components/ui/Button'
+import { Loading } from '@/components/ui/Loading'
+import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logError, logInfo } from '@/lib/logger'
 import type { Workflow, WorkflowNode, WorkflowEdge, NodeType } from '@/lib/workflow-engine'
@@ -445,7 +445,7 @@ export function VisualWorkflowBuilder({
           handleNodeDragStart(node.id, e)
         }}
       >
-        <HolographicCard className="w-48 p-3">
+        <div className="w-48 p-3">
           <div className="flex items-center gap-2 mb-2">
             <div
               className="node-color-indicator"
@@ -506,7 +506,7 @@ export function VisualWorkflowBuilder({
               <div className="node-port node-port-output" />
             </div>
           )}
-        </HolographicCard>
+        </div>
       </motion.div>
     )
   }, [selectedNode, zoom, nodeTypes, handleNodeDragStart, deleteNode])
@@ -587,50 +587,50 @@ export function VisualWorkflowBuilder({
         </div>
 
         <div className="flex items-center gap-2">
-          <HolographicButton
+          <PrimaryButton
             variant="outline"
             size="sm"
             onClick={() => setShowNodeLibrary(true)}
           >
             <Plus className="h-4 w-4 mr-1" />
             Add Node
-          </HolographicButton>
+          </PrimaryButton>
 
-          <HolographicButton
+          <PrimaryButton
             variant="outline"
             size="sm"
             onClick={() => _setShowWorkflowSettings(true)}
           >
             <Settings className="h-4 w-4 mr-1" />
             Settings
-          </HolographicButton>
+          </PrimaryButton>
 
-          <HolographicButton
+          <PrimaryButton
             variant="outline"
             size="sm"
             onClick={handleExecute}
             disabled={isExecuting || workflow.nodes.length === 0}
           >
             {isExecuting ? (
-              <HolographicLoader size="sm" />
+              <Loading size="sm" />
             ) : (
               <Play className="h-4 w-4 mr-1" />
             )}
             Execute
-          </HolographicButton>
+          </PrimaryButton>
 
-          <HolographicButton
+          <PrimaryButton
             size="sm"
             onClick={handleSave}
             disabled={isSaving}
           >
             {isSaving ? (
-              <HolographicLoader size="sm" />
+              <Loading size="sm" />
             ) : (
               <Save className="h-4 w-4 mr-1" />
             )}
             Save
-          </HolographicButton>
+          </PrimaryButton>
         </div>
       </div>
 
@@ -690,7 +690,7 @@ export function VisualWorkflowBuilder({
               {selectedNode && (
                 <div>
                   <h3 className="font-semibold mb-2">Node Configuration</h3>
-                  <HolographicCard className="p-3">
+                  <div className="p-3">
                     <div className="space-y-3">
                       <div>
                         <Label htmlFor="node-name">Name</Label>
@@ -734,7 +734,7 @@ export function VisualWorkflowBuilder({
                         Node type: {selectedNode.type}
                       </div>
                     </div>
-                  </HolographicCard>
+                  </div>
                 </div>
               )}
 
@@ -845,10 +845,10 @@ export function VisualWorkflowBuilder({
                   <WorkflowIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-300 mb-2">No Workflow Nodes</h3>
                   <p className="text-gray-500 mb-4">Add nodes to start building your workflow</p>
-                  <HolographicButton onClick={() => setShowNodeLibrary(true)}>
+                  <PrimaryButton onClick={() => setShowNodeLibrary(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add First Node
-                  </HolographicButton>
+                  </PrimaryButton>
                 </div>
               </div>
             )}

@@ -1,37 +1,55 @@
-// @ts-nocheck
-import * as React from "react"
-import { cva, type VariantProps} from "class-variance-authority"
+'use client'
 
-import { cn} from "@/lib/utils"
+import { useTheme } from 'next-themes'
+import { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+interface BadgeProps {
+  children: ReactNode
+  variant?: 'cyan' | 'magenta' | 'lime' | 'purple' | 'orange'
+  size?: 'sm' | 'md' | 'lg'
+  glitch?: boolean
+  className?: string
 }
 
-export { Badge, badgeVariants }
+export const Badge = ({ 
+  children,
+  variant = 'cyan',
+  size = 'md',
+  glitch = false,
+  className = ''
+}: BadgeProps) => {
+  const { theme } = useTheme()
+  
+  const sizeClasses = {
+    sm: 'px-2 py-1 text-xs',
+    md: 'px-3 py-1.5 text-sm',
+    lg: 'px-4 py-2 text-base',
+  }
+  
+  const variants = {
+    cyan: 'border-neon-cyan text-neon-cyan bg-neon-cyan/5',
+    magenta: 'border-neon-magenta text-neon-magenta bg-neon-magenta/5',
+    lime: 'border-neon-lime text-neon-lime bg-neon-lime/5',
+    purple: 'border-neon-purple text-neon-purple bg-neon-purple/5',
+    orange: 'border-neon-orange text-neon-orange bg-neon-orange/5',
+  }
+  
+  return (
+    <span className={cn(
+      'border-2',
+      variants[variant],
+      theme === 'aggressive' ? 'rounded-none' : 'rounded-sm',
+      'font-bold uppercase tracking-wide',
+      'inline-block',
+      sizeClasses[size],
+      glitch && 'glitch-hover',
+      'transition-all duration-300',
+      className
+    )}
+    data-text={glitch ? String(children) : undefined}
+    >
+      {children}
+    </span>
+  )
+}

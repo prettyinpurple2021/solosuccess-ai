@@ -5,7 +5,7 @@ alwaysApply: true
 
 - Production quality only: no mocks, placeholders, disabled code, demos, or TODO comments.
 - Follow the audit truth source: see [COMPREHENSIVE_AUDIT_REPORT.md](mdc:COMPREHENSIVE_AUDIT_REPORT.md). Update this file when fixing issues.
-- Enforce the holographic design system across all UI: see [HOLOGRAPHIC_DESIGN_SYSTEM.md](mdc:HOLOGRAPHIC_DESIGN_SYSTEM.md).
+- Enforce the Cyberpunk Design System v3 across all UI: see [DESIGN_SYSTEM.md](mdc:DESIGN_SYSTEM.md).
 - Keep code maintainable: typed APIs, early returns, clear naming, minimal nesting, meaningful errors.
 - Zero console noise: prefer project logger and structured errors over `console.*`.
 - Never commit broken builds, lint errors, or warnings.

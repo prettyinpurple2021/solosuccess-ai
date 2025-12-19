@@ -1,11 +1,11 @@
 ---
 globs: components/**/*.{ts,tsx}
-description: Components must use Tailwind for styling and Framer Motion for animations where applicable
+description: Components must use Tailwind for styling and CSS animations for animations where applicable
 ---
 # Components Guidelines
 
 - Styling: Use Tailwind classes; do not use inline styles. Extract repeated styles into utilities.
-- Animations: Use Framer Motion components/APIs for motion and transitions when animation is needed.
-- Design: Follow [HOLOGRAPHIC_DESIGN_SYSTEM.md](mdc:HOLOGRAPHIC_DESIGN_SYSTEM.md) utilities and components (e.g., HolographicCard, HolographicButton).
+- Animations: Use CSS animations for smooth transitions and effects.
+- Design: Follow [DESIGN_SYSTEM.md](mdc:DESIGN_SYSTEM.md) utilities and components for branding and consistency.
 - Accessibility: Provide `aria-*` labels where needed; ensure inputs have labels; support reduced motion.
 - No placeholders: Remove demo, mock, or commented-out code. Do not merge incomplete features.

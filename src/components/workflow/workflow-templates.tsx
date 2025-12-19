@@ -39,8 +39,8 @@ import {
   Settings,
   Info
 } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
+import { PrimaryButton } from '@/components/ui/Button'
+import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
 import type { Workflow } from '@/lib/workflow-engine'
@@ -422,7 +422,7 @@ export function WorkflowTemplates({
         whileHover={{ y: -5 }}
         transition={{ duration: 0.2 }}
       >
-        <HolographicCard className="h-full hover:shadow-xl transition-all duration-300 group">
+        <div className="h-full hover:shadow-xl transition-all duration-300 group">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2 mb-2">
@@ -434,13 +434,13 @@ export function WorkflowTemplates({
                   {template.complexity}
                 </Badge>
                 {template.metadata.featured && (
-                  <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-500">
+                  <Badge variant="cyan" className="text-xs border-yellow-500 text-yellow-500">
                     <Crown className="h-3 w-3 mr-1" />
                     Featured
                   </Badge>
                 )}
                 {template.metadata.trending && (
-                  <Badge variant="outline" className="text-xs border-green-500 text-green-500">
+                  <Badge variant="cyan" className="text-xs border-green-500 text-green-500">
                     <TrendingUp className="h-3 w-3 mr-1" />
                     Trending
                   </Badge>
@@ -489,12 +489,12 @@ export function WorkflowTemplates({
               {/* Tags */}
               <div className="flex flex-wrap gap-1">
                 {template.tags.slice(0, 3).map(tag => (
-                  <Badge key={tag} variant="outline" className="text-xs">
+                  <Badge key={tag} variant="cyan" className="text-xs">
                     {tag}
                   </Badge>
                 ))}
                 {template.tags.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="cyan" className="text-xs">
                     +{template.tags.length - 3}
                   </Badge>
                 )}
@@ -562,7 +562,7 @@ export function WorkflowTemplates({
                 </HolographicButton>
                 
                 <Button
-                  variant="outline"
+                  variant="cyan"
                   size="sm"
                   onClick={() => {
                     // Preview template
@@ -575,7 +575,7 @@ export function WorkflowTemplates({
               </div>
             </div>
           </CardContent>
-        </HolographicCard>
+        </div>
       </motion.div>
     )
   }, [handleLikeTemplate, handleBookmarkTemplate, handleShareTemplate, handleSelectTemplate])
@@ -699,7 +699,7 @@ export function WorkflowTemplates({
               <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-300 mb-2">No Templates Found</h3>
               <p className="text-gray-500 mb-4">Try adjusting your search or filters</p>
-              <Button variant="outline" onClick={() => {
+              <Button variant="cyan" onClick={() => {
                 setSearchQuery('')
                 setSelectedCategory('all')
                 setSelectedComplexity('all')

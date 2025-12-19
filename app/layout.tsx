@@ -1,9 +1,9 @@
 import "./globals.css"
 import type { ReactNode } from 'react'
-import { Inter as FontSans } from "next/font/google"
+import { Inter as FontSans, Orbitron, JetBrains_Mono } from "next/font/google"
 import Script from 'next/script'
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/lib/theme/ThemeProvider"
 import { AuthProvider } from "@/components/auth-provider"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
 import { PerformanceMonitor } from "@/components/performance/performance-monitor"
@@ -12,7 +12,7 @@ import ExitIntentSurvey from "@/components/marketing/exit-intent-survey"
 import { AccessibilityProvider } from "@/components/ui/accessibility"
 import { ChatProvider } from "@/components/providers/chat-provider"
 import { SmartTipManager } from "@/components/ui/smart-tip"
-import { HolographicFeedbackWidget } from "@/components/feedback/holographic-feedback-widget"
+import { FeedbackWidget } from "@/components/feedback/feedback-widget"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
@@ -20,7 +20,22 @@ import { OfflineProvider } from "@/components/providers/offline-provider"
 import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
 import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
 
-// Font configuration - using runtime-loaded fonts via link tags
+// Font configuration - Cyberpunk Design System v3 fonts
+const orbitronFont = Orbitron({ 
+  subsets: ['latin'], 
+  variable: '--font-orbitron',
+  weight: ['400', '700', '900'],
+  display: 'swap',
+})
+
+const jetbrainsMonoFont = JetBrains_Mono({ 
+  subsets: ['latin'], 
+  variable: '--font-mono',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+})
+
+// Legacy font configuration - using runtime-loaded fonts via link tags
 // These objects define CSS variables that map to font families in globals.css
 const inter = { variable: '--font-inter', className: 'font-sans' }
 const jetbrains = { variable: '--font-mono', className: 'font-mono' }
@@ -128,12 +143,7 @@ export default function RootLayout({
 
   // GA4 is injected manually; no env var needed
   const appShell = (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider>
       <AuthProvider>
         <OfflineProvider>
           <AccessibilityProvider>
@@ -145,7 +155,7 @@ export default function RootLayout({
             <ServiceWorkerRegister />
             {!exitIntentDisabled && <ExitIntentSurvey />}
             <SmartTipManager />
-            <HolographicFeedbackWidget />
+            <FeedbackWidget />
           </AccessibilityProvider>
         </OfflineProvider>
       </AuthProvider>
@@ -153,7 +163,7 @@ export default function RootLayout({
   )
 
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${orbitronFont.variable} ${jetbrainsMonoFont.variable} ${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
       <head>
         <Script
           id="strip-css-scripts"
@@ -229,7 +239,9 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-cyber-black font-tech text-gray-300 antialiased",
+          "min-h-screen bg-dark-bg text-white font-mono antialiased",
+          orbitronFont.variable,
+          jetbrainsMonoFont.variable,
           inter.variable,
           jetbrains.variable,
           orbitron.variable,

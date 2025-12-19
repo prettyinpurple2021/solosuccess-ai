@@ -39,9 +39,9 @@ import {
   Zap,
   Crown
 } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicLoader } from '@/components/ui/holographic-loader'
+import { PrimaryButton } from '@/components/ui/Button'
+import { Loading } from '@/components/ui/Loading'
+import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
 
@@ -362,15 +362,15 @@ export function CustomReportBuilder({
           <p className="text-gray-600">Create powerful analytics reports with drag-and-drop visualization</p>
         </div>
         <div className="flex items-center gap-2">
-          <HolographicButton
-            variant="outline"
+          <PrimaryButton
+            variant="cyan"
             onClick={() => setIsPreviewOpen(true)}
             className="flex items-center gap-2"
           >
             <Eye className="h-4 w-4" />
             Preview
-          </HolographicButton>
-          <HolographicButton
+          </PrimaryButton>
+          <PrimaryButton
             onClick={handleSave}
             disabled={isSaving}
             className="flex items-center gap-2"
@@ -383,12 +383,12 @@ export function CustomReportBuilder({
                 Save Report
               </>
             )}
-          </HolographicButton>
+          </PrimaryButton>
         </div>
       </div>
 
       {/* Report Configuration */}
-      <HolographicCard className="p-6">
+      <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="report-name">Report Name</Label>
@@ -431,7 +431,7 @@ export function CustomReportBuilder({
             />
           </div>
         </div>
-      </HolographicCard>
+      </div>
 
       {/* Main Builder Interface */}
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
@@ -458,7 +458,7 @@ export function CustomReportBuilder({
         <TabsContent value="design" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Available Fields */}
-            <HolographicCard>
+            <div>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
@@ -494,10 +494,10 @@ export function CustomReportBuilder({
                   ))}
                 </ScrollArea>
               </CardContent>
-            </HolographicCard>
+            </div>
 
             {/* Global Filters */}
-            <HolographicCard>
+            <div>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Filter className="h-5 w-5" />
@@ -559,7 +559,7 @@ export function CustomReportBuilder({
                     </div>
                   ))}
                   <Button
-                    variant="outline"
+                    variant="cyan"
                     onClick={() => addFilter('', true)}
                     className="w-full"
                   >
@@ -568,7 +568,7 @@ export function CustomReportBuilder({
                   </Button>
                 </div>
               </CardContent>
-            </HolographicCard>
+            </div>
           </div>
         </TabsContent>
 
@@ -576,17 +576,17 @@ export function CustomReportBuilder({
         <TabsContent value="visualize" className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Visualizations</h3>
-            <HolographicButton onClick={addVisualization}>
+            <PrimaryButton onClick={addVisualization}>
               <Plus className="h-4 w-4 mr-2" />
               Add Visualization
-            </HolographicButton>
+            </PrimaryButton>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Visualization List */}
             <div className="space-y-4">
               {report.visualizations.map(viz => (
-                <HolographicCard
+                <div
                   key={viz.id}
                   className={`cursor-pointer transition-all ${
                     selectedVisualization?.id === viz.id ? 'ring-2 ring-purple-500' : ''
@@ -620,13 +620,13 @@ export function CustomReportBuilder({
                       </Button>
                     </div>
                   </CardContent>
-                </HolographicCard>
+                </div>
               ))}
             </div>
 
             {/* Visualization Editor */}
             {selectedVisualization && (
-              <HolographicCard>
+              <div>
                 <CardHeader>
                   <CardTitle>Edit Visualization</CardTitle>
                 </CardHeader>
@@ -753,7 +753,7 @@ export function CustomReportBuilder({
                         </div>
                       ))}
                       <Button
-                        variant="outline"
+                        variant="cyan"
                         onClick={() => addFilter(selectedVisualization.id)}
                         className="w-full"
                       >
@@ -763,14 +763,14 @@ export function CustomReportBuilder({
                     </div>
                   </div>
                 </CardContent>
-              </HolographicCard>
+              </div>
             )}
           </div>
         </TabsContent>
 
         {/* Schedule Tab */}
         <TabsContent value="schedule" className="space-y-6">
-          <HolographicCard>
+          <div>
             <CardHeader>
               <CardTitle>Automated Reporting</CardTitle>
               <CardDescription>
@@ -875,7 +875,7 @@ export function CustomReportBuilder({
                 </div>
               )}
             </CardContent>
-          </HolographicCard>
+          </div>
         </TabsContent>
 
         {/* Preview Tab */}
@@ -886,10 +886,10 @@ export function CustomReportBuilder({
             <p className="text-gray-500 mb-4">
               Preview your report with sample data
             </p>
-            <HolographicButton onClick={() => setIsPreviewOpen(true)}>
+            <PrimaryButton onClick={() => setIsPreviewOpen(true)}>
               <Eye className="h-4 w-4 mr-2" />
               Open Preview
-            </HolographicButton>
+            </PrimaryButton>
           </div>
         </TabsContent>
       </Tabs>
@@ -899,7 +899,7 @@ export function CustomReportBuilder({
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Export as:</span>
           <Button
-            variant="outline"
+            variant="cyan"
             size="sm"
             onClick={() => handleExport('pdf')}
             disabled={isExporting}
@@ -907,7 +907,7 @@ export function CustomReportBuilder({
             PDF
           </Button>
           <Button
-            variant="outline"
+            variant="cyan"
             size="sm"
             onClick={() => handleExport('excel')}
             disabled={isExporting}
@@ -915,7 +915,7 @@ export function CustomReportBuilder({
             Excel
           </Button>
           <Button
-            variant="outline"
+            variant="cyan"
             size="sm"
             onClick={() => handleExport('csv')}
             disabled={isExporting}
@@ -953,7 +953,7 @@ export function CustomReportBuilder({
           <ScrollArea className="h-96">
             <div className="space-y-6">
               {report.visualizations.map(viz => (
-                <HolographicCard key={viz.id} className="p-6">
+                <div key={viz.id} className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">{viz.title}</h3>
                     <Badge variant="secondary">
@@ -969,7 +969,7 @@ export function CustomReportBuilder({
                       </p>
                     </div>
                   </div>
-                </HolographicCard>
+                </div>
               ))}
             </div>
           </ScrollArea>

@@ -25,9 +25,9 @@ import {
   Minimize2,
   Square
 } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicLoader } from '@/components/ui/holographic-loader'
+import { PrimaryButton } from '@/components/ui/Button'
+import { Loading } from '@/components/ui/Loading'
+import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logError, logInfo } from '@/lib/logger'
 
@@ -419,21 +419,21 @@ export function AdvancedDataVisualization({
           <p className="text-gray-600">Create interactive charts and dashboards with real-time data</p>
         </div>
         <div className="flex items-center gap-2">
-          <HolographicButton
+          <PrimaryButton
             variant="outline"
             onClick={() => setIsFullscreen(!isFullscreen)}
             className="flex items-center gap-2"
           >
             {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-          </HolographicButton>
-          <HolographicButton
+          </PrimaryButton>
+          <PrimaryButton
             onClick={() => setIsCreating(true)}
             className="flex items-center gap-2"
           >
             <Zap className="h-4 w-4" />
             New Chart
-          </HolographicButton>
+          </PrimaryButton>
         </div>
       </div>
 
@@ -466,7 +466,7 @@ export function AdvancedDataVisualization({
               <ScrollArea className="h-96">
                 <div className="space-y-3">
                   {visualizations.map((viz: VisualizationData) => (
-                    <HolographicCard
+                    <div
                       key={viz.id}
                       className={`cursor-pointer transition-all ${
                         selectedViz?.id === viz.id ? 'ring-2 ring-purple-500' : ''
@@ -494,7 +494,7 @@ export function AdvancedDataVisualization({
                               disabled={isAnimating}
                             >
                               {isAnimating ? (
-                                <HolographicLoader size="sm" />
+                                <Loading size="sm" />
                               ) : (
                                 <RefreshCw className="h-3 w-3" />
                               )}
@@ -517,7 +517,7 @@ export function AdvancedDataVisualization({
                           <div>Updated: {viz.metadata.lastUpdated.toLocaleTimeString()}</div>
                         </div>
                       </CardContent>
-                    </HolographicCard>
+                    </div>
                   ))}
                 </div>
               </ScrollArea>
@@ -528,7 +528,7 @@ export function AdvancedDataVisualization({
               {selectedViz ? (
                 <div className="space-y-6">
                   {/* Chart Configuration */}
-                  <HolographicCard>
+                  <div>
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div>
@@ -545,7 +545,7 @@ export function AdvancedDataVisualization({
                             disabled={isAnimating}
                           >
                             {isAnimating ? (
-                              <HolographicLoader size="sm" />
+                              <Loading size="sm" />
                             ) : (
                               <RefreshCw className="h-4 w-4" />
                             )}
@@ -571,7 +571,7 @@ export function AdvancedDataVisualization({
                         />
                         {isAnimating && (
                           <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
-                            <HolographicLoader text="Rendering chart..." />
+                            <Loading text="Rendering chart..." />
                           </div>
                         )}
                       </div>
@@ -670,10 +670,10 @@ export function AdvancedDataVisualization({
                         </label>
                       </div>
                     </CardContent>
-                  </HolographicCard>
+                  </div>
 
                   {/* Data Table */}
-                  <HolographicCard>
+                  <div>
                     <CardHeader>
                       <CardTitle>Data Preview</CardTitle>
                       <CardDescription>
@@ -709,7 +709,7 @@ export function AdvancedDataVisualization({
                         </table>
                       </ScrollArea>
                     </CardContent>
-                  </HolographicCard>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-12">
@@ -718,10 +718,10 @@ export function AdvancedDataVisualization({
                   <p className="text-gray-500 mb-4">
                     Select a chart from the list or create a new one
                   </p>
-                  <HolographicButton onClick={() => setIsCreating(true)}>
+                  <PrimaryButton onClick={() => setIsCreating(true)}>
                     <Zap className="h-4 w-4 mr-2" />
                     Create Chart
-                  </HolographicButton>
+                  </PrimaryButton>
                 </div>
               )}
             </div>
@@ -736,10 +736,10 @@ export function AdvancedDataVisualization({
             <p className="text-gray-500 mb-4">
               Create interactive dashboards with multiple visualizations
             </p>
-            <HolographicButton>
+            <PrimaryButton>
               <Sparkles className="h-4 w-4 mr-2" />
               Coming Soon
-            </HolographicButton>
+            </PrimaryButton>
           </div>
         </TabsContent>
 
@@ -751,10 +751,10 @@ export function AdvancedDataVisualization({
             <p className="text-gray-500 mb-4">
               Pre-built chart templates for common use cases
             </p>
-            <HolographicButton>
+            <PrimaryButton>
               <Sparkles className="h-4 w-4 mr-2" />
               Coming Soon
-            </HolographicButton>
+            </PrimaryButton>
           </div>
         </TabsContent>
       </Tabs>

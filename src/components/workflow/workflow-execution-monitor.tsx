@@ -42,9 +42,9 @@ import {
   MoreHorizontal
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicLoader } from '@/components/ui/holographic-loader'
+import { PrimaryButton } from '@/components/ui/Button'
+import { Loading } from '@/components/ui/Loading'
+import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
 import type { WorkflowExecution, WorkflowExecutionStep } from '@/lib/workflow-engine'
@@ -399,7 +399,7 @@ export function WorkflowExecutionMonitor({
         whileHover={{ y: -2 }}
         transition={{ duration: 0.2 }}
       >
-        <HolographicCard className="hover:shadow-xl transition-all duration-300">
+        <div className="hover:shadow-xl transition-all duration-300">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
@@ -490,7 +490,7 @@ export function WorkflowExecutionMonitor({
               <div className="flex gap-2 pt-2">
                 {isRunning && (
                   <Button
-                    variant="outline"
+                    variant="cyan"
                     size="sm"
                     onClick={() => handleStopExecution(execution.id)}
                     className="flex-1"
@@ -502,7 +502,7 @@ export function WorkflowExecutionMonitor({
 
                 {execution.status === 'failed' && (
                   <Button
-                    variant="outline"
+                    variant="cyan"
                     size="sm"
                     onClick={() => handleRetryExecution(execution.id)}
                     className="flex-1"
@@ -513,7 +513,7 @@ export function WorkflowExecutionMonitor({
                 )}
 
                 <HolographicButton
-                  variant="outline"
+                  variant="cyan"
                   size="sm"
                   onClick={() => handleViewDetails(execution.id)}
                   className="flex-1"
@@ -524,7 +524,7 @@ export function WorkflowExecutionMonitor({
               </div>
             </div>
           </CardContent>
-        </HolographicCard>
+        </div>
       </motion.div>
     )
   }, [formatRelativeTime, formatDuration, handleStopExecution, handleRetryExecution, handleViewDetails])
@@ -622,7 +622,7 @@ export function WorkflowExecutionMonitor({
                     {log.timestamp.toLocaleTimeString()}
                   </span>
                   <Badge
-                    variant="outline"
+                    variant="cyan"
                     className={`text-xs min-w-[60px] justify-center badge-log-${log.level}`}
                   >
                     {log.level}
@@ -649,13 +649,13 @@ export function WorkflowExecutionMonitor({
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="cyan"
               size="sm"
               onClick={refreshExecutions}
               disabled={loading}
             >
               {loading ? (
-                <HolographicLoader size="sm" />
+                <Loading size="sm" />
               ) : (
                 <RefreshCw className="h-4 w-4 mr-1" />
               )}

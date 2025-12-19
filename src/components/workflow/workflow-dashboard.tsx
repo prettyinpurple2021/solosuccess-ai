@@ -35,9 +35,9 @@ import {
   ChevronRight,
   ChevronDown
 } from 'lucide-react'
-import { HolographicButton } from '@/components/ui/holographic-button'
-import { HolographicCard } from '@/components/ui/holographic-card'
-import { HolographicLoader } from '@/components/ui/holographic-loader'
+import { PrimaryButton } from '@/components/ui/Button'
+import { Loading } from '@/components/ui/Loading'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { VisualWorkflowBuilder } from './visual-workflow-builder'
 import { WorkflowTemplates } from './workflow-templates'
@@ -254,64 +254,65 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
           </div>
           
           <div className="flex items-center gap-2">
-            <HolographicButton
-              variant="outline"
+            <PrimaryButton
+              variant="cyan"
               onClick={() => setActiveTab('templates')}
             >
               <Download className="h-4 w-4 mr-2" />
               Browse Templates
-            </HolographicButton>
+            </PrimaryButton>
             
-            <HolographicButton
+            <PrimaryButton
+              variant="cyan"
               onClick={handleCreateCustom}
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Workflow
-            </HolographicButton>
+            </PrimaryButton>
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-400">{stats.totalWorkflows}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-purple bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-purple">{stats.totalWorkflows}</div>
             <div className="text-xs text-gray-400">Total Workflows</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">{stats.activeWorkflows}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-lime bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-lime">{stats.activeWorkflows}</div>
             <div className="text-xs text-gray-400">Active</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-400">{stats.totalExecutions}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-cyan bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-cyan">{stats.totalExecutions}</div>
             <div className="text-xs text-gray-400">Total Executions</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">{stats.successfulExecutions}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-lime bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-lime">{stats.successfulExecutions}</div>
             <div className="text-xs text-gray-400">Successful</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-400">{stats.failedExecutions}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-magenta bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-magenta">{stats.failedExecutions}</div>
             <div className="text-xs text-gray-400">Failed</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-400">{stats.runningExecutions}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-orange bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-orange">{stats.runningExecutions}</div>
             <div className="text-xs text-gray-400">Running</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-400">{stats.successRate.toFixed(1)}%</div>
+          <div className={cn("p-4 text-center border-2 border-neon-purple bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-purple">{stats.successRate.toFixed(1)}%</div>
             <div className="text-xs text-gray-400">Success Rate</div>
-          </HolographicCard>
+          </div>
           
-          <HolographicCard className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-400">{formatDuration(stats.averageExecutionTime)}</div>
+          <div className={cn("p-4 text-center border-2 border-neon-cyan bg-dark-card rounded-sm")}>
+            <div className="text-2xl font-bold text-neon-cyan">{formatDuration(stats.averageExecutionTime)}</div>
             <div className="text-xs text-gray-400">Avg Duration</div>
-          </HolographicCard>
+          </div>
         </div>
       </div>
 
@@ -412,38 +413,38 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                   Quick Actions
                 </h3>
                 <div className="space-y-2">
-                  <HolographicButton
-                    variant="outline"
+                  <PrimaryButton
+                    variant="cyan"
                     size="sm"
                     onClick={() => setActiveTab('builder')}
                     className="w-full justify-start"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Create New Workflow
-                  </HolographicButton>
+                  </PrimaryButton>
                   
-                  <HolographicButton
-                    variant="outline"
+                  <PrimaryButton
+                    variant="cyan"
                     size="sm"
                     onClick={() => setActiveTab('templates')}
                     className="w-full justify-start"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Browse Templates
-                  </HolographicButton>
+                  </PrimaryButton>
                   
-                  <HolographicButton
-                    variant="outline"
+                  <PrimaryButton
+                    variant="cyan"
                     size="sm"
                     onClick={() => setActiveTab('executions')}
                     className="w-full justify-start"
                   >
                     <Activity className="h-4 w-4 mr-2" />
                     View Executions
-                  </HolographicButton>
+                  </PrimaryButton>
                   
-                  <HolographicButton
-                    variant="outline"
+                  <PrimaryButton
+                    variant="cyan"
                     size="sm"
                     onClick={() => {
                       // Import workflow functionality
@@ -453,7 +454,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Import Workflow
-                  </HolographicButton>
+                  </PrimaryButton>
                 </div>
               </div>
             </TabsContent>
@@ -467,24 +468,24 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                 </p>
                 
                 <div className="space-y-2">
-                  <HolographicButton
+                  <PrimaryButton
                     size="sm"
                     onClick={handleCreateCustom}
                     className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Start from Scratch
-                  </HolographicButton>
+                  </PrimaryButton>
                   
-                  <HolographicButton
-                    variant="outline"
+                  <PrimaryButton
+                    variant="cyan"
                     size="sm"
                     onClick={() => setActiveTab('templates')}
                     className="w-full"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Use Template
-                  </HolographicButton>
+                  </PrimaryButton>
                 </div>
               </div>
 
@@ -512,7 +513,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                   Browse pre-built workflow templates
                 </p>
                 
-                <HolographicButton
+                <PrimaryButton
                   size="sm"
                   onClick={() => {
                     // This will be handled by the main templates component
@@ -522,7 +523,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   Browse All Templates
-                </HolographicButton>
+                </PrimaryButton>
               </div>
             </TabsContent>
 
@@ -534,7 +535,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                   Monitor and manage workflow executions
                 </p>
                 
-                <HolographicButton
+                <PrimaryButton
                   size="sm"
                   onClick={() => {
                     // This will be handled by the main executions component
@@ -544,7 +545,7 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                 >
                   <Activity className="h-4 w-4 mr-2" />
                   View All Executions
-                </HolographicButton>
+                </PrimaryButton>
               </div>
             </TabsContent>
           </Tabs>
@@ -570,18 +571,18 @@ export function WorkflowDashboard({ className = "" }: WorkflowDashboardProps) {
                   </p>
                   
                   <div className="flex items-center justify-center gap-4">
-                    <HolographicButton onClick={handleCreateCustom}>
+                    <PrimaryButton onClick={handleCreateCustom}>
                       <Plus className="h-4 w-4 mr-2" />
                       Create Workflow
-                    </HolographicButton>
+                    </PrimaryButton>
                     
-                    <HolographicButton
-                      variant="outline"
+                    <PrimaryButton
+                      variant="cyan"
                       onClick={() => setActiveTab('templates')}
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Browse Templates
-                    </HolographicButton>
+                    </PrimaryButton>
                   </div>
                 </div>
               </motion.div>

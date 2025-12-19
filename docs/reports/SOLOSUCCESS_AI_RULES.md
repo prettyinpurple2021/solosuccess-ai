@@ -9,7 +9,7 @@
 ### Core Technologies
 - **Framework**: Next.js 15.5+ with App Router
 - **Language**: TypeScript (strict mode, zero `any` types)
-- **Styling**: Tailwind CSS 3.4+ with holographic design system
+- **Styling**: Tailwind CSS 3.4+ with Cyberpunk Design System v3
 - **Database**: Neon PostgreSQL with Drizzle ORM
 - **Authentication**: JWT-based custom auth
 - **Deployment**: Compatible with any modern hosting platform
@@ -38,32 +38,34 @@ ANTHROPIC_API_KEY=    # AI service keys
 
 ---
 
-## 🎨 HOLOGRAPHIC DESIGN SYSTEM MANDATES
+## 🎨 CYBERPUNK DESIGN SYSTEM v3 MANDATES
 
 ### Brand Colors (Required)
 ```typescript
 // tailwind.config.ts - Exact colors only
 colors: {
-  SoloSuccess: {
-    purple: '#B621FF',   // Primary brand
-    cyan: '#18FFFF',     // Secondary accent
-    pink: '#FF1FAF',     // Tertiary accent
-    black: '#000000'     // Text/contrast
-  }
+  'neon-cyan': '#0be4ec',
+  'neon-magenta': '#ff006e',
+  'neon-lime': '#39ff14',
+  'neon-purple': '#b300ff',
+  'neon-orange': '#ff6600',
+  'dark-bg': '#0a0e27',
+  'dark-card': '#0f1535',
+  'dark-hover': '#151d3a',
 }
 ```
 
 ### Required Components
-- **All buttons**: Use `HolographicButton` only
-- **All cards**: Use `HolographicCard` variants
-- **All text**: Apply `GradientText` for headings
-- **All loaders**: Use `HolographicLoader`, `SparkleLoader`, `GlitterLoader`
+- **All buttons**: Use `PrimaryButton` from `@/components/ui/Button`
+- **All cards**: Use `div` with `border-2 border-neon-cyan bg-dark-card rounded-sm` classes
+- **All headings**: Use `Heading` component with glitch-hover support
+- **All text**: Use `Text` component (no glitch on body text)
+- **All loaders**: Use `Loading` component from `@/components/ui/Loading`
 
-### Gradient Requirements
-```css
-/* Required gradients - use exact definitions */
-.gradient-hero { background: linear-gradient(135deg, #B621FF 0%, #18FFFF 45%, #FF1FAF 100%); }
-.gradient-card { background: linear-gradient(120deg, #B621FF 0%, #FF1FAF 100%); }
+### Theme System
+- **Dual-mode**: Balanced (production) and Aggressive (full cyberpunk)
+- **Default**: Balanced mode (0.3s animations, 0.5 opacity, 4px radius)
+- **Theme switcher**: Use `ThemeSwitcher` component
 .gradient-holographic { background: linear-gradient(135deg, #B621FF 0%, #18FFFF 20%, #FF1FAF 40%, #18FFFF 60%, #B621FF 80%, #FF1FAF 100%); }
 ```
 

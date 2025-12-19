@@ -385,7 +385,7 @@ export function RevenueIntegration({ className = "" }: RevenueIntegrationProps) 
 
   return (
     <div className={className}>
-      <Card className="holographic-card border-military-hot-pink/30">
+      <Card className="border-2 border-neon-cyan bg-dark-card rounded-sm border-military-hot-pink/30">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -419,7 +419,7 @@ export function RevenueIntegration({ className = "" }: RevenueIntegrationProps) 
               const isConnected = connection.connected
 
               return (
-                <Card key={provider.id} className="holographic-card border-military-tactical/30">
+                <Card key={provider.id} className="border-2 border-neon-cyan bg-dark-card rounded-sm border-military-tactical/30">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
