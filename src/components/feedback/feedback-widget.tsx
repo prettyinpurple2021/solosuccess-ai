@@ -15,8 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { PrimaryButton } from "@/components/ui/Button"
-import { Loading } from "@/components/ui/Loading"
+import { PrimaryButton } from "@/components/ui/button"
+import { Loading } from "@/components/ui/loading"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

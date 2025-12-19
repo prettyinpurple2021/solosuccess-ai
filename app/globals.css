@@ -3,9 +3,6 @@
 /* Fonts: Using system fonts as base, with Google Fonts loaded via link tags in HTML head
    This avoids build-time network dependencies while allowing runtime font loading */
 
-/* Core cyberpunk utilities */
-@import "../styles/cyberpunk.css";
-
 /* Tailwind directives follow imports to satisfy @import ordering rules */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;

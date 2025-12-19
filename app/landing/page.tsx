@@ -1,5 +1,8 @@
 'use client'
 
+// Avoid static prerender failures when feature-flag SDK keys are absent in build envs
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { NeuralNetworkCanvas } from '@/components/cyber/NeuralNetworkCanvas'
 import { UIOverlayLines } from '@/components/cyber/UIOverlayLines'
@@ -12,9 +15,6 @@ import {
   FaBrain,
   FaCity 
 } from 'react-icons/fa'
-
-// Avoid static prerender failures when feature-flag SDK keys are absent in build envs
-export const dynamic = 'force-dynamic'
 
 export default function LandingPage() {
   return (

@@ -1,4 +1,4 @@
-import rawTemplateData from '@/data/templates.json'
+import rawTemplateData from '../../data/templates.json'
 
 export type TemplateDifficulty = 'beginner' | 'intermediate' | 'advanced'
 

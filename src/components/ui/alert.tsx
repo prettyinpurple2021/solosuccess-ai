@@ -90,8 +90,8 @@ export const Alert = ({
         {config.icon}
       </div>
       <div className="flex-1 min-w-0">
-        {title && <h4 className={cn('font-bold', config.title, 'mb-1')}>{title}</h4>}
-        {description && <p className="text-gray-300 text-sm font-mono">{description}</p>}
+        {title && <AlertTitle className={cn(config.title, 'mb-1')}>{title}</AlertTitle>}
+        {description && <AlertDescription>{description}</AlertDescription>}
       </div>
       {dismissible && (
         <button
@@ -105,3 +105,30 @@ export const Alert = ({
     </div>
   )
 }
+
+// Backward-compatible helpers for places that import `AlertTitle` / `AlertDescription`
+// from `@/components/ui/alert`. These wrap the design-system-compliant typography.
+
+export interface AlertTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+
+export const AlertTitle = ({ className, ...props }: AlertTitleProps) => (
+  <h4
+    className={cn(
+      'font-bold text-neon-cyan text-sm md:text-base leading-snug',
+      className
+    )}
+    {...props}
+  />
+)
+
+export interface AlertDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+
+export const AlertDescription = ({ className, ...props }: AlertDescriptionProps) => (
+  <p
+    className={cn(
+      'text-gray-300 text-xs md:text-sm font-mono',
+      className
+    )}
+    {...props}
+  />
+)
