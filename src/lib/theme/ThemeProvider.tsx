@@ -5,7 +5,15 @@ import { ReactNode } from 'react'
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="balanced" storageKey="solosuccess-theme">
+    <NextThemesProvider 
+      attribute="class" 
+      defaultTheme="balanced" 
+      storageKey="solosuccess-theme"
+      enableSystem={false}
+      disableTransitionOnChange
+      // Suppress hydration warnings during static generation
+      suppressHydrationWarning
+    >
       {children}
     </NextThemesProvider>
   )

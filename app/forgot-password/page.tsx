@@ -1,6 +1,8 @@
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic'
+
 export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen bg-[#020005] flex items-center justify-center p-4 relative overflow-hidden">

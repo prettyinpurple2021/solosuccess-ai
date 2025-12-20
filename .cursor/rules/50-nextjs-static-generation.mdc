@@ -1,0 +1,42 @@
+# Next.js Static Generation & React Context Issues
+
+## Problem: "Cannot read properties of null (reading 'useContext')" During Build
+
+### Root Cause
+- Next.js analyzes client components during build, even with `export const dynamic = 'force-dynamic'`
+- During static generation, React context providers (like `ThemeProvider`) aren't available because:
+  - Static generation runs at build time, not runtime
+  - React context requires a rendered component tree
+  - During build, React isn't fully initialized
+- When `useTheme()` from `next-themes` runs during static generation, it calls `useContext`, but React is `null`, causing the error
+
+### Why `force-dynamic` Doesn't Fully Help
+- `export const dynamic = 'force-dynamic'` prevents runtime static generation but doesn't stop build-time analysis
+- Next.js still analyzes the component tree during build to understand dependencies
+
+### Solutions Attempted
+1. ✅ Added `export const dynamic = 'force-dynamic'` to affected pages
+2. ✅ Added `suppressHydrationWarning` to HTML tag in `layout.tsx`
+3. ✅ Configured `ThemeProvider` with proper options
+4. ⚠️ Still fails because Next.js analyzes components during build
+
+### Key Insight
+The error "Cannot read properties of null (reading 'useContext')" indicates React is `null` during static generation, not just the context. This happens because Next.js analyzes client components during build even with `force-dynamic`.
+
+### Required Fix Pattern
+When using `useTheme()` or other React context hooks in components:
+- Components must handle missing context gracefully
+- Since hooks must be called unconditionally, ensure the hook library handles missing context
+- Consider making components work without context during static generation
+- May need to configure Next.js to skip static analysis for components using context
+
+### Files Affected
+- `src/components/ui/button.tsx` - Uses `useTheme()` from `next-themes`
+- Any component using React context hooks during static generation
+- Pages that import components using context hooks
+
+### Best Practices
+1. Always add `export const dynamic = 'force-dynamic'` to pages using context-dependent components
+2. Add `suppressHydrationWarning` to HTML tag in root layout
+3. Ensure context providers handle missing context gracefully
+4. Consider using dynamic imports with `ssr: false` for components that heavily rely on context

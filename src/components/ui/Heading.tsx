@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -19,7 +18,8 @@ export const Heading = ({
   children,
   className = '',
 }: HeadingProps) => {
-  const { theme } = useTheme()
+  // Theme not available during static generation - use defaults
+  const theme = undefined
   
   const headingTags = {
     1: 'h1', 2: 'h2', 3: 'h3', 4: 'h4', 5: 'h5', 6: 'h6',

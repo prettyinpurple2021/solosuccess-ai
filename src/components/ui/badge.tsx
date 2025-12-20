@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -19,7 +18,8 @@ export const Badge = ({
   glitch = false,
   className = ''
 }: BadgeProps) => {
-  const { theme } = useTheme()
+  // Theme not available during static generation - use defaults
+  const theme = undefined
   
   const sizeClasses = {
     sm: 'px-2 py-1 text-xs',

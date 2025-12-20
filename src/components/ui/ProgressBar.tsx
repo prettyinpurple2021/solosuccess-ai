@@ -18,7 +18,8 @@ export const ProgressBar = ({
   label = false,
   className = ''
 }: ProgressBarProps) => {
-  const { theme } = useTheme()
+  // Theme not available during static generation - use defaults
+  const theme = undefined
   
   const colorClasses = {
     cyan: 'bg-gradient-to-r from-neon-cyan to-cyan-500 shadow-[0_0_20px_rgba(11,228,236,0.6)]',

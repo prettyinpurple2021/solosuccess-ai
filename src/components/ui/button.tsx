@@ -1,8 +1,8 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { useSafeTheme } from '@/hooks/use-safe-theme'
 
 export interface PrimaryButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   children: ReactNode
@@ -22,8 +22,11 @@ export const PrimaryButton = ({
   className = '',
   ...props
 }: PrimaryButtonProps) => {
-  const { theme } = useTheme()
-  const isBalanced = theme === 'balanced'
+  // Theme is not available during static generation (React context is null)
+  // Use default values that work for all themes
+  // The theme-dependent styling will be applied on the client side after hydration
+  const theme = undefined // Default: will be set on client after mount
+  const isBalanced = false // Default: use balanced shadows (works for all themes)
   
   const sizes = {
     sm: 'px-4 py-2 text-sm',

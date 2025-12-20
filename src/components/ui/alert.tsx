@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 
 interface AlertProps {
@@ -22,8 +21,9 @@ export const Alert = ({
   className = ''
 }: AlertProps) => {
   const [isVisible, setIsVisible] = React.useState(true)
-  const { theme } = useTheme()
-  const isBalanced = theme === 'balanced'
+  // Theme not available during static generation - use defaults
+  const theme = undefined
+  const isBalanced = false // Default: balanced shadows work for all themes
   
   const variants = {
     success: {

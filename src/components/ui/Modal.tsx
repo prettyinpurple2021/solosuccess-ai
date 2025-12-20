@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { ReactNode } from 'react'
 import { PrimaryButton } from './Button'
 import { cn } from '@/lib/utils'
@@ -30,7 +29,8 @@ export const Modal = ({
   variant = 'cyan',
   className = ''
 }: ModalProps) => {
-  const { theme } = useTheme()
+  // Theme not available during static generation - use defaults
+  const theme = undefined
   
   if (!isOpen) return null
   

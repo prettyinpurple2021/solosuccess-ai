@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic'
+
 import { useState } from "react"
 import { useTemplates } from "@/hooks/use-templates-swr"
 import { GlassCard, CamoBackground, TacticalGrid } from "@/components/military"

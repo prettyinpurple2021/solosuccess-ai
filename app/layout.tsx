@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { Inter as FontSans, Orbitron, JetBrains_Mono } from "next/font/google"
 import Script from 'next/script'
 import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/lib/theme/ThemeProvider"
+import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth-provider"
 // import { RecaptchaProvider} from "@/components/recaptcha/recaptcha-provider"
 import { PerformanceMonitor } from "@/components/performance/performance-monitor"
@@ -163,7 +163,7 @@ export default function RootLayout({
   )
 
   return (
-    <html lang="en" className={`${orbitronFont.variable} ${jetbrainsMonoFont.variable} ${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${orbitronFont.variable} ${jetbrainsMonoFont.variable} ${inter.variable} ${jetbrains.variable} ${orbitron.variable} ${rajdhani.variable}`} suppressHydrationWarning>
       <head>
         <Script
           id="strip-css-scripts"

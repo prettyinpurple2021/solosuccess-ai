@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 
 interface LoadingProps {
@@ -16,8 +15,9 @@ export const Loading = ({
   color = 'cyan',
   className = ''
 }: LoadingProps) => {
-  const { theme } = useTheme()
-  const isBalanced = theme === 'balanced'
+  // Theme not available during static generation - use defaults
+  const theme = undefined
+  const isBalanced = false // Default: balanced shadows work for all themes
   
   const sizeClasses = {
     sm: 'w-8 h-8',

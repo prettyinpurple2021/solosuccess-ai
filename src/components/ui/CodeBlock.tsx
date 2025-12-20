@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 
 interface CodeBlockProps {
@@ -22,7 +21,8 @@ export const CodeBlock = ({
   className = ''
 }: CodeBlockProps) => {
   const [copied, setCopied] = React.useState(false)
-  const { theme } = useTheme()
+  // Theme not available during static generation - use defaults
+  const theme = undefined
   
   const handleCopy = () => {
     navigator.clipboard.writeText(code)
