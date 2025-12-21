@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server'
 
+// Mock uuid to avoid ESM issues and generate unique values
+// Use module-level counter that can be reset between tests
+let uuidCounter = 0
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => `mock-uuid-v4-${++uuidCounter}`),
+}))
+
 jest.mock('@/lib/auth-server', () => ({
   authenticateRequest: jest.fn(),
 }))
@@ -25,6 +32,8 @@ describe('DELETE /api/templates/[id]', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset UUID counter for test isolation
+    uuidCounter = 0
   })
 
   it('returns 401 when user is not authenticated', async () => {
