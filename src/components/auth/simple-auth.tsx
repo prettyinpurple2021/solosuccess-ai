@@ -281,7 +281,7 @@ export function SimpleAuth() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-purple mx-auto mb-4"></div>
           <p>Loading authentication...</p>
         </div>
       </div>
@@ -412,7 +412,7 @@ export function SimpleAuth() {
                   <button
                     type="button"
                     onClick={() => router.push('/forgot-password')}
-                    className="text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center justify-center gap-1 mx-auto"
+                    className="text-sm text-neon-purple hover:text-neon-magenta font-medium flex items-center justify-center gap-1 mx-auto"
                   >
                     <Lock className="w-3 h-3" />
                     Forgot Password?
@@ -425,7 +425,7 @@ export function SimpleAuth() {
                     <button
                       type="button"
                       onClick={() => router.push('/signup')}
-                      className="text-purple-600 hover:text-purple-700 font-medium"
+                      className="text-neon-purple hover:text-neon-magenta font-medium"
                     >
                       Sign up here
                     </button>
@@ -592,7 +592,7 @@ export function SimpleAuth() {
                     <button
                       type="button"
                       onClick={() => router.push('/signin')}
-                      className="text-purple-600 hover:text-purple-700 font-medium"
+                      className="text-neon-purple hover:text-neon-magenta font-medium"
                     >
                       Sign in here
                     </button>

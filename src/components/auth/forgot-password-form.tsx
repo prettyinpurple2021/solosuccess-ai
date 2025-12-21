@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { PrimaryButton } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import { Heading } from '@/components/ui/heading';
 
 export function ForgotPasswordForm() {
   const [isPending, setIsPending] = useState(false);
@@ -22,9 +24,9 @@ export function ForgotPasswordForm() {
 
   if (submitted) {
      return (
-        <div className="card-boss relative bg-[#0a0a0f]/90 backdrop-blur-xl p-8 rounded-2xl border border-[#18FFFF]/30 text-center">
-             <div className="text-[#18FFFF] text-4xl mb-4">✓</div>
-             <h3 className="text-white font-boss text-lg mb-2">PROTOCOL INITIATED</h3>
+        <div className="relative bg-dark-card/90 backdrop-blur-xl p-8 rounded-2xl border border-neon-cyan/30 text-center">
+             <div className="text-neon-cyan text-4xl mb-4">✓</div>
+             <Heading level={3} color="cyan" className="mb-2">PROTOCOL INITIATED</Heading>
              <p className="text-gray-400 font-mono text-sm">
                 If an active agent profile exists for that email, recovery instructions have been transmitted.
              </p>
@@ -33,19 +35,26 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <div className="card-boss relative group border-blue-500/30">
-       <div className="absolute -inset-0.5 bg-gradient-to-r from-[#18FFFF] to-[#B621FF] rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+    <div className="relative group">
+       <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
        
-       <div className="relative bg-[#0a0a0f]/90 backdrop-blur-xl p-8 rounded-2xl border border-white/10 space-y-6">
+       <div className="relative bg-dark-card/90 backdrop-blur-xl p-8 rounded-2xl border border-neon-cyan/30 space-y-6">
          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-cyan-400 font-mono uppercase text-xs">Email Address</Label>
-              <Input id="email" name="email" type="email" required className="bg-black/50 border-white/10 focus:border-cyan-500/50" placeholder="agent@solosuccess.ai" />
+              <Label htmlFor="email" className="text-neon-cyan font-mono uppercase text-xs">Email Address</Label>
+              <Input id="email" name="email" type="email" required className="bg-dark-bg/50 border-white/10 focus:border-neon-cyan/50 text-white" placeholder="agent@solosuccess.ai" />
             </div>
 
-            <Button className="w-full btn-boss bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 border-none mt-4" disabled={isPending}>
-              {isPending ? <Loader2 className="animate-spin mr-2" /> : 'Transmit Recovery Link'}
-            </Button>
+            <PrimaryButton variant="cyan" size="lg" className="w-full mt-4" disabled={isPending} type="submit">
+              {isPending ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="animate-spin" />
+                  Transmit Recovery Link
+                </span>
+              ) : (
+                'Transmit Recovery Link'
+              )}
+            </PrimaryButton>
          </form>
        </div>
     </div>

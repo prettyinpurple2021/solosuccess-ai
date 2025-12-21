@@ -4,10 +4,10 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import { authClient } from "@/lib/auth-client"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { PrimaryButton } from "@/components/ui/button"
+import { Alert } from "@/components/ui/alert"
+import { Heading } from "@/components/ui/heading"
+import { HudBorder } from '@/components/cyber/HudBorder'
 import { 
   Monitor, 
   Smartphone, 
@@ -118,110 +118,104 @@ export default function SessionsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-dark-bg">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-dark-bg p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-neon-purple/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0))] opacity-20 pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Active Sessions</h1>
-          <p className="text-gray-300">
+          <Heading level={1} color="purple" className="text-3xl mb-2">ACTIVE SESSIONS</Heading>
+          <p className="text-gray-400 font-mono">
             Manage your active sessions and device access
           </p>
         </div>
 
         {error && (
-          <Alert className="mb-6 bg-red-500/20 border-red-500/50">
-            <AlertDescription className="text-red-200">
-              {error}
-            </AlertDescription>
-          </Alert>
+          <Alert variant="error" description={error} className="mb-6" />
         )}
 
         <div className="grid gap-6">
           {sessions.map((session) => (
-            <Card key={session.id} className="bg-white/10 backdrop-blur-lg border-white/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+            <HudBorder key={session.id} variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="text-neon-cyan">
                     {getDeviceIcon(session.deviceType)}
-                    <div>
-                      <CardTitle className="text-white flex items-center space-x-2">
-                        <span>{session.deviceName}</span>
-                        {session.isCurrent && (
-                          <Badge variant="secondary" className="bg-green-500/20 text-green-300">
-                            Current
-                          </Badge>
-                        )}
-                      </CardTitle>
-                      <CardDescription className="text-gray-300">
-                        {session.deviceType} • {session.ipAddress}
-                      </CardDescription>
-                    </div>
                   </div>
-                  {!session.isCurrent && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => revokeSession(session.id)}
-                      className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border-red-500/50"
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Revoke
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4" />
-                    <span>Last active: {formatDate(session.lastActivity)}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="w-4 h-4" />
-                    <span>Location: {session.location || "Unknown"}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Wifi className="w-4 h-4" />
-                    <span>IP: {session.ipAddress}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4" />
-                    <span>Created: {formatDate(session.createdAt)}</span>
+                  <div>
+                    <Heading level={3} color="cyan" className="flex items-center space-x-2">
+                      <span>{session.deviceName}</span>
+                      {session.isCurrent && (
+                        <span className="text-xs bg-neon-lime/20 text-neon-lime px-2 py-1 rounded font-mono uppercase">
+                          Current
+                        </span>
+                      )}
+                    </Heading>
+                    <p className="text-gray-400 font-mono text-sm">
+                      {session.deviceType} • {session.ipAddress}
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                {!session.isCurrent && (
+                  <PrimaryButton
+                    variant="error"
+                    size="sm"
+                    onClick={() => revokeSession(session.id)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Revoke
+                  </PrimaryButton>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4 text-neon-cyan" />
+                  <span className="font-mono">Last active: {formatDate(session.lastActivity)}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <MapPin className="w-4 h-4 text-neon-cyan" />
+                  <span className="font-mono">Location: {session.location || "Unknown"}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Wifi className="w-4 h-4 text-neon-cyan" />
+                  <span className="font-mono">IP: {session.ipAddress}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Shield className="w-4 h-4 text-neon-cyan" />
+                  <span className="font-mono">Created: {formatDate(session.createdAt)}</span>
+                </div>
+              </div>
+            </HudBorder>
           ))}
         </div>
 
         {sessions.length > 1 && (
-          <Card className="mt-6 bg-red-500/10 backdrop-blur-lg border-red-500/20">
-            <CardHeader>
-              <CardTitle className="text-red-300 flex items-center space-x-2">
+          <HudBorder variant="hover" className="mt-6 p-6 border-neon-magenta/30">
+            <div className="mb-4">
+              <Heading level={3} color="magenta" className="flex items-center space-x-2 mb-2">
                 <Shield className="w-5 h-5" />
                 <span>Security Actions</span>
-              </CardTitle>
-              <CardDescription className="text-red-200">
+              </Heading>
+              <p className="text-gray-400 font-mono text-sm">
                 Revoke all other sessions to sign out all devices except this one
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                variant="destructive"
-                onClick={revokeAllOtherSessions}
-                className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border-red-500/50"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Revoke All Other Sessions
-              </Button>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+            <PrimaryButton
+              variant="error"
+              onClick={revokeAllOtherSessions}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Revoke All Other Sessions
+            </PrimaryButton>
+          </HudBorder>
         )}
       </div>
     </div>

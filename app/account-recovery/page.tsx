@@ -3,12 +3,12 @@
 export const dynamic = 'force-dynamic'
 
 import { useState } from "react";
-import { Button} from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import { PrimaryButton } from "@/components/ui/button";
 import { Input} from "@/components/ui/input";
 import { Label} from "@/components/ui/label";
-import { Alert, AlertDescription} from "@/components/ui/alert";
-import { Mail, AlertCircle, CheckCircle} from "lucide-react";
+import { Alert } from "@/components/ui/alert";
+import { Heading } from "@/components/ui/heading";
+import { Mail, CheckCircle} from "lucide-react";
 import Link from "next/link";
 
 export default function AccountRecoveryPage() {
@@ -55,66 +55,69 @@ export default function AccountRecoveryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2 border-purple-200 shadow-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold boss-text-gradient">
-            Forgot Your Password?
-          </CardTitle>
-          <CardDescription>
-            No problem. Enter your email below and we&apos;ll send you a link to reset it.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handlePasswordResetRequest} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="font-semibold">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e: any) => setEmail(e.target.value)}
-                  placeholder="you@your-empire.com"
-                  required
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            
-            {message && (
-              <Alert variant="default" className="bg-green-50 border-green-200">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800">
-                  {message}
-                </AlertDescription>
-              </Alert>
-            )}
+    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute top-[-20%] left-[20%] w-[60%] h-[60%] bg-neon-purple/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0))] opacity-20 pointer-events-none" />
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button 
-              type="submit" 
-              className="w-full boss-button bg-gradient-SoloSuccess hover:bg-gradient-SoloSuccess-light text-white font-bold"
-              disabled={loading}
-            >
-              {loading ? "Sending..." : "🚀 Send Reset Link"}
-            </Button>
-          </form>
+      <div className="w-full max-w-md relative z-10">
+        <div className="relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-purple to-neon-cyan rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
           
-          <div className="mt-6 text-center">
-            <Link href="/signin" className="text-sm font-medium text-purple-600 hover:underline">
-              Remembered your password? Sign In
-            </Link>
+          <div className="relative bg-dark-card/90 backdrop-blur-xl p-8 rounded-2xl border border-neon-purple/30">
+            <div className="text-center mb-8">
+              <Heading level={1} color="purple" glitch={true} className="text-2xl mb-2">
+                RECOVER ACCOUNT
+              </Heading>
+              <p className="text-gray-400 font-mono text-sm">
+                Enter your email to receive recovery instructions
+              </p>
+            </div>
+
+            <form onSubmit={handlePasswordResetRequest} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-neon-purple font-mono uppercase text-xs">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e: any) => setEmail(e.target.value)}
+                    placeholder="agent@solosuccess.ai"
+                    required
+                    className="pl-10 bg-dark-bg/50 border-white/10 focus:border-neon-purple/50 text-white"
+                  />
+                </div>
+              </div>
+              
+              {message && (
+                <Alert variant="success" description={message} />
+              )}
+
+              {error && (
+                <Alert variant="error" description={error} />
+              )}
+
+              <PrimaryButton 
+                variant="purple"
+                size="lg"
+                type="submit" 
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send Recovery Link"}
+              </PrimaryButton>
+            </form>
+            
+            <div className="mt-6 text-center">
+              <Link href="/login" className="text-sm font-mono text-gray-400 hover:text-neon-cyan transition-colors">
+                Remembered your password? <span className="underline">Sign In</span>
+              </Link>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

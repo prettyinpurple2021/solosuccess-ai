@@ -2,10 +2,11 @@
 
 import { useActionState } from 'react';
 import { register, socialLogin } from '@/lib/auth-actions';
-import { Button } from '@/components/ui/button';
+import { PrimaryButton } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Alert } from '@/components/ui/alert';
+import { Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
 
@@ -14,10 +15,10 @@ export function RegisterForm() {
   const [state, formAction, isPending] = useActionState(register, undefined);
 
   return (
-    <div className="card-boss relative group border-pink-500/30 max-w-lg mx-auto">
-       <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FF1FAF] to-[#B621FF] rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+    <div className="relative group max-w-lg mx-auto">
+       <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-magenta to-neon-purple rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
        
-       <div className="relative bg-[#0a0a0f]/90 backdrop-blur-xl p-8 rounded-2xl border border-white/10 space-y-6">
+       <div className="relative bg-dark-card/90 backdrop-blur-xl p-8 rounded-2xl border border-neon-purple/30 space-y-6">
 
 
          <form action={formAction} className="space-y-4">
@@ -79,32 +80,32 @@ export function RegisterForm() {
               <span className="w-full border-t border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#0a0a0f] px-2 text-gray-500 font-mono">
+              <span className="bg-dark-card px-2 text-gray-500 font-mono">
                 Or Connect Via
               </span>
             </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-             <Button 
-                variant="outline" 
+             <PrimaryButton 
+                variant="purple"
                 onClick={() => socialLogin('google')} 
-                className="border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all font-mono"
+                className="font-mono"
              >
                 Google
-             </Button>
-             <Button 
-                variant="outline" 
+             </PrimaryButton>
+             <PrimaryButton 
+                variant="purple"
                 onClick={() => socialLogin('github')} 
-                className="border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 transition-all font-mono"
+                className="font-mono"
              >
                 GitHub
-             </Button>
+             </PrimaryButton>
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6 font-mono">
             Already have an account?{' '}
-            <Link href="/login" className="text-pink-400 hover:text-purple-400 transition-colors underline decoration-dashed underline-offset-4">
+            <Link href="/login" className="text-neon-magenta hover:text-neon-purple transition-colors underline decoration-dashed underline-offset-4">
               Sign In
             </Link>
           </p>

@@ -11,6 +11,7 @@ import { CyberButton } from '@/components/cyber/CyberButton'
 import { SoloSuccessLogo } from '@/components/cyber/SoloSuccessLogo'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Alert } from '@/components/ui/alert'
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react'
 
 export default function ResetPasswordPage() {
@@ -168,9 +169,7 @@ export default function ResetPasswordPage() {
                 </div>
 
                 {error && (
-                  <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 font-tech text-sm">
-                    {error}
-                  </div>
+                  <Alert variant="error" description={error} />
                 )}
 
                 <CyberButton

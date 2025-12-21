@@ -5,9 +5,9 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { PrimaryButton } from "@/components/ui/button"
+import { Alert } from "@/components/ui/alert"
+import { Heading } from "@/components/ui/heading"
 import { 
   Shield, 
   CheckCircle, 
@@ -142,92 +142,101 @@ export default function DeviceApprovalPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-dark-bg">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-purple"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-      <Card className="w-full max-w-2xl bg-white/10 backdrop-blur-lg border-white/20">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center">
-            <Shield className="w-8 h-8 text-yellow-400" />
-          </div>
-          <CardTitle className="text-3xl font-bold text-white">
-            Device Approval Required
-          </CardTitle>
-          <CardDescription className="text-gray-300">
-            A new device is trying to access your account. Please review and approve this request.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen flex items-center justify-center bg-dark-bg p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-neon-orange/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0))] opacity-20 pointer-events-none" />
+
+      <div className="w-full max-w-2xl relative z-10">
+        <div className="relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-orange to-neon-purple rounded-2xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+          
+          <div className="relative bg-dark-card/90 backdrop-blur-xl p-8 rounded-2xl border border-neon-orange/30">
+            <div className="text-center mb-8">
+              <div className="mx-auto mb-4 w-16 h-16 bg-neon-orange/20 rounded-full flex items-center justify-center">
+                <Shield className="w-8 h-8 text-neon-orange" />
+              </div>
+              <Heading level={1} color="orange" className="text-3xl mb-2">
+                DEVICE APPROVAL REQUIRED
+              </Heading>
+              <p className="text-gray-400 font-mono text-sm">
+                A new device is trying to access your account. Please review and approve this request.
+              </p>
+            </div>
           {deviceInfo && (
             <div className="space-y-6">
-              <div className="bg-white/5 rounded-lg p-6">
+              <div className="bg-dark-bg/50 rounded-lg p-6 border border-white/10">
                 <div className="flex items-center space-x-4 mb-4">
-                  {getDeviceIcon(deviceInfo.deviceType)}
+                  <div className="text-neon-cyan">
+                    {getDeviceIcon(deviceInfo.deviceType)}
+                  </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white">
+                    <Heading level={3} color="cyan" className="text-xl">
                       {deviceInfo.deviceName}
-                    </h3>
-                    <p className="text-gray-300 capitalize">
+                    </Heading>
+                    <p className="text-gray-400 capitalize font-mono text-sm">
                       {deviceInfo.deviceType} Device
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center space-x-2 text-gray-300">
-                    <MapPin className="w-4 h-4" />
-                    <span>Location: {deviceInfo.location}</span>
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <MapPin className="w-4 h-4 text-neon-cyan" />
+                    <span className="font-mono">Location: {deviceInfo.location}</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-300">
-                    <Clock className="w-4 h-4" />
-                    <span>Requested: {formatDate(deviceInfo.requestedAt)}</span>
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <Clock className="w-4 h-4 text-neon-cyan" />
+                    <span className="font-mono">Requested: {formatDate(deviceInfo.requestedAt)}</span>
                   </div>
                 </div>
               </div>
 
               {error && (
-                <Alert className="bg-red-500/20 border-red-500/50">
-                  <AlertDescription className="text-red-200">
-                    {error}
-                  </AlertDescription>
-                </Alert>
+                <Alert variant="error" description={error} />
               )}
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
+                <PrimaryButton
+                  variant="success"
+                  size="lg"
                   onClick={handleApprove}
                   disabled={isApproving}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  className="flex-1"
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   {isApproving ? "Approving..." : "Approve Device"}
-                </Button>
-                <Button
+                </PrimaryButton>
+                <PrimaryButton
+                  variant="error"
+                  size="lg"
                   onClick={handleDeny}
-                  variant="destructive"
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  className="flex-1"
                 >
                   <XCircle className="w-4 h-4 mr-2" />
                   Deny Access
-                </Button>
+                </PrimaryButton>
               </div>
 
-              <div className="bg-blue-500/20 rounded-lg p-4">
-                <h4 className="text-blue-200 font-semibold mb-2">Security Notice</h4>
-                <p className="text-blue-100 text-sm">
+              <div className="bg-neon-cyan/10 border border-neon-cyan/30 rounded-lg p-4">
+                <h4 className="text-neon-cyan font-bold mb-2 font-mono uppercase text-sm">Security Notice</h4>
+                <p className="text-gray-300 text-sm font-mono">
                   Only approve this device if you recognize it and trust the location. 
                   If you don't recognize this device, deny access and consider changing your password.
                 </p>
               </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

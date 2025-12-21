@@ -397,7 +397,7 @@ export function NeonAuth() {
                 <button
                   onClick={handleSignIn}
                   disabled={!email || !password || loading}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan/90 hover:to-neon-purple/90 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
                   type="button"
                 >
                   {loading ? (
@@ -418,7 +418,7 @@ export function NeonAuth() {
                   <button
                     type="button"
                     onClick={() => router.push('/forgot-password')}
-                    className="text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center justify-center gap-1 mx-auto"
+                    className="text-sm text-neon-purple hover:text-neon-magenta font-medium flex items-center justify-center gap-1 mx-auto"
                   >
                     <Lock className="w-3 h-3" />
                     Forgot Password?
@@ -431,7 +431,7 @@ export function NeonAuth() {
                     <button
                       type="button"
                       onClick={() => router.push('/signup')}
-                      className="text-purple-600 hover:text-purple-700 font-medium"
+                      className="text-neon-purple hover:text-neon-magenta font-medium"
                     >
                       Sign up here
                     </button>
@@ -576,7 +576,7 @@ export function NeonAuth() {
                 <button
                   onClick={handleSignUp}
                   disabled={signUpLoading}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan/90 hover:to-neon-purple/90 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
                   type="button"
                 >
                   {signUpLoading ? (
@@ -598,7 +598,7 @@ export function NeonAuth() {
                     <button
                       type="button"
                       onClick={() => router.push('/signin')}
-                      className="text-purple-600 hover:text-purple-700 font-medium"
+                      className="text-neon-purple hover:text-neon-magenta font-medium"
                     >
                       Sign in here
                     </button>
