@@ -18,8 +18,14 @@ const customJestConfig = {
     '.*TermsOfService\\.test\\.tsx$',
   ],
   moduleNameMapper: {
+    // Map @/app/* to app/ directory (must come before @/* pattern)
+    '^@/app/(.*)$': '<rootDir>/app/$1',
+    // Map @/* to src/ directory (default - must come after @/app/ pattern)
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(uuid|@neondatabase)/)',
+  ],
   // Ensure coverage reports are generated in formats that Codecov understands
   coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'json-summary', 'clover', 'text', 'text-summary'],

@@ -7,6 +7,7 @@ jest.mock('@/lib/web-scraping-service', () => ({
     monitorPricingPages: jest.fn(),
     trackProductPages: jest.fn(),
     scrapeJobPostings: jest.fn(),
+    checkUrlExists: jest.fn(),
   },
 }))
 
