@@ -14,20 +14,20 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     // Add holographic theme support to the document
     const updateThemeColors = () => {
       const root = document.documentElement;
-      const isDark = root.classList.contains('dark');
+      const isAggressive = root.classList.contains('aggressive');
       
-      if (isDark) {
-        // Dark mode holographic colors
+      if (isAggressive) {
+        // Aggressive theme: stronger holographic effects
+        root.style.setProperty('--holo-bg', 'rgba(0, 0, 0, 0.9)');
+        root.style.setProperty('--holo-border', 'rgba(182, 33, 255, 0.5)');
+        root.style.setProperty('--holo-glow', 'rgba(182, 33, 255, 0.8)');
+        root.style.setProperty('--holo-text', 'rgba(255, 255, 255, 1)');
+      } else {
+        // Balanced theme: refined holographic effects
         root.style.setProperty('--holo-bg', 'rgba(0, 0, 0, 0.8)');
         root.style.setProperty('--holo-border', 'rgba(182, 33, 255, 0.3)');
         root.style.setProperty('--holo-glow', 'rgba(182, 33, 255, 0.5)');
         root.style.setProperty('--holo-text', 'rgba(255, 255, 255, 0.9)');
-      } else {
-        // Light mode holographic colors
-        root.style.setProperty('--holo-bg', 'rgba(255, 255, 255, 0.1)');
-        root.style.setProperty('--holo-border', 'rgba(182, 33, 255, 0.2)');
-        root.style.setProperty('--holo-glow', 'rgba(182, 33, 255, 0.3)');
-        root.style.setProperty('--holo-text', 'rgba(0, 0, 0, 0.9)');
       }
     };
 
@@ -48,6 +48,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     <NextThemesProvider 
       {...props}
       attribute="class" 
+      themes={['balanced', 'aggressive']}
       defaultTheme="balanced" 
       storageKey="solosuccess-theme"
       enableSystem={false}
