@@ -1,8 +1,5 @@
 'use client'
 
-// Avoid static prerender failures when feature-flag SDK keys are absent in build envs
-export const dynamic = 'force-dynamic'
-
 import Link from 'next/link'
 import { NeuralNetworkCanvas } from '@/components/cyber/NeuralNetworkCanvas'
 import { UIOverlayLines } from '@/components/cyber/UIOverlayLines'
@@ -35,7 +32,7 @@ export default function LandingPage() {
                 SOLO<span className="text-cyber-cyan">SUCCESS</span>.AI
               </span>
               <span className="text-[10px] text-cyber-purple tracking-[0.3em] uppercase">
-                System: Operational
+                Status: Online
               </span>
             </div>
           </div>
@@ -50,7 +47,7 @@ export default function LandingPage() {
               href="#deploy" 
               className="text-sm font-bold uppercase tracking-widest hover:text-cyber-cyan transition-colors text-gray-400"
             >
-              Initialize
+              Get Started
             </Link>
             <Link 
               href="/signin"
@@ -58,7 +55,7 @@ export default function LandingPage() {
             >
               <span className="absolute w-0 h-full bg-cyber-purple left-0 top-0 transition-all duration-300 group-hover:w-full opacity-20" />
               <span className="font-sci text-xs font-bold text-cyber-purple tracking-widest group-hover:text-white relative z-10">
-                USER_LOGIN
+                Sign In
               </span>
             </Link>
           </div>
@@ -74,7 +71,7 @@ export default function LandingPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 border border-cyber-cyan/30 bg-cyber-cyan/5 rounded-none">
               <span className="w-1.5 h-1.5 bg-cyber-cyan rounded-full animate-ping" />
               <span className="text-xs font-bold tracking-widest text-cyber-cyan uppercase">
-                Neural Link Established ⚡
+                Intelligence Network Active ⚡
               </span>
             </div>
 
@@ -93,12 +90,12 @@ export default function LandingPage() {
               <Link href="#deploy" className="group relative px-8 py-4 bg-cyber-cyan/10 border border-cyber-cyan overflow-hidden">
                 <div className="absolute inset-0 w-0 bg-cyber-cyan transition-all duration-[250ms] ease-out group-hover:w-full opacity-20" />
                 <span className="relative font-sci font-bold tracking-widest text-cyber-cyan group-hover:text-white">
-                  INITIALIZE_SYSTEM
+                  START BUILDING
                 </span>
               </Link>
               <Link href="#features" className="group relative px-8 py-4 border border-gray-600 hover:border-cyber-purple overflow-hidden">
                 <span className="relative font-sci font-bold tracking-widest text-gray-300 group-hover:text-cyber-purple">
-                  VIEW_ARCHITECTURE
+                  EXPLORE FEATURES
                 </span>
               </Link>
             </div>
@@ -136,7 +133,7 @@ export default function LandingPage() {
               {/* Inner Content */}
               <div className="p-8 space-y-6">
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                  <span className="font-sci text-xs text-cyber-cyan">OBJECTIVE: MARKET SINGULARITY</span>
+                  <span className="font-sci text-xs text-cyber-cyan">FOCUS: MARKET INTELLIGENCE</span>
                   {/* SVG Mini Logo in Dashboard */}
                   <svg viewBox="0 0 100 100" className="w-6 h-6 animate-pulse">
                     <circle cx="50" cy="50" r="40" stroke="#bd00ff" strokeWidth="4" fill="none" />
@@ -148,7 +145,7 @@ export default function LandingPage() {
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-xs font-bold mb-1">
-                      <span>MODULES_ACTIVE</span>
+                      <span>AGENTS_ACTIVE</span>
                       <span className="text-cyber-cyan">8/8 ONLINE</span>
                     </div>
                     <div className="h-1 bg-gray-800 w-full overflow-hidden">
@@ -157,8 +154,8 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <div className="flex justify-between text-xs font-bold mb-1">
-                      <span>SCALE_VELOCITY</span>
-                      <span className="text-cyber-purple">CALCULATING...</span>
+                      <span>GROWTH_VELOCITY</span>
+                      <span className="text-cyber-purple">OPTIMIZING...</span>
                     </div>
                     <div className="h-1 bg-gray-800 w-full overflow-hidden">
                       <div className="h-full bg-cyber-purple w-2/3 animate-pulse" />
@@ -170,7 +167,7 @@ export default function LandingPage() {
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <div className="bg-cyber-cyan/5 p-3 border border-cyber-cyan/10">
                     <div className="text-[10px] text-gray-500">MODE</div>
-                    <div className="font-sci text-sm">AUTONOMOUS</div>
+                    <div className="font-sci text-sm">INTELLIGENT</div>
                   </div>
                   <div className="bg-cyber-purple/5 p-3 border border-cyber-purple/10">
                     <div className="text-[10px] text-gray-500">ENCRYPTION</div>
@@ -189,9 +186,9 @@ export default function LandingPage() {
         
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-16">
-            <span className="text-cyber-purple font-sci text-sm tracking-widest">/// SYSTEM_CAPABILITIES</span>
+            <span className="text-cyber-purple font-sci text-sm tracking-widest">/// CAPABILITIES</span>
             <h2 className="text-4xl font-sci font-bold text-white mt-2">
-              NEURAL_MODULES <span className="text-cyber-cyan blinking">_</span>
+              INTELLIGENCE_MODULES <span className="text-cyber-cyan blinking">_</span>
             </h2>
           </div>
 
@@ -277,9 +274,9 @@ export default function LandingPage() {
       <div id="deploy" className="py-24 relative z-10">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-sci font-bold text-white">INITIALIZE SEQUENCE</h2>
+            <h2 className="text-3xl font-sci font-bold text-white">GET STARTED</h2>
             <p className="text-cyber-cyan mt-2 font-tech tracking-widest uppercase">
-              Join the network of autonomous founders.
+              Join the network of innovative founders.
             </p>
             <div className="w-24 h-1 bg-cyber-purple mx-auto mt-4 shadow-[0_0_15px_#bd00ff]" />
           </div>
@@ -287,7 +284,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* Free Tier */}
             <div className="hud-border p-8 flex flex-col items-center text-center">
-              <h3 className="font-sci text-xl text-gray-400">CORE_ACCESS</h3>
+              <h3 className="font-sci text-xl text-gray-400">ESSENTIAL</h3>
               <div className="text-4xl font-sci font-bold text-white mt-4 mb-2">FREE</div>
               <span className="text-xs font-tech text-cyber-cyan uppercase tracking-widest mb-8">
                 No Validation Required
@@ -309,7 +306,7 @@ export default function LandingPage() {
                 href="/register" 
                 className="w-full py-3 border border-gray-600 hover:border-cyber-cyan text-white font-sci text-sm font-bold uppercase transition-colors block text-center"
               >
-                Start Sequence
+                Get Started
               </Link>
             </div>
 
@@ -358,7 +355,7 @@ export default function LandingPage() {
           <InlineSSLogo size={48} animated={false} />
         </div>
         <p className="font-tech text-gray-500 text-sm">
-          SYSTEM STATUS: ONLINE <br />
+          Platform Status: Online <br />
           © 2025 SoloSuccess AI. All rights reserved. <br />
           <span className="text-[10px] text-cyber-dim mt-2 block">
             ENCHANTED NIGHTMARE INDUSTRIES

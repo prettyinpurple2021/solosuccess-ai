@@ -17,8 +17,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 // Removed GoogleAnalytics component usage; using manual GA4 snippet
 import { OfflineProvider } from "@/components/providers/offline-provider"
-import { DevCycleClientsideProvider } from "@devcycle/nextjs-sdk"
-import { getClientContext, isDevCycleEnabled, isStaticBuild } from "./devcycle"
+// DevCycle removed - will use PostHog for feature flags after redesign
 
 // Font configuration - Cyberpunk Design System v3 fonts
 const orbitronFont = Orbitron({ 
@@ -321,13 +320,7 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        {isDevCycleEnabled && !isStaticBuild ? (
-          <DevCycleClientsideProvider context={getClientContext()}>
-            {appShell}
-          </DevCycleClientsideProvider>
-        ) : (
-          appShell
-        )}
+        {appShell}
         <Analytics />
         <SpeedInsights />
       </body>

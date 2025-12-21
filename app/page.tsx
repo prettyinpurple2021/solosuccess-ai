@@ -81,7 +81,7 @@ export default function HomePage() {
             <div className="inline-block px-3 py-1 mb-2 border border-[#00F0FF]/30 bg-[#00F0FF]/5 rounded-sm">
               <span className="font-mono text-[10px] text-[#00F0FF] tracking-[0.2em] uppercase flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-[#00F0FF] rounded-full animate-pulse" />
-                System initialized
+                Intelligence Network Active
               </span>
             </div>
             
@@ -95,20 +95,20 @@ export default function HomePage() {
 
           {/* Subtext */}
           <p className="text-[#8892b0] text-lg md:text-xl max-w-[550px] mx-auto lg:mx-0 leading-relaxed font-sans">
-            Deploy an autonomous workforce. Scale your operations with a neural network of specialized AI agents working 24/7.
+            Build your intelligent business ecosystem. Scale your operations with a network of specialized AI agents working 24/7.
           </p>
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
             <Link href="/register">
               <button className="group relative px-8 py-4 bg-transparent border border-[#00F0FF] text-[#00F0FF] font-sci tracking-widest uppercase text-sm transition-all hover:bg-[#00F0FF]/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]">
-                <span className="relative z-10">Initialize_Core</span>
+                <span className="relative z-10">Get Started</span>
               </button>
             </Link>
             
             <Link href="/about">
               <button className="group px-8 py-4 bg-transparent text-white font-sci tracking-widest uppercase text-sm border border-transparent hover:border-white/20 transition-all opacity-70 hover:opacity-100">
-                System_Overview
+                Learn More
               </button>
             </Link>
           </div>
@@ -148,7 +148,7 @@ export default function HomePage() {
             <div className="flex justify-between items-center mb-8 border-b border-[#00F0FF]/20 pb-4">
               <div className="font-mono text-xs text-[#00F0FF] tracking-[0.2em] flex items-center gap-2">
                 <Server size={14} />
-                <span>TERMINAL_01</span>
+                <span>HUB_01</span>
               </div>
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-[#00F0FF] rounded-full animate-pulse" />
@@ -174,14 +174,14 @@ export default function HomePage() {
               {/* Progress Bars */}
               <div className="space-y-6">
                 <HudMetric 
-                  label="DEDICATED AGENTS" 
+                  label="ACTIVE AGENTS" 
                   value="8/8 ONLINE" 
                   status="active" 
                   pcolor="cyan" 
                 />
                 <HudMetric 
-                  label="NEURAL SYNC" 
-                  value="STABILIZING..." 
+                  label="SYSTEM SYNC" 
+                  value="OPTIMIZING..." 
                   status="stabilizing" 
                   pcolor="purple" 
                 />
@@ -191,11 +191,11 @@ export default function HomePage() {
               <div className="mt-6 p-4 bg-black/80 border border-white/10 font-mono text-[10px] text-[#8892b0] rounded-sm h-32 overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-[#020204]/90 pointer-events-none" />
                 <div className="space-y-2 opacity-80">
-                  <p><span className="text-[#00F0FF]">{'>'}</span> Initializing core protocols...</p>
-                  <p><span className="text-[#00F0FF]">{'>'}</span> Loading competitor_data.json...</p>
-                  <p><span className="text-[#00F0FF]">{'>'}</span> Optimizing neural pathways...</p>
+                  <p><span className="text-[#00F0FF]">{'>'}</span> Initializing intelligence modules...</p>
+                  <p><span className="text-[#00F0FF]">{'>'}</span> Loading business data streams...</p>
+                  <p><span className="text-[#00F0FF]">{'>'}</span> Optimizing agent networks...</p>
                   <p><span className="text-[#BC13FE]">{'>'}</span> Connection established.</p>
-                  <p className="animate-pulse"><span className="text-[#00F0FF]">{'>'}</span> Awaiting user input_</p>
+                  <p className="animate-pulse"><span className="text-[#00F0FF]">{'>'}</span> Ready for input_</p>
                 </div>
               </div>
             </div>
