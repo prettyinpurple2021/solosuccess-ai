@@ -47,10 +47,12 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider 
       {...props}
-      themes={['light', 'dark', 'system']}
-      defaultTheme="system"
-      enableSystem={true}
-      disableTransitionOnChange={false}
+      attribute="class" 
+      defaultTheme="balanced" 
+      storageKey="solosuccess-theme"
+      enableSystem={false}
+      disableTransitionOnChange
+      suppressHydrationWarning
     >
       {children}
     </NextThemesProvider>

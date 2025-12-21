@@ -6,27 +6,15 @@ import { useEffect, useState } from 'react'
 
 export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false)
-  
   // useTheme must be called unconditionally (React rules of hooks)
-  // During static generation, this may fail, so we provide defaults
-  let theme: string | undefined = undefined
-  let setTheme: ((theme: string) => void) | undefined = undefined
-  
-  try {
-    const themeContext = useTheme()
-    theme = themeContext?.theme
-    setTheme = themeContext?.setTheme
-  } catch {
-    // During static generation when React is null, use defaults
-    theme = undefined
-    setTheme = undefined
-  }
+  // With ThemeProvider using dynamic import (ssr: false), this is safe during static generation
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  if (!mounted || !setTheme) return <div className="w-24 h-10 bg-dark-hover rounded-sm animate-pulse" />
+  if (!mounted) return <div className="w-24 h-10 bg-dark-hover rounded-sm animate-pulse" />
 
   return (
     <div className="flex gap-2">

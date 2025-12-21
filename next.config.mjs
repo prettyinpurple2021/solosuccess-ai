@@ -55,9 +55,6 @@ const nextConfig = {
     ],
     // Enable webpack build worker
     webpackBuildWorker: true,
-    // Skip static optimization for pages with client components that use context
-    // This prevents build-time errors when components use React context
-    isrMemoryCacheSize: 0,
   },
 
   // Compression and optimization

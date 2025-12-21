@@ -7,27 +7,15 @@ import { useEffect, useState} from "react"
 
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
-  
   // useTheme must be called unconditionally (React rules of hooks)
-  // During static generation, this may fail, so we provide defaults
-  let theme: string | undefined = undefined
-  let setTheme: ((theme: string) => void) | undefined = undefined
-  
-  try {
-    const themeContext = useTheme()
-    theme = themeContext?.theme
-    setTheme = themeContext?.setTheme
-  } catch {
-    // During static generation when React is null, use defaults
-    theme = undefined
-    setTheme = undefined
-  }
+  // With ThemeProvider using dynamic import (ssr: false), this is safe during static generation
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  if (!mounted || !setTheme) {
+  if (!mounted) {
     return (
       <Button variant="ghost" size="sm" className="w-9 h-9 p-0">
         <div className="h-4 w-4" />
