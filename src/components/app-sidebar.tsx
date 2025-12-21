@@ -19,7 +19,7 @@ const data = {
     {
       name: "SoloSuccess AI",
       logo: GalleryVerticalEnd,
-      plan: "Empire Builder",
+      plan: "Scale",
     },
   ],
   navMain: [

@@ -67,10 +67,10 @@ interface MobileNavigationProps {
 const navigationItems: NavigationItem[] = [
   {
     id: 'dashboard',
-    label: 'Command Center',
+    label: 'Dashboard',
     icon: Home,
     href: '/dashboard',
-    color: 'text-purple-600',
+    color: 'text-neon-purple',
     quickActions: [
       { id: 'overview', label: 'Overview', icon: BarChart3, action: () => { } },
       { id: 'insights', label: 'Insights', icon: Zap, action: () => { } }
@@ -89,10 +89,10 @@ const navigationItems: NavigationItem[] = [
   },
   {
     id: 'goals',
-    label: 'Empire Goals',
+    label: 'Goals',
     icon: Target,
     href: '/dashboard/goals',
-    color: 'text-orange-600',
+    color: 'text-neon-orange',
     quickActions: [
       { id: 'add_goal', label: 'New Goal', icon: Target, action: () => { } },
       { id: 'progress', label: 'Progress', icon: BarChart3, action: () => { } }
@@ -115,7 +115,7 @@ const navigationItems: NavigationItem[] = [
     label: 'Briefcase',
     icon: Briefcase,
     href: '/dashboard/briefcase',
-    color: 'text-indigo-600',
+    color: 'text-neon-purple',
     quickActions: [
       { id: 'upload', label: 'Upload File', icon: Plus, action: () => { } },
       { id: 'recent', label: 'Recent Files', icon: Clock, action: () => { } }
@@ -136,7 +136,7 @@ const navigationItems: NavigationItem[] = [
     label: 'Analytics',
     icon: BarChart3,
     href: '/dashboard/analytics',
-    color: 'text-teal-600',
+    color: 'text-neon-cyan',
     quickActions: [
       { id: 'overview', label: 'Overview', icon: Home, action: () => { } },
       { id: 'reports', label: 'Reports', icon: FileText, action: () => { } }
@@ -292,7 +292,7 @@ export default function MobileNavigation({
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs">
+                <AvatarFallback className="bg-gradient-to-r from-neon-purple to-neon-cyan text-white text-xs">
                   {user?.name?.charAt(0) || <User className="h-4 w-4" />}
                 </AvatarFallback>
               </Avatar>
@@ -337,7 +337,7 @@ export default function MobileNavigation({
           >
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+              <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-neon-purple to-neon-cyan text-white">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
@@ -371,7 +371,7 @@ export default function MobileNavigation({
                         className={cn(
                           "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors touch-target",
                           activeItem === item.id
-                            ? "bg-purple-50 text-purple-700 border-l-4 border-purple-600"
+                            ? "bg-neon-purple/10 text-neon-purple border-l-4 border-neon-purple"
                             : "text-gray-700 hover:bg-gray-50",
                           item.isNew && "relative"
                         )}
@@ -447,7 +447,7 @@ export default function MobileNavigation({
                 {/* Quick Stats */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
                   <div className="p-2 bg-gray-50 rounded">
-                    <div className="font-bold text-purple-600">12</div>
+                    <div className="font-bold text-neon-purple">12</div>
                     <div className="text-gray-600">Tasks</div>
                   </div>
                   <div className="p-2 bg-gray-50 rounded">
@@ -477,7 +477,7 @@ export default function MobileNavigation({
               className={cn(
                 "flex flex-col items-center gap-1 p-2 rounded-lg transition-colors touch-target",
                 activeItem === item.id
-                  ? "bg-purple-50 text-purple-700"
+                  ? "bg-neon-purple/10 text-neon-purple"
                   : "text-gray-600 hover:bg-gray-50"
               )}
               onClick={() => {

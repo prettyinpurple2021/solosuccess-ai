@@ -150,12 +150,12 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-cyan-100 to-pink-100 dark:from-purple-900/30 dark:via-cyan-900/30 dark:to-pink-900/30 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-cyan-400/20 to-pink-400/20 -z-10"></div>
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 -z-10"></div>
+    <div className="min-h-screen bg-dark-bg relative overflow-hidden">
+      {/* Animated background elements - cyberpunk grid */}
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 -z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 via-transparent to-neon-purple/5 -z-10"></div>
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-purple-200 dark:border-teal-800">
+      <nav className="sticky top-0 z-50 bg-dark-bg/80 backdrop-blur-md border-b border-neon-cyan/20">
         <div className="container-responsive py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -173,7 +173,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   logInfo('Logo image loaded successfully');
                 }}
               />
-              <span className="text-responsive-xl lg:text-responsive-2xl font-bold bg-gradient-to-r from-purple-600 via-teal-500 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-responsive-xl lg:text-responsive-2xl font-bold bg-gradient-to-r from-neon-cyan via-white to-neon-purple bg-clip-text text-transparent">
                 SoloSuccess AI
               </span>
             </div>
@@ -186,7 +186,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   e.preventDefault()
                   scrollToSection("features")
                 }}
-                className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
+                className="text-gray-300 hover:text-neon-cyan transition-colors"
               >
                 Features
               </a>
@@ -196,7 +196,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   e.preventDefault()
                   scrollToSection("agents")
                 }}
-                className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
+                className="text-gray-300 hover:text-neon-cyan transition-colors"
               >
                 AI Squad
               </a>
@@ -207,19 +207,19 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   e.preventDefault()
                   scrollToSection("pricing")
                 }}
-                className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
+                className="text-gray-300 hover:text-neon-cyan transition-colors"
               >
                 Pricing
               </a>
               <ThemeToggle />
               <Link href="/signin">
-                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400">
+                <Button variant="ghost" className="text-gray-300 hover:text-neon-cyan">
                   Sign In
                 </Button>
               </Link>
               <Link href="/signup">
                 <Button 
-                  className="bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 hover:from-purple-600 hover:via-teal-600 hover:to-pink-600 text-white"
+                  className="bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan hover:to-neon-magenta text-white"
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -243,7 +243,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="md:hidden py-4 border-t border-purple-200 dark:border-teal-800"
+                className="md:hidden py-4 border-t border-neon-cyan/20"
               >
                 <div className="flex flex-col space-y-4">
                   <a
@@ -253,7 +253,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                       scrollToSection("features")
                       setMobileMenuOpen(false)
                     }}
-                    className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
+                    className="text-gray-300 hover:text-neon-cyan transition-colors"
                   >
                     Features
                   </a>
@@ -264,7 +264,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                       scrollToSection("agents")
                       setMobileMenuOpen(false)
                     }}
-                    className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
+                    className="text-gray-300 hover:text-neon-cyan transition-colors"
                   >
                     AI Squad
                   </a>
@@ -276,18 +276,18 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                       scrollToSection("pricing")
                       setMobileMenuOpen(false)
                     }}
-                    className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 transition-colors"
+                    className="text-gray-300 hover:text-neon-cyan transition-colors"
                   >
                     Pricing
                   </a>
                   <Link href="/signin">
-                    <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-teal-400 w-full">
+                    <Button variant="ghost" className="text-gray-300 hover:text-neon-cyan w-full">
                       Sign In
                     </Button>
                   </Link>
                   <Link href="/signup">
                     <Button
-                      className="bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 hover:from-purple-600 hover:via-teal-600 hover:to-pink-600 text-white w-full"
+                      className="bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan hover:to-neon-magenta text-white w-full"
                     >
                       Get Started
                     </Button>
@@ -305,25 +305,25 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left side - Content */}
             <div className="space-y-8">
-              <Badge className="mb-6 bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 text-white">
+              <Badge className="mb-6 bg-gradient-to-r from-neon-cyan to-neon-purple text-white">
                 ✨ AI-Powered Productivity Revolution
               </Badge>
-              <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-                Become the Ultimate
+              <h1 className="text-responsive-4xl lg:text-responsive-6xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-white to-neon-purple bg-clip-text text-transparent">
+                Build Your Intelligent
                 <br />
-                <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-pink-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">SoloSuccess</span>
+                <span className="text-responsive-5xl lg:text-responsive-7xl bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-magenta bg-clip-text text-transparent">Business Ecosystem</span>
               </h1>
-              <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 mb-8">
-                Meet your <strong>AI Co-founder</strong> and <strong>AI Business Co-pilot</strong>—a <strong>Virtual Team for Founders</strong> inside a
-                <strong> Solopreneur Operating System</strong>. This is the all‑in‑one <strong>AI Business Assistant</strong> and <strong>Startup AI Platform</strong>
+              <p className="text-responsive-lg lg:text-responsive-xl text-gray-300 mb-8">
+                Meet your <strong>AI Co-founder</strong> and <strong>AI Business Co-pilot</strong>—a <strong>Virtual Team for Founders</strong> inside an
+                <strong> Intelligent Business Platform</strong>. This is the all‑in‑one <strong>AI Business Assistant</strong> and <strong>Startup AI Platform</strong>
                 that brings together <strong>Founder AI Tools</strong> and <strong>One-Person Business Software</strong> so every <strong>Solo Founder</strong>,
                 <strong> Solopreneur</strong>, or <strong>Individual Creator</strong> can move faster with clarity.
               </p>
-              <p className="text-responsive-base lg:text-responsive-lg text-gray-600 dark:text-gray-300">
+              <p className="text-responsive-base lg:text-responsive-lg text-gray-300">
                 Whether you’re using <strong>Freelancer Tools</strong>, building as a <strong>Bootstrapped Founder</strong>, growing as an
                 <strong> E-commerce Entrepreneur</strong>, scaling as a <strong>Small Business Owner</strong>, or consulting with dedicated
                 <strong> Consultant Software</strong>—we help you avoid <strong>Founder Burnout</strong>, <strong>Reduce Context Switching</strong>, and
-                <strong> Overcome Decision Fatigue</strong>. Execute confidently, <strong>Scale a Solo Business</strong>, and unlock
+                <strong> Overcome Decision Fatigue</strong>. Build confidently, <strong>Scale a Solo Business</strong>, and unlock
                 <strong> Business Automation</strong> with <strong>Strategic Planning Tools</strong> that <strong>Streamline Operations</strong> and answer
                 <strong> How to Grow a Business Alone</strong> with proven AI workflows.
               </p>
@@ -331,16 +331,16 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 <Link href="/signup">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 hover:from-purple-600 hover:via-teal-600 hover:to-pink-600 text-white px-8 py-3"
+                    className="bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan hover:to-neon-magenta text-white px-8 py-3"
                   >
-                    Start Your Empire
+                    Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="px-8 py-3 border-purple-300 dark:border-teal-600 bg-transparent"
+                  className="px-8 py-3 border-neon-cyan/50 bg-transparent text-gray-300 hover:text-neon-cyan"
                   onClick={() => setShowScheduleModal(true)}
                 >
                   Watch Demo
@@ -363,7 +363,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                   }}
                 />
                 {/* Gradient overlay to enhance the integration */}
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 via-transparent to-teal-900/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-neon-cyan/20" />
               </div>
             </div>
           </div>
@@ -372,16 +372,16 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
           <div className="mt-16">
             <div className="mobile-first-grid max-w-4xl mx-auto text-center">
               <div className="text-center">
-                <div className="text-responsive-3xl lg:text-responsive-4xl font-bold text-purple-600 dark:text-teal-400">300%</div>
-                <div className="text-responsive-sm lg:text-responsive-base text-gray-600 dark:text-gray-300">Productivity Increase</div>
+                <div className="text-responsive-3xl lg:text-responsive-4xl font-bold text-neon-cyan">300%</div>
+                <div className="text-responsive-sm lg:text-responsive-base text-gray-300">Productivity Increase</div>
               </div>
               <div className="text-center">
-                <div className="text-responsive-3xl lg:text-responsive-4xl font-bold text-teal-600 dark:text-pink-400">50K+</div>
-                <div className="text-responsive-sm lg:text-responsive-base text-gray-600 dark:text-gray-300">Active Users</div>
+                <div className="text-responsive-3xl lg:text-responsive-4xl font-bold text-neon-lime">50K+</div>
+                <div className="text-responsive-sm lg:text-responsive-base text-gray-300">Active Users</div>
               </div>
               <div className="text-center">
-                <div className="text-responsive-3xl lg:text-responsive-4xl font-bold text-pink-600 dark:text-purple-400">$2M+</div>
-                <div className="text-responsive-sm lg:text-responsive-base text-gray-600 dark:text-gray-300">Revenue Generated</div>
+                <div className="text-responsive-3xl lg:text-responsive-4xl font-bold text-neon-purple">$2M+</div>
+                <div className="text-responsive-sm lg:text-responsive-base text-gray-300">Revenue Generated</div>
               </div>
             </div>
           </div>
@@ -389,7 +389,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       </section>
 
       {/* SoloSuccess Motto Banner */}
-      <section className="p-responsive-xl bg-gradient-to-r from-purple-50 via-teal-50 to-pink-50 dark:from-purple-900/20 dark:via-teal-900/20 dark:to-pink-900/20">
+      <section className="p-responsive-xl bg-dark-card/50">
         <div className="container-responsive">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -415,7 +415,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="p-responsive-xl bg-white/50 dark:bg-slate-800/50">
+      <section id="features" className="p-responsive-xl bg-dark-bg">
         <div className="container-responsive">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -424,10 +424,10 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-              Supercharge Your Success
+            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-white to-neon-purple bg-clip-text text-transparent">
+              Amplify Your Success
             </h2>
-            <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-responsive-lg lg:text-responsive-xl text-gray-300 max-w-3xl mx-auto">
               Your <strong>AI Marketing Assistant</strong> and <strong>AI Sales Strategist</strong> collaborate to deliver
               <strong> Automated Content Creation</strong>, <strong>AI for Social Media</strong>, and <strong>Business Intelligence Tools</strong>,
               powered by <strong>Workflow Automation AI</strong> and an <strong>AI Executive Assistant</strong>—all wrapped in
@@ -444,15 +444,15 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 border-purple-200 dark:border-teal-800 hover:border-purple-300 dark:hover:border-teal-600">
+                <Card className="h-full hover:shadow-xl transition-all duration-300 border-neon-cyan/20 hover:border-neon-cyan/40 bg-dark-card">
                   <CardHeader>
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center mb-4">
                       <feature.icon className="h-6 w-6 text-white" />
                     </div>
-                    <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{feature.title}</CardTitle>
+                    <CardTitle className="text-xl font-bold text-white">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-gray-600 dark:text-gray-300">
+                    <CardDescription className="text-gray-300">
                       {feature.description}
                     </CardDescription>
                   </CardContent>
@@ -473,10 +473,10 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
+            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-white to-neon-purple bg-clip-text text-transparent">
               Meet Your AI Squad ✨
             </h2>
-            <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-responsive-lg lg:text-responsive-xl text-gray-300 max-w-3xl mx-auto">
               8 specialized AI agents, each with unique personalities and expertise to handle different aspects of your business. 
               Your virtual dream team, available 24/7.
             </p>
@@ -484,14 +484,14 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
 
           <div className="mobile-first-grid mb-12">
             {[
-              { id: 'roxy', name: "Roxy", role: "Creative Strategist", specialty: "Brand & Content Creation", color: "from-purple-500 to-pink-500", image: getAgentMeta('roxy')?.image || '/images/agents/roxy.png' },
-              { id: 'blaze', name: "Blaze", role: "Performance Coach", specialty: "Productivity & Goal Achievement", color: "from-orange-500 to-red-500", image: getAgentMeta('blaze')?.image || '/images/agents/blaze.png' },
-              { id: 'echo', name: "Echo", role: "Communication Expert", specialty: "Networking & Relationships", color: "from-teal-500 to-cyan-500", image: getAgentMeta('echo')?.image || '/images/agents/echo.png' },
-              { id: 'glitch', name: "Glitch", role: "QA & Debug Agent", specialty: "Quality Assurance & Testing", color: "from-red-500 to-orange-500", image: getAgentMeta('glitch')?.image || '/images/agents/glitch.png' },
-              { id: 'lumi', name: "Lumi", role: "Legal & Docs Agent", specialty: "Legal Compliance & Documentation", color: "from-purple-500 to-indigo-500", image: getAgentMeta('lumi')?.image || '/images/agents/lumi.png' },
-              { id: 'vex', name: "Vex", role: "Tech & Automation", specialty: "Technical Solutions & Workflows", color: "from-cyan-500 to-teal-500", image: getAgentMeta('vex')?.image || '/images/agents/vex.png' },
-              { id: 'lexi', name: "Lexi", role: "Data & Analytics", specialty: "Business Intelligence & Insights", color: "from-teal-500 to-emerald-500", image: getAgentMeta('lexi')?.image || '/images/agents/lexi.png' },
-              { id: 'nova', name: "Nova", role: "Innovation & Growth", specialty: "Strategy & Market Expansion", color: "from-pink-500 to-purple-500", image: getAgentMeta('nova')?.image || '/images/agents/nova.png' }
+              { id: 'roxy', name: "Roxy", role: "Creative Strategist", specialty: "Brand & Content Creation", color: "from-neon-purple to-neon-magenta", image: getAgentMeta('roxy')?.image || '/images/agents/roxy.png' },
+              { id: 'blaze', name: "Blaze", role: "Performance Coach", specialty: "Productivity & Goal Achievement", color: "from-neon-orange to-neon-magenta", image: getAgentMeta('blaze')?.image || '/images/agents/blaze.png' },
+              { id: 'echo', name: "Echo", role: "Communication Expert", specialty: "Networking & Relationships", color: "from-neon-cyan to-neon-lime", image: getAgentMeta('echo')?.image || '/images/agents/echo.png' },
+              { id: 'glitch', name: "Glitch", role: "QA & Debug Agent", specialty: "Quality Assurance & Testing", color: "from-neon-magenta to-neon-orange", image: getAgentMeta('glitch')?.image || '/images/agents/glitch.png' },
+              { id: 'lumi', name: "Lumi", role: "Legal & Docs Agent", specialty: "Legal Compliance & Documentation", color: "from-neon-purple to-neon-cyan", image: getAgentMeta('lumi')?.image || '/images/agents/lumi.png' },
+              { id: 'vex', name: "Vex", role: "Tech & Automation", specialty: "Technical Solutions & Workflows", color: "from-neon-cyan to-neon-lime", image: getAgentMeta('vex')?.image || '/images/agents/vex.png' },
+              { id: 'lexi', name: "Lexi", role: "Data & Analytics", specialty: "Business Intelligence & Insights", color: "from-neon-lime to-neon-cyan", image: getAgentMeta('lexi')?.image || '/images/agents/lexi.png' },
+              { id: 'nova', name: "Nova", role: "Innovation & Growth", specialty: "Strategy & Market Expansion", color: "from-neon-magenta to-neon-purple", image: getAgentMeta('nova')?.image || '/images/agents/nova.png' }
             ].map((agent, index) => (
               <motion.div
                 key={index}
@@ -500,7 +500,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 border-purple-200 dark:border-teal-800 hover:border-purple-300 dark:hover:border-teal-600 text-center bg-gradient-to-br from-white/80 to-purple-50/80 dark:from-slate-800/80 dark:to-purple-900/20 hover:from-purple-50 hover:to-pink-50 dark:hover:from-purple-900/30 dark:hover:to-teal-900/20">
+                <Card className="h-full hover:shadow-xl transition-all duration-300 border-neon-cyan/20 hover:border-neon-cyan/40 text-center bg-dark-card hover:bg-dark-hover">
                   <CardHeader>
                     <div className={`w-20 h-20 bg-gradient-to-r ${agent.color} rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden`}>
                       <img
@@ -517,13 +517,13 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                         {agent.name.charAt(0)}
                       </div>
                     </div>
-                    <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{agent.name}</CardTitle>
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-teal-900 dark:text-teal-200">
+                    <CardTitle className="text-xl font-bold text-white">{agent.name}</CardTitle>
+                    <Badge variant="secondary" className="bg-neon-purple/20 text-neon-purple border border-neon-purple/30">
                       {agent.role}
                     </Badge>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-gray-600 dark:text-gray-300 text-sm">
+                    <CardDescription className="text-gray-300 text-sm">
                       {agent.specialty}
                     </CardDescription>
                   </CardContent>
@@ -542,7 +542,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               <Link href="/signup">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 hover:from-purple-600 hover:via-teal-600 hover:to-pink-600 text-white text-lg px-8 py-4"
+                  className="bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan hover:to-neon-magenta text-white text-lg px-8 py-4"
                 >
                   Meet Your Full AI Team
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -556,7 +556,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       
 
       {/* Pricing Section */}
-      <section id="pricing" className="p-responsive-xl bg-white/50 dark:bg-slate-800/50">
+      <section id="pricing" className="p-responsive-xl bg-dark-bg">
         <div className="container-responsive">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -565,10 +565,10 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
+            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-white to-neon-purple bg-clip-text text-transparent">
               Choose Your Power Level
             </h2>
-            <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-responsive-lg lg:text-responsive-xl text-gray-300 max-w-3xl mx-auto">
               Pricing tailored for every stage: from <strong>Solo Founder</strong> just starting, to the scaling
               <strong> Small Business Owner</strong> and <strong>Consultant</strong> seeking <strong>Business Automation</strong> that
               <strong> Streamlines Operations</strong>.
@@ -587,34 +587,34 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 text-white">Most Popular</Badge>
+                    <Badge className="bg-gradient-to-r from-neon-cyan to-neon-purple text-white">Most Popular</Badge>
                   </div>
                 )}
                 <Card
-                  className={`h-full ${
+                  className={`h-full bg-dark-card ${
                     plan.popular
-                      ? "border-purple-300 dark:border-teal-600 shadow-xl"
-                      : "border-purple-200 dark:border-teal-800"
+                      ? "border-neon-cyan/50 shadow-xl shadow-neon-cyan/20"
+                      : "border-neon-cyan/20"
                   }`}
                 >
                   <CardHeader className="text-center">
-                    <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">{plan.name}</CardTitle>
-                    <div className="text-4xl font-bold text-purple-600 dark:text-teal-400">
+                    <CardTitle className="text-2xl font-bold text-white">{plan.name}</CardTitle>
+                    <div className="text-4xl font-bold text-neon-cyan">
                       {plan.price}
-                      <span className="text-lg text-gray-600 dark:text-gray-400">{plan.period}</span>
+                      <span className="text-lg text-gray-300">{plan.period}</span>
                     </div>
-                    <CardDescription className="text-gray-600 dark:text-gray-300">{plan.description}</CardDescription>
+                    <CardDescription className="text-gray-300">{plan.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature, featureIndex) => (
                         <li key={featureIndex} className="flex items-center space-x-3">
                           <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                          <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                          <span className="text-gray-300">{feature}</span>
                         </li>
                       ))}
                     </ul>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                    <div className="text-sm text-gray-400 mb-6">
                       Built for <strong>Bootstrapped Founders</strong>, <strong>Freelancers</strong>, and
                       <strong> E-commerce Entrepreneurs</strong>—with <strong>Strategic Planning Tools</strong> and an integrated
                       <strong> AI Business Assistant</strong>.
@@ -622,8 +622,8 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
                     <Button
                       className={`w-full ${
                         plan.popular
-                          ? "bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 hover:from-purple-600 hover:via-teal-600 hover:to-pink-600 text-white"
-                          : "border-purple-300 dark:border-teal-600 text-purple-600 dark:text-teal-400 hover:bg-purple-50 dark:hover:bg-teal-900/20"
+                          ? "bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan hover:to-neon-magenta text-white"
+                          : "border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10"
                       }`}
                       variant={plan.popular ? "default" : "outline"}
                       onClick={() => {
@@ -653,10 +653,10 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-teal-600 to-pink-600 bg-clip-text text-transparent">
-              Ready to Become a SoloSuccess?
+            <h2 className="text-responsive-3xl lg:text-responsive-5xl font-bold mb-6 bg-gradient-to-r from-neon-cyan via-white to-neon-purple bg-clip-text text-transparent">
+              Ready to Build Your Intelligent Business?
             </h2>
-            <p className="text-responsive-lg lg:text-responsive-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+            <p className="text-responsive-lg lg:text-responsive-xl text-gray-300 mb-8 max-w-3xl mx-auto">
               Join the revolution of AI-powered entrepreneurs. Start for free today and experience the future of
               productivity.
             </p>
@@ -664,7 +664,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               <Link href="/signup">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-purple-500 via-teal-500 to-pink-500 hover:from-purple-600 hover:via-teal-600 hover:to-pink-600 text-white text-lg px-8 py-4"
+                  className="bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-cyan hover:to-neon-magenta text-white text-lg px-8 py-4"
                 >
                   Start for free
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -673,7 +673,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-lg px-8 py-4 border-purple-300 dark:border-teal-600 bg-transparent"
+                className="text-lg px-8 py-4 border-neon-cyan/50 bg-transparent text-gray-300 hover:text-neon-cyan"
                 onClick={() => setShowScheduleModal(true)}
               >
                 Schedule Demo
@@ -708,7 +708,7 @@ export function SharedLandingPage(_props: SharedLandingPageProps) {
       />
 
       {/* Footer */}
-      <footer className="relative bg-gray-900 text-white p-responsive-xl z-10">
+      <footer className="relative bg-dark-bg border-t border-neon-cyan/20 text-white p-responsive-xl z-10">
         <div className="container-responsive">
           <div className="mobile-first-grid">
             <div>

@@ -20,7 +20,7 @@ export function Navbar() {
               SOLO<span className="text-cyber-cyan">SUCCESS</span>.AI
             </span>
             <span className="text-[10px] text-cyber-purple tracking-[0.3em] uppercase">
-              System: Operational
+              Status: Online
             </span>
           </div>
         </Link>
@@ -40,7 +40,7 @@ export function Navbar() {
           </Link>
           <Link href="/signup">
             <CyberButton variant="ghost" size="sm">
-              GET_STARTED
+              Get Started
             </CyberButton>
           </Link>
         </div>

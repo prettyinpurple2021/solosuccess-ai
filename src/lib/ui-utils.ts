@@ -3,21 +3,30 @@ import { cn } from "@/lib/utils"
 
 /**
  * Common gradient styles used throughout the app
+ * Updated to use Cyberpunk Design System v3 neon colors
  */
 export const gradientVariants = cva("", {
   variants: {
     variant: {
-      "purple-pink": "bg-gradient-to-r from-purple-500 to-pink-500",
-      "purple-pink-text": "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent",
-      "teal-purple": "bg-gradient-to-r from-teal-500 to-purple-500",
-      "pink-purple": "bg-gradient-to-r from-pink-500 to-purple-500", 
-      "purple-teal": "bg-gradient-to-r from-purple-500 to-teal-500",
-      "teal-pink": "bg-gradient-to-r from-teal-500 to-pink-500",
-      "pink-teal": "bg-gradient-to-r from-pink-500 to-teal-500",
+      "cyan-purple": "bg-gradient-to-r from-neon-cyan to-neon-purple",
+      "cyan-purple-text": "bg-gradient-to-r from-neon-cyan to-neon-purple bg-clip-text text-transparent",
+      "purple-magenta": "bg-gradient-to-r from-neon-purple to-neon-magenta",
+      "magenta-purple": "bg-gradient-to-r from-neon-magenta to-neon-purple", 
+      "cyan-magenta": "bg-gradient-to-r from-neon-cyan to-neon-magenta",
+      "lime-cyan": "bg-gradient-to-r from-neon-lime to-neon-cyan",
+      "orange-purple": "bg-gradient-to-r from-neon-orange to-neon-purple",
+      // Legacy support - map old variants to new colors
+      "purple-pink": "bg-gradient-to-r from-neon-purple to-neon-magenta",
+      "purple-pink-text": "bg-gradient-to-r from-neon-purple to-neon-magenta bg-clip-text text-transparent",
+      "teal-purple": "bg-gradient-to-r from-neon-cyan to-neon-purple",
+      "pink-purple": "bg-gradient-to-r from-neon-magenta to-neon-purple", 
+      "purple-teal": "bg-gradient-to-r from-neon-purple to-neon-cyan",
+      "teal-pink": "bg-gradient-to-r from-neon-cyan to-neon-magenta",
+      "pink-teal": "bg-gradient-to-r from-neon-magenta to-neon-cyan",
     },
   },
   defaultVariants: {
-    variant: "purple-pink",
+    variant: "cyan-purple",
   },
 })
 
@@ -41,7 +50,7 @@ export const cardVariants = cva("", {
   variants: {
     variant: {
       default: "border border-gray-200",
-      purple: "border-2 border-purple-100 hover:border-purple-300",
+      purple: "border-2 border-neon-purple/30 hover:border-neon-purple/60",
       boss: "boss-card",
     },
     animation: {
@@ -59,7 +68,15 @@ export const cardVariants = cva("", {
 /**
  * Utility function to get gradient classes
  */
-export function getGradient(variant: "purple-pink" | "purple-pink-text" | "teal-purple" | "pink-purple" | "purple-teal" | "teal-pink" | "pink-teal" = "purple-pink") {
+export function getGradient(
+  variant: 
+    | "cyan-purple" | "cyan-purple-text" | "purple-magenta" | "magenta-purple" 
+    | "cyan-magenta" | "lime-cyan" | "orange-purple"
+    // Legacy variants (mapped to new colors)
+    | "purple-pink" | "purple-pink-text" | "teal-purple" | "pink-purple" 
+    | "purple-teal" | "teal-pink" | "pink-teal" 
+  = "cyan-purple"
+) {
   return gradientVariants({ variant })
 }
 

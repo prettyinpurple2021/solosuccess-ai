@@ -79,7 +79,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           {title ? (
             <div>
               <div className="flex items-center gap-3">
-                <Crown className="text-military-hot-pink" size={24} />
+                <Crown className="text-neon-magenta" size={24} />
                 <h1 className="text-2xl font-sci font-bold bg-gradient-to-r from-cyber-cyan via-white to-cyber-purple bg-clip-text text-transparent">
                   {title}
                 </h1>
