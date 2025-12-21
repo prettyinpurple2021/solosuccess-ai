@@ -25,6 +25,11 @@ export const Alert = ({
   const theme = undefined
   const isBalanced = false // Default: balanced shadows work for all themes
   
+  // Reset visibility when content changes (new error/success message)
+  React.useEffect(() => {
+    setIsVisible(true)
+  }, [title, description, variant])
+  
   const variants = {
     success: {
       border: 'border-neon-lime',
