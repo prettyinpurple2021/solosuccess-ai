@@ -21,11 +21,13 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
+      // Map @/app/* to app/ directory (must come before @/* pattern)
       "@/app/*": [
         "./app/*"
+      ],
+      // Map @/* to src/ directory (default - must come after @/app/ pattern)
+      "@/*": [
+        "./src/*"
       ]
     },
     "allowImportingTsExtensions": true,

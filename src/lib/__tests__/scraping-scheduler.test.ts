@@ -1,10 +1,13 @@
 import { ScrapingScheduler } from '../database-scraping-scheduler'
 import { queueProcessor } from '../scraping-queue-processor'
 
-// Mock uuid to avoid ESM issues
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'mock-uuid-v4'),
-}))
+// Mock uuid to avoid ESM issues and generate unique values
+jest.mock('uuid', () => {
+  let uuidCounter = 0
+  return {
+    v4: jest.fn(() => `mock-uuid-v4-${++uuidCounter}`),
+  }
+})
 
 // Mock the database
 jest.mock('@/db', () => ({
