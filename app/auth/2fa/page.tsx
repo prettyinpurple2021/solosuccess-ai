@@ -9,7 +9,7 @@ import { PrimaryButton } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert } from "@/components/ui/alert"
-import { Heading } from "@/components/ui/heading"
+import { Heading } from "@/components/ui/Heading"
 import { Loader2, Shield, Smartphone } from "lucide-react"
 
 export default function TwoFactorPage() {

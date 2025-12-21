@@ -1,6 +1,6 @@
 import { LoginForm } from '@/components/auth/login-form';
 import { Suspense } from 'react';
-import { Heading } from '@/components/ui/heading';
+import { Heading } from '@/components/ui/Heading';
 
 export default function LoginPage() {
   return (

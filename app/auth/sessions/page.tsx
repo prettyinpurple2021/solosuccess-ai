@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { authClient } from "@/lib/auth-client"
 import { PrimaryButton } from "@/components/ui/button"
 import { Alert } from "@/components/ui/alert"
-import { Heading } from "@/components/ui/heading"
+import { Heading } from "@/components/ui/Heading"
 import { HudBorder } from '@/components/cyber/HudBorder'
 import { 
   Monitor, 

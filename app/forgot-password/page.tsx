@@ -1,6 +1,6 @@
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 import Link from 'next/link';
-import { Heading } from '@/components/ui/heading';
+import { Heading } from '@/components/ui/Heading';
 
 export const dynamic = 'force-dynamic'
 

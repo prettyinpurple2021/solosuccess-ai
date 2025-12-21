@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
-import { Heading } from '@/components/ui/heading';
+import { Heading } from '@/components/ui/Heading';
 
 export function ForgotPasswordForm() {
   const [isPending, setIsPending] = useState(false);

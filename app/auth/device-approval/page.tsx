@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { PrimaryButton } from "@/components/ui/button"
 import { Alert } from "@/components/ui/alert"
-import { Heading } from "@/components/ui/heading"
+import { Heading } from "@/components/ui/Heading"
 import { 
   Shield, 
   CheckCircle, 
