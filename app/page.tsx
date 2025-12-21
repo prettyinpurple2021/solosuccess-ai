@@ -163,10 +163,10 @@ export default function HomePage() {
                  <div className="absolute inset-0 flex items-center justify-center opacity-10">
                     <Brain size={120} className="text-neon-purple animate-pulse" />
                  </div>
-                 <h3 className="relative z-10 font-mono text-sm text-[#8892b0] mb-2 tracking-widest uppercase">
+                 <h3 className="relative z-10 font-mono text-sm text-gray-400 mb-2 tracking-widest uppercase">
                    Current Objective
                  </h3>
-                 <p className="relative z-10 font-sci text-3xl text-white font-bold tracking-wider drop-shadow-[0_0_10px_rgba(188,19,254,0.5)]">
+                 <p className="relative z-10 font-sci text-3xl text-white font-bold tracking-wider drop-shadow-[0_0_10px_rgba(179,0,255,0.5)]">
                    MARKET_INTELLIGENCE
                  </p>
               </div>
@@ -188,8 +188,8 @@ export default function HomePage() {
               </div>
 
               {/* Terminal Log Output */}
-              <div className="mt-6 p-4 bg-black/80 border border-white/10 font-mono text-[10px] text-[#8892b0] rounded-sm h-32 overflow-hidden relative">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-[#020204]/90 pointer-events-none" />
+              <div className="mt-6 p-4 bg-black/80 border border-white/10 font-mono text-[10px] text-gray-400 rounded-sm h-32 overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-dark-bg/90 pointer-events-none" />
                 <div className="space-y-2 opacity-80">
                   <p><span className="text-neon-cyan">{'>'}</span> Initializing intelligence modules...</p>
                   <p><span className="text-neon-cyan">{'>'}</span> Loading business data streams...</p>

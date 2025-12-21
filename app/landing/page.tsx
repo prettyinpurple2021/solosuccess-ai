@@ -212,9 +212,9 @@ export default function LandingPage() {
                 <span className="font-sci text-2xl font-bold text-white/20 group-hover:text-cyber-cyan transition-colors">02</span>
                 <FaLock className="text-cyber-purple text-xl" />
               </div>
-              <h3 className="font-sci text-lg text-white mb-2">Quantum-Grade Encryption</h3>
+              <h3 className="font-sci text-lg text-white mb-2">Advanced Encryption</h3>
               <p className="text-sm text-gray-400 font-tech leading-relaxed">
-                Advanced security protocols. Your proprietary data is secured behind layers of digital armor.
+                Enterprise-grade security protocols. Your proprietary data is secured behind layers of digital protection.
               </p>
             </div>
 
