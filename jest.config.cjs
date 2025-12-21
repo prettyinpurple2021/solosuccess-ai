@@ -4,10 +4,21 @@ const createJestConfig = nextJest({ dir: './' })
 
 /** @type {import('jest').Config} */
 const customJestConfig = {
+  // Default to node for server tests
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['/node_modules/', '/tests/'],
+  testMatch: ['**/*.test.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/',
+    '/.next/',
+    '/coverage/',
+    'eslint.config.test.js',
+    // Exclude Vitest test files (they use vitest, not jest)
+    '.*PrivacyPolicy\\.test\\.tsx$',
+    '.*TermsOfService\\.test\\.tsx$',
+  ],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   // Ensure coverage reports are generated in formats that Codecov understands
   coverageDirectory: 'coverage',

@@ -102,6 +102,7 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.3.1",
     "@types/bcryptjs": "^2.4.6",

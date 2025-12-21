@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 "use client"
 
 import "@testing-library/jest-dom"
