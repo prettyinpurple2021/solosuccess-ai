@@ -110,12 +110,12 @@ export default function DominatorPricingPage() {
       <div className="min-h-screen bg-military-midnight relative overflow-hidden">
         <CamoBackground opacity={0.1} withGrid>
           {/* Navigation */}
-          <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-neon-purple/30">
             <div className="container mx-auto px-4">
               <div className="flex items-center justify-between h-20">
                 <Link href="/" className="flex items-center gap-3">
                   <motion.div 
-                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center shadow-lg"
                     whileHover={{ scale: 1.05 }}
                   >
                     <Crown className="w-6 h-6 text-white" />
@@ -150,13 +150,13 @@ export default function DominatorPricingPage() {
               >
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <RankStars count={5} size="lg" />
-                  <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  <span className="text-neon-purple font-tactical text-sm uppercase tracking-wider">
                     Elite Empire Tier
                   </span>
                 </div>
                 
                 <h1 className="font-heading text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">
                     Dominator
                   </span> Plan
                 </h1>
@@ -167,7 +167,7 @@ export default function DominatorPricingPage() {
                 </p>
                 
                 <div className="flex items-center justify-center gap-4 mb-12">
-                  <div className="text-6xl font-bold text-military-hot-pink">$29</div>
+                  <div className="text-6xl font-bold text-neon-purple">$29</div>
                   <div className="text-military-storm-grey">
                     <div className="text-2xl">/month</div>
                     <div className="text-sm">or $290/year</div>
@@ -193,7 +193,7 @@ export default function DominatorPricingPage() {
                 className="text-center mb-16"
               >
                 <h2 className="font-heading text-5xl font-bold text-white mb-6">
-                  Unlimited <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Power</span>
+                  Unlimited <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">Power</span>
                 </h2>
                 <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
                   Everything you need to build and dominate your empire
@@ -209,7 +209,7 @@ export default function DominatorPricingPage() {
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
                       <GlassCard className="h-full p-8">
-                        <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           {index === 0 && <Infinity className="w-8 h-8 text-white" />}
                           {index === 1 && <Sword className="w-8 h-8 text-white" />}
                           {index === 2 && <Gem className="w-8 h-8 text-white" />}
@@ -245,7 +245,7 @@ export default function DominatorPricingPage() {
                 className="text-center mb-16"
               >
                 <h2 className="font-heading text-5xl font-bold text-white mb-6">
-                  Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Advantages</span>
+                  Elite <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">Advantages</span>
                 </h2>
                 <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
                   Why empire builders choose the Dominator plan
@@ -257,7 +257,7 @@ export default function DominatorPricingPage() {
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Crown className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -267,7 +267,7 @@ export default function DominatorPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Shield className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -277,7 +277,7 @@ export default function DominatorPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Users className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -289,7 +289,7 @@ export default function DominatorPricingPage() {
                     
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Zap className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -299,7 +299,7 @@ export default function DominatorPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <TrendingUp className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -309,7 +309,7 @@ export default function DominatorPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Flame className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -334,7 +334,7 @@ export default function DominatorPricingPage() {
                 className="text-center mb-16"
               >
                 <h2 className="font-heading text-5xl font-bold text-white mb-6">
-                  Empire <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Builders</span>
+                  Empire <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">Builders</span>
                 </h2>
                 <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
                   Hear from successful entrepreneurs who've built empires with our platform
@@ -361,7 +361,7 @@ export default function DominatorPricingPage() {
                         </p>
                         
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                             <span className="text-white font-bold text-sm">
                               {testimonial.name.split(' ').map(n => n[0]).join('')}
                             </span>
@@ -389,7 +389,7 @@ export default function DominatorPricingPage() {
                 className="text-center"
               >
                 <GlassCard className="max-w-4xl mx-auto p-12">
-                  <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                     <Crown className="w-10 h-10 text-white" />
                   </div>
                   

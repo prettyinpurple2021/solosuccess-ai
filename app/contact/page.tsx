@@ -60,10 +60,10 @@ export default function ContactPage() {
                 <CheckCircle className="w-10 h-10 text-cyber-cyan" />
               </div>
               <h1 className="font-sci text-4xl font-bold text-white mb-4">
-                MESSAGE TRANSMITTED
+                MESSAGE SENT
               </h1>
               <p className="text-gray-400 font-tech">
-                Your communication has been received. Our neural network will process your request and respond within 24 hours.
+                Your message has been received. Our team will process your request and respond within 24 hours.
               </p>
             </HudBorder>
           </div>
@@ -78,10 +78,10 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-sci font-bold text-white mb-6">
-              ESTABLISH <span className="text-cyber-cyan">NEURAL_LINK</span>
+              GET IN <span className="text-cyber-cyan">TOUCH</span>
             </h1>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto font-tech">
-              Connect with our command center. We'll respond within 24 hours.
+              Connect with our team. We'll respond within 24 hours.
             </p>
           </div>
 

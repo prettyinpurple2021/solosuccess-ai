@@ -9,7 +9,7 @@ import { Check } from 'lucide-react'
 const pricingPlans = [
   {
     id: 'launch',
-    title: 'CORE_ACCESS',
+    title: 'ESSENTIAL',
     price: 'FREE',
     subtitle: 'No Validation Required',
     features: [
@@ -17,12 +17,12 @@ const pricingPlans = [
       'Neural Hub Lite',
       'Network Support',
     ],
-    cta: 'Start Sequence',
+    cta: 'Get Started',
     popular: false,
   },
   {
     id: 'accelerator',
-    title: 'ARCHITECT_PRO',
+    title: 'SCALE',
     price: 'SCALE',
     subtitle: 'Full System Suite',
     features: [
@@ -31,7 +31,7 @@ const pricingPlans = [
       'Priority Data Streams',
       'Quantum Encryption+',
     ],
-    cta: 'Full Upgrade',
+    cta: 'Upgrade',
     popular: true,
   },
 ]
@@ -42,9 +42,9 @@ export default function PricingPage() {
       <div className="pt-32 pb-20">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h1 className="text-3xl md:text-5xl font-sci font-bold text-white">INITIALIZE SEQUENCE</h1>
+            <h1 className="text-3xl md:text-5xl font-sci font-bold text-white">CHOOSE YOUR PLAN</h1>
             <p className="text-cyber-cyan mt-4 font-tech tracking-widest uppercase">
-              Join the network of autonomous founders.
+              Join the network of innovative founders.
             </p>
             <div className="w-24 h-1 bg-cyber-purple mx-auto mt-4 shadow-[0_0_15px_#bd00ff]"></div>
           </div>

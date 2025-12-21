@@ -20,7 +20,7 @@ const HudMetric = ({ label, value, status, pcolor }: HudMetricProps) => (
   <div className="space-y-1 font-mono text-xs tracking-wider">
     <div className="flex justify-between items-end text-[#8892b0]">
       <span>{label}</span>
-      <span className={status === 'active' ? 'text-[#00F0FF]' : 'text-[#BC13FE]'}>
+      <span className={status === 'active' ? 'text-neon-cyan' : 'text-neon-purple'}>
         {value}
       </span>
     </div>
@@ -45,7 +45,7 @@ const BracketCorner = ({ position }: { position: string }) => {
     'br': 'bottom-0 right-0 border-b-2 border-r-2',
   }
   return (
-    <div className={`absolute w-3 h-3 border-[#00F0FF] ${styles[position as keyof typeof styles]}`} />
+    <div className={`absolute w-3 h-3 border-neon-cyan ${styles[position as keyof typeof styles]}`} />
   )
 }
 
@@ -87,7 +87,7 @@ export default function HomePage() {
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-sci tracking-tight leading-[1.1] text-white">
               YOUR AI <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] to-[#BC13FE] animate-pulse">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple animate-pulse">
                 CO-FOUNDER
               </span>
             </h1>
@@ -136,7 +136,7 @@ export default function HomePage() {
           className="w-full max-w-lg lg:max-w-full lg:w-[45%] relative z-10"
         >
           {/* HUD Container */}
-          <div className="relative bg-[#020204]/90 border border-[#00F0FF]/50 p-6 md:p-8 backdrop-blur-md shadow-[0_0_40px_rgba(0,240,255,0.1)] group hover:border-[#00F0FF] transition-colors duration-500">
+          <div className="relative bg-dark-bg/90 border border-neon-cyan/50 p-6 md:p-8 backdrop-blur-md shadow-[0_0_40px_rgba(11,228,236,0.1)] group hover:border-neon-cyan transition-colors duration-500">
             
             {/* Corner Accents */}
             <BracketCorner position="tl" />
@@ -161,13 +161,13 @@ export default function HomePage() {
             <div className="space-y-8">
               <div className="text-center py-4 relative">
                  <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                    <Brain size={120} className="text-[#BC13FE] animate-pulse" />
+                    <Brain size={120} className="text-neon-purple animate-pulse" />
                  </div>
                  <h3 className="relative z-10 font-mono text-sm text-[#8892b0] mb-2 tracking-widest uppercase">
                    Current Objective
                  </h3>
                  <p className="relative z-10 font-sci text-3xl text-white font-bold tracking-wider drop-shadow-[0_0_10px_rgba(188,19,254,0.5)]">
-                   MARKET_SINGULARITY
+                   MARKET_INTELLIGENCE
                  </p>
               </div>
 
@@ -191,11 +191,11 @@ export default function HomePage() {
               <div className="mt-6 p-4 bg-black/80 border border-white/10 font-mono text-[10px] text-[#8892b0] rounded-sm h-32 overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-[#020204]/90 pointer-events-none" />
                 <div className="space-y-2 opacity-80">
-                  <p><span className="text-[#00F0FF]">{'>'}</span> Initializing intelligence modules...</p>
-                  <p><span className="text-[#00F0FF]">{'>'}</span> Loading business data streams...</p>
-                  <p><span className="text-[#00F0FF]">{'>'}</span> Optimizing agent networks...</p>
-                  <p><span className="text-[#BC13FE]">{'>'}</span> Connection established.</p>
-                  <p className="animate-pulse"><span className="text-[#00F0FF]">{'>'}</span> Ready for input_</p>
+                  <p><span className="text-neon-cyan">{'>'}</span> Initializing intelligence modules...</p>
+                  <p><span className="text-neon-cyan">{'>'}</span> Loading business data streams...</p>
+                  <p><span className="text-neon-cyan">{'>'}</span> Optimizing agent networks...</p>
+                  <p><span className="text-neon-purple">{'>'}</span> Connection established.</p>
+                  <p className="animate-pulse"><span className="text-neon-cyan">{'>'}</span> Ready for input_</p>
                 </div>
               </div>
             </div>

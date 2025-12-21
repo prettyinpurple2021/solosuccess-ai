@@ -41,7 +41,7 @@ export default function LandingPage() {
               href="#features" 
               className="text-sm font-bold uppercase tracking-widest hover:text-cyber-cyan transition-colors text-gray-400"
             >
-              Core_Functions
+              Features
             </Link>
             <Link 
               href="#deploy" 

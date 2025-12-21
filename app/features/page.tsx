@@ -31,26 +31,26 @@ export default function FeaturesPage() {
     {
       number: '01',
       icon: Server,
-      title: 'Central Neural Hub',
-      description: '8 specialized autonomous agents ready for input. Centralized control for all data streams.',
+      title: 'Intelligence Hub',
+      description: '8 specialized AI agents ready for input. Centralized control for all data streams.',
     },
     {
       number: '02',
       icon: Lock,
-      title: 'Quantum-Grade Encryption',
-      description: 'Advanced security protocols. Your proprietary data is secured behind layers of digital armor.',
+      title: 'Advanced Encryption',
+      description: 'Enterprise-grade security protocols. Your proprietary data is secured behind layers of digital protection.',
     },
     {
       number: '03',
       icon: Bolt,
-      title: 'Instant Implementation',
+      title: 'Rapid Deployment',
       description: 'Launch protocols in under 60 seconds. Zero latency. Instant execution of business logic.',
     },
     {
       number: '04',
       icon: Crosshair,
-      title: 'Algorithmic Targeting',
-      description: 'Hit business objectives with calculated accuracy. Eliminate wasted compute and effort.',
+      title: 'Intelligent Targeting',
+      description: 'Achieve business objectives with calculated accuracy. Optimize compute and effort.',
     },
     {
       number: '05',
@@ -71,12 +71,12 @@ export default function FeaturesPage() {
       <div className="pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-cyber-purple font-sci text-sm tracking-widest">/// SYSTEM_CAPABILITIES</span>
+            <span className="text-cyber-purple font-sci text-sm tracking-widest">/// CAPABILITIES</span>
             <h1 className="text-4xl md:text-6xl font-sci font-bold text-white mt-4">
-              NEURAL_MODULES <span className="text-cyber-cyan blinking">_</span>
+              INTELLIGENCE_MODULES <span className="text-cyber-cyan blinking">_</span>
             </h1>
             <p className="text-lg text-gray-400 mt-6 max-w-2xl mx-auto font-tech">
-              Deploy AI agents with military precision to dominate every aspect of your operation
+              Deploy AI agents with intelligent precision to optimize every aspect of your operation
             </p>
           </div>
 

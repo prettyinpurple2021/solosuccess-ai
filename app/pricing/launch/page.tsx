@@ -109,12 +109,12 @@ export default function LaunchPricingPage() {
       <div className="min-h-screen bg-military-midnight relative overflow-hidden">
         <CamoBackground opacity={0.1} withGrid>
           {/* Navigation */}
-          <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-military-hot-pink/30">
+          <nav className="fixed top-0 left-0 right-0 z-50 glass-panel-strong border-b border-neon-purple/30">
             <div className="container mx-auto px-4">
               <div className="flex items-center justify-between h-20">
                 <Link href="/" className="flex items-center gap-3">
                   <motion.div 
-                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center shadow-lg"
+                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center shadow-lg"
                     whileHover={{ scale: 1.05 }}
                   >
                     <Crown className="w-6 h-6 text-white" />
@@ -149,13 +149,13 @@ export default function LaunchPricingPage() {
               >
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <RankStars count={5} size="lg" />
-                  <span className="text-military-hot-pink font-tactical text-sm uppercase tracking-wider">
+                  <span className="text-neon-purple font-tactical text-sm uppercase tracking-wider">
                     Elite Starter Tier
                   </span>
                 </div>
                 
                 <h1 className="font-heading text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">
                     Launch
                   </span> Plan
             </h1>
@@ -166,7 +166,7 @@ export default function LaunchPricingPage() {
                 </p>
                 
                 <div className="flex items-center justify-center gap-4 mb-12">
-                  <div className="text-6xl font-bold text-military-hot-pink">Free</div>
+                  <div className="text-6xl font-bold text-neon-purple">Free</div>
                   <div className="text-military-storm-grey">
                     <div className="text-2xl">forever</div>
                     <div className="text-sm">no credit card required</div>
@@ -192,7 +192,7 @@ export default function LaunchPricingPage() {
                 className="text-center mb-16"
               >
                 <h2 className="font-heading text-5xl font-bold text-white mb-6">
-                  Perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Starting Point</span>
+                  Perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">Starting Point</span>
                 </h2>
                 <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
                   Everything you need to begin your entrepreneurial journey
@@ -208,7 +208,7 @@ export default function LaunchPricingPage() {
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
                       <GlassCard className="h-full p-8">
-                        <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           {index === 0 && <Users className="w-8 h-8 text-white" />}
                           {index === 1 && <Play className="w-8 h-8 text-white" />}
                           {index === 2 && <Heart className="w-8 h-8 text-white" />}
@@ -244,7 +244,7 @@ export default function LaunchPricingPage() {
                 className="text-center mb-16"
               >
                 <h2 className="font-heading text-5xl font-bold text-white mb-6">
-                  Why <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Free?</span>
+                  Why <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">Free?</span>
                 </h2>
                 <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
                   We believe every entrepreneur deserves access to AI-powered business tools
@@ -256,7 +256,7 @@ export default function LaunchPricingPage() {
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Gift className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -266,7 +266,7 @@ export default function LaunchPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Heart className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -276,7 +276,7 @@ export default function LaunchPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Target className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -288,7 +288,7 @@ export default function LaunchPricingPage() {
                     
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Shield className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -298,7 +298,7 @@ export default function LaunchPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <TrendingUp className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -308,7 +308,7 @@ export default function LaunchPricingPage() {
                       </div>
                       
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                           <Star className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -333,7 +333,7 @@ export default function LaunchPricingPage() {
                 className="text-center mb-16"
               >
                 <h2 className="font-heading text-5xl font-bold text-white mb-6">
-                  Success <span className="text-transparent bg-clip-text bg-gradient-to-r from-military-hot-pink to-military-blush-pink">Stories</span>
+                  Success <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">Stories</span>
                 </h2>
                 <p className="text-xl text-military-storm-grey max-w-2xl mx-auto">
                   Hear from entrepreneurs who started with the Launch plan
@@ -360,7 +360,7 @@ export default function LaunchPricingPage() {
                         </p>
                         
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                             <span className="text-white font-bold text-sm">
                               {testimonial.name.split(' ').map(n => n[0]).join('')}
                             </span>
@@ -388,7 +388,7 @@ export default function LaunchPricingPage() {
                 className="text-center"
               >
                 <GlassCard className="max-w-4xl mx-auto p-12">
-                  <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-military-hot-pink to-military-blush-pink flex items-center justify-center">
+                  <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center">
                     <Rocket className="w-10 h-10 text-white" />
                   </div>
                   

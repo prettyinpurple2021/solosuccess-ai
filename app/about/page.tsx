@@ -46,7 +46,7 @@ export default function AboutPage() {
           <div className="text-center">
             <Link href="/signup">
               <CyberButton variant="primary" size="lg">
-                JOIN_THE_NETWORK
+                JOIN THE NETWORK
                 <ArrowRight className="ml-2 w-5 h-5" />
               </CyberButton>
             </Link>
