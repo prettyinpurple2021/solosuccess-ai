@@ -468,7 +468,6 @@ export default function AgentsPage() {
               </ScrollArea>
             </div>
           </div>
-        </div>
 
         {/* Chat Interface */}
         <div className="lg:col-span-3">
@@ -499,7 +498,7 @@ export default function AgentsPage() {
                       <div className="flex items-center gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="cyan"
                           onClick={handleSaveConversation}
                           className="flex items-center gap-2 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                         >
@@ -561,18 +560,18 @@ export default function AgentsPage() {
                                   <div className="flex flex-col gap-1 bg-dark-card rounded-lg shadow-lg border border-neon-cyan/30 p-1">
                                     <Button
                                       size="sm"
-                                      variant="ghost"
+                                      variant="purple"
                                       onClick={() => handleSaveMessage(message)}
-                                      className="w-8 h-8 p-0 hover:bg-neon-purple/20"
+                                      className="w-8 h-8 p-0 hover:bg-neon-purple/20 border-transparent"
                                       title="Save to Briefcase"
                                     >
                                       <Briefcase className="w-3 h-3 text-neon-purple" />
                                     </Button>
                                     <Button
                                       size="sm"
-                                      variant="ghost"
+                                      variant="cyan"
                                       onClick={() => copyToClipboard(message.content)}
-                                      className="w-8 h-8 p-0 hover:bg-neon-cyan/20"
+                                      className="w-8 h-8 p-0 hover:bg-neon-cyan/20 border-transparent"
                                       title="Copy to Clipboard"
                                     >
                                       <Copy className="w-3 h-3 text-neon-cyan" />
@@ -716,7 +715,7 @@ export default function AgentsPage() {
           </div>
           
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={() => setShowSaveDialog(false)} className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
+            <Button variant="cyan" onClick={() => setShowSaveDialog(false)} className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
               Cancel
             </Button>
             <Button 
