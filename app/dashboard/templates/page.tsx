@@ -29,7 +29,7 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { logger, logInfo } from "@/lib/logger"
 import { useSmartTips } from "@/hooks/use-smart-tips"
-import { GlassCard, CamoBackground, TacticalGrid } from "@/components/military"
+import { HudBorder } from "@/components/cyber/HudBorder"
 import { useTemplateSave } from "@/hooks/use-templates-swr"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -286,24 +286,23 @@ export default function TemplatesDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-military-midnight relative overflow-hidden p-6">
-      <CamoBackground opacity={0.1} withGrid />
-      <TacticalGrid />
+    <div className="min-h-screen bg-dark-bg relative overflow-hidden p-6">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-heading font-bold text-military-glass-white mb-2">
-                Template Library 📚
+              <h1 className="text-4xl font-sci font-bold text-white mb-2">
+                TEMPLATE LIBRARY 📚
               </h1>
-              <p className="text-lg text-military-storm-grey">
+              <p className="text-lg text-gray-400 font-tech">
                 Professional templates to accelerate your business growth
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-sm border border-military-storm-grey text-military-glass-white bg-military-tactical-black/50">
+              <span className="px-3 py-1 rounded-full text-sm border border-neon-purple/30 text-neon-purple bg-neon-purple/10 font-tech">
                 {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
               </span>
             </div>
@@ -312,21 +311,21 @@ export default function TemplatesDashboard() {
           {/* Search and Filters */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-military-storm-grey" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
                 placeholder="Search templates..."
                 value={searchQuery}
                 onChange={(e: any) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white placeholder:text-military-storm-grey"
+                className="pl-10 bg-dark-card border-neon-cyan/30 text-white placeholder:text-gray-500 focus:border-neon-cyan"
               />
             </div>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48 bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white">
+              <SelectTrigger className="w-full md:w-48 bg-dark-card border-neon-cyan/30 text-white">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent className="bg-military-tactical-black border-military-storm-grey">
+              <SelectContent className="bg-dark-card border-neon-cyan/30">
                 {categories.map(category => (
-                  <SelectItem key={category.id} value={category.id} className="text-military-glass-white hover:bg-military-midnight">
+                  <SelectItem key={category.id} value={category.id} className="text-white hover:bg-dark-bg">
                     <div className="flex items-center gap-2">
                       <category.icon className="h-4 w-4" />
                       {category.label}
@@ -336,12 +335,12 @@ export default function TemplatesDashboard() {
               </SelectContent>
             </Select>
             <Select value={selectedTier} onValueChange={setSelectedTier}>
-              <SelectTrigger className="w-full md:w-48 bg-military-tactical-black/50 border-military-storm-grey text-military-glass-white">
+              <SelectTrigger className="w-full md:w-48 bg-dark-card border-neon-cyan/30 text-white">
                 <SelectValue placeholder="Tier" />
               </SelectTrigger>
-              <SelectContent className="bg-military-tactical-black border-military-storm-grey">
+              <SelectContent className="bg-dark-card border-neon-cyan/30">
                 {tiers.map(tier => (
-                  <SelectItem key={tier.id} value={tier.id} className="text-military-glass-white hover:bg-military-midnight">
+                  <SelectItem key={tier.id} value={tier.id} className="text-white hover:bg-dark-bg">
                     <div className="flex items-center gap-2">
                       {tier.id !== "all" && getTierIcon(tier.id)}
                       {tier.label}
@@ -360,30 +359,30 @@ export default function TemplatesDashboard() {
             const isUsed = usedTemplates.has(template.id)
 
             return (
-              <GlassCard key={template.id} className="p-6 hover:shadow-lg transition-all duration-200" glow>
+              <HudBorder key={template.id} variant="hover" className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {getTierIcon(template.tier)}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${template.difficulty === "beginner" ? "bg-green-500/20 text-green-400" :
-                        template.difficulty === "intermediate" ? "bg-yellow-500/20 text-yellow-400" :
-                          "bg-red-500/20 text-red-400"
+                      <span className={`px-2 py-1 rounded-full text-xs font-tech ${template.difficulty === "beginner" ? "bg-neon-lime/20 text-neon-lime" :
+                        template.difficulty === "intermediate" ? "bg-neon-orange/20 text-neon-orange" :
+                          "bg-neon-magenta/20 text-neon-magenta"
                         }`}>
                         {template.difficulty}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      {template.isNew && <span className="px-2 py-1 rounded-full text-xs border border-military-hot-pink/30 text-military-hot-pink">New</span>}
-                      {template.isPopular && <span className="px-2 py-1 rounded-full text-xs border border-military-hot-pink/30 text-military-hot-pink">Popular</span>}
-                      {template.isPremium && <span className="px-2 py-1 rounded-full text-xs border border-military-hot-pink/30 text-military-hot-pink">Premium</span>}
+                      {template.isNew && <span className="px-2 py-1 rounded-full text-xs border border-neon-purple/30 text-neon-purple font-tech">New</span>}
+                      {template.isPopular && <span className="px-2 py-1 rounded-full text-xs border border-neon-purple/30 text-neon-purple font-tech">Popular</span>}
+                      {template.isPremium && <span className="px-2 py-1 rounded-full text-xs border border-neon-purple/30 text-neon-purple font-tech">Premium</span>}
                     </div>
                   </div>
-                  <h3 className="text-lg font-heading font-bold text-military-glass-white">{template.title}</h3>
-                  <p className="text-sm text-military-storm-grey">
+                  <h3 className="text-lg font-sci font-bold text-white">{template.title}</h3>
+                  <p className="text-sm text-gray-400 font-tech">
                     {template.description}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs text-military-storm-grey">
+                  <div className="flex items-center gap-4 text-xs text-gray-400 font-tech">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {template.estimatedTime}
@@ -400,12 +399,12 @@ export default function TemplatesDashboard() {
 
                   <div className="flex flex-wrap gap-1">
                     {template.tags.slice(0, 3).map((tag: string) => (
-                      <span key={tag} className="px-2 py-1 rounded-full text-xs bg-military-tactical-black/50 text-military-storm-grey border border-white/10">
+                      <span key={tag} className="px-2 py-1 rounded-full text-xs bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 font-tech">
                         {tag}
                       </span>
                     ))}
                     {template.tags.length > 3 && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-military-tactical-black/50 text-military-storm-grey border border-white/10">
+                      <span className="px-2 py-1 rounded-full text-xs bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 font-tech">
                         +{template.tags.length - 3}
                       </span>
                     )}
@@ -414,27 +413,27 @@ export default function TemplatesDashboard() {
                   <div className="flex gap-2 pt-2">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="flex-1 border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black">
+                        <Button variant="outline" size="sm" className="flex-1 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-2xl bg-military-tactical-black border-military-storm-grey">
+                      <DialogContent className="max-w-2xl bg-dark-card border-neon-cyan/30">
                         <DialogHeader>
-                          <DialogTitle className="text-military-glass-white">{template.title}</DialogTitle>
-                          <DialogDescription className="text-military-storm-grey">
+                          <DialogTitle className="text-white font-sci">{template.title}</DialogTitle>
+                          <DialogDescription className="text-gray-400 font-tech">
                             {template.description}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
-                          <div className="p-4 glass-card rounded-lg">
-                            <h4 className="font-medium mb-2 text-military-glass-white">Template Preview:</h4>
-                            <p className="text-sm text-military-storm-grey">
+                          <div className="p-4 bg-dark-bg/50 rounded-lg border border-neon-cyan/20">
+                            <h4 className="font-medium mb-2 text-white font-sci">Template Preview:</h4>
+                            <p className="text-sm text-gray-400 font-tech">
                               {template.preview}
                             </p>
                           </div>
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4 text-sm text-military-storm-grey">
+                            <div className="flex items-center gap-4 text-sm text-gray-400 font-tech">
                               <span>⏱️ {template.estimatedTime}</span>
                               <span>👥 {template.usageCount.toLocaleString()} uses</span>
                               <span>⭐ {template.rating}</span>
@@ -442,7 +441,7 @@ export default function TemplatesDashboard() {
                             <Button
                               onClick={() => handleUseTemplate(template)}
                               disabled={!hasAccess || isSaving}
-                              className="bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90"
+                              className="bg-gradient-to-r from-neon-purple to-neon-magenta text-white hover:opacity-90"
                             >
                               {isUsed ? (
                                 <>
@@ -465,7 +464,7 @@ export default function TemplatesDashboard() {
                       onClick={() => handleUseTemplate(template)}
                       disabled={!hasAccess || isSaving}
                       size="sm"
-                      className="flex-1 bg-gradient-to-r from-military-hot-pink to-military-blush-pink text-white hover:opacity-90"
+                      className="flex-1 bg-gradient-to-r from-neon-purple to-neon-magenta text-white hover:opacity-90"
                     >
                       {isUsed ? (
                         <>
@@ -482,37 +481,37 @@ export default function TemplatesDashboard() {
                   </div>
 
                   {template.user_id === user?.id && (
-                    <div className="flex gap-2 pt-2 border-t border-white/10 mt-2">
+                    <div className="flex gap-2 pt-2 border-t border-neon-cyan/20 mt-2">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="flex-1 border-military-storm-grey text-military-glass-white hover:bg-military-tactical-black">
+                          <Button variant="outline" size="sm" className="flex-1 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
                             Edit
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-military-tactical-black border-military-storm-grey">
+                        <DialogContent className="bg-dark-card border-neon-cyan/30">
                           <DialogHeader>
-                            <DialogTitle className="text-military-glass-white">Edit Template</DialogTitle>
+                            <DialogTitle className="text-white font-sci">Edit Template</DialogTitle>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <label className="text-sm text-military-storm-grey">Title</label>
+                              <label className="text-sm text-neon-cyan font-tech uppercase">Title</label>
                               <Input
                                 defaultValue={template.title}
                                 onChange={(e) => template.title = e.target.value} // Note: This is a quick hack for the dialog, ideally use state
-                                className="bg-military-tactical-black/50 border-military-storm-grey text-white"
+                                className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
                               />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm text-military-storm-grey">Description</label>
+                              <label className="text-sm text-neon-cyan font-tech uppercase">Description</label>
                               <Input
                                 defaultValue={template.description}
                                 onChange={(e) => template.description = e.target.value}
-                                className="bg-military-tactical-black/50 border-military-storm-grey text-white"
+                                className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
                               />
                             </div>
                             <Button
                               onClick={() => handleEditTemplate(template.id, { title: template.title, description: template.description })}
-                              className="w-full bg-military-hot-pink hover:bg-military-hot-pink/90"
+                              className="w-full bg-neon-purple hover:bg-neon-purple/90 text-white"
                             >
                               Save Changes
                             </Button>
@@ -523,7 +522,7 @@ export default function TemplatesDashboard() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="flex-1"
+                        className="flex-1 bg-neon-magenta hover:bg-neon-magenta/90"
                         onClick={() => handleDeleteTemplate(template.id)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -533,21 +532,21 @@ export default function TemplatesDashboard() {
                   )}
 
                   {!hasAccess && (
-                    <div className="text-xs text-military-storm-grey text-center pt-2">
+                    <div className="text-xs text-gray-400 text-center pt-2 font-tech">
                       Upgrade to {template.tier} plan to access this template
                     </div>
                   )}
                 </div>
-              </GlassCard>
+              </HudBorder>
             )
           })}
         </div>
 
         {filteredTemplates.length === 0 && (
           <div className="text-center py-12">
-            <FileText className="h-12 w-12 text-military-storm-grey mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2 text-military-glass-white">No templates found</h3>
-            <p className="text-military-storm-grey">
+            <FileText className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-sci font-bold mb-2 text-white">No templates found</h3>
+            <p className="text-gray-400 font-tech">
               Try adjusting your search or filter criteria
             </p>
           </div>
