@@ -41,12 +41,12 @@ type BadgeVariant = 'cyan' | 'purple' | 'muted' | 'danger' | 'success' | 'warnin
 
 function Badge({ children, variant = 'muted' }: { children: ReactNode; variant?: BadgeVariant }) {
   const styles: Record<BadgeVariant, string> = {
-    cyan: 'border-cyber-cyan/60 bg-cyber-dim text-cyber-cyan',
-    purple: 'border-cyber-purple/60 bg-cyber-purple/10 text-cyber-purple',
+    cyan: 'border-neon-cyan/60 bg-neon-cyan/10 text-neon-cyan',
+    purple: 'border-neon-purple/60 bg-neon-purple/10 text-neon-purple',
     muted: 'border-white/10 bg-white/5 text-gray-300',
-    danger: 'border-rose-400/50 bg-rose-500/10 text-rose-100',
-    success: 'border-emerald-400/50 bg-emerald-500/10 text-emerald-100',
-    warning: 'border-amber-400/50 bg-amber-500/10 text-amber-100',
+    danger: 'border-neon-magenta/50 bg-neon-magenta/10 text-neon-magenta',
+    success: 'border-neon-lime/50 bg-neon-lime/10 text-neon-lime',
+    warning: 'border-neon-orange/50 bg-neon-orange/10 text-neon-orange',
   }
 
   return (
@@ -228,7 +228,7 @@ export default function DashboardPage() {
 
         <div className="relative z-10 flex items-center justify-center min-h-[60vh] px-6">
           <HudBorder className="max-w-md w-full p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center mx-auto mb-4 shadow-neon-cyan">
+            <div className="w-16 h-16 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(11,228,236,0.4)]">
               <Shield className="w-8 h-8 text-black animate-pulse" />
             </div>
             <h2 className="text-xl font-sci font-bold text-white mb-2">
@@ -245,7 +245,7 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="relative min-h-screen bg-cyber-black overflow-hidden">
+      <div className="relative min-h-screen bg-dark-bg overflow-hidden">
         <NeuralNetworkCanvas />
         <UIOverlayLines />
 
@@ -292,7 +292,7 @@ export default function DashboardPage() {
 
         <div className="relative z-10 flex items-center justify-center min-h-[60vh] p-4">
           <HudBorder className="max-w-md w-full p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center mx-auto mb-4 shadow-neon-cyan">
+            <div className="w-16 h-16 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(11,228,236,0.4)]">
               <Sparkles className="w-8 h-8 text-black" />
             </div>
             <h2 className="text-2xl font-sci font-bold text-white mb-2">
@@ -370,7 +370,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-cyber-black text-white overflow-hidden" role="main">
+    <main className="relative min-h-screen bg-dark-bg text-white overflow-hidden" role="main">
       <NeuralNetworkCanvas />
       <UIOverlayLines />
 
@@ -399,12 +399,12 @@ export default function DashboardPage() {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="w-14 h-14 rounded-xl border border-cyber-cyan/50 bg-cyber-dim flex items-center justify-center shadow-neon-cyan"
+              className="w-14 h-14 rounded-xl border border-neon-cyan/50 bg-neon-cyan/10 flex items-center justify-center shadow-[0_0_20px_rgba(11,228,236,0.4)]"
             >
-              <Crown className="w-7 h-7 text-cyber-cyan" />
+              <Crown className="w-7 h-7 text-neon-cyan" />
             </motion.div>
             <div>
-              <p className="text-xs font-tech uppercase tracking-[0.2em] text-cyber-cyan">Command Center</p>
+              <p className="text-xs font-tech uppercase tracking-[0.2em] text-neon-cyan">Command Center</p>
               <h1 className="text-3xl md:text-4xl font-sci font-bold text-white">
                 Welcome back, {data.user.full_name || data.user.email.split('@')[0]}!
               </h1>
@@ -425,7 +425,7 @@ export default function DashboardPage() {
           <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(11,228,236,0.4)]">
                   <CheckCircle className="w-6 h-6 text-black" />
                 </div>
                 <Badge variant="cyan">+15%</Badge>
@@ -438,7 +438,7 @@ export default function DashboardPage() {
 
             <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(11,228,236,0.4)]">
                   <Clock className="w-6 h-6 text-black" />
                 </div>
                 <Badge variant="cyan">+8%</Badge>
@@ -451,7 +451,7 @@ export default function DashboardPage() {
 
             <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(11,228,236,0.4)]">
                   <MessageCircle className="w-6 h-6 text-black" />
                 </div>
                 <Badge variant="cyan">+12%</Badge>
@@ -464,7 +464,7 @@ export default function DashboardPage() {
 
             <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(11,228,236,0.4)]">
                   <BarChart3 className="w-6 h-6 text-black" />
                 </div>
                 <Badge variant="cyan">+5%</Badge>
@@ -486,7 +486,7 @@ export default function DashboardPage() {
               <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
-                    <Target className="w-6 h-6 text-cyber-cyan" />
+                    <Target className="w-6 h-6 text-neon-cyan" />
                     <span>Today's Missions</span>
                   </h2>
                   <CyberButton variant="secondary" size="sm">
@@ -502,12 +502,12 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 bg-white/5 border border-cyber-cyan/10 rounded-lg hover:border-cyber-cyan/50 transition-all"
+                        className="flex items-center justify-between p-4 bg-white/5 border border-neon-cyan/10 rounded-lg hover:border-neon-cyan/50 transition-all"
                       >
                         <div className="flex items-center space-x-3">
                           <motion.div
                             whileHover={{ scale: 1.15 }}
-                            className={`w-3 h-3 rounded-full ${task.status === 'completed' ? 'bg-cyber-cyan' : 'bg-cyber-purple/60'}`}
+                            className={`w-3 h-3 rounded-full ${task.status === 'completed' ? 'bg-neon-cyan' : 'bg-neon-purple/60'}`}
                             aria-hidden="true"
                           />
                           <div>
@@ -526,7 +526,7 @@ export default function DashboardPage() {
                             {task.priority}
                           </Badge>
                           {task.status === 'completed' && (
-                            <CheckCircle className="w-5 h-5 text-cyber-cyan" />
+                            <CheckCircle className="w-5 h-5 text-neon-cyan" />
                           )}
                         </div>
                       </motion.div>
@@ -556,7 +556,7 @@ export default function DashboardPage() {
               <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
-                    <Trophy className="w-6 h-6 text-cyber-cyan" />
+                    <Trophy className="w-6 h-6 text-neon-cyan" />
                     <span>Active Objectives</span>
                   </h2>
                   <CyberButton size="sm" variant="primary">
@@ -572,7 +572,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="p-4 bg-white/5 border border-cyber-cyan/10 rounded-lg"
+                        className="p-4 bg-white/5 border border-neon-cyan/10 rounded-lg"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-white">{goal.title}</h3>
@@ -582,7 +582,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="w-full bg-white/10 rounded-full h-2 mb-2">
                           <div
-                            className="bg-gradient-to-r from-cyber-cyan to-cyber-purple h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-neon-cyan to-neon-purple h-2 rounded-full transition-all duration-300"
                             style={{ width: `${goal.progress_percentage}%` }}
                           />
                         </div>
@@ -621,7 +621,7 @@ export default function DashboardPage() {
               <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
-                    <MessageCircle className="w-6 h-6 text-cyber-cyan" />
+                    <MessageCircle className="w-6 h-6 text-neon-cyan" />
                     <span>Recent Intel</span>
                   </h2>
                   <CyberButton size="sm" variant="primary">
@@ -637,7 +637,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center space-x-3 p-3 bg-white/5 border border-cyber-cyan/10 rounded-lg hover:border-cyber-cyan/50 transition-all cursor-pointer"
+                        className="flex items-center space-x-3 p-3 bg-white/5 border border-neon-cyan/10 rounded-lg hover:border-neon-cyan/50 transition-all cursor-pointer"
                       >
                         <div
                           className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
@@ -675,7 +675,7 @@ export default function DashboardPage() {
               <HudBorder variant="hover" className="p-6 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
-                    <Sparkles className="w-6 h-6 text-cyber-cyan" />
+                    <Sparkles className="w-6 h-6 text-neon-cyan" />
                     <span>AI Intelligence</span>
                   </h2>
                   <CyberButton size="sm" variant="primary">
@@ -691,7 +691,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="p-4 bg-white/5 border border-cyber-cyan/10 rounded-lg"
+                        className="p-4 bg-white/5 border border-neon-cyan/10 rounded-lg"
                       >
                         <h3 className="font-semibold text-white mb-2">{insight.title}</h3>
                         <p className="text-sm text-gray-400 mb-3">
@@ -724,7 +724,7 @@ export default function DashboardPage() {
             <HudBorder variant="hover" className="p-6 h-full">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-sci font-bold flex items-center space-x-2">
-                  <Briefcase className="w-6 h-6 text-cyber-cyan" />
+                  <Briefcase className="w-6 h-6 text-neon-cyan" />
                   <span>Mission Briefcases</span>
                 </h2>
                 <Link href="/dashboard/briefcase">
@@ -742,9 +742,9 @@ export default function DashboardPage() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-center space-x-3 p-3 bg-white/5 border border-cyber-cyan/10 rounded-lg hover:border-cyber-cyan/50 transition-all cursor-pointer"
+                      className="flex items-center space-x-3 p-3 bg-white/5 border border-neon-cyan/10 rounded-lg hover:border-neon-cyan/50 transition-all cursor-pointer"
                     >
-                      <div className="w-10 h-10 bg-gradient-to-r from-cyber-cyan to-cyber-purple rounded-lg flex items-center justify-center shadow-neon-cyan">
+                      <div className="w-10 h-10 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(11,228,236,0.4)]">
                         <Briefcase className="w-5 h-5 text-black" />
                       </div>
                       <div className="flex-1">
