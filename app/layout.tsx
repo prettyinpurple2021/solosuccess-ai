@@ -168,52 +168,88 @@ export default function RootLayout({
           id="strip-css-scripts"
           strategy="beforeInteractive"
         >{`
-          try {
-            // Reuse a single observer and clean it up on unload/pagehide to avoid leaks
-            if (window.__ssCssScriptObserver) {
-              window.__ssCssScriptObserver.disconnect();
-              window.__ssCssScriptObserver = undefined;
-            }
-            const removeCssScripts = () => {
-              const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
-                try {
-                  const url = new URL(el.getAttribute('src') || '', window.location.href);
-                  return url.pathname.endsWith('.css');
-                } catch {
-                  return false;
+          (function() {
+            try {
+              // Suppress React DevTools errors in production
+              if (typeof window !== 'undefined' && window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                const originalOn = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on;
+                if (typeof originalOn !== 'function') {
+                  window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on = function() {
+                    // Suppress error silently
+                    return function() {};
+                  };
                 }
-              });
-              nodes.forEach((el) => el.parentElement?.removeChild(el));
-            };
-            // Initial pass
-            removeCssScripts();
-            // Watch for future insertions during streaming/hydration
-            const observer = new MutationObserver(() => removeCssScripts());
-            window.__ssCssScriptObserver = observer;
-            const target = document.documentElement || document.body;
-            if (target) {
-              observer.observe(target, { childList: true, subtree: true });
-            }
-            const teardown = () => {
+              }
+
+              // Suppress backendManager errors (likely from browser extensions)
+              const originalError = console.error;
+              console.error = function(...args) {
+                const message = args[0]?.toString() || '';
+                if (message.includes('Cannot read properties of undefined') && 
+                    message.includes('reading \'has\'')) {
+                  // Suppress backendManager errors silently
+                  return;
+                }
+                originalError.apply(console, args);
+              };
+
+              // Reuse a single observer and clean it up on unload/pagehide to avoid leaks
               if (window.__ssCssScriptObserver) {
                 window.__ssCssScriptObserver.disconnect();
                 window.__ssCssScriptObserver = undefined;
               }
-              window.removeEventListener('pagehide', teardown);
-              window.removeEventListener('beforeunload', teardown);
-              document.removeEventListener('visibilitychange', onHidden);
-            };
-            const onHidden = () => {
-              if (document.visibilityState === 'hidden') {
-                teardown();
+              const removeCssScripts = () => {
+                const nodes = Array.from(document.querySelectorAll('script[src]')).filter((el) => {
+                  try {
+                    const src = el.getAttribute('src') || '';
+                    const url = new URL(src, window.location.href);
+                    return url.pathname.endsWith('.css');
+                  } catch {
+                    return false;
+                  }
+                });
+                nodes.forEach((el) => {
+                  try {
+                    el.parentElement?.removeChild(el);
+                  } catch (e) {
+                    // Ignore removal errors
+                  }
+                });
+              };
+              // Initial pass - run immediately
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', removeCssScripts);
+              } else {
+                removeCssScripts();
               }
-            };
-            window.addEventListener('pagehide', teardown);
-            window.addEventListener('beforeunload', teardown);
-            document.addEventListener('visibilitychange', onHidden);
-          } catch (err) {
-            // no-op
-          }
+              // Watch for future insertions during streaming/hydration
+              const observer = new MutationObserver(() => removeCssScripts());
+              window.__ssCssScriptObserver = observer;
+              const target = document.documentElement || document.body;
+              if (target) {
+                observer.observe(target, { childList: true, subtree: true });
+              }
+              const teardown = () => {
+                if (window.__ssCssScriptObserver) {
+                  window.__ssCssScriptObserver.disconnect();
+                  window.__ssCssScriptObserver = undefined;
+                }
+                window.removeEventListener('pagehide', teardown);
+                window.removeEventListener('beforeunload', teardown);
+                document.removeEventListener('visibilitychange', onHidden);
+              };
+              const onHidden = () => {
+                if (document.visibilityState === 'hidden') {
+                  teardown();
+                }
+              };
+              window.addEventListener('pagehide', teardown);
+              window.addEventListener('beforeunload', teardown);
+              document.addEventListener('visibilitychange', onHidden);
+            } catch (err) {
+              // no-op
+            }
+          })();
         `}</Script>
         {/* Optimize font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

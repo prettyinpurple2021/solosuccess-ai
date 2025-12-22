@@ -10,8 +10,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-import { BossCard, EmpowermentCard, StatsCard } from "@/components/ui/boss-card"
-import { BossButton, ZapButton } from "@/components/ui/boss-button"
+import { HudBorder } from "@/components/cyber/HudBorder"
+import { PrimaryButton } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -330,8 +330,9 @@ export default function CompetitorDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-background p-6">
-        <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="min-h-screen bg-dark-bg p-6">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 pointer-events-none" />
+        <div className="flex items-center justify-center min-h-[60vh] relative z-10">
           <Loading
             variant="boss"
             size="lg"
@@ -343,7 +344,8 @@ export default function CompetitorDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen gradient-background p-6">
+    <div className="min-h-screen bg-dark-bg p-6 relative">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 pointer-events-none" />
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -364,35 +366,36 @@ export default function CompetitorDashboardPage() {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="w-12 h-12 gradient-danger rounded-full flex items-center justify-center"
+                className="w-12 h-12 bg-gradient-to-br from-neon-magenta to-neon-purple rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,0,110,0.4)]"
               >
                 <Eye className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h1 className="text-4xl font-bold text-gradient">
-                  Competitor Intelligence 🕵️‍♀️
+                <h1 className="text-4xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">
+                  COMPETITOR INTELLIGENCE 🕵️‍♀️
                 </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  Monitor, analyze, and dominate your competition
+                <p className="text-lg text-gray-400 font-tech">
+                  Monitor, analyze, and optimize your competitive position
                 </p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <BossButton
-              variant="secondary"
+            <PrimaryButton
+              variant="outline"
               size="sm"
-              icon={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
+              className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
               onClick={handleRefresh}
               disabled={refreshing}
             >
+              <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
-            </BossButton>
+            </PrimaryButton>
             <Link href="/dashboard/competitors/add">
-              <ZapButton>
+              <PrimaryButton size="sm" className="bg-neon-purple hover:bg-neon-purple/90">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Competitor
-              </ZapButton>
+              </PrimaryButton>
             </Link>
           </div>
         </motion.div>
@@ -400,116 +403,141 @@ export default function CompetitorDashboardPage() {
         {/* Stats Cards */}
         {stats && (
           <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <StatsCard
-              title="Total Competitors"
-              value={stats.total_competitors}
-              icon={<Users className="w-6 h-6 text-white" />}
-              trend={{ value: 12, isPositive: true }}
-            />
+            <HudBorder variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(11,228,236,0.3)]">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-tech text-neon-lime">+12%</span>
+              </div>
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">{stats.total_competitors}</h3>
+              <p className="text-sm text-gray-400 font-tech">Total Competitors</p>
+            </HudBorder>
 
-            <StatsCard
-              title="Active Monitoring"
-              value={stats.active_monitoring}
-              icon={<Eye className="w-6 h-6 text-white" />}
-              trend={{ value: 8, isPositive: true }}
-            />
+            <HudBorder variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(11,228,236,0.3)]">
+                  <Eye className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-tech text-neon-lime">+8%</span>
+              </div>
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">{stats.active_monitoring}</h3>
+              <p className="text-sm text-gray-400 font-tech">Active Monitoring</p>
+            </HudBorder>
 
-            <StatsCard
-              title="Critical Threats"
-              value={stats.critical_threats}
-              icon={<AlertTriangle className="w-6 h-6 text-white" />}
-              trend={{ value: 2, isPositive: false }}
-            />
+            <HudBorder variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-magenta to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(255,0,110,0.3)]">
+                  <AlertTriangle className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-tech text-neon-magenta">+2</span>
+              </div>
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">{stats.critical_threats}</h3>
+              <p className="text-sm text-gray-400 font-tech">Critical Threats</p>
+            </HudBorder>
 
-            <StatsCard
-              title="Recent Alerts"
-              value={stats.recent_alerts}
-              icon={<Shield className="w-6 h-6 text-white" />}
-              trend={{ value: 15, isPositive: true }}
-            />
+            <HudBorder variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(11,228,236,0.3)]">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-tech text-neon-lime">+15</span>
+              </div>
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">{stats.recent_alerts}</h3>
+              <p className="text-sm text-gray-400 font-tech">Recent Alerts</p>
+            </HudBorder>
 
-            <StatsCard
-              title="Intelligence Collected"
-              value={stats.intelligence_collected}
-              icon={<Globe className="w-6 h-6 text-white" />}
-              trend={{ value: 25, isPositive: true }}
-            />
+            <HudBorder variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(11,228,236,0.3)]">
+                  <Globe className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-tech text-neon-lime">+25</span>
+              </div>
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">{stats.intelligence_collected}</h3>
+              <p className="text-sm text-gray-400 font-tech">Intelligence Collected</p>
+            </HudBorder>
 
-            <StatsCard
-              title="Opportunities"
-              value={stats.opportunities_identified}
-              icon={<Target className="w-6 h-6 text-white" />}
-              trend={{ value: 18, isPositive: true }}
-            />
+            <HudBorder variant="hover" className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(11,228,236,0.3)]">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-sm font-tech text-neon-lime">+18</span>
+              </div>
+              <h3 className="text-2xl font-sci font-bold text-white mb-1">{stats.opportunities_identified}</h3>
+              <p className="text-sm text-gray-400 font-tech">Opportunities</p>
+            </HudBorder>
           </motion.div>
         )}
 
         {/* Filters and Search */}
         <motion.div variants={itemVariants}>
-          <EmpowermentCard>
+          <HudBorder variant="hover" className="p-6">
             <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
                   <Input
                     placeholder="Search competitors..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-dark-bg border-neon-cyan/30 text-white placeholder:text-gray-500 focus:border-neon-cyan"
                   />
                 </div>
 
                 <Select value={threatFilter} onValueChange={setThreatFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] bg-dark-bg border-neon-cyan/30 text-white">
                     <SelectValue placeholder="Threat Level" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Threats</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                  <SelectContent className="bg-dark-card border-neon-cyan/30">
+                    <SelectItem value="all" className="text-white">All Threats</SelectItem>
+                    <SelectItem value="critical" className="text-white">Critical</SelectItem>
+                    <SelectItem value="high" className="text-white">High</SelectItem>
+                    <SelectItem value="medium" className="text-white">Medium</SelectItem>
+                    <SelectItem value="low" className="text-white">Low</SelectItem>
                   </SelectContent>
                 </Select>
 
                 <Select value={industryFilter} onValueChange={setIndustryFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] bg-dark-bg border-neon-cyan/30 text-white">
                     <SelectValue placeholder="Industry" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Industries</SelectItem>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="finance">Finance</SelectItem>
-                    <SelectItem value="healthcare">Healthcare</SelectItem>
-                    <SelectItem value="retail">Retail</SelectItem>
-                    <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                  <SelectContent className="bg-dark-card border-neon-cyan/30">
+                    <SelectItem value="all" className="text-white">All Industries</SelectItem>
+                    <SelectItem value="technology" className="text-white">Technology</SelectItem>
+                    <SelectItem value="finance" className="text-white">Finance</SelectItem>
+                    <SelectItem value="healthcare" className="text-white">Healthcare</SelectItem>
+                    <SelectItem value="retail" className="text-white">Retail</SelectItem>
+                    <SelectItem value="manufacturing" className="text-white">Manufacturing</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex items-center gap-2">
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[160px]">
+                  <SelectTrigger className="w-[160px] bg-dark-bg border-neon-cyan/30 text-white">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="threat_level">Threat Level</SelectItem>
-                    <SelectItem value="name">Name</SelectItem>
-                    <SelectItem value="last_analyzed">Last Analyzed</SelectItem>
-                    <SelectItem value="activity">Recent Activity</SelectItem>
+                  <SelectContent className="bg-dark-card border-neon-cyan/30">
+                    <SelectItem value="threat_level" className="text-white">Threat Level</SelectItem>
+                    <SelectItem value="name" className="text-white">Name</SelectItem>
+                    <SelectItem value="last_analyzed" className="text-white">Last Analyzed</SelectItem>
+                    <SelectItem value="activity" className="text-white">Recent Activity</SelectItem>
                   </SelectContent>
                 </Select>
 
-                <BossButton
-                  variant="secondary"
+                <PrimaryButton
+                  variant="outline"
                   size="sm"
-                  icon={<Download className="w-4 h-4" />}
+                  className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                 >
+                  <Download className="w-4 h-4 mr-2" />
                   Export
-                </BossButton>
+                </PrimaryButton>
               </div>
             </div>
-          </EmpowermentCard>
+          </HudBorder>
         </motion.div>
 
         {/* Main Dashboard Tabs */}
@@ -549,9 +577,8 @@ export default function CompetitorDashboardPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <BossCard
-                        variant="default"
-                        interactive
+                      <HudBorder
+                        variant="hover"
                         className="h-full"
                       >
                         <div className="space-y-4">
@@ -560,20 +587,29 @@ export default function CompetitorDashboardPage() {
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 mb-2">
                                 <div
-                                  className={`w-3 h-3 rounded-full ${getThreatLevelColor(competitor.threat_level)}`}
+                                  className={`w-3 h-3 rounded-full ${
+                                    competitor.threat_level === 'critical' ? 'bg-neon-magenta' :
+                                    competitor.threat_level === 'high' ? 'bg-neon-orange' :
+                                    competitor.threat_level === 'medium' ? 'bg-neon-orange' :
+                                    'bg-neon-lime'
+                                  }`}
                                 />
-                                <h3 className="font-bold text-lg text-gradient">
+                                <h3 className="font-sci font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">
                                   {competitor.name}
                                 </h3>
                               </div>
                               {competitor.domain && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <p className="text-sm text-gray-400 mb-1 font-tech">
                                   {competitor.domain}
                                 </p>
                               )}
                               <Badge
-                                variant="outline"
-                                className={getThreatLevelBadge(competitor.threat_level)}
+                                className={`text-xs font-tech ${
+                                  competitor.threat_level === 'critical' ? 'bg-neon-magenta/10 text-neon-magenta border-neon-magenta/30' :
+                                  competitor.threat_level === 'high' ? 'bg-neon-orange/10 text-neon-orange border-neon-orange/30' :
+                                  competitor.threat_level === 'medium' ? 'bg-neon-orange/10 text-neon-orange border-neon-orange/30' :
+                                  'bg-neon-lime/10 text-neon-lime border-neon-lime/30'
+                                }`}
                               >
                                 {competitor.threat_level.toUpperCase()} THREAT
                               </Badge>
@@ -581,27 +617,27 @@ export default function CompetitorDashboardPage() {
 
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <BossButton variant="secondary" size="sm">
+                                <PrimaryButton variant="outline" size="sm" className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
                                   <MoreVertical className="w-4 h-4" />
-                                </BossButton>
+                                </PrimaryButton>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
+                              <DropdownMenuContent align="end" className="bg-dark-card border-neon-cyan/30">
+                                <DropdownMenuItem asChild className="text-white hover:bg-dark-bg">
                                   <Link href={`/dashboard/competitors/${competitor.id}`}>
                                     <Eye className="w-4 h-4 mr-2" />
                                     View Profile
                                   </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem className="text-white hover:bg-dark-bg">
                                   <Zap className="w-4 h-4 mr-2" />
                                   Trigger Enrichment
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem className="text-white hover:bg-dark-bg">
                                   <Settings className="w-4 h-4 mr-2" />
                                   Configure Monitoring
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuSeparator className="bg-neon-cyan/30" />
+                                <DropdownMenuItem className="text-neon-magenta hover:bg-dark-bg">
                                   Archive Competitor
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -610,7 +646,7 @@ export default function CompetitorDashboardPage() {
 
                           {/* Description */}
                           {competitor.description && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                            <p className="text-sm text-gray-400 line-clamp-2 font-tech">
                               {competitor.description}
                             </p>
                           )}
@@ -618,22 +654,25 @@ export default function CompetitorDashboardPage() {
                           {/* Metrics */}
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <p className="text-gray-500">Industry</p>
-                              <p className="font-medium">{competitor.industry || 'Unknown'}</p>
+                              <p className="text-gray-500 font-tech">Industry</p>
+                              <p className="font-medium text-white font-sci">{competitor.industry || 'Unknown'}</p>
                             </div>
                             <div>
-                              <p className="text-gray-500">Employees</p>
-                              <p className="font-medium">{competitor.employee_count || 'Unknown'}</p>
+                              <p className="text-gray-500 font-tech">Employees</p>
+                              <p className="font-medium text-white font-sci">{competitor.employee_count || 'Unknown'}</p>
                             </div>
                             <div>
-                              <p className="text-gray-500">Funding</p>
-                              <p className="font-medium">{competitor.funding_stage || 'Unknown'}</p>
+                              <p className="text-gray-500 font-tech">Funding</p>
+                              <p className="font-medium text-white font-sci">{competitor.funding_stage || 'Unknown'}</p>
                             </div>
                             <div>
-                              <p className="text-gray-500">Status</p>
+                              <p className="text-gray-500 font-tech">Status</p>
                               <Badge
-                                variant={competitor.monitoring_status === 'active' ? 'default' : 'secondary'}
-                                className="text-xs"
+                                className={`text-xs ${
+                                  competitor.monitoring_status === 'active' 
+                                    ? 'bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30' 
+                                    : 'bg-white/5 text-gray-400 border-white/10'
+                                } font-tech`}
                               >
                                 {competitor.monitoring_status}
                               </Badge>
@@ -641,33 +680,33 @@ export default function CompetitorDashboardPage() {
                           </div>
 
                           {/* Activity Indicators */}
-                          <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between pt-2 border-t border-neon-cyan/20">
                             <div className="flex items-center space-x-4 text-sm">
                               <div className="flex items-center space-x-1">
-                                <TrendingUp className="w-4 h-4 text-blue-500" />
-                                <span>{competitor.recent_activity_count} activities</span>
+                                <TrendingUp className="w-4 h-4 text-neon-cyan" />
+                                <span className="text-gray-400 font-tech">{competitor.recent_activity_count} activities</span>
                               </div>
                               {competitor.alert_count > 0 && (
                                 <div className="flex items-center space-x-1">
-                                  <AlertTriangle className="w-4 h-4 text-orange-500" />
-                                  <span>{competitor.alert_count} alerts</span>
+                                  <AlertTriangle className="w-4 h-4 text-neon-orange" />
+                                  <span className="text-gray-400 font-tech">{competitor.alert_count} alerts</span>
                                 </div>
                               )}
                             </div>
 
                             <Link href={`/dashboard/competitors/${competitor.id}`}>
-                              <BossButton variant="primary" size="sm">
+                              <PrimaryButton size="sm" className="bg-neon-purple hover:bg-neon-purple/90">
                                 View Details
-                              </BossButton>
+                              </PrimaryButton>
                             </Link>
                           </div>
                         </div>
-                      </BossCard>
+                      </HudBorder>
                     </motion.div>
                   ))}
                 </div>
               ) : (
-                <EmpowermentCard>
+                <HudBorder variant="hover" className="p-8">
                   <div className="text-center py-12">
                     <motion.div
                       animate={{
@@ -679,17 +718,17 @@ export default function CompetitorDashboardPage() {
                         repeat: Infinity,
                         ease: "easeInOut"
                       }}
-                      className="mx-auto w-20 h-20 gradient-danger rounded-full flex items-center justify-center mb-6"
+                      className="mx-auto w-20 h-20 bg-gradient-to-br from-neon-magenta to-neon-purple rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(255,0,110,0.4)]"
                     >
                       <Eye className="w-10 h-10 text-white" />
                     </motion.div>
-                    <h2 className="text-2xl font-bold text-gradient mb-4">
+                    <h2 className="text-2xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta mb-4">
                       {searchQuery || threatFilter !== "all" || industryFilter !== "all"
                         ? "No competitors match your filters"
                         : "No competitors added yet"
                       }
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    <p className="text-gray-400 mb-6 font-tech">
                       {searchQuery || threatFilter !== "all" || industryFilter !== "all"
                         ? "Try adjusting your search criteria or filters"
                         : "Start building your competitive intelligence by adding your first competitor"
@@ -697,14 +736,15 @@ export default function CompetitorDashboardPage() {
                     </p>
                     <div className="space-y-3">
                       <Link href="/dashboard/competitors/add">
-                        <ZapButton>
+                        <PrimaryButton className="bg-neon-purple hover:bg-neon-purple/90">
                           <Plus className="w-4 h-4 mr-2" />
                           Add First Competitor
-                        </ZapButton>
+                        </PrimaryButton>
                       </Link>
                       {(searchQuery || threatFilter !== "all" || industryFilter !== "all") && (
-                        <BossButton
-                          variant="secondary"
+                        <PrimaryButton
+                          variant="outline"
+                          className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                           onClick={() => {
                             setSearchQuery("")
                             setThreatFilter("all")
@@ -712,11 +752,11 @@ export default function CompetitorDashboardPage() {
                           }}
                         >
                           Clear Filters
-                        </BossButton>
+                        </PrimaryButton>
                       )}
                     </div>
                   </div>
-                </EmpowermentCard>
+                </HudBorder>
               )}
             </TabsContent>
 
@@ -725,33 +765,34 @@ export default function CompetitorDashboardPage() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Activity Feed */}
                 <div className="lg:col-span-2">
-                  <EmpowermentCard>
+                  <HudBorder variant="hover" className="p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
+                      <h2 className="text-2xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta flex items-center space-x-2">
                         <Activity className="w-6 h-6" />
                         <span>Live Intelligence Feed</span>
                       </h2>
                       <div className="flex items-center gap-2">
                         <Select value={timelineFilter} onValueChange={setTimelineFilter}>
-                          <SelectTrigger className="w-[120px]">
+                          <SelectTrigger className="w-[120px] bg-dark-bg border-neon-cyan/30 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1h">Last Hour</SelectItem>
-                            <SelectItem value="24h">Last 24h</SelectItem>
-                            <SelectItem value="7d">Last Week</SelectItem>
-                            <SelectItem value="30d">Last Month</SelectItem>
+                          <SelectContent className="bg-dark-card border-neon-cyan/30">
+                            <SelectItem value="1h" className="text-white">Last Hour</SelectItem>
+                            <SelectItem value="24h" className="text-white">Last 24h</SelectItem>
+                            <SelectItem value="7d" className="text-white">Last Week</SelectItem>
+                            <SelectItem value="30d" className="text-white">Last Month</SelectItem>
                           </SelectContent>
                         </Select>
-                        <BossButton
-                          variant="secondary"
+                        <PrimaryButton
+                          variant="outline"
                           size="sm"
-                          icon={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
+                          className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                           onClick={handleRefresh}
                           disabled={refreshing}
                         >
+                          <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                           Refresh
-                        </BossButton>
+                        </PrimaryButton>
                       </div>
                     </div>
 
@@ -763,33 +804,42 @@ export default function CompetitorDashboardPage() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: _index * 0.05 }}
-                            className="flex items-start space-x-4 p-4 glass rounded-xl hover-lift"
+                            className="flex items-start space-x-4 p-4 bg-dark-bg/50 rounded-xl border border-neon-cyan/20 hover:border-neon-cyan/50 transition-all"
                           >
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getActivityColor(activity.importance)}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              activity.importance === 'critical' ? 'bg-neon-magenta/20 text-neon-magenta' :
+                              activity.importance === 'high' ? 'bg-neon-orange/20 text-neon-orange' :
+                              activity.importance === 'medium' ? 'bg-neon-orange/20 text-neon-orange' :
+                              'bg-neon-lime/20 text-neon-lime'
+                            }`}>
                               {getActivityIcon(activity.type)}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
-                                <h3 className="font-semibold text-sm truncate">
+                                <h3 className="font-semibold text-sm truncate text-white font-sci">
                                   {activity.competitorName}
                                 </h3>
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-gray-500 font-tech">
                                   {formatTimeAgo(activity.timestamp)}
                                 </span>
                               </div>
-                              <p className="font-medium text-sm mb-1">{activity.title}</p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                              <p className="font-medium text-sm mb-1 text-white font-sci">{activity.title}</p>
+                              <p className="text-xs text-gray-400 line-clamp-2 mb-2 font-tech">
                                 {activity.description}
                               </p>
                               <div className="flex items-center justify-between">
                                 <Badge
-                                  variant="outline"
-                                  className={getThreatLevelBadge(activity.importance)}
+                                  className={`text-xs font-tech ${
+                                    activity.importance === 'critical' ? 'bg-neon-magenta/10 text-neon-magenta border-neon-magenta/30' :
+                                    activity.importance === 'high' ? 'bg-neon-orange/10 text-neon-orange border-neon-orange/30' :
+                                    activity.importance === 'medium' ? 'bg-neon-orange/10 text-neon-orange border-neon-orange/30' :
+                                    'bg-neon-lime/10 text-neon-lime border-neon-lime/30'
+                                  }`}
                                 >
                                   {activity.importance.toUpperCase()}
                                 </Badge>
                                 {activity.agentAnalysis && (
-                                  <div className="flex items-center space-x-1 text-xs text-blue-600">
+                                  <div className="flex items-center space-x-1 text-xs text-neon-cyan font-tech">
                                     <Zap className="w-3 h-3" />
                                     <span>Analyzed by {activity.agentAnalysis.agentName}</span>
                                   </div>
@@ -800,87 +850,88 @@ export default function CompetitorDashboardPage() {
                         ))
                       ) : (
                         <div className="text-center py-8">
-                          <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-600 dark:text-gray-400">No recent activity</p>
+                          <Activity className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                          <p className="text-gray-400 font-tech">No recent activity</p>
                         </div>
                       )}
                     </div>
-                  </EmpowermentCard>
+                  </HudBorder>
                 </div>
 
                 {/* Activity Summary */}
                 <div className="space-y-6">
-                  <BossCard variant="success">
-                    <h3 className="font-bold text-lg mb-4 text-gradient">Activity Summary</h3>
+                  <HudBorder variant="hover" className="p-6 border-neon-lime/30">
+                    <h3 className="font-sci font-bold text-lg mb-4 text-white">Activity Summary</h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm">Website Changes</span>
-                        <Badge variant="outline">
+                        <span className="text-sm text-gray-400 font-tech">Website Changes</span>
+                        <Badge className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
                           {realtimeActivities.filter(a => a.type === 'website_change').length}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm">Social Posts</span>
-                        <Badge variant="outline">
+                        <span className="text-sm text-gray-400 font-tech">Social Posts</span>
+                        <Badge className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
                           {realtimeActivities.filter(a => a.type === 'social_post').length}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm">News Mentions</span>
-                        <Badge variant="outline">
+                        <span className="text-sm text-gray-400 font-tech">News Mentions</span>
+                        <Badge className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
                           {realtimeActivities.filter(a => a.type === 'news_mention').length}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm">Job Postings</span>
-                        <Badge variant="outline">
+                        <span className="text-sm text-gray-400 font-tech">Job Postings</span>
+                        <Badge className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
                           {realtimeActivities.filter(a => a.type === 'job_posting').length}
                         </Badge>
                       </div>
                     </div>
-                  </BossCard>
+                  </HudBorder>
 
-                  <BossCard variant="warning">
-                    <h3 className="font-bold text-lg mb-4 text-gradient">Critical Alerts</h3>
+                  <HudBorder variant="hover" className="p-6 border-neon-orange/30">
+                    <h3 className="font-sci font-bold text-lg mb-4 text-white">Critical Alerts</h3>
                     <div className="space-y-3">
                       {realtimeActivities
                         .filter(a => a.importance === 'critical')
                         .slice(0, 3)
                         .map((activity, _index) => (
-                          <div key={activity.id} className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                            <p className="font-medium text-sm">{activity.competitorName}</p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">{activity.title}</p>
+                          <div key={activity.id} className="p-3 bg-neon-magenta/10 rounded-lg border border-neon-magenta/30">
+                            <p className="font-medium text-sm text-white font-sci">{activity.competitorName}</p>
+                            <p className="text-xs text-gray-400 font-tech">{activity.title}</p>
                           </div>
                         ))}
                       {realtimeActivities.filter(a => a.importance === 'critical').length === 0 && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">No critical alerts</p>
+                        <p className="text-sm text-gray-400 font-tech">No critical alerts</p>
                       )}
                     </div>
-                  </BossCard>
+                  </HudBorder>
                 </div>
               </div>
             </TabsContent>
 
             {/* Threat Matrix Visualization */}
             <TabsContent value="threat-matrix" className="space-y-6">
-              <EmpowermentCard>
+              <HudBorder variant="hover" className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
+                  <h2 className="text-2xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta flex items-center space-x-2">
                     <Radar className="w-6 h-6" />
                     <span>Competitive Threat Matrix</span>
                   </h2>
-                  <BossButton
-                    variant="secondary"
+                  <PrimaryButton
+                    variant="outline"
                     size="sm"
-                    icon={<Download className="w-4 h-4" />}
+                    className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                   >
+                    <Download className="w-4 h-4 mr-2" />
                     Export Matrix
-                  </BossButton>
+                  </PrimaryButton>
                 </div>
 
                 <div className="relative">
                   {/* Matrix Chart */}
-                  <div className="relative w-full h-96 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                  <div className="relative w-full h-96 bg-dark-bg/50 rounded-xl border-2 border-dashed border-neon-cyan/30">
                     {/* Axis Labels */}
                     <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 -rotate-90">
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -934,38 +985,40 @@ export default function CompetitorDashboardPage() {
                     ))}
                   </div>
                 </div>
-              </EmpowermentCard>
+              </HudBorder>
             </TabsContent>
 
             {/* Market Positioning Map */}
             <TabsContent value="positioning" className="space-y-6">
-              <EmpowermentCard>
+              <HudBorder variant="hover" className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
+                  <h2 className="text-2xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta flex items-center space-x-2">
                     <Map className="w-6 h-6" />
                     <span>Market Positioning Map</span>
                   </h2>
                   <div className="flex items-center gap-2">
-                    <BossButton
-                      variant="secondary"
+                    <PrimaryButton
+                      variant="outline"
                       size="sm"
-                      icon={<Layers className="w-4 h-4" />}
+                      className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                     >
+                      <Layers className="w-4 h-4 mr-2" />
                       Toggle View
-                    </BossButton>
-                    <BossButton
-                      variant="secondary"
+                    </PrimaryButton>
+                    <PrimaryButton
+                      variant="outline"
                       size="sm"
-                      icon={<Download className="w-4 h-4" />}
+                      className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                     >
+                      <Download className="w-4 h-4 mr-2" />
                       Export Map
-                    </BossButton>
+                    </PrimaryButton>
                   </div>
                 </div>
 
                 <div className="relative">
                   {/* Positioning Chart */}
-                  <div className="relative w-full h-96 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border-2 border-dashed border-blue-300 dark:border-blue-600">
+                  <div className="relative w-full h-96 bg-dark-bg/50 rounded-xl border-2 border-dashed border-neon-purple/30">
                     {/* Axis Labels */}
                     <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 -rotate-90">
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -989,7 +1042,12 @@ export default function CompetitorDashboardPage() {
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`absolute rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 ${getThreatLevelColor(competitor.threatLevel)} hover:scale-110 transition-transform flex items-center justify-center text-white text-xs font-bold`}
+                        className={`absolute rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 ${
+                          competitor.threatLevel === 'critical' ? 'bg-neon-magenta' :
+                          competitor.threatLevel === 'high' ? 'bg-neon-orange' :
+                          competitor.threatLevel === 'medium' ? 'bg-neon-orange' :
+                          'bg-neon-lime'
+                        } hover:scale-110 transition-transform flex items-center justify-center text-white text-xs font-bold font-sci`}
                         style={{
                           left: `${(competitor.marketShare / 50) * 80 + 10}%`,
                           top: `${50 - (competitor.growthRate / 40) * 40}%`,
@@ -1005,84 +1063,85 @@ export default function CompetitorDashboardPage() {
 
                   {/* Market Insights */}
                   <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <BossCard variant="success">
-                      <h3 className="font-bold mb-2">Market Leaders</h3>
+                    <HudBorder variant="hover" className="p-4 border-neon-lime/30">
+                      <h3 className="font-sci font-bold mb-2 text-white">Market Leaders</h3>
                       <div className="space-y-2">
                         {marketPositioning
                           .sort((a, b) => b.marketShare - a.marketShare)
                           .slice(0, 3)
                           .map((competitor) => (
                             <div key={competitor.competitorId} className="flex items-center justify-between">
-                              <span className="text-sm">{competitor.name}</span>
-                              <span className="text-xs font-medium">{competitor.marketShare.toFixed(1)}%</span>
+                              <span className="text-sm text-gray-300 font-tech">{competitor.name}</span>
+                              <span className="text-xs font-medium text-neon-lime">{competitor.marketShare.toFixed(1)}%</span>
                             </div>
                           ))}
                       </div>
-                    </BossCard>
+                    </HudBorder>
 
-                    <BossCard variant="warning">
-                      <h3 className="font-bold mb-2">Fast Growers</h3>
+                    <HudBorder variant="hover" className="p-4 border-neon-orange/30">
+                      <h3 className="font-sci font-bold mb-2 text-white">Fast Growers</h3>
                       <div className="space-y-2">
                         {marketPositioning
                           .sort((a, b) => b.growthRate - a.growthRate)
                           .slice(0, 3)
                           .map((competitor) => (
                             <div key={competitor.competitorId} className="flex items-center justify-between">
-                              <span className="text-sm">{competitor.name}</span>
-                              <span className="text-xs font-medium">+{competitor.growthRate.toFixed(1)}%</span>
+                              <span className="text-sm text-gray-300 font-tech">{competitor.name}</span>
+                              <span className="text-xs font-medium text-neon-orange">+{competitor.growthRate.toFixed(1)}%</span>
                             </div>
                           ))}
                       </div>
-                    </BossCard>
+                    </HudBorder>
 
-                    <BossCard variant="danger">
-                      <h3 className="font-bold mb-2">Critical Threats</h3>
+                    <HudBorder variant="hover" className="p-4 border-neon-magenta/30">
+                      <h3 className="font-sci font-bold mb-2 text-white">Critical Threats</h3>
                       <div className="space-y-2">
                         {marketPositioning
                           .filter(c => c.threatLevel === 'critical' || c.threatLevel === 'high')
                           .slice(0, 3)
                           .map((competitor) => (
                             <div key={competitor.competitorId} className="flex items-center justify-between">
-                              <span className="text-sm">{competitor.name}</span>
+                              <span className="text-sm text-gray-300 font-tech">{competitor.name}</span>
                               <Badge variant="outline" className={getThreatLevelBadge(competitor.threatLevel)}>
                                 {competitor.threatLevel}
                               </Badge>
                             </div>
                           ))}
                       </div>
-                    </BossCard>
+                    </HudBorder>
                   </div>
                 </div>
-              </EmpowermentCard>
+              </HudBorder>
             </TabsContent>
 
             {/* Intelligence Timeline */}
             <TabsContent value="timeline" className="space-y-6">
-              <EmpowermentCard>
+              <HudBorder variant="hover" className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gradient flex items-center space-x-2">
+                  <h2 className="text-2xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta flex items-center space-x-2">
                     <Clock className="w-6 h-6" />
                     <span>Intelligence Timeline</span>
                   </h2>
                   <div className="flex items-center gap-2">
                     <Select value={timelineFilter} onValueChange={setTimelineFilter}>
-                      <SelectTrigger className="w-[120px]">
+                      <SelectTrigger className="w-[120px] bg-dark-bg border-neon-cyan/30 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="24h">Last 24h</SelectItem>
-                        <SelectItem value="7d">Last Week</SelectItem>
-                        <SelectItem value="30d">Last Month</SelectItem>
-                        <SelectItem value="90d">Last Quarter</SelectItem>
+                      <SelectContent className="bg-dark-card border-neon-cyan/30">
+                        <SelectItem value="24h" className="text-white">Last 24h</SelectItem>
+                        <SelectItem value="7d" className="text-white">Last Week</SelectItem>
+                        <SelectItem value="30d" className="text-white">Last Month</SelectItem>
+                        <SelectItem value="90d" className="text-white">Last Quarter</SelectItem>
                       </SelectContent>
                     </Select>
-                    <BossButton
-                      variant="secondary"
+                    <PrimaryButton
+                      variant="outline"
                       size="sm"
-                      icon={<Download className="w-4 h-4" />}
+                      className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                     >
+                      <Download className="w-4 h-4 mr-2" />
                       Export Timeline
-                    </BossButton>
+                    </PrimaryButton>
                   </div>
                 </div>
 
@@ -1100,50 +1159,60 @@ export default function CompetitorDashboardPage() {
                         >
                           {/* Timeline Line */}
                           {_index < realtimeActivities.length - 1 && (
-                            <div className="absolute left-5 top-10 bottom-0 w-px bg-gray-200 dark:bg-gray-700" />
+                            <div className="absolute left-5 top-10 bottom-0 w-px bg-neon-cyan/20" />
                           )}
 
                           {/* Activity Icon */}
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getActivityColor(activity.importance)} border-2 border-white dark:border-gray-800 z-10`}>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            activity.importance === 'critical' ? 'bg-neon-magenta/20 text-neon-magenta' :
+                            activity.importance === 'high' ? 'bg-neon-orange/20 text-neon-orange' :
+                            activity.importance === 'medium' ? 'bg-neon-orange/20 text-neon-orange' :
+                            'bg-neon-lime/20 text-neon-lime'
+                          } border-2 border-dark-card z-10`}>
                             {getActivityIcon(activity.type)}
                           </div>
 
                           {/* Activity Content */}
                           <div className="flex-1 min-w-0">
-                            <BossCard variant="default" className="p-4">
+                            <HudBorder variant="hover" className="p-4">
                               <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-bold text-gradient">{activity.competitorName}</h3>
+                                <h3 className="font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">{activity.competitorName}</h3>
                                 <div className="flex items-center space-x-2">
-                                  <Badge variant="outline" className={getThreatLevelBadge(activity.importance)}>
+                                  <Badge className={`text-xs font-tech ${
+                                    activity.importance === 'critical' ? 'bg-neon-magenta/10 text-neon-magenta border-neon-magenta/30' :
+                                    activity.importance === 'high' ? 'bg-neon-orange/10 text-neon-orange border-neon-orange/30' :
+                                    activity.importance === 'medium' ? 'bg-neon-orange/10 text-neon-orange border-neon-orange/30' :
+                                    'bg-neon-lime/10 text-neon-lime border-neon-lime/30'
+                                  }`}>
                                     {activity.importance}
                                   </Badge>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-gray-500 font-tech">
                                     {formatTimeAgo(activity.timestamp)}
                                   </span>
                                 </div>
                               </div>
-                              <h4 className="font-semibold mb-1">{activity.title}</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                              <h4 className="font-semibold mb-1 text-white font-sci">{activity.title}</h4>
+                              <p className="text-sm text-gray-400 mb-3 font-tech">
                                 {activity.description}
                               </p>
 
                               {activity.agentAnalysis && (
-                                <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                                <div className="border-t border-neon-cyan/20 pt-3">
                                   <div className="flex items-center space-x-2 mb-2">
-                                    <Zap className="w-4 h-4 text-blue-500" />
-                                    <span className="text-sm font-medium text-blue-600">
+                                    <Zap className="w-4 h-4 text-neon-cyan" />
+                                    <span className="text-sm font-medium text-neon-cyan font-tech">
                                       AI Analysis by {activity.agentAnalysis.agentName}
                                     </span>
                                   </div>
                                   {activity.agentAnalysis.insights.length > 0 && (
                                     <div className="mb-2">
-                                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                      <p className="text-xs font-medium text-gray-400 mb-1 font-tech">
                                         Key Insights:
                                       </p>
-                                      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                      <ul className="text-xs text-gray-400 space-y-1 font-tech">
                                         {activity.agentAnalysis.insights.slice(0, 2).map((insight, i) => (
                                           <li key={i} className="flex items-start space-x-1">
-                                            <span className="text-blue-500">•</span>
+                                            <span className="text-neon-cyan">•</span>
                                             <span>{insight}</span>
                                           </li>
                                         ))}
@@ -1152,13 +1221,13 @@ export default function CompetitorDashboardPage() {
                                   )}
                                   {activity.agentAnalysis.recommendations.length > 0 && (
                                     <div>
-                                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                      <p className="text-xs font-medium text-gray-400 mb-1 font-tech">
                                         Recommendations:
                                       </p>
-                                      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                      <ul className="text-xs text-gray-400 space-y-1 font-tech">
                                         {activity.agentAnalysis.recommendations.slice(0, 2).map((rec, i) => (
                                           <li key={i} className="flex items-start space-x-1">
-                                            <span className="text-green-500">•</span>
+                                            <span className="text-neon-lime">•</span>
                                             <span>{rec}</span>
                                           </li>
                                         ))}
@@ -1167,19 +1236,19 @@ export default function CompetitorDashboardPage() {
                                   )}
                                 </div>
                               )}
-                            </BossCard>
+                            </HudBorder>
                           </div>
                         </motion.div>
                       ))
                     ) : (
                       <div className="text-center py-12">
-                        <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400">No intelligence activities in the selected timeframe</p>
+                        <Clock className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                        <p className="text-gray-400 font-tech">No intelligence activities in the selected timeframe</p>
                       </div>
                     )}
                   </div>
                 </div>
-              </EmpowermentCard>
+              </HudBorder>
             </TabsContent>
           </Tabs>
         </motion.div>

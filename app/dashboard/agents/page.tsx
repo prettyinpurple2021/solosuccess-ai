@@ -468,7 +468,6 @@ export default function AgentsPage() {
               </ScrollArea>
             </div>
           </div>
-        </div>
 
         {/* Chat Interface */}
         <div className="lg:col-span-3">

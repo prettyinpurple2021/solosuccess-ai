@@ -62,6 +62,10 @@ export function useUserPreferences(
       if (response.ok) {
         const data = await response.json()
         setPreferencesState(data.preferences || {})
+      } else if (response.status === 401) {
+        // 401 is expected for anonymous users - return empty preferences
+        setPreferencesState(options.defaultValues || {})
+        setError(null)
       } else if (options.fallbackToLocalStorage) {
         // Fallback to localStorage for anonymous users or on error
         const fallbackPrefs = { ...options.defaultValues }

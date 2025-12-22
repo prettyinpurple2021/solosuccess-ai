@@ -27,7 +27,7 @@ import {
   Settings as SettingsIcon
 } from 'lucide-react'
 import { HudBorder } from '@/components/cyber/HudBorder'
-import { PrimaryButton } from '@/components/ui/PrimaryButton'
+import { PrimaryButton } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
