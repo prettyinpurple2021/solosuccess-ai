@@ -181,17 +181,27 @@ export default function RootLayout({
                 }
               }
 
-              // Suppress backendManager errors (likely from browser extensions)
-              const originalError = console.error;
-              console.error = function(...args) {
-                const message = args[0]?.toString() || '';
-                if (message.includes('Cannot read properties of undefined') && 
-                    message.includes('reading \'has\'')) {
-                  // Suppress backendManager errors silently
-                  return;
-                }
-                originalError.apply(console, args);
-              };
+              // Suppress backendManager errors from browser extensions
+              // This is a targeted suppression for third-party extension errors only
+              // We use a wrapper that checks the error source before suppressing
+              if (typeof window !== 'undefined' && window.addEventListener) {
+                const originalErrorHandler = window.onerror;
+                window.onerror = function(message, source, lineno, colno, error) {
+                  // Only suppress if it's clearly from a browser extension (backendManager.js)
+                  if (typeof message === 'string' && 
+                      message.includes('Cannot read properties of undefined') && 
+                      message.includes('reading \'has\'') &&
+                      (source && source.includes('backendManager'))) {
+                    // Suppress browser extension errors silently
+                    return true;
+                  }
+                  // For all other errors, use the original handler or let them through
+                  if (originalErrorHandler) {
+                    return originalErrorHandler.call(this, message, source, lineno, colno, error);
+                  }
+                  return false;
+                };
+              }
 
               // Reuse a single observer and clean it up on unload/pagehide to avoid leaks
               if (window.__ssCssScriptObserver) {
