@@ -8,8 +8,6 @@ import { motion, easeOut } from "framer-motion"
 import {
   Search, Filter, Plus, Eye, AlertTriangle, TrendingUp, Users, Globe, Shield, Target, Zap, MoreVertical, RefreshCw, Download, Settings, Activity, BarChart3, Map, Clock, Radar, Grid3X3, Layers, Crosshair
 } from "lucide-react"
-import Link from "next/link"
-
 import { HudBorder } from "@/components/cyber/HudBorder"
 import { PrimaryButton } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,6 +23,7 @@ import {
 } from "@/components/ui/tabs"
 import { Loading } from "@/components/ui/loading"
 import { Progress as _Progress } from "@/components/ui/progress"
+import { Terminal as TerminalIcon } from "lucide-react"
 
 
 interface Competitor {
@@ -356,27 +355,19 @@ export default function CompetitorDashboardPage() {
         <motion.div variants={itemVariants} className="flex items-center justify-between">
           <div className="space-y-2">
             <div className="flex items-center space-x-3">
-              <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="w-12 h-12 bg-gradient-to-br from-neon-magenta to-neon-purple rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,0,110,0.4)]"
-              >
-                <Eye className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h1 className="text-4xl font-sci font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-magenta">
-                  COMPETITOR INTELLIGENCE 🕵️‍♀️
-                </h1>
-                <p className="text-lg text-gray-400 font-tech">
-                  Monitor, analyze, and optimize your competitive position
-                </p>
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-neon-magenta/10 border border-neon-magenta/30 rounded-none shadow-[0_0_15px_rgba(255,0,110,0.2)]">
+                  <TerminalIcon className="w-8 h-8 text-neon-magenta" />
+                </div>
+                <div>
+                  <h1 className="text-5xl font-sci font-black tracking-tighter text-white uppercase italic">
+                    Intel<span className="text-neon-magenta">Feed</span>
+                  </h1>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-neon-magenta animate-pulse rounded-none" />
+                    <p className="text-magenta-200 font-tech uppercase text-xs tracking-[0.2em] font-bold">Competitive Surveillance Engine // v4.1.0</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

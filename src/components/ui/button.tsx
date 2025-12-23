@@ -2,14 +2,13 @@
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { useSafeTheme } from '@/hooks/use-safe-theme'
 
 export interface PrimaryButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   children: ReactNode
   onClick?: () => void
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
-  variant?: 'cyan' | 'magenta' | 'lime' | 'purple' | 'orange' | 'success' | 'warning' | 'error' | 'info'
+  variant?: 'cyan' | 'magenta' | 'lime' | 'purple' | 'orange' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'ghost'
   className?: string
 }
 
@@ -59,6 +58,8 @@ export const PrimaryButton = ({
     orange: `border-2 border-neon-orange text-neon-orange hover:bg-neon-orange hover:bg-opacity-10 ${
       isBalanced ? 'hover:shadow-[0_0_15px_rgba(255,102,0,0.3)]' : 'hover:shadow-[0_0_20px_rgba(255,102,0,0.5)]'
     }`,
+    outline: 'border border-gray-600 text-gray-300 hover:border-neon-cyan hover:text-neon-cyan',
+    ghost: 'border-transparent text-gray-300 hover:bg-dark-hover',
   }
   
   return (

@@ -69,7 +69,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   }
 
   return (
-    <div className={`bg-cyber-black/80 backdrop-blur-md border-b border-cyber-cyan/20 px-6 py-4 ${className}`}>
+    <div className={`bg-dark-bg/80 backdrop-blur-xl border-b border-neon-cyan/20 px-6 py-4 ${className}`}>
       <div className="flex items-center justify-between">
         {/* Left side - Title or Search */}
         <div className="flex items-center gap-6 flex-1">

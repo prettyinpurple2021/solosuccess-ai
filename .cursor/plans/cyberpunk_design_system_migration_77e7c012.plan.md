@@ -85,7 +85,7 @@ todos:
 
 ## Overview
 
-Transform the entire SoloSuccess AI application from the current military glassmorphic design to a cyberpunk/sci-fi theme based on `public/index.html`. This includes updating the design system, all pages, components, and integrating the new SVG logo.
+Transform the entire SoloSuccess AI application from the current military glassmorphic design to a cyberpunk/sci-fi theme based on the new design system that can be found in `docs/design-system/`. This includes updating the design system, all pages, components, and integrating the new SVG logo.
 
 ## Design System Changes
 

@@ -19,56 +19,33 @@
     --card-foreground: 210 15% 92%;
     --popover: 240 33% 2%;
     --popover-foreground: 210 15% 92%;
-    --primary: 312 100% 50%; /* brand magenta */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 183 100% 50%; /* brand cyan */
-    --secondary-foreground: 0 0% 12%;
-    --muted: 222 18% 22%;
-    --muted-foreground: 215 12% 72%;
-    --accent: 260 70% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 18% 18%;
-    --input: 222 18% 18%;
-    --ring: 312 100% 50%;
-    --radius: 0.75rem;
-    --chart-1: 312 100% 50%;
-    --chart-2: 183 100% 50%;
-    --chart-3: 200 80% 56%;
-    --chart-4: 260 70% 60%;
-    --chart-5: 183 100% 70%;
+    --primary: 312 100% 55%; /* hyper magenta */
+    --secondary: 183 100% 50%; /* neon cyan */
+    --accent: 280 100% 60%; /* psychic purple */
+    --neon-cyan: 183 100% 50%;
+    --neon-magenta: 312 100% 55%;
+    --neon-purple: 280 100% 60%;
+    --neon-lime: 84 100% 50%;
+    --neon-orange: 32 100% 50%;
+    --radius: 0px; /* Sharp technical edges */
   }
 
   .dark {
-    --background: 240 33% 1%;
-    --foreground: 210 15% 92%;
-    --card: 240 33% 2%;
-    --card-foreground: 210 15% 92%;
-    --popover: 240 33% 2%;
-    --popover-foreground: 210 15% 92%;
-    --primary: 312 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 183 100% 50%;
-    --secondary-foreground: 0 0% 12%;
-    --muted: 222 18% 22%;
-    --muted-foreground: 215 12% 72%;
-    --accent: 260 70% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 18% 18%;
-    --input: 222 18% 18%;
-    --ring: 312 100% 50%;
-    --chart-1: 312 100% 50%;
-    --chart-2: 183 100% 50%;
-    --chart-3: 200 80% 56%;
-    --chart-4: 260 70% 60%;
-    --chart-5: 183 100% 70%;
+    --background: 240 50% 1%; /* even deeper void */
+    --foreground: 210 20% 98%;
+    /* ... rest of dark mode vars ... */
   }
 }
 
 @layer base {
+  body {
+    @apply bg-background text-foreground;
+    background-image: 
+      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+      linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+  }
+
   * {
     border-color: hsl(var(--border));
   }

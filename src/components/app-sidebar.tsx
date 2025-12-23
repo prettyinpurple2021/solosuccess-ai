@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="bg-cyber-black backdrop-blur-md border-r border-cyber-cyan/20"
+      className="bg-dark-bg/95 backdrop-blur-xl border-r border-neon-cyan/20"
       {...props}
     >
       <SidebarHeader>

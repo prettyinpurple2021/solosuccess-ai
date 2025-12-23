@@ -1,10 +1,10 @@
 # SoloSuccess AI Platform - Cursor Rules
-
+alwaysApply: true
 # This file provides comprehensive guidelines for AI assistants working on this project
 
 ## 🎯 PROJECT OVERVIEW
 
-You are working on SoloSuccess AI, a comprehensive AI-powered business platform for solo entrepreneurs. The platform includes AI agents, analytics, competitor intelligence, brand studio, briefcase system, and more.
+You are working on SoloSuccess AI, a comprehensive AI-powered business platform for solo entrepreneurs. The platform includes AI agents, analytics, competitor intelligence, brand studio, briefcase system, and more. THIS APP IS BEING BUILT FOR PRODUCTION. IT IS A REAL APP, A REAL IMPLEMENTATION, A REAL PRODUCT DESIGNED TO BE USED BY REAL PEOPLE. ALL CODE IS TO BE WRITTEN IN A PRODUCTION READY MANNER. 
 
 ## 🛠️ TECH STACK & ARCHITECTURE
 

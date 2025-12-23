@@ -17,7 +17,8 @@ import {
   Download,
   Share,
   MoreVertical,
-  Star
+  Star,
+  Terminal as TerminalIcon
 } from 'lucide-react'
 
 import {
@@ -27,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { HudBorder } from "@/components/cyber/HudBorder"
 
 interface Document {
   id: string
@@ -241,19 +243,27 @@ export default function BriefcasePage() {
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 pointer-events-none" />
       
       <div className="max-w-7xl mx-auto relative z-10 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-sci font-bold text-white">BRIEFCASE</h1>
-            <p className="text-lg text-gray-400 font-tech">Manage your business documents and files</p>
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-neon-purple/10 border border-neon-purple/30 rounded-none shadow-[0_0_15px_rgba(179,0,255,0.2)]">
+            <TerminalIcon className="w-8 h-8 text-neon-purple" />
           </div>
-          <div className="flex items-center gap-3">
-          <Button onClick={handleCreateFolder} variant="outline" className="border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10">
+          <div>
+            <h1 className="text-5xl font-sci font-black tracking-tighter text-white uppercase italic">
+              Brief<span className="text-neon-purple">Case</span>
+            </h1>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-neon-purple animate-pulse rounded-none" />
+              <p className="text-purple-200 font-tech uppercase text-xs tracking-[0.2em] font-bold">Secure Asset Repository System // v1.0.4</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button onClick={handleCreateFolder} variant="purple" className="border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10">
             <FolderPlus className="w-4 h-4 mr-2" />
             New Folder
           </Button>
           <label className="cursor-pointer">
-            <Button className="bg-gradient-to-r from-neon-purple to-neon-magenta text-white hover:opacity-90">
+            <Button variant="purple" className="bg-gradient-to-r from-neon-purple to-neon-magenta text-white hover:opacity-90">
               <Upload className="w-4 h-4 mr-2" />
               Upload Files
             </Button>
@@ -265,7 +275,6 @@ export default function BriefcasePage() {
               accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.webp"
             />
           </label>
-        </div>
         </div>
 
       {/* Stats */}
@@ -335,7 +344,7 @@ export default function BriefcasePage() {
         </select>
         <div className="flex items-center gap-2">
           <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            variant={viewMode === 'grid' ? 'purple' : 'cyan'}
             size="sm"
             onClick={() => setViewMode('grid')}
             className={viewMode === 'grid' ? 'bg-neon-purple text-white' : 'border-neon-cyan/30 text-white hover:bg-neon-cyan/10'}
@@ -343,7 +352,7 @@ export default function BriefcasePage() {
             <Grid3X3 className="w-4 h-4" />
           </Button>
           <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
+            variant={viewMode === 'list' ? 'purple' : 'cyan'}
             size="sm"
             onClick={() => setViewMode('list')}
             className={viewMode === 'list' ? 'bg-neon-purple text-white' : 'border-neon-cyan/30 text-white hover:bg-neon-cyan/10'}
@@ -392,7 +401,7 @@ export default function BriefcasePage() {
             </p>
             {!searchTerm && selectedCategory === 'all' && (
               <label className="cursor-pointer">
-                <Button className="bg-gradient-to-r from-neon-purple to-neon-magenta text-white hover:opacity-90">
+                <Button variant="purple" className="bg-gradient-to-r from-neon-purple to-neon-magenta text-white hover:opacity-90">
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Files
                 </Button>
@@ -417,7 +426,7 @@ export default function BriefcasePage() {
                         {getFileIcon(doc.fileType)}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="cyan" size="sm" className="text-white hover:bg-dark-bg">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -469,7 +478,7 @@ export default function BriefcasePage() {
                         )}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-white hover:bg-dark-bg">
+                            <Button variant="cyan" size="sm" className="text-white hover:bg-dark-bg">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -498,7 +507,7 @@ export default function BriefcasePage() {
           </div>
         )}
       </div>
-      </div>
     </div>
+  </div>
   )
 }

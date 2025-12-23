@@ -12,7 +12,6 @@ class RealtimeService {
 
     connect(userId: string) {
         if (this.socket?.connected && this.userId === userId) {
-            console.log('Already connected to real-time service');
             return;
         }
 
@@ -28,33 +27,27 @@ class RealtimeService {
 
         // Join user-specific room
         this.socket.on('connect', () => {
-            console.log('✅ Connected to real-time server');
             this.socket?.emit('join', userId);
         });
 
         // Handle real-time events
         this.socket.on('task:updated', (data) => {
-            console.log('Real-time: Task updated', data);
             this.emit('task:updated', data);
         });
 
         this.socket.on('task:deleted', (data) => {
-            console.log('Real-time: Task deleted', data);
             this.emit('task:deleted', data);
         });
 
         this.socket.on('tasks:batch_updated', (data) => {
-            console.log('Real-time: Tasks batch updated');
             this.emit('tasks:batch_updated', data);
         });
 
         this.socket.on('tasks:cleared', () => {
-            console.log('Real-time: All tasks cleared');
             this.emit('tasks:cleared', {});
         });
 
         this.socket.on('chat:updated', (data) => {
-            console.log('Real-time: Chat updated', data);
             this.emit('chat:updated', data);
         });
 

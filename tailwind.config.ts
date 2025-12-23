@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss"
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -86,15 +86,16 @@ const config: Config = {
           nova: '#06B6D4',      // Product Designer
           glitch: '#EF4444',    // QA & Debug
         },
-        // Cyberpunk Design System v3 Colors
+        // Cyberpunk Design System v4 "Aggressive" Colors
         'neon-cyan': '#0be4ec',
         'neon-magenta': '#ff006e',
         'neon-lime': '#39ff14',
         'neon-purple': '#b300ff',
         'neon-orange': '#ff6600',
-        'dark-bg': '#0a0e27',
-        'dark-card': '#0f1535',
-        'dark-hover': '#151d3a',
+        'neon-red': '#ff1414',
+        'dark-bg': '#020204',
+        'dark-card': '#0a0514',
+        'dark-hover': '#120b24',
       },
       borderRadius: {
         lg: "var(--radius)",

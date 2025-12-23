@@ -18,7 +18,8 @@ export function CyberPageLayout({
   showFooter = true 
 }: CyberPageLayoutProps) {
   return (
-    <div className="min-h-screen bg-cyber-black relative overflow-hidden">
+    <div className="min-h-screen bg-dark-bg relative overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
       <NeuralNetworkCanvas />
       <UIOverlayLines />
       {showNav && <CyberNav />}

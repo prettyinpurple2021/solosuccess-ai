@@ -400,56 +400,57 @@ export default function AgentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-sci font-bold text-white">AI SQUAD</h1>
-          <p className="text-gray-400 font-tech">Chat with your specialized AI agents to optimize your operations</p>
+    <>
+      <div className="min-h-screen bg-dark-bg p-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-sci font-bold text-white">AI SQUAD</h1>
+            <p className="text-gray-400 font-tech">Chat with your specialized AI agents to optimize your operations</p>
+          </div>
+          <Badge className="bg-neon-purple/20 text-neon-purple border-neon-purple/50">
+            <Bot className="w-3 h-3 mr-1" />
+            {AI_AGENTS.length} Agents Available
+          </Badge>
         </div>
-        <Badge className="bg-neon-purple/20 text-neon-purple border-neon-purple/50">
-          <Bot className="w-3 h-3 mr-1" />
-          {AI_AGENTS.length} Agents Available
-        </Badge>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-200px)]">
-        {/* Agent Selection */}
-        <div className="lg:col-span-1">
-          <div className="h-full bg-dark-card border border-neon-purple/30 rounded-lg p-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-sci font-bold text-white flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-neon-purple" />
-                YOUR AI SQUAD
-              </h2>
-              <p className="text-sm text-gray-400 font-tech">
-                Choose your AI agent to chat with
-              </p>
-            </div>
-            <ScrollArea className="h-[calc(100vh-300px)]">
-              <div className="space-y-3">
-                {AI_AGENTS.map((agent) => (
-                  <div
-                    key={agent.id}
-                    onClick={() => startNewConversation(agent)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-[0_0_15px_rgba(179,0,255,0.3)] ${
-                      selectedAgent?.id === agent.id 
-                        ? 'border-neon-purple/50 bg-neon-purple/10' 
-                        : 'border-white/10 hover:border-neon-purple/30 bg-dark-bg/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
-                        data-agent-color={agent.accent_color}
-                      >
-                        {agent.display_name.charAt(0)}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-200px)]">
+          {/* Agent Selection */}
+          <div className="lg:col-span-1">
+            <div className="h-full bg-dark-card border border-neon-purple/30 rounded-lg p-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-sci font-bold text-white flex items-center gap-2 mb-2">
+                  <Users className="w-5 h-5 text-neon-purple" />
+                  YOUR AI SQUAD
+                </h2>
+                <p className="text-sm text-gray-400 font-tech">
+                  Choose your AI agent to chat with
+                </p>
+              </div>
+              <ScrollArea className="h-[calc(100vh-300px)]">
+                <div className="space-y-3">
+                  {AI_AGENTS.map((agent) => (
+                    <div
+                      key={agent.id}
+                      onClick={() => startNewConversation(agent)}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-[0_0_15px_rgba(179,0,255,0.3)] ${
+                        selectedAgent?.id === agent.id 
+                          ? 'border-neon-purple/50 bg-neon-purple/10' 
+                          : 'border-white/10 hover:border-neon-purple/30 bg-dark-bg/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
+                          data-agent-color={agent.accent_color}
+                        >
+                          {agent.display_name.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm text-white">{agent.display_name}</h3>
+                          <p className="text-xs text-gray-400 truncate font-tech">{agent.description}</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm text-white">{agent.display_name}</h3>
-                        <p className="text-xs text-gray-400 truncate font-tech">{agent.description}</p>
-                      </div>
-                    </div>
                       <div className="mt-2 flex flex-wrap gap-1">
                         {agent.capabilities.slice(0, 2).map((capability, index) => (
                           <Badge key={index} className="text-xs bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
@@ -468,277 +469,277 @@ export default function AgentsPage() {
               </ScrollArea>
             </div>
           </div>
-        </div>
 
-        {/* Chat Interface */}
-        <div className="lg:col-span-3">
-          <div className="h-full flex flex-col bg-dark-card border border-neon-cyan/30 rounded-lg">
-            {selectedAgent ? (
-              <>
-                {/* Chat Header */}
-                <div className="p-6 border-b border-neon-cyan/30">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
-                        data-agent-color={selectedAgent.accent_color}
-                      >
-                        {selectedAgent.display_name.charAt(0)}
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-sci font-bold text-white flex items-center gap-2">
-                          {selectedAgent.display_name}
-                          <Sparkles className="w-4 h-4 text-neon-purple" />
-                        </h2>
-                        <p className="text-sm text-gray-400 font-tech">{selectedAgent.description}</p>
-                      </div>
-                    </div>
-                    
-                    {/* Conversation Actions */}
-                    {messages.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="cyan"
-                          onClick={handleSaveConversation}
-                          className="flex items-center gap-2 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
-                        >
-                          <Briefcase className="w-4 h-4" />
-                          Save Conversation
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 p-0">
-                  <ScrollArea className="h-[calc(100vh-400px)] p-4">
-                    {messages.length === 0 ? (
-                      <div className="text-center py-12">
+          {/* Chat Interface */}
+          <div className="lg:col-span-3">
+            <div className="h-full flex flex-col bg-dark-card border border-neon-cyan/30 rounded-lg">
+              {selectedAgent ? (
+                <>
+                  {/* Chat Header */}
+                  <div className="p-6 border-b border-neon-cyan/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
                         <div 
-                          className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 agent-avatar"
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold agent-avatar"
                           data-agent-color={selectedAgent.accent_color}
                         >
                           {selectedAgent.display_name.charAt(0)}
                         </div>
-                        <h3 className="text-lg font-sci font-bold text-white mb-2">Chat with {selectedAgent.display_name}</h3>
-                        <p className="text-gray-400 mb-4 font-tech">{selectedAgent.personality}</p>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                          {selectedAgent.capabilities.map((capability, index) => (
-                            <Badge key={index} className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
-                              {capability}
-                            </Badge>
-                          ))}
+                        <div>
+                          <h2 className="text-xl font-sci font-bold text-white flex items-center gap-2">
+                            {selectedAgent.display_name}
+                            <Sparkles className="w-4 h-4 text-neon-purple" />
+                          </h2>
+                          <p className="text-sm text-gray-400 font-tech">{selectedAgent.description}</p>
                         </div>
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {messages.map((message) => (
-                          <motion.div
-                            key={message.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} group`}
+                      
+                      {/* Conversation Actions */}
+                      {messages.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="cyan"
+                            onClick={handleSaveConversation}
+                            className="flex items-center gap-2 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
                           >
-                            <div
-                              className={`max-w-[80%] p-3 rounded-lg relative ${
-                                message.role === 'user'
-                                  ? 'bg-neon-purple text-white'
-                                  : 'bg-dark-bg/50 text-gray-300 hover:bg-dark-bg border border-neon-cyan/20'
-                              }`}
+                            <Briefcase className="w-4 h-4" />
+                            Save Conversation
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Messages */}
+                  <div className="flex-1 p-0">
+                    <ScrollArea className="h-[calc(100vh-400px)] p-4">
+                      {messages.length === 0 ? (
+                        <div className="text-center py-12">
+                          <div 
+                            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 agent-avatar"
+                            data-agent-color={selectedAgent.accent_color}
+                          >
+                            {selectedAgent.display_name.charAt(0)}
+                          </div>
+                          <h3 className="text-lg font-sci font-bold text-white mb-2">Chat with {selectedAgent.display_name}</h3>
+                          <p className="text-gray-400 mb-4 font-tech">{selectedAgent.personality}</p>
+                          <div className="flex flex-wrap gap-2 justify-center">
+                            {selectedAgent.capabilities.map((capability, index) => (
+                              <Badge key={index} className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
+                                {capability}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {messages.map((message) => (
+                            <motion.div
+                              key={message.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} group`}
                             >
-                              <p className="text-sm font-tech">{message.content}</p>
-                              <p className={`text-xs mt-1 ${
-                                message.role === 'user' ? 'text-neon-purple/70' : 'text-gray-500'
-                              } font-tech`}>
-                                {formatTime(message.timestamp)}
-                              </p>
-                              
-                              {/* Message Actions - Only show for assistant messages */}
-                              {message.role === 'assistant' && (
-                                <div className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <div className="flex flex-col gap-1 bg-dark-card rounded-lg shadow-lg border border-neon-cyan/30 p-1">
-                                    <Button
-                                      size="sm"
-                                      variant="purple"
-                                      onClick={() => handleSaveMessage(message)}
-                                      className="w-8 h-8 p-0 hover:bg-neon-purple/20 border-transparent"
-                                      title="Save to Briefcase"
-                                    >
-                                      <Briefcase className="w-3 h-3 text-neon-purple" />
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="cyan"
-                                      onClick={() => copyToClipboard(message.content)}
-                                      className="w-8 h-8 p-0 hover:bg-neon-cyan/20 border-transparent"
-                                      title="Copy to Clipboard"
-                                    >
-                                      <Copy className="w-3 h-3 text-neon-cyan" />
-                                    </Button>
+                              <div
+                                className={`max-w-[80%] p-3 rounded-lg relative ${
+                                  message.role === 'user'
+                                    ? 'bg-neon-purple text-white'
+                                    : 'bg-dark-bg/50 text-gray-300 hover:bg-dark-bg border border-neon-cyan/20'
+                                }`}
+                              >
+                                <p className="text-sm font-tech">{message.content}</p>
+                                <p className={`text-xs mt-1 ${
+                                  message.role === 'user' ? 'text-neon-purple/70' : 'text-gray-500'
+                                } font-tech`}>
+                                  {formatTime(message.timestamp)}
+                                </p>
+                                
+                                {/* Message Actions - Only show for assistant messages */}
+                                {message.role === 'assistant' && (
+                                  <div className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex flex-col gap-1 bg-dark-card rounded-lg shadow-lg border border-neon-cyan/30 p-1">
+                                      <Button
+                                        size="sm"
+                                        variant="purple"
+                                        onClick={() => handleSaveMessage(message)}
+                                        className="w-8 h-8 p-0 hover:bg-neon-purple/20 border-transparent"
+                                        title="Save to Briefcase"
+                                      >
+                                        <Briefcase className="w-3 h-3 text-neon-purple" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="cyan"
+                                        onClick={() => copyToClipboard(message.content)}
+                                        className="w-8 h-8 p-0 hover:bg-neon-cyan/20 border-transparent"
+                                        title="Copy to Clipboard"
+                                      >
+                                        <Copy className="w-3 h-3 text-neon-cyan" />
+                                      </Button>
+                                    </div>
                                   </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          ))}
+                          {isLoading && (
+                            <div className="flex justify-start">
+                              <div className="bg-dark-bg/50 p-3 rounded-lg border border-neon-purple/30">
+                                <div className="flex items-center gap-2">
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-neon-purple"></div>
+                                  <span className="text-sm text-gray-400 font-tech">Thinking...</span>
                                 </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        ))}
-                        {isLoading && (
-                          <div className="flex justify-start">
-                            <div className="bg-dark-bg/50 p-3 rounded-lg border border-neon-purple/30">
-                              <div className="flex items-center gap-2">
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-neon-purple"></div>
-                                <span className="text-sm text-gray-400 font-tech">Thinking...</span>
                               </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </ScrollArea>
-                </div>
+                          )}
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </div>
 
-                {/* Input */}
-                <div className="p-4 border-t border-neon-cyan/30">
-                  <div className="flex gap-2">
-                    <Textarea
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder={`Message ${selectedAgent.display_name}...`}
-                      className="flex-1 min-h-[60px] max-h-[120px] resize-none bg-dark-bg border-neon-cyan/30 text-white placeholder:text-gray-500 focus:border-neon-cyan"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault()
-                          sendMessage()
-                        }
-                      }}
-                    />
-                    <Button 
-                      onClick={sendMessage} 
-                      disabled={!input.trim() || isLoading}
-                      className="px-4 bg-neon-cyan hover:bg-neon-cyan/90 text-dark-bg border-neon-cyan"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
+                  {/* Input */}
+                  <div className="p-4 border-t border-neon-cyan/30">
+                    <div className="flex gap-2">
+                      <Textarea
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder={`Message ${selectedAgent.display_name}...`}
+                        className="flex-1 min-h-[60px] max-h-[120px] resize-none bg-dark-bg border-neon-cyan/30 text-white placeholder:text-gray-500 focus:border-neon-cyan"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            sendMessage()
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={sendMessage} 
+                        disabled={!input.trim() || isLoading}
+                        className="px-4 bg-neon-cyan hover:bg-neon-cyan/90 text-dark-bg border-neon-cyan"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center p-6">
+                  <div className="text-center">
+                    <Bot className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-sci font-bold text-white mb-2">SELECT AN AI AGENT</h3>
+                    <p className="text-gray-400 font-tech">Choose an agent from the sidebar to start chatting</p>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center p-6">
-                <div className="text-center">
-                  <Bot className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-sci font-bold text-white mb-2">SELECT AN AI AGENT</h3>
-                  <p className="text-gray-400 font-tech">Choose an agent from the sidebar to start chatting</p>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Save to Briefcase Dialog */}
-      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <DialogContent className="sm:max-w-md bg-dark-card border-neon-purple/30">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white font-sci">
-              <Briefcase className="w-5 h-5 text-neon-purple" />
-              Save to Briefcase
-            </DialogTitle>
-            <DialogDescription className="text-gray-400 font-tech">
-              Configure how you want to save this content to your Briefcase.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="fileName" className="text-neon-cyan font-mono text-xs uppercase">File Name</Label>
-              <Input
-                id="fileName"
-                value={saveForm.fileName}
-                onChange={(e) => setSaveForm(prev => ({ ...prev, fileName: e.target.value }))}
-                placeholder="Enter filename..."
-                className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
-              />
-            </div>
+        {/* Save to Briefcase Dialog */}
+        <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+          <DialogContent className="sm:max-w-md bg-dark-card border-neon-purple/30">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-white font-sci">
+                <Briefcase className="w-5 h-5 text-neon-purple" />
+                Save to Briefcase
+              </DialogTitle>
+              <DialogDescription className="text-gray-400 font-tech">
+                Configure how you want to save this content to your Briefcase.
+              </DialogDescription>
+            </DialogHeader>
             
-            <div>
-              <Label htmlFor="description" className="text-neon-cyan font-mono text-xs uppercase">Description (Optional)</Label>
-              <Input
-                id="description"
-                value={saveForm.description}
-                onChange={(e) => setSaveForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Brief description of the content..."
-                className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="category" className="text-neon-cyan font-mono text-xs uppercase">Category</Label>
-                <Select value={saveForm.category} onValueChange={(value) => setSaveForm(prev => ({ ...prev, category: value }))}>
-                  <SelectTrigger className="bg-dark-bg border-neon-cyan/30 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-dark-card border-neon-cyan/30">
-                    <SelectItem value="document" className="text-white">Document</SelectItem>
-                    <SelectItem value="template" className="text-white">Template</SelectItem>
-                    <SelectItem value="note" className="text-white">Note</SelectItem>
-                    <SelectItem value="reference" className="text-white">Reference</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="fileName" className="text-neon-cyan font-mono text-xs uppercase">File Name</Label>
+                <Input
+                  id="fileName"
+                  value={saveForm.fileName}
+                  onChange={(e) => setSaveForm(prev => ({ ...prev, fileName: e.target.value }))}
+                  placeholder="Enter filename..."
+                  className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
+                />
               </div>
               
               <div>
-                <Label htmlFor="format" className="text-neon-cyan font-mono text-xs uppercase">Format</Label>
-                <Select value={saveForm.format} onValueChange={(value) => setSaveForm(prev => ({ ...prev, format: value }))}>
-                  <SelectTrigger className="bg-dark-bg border-neon-cyan/30 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-dark-card border-neon-cyan/30">
-                    <SelectItem value="txt" className="text-white">Text (.txt)</SelectItem>
-                    <SelectItem value="md" className="text-white">Markdown (.md)</SelectItem>
-                    <SelectItem value="json" className="text-white">JSON (.json)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="description" className="text-neon-cyan font-mono text-xs uppercase">Description (Optional)</Label>
+                <Input
+                  id="description"
+                  value={saveForm.description}
+                  onChange={(e) => setSaveForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Brief description of the content..."
+                  className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="category" className="text-neon-cyan font-mono text-xs uppercase">Category</Label>
+                  <Select value={saveForm.category} onValueChange={(value) => setSaveForm(prev => ({ ...prev, category: value }))}>
+                    <SelectTrigger className="bg-dark-bg border-neon-cyan/30 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-dark-card border-neon-cyan/30">
+                      <SelectItem value="document" className="text-white">Document</SelectItem>
+                      <SelectItem value="template" className="text-white">Template</SelectItem>
+                      <SelectItem value="note" className="text-white">Note</SelectItem>
+                      <SelectItem value="reference" className="text-white">Reference</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="format" className="text-neon-cyan font-mono text-xs uppercase">Format</Label>
+                  <Select value={saveForm.format} onValueChange={(value) => setSaveForm(prev => ({ ...prev, format: value }))}>
+                    <SelectTrigger className="bg-dark-bg border-neon-cyan/30 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-dark-card border-neon-cyan/30">
+                      <SelectItem value="txt" className="text-white">Text (.txt)</SelectItem>
+                      <SelectItem value="md" className="text-white">Markdown (.md)</SelectItem>
+                      <SelectItem value="json" className="text-white">JSON (.json)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="tags" className="text-neon-cyan font-mono text-xs uppercase">Tags (Optional)</Label>
+                <Input
+                  id="tags"
+                  value={saveForm.tags}
+                  onChange={(e) => setSaveForm(prev => ({ ...prev, tags: e.target.value }))}
+                  placeholder="comma, separated, tags"
+                  className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
+                />
               </div>
             </div>
             
-            <div>
-              <Label htmlFor="tags" className="text-neon-cyan font-mono text-xs uppercase">Tags (Optional)</Label>
-              <Input
-                id="tags"
-                value={saveForm.tags}
-                onChange={(e) => setSaveForm(prev => ({ ...prev, tags: e.target.value }))}
-                placeholder="comma, separated, tags"
-                className="bg-dark-bg border-neon-cyan/30 text-white focus:border-neon-cyan"
-              />
+            <div className="flex justify-end gap-3 mt-6">
+              <Button variant="cyan" onClick={() => setShowSaveDialog(false)} className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
+                Cancel
+              </Button>
+              <Button 
+                onClick={executeSave} 
+                disabled={!saveForm.fileName.trim() || isSaving}
+                className="bg-neon-purple hover:bg-neon-purple/90 text-white"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save to Briefcase
+                  </>
+                )}
+              </Button>
             </div>
-          </div>
-          
-          <div className="flex justify-end gap-3 mt-6">
-            <Button variant="cyan" onClick={() => setShowSaveDialog(false)} className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
-              Cancel
-            </Button>
-            <Button 
-              onClick={executeSave} 
-              disabled={!saveForm.fileName.trim() || isSaving}
-              className="bg-neon-purple hover:bg-neon-purple/90 text-white"
-            >
-              {isSaving ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save to Briefcase
-                </>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </>
   )
 }

@@ -3,8 +3,9 @@
 export const dynamic = 'force-dynamic'
 import { logger, logError, logWarn, logInfo, logDebug, logApi, logDb, logAuth } from '@/lib/logger'
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { motion, easeOut } from "framer-motion"
+import { HudBorder } from "@/components/cyber/HudBorder"
+import { PrimaryButton } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
@@ -21,7 +22,12 @@ import {
   Clock,
   TrendingUp,
   Brain,
-  Mic
+  Mic,
+  Zap,
+  Shield,
+  Activity,
+  Award,
+  Terminal as TerminalIcon
 } from "lucide-react"
 import TaskIntelligencePanel from "@/components/ai/task-intelligence-panel"
 import { useOffline } from "@/components/providers/offline-provider"
@@ -224,7 +230,6 @@ export default function SlaylistPage() {
         body: JSON.stringify(payload)
       })
 
-
       if (response.ok) {
         await fetchTasks()
       } else {
@@ -302,426 +307,469 @@ export default function SlaylistPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'urgent':
+      case 'high': return 'bg-neon-magenta/10 text-neon-magenta border-neon-magenta/30'
+      case 'medium': return 'bg-neon-orange/10 text-neon-orange border-neon-orange/30'
+      case 'low': return 'bg-neon-lime/10 text-neon-lime border-neon-lime/30'
+      default: return 'bg-white/5 text-gray-400 border-white/10'
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800'
-      case 'in_progress': return 'bg-blue-100 text-blue-800'
-      case 'todo': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'completed': return 'bg-neon-lime/10 text-neon-lime border-neon-lime/30'
+      case 'in_progress': return 'bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30'
+      case 'todo': return 'bg-white/5 text-gray-300 border-white/10'
+      default: return 'bg-white/5 text-gray-400 border-white/10'
+    }
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.5,
+        ease: easeOut
+      }
     }
   }
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+      <div className="min-h-screen bg-dark-bg p-6 relative">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 pointer-events-none" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-t-2 border-r-2 border-neon-cyan rounded-full shadow-[0_0_15px_rgba(11,228,236,0.4)]"
+          />
+          <p className="font-sci font-bold text-neon-cyan animate-pulse uppercase tracking-[0.2em]">Initializing System Data...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">SlayList</h1>
-          <p className="text-gray-600">Manage your goals and tasks to dominate your empire</p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setShowVoiceTaskDialog(true)}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-          >
-            <Mic className="w-4 h-4 mr-2" />
-            Voice Task
-          </Button>
+    <div className="min-h-screen bg-dark-bg p-6 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-5 pointer-events-none" />
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-neon-purple/5 blur-[100px] pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-neon-magenta/5 blur-[100px] pointer-events-none" />
 
-          <Dialog open={showGoalDialog} onOpenChange={setShowGoalDialog}>
-            <DialogTrigger asChild>
-              <Button className="bg-purple-600 hover:bg-purple-700">
-                <Plus className="w-4 h-4 mr-2" />
-                New Goal
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Goal</DialogTitle>
-                <DialogDescription>
-                  Set a new goal to work towards your empire
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="goal-title">Title</Label>
-                  <Input
-                    id="goal-title"
-                    data-goal-input
-                    value={goalForm.title}
-                    onChange={(e) => setGoalForm({ ...goalForm, title: e.target.value })}
-                    placeholder="Enter goal title"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="goal-description">Description</Label>
-                  <Textarea
-                    id="goal-description"
-                    value={goalForm.description}
-                    onChange={(e) => setGoalForm({ ...goalForm, description: e.target.value })}
-                    placeholder="Describe your goal"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="goal-priority">Priority</Label>
-                    <Select value={goalForm.priority} onValueChange={(value) => setGoalForm({ ...goalForm, priority: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="goal-category">Category</Label>
-                    <Select value={goalForm.category} onValueChange={(value) => setGoalForm({ ...goalForm, category: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="business">Business</SelectItem>
-                        <SelectItem value="personal">Personal</SelectItem>
-                        <SelectItem value="health">Health</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="goal-date">Target Date</Label>
-                  <Input
-                    id="goal-date"
-                    type="date"
-                    value={goalForm.target_date}
-                    onChange={(e) => setGoalForm({ ...goalForm, target_date: e.target.value })}
-                  />
-                </div>
-                <Button onClick={createGoal} className="w-full">Create Goal</Button>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="max-w-7xl mx-auto space-y-8 relative z-10"
+      >
+        {/* Header Section */}
+        <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-neon-cyan/20 pb-8">
+          <div className="space-y-2">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-neon-purple/10 border border-neon-purple/30 rounded-none shadow-[0_0_15px_rgba(179,0,255,0.2)]">
+                <Target className="w-8 h-8 text-neon-purple" />
               </div>
-            </DialogContent>
-          </Dialog>
+              <div>
+                <h1 className="text-5xl font-sci font-black tracking-tighter text-white uppercase italic">
+                  Slay<span className="text-neon-cyan">List</span>
+                </h1>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-neon-lime animate-pulse rounded-none" />
+                  <p className="text-blue-200 font-tech uppercase text-xs tracking-[0.2em] font-bold">Strategic Objective Management System // v2.4.0</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Plus className="w-4 h-4 mr-2" />
-                New Task
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Task</DialogTitle>
-                <DialogDescription>
-                  Add a new task to work on
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="task-title">Title</Label>
-                  <Input
-                    id="task-title"
-                    data-task-input
-                    value={taskForm.title}
-                    onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
-                    placeholder="Enter task title"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="task-description">Description</Label>
-                  <Textarea
-                    id="task-description"
-                    value={taskForm.description}
-                    onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
-                    placeholder="Describe your task"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="task-priority">Priority</Label>
-                    <Select value={taskForm.priority} onValueChange={(value) => setTaskForm({ ...taskForm, priority: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="task-goal">Goal (Optional)</Label>
-                    <Select value={taskForm.goal_id} onValueChange={(value) => setTaskForm({ ...taskForm, goal_id: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a goal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {goals.map((goal) => (
-                          <SelectItem key={goal.id} value={goal.id}>{goal.title}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="task-date">Due Date</Label>
+          <div className="flex flex-wrap items-center gap-3">
+            <PrimaryButton
+              variant="purple"
+              onClick={() => setShowVoiceTaskDialog(true)}
+              className="group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+              <Mic className="w-4 h-4 mr-2" />
+              Voice Command
+            </PrimaryButton>
+
+            <Dialog open={showGoalDialog} onOpenChange={setShowGoalDialog}>
+              <DialogTrigger asChild>
+                <PrimaryButton variant="cyan">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Objective
+                </PrimaryButton>
+              </DialogTrigger>
+              <DialogContent className="bg-dark-card border-neon-cyan/50 text-white rounded-none">
+                <DialogHeader>
+                  <DialogTitle className="font-sci text-2xl text-neon-cyan uppercase">Define Alpha Goal</DialogTitle>
+                  <DialogDescription className="text-gray-400 font-tech">Establish a high-level strategic target for your empire.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="goal-title" className="font-sci text-xs uppercase text-neon-purple">Identifier</Label>
                     <Input
-                      id="task-date"
-                      type="date"
-                      value={taskForm.due_date}
-                      onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })}
+                      id="goal-title"
+                      className="bg-black/50 border-neon-purple/30 text-white focus:border-neon-purple rounded-none"
+                      value={goalForm.title}
+                      onChange={(e) => setGoalForm({ ...goalForm, title: e.target.value })}
+                      placeholder="e.g. Market Dominance Phase I"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="task-time">Estimated Time (min)</Label>
-                    <Input
-                      id="task-time"
-                      type="number"
-                      value={taskForm.estimated_minutes}
-                      onChange={(e) => setTaskForm({ ...taskForm, estimated_minutes: parseInt(e.target.value) })}
+                  <div className="space-y-2">
+                    <Label htmlFor="goal-description" className="font-sci text-xs uppercase text-neon-purple">Mission Parameters</Label>
+                    <Textarea
+                      id="goal-description"
+                      className="bg-black/50 border-neon-purple/30 text-white focus:border-neon-purple rounded-none"
+                      value={goalForm.description}
+                      onChange={(e) => setGoalForm({ ...goalForm, description: e.target.value })}
+                      placeholder="Define completion criteria..."
                     />
                   </div>
-                </div>
-                <Button onClick={createTask} className="w-full">Create Task</Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Goals</p>
-                <p className="text-2xl font-bold">{goals.length}</p>
-              </div>
-              <Target className="w-8 h-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                <p className="text-2xl font-bold">{tasks.length}</p>
-              </div>
-              <CheckSquare className="w-8 h-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed Today</p>
-                <p className="text-2xl font-bold">
-                  {tasks.filter(t => t.status === 'completed' && new Date(t.created_at).toDateString() === new Date().toDateString()).length}
-                </p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Goals</p>
-                <p className="text-2xl font-bold">{goals.filter(g => g.status === 'active').length}</p>
-              </div>
-              <Flag className="w-8 h-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* AI Task Intelligence Panel */}
-      {tasks.length > 0 && (
-        <div className="mb-6">
-          <TaskIntelligencePanel
-            tasks={tasks as TaskIntelligenceData[]}
-            onApplySuggestion={handleApplySuggestion}
-            onReorderTasks={handleReorderTasks}
-          />
-        </div>
-      )}
-
-      {/* Goals and Tasks Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Goals */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="w-5 h-5" />
-              Goals
-            </CardTitle>
-            <CardDescription>
-              Your empire-building objectives
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {goals.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No goals yet</p>
-                <Button
-                  onClick={() => setShowGoalDialog(true)}
-                  className="mt-4"
-                  variant="outline"
-                >
-                  Create Your First Goal
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {goals.map((goal) => (
-                  <div key={goal.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-medium">{goal.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{goal.description}</p>
-                      </div>
-                      <Badge className={getPriorityColor(goal.priority)}>
-                        {goal.priority}
-                      </Badge>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="font-sci text-xs uppercase text-neon-purple">Threat Priority</Label>
+                      <Select value={goalForm.priority} onValueChange={(value) => setGoalForm({ ...goalForm, priority: value })}>
+                        <SelectTrigger className="bg-black/50 border-neon-purple/30 rounded-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-dark-card border-neon-purple/30 text-white">
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">Critical</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span>Progress</span>
-                        <span>{goal.progress_percentage}%</span>
-                      </div>
-                      <Progress value={goal.progress_percentage} className="h-2" />
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {goal.target_date ? new Date(goal.target_date).toLocaleDateString() : 'No deadline'}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Flag className="w-3 h-3" />
-                          {goal.category}
-                        </span>
-                      </div>
+                      <Label className="font-sci text-xs uppercase text-neon-purple">Classification</Label>
+                      <Select value={goalForm.category} onValueChange={(value) => setGoalForm({ ...goalForm, category: value })}>
+                        <SelectTrigger className="bg-black/50 border-neon-purple/30 rounded-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-dark-card border-neon-purple/30 text-white">
+                          <SelectItem value="general">Standard</SelectItem>
+                          <SelectItem value="business">Empire</SelectItem>
+                          <SelectItem value="personal">Bio-Sync</SelectItem>
+                          <SelectItem value="health">Combat-Ready</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <div className="space-y-2">
+                    <Label htmlFor="goal-date" className="font-sci text-xs uppercase text-neon-purple">Termination Date</Label>
+                    <Input
+                      id="goal-date"
+                      type="date"
+                      className="bg-black/50 border-neon-purple/30 text-white focus:border-neon-purple rounded-none"
+                      value={goalForm.target_date}
+                      onChange={(e) => setGoalForm({ ...goalForm, target_date: e.target.value })}
+                    />
+                  </div>
+                  <PrimaryButton onClick={createGoal} variant="purple" className="w-full">Initialize Objective</PrimaryButton>
+                </div>
+              </DialogContent>
+            </Dialog>
 
-        {/* Tasks */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckSquare className="w-5 h-5" />
-              Tasks
-            </CardTitle>
-            <CardDescription>
-              Your actionable items
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {tasks.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <CheckSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No tasks yet</p>
-                <Button
-                  onClick={() => setShowTaskDialog(true)}
-                  className="mt-4"
-                  variant="outline"
-                >
-                  Create Your First Task
-                </Button>
+            <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
+              <DialogTrigger asChild>
+                <PrimaryButton variant="magenta" className="border-neon-magenta text-neon-magenta hover:bg-neon-magenta/10">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Tactical
+                </PrimaryButton>
+              </DialogTrigger>
+              <DialogContent className="bg-dark-card border-neon-magenta/50 text-white rounded-none">
+                <DialogHeader>
+                  <DialogTitle className="font-sci text-2xl text-neon-magenta uppercase">Deploy Tactical Item</DialogTitle>
+                  <DialogDescription className="text-gray-400 font-tech">Define actionable procedures for immediate execution.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="task-title" className="font-sci text-xs uppercase text-neon-magenta">Task Vector</Label>
+                    <Input
+                      id="task-title"
+                      className="bg-black/50 border-neon-magenta/30 text-white rounded-none"
+                      value={taskForm.title}
+                      onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                      placeholder="e.g. Exploit Competitor Weakness"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="font-sci text-xs uppercase text-neon-magenta">Execution Detail</Label>
+                    <Textarea
+                      id="task-description"
+                      className="bg-black/50 border-neon-magenta/30 text-white rounded-none"
+                      value={taskForm.description}
+                      onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="font-sci text-xs uppercase text-neon-magenta">Priority</Label>
+                      <Select value={taskForm.priority} onValueChange={(value) => setTaskForm({ ...taskForm, priority: value })}>
+                        <SelectTrigger className="bg-black/50 border-neon-magenta/30 rounded-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-dark-card border-neon-magenta/30 text-white">
+                          <SelectItem value="low">Delta</SelectItem>
+                          <SelectItem value="medium">Gamma</SelectItem>
+                          <SelectItem value="high">Beta</SelectItem>
+                          <SelectItem value="urgent">Alpha</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-sci text-xs uppercase text-neon-magenta">Parent Objective</Label>
+                      <Select value={taskForm.goal_id} onValueChange={(value) => setTaskForm({ ...taskForm, goal_id: value })}>
+                        <SelectTrigger className="bg-black/50 border-neon-magenta/30 rounded-none">
+                          <SelectValue placeholder="Select linkage" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-dark-card border-neon-magenta/30 text-white">
+                          {goals.map((goal) => (
+                            <SelectItem key={goal.id} value={goal.id}>{goal.title}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="font-sci text-xs uppercase text-neon-magenta">Due Time</Label>
+                      <Input
+                        type="date"
+                        className="bg-black/50 border-neon-magenta/30 rounded-none"
+                        value={taskForm.due_date}
+                        onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-sci text-xs uppercase text-neon-magenta">Est. Runtime (m)</Label>
+                      <Input
+                        type="number"
+                        className="bg-black/50 border-neon-magenta/30 rounded-none"
+                        value={taskForm.estimated_minutes}
+                        onChange={(e) => setTaskForm({ ...taskForm, estimated_minutes: parseInt(e.target.value) })}
+                      />
+                    </div>
+                  </div>
+                  <PrimaryButton onClick={createTask} variant="magenta" className="w-full">Execute Deployment</PrimaryButton>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </motion.div>
+
+        {/* Stats Grid */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "Active Objectives", val: goals.length, icon: Target, color: "text-neon-purple", bg: "bg-neon-purple/5" },
+            { label: "Tactical Items", val: tasks.length, icon: Activity, color: "text-neon-cyan", bg: "bg-neon-cyan/5" },
+            { label: "Completed Today", val: tasks.filter(t => t.status === 'completed' && new Date(t.created_at).toDateString() === new Date().toDateString()).length, icon: Zap, color: "text-neon-lime", bg: "bg-neon-lime/5" },
+            { label: "Mission Status", val: "OPERATIONAL", icon: Shield, color: "text-neon-orange", bg: "bg-neon-orange/5" },
+          ].map((stat, i) => (stat.label !== "Mission Status" ? (
+            <HudBorder key={i} variant="hover" className="group">
+              <div className="flex items-center justify-between p-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-tech font-bold text-gray-400 uppercase tracking-widest">{stat.label}</p>
+                  <p className={`text-4xl font-sci font-black ${stat.color} tracking-tight`}>{stat.val}</p>
+                </div>
+                <div className={`p-3 ${stat.bg} border border-white/5 rounded-none group-hover:scale-110 transition-transform`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {tasks.map((task) => (
-                  <div key={task.id} className="border rounded-lg p-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
+            </HudBorder>
+          ) : (
+            <HudBorder key={i} variant="hover" className="group border-neon-orange/20">
+              <div className="flex items-center justify-between p-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-tech font-bold text-gray-400 uppercase tracking-widest">{stat.label}</p>
+                  <p className={`text-2xl font-sci font-black ${stat.color} tracking-tight`}>{stat.val}</p>
+                </div>
+                <div className={`p-3 ${stat.bg} border border-white/5 rounded-none group-hover:animate-pulse`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
+              </div>
+            </HudBorder>
+          )))}
+        </motion.div>
+
+        {/* AI Analysis Integration */}
+        {tasks.length > 0 && (
+          <motion.div variants={itemVariants}>
+            <HudBorder className="border-neon-purple/30 bg-neon-purple/5 overflow-hidden">
+               <div className="relative p-6">
+                  <div className="absolute top-0 right-0 p-2 opacity-20">
+                    <Brain className="w-24 h-24 text-neon-purple" />
+                  </div>
+                  <TaskIntelligencePanel
+                    tasks={tasks as TaskIntelligenceData[]}
+                    onApplySuggestion={handleApplySuggestion}
+                    onReorderTasks={handleReorderTasks}
+                  />
+               </div>
+            </HudBorder>
+          </motion.div>
+        )}
+
+        {/* Main Content: Objectives & Tacticals */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Objectives Column (Left) */}
+          <motion.div variants={itemVariants} className="lg:col-span-2 space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <h2 className="font-sci font-bold text-xl uppercase tracking-wider text-neon-purple flex items-center gap-2">
+                <Shield className="w-5 h-5" /> High-Level Goals
+              </h2>
+              <Badge className="bg-neon-purple/10 text-neon-purple border-neon-purple/30 rounded-none font-tech">{goals.length}</Badge>
+            </div>
+
+            <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+              {goals.length === 0 ? (
+                <HudBorder className="p-12 text-center bg-white/5 opacity-50">
+                   <Target className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+                   <p className="font-tech text-gray-400">NO ACTIVE OBJECTIVES LOGGED</p>
+                </HudBorder>
+              ) : (
+                goals.map((goal) => (
+                  <HudBorder key={goal.id} variant="hover" className="relative group overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-neon-purple opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="p-5 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <h3 className="font-sci font-bold text-lg text-white uppercase tracking-tight group-hover:text-neon-purple transition-colors">{goal.title}</h3>
+                          <p className="text-sm text-gray-400 font-tech line-clamp-2">{goal.description}</p>
+                        </div>
+                        <Badge className={getPriorityColor(goal.priority)}>{goal.priority.toUpperCase()}</Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px] font-tech font-bold uppercase tracking-widest">
+                          <span className="text-gray-500">Sync Progress</span>
+                          <span className="text-neon-cyan">{goal.progress_percentage}%</span>
+                        </div>
+                        <Progress value={goal.progress_percentage} className="h-1 bg-white/5 rounded-none" />
+                      </div>
+
+                      <div className="flex items-center gap-6 pt-2 border-t border-white/5 text-[10px] font-tech text-gray-500 uppercase tracking-widest font-bold">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3 text-neon-cyan" />
+                          {goal.target_date ? new Date(goal.target_date).toLocaleDateString() : 'NO-DEADLINE'}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Flag className="w-3 h-3 text-neon-purple" />
+                          {goal.category}
+                        </div>
+                      </div>
+                    </div>
+                  </HudBorder>
+                ))
+              )}
+            </div>
+          </motion.div>
+
+          {/* Tactical List (Right) */}
+          <motion.div variants={itemVariants} className="lg:col-span-3 space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <h2 className="font-sci font-bold text-xl uppercase tracking-wider text-neon-cyan flex items-center gap-2">
+                <Zap className="w-5 h-5 animate-pulse" /> Active Tacticals
+              </h2>
+              <div className="flex items-center gap-2">
+                 <Badge className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30 rounded-none font-tech">{tasks.filter(t => t.status !== 'completed').length} PENDING</Badge>
+                 <Badge className="bg-white/5 text-gray-500 border-white/10 rounded-none font-tech">{tasks.filter(t => t.status === 'completed').length} ARCHIVED</Badge>
+              </div>
+            </div>
+
+            <div className="space-y-3 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+              {tasks.length === 0 ? (
+                <HudBorder className="p-12 text-center bg-white/5 opacity-50">
+                   <Activity className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+                   <p className="font-tech text-gray-400">NO TACTICAL DEPLOYMENTS PENDING</p>
+                </HudBorder>
+              ) : (
+                tasks.map((task) => (
+                  <HudBorder key={task.id} variant="hover" className={`relative group transition-all duration-300 ${task.status === 'completed' ? 'opacity-40 grayscale' : 'opacity-100'}`}>
+                    <div className="p-4 flex items-center gap-4">
+                      <div className="relative">
                         <input
                           type="checkbox"
                           checked={task.status === 'completed'}
                           onChange={(e) => updateTaskStatus(task.id, e.target.checked ? 'completed' : 'todo')}
-                          className="mt-1"
-                          aria-label={`Mark task "${task.title}" as ${task.status === 'completed' ? 'incomplete' : 'completed'}`}
+                          className="w-5 h-5 border-2 border-neon-cyan bg-transparent checked:bg-neon-cyan appearance-none rounded-none cursor-pointer transition-colors"
+                          aria-label={`Mark tactical "${task.title}" as ${task.status === 'completed' ? 'incomplete' : 'completed'}`}
                         />
-                        <div className="flex-1">
-                          <h4 className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : ''}`}>
-                            {task.title}
-                          </h4>
-                          <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {task.estimated_minutes}m
-                            </span>
-                          </div>
+                        {task.status === 'completed' && <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-black font-bold">✓</div>}
+                      </div>
+
+                      <div className="flex-1 space-y-1">
+                        <h4 className={`font-sci font-bold text-white uppercase tracking-tight group-hover:text-neon-cyan transition-colors ${task.status === 'completed' ? 'line-through decoration-neon-cyan/50 text-gray-500' : ''}`}>
+                          {task.title}
+                        </h4>
+                        <div className="flex items-center gap-4 text-[10px] font-tech text-gray-400 uppercase tracking-widest font-bold">
+                           <span className="flex items-center gap-1.5">
+                             <Clock className="w-3 h-3 text-neon-magenta" /> {task.estimated_minutes}M Runtime
+                           </span>
+                           <span className="flex items-center gap-1.5">
+                             <Calendar className="w-3 h-3 text-neon-cyan" /> {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'NO-WINDOW'}
+                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getPriorityColor(task.priority)}>
+
+                      <div className="flex flex-col items-end gap-2">
+                        <Badge className={`text-[9px] font-tech font-bold uppercase tracking-tighter ${getPriorityColor(task.priority)}`}>
                           {task.priority}
                         </Badge>
-                        <Badge className={getStatusColor(task.status)}>
-                          {task.status}
+                        <Badge className={`text-[9px] font-tech font-bold uppercase tracking-tighter ${getStatusColor(task.status)}`}>
+                          {task.status.replace('_', ' ')}
                         </Badge>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Voice Task Creator Dialog */}
-      {showVoiceTaskDialog && (
-        <VoiceTaskCreator
-          isOpen={showVoiceTaskDialog}
-          onClose={() => setShowVoiceTaskDialog(false)}
-          onTaskCreate={createVoiceTask}
-        />
-      )}
+                      {/* Hover Interaction Overlay */}
+                      <div className="absolute right-0 bottom-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Award className="w-4 h-4 text-neon-lime/20" />
+                      </div>
+                    </div>
+                  </HudBorder>
+                ))
+              )}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Voice System Overlay */}
+        {showVoiceTaskDialog && (
+          <VoiceTaskCreator
+            isOpen={showVoiceTaskDialog}
+            onClose={() => setShowVoiceTaskDialog(false)}
+            onTaskCreate={createVoiceTask}
+          />
+        )}
+      </motion.div>
+
+      {/* Styles Injection */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(11, 228, 236, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(11, 228, 236, 0.5);
+        }
+      `}</style>
     </div>
   )
 }

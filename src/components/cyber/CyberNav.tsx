@@ -9,13 +9,15 @@ export function CyberNav() {
     <nav className="fixed w-full z-50 top-0 bg-cyber-black/80 backdrop-blur-md border-b border-cyber-cyan/20">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <SoloSuccessLogo size={48} animated={true} />
+          <div className="w-10 h-10 border border-neon-cyan/50 flex items-center justify-center bg-neon-cyan/10 hover:shadow-[0_0_15px_rgba(11,228,236,0.4)] transition-all">
+            <span className="text-neon-cyan font-bold text-xl font-sci">S</span>
+          </div>
           <div className="flex flex-col">
             <span className="font-sci font-bold text-xl tracking-widest text-white">
-              SOLO<span className="text-cyber-cyan">SUCCESS</span>.AI
+              SOLO<span className="text-neon-cyan">SUCCESS</span>.AI
             </span>
-            <span className="text-[10px] text-cyber-purple tracking-[0.3em] uppercase">
-              SYSTEM_OPERATIONAL
+            <span className="text-[10px] text-neon-purple tracking-[0.3em] uppercase animate-pulse">
+              SYSTEM_SECURED // V4.0
             </span>
           </div>
         </div>
