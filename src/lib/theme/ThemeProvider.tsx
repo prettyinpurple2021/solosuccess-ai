@@ -11,8 +11,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       storageKey="solosuccess-theme"
       enableSystem={false}
       disableTransitionOnChange
-      // Suppress hydration warnings during static generation
-      suppressHydrationWarning
     >
       {children}
     </NextThemesProvider>

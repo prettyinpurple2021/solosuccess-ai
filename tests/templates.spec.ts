@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
 
+// Store state between tests
+let authCookie: string;
+
 /**
  * Templates page test suite
  * Tests template browsing, filtering, and interaction
  */
 test.describe('Templates Page', () => {
-  // Store state between tests
-  let authCookie: string;
   
   test.beforeEach(async ({ page }) => {
     // Set auth cookie if available from previous tests

@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
 
+// Store state between tests
+let authCookie: string;
+
 /**
  * Authentication flow test suite
  * Tests sign-in, profile update, and sign-out functionality
  */
 test.describe('Authentication Flow', () => {
-  // Store state between tests
-  let authCookie: string;
   
   test('should navigate to sign-in page', async ({ page }) => {
     // Navigate to sign-in page

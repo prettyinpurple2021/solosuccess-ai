@@ -24,7 +24,7 @@ export const generateCompetitorMarkdown = (report: CompetitorReport): string => 
 ---
 
 ## 1. MISSION BRIEF
-${report.missionBrief}
+${report.missionBrief || 'No mission brief available.'}
 
 ## 2. THREAT MATRIX
 - **Innovation:** ${report.metrics?.innovation || 'N/A'}/100
@@ -34,10 +34,10 @@ ${report.missionBrief}
 - **Velocity:** ${report.metrics?.velocity || 'N/A'}/100
 
 ## 3. INTERCEPTED INTEL
-${report.intel.map(i => `- ${i}`).join('\n')}
+${(report.intel || report.marketingChannels || []).map(i => `- ${i}`).join('\n')}
 
 ## 4. CRITICAL VULNERABILITIES
-${report.vulnerabilities.map(v => `- [WEAKNESS] ${v}`).join('\n')}
+${(report.vulnerabilities || report.weaknesses || []).map(v => `- [WEAKNESS] ${v}`).join('\n')}
 
 ## 5. DEFENSIVE STRENGTHS
 ${report.strengths.map(s => `- [STRENGTH] ${s}`).join('\n')}

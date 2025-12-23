@@ -1,7 +1,8 @@
+import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals'
 import { WebScrapingService } from '@/lib/web-scraping-service'
 
 // Mock fetch globally
-global.fetch = jest.fn()
+global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>
 
 describe('WebScrapingService', () => {
   let scrapingService: WebScrapingService

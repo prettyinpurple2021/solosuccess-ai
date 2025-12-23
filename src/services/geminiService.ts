@@ -16,6 +16,15 @@ export interface WarRoomDebate {
 // --- AI Service ---
 
 export const geminiService = {
+    // Generic generation
+    async generateContent(prompt: string, options: any = {}): Promise<string> {
+        return apiService.generate({
+            prompt,
+            systemInstruction: "You are the SoloSuccess AI Executive Team. Provide high-level strategic intelligence.",
+            ...options
+        });
+    },
+
     // Chat
     async getAgentResponse(agentId: string, history: ChatMessage[], newMessage: string): Promise<string> {
         try {
