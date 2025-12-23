@@ -353,7 +353,7 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: "frances-loggins",
+  org: "solosuccess-ai",
 
   project: "solosuccess-ai",
 
@@ -373,11 +373,11 @@ export default withSentryConfig(nextConfig, {
   // tunnelRoute: "/monitoring",
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
+  // disableLogger: true, // Deprecated in favor of automatic tree shaking
 
   // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
   // See the following for more information:
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true
+  // automaticVercelMonitors: true // Deprecated
 });
