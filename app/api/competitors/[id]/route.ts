@@ -66,11 +66,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await params
+    if (!competitorId) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
+
 
     const sql = getSql()
 
@@ -203,11 +203,11 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await params
+    if (!competitorId) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
+
 
     const body = await request.json()
     const parsed = UpdateCompetitorSchema.safeParse(body)
@@ -343,11 +343,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await params
+    if (!competitorId) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
+
 
     const sql = getSql()
 

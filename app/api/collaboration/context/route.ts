@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (session.userId !== parseInt(user.id.toString())) {
+    if (session.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Access denied to this session' },
         { status: 403 }
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      if (session.userId !== parseInt(user.id.toString())) {
+      if (session.userId !== user.id) {
         return NextResponse.json(
           { error: 'Forbidden', message: 'Access denied to this session' },
           { status: 403 }

@@ -341,7 +341,7 @@ export class CompetitiveDecisionFrameworks {
     ]
   }
   
-  private static generateCompetitiveActionPlan(problem: string, context: CompetitiveIntelligenceContext): any[] {
+    private static generateCompetitiveActionPlan(problem: string, context: CompetitiveIntelligenceContext): FiveWhysWithCompetitiveIntelligence['action_plan'] {
     return [
       {
         action: 'Analyze competitor approaches to similar problems',
@@ -403,10 +403,10 @@ export class CompetitiveDecisionFrameworks {
   }
   
   private static generateCompetitiveRecommendation(
-    costs: any[], 
-    benefits: any[], 
+    costs: { amount: number }[], 
+    benefits: { amount: number }[], 
     context: CompetitiveIntelligenceContext
-  ): any {
+  ): CostBenefitAnalysisWithCompetitiveIntelligence['recommendation'] {
     const totalCosts = costs.reduce((sum, cost) => sum + cost.amount, 0)
     const totalBenefits = benefits.reduce((sum, benefit) => sum + benefit.amount, 0)
     const netBenefit = totalBenefits - totalCosts

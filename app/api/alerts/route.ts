@@ -22,8 +22,8 @@ export const dynamic = 'force-dynamic'
 
 // Validation schemas
 const AlertCreateSchema = z.object({
-  competitorId: z.number().int().positive(),
-  intelligenceId: z.number().int().positive().optional(),
+  competitorId: z.string().min(1),
+  intelligenceId: z.string().min(1).optional(),
   alertType: z.string().min(1).max(100),
   severity: z.enum(['info', 'warning', 'urgent', 'critical']).default('info'),
   title: z.string().min(1).max(255),
@@ -54,7 +54,7 @@ const AlertCreateSchema = z.object({
 })
 
 const AlertFiltersSchema = z.object({
-  competitorIds: z.array(z.number().int().positive()).optional(),
+  competitorIds: z.array(z.string().min(1)).optional(),
   alertTypes: z.array(z.string()).optional(),
   severity: z.array(z.enum(['info', 'warning', 'urgent', 'critical'])).optional(),
   isRead: z.boolean().optional(),
@@ -88,8 +88,8 @@ export async function GET(request: NextRequest) {
     if (parsedParams.competitorIds) {
       parsedParams.competitorIds = parsedParams.competitorIds
         .split(',')
-        .map((id: string) => parseInt(id, 10))
-        .filter((id: number) => Number.isInteger(id) && id > 0)
+        .map((id: string) => id.trim())
+        .filter((id: string) => id.length > 0)
     }
     if (parsedParams.alertTypes) {
       parsedParams.alertTypes = parsedParams.alertTypes.split(',')

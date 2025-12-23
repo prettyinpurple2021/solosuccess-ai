@@ -122,9 +122,9 @@ export async function POST(request: NextRequest) {
       await db.insert(users).values({
         id: user.id,
         email: user.email,
-        password_hash: '',
+        password: '',
         full_name: user.full_name,
-        avatar_url: user.avatar_url,
+        image: user.avatar_url,
         subscription_tier: 'free',
         onboarding_completed: false,
         created_at: new Date(),

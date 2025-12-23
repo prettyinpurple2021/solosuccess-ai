@@ -19,8 +19,8 @@ export const dynamic = 'force-dynamic'
 const querySchema = z.object({
   competitor_ids: z.string().transform(str => str.split(',').filter(Boolean)),
   platform: z.enum(['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']).optional(),
-  days: z.string().transform(Number).default('30'),
-  metrics: z.string().transform(str => str.split(',')).default('engagement,frequency,reach,sentiment')
+  days: z.coerce.number().default(30),
+  metrics: z.string().transform(str => str.split(',')).default(['engagement', 'frequency', 'reach', 'sentiment'] as any)
 });
 
 /**

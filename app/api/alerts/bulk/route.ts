@@ -17,9 +17,9 @@ export const dynamic = 'force-dynamic'
 
 // Validation schema for bulk operations
 const BulkOperationSchema = z.object({
-  alertIds: z.array(z.number().int().positive()).min(1).max(100),
+  alertIds: z.array(z.string().min(1)).min(1).max(100),
   operation: z.enum(['acknowledge', 'archive', 'unarchive', 'mark_read', 'mark_unread', 'delete']),
-  competitorId: z.number().int().positive().optional(), // Optional filter for additional security
+  competitorId: z.string().min(1).optional(), // Optional filter for additional security
 })
 
 export async function POST(request: NextRequest) {
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       acc[competitorId].alertCount++
       acc[competitorId].severityBreakdown[alert.severity as keyof typeof acc[typeof competitorId]['severityBreakdown']]++
       return acc
-    }, {} as Record<number, any>)
+    }, {} as Record<string, any>)
 
     return NextResponse.json({
       message: resultMessage,

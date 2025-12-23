@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validation = await validateRequestBody(request, SigninSchema)
     if (!validation.success) {
-      return validation.error
+      return (validation as { success: false; error: any }).error
     }
 
     const { identifier, password, isEmail } = validation.data as z.infer<typeof SigninSchema>
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       .select({
         id: users.id,
         email: users.email,
-        password_hash: users.password_hash,
+        password: users.password,
         full_name: users.full_name,
         username: users.username,
         subscription_tier: users.subscription_tier,
@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
 
     const user = userResults[0]
 
-    // Check if user has a password hash
-    if (!user.password_hash) {
+    // Check if user has a password
+    if (!user.password) {
       return createErrorResponse('Please set up a password for your account', 401)
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password_hash)
+    const isValidPassword = await bcrypt.compare(password, user.password)
     if (!isValidPassword) {
       return createErrorResponse('Invalid email/username or password', 401)
     }

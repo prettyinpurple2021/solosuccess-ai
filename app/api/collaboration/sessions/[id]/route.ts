@@ -67,7 +67,7 @@ export async function GET(
     }
 
     // Verify user owns this session
-    if (session.userId !== parseInt(user.id.toString())) {
+    if (session.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Access denied to this session' },
         { status: 403 }
@@ -165,7 +165,7 @@ export async function PATCH(
     }
 
     // Verify user owns this session
-    if (session.userId !== parseInt(user.id.toString())) {
+    if (session.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Access denied to this session' },
         { status: 403 }
@@ -282,7 +282,7 @@ export async function DELETE(
     }
 
     // Verify user owns this session
-    if (session.userId !== parseInt(user.id.toString())) {
+    if (session.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Access denied to this session' },
         { status: 403 }

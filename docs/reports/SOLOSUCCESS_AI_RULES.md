@@ -7,16 +7,18 @@
 ## 🚀 TECH STACK & DEPLOYMENT
 
 ### Core Technologies
+
 - **Framework**: Next.js 15.5+ with App Router
 - **Language**: TypeScript (strict mode, zero `any` types)
 - **Styling**: Tailwind CSS 3.4+ with Cyberpunk Design System v3
 - **Database**: Neon PostgreSQL with Drizzle ORM
-- **Authentication**: JWT-based custom auth
+- **Authentication**: Custom Authentication with JWT
 - **Deployment**: Compatible with any modern hosting platform
 - **File Storage**: S3-compatible storage or local storage
 - **AI Integration**: OpenAI, Anthropic, Google AI SDKs
 
 ### Deployment Architecture
+
 ```typescript
 // next.config.mjs - Standard Next.js configuration
 export default {
@@ -27,6 +29,7 @@ export default {
 ```
 
 ### Environment Variables
+
 ```bash
 # Required for production
 DATABASE_URL=          # Neon PostgreSQL connection
@@ -41,6 +44,7 @@ ANTHROPIC_API_KEY=    # AI service keys
 ## 🎨 CYBERPUNK DESIGN SYSTEM v3 MANDATES
 
 ### Brand Colors (Required)
+
 ```typescript
 // tailwind.config.ts - Exact colors only
 colors: {
@@ -56,6 +60,7 @@ colors: {
 ```
 
 ### Required Components
+
 - **All buttons**: Use `PrimaryButton` from `@/components/ui/Button`
 - **All cards**: Use `div` with `border-2 border-neon-cyan bg-dark-card rounded-sm` classes
 - **All headings**: Use `Heading` component with glitch-hover support
@@ -63,54 +68,50 @@ colors: {
 - **All loaders**: Use `Loading` component from `@/components/ui/Loading`
 
 ### Theme System
+
 - **Dual-mode**: Balanced (production) and Aggressive (full cyberpunk)
 - **Default**: Balanced mode (0.3s animations, 0.5 opacity, 4px radius)
 - **Theme switcher**: Use `ThemeSwitcher` component
+
+```css
 .gradient-holographic { background: linear-gradient(135deg, #B621FF 0%, #18FFFF 20%, #FF1FAF 40%, #18FFFF 60%, #B621FF 80%, #FF1FAF 100%); }
 ```
 
 ### Animation Standards
+
 - **Framer Motion**: Required for all interactive elements
 - **Performance**: Hardware-accelerated transforms only
 - **Accessibility**: Respect `prefers-reduced-motion`
 
 ---
 
-## 🔒 AUTHENTICATION (BETTER AUTH)
+## 🔒 AUTHENTICATION
 
 ### Implementation Requirements
-```typescript
-// lib/auth.ts - Better Auth configuration
-import { betterAuth } from "better-auth"
-import { drizzleAdapter } from "better-auth/adapters/drizzle"
 
-export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "pg"
-  }),
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true
-  },
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24 // 24 hours
+```typescript
+// lib/auth-server.ts - Custom Auth implementation
+import { authenticateRequest } from "@/lib/auth-server"
+
+export async function POST(request: NextRequest) {
+  const { user, error } = await authenticateRequest()
+  
+  if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-})
+}
 ```
 
 ### API Route Protection
+
 ```typescript
 // Required pattern for all protected API routes
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { authenticateRequest } from "@/lib/auth-server"
 
 export async function POST(request: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  })
+  const { user, error } = await authenticateRequest()
   
-  if (!session?.user) {
+  if (error || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
@@ -123,8 +124,9 @@ export async function POST(request: NextRequest) {
 ## 💾 DATABASE (NEON POSTGRESQL)
 
 ### Connection Management
+
 ```typescript
-// lib/db.ts - Neon with connection pooling
+// lib/db.ts - Neon HTTP with Neon-HTTP adapter
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 
@@ -133,13 +135,14 @@ export const db = drizzle(sql)
 ```
 
 ### Schema Requirements
+
 ```typescript
 // db/schema.ts - Required patterns
 import { pgTable, uuid, text, timestamp, index } from 'drizzle-orm/pg-core'
 
 export const exampleTable = pgTable('example_table', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 }, (table) => ({
@@ -149,6 +152,7 @@ export const exampleTable = pgTable('example_table', {
 ```
 
 ### Migration Requirements
+
 - Use Drizzle Kit for all schema changes
 - Never modify production data directly
 - Include proper indexes for performance
@@ -157,7 +161,8 @@ export const exampleTable = pgTable('example_table', {
 
 ## 🛡️ SECURITY STANDARDS
 
-### Required Headers (Cloudflare)
+### Required Headers
+
 ```typescript
 // middleware.ts - Security headers
 export function middleware(request: NextRequest) {
@@ -173,6 +178,7 @@ export function middleware(request: NextRequest) {
 ```
 
 ### Input Validation
+
 ```typescript
 // Required pattern for all API routes
 import { z } from 'zod'
@@ -188,10 +194,11 @@ if (error) {
 ```
 
 ### Rate Limiting
+
 ```typescript
-// lib/rate-limit.ts - Cloudflare KV based
-export async function rateLimit(identifier: string, limit = 100, window = 3600) {
-  // Implementation using Cloudflare KV
+// lib/rate-limit.ts - In-memory or Redis based
+export function rateLimitByIp(type: string, ip: string, windowMs: number, limit: number) {
+  // Implementation
 }
 ```
 
@@ -200,18 +207,17 @@ export async function rateLimit(identifier: string, limit = 100, window = 3600) 
 ## 🧩 COMPONENT STANDARDS
 
 ### File Structure
-```
+
+```text
 components/
-├── holographic/          # Holographic design components
-│   ├── HolographicButton.tsx
-│   ├── HolographicCard.tsx
-│   ├── animations/       # Framer Motion animations
 ├── ui/                   # Base Radix UI components  
-├── forms/               # Form components with Better Auth
-└── layout/              # Layout components
+├── forms/               # Form components
+├── layout/              # Layout components
+└── holographic/          # Holographic design components
 ```
 
 ### Component Template
+
 ```typescript
 'use client'
 
@@ -222,16 +228,12 @@ import { cn } from '@/lib/utils'
 interface ComponentProps {
   children: React.ReactNode
   className?: string
-  sparkles?: boolean
-  shine?: boolean
   glow?: boolean
 }
 
 export function HolographicComponent({ 
   children,
   className,
-  sparkles = false,
-  shine = false,
   glow = false,
   ...props 
 }: ComponentProps) {
@@ -239,8 +241,6 @@ export function HolographicComponent({
     <motion.div
       className={cn(
         "relative holo-overlay",
-        sparkles && "holo-glitter",
-        shine && "glass-shine", 
         glow && "glow-pulse",
         className
       )}
@@ -260,13 +260,13 @@ export function HolographicComponent({
 ## 🔧 API STANDARDS
 
 ### Route Template
+
 ```typescript
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
-import { rateLimit } from '@/lib/rate-limit'
-import { db } from '@/lib/db'
+import { authenticateRequest } from '@/lib/auth-server'
+import { rateLimitByIp } from '@/lib/rate-limit'
+import { db } from '@/db'
 import { z } from 'zod'
-import { headers } from 'next/headers'
 
 const RequestSchema = z.object({
   // Define validation schema
@@ -275,17 +275,15 @@ const RequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit('api', 100)
-    if (!rateLimitResult.success) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { allowed } = rateLimitByIp('api', ip, 60000, 100)
+    if (!allowed) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     // Authentication
-    const session = await auth.api.getSession({
-      headers: await headers()
-    })
-    
-    if (!session?.user) {
+    const { user, error: authError } = await authenticateRequest()
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -297,9 +295,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Database operations - REAL DATA ONLY
-    const result = await db.query./* your query */
+    // const result = await db.query...
 
-    return NextResponse.json({ success: true, data: result })
+    return NextResponse.json({ success: true, data: {} })
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json(
@@ -315,6 +313,7 @@ export async function POST(request: NextRequest) {
 ## ♿ ACCESSIBILITY REQUIREMENTS
 
 ### Form Standards
+
 ```typescript
 // Required accessibility patterns
 <label htmlFor="email" className="sr-only">
@@ -335,6 +334,7 @@ export async function POST(request: NextRequest) {
 ```
 
 ### Navigation Requirements
+
 - All interactive elements keyboard accessible
 - Focus states visible and consistent
 - ARIA labels for complex interactions
@@ -345,21 +345,21 @@ export async function POST(request: NextRequest) {
 ## 🚫 PROHIBITED PRACTICES
 
 ### Absolutely Forbidden
+
 ```typescript
 // ❌ NEVER DO THESE
 const mockData = [...] // No mock data
 const TODO = "..." // No TODO comments
 const disabled = true // No disabled features
 const placeholder = "..." // No placeholders
-console.log(...) // No console logging in production
 ```
 
 ### Security Violations
+
 ```typescript
 // ❌ SECURITY VIOLATIONS
 const query = `SELECT * FROM users WHERE id = ${userId}` // SQL injection
 const token = localStorage.getItem('token') // Insecure storage
-process.env.SECRET_KEY // Client-side secrets
 ```
 
 ---
@@ -367,15 +367,16 @@ process.env.SECRET_KEY // Client-side secrets
 ## ✅ REQUIRED PRACTICES
 
 ### Production Standards
+
 ```typescript
 // ✅ ALWAYS DO THESE
-const realData = await db.query.users.findMany() // Real data
+const realData = await db.select().from(users) // Real data
 const validatedInput = schema.parse(input) // Validation
-const authenticatedUser = await getSession() // Authentication
-const rateLimited = await rateLimit(ip) // Rate limiting
+const authenticatedUser = await authenticateRequest() // Authentication
 ```
 
 ### Code Quality
+
 - TypeScript strict mode enabled
 - Zero ESLint errors or warnings
 - All components tested and functional
@@ -387,6 +388,7 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 ## 🎯 SUCCESS METRICS
 
 ### Technical Requirements
+
 - **Build**: Zero errors, zero warnings
 - **Performance**: Core Web Vitals all green
 - **Security**: Zero vulnerabilities
@@ -394,20 +396,22 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 - **Type Safety**: 100% TypeScript coverage
 
 ### User Experience Goals
-- **Loading**: Sub-3 second page loads on Cloudflare
+
+- **Loading**: Sub-3 second page loads
 - **Interactive**: Holographic effects smooth on all devices
 - **Responsive**: Perfect mobile experience
-- **Reliable**: 99.9% uptime with Neon connection pooling
+- **Reliable**: 99.9% uptime
 
 ---
 
 ## 📋 DEPLOYMENT CHECKLIST
 
 ### Pre-deployment Requirements
-- [ ] Better Auth configured and tested
+
+- [ ] Auth configured and tested
 - [ ] Neon database schema migrated
 - [ ] All holographic components implemented
-- [ ] Cloudflare Pages build successful
+- [ ] Build successful
 - [ ] Environment variables configured
 - [ ] Security headers implemented
 - [ ] Rate limiting active
@@ -415,6 +419,7 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 - [ ] Performance optimized
 
 ### Post-deployment Verification
+
 - [ ] Authentication flows working
 - [ ] Database connections stable
 - [ ] Holographic animations smooth
@@ -424,18 +429,19 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 
 ---
 
-**REMEMBER**: This is a production application serving real users. Every line of code must be production-ready, secure, accessible, and aligned with the holographic design system. No compromises. No shortcuts. No fake data. 
-
+**REMEMBER**: This is a production application serving real users. Every line of code must be production-ready, secure, accessible, and aligned with the holographic design system. No compromises. No shortcuts. No fake data.
 
 ## 🏗️ PRODUCTION QUALITY STANDARDS (V1.0)
 
 ### Core Principles
+
 1. **Code Quality First**: All code must be production-ready. No exceptions for deadlines.
 2. **Never Assume - Always Ask**: Clarify requirements, implementation, or testing strategy with the user.
 3. **No Incomplete Code**: Use feature flags for ongoing work. Do NOT comment out or disable unfinished features.
 4. **Data Integrity**: REAL DATA ONLY. No fake metrics, dummy data, or placeholder content in production.
 
 ### TypeScript & React Standards
+
 - **Strict Mode**: Mandatory `"strict": true` in `tsconfig.json`.
 - **Zero `any` Types**: Use `unknown` or specific interfaces/types for all data structures.
 - **Explicit Types**: All function parameters and return types must be explicit.
@@ -443,24 +449,28 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 - **Hook Efficiency**: Memoize expensive computations with `useMemo` and callbacks with `useCallback`.
 
 ### API & Database Mandates
+
 - **RESTful Design**: Proper HTTP methods, status codes, and versioning (`/api/v1/...`).
 - **Standardized Responses**: Use `ApiResponse<T>` and `ApiError` interfaces.
 - **Type-Safe Queries**: Use Drizzle ORM with parameterized queries. No raw SQL.
 - **Performance**: Indexes required for frequently queried fields.
 
 ### Testing Requirements
+
 - **100% Coverage**: Required for all public functions and critical workflows.
 - **80%+ Coverage**: Required for React components and API endpoints.
 - **Pattern**: Arrange-Act-Assert for all unit tests.
 - **Clean State**: Always clean up test data after integration/E2E tests.
 
 ### Documentation & Security
+
 - **JSDoc**: Required for all exported functions and complex logic.
 - **Secret Management**: Environment variables only. Never commit secrets to git.
 - **Tenancy Enforcement**: All database queries MUST include `userId` filters.
 - **RBAC**: Implement role-based access control for all sensitive operations.
 
 ### Deployment Readiness
+
 - **Zero Warnings**: Build must be free of all TypeScript errors and ESLint warnings.
 - **Core Web Vitals**: LCP < 2.5s, FID < 100ms, CLS < 0.1.
 - **Rollback Plan**: Mandatory for all production deployments.
@@ -468,18 +478,3 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 ---
 
 Build with integrity. Ship with confidence. Serve users with excellence.
-
-<citations>
-<document>
-<document_type>RULE</document_type>
-<document_id>AGBdBMsHgdpuHzp6ibHWRH</document_id>
-</document>
-<document>
-<document_type>RULE</document_type>
-<document_id>OOkqCW6HtnyHGSWdEoBhA2</document_id>
-</document>
-<document>
-<document_type>RULE</document_type>
-<document_id>ow3nATI7pBAcw1gQXye9xG</document_id>
-</document>
-</citations>

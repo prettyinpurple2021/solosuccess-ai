@@ -57,9 +57,8 @@ export async function GET(
       )
     }
 
-    const params = await context.params;
-    const competitorId = parseInt(params.id, 10)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await context.params
+    if (!competitorId) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
         { status: 400 }
@@ -109,9 +108,8 @@ export async function POST(
       )
     }
 
-    const params = await context.params;
-    const competitorId = parseInt(params.id, 10)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await context.params
+    if (!competitorId) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
         { status: 400 }
@@ -195,9 +193,8 @@ export async function PUT(
       )
     }
 
-    const params = await context.params;
-    const competitorId = parseInt(params.id, 10)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await context.params
+    if (!competitorId) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
         { status: 400 }
@@ -268,9 +265,8 @@ export async function DELETE(
       )
     }
 
-    const params = await context.params;
-    const competitorId = parseInt(params.id, 10)
-    if (isNaN(competitorId)) {
+    const { id: competitorId } = await context.params
+    if (!competitorId) {
       return NextResponse.json(
         { error: 'Invalid competitor ID' },
         { status: 400 }

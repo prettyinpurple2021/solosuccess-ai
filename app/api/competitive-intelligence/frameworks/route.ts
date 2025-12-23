@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
         result = await CompetitiveDecisionFrameworks.generateCostBenefitWithCompetitiveIntelligence(
           user.id,
           context,
-          costs,
-          benefits
+          costs as { category: string; amount: number; description: string }[],
+          benefits as { category: string; amount: number; description: string }[]
         )
         break
         

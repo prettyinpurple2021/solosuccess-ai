@@ -31,12 +31,12 @@ const _NotificationPreferencesSchema = z.object({
     end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).default('08:00'),
     timezone: z.string().default('UTC'),
   }).default({}),
-  competitorFilters: z.array(z.number().int().positive()).optional(),
+  competitorFilters: z.array(z.string().min(1)).optional(),
   alertTypeFilters: z.array(z.string()).optional(),
 })
 
 const NotificationDeliverySchema = z.object({
-  alertIds: z.array(z.number().int().positive()).min(1).max(50),
+  alertIds: z.array(z.string().min(1)).min(1).max(50),
   channels: z.array(z.enum(['email', 'push', 'sms'])).min(1),
   priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal'),
   template: z.enum(['summary', 'detailed', 'critical_only']).default('summary'),

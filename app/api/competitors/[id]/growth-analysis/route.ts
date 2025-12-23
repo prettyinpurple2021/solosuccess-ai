@@ -50,8 +50,8 @@ export async function GET(
   }
 
     const { id } = await context.params;
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
+    const competitorId = id as string
+    if (!competitorId) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
 
@@ -195,8 +195,8 @@ export async function POST(
   }
 
     const { id } = await context.params;
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
+    const competitorId = id as string
+    if (!competitorId) {
       return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
     }
 

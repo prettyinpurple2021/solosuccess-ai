@@ -17,7 +17,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 const paramsSchema = z.object({
-  id: z.string().transform(Number)
+  id: z.string().min(1)
 });
 
 const querySchema = z.object({
@@ -72,7 +72,7 @@ export async function GET(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, Number(user.id))
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -87,7 +87,7 @@ export async function GET(
     // Build query conditions
     let whereConditions = and(
       eq(intelligenceData.competitor_id, competitorId),
-      eq(intelligenceData.user_id, Number(user.id)),
+      eq(intelligenceData.user_id, user.id),
       eq(intelligenceData.source_type, 'social_media')
     );
 
@@ -204,7 +204,7 @@ export async function POST(
       .where(
         and(
           eq(competitorProfiles.id, competitorId),
-          eq(competitorProfiles.user_id, Number(user.id))
+          eq(competitorProfiles.user_id, user.id)
         )
       )
       .limit(1);
@@ -235,16 +235,16 @@ export async function POST(
           let platformData;
           switch (platform) {
             case 'linkedin':
-              platformData = await socialMediaMonitor.monitorLinkedInActivity(competitorId, Number(user.id));
+              platformData = await socialMediaMonitor.monitorLinkedInActivity(competitorId, user.id);
               break;
             case 'twitter':
-              platformData = await socialMediaMonitor.monitorTwitterActivity(competitorId, Number(user.id));
+              platformData = await socialMediaMonitor.monitorTwitterActivity(competitorId, user.id);
               break;
             case 'facebook':
-              platformData = await socialMediaMonitor.monitorFacebookActivity(competitorId, Number(user.id));
+              platformData = await socialMediaMonitor.monitorFacebookActivity(competitorId, user.id);
               break;
             case 'instagram':
-              platformData = await socialMediaMonitor.monitorInstagramActivity(competitorId, Number(user.id));
+              platformData = await socialMediaMonitor.monitorInstagramActivity(competitorId, user.id);
               break;
           }
           
@@ -268,7 +268,7 @@ export async function POST(
     } else {
       // Monitor all platforms
       try {
-        const analyses = await socialMediaMonitor.monitorCompetitor(competitorId);
+        const analyses = await socialMediaMonitor.monitorCompetitor(competitorId, user.id);
         results = analyses.map(analysis => ({
           platform: analysis.platform,
           posts_collected: analysis.posts.length,
