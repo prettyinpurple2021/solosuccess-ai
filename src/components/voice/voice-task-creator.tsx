@@ -159,7 +159,7 @@ export function VoiceTaskCreator({ isOpen, onClose, onTaskCreate }: VoiceTaskCre
                     <div className="flex justify-center">
                         <Button
                             size="lg"
-                            variant={isListening ? "destructive" : "default"}
+                            variant={isListening ? "magenta" : "cyan"}
                             className={`rounded-full w-16 h-16 ${isListening ? "animate-pulse" : ""}`}
                             onClick={toggleListening}
                         >

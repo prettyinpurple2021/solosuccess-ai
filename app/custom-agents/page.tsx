@@ -136,7 +136,7 @@ export default function CustomAgentsPage() {
                     <p className="text-sm text-gray-700 mb-3">{agent.description}</p>
                     <div className="space-y-1">
                       {agent.specialties.map((specialty, index) => (
-                        <Badge key={index} variant="outline" className="text-xs mr-1 mb-1">
+                        <Badge key={index} variant="purple" className="text-xs mr-1 mb-1">
                           {specialty}
                         </Badge>
                       ))}

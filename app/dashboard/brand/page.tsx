@@ -572,7 +572,7 @@ export default function BrandStudioPage() {
                     {PERSONALITY_TRAITS.map(trait => (
                       <Badge
                         key={trait}
-                        variant={brandSettings.brandPersonality.includes(trait) ? "default" : "outline"}
+                        variant={brandSettings.brandPersonality.includes(trait) ? "cyan" : "outline"}
                         className={`cursor-pointer transition-all ${
                           brandSettings.brandPersonality.includes(trait)
                             ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white border-0'

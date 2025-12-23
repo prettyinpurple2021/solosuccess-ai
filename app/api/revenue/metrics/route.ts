@@ -15,12 +15,12 @@ const QuerySchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = parseInt(authResult.user.id)
+    const userId = authResult.user.id
     const { searchParams } = new URL(request.url)
     
     const validation = QuerySchema.safeParse({

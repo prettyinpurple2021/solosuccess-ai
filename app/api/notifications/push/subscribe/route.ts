@@ -16,7 +16,7 @@ const subscriptionSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request);
+    const authResult = await verifyAuth();
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

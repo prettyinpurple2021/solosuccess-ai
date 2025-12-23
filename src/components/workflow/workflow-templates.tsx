@@ -39,7 +39,7 @@ import {
   Settings,
   Info
 } from 'lucide-react'
-import { PrimaryButton } from '@/components/ui/Button'
+import { PrimaryButton } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
@@ -428,7 +428,7 @@ export function WorkflowTemplates({
               <div className="flex items-center gap-2 mb-2">
                 <CategoryIcon className="h-4 w-4 text-purple-400" />
                 <Badge 
-                  variant="secondary" 
+                  variant="purple" 
                   className={`text-xs capitalize badge-complexity-${template.complexity}`}
                 >
                   {template.complexity}
@@ -552,14 +552,15 @@ export function WorkflowTemplates({
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
-                <HolographicButton
+                <PrimaryButton
+                  variant="cyan"
                   size="sm"
                   onClick={() => handleSelectTemplate(template)}
                   className="flex-1"
                 >
                   <Play className="h-4 w-4 mr-1" />
                   Use Template
-                </HolographicButton>
+                </PrimaryButton>
                 
                 <Button
                   variant="cyan"
@@ -590,10 +591,10 @@ export function WorkflowTemplates({
             <p className="text-gray-300 mt-1">Choose from pre-built workflows or create your own</p>
           </div>
           
-          <HolographicButton onClick={onCreateCustom}>
+          <PrimaryButton onClick={onCreateCustom}>
             <Plus className="h-4 w-4 mr-2" />
             Create Custom Workflow
-          </HolographicButton>
+          </PrimaryButton>
         </div>
 
         {/* Search and Filters */}
@@ -655,7 +656,7 @@ export function WorkflowTemplates({
 
             <div className="flex items-center gap-1 ml-auto">
               <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                variant={viewMode === 'grid' ? 'purple' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
                 className="h-8 w-8 p-0"

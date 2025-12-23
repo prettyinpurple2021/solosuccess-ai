@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic'
 // Enhanced search schema with full-text search capabilities
 const IntelligenceSearchSchema = z.object({
   query: z.string().optional(), // Full-text search query
-  competitorIds: z.array(z.number().int().positive()).optional(),
+  competitorIds: z.array(z.string()).optional(),
   sourceTypes: z.array(z.enum(['website', 'social_media', 'news', 'job_posting', 'app_store', 'manual'])).optional(),
   dataTypes: z.array(z.string()).optional(),
   importance: z.array(z.enum(['low', 'medium', 'high', 'critical'])).optional(),
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     // Parse arrays from query string
     const parsedParams: any = { ...queryParams }
     if (queryParams.competitorIds) {
-      parsedParams.competitorIds = queryParams.competitorIds.split(',').map(id => parseInt(id))
+      parsedParams.competitorIds = queryParams.competitorIds.split(',')
     }
     if (queryParams.sourceTypes) {
       parsedParams.sourceTypes = queryParams.sourceTypes.split(',')

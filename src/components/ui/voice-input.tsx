@@ -242,15 +242,15 @@ export default function VoiceInput({
 
           <div className="flex items-center gap-2">
             {confidence > 0 && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="cyan" className="text-xs">
                 {Math.round(confidence * 100)}% confidence
               </Badge>
             )}
             <Badge
-              variant={isListening ? "default" : "outline"}
+              variant={isListening ? "magenta" : "cyan"}
               className={cn(
                 "text-xs transition-colors",
-                isListening && "bg-red-500 text-white animate-pulse"
+                isListening && "bg-magenta text-white animate-pulse"
               )}
             >
               {isListening ? "Recording" : "Ready"}
@@ -288,7 +288,7 @@ export default function VoiceInput({
             onClick={toggleListening}
             disabled={!isSupported}
             size="sm"
-            variant={isListening ? "destructive" : "default"}
+            variant={isListening ? "magenta" : "cyan"}
             className={cn(
               "flex items-center gap-2 transition-all duration-200",
               isListening && "animate-pulse"

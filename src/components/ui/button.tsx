@@ -2,6 +2,7 @@
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { Slot } from '@radix-ui/react-slot'
 
 export interface PrimaryButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   children: ReactNode
@@ -10,6 +11,7 @@ export interface PrimaryButtonProps extends Omit<ButtonHTMLAttributes<HTMLButton
   size?: 'sm' | 'md' | 'lg'
   variant?: 'cyan' | 'magenta' | 'lime' | 'purple' | 'orange' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'ghost'
   className?: string
+  asChild?: boolean
 }
 
 export const PrimaryButton = ({ 
@@ -19,6 +21,7 @@ export const PrimaryButton = ({
   size = 'md',
   variant = 'cyan',
   className = '',
+  asChild = false,
   ...props
 }: PrimaryButtonProps) => {
   // Theme is not available during static generation (React context is null)
@@ -62,8 +65,10 @@ export const PrimaryButton = ({
     ghost: 'border-transparent text-gray-300 hover:bg-dark-hover',
   }
   
+  const Comp = asChild ? Slot : 'button'
+  
   return (
-    <button
+    <Comp
       onClick={onClick}
       disabled={disabled}
       className={cn(
@@ -81,7 +86,7 @@ export const PrimaryButton = ({
       {...props}
     >
       {children}
-    </button>
+    </Comp>
   )
 }
 

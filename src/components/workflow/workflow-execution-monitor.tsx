@@ -42,8 +42,8 @@ import {
   MoreHorizontal
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { PrimaryButton } from '@/components/ui/Button'
-import { Loading } from '@/components/ui/Loading'
+import { PrimaryButton } from '@/components/ui/button'
+import { Loading } from '@/components/ui/loading'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
@@ -419,7 +419,7 @@ export function WorkflowExecutionMonitor({
 
               <div className="flex items-center gap-2">
                 <Badge
-                  variant="secondary"
+                  variant="purple"
                   className={`badge-status-${execution.status} bg-opacity-20`}
                 >
                   {execution.status}
@@ -512,7 +512,7 @@ export function WorkflowExecutionMonitor({
                   </Button>
                 )}
 
-                <HolographicButton
+                <PrimaryButton
                   variant="cyan"
                   size="sm"
                   onClick={() => handleViewDetails(execution.id)}
@@ -520,7 +520,7 @@ export function WorkflowExecutionMonitor({
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   Details
-                </HolographicButton>
+                </PrimaryButton>
               </div>
             </div>
           </CardContent>
@@ -663,7 +663,7 @@ export function WorkflowExecutionMonitor({
             </Button>
 
             <Button
-              variant={autoRefresh ? 'default' : 'outline'}
+              variant={autoRefresh ? 'purple' : 'outline'}
               size="sm"
               onClick={() => setAutoRefresh(!autoRefresh)}
             >

@@ -27,7 +27,7 @@ function getOAuth2Client(clientId?: string, clientSecret?: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -162,9 +162,7 @@ export async function POST(request: NextRequest) {
 
       const expiresAt = tokens.expiry_date 
         ? new Date(tokens.expiry_date) 
-        : tokens.expires_in 
-          ? new Date(Date.now() + tokens.expires_in * 1000)
-          : null
+        : null
 
       // Store connection
       const existing = await db

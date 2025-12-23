@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
 
     // Create a test alert
     const testAlert: CompetitorAlert = {
-      id: 999999,
-      competitor_id: 1,
+      id: 'test-999999',
+      competitor_id: 'test-1',
       alert_type: 'product_launch',
       severity,
       title: 'Test Notification - Competitor Product Launch',

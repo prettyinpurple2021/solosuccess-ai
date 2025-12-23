@@ -137,7 +137,7 @@ export function ProductivityDashboard({ className = "" }: ProductivityDashboardP
           {(['week', 'month', 'quarter'] as const).map((range) => (
             <Button
               key={range}
-              variant={timeRange === range ? "default" : "outline"}
+              variant={timeRange === range ? "cyan" : "outline"}
               size="sm"
               onClick={() => setTimeRange(range)}
             >
@@ -323,11 +323,11 @@ export function ProductivityDashboard({ className = "" }: ProductivityDashboardP
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                   <span className="text-sm">Best performing day</span>
-                  <Badge variant="secondary">{data.insights.topPerformingDay}</Badge>
+                  <Badge variant="cyan">{data.insights.topPerformingDay}</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                   <span className="text-sm">Most productive time</span>
-                  <Badge variant="secondary">{data.insights.mostProductiveTime}</Badge>
+                  <Badge variant="purple">{data.insights.mostProductiveTime}</Badge>
                 </div>
               </div>
             </div>

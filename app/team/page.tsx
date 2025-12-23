@@ -128,7 +128,7 @@ export default function TeamPage() {
                     {aiAgents.map((agent) => (
                       <Button
                         key={agent.id}
-                        variant={selectedAgent.id === agent.id ? "default" : "ghost"}
+                        variant={selectedAgent.id === agent.id ? "purple" : "ghost"}
                         className={`w-full justify-start p-4 h-auto ${
                           selectedAgent.id === agent.id ? "bg-gradient-primary text-white" : "hover:bg-muted"
                         }`}
@@ -789,7 +789,7 @@ export default function TeamPage() {
                     {selectedAgent.isVoiceEnabled && (
                       <div className="flex items-center space-x-2">
                         <Button
-                          variant={isListening ? "destructive" : "outline"}
+                          variant={isListening ? "magenta" : "outline"}
                           size="sm"
                           onClick={isListening ? stopListening : startListening}
                           className={isListening ? "animate-pulse-mic" : ""}

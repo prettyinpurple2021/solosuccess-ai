@@ -35,7 +35,7 @@ export const pushNotificationService = {
   /**
    * Send a push notification to a specific user
    */
-  async sendToUser(userId: number, title: string, body: string, url?: string) {
+  async sendToUser(userId: string, title: string, body: string, url?: string) {
     try {
       // Fetch user's active push subscriptions
       const subscriptions = await db
@@ -103,7 +103,7 @@ export const pushNotificationService = {
   /**
    * Save a user's subscription
    */
-  async saveSubscription(userId: number, subscription: PushSubscriptionData) {
+  async saveSubscription(userId: string, subscription: PushSubscriptionData) {
     try {
       // Check if subscription already exists
       const existing = await db

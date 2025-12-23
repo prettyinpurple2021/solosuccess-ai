@@ -82,7 +82,7 @@ export default function AccountRecoveryClient() {
             </div>
             
             {message && (
-              <Alert variant="default" className="bg-green-50 border-green-200">
+              <Alert variant="success" className="bg-green-50 border-green-200">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <AlertDescription className="text-green-800">
                   {message}
@@ -91,7 +91,7 @@ export default function AccountRecoveryClient() {
             )}
 
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="error">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>

@@ -54,10 +54,10 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
   }
 
   const getStatusBadge = () => {
-    if (isCompleted) return <Badge variant="default" className="bg-green-500">Completed</Badge>
-    if (isRunning) return <Badge variant="default" className="bg-blue-500">Running</Badge>
-    if (isFailed) return <Badge variant="destructive">Failed</Badge>
-    return <Badge variant="secondary">Pending</Badge>
+    if (isCompleted) return <Badge variant="cyan" className="bg-green-500">Completed</Badge>
+    if (isRunning) return <Badge variant="cyan" className="bg-blue-500">Running</Badge>
+    if (isFailed) return <Badge variant="magenta">Failed</Badge>
+    return <Badge variant="purple">Pending</Badge>
   }
 
   const getProgress = () => {
@@ -191,7 +191,7 @@ export function WorkflowStatus({ workflowId, userId, userData }: WorkflowStatusP
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <Alert variant="destructive">
+                  <Alert variant="error">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
                       Onboarding failed. Please try again or contact support.

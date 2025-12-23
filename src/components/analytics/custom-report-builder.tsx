@@ -39,8 +39,8 @@ import {
   Zap,
   Crown
 } from 'lucide-react'
-import { PrimaryButton } from '@/components/ui/Button'
-import { Loading } from '@/components/ui/Loading'
+import { PrimaryButton } from '@/components/ui/button'
+import { Loading } from '@/components/ui/loading'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logger, logError, logInfo } from '@/lib/logger'
@@ -376,7 +376,7 @@ export function CustomReportBuilder({
             className="flex items-center gap-2"
           >
             {isSaving ? (
-              <HolographicLoader size="sm" text="Saving..." />
+              <Loading size="sm" />
             ) : (
               <>
                 <Save className="h-4 w-4" />
@@ -482,7 +482,7 @@ export function CustomReportBuilder({
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">{field.name}</span>
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant="purple" className="text-xs">
                                 {field.type}
                               </Badge>
                             </div>
@@ -611,8 +611,7 @@ export function CustomReportBuilder({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
+                        onClick={() => {
                           removeVisualization(viz.id)
                         }}
                       >
@@ -687,7 +686,7 @@ export function CustomReportBuilder({
                     </Select>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {selectedVisualization.metrics.map(metric => (
-                        <Badge key={metric} variant="secondary" className="flex items-center gap-1">
+                        <Badge key={metric} variant="purple" className="flex items-center gap-1">
                           {REPORT_FIELDS.find(f => f.id === metric)?.name}
                           <button
                             onClick={() => updateVisualization(selectedVisualization.id, {
@@ -956,7 +955,7 @@ export function CustomReportBuilder({
                 <div key={viz.id} className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">{viz.title}</h3>
-                    <Badge variant="secondary">
+                    <Badge variant="purple">
                       {VISUALIZATION_TYPES.find(t => t.id === viz.type)?.name}
                     </Badge>
                   </div>

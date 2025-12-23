@@ -398,7 +398,7 @@ export default function SettingsPage() {
                             </div>
                             <Dialog>
                               <DialogTrigger asChild>
-                                <Button variant="destructive" size="sm" className="bg-neon-magenta hover:bg-neon-magenta/90">
+                                <Button variant="magenta" size="sm" className="bg-neon-magenta hover:bg-neon-magenta/90">
                                   <Trash2 className="w-4 h-4 mr-2" />
                                   Delete Account
                                 </Button>
@@ -413,7 +413,7 @@ export default function SettingsPage() {
                                 <DialogFooter>
                                   <Button variant="outline" className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">Cancel</Button>
                                   <Button
-                                    variant="destructive"
+                                    variant="magenta"
                                     onClick={handleDeleteAccount}
                                     disabled={isDeleting}
                                     className="bg-neon-magenta hover:bg-neon-magenta/90"

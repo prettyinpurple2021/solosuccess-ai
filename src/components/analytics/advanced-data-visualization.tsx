@@ -25,8 +25,8 @@ import {
   Minimize2,
   Square
 } from 'lucide-react'
-import { PrimaryButton } from '@/components/ui/Button'
-import { Loading } from '@/components/ui/Loading'
+import { PrimaryButton } from '@/components/ui/button'
+import { Loading } from '@/components/ui/loading'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { logError, logInfo } from '@/lib/logger'
@@ -571,7 +571,7 @@ export function AdvancedDataVisualization({
                         />
                         {isAnimating && (
                           <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
-                            <Loading text="Rendering chart..." />
+                            <Loading />
                           </div>
                         )}
                       </div>

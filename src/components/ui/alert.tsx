@@ -4,12 +4,13 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 
 interface AlertProps {
-  variant?: 'success' | 'error' | 'warning' | 'info'
+  variant?: 'success' | 'error' | 'warning' | 'info' | 'default' | 'destructive'
   title?: string
   description?: string
   dismissible?: boolean
   onDismiss?: () => void
   className?: string
+  children?: React.ReactNode
 }
 
 export const Alert = ({ 
@@ -18,7 +19,8 @@ export const Alert = ({
   description,
   dismissible = true,
   onDismiss,
-  className = ''
+  className = '',
+  children
 }: AlertProps) => {
   const [isVisible, setIsVisible] = React.useState(true)
   // Theme not available during static generation - use defaults
@@ -67,6 +69,24 @@ export const Alert = ({
       icon: 'ℹ',
       bg: 'bg-neon-cyan/5',
     },
+    default: {
+      border: 'border-neon-cyan',
+      shadow: isBalanced 
+        ? 'shadow-[0_0_15px_rgba(11,228,236,0.2)]' 
+        : 'shadow-[0_0_20px_rgba(11,228,236,0.3)]',
+      title: 'text-neon-cyan',
+      icon: 'ℹ',
+      bg: 'bg-neon-cyan/5',
+    },
+    destructive: {
+      border: 'border-neon-magenta',
+      shadow: isBalanced 
+        ? 'shadow-[0_0_15px_rgba(255,0,110,0.2)]' 
+        : 'shadow-[0_0_20px_rgba(255,0,110,0.3)]',
+      title: 'text-neon-magenta',
+      icon: '✕',
+      bg: 'bg-neon-magenta/5',
+    },
   }
   
   const config = variants[variant]
@@ -97,6 +117,7 @@ export const Alert = ({
       <div className="flex-1 min-w-0">
         {title && <AlertTitle className={cn(config.title, 'mb-1')}>{title}</AlertTitle>}
         {description && <AlertDescription>{description}</AlertDescription>}
+        {children}
       </div>
       {dismissible && (
         <button

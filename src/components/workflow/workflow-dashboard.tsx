@@ -35,8 +35,8 @@ import {
   ChevronRight,
   ChevronDown
 } from 'lucide-react'
-import { PrimaryButton } from '@/components/ui/Button'
-import { Loading } from '@/components/ui/Loading'
+import { PrimaryButton } from '@/components/ui/button'
+import { Loading } from '@/components/ui/loading'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { VisualWorkflowBuilder } from './visual-workflow-builder'

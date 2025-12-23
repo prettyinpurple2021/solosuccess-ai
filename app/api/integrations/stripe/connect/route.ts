@@ -23,7 +23,7 @@ const PostSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         .select()
         .from(paymentProviderConnections)
         .where(and(
-          eq(paymentProviderConnections.user_id, parseInt(userId)),
+          eq(paymentProviderConnections.user_id, userId),
           eq(paymentProviderConnections.provider, 'stripe'),
           eq(paymentProviderConnections.is_active, true)
         ))
@@ -90,12 +90,12 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = parseInt(authResult.user.id)
+    const userId = authResult.user.id
     const body = await request.json()
     const validation = PostSchema.safeParse(body)
 
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (code) {
-      if (state && parseInt(state) !== userId) {
+      if (state && state !== userId) {
         return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 })
       }
 

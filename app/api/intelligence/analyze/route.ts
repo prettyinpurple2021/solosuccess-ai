@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic'
 
 // Validation schema for analysis request
 const AnalysisRequestSchema = z.object({
-  intelligenceIds: z.array(z.number().int().positive()).min(1).max(50),
+  intelligenceIds: z.array(z.string()).min(1).max(50),
   analysisType: z.enum(['comprehensive', 'trend', 'sentiment', 'competitive', 'opportunity']).default('comprehensive'),
   agentIds: z.array(z.string()).optional(), // Specific agents to use for analysis
   focusAreas: z.array(z.enum(['marketing', 'strategic', 'product', 'pricing', 'technical', 'opportunity', 'threat'])).optional(),

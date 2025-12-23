@@ -218,7 +218,7 @@ export default function AnalyticsDashboard() {
                     <p className="text-sm font-medium">New user registration</p>
                     <p className="text-xs text-muted-foreground">2 minutes ago</p>
                   </div>
-                  <Badge variant="secondary">User</Badge>
+                  <Badge variant="cyan">User</Badge>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -226,7 +226,7 @@ export default function AnalyticsDashboard() {
                     <p className="text-sm font-medium">AI task completed</p>
                     <p className="text-xs text-muted-foreground">5 minutes ago</p>
                   </div>
-                  <Badge variant="secondary">AI</Badge>
+                  <Badge variant="purple">AI</Badge>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
@@ -234,7 +234,7 @@ export default function AnalyticsDashboard() {
                     <p className="text-sm font-medium">Goal milestone reached</p>
                     <p className="text-xs text-muted-foreground">10 minutes ago</p>
                   </div>
-                  <Badge variant="secondary">Goal</Badge>
+                  <Badge variant="magenta">Goal</Badge>
                 </div>
               </div>
             </CardContent>
