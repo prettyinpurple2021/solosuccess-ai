@@ -64,15 +64,12 @@ export function RegisterForm() {
             </div>
 
             {state?.error && (
-              <div className="p-3 bg-red-900/20 border border-red-500/50 rounded flex items-start gap-2 text-red-400 text-xs font-mono break-words">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{state.error}</span>
-              </div>
+              <Alert variant="error" description={state.error} />
             )}
 
-            <Button className="w-full btn-boss bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border-none mt-4" disabled={isPending}>
+            <PrimaryButton className="w-full btn-boss bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border-none mt-4" disabled={isPending}>
               {isPending ? <Loader2 className="animate-spin mr-2" /> : 'Register Account'}
-            </Button>
+            </PrimaryButton>
          </form>
 
          <div className="relative my-6">
