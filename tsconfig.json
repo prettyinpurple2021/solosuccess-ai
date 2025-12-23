@@ -12,7 +12,8 @@
     "skipLibCheck": true,
     "types": [
       "node",
-      "jest"
+      "jest",
+      "tailwindcss"
     ],
     "moduleResolution": "bundler",
     "isolatedModules": true,
@@ -48,7 +49,12 @@
     "instrumentation.ts",
     "middleware.ts",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "tailwind.config.ts",
+    "drizzle.config.ts",
+    "sentry.edge.config.ts",
+    "sentry.server.config.ts",
+    "playwright.config.ts"
   ],
   "exclude": [
     "node_modules",
