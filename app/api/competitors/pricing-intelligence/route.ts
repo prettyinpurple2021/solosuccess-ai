@@ -18,7 +18,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 const pricingAnalysisSchema = z.object({
-  competitor_ids: z.array(z.number()).min(1).max(10),
+  competitor_ids: z.array(z.string()).min(1).max(10),
   analysis_scope: z.enum(['pricing_only', 'competitive_positioning', 'revenue_optimization', 'comprehensive']).default('pricing_only'),
   market_context: z.object({
     industry: z.string().optional(),

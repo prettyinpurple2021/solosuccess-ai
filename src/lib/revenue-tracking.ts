@@ -23,9 +23,9 @@ export interface RevenueMetrics {
 
 export class RevenueTrackingService {
   /**
-   * Calculate MRR from user's own Stripe account
-   */
-  static async calculateMRR(userId: number): Promise<number> {
+    * Calculate MRR from user's own Stripe account
+    */
+  static async calculateMRR(userId: string): Promise<number> {
     try {
       const connection = await this.getStripeConnection(userId)
       if (!connection || !connection.access_token) {
@@ -34,7 +34,7 @@ export class RevenueTrackingService {
       }
 
       const stripe = new Stripe(connection.access_token, {
-        apiVersion: '2024-12-18.acacia'
+        apiVersion: '2025-12-15.clover'
       })
 
       // Get all active subscriptions from user's Stripe account
@@ -72,10 +72,10 @@ export class RevenueTrackingService {
   }
 
   /**
-   * Calculate total revenue for a time period from user's Stripe account
-   */
+    * Calculate total revenue for a time period from user's Stripe account
+    */
   static async calculateRevenue(
-    userId: number,
+    userId: string,
     startDate: Date,
     endDate: Date
   ): Promise<number> {
@@ -87,7 +87,7 @@ export class RevenueTrackingService {
       }
 
       const stripe = new Stripe(connection.access_token, {
-        apiVersion: '2024-12-18.acacia'
+        apiVersion: '2025-12-15.clover'
       })
 
       // Get all successful charges/payment intents in the date range
@@ -139,10 +139,10 @@ export class RevenueTrackingService {
   }
 
   /**
-   * Get comprehensive revenue metrics for a user
-   */
+    * Get comprehensive revenue metrics for a user
+    */
   static async getRevenueMetrics(
-    userId: number,
+    userId: string,
     periodDays: number = 30
   ): Promise<RevenueMetrics> {
     try {
@@ -159,7 +159,7 @@ export class RevenueTrackingService {
       }
 
       const stripe = new Stripe(connection.access_token, {
-        apiVersion: '2024-12-18.acacia'
+        apiVersion: '2025-12-15.clover'
       })
 
       const now = new Date()
@@ -244,11 +244,11 @@ export class RevenueTrackingService {
   }
 
   /**
-   * Get revenue breakdown by time period
-   */
+    * Get revenue breakdown by time period
+    */
   private static async getRevenueByPeriod(
     stripe: Stripe,
-    userId: number,
+    userId: string,
     startDate: Date,
     endDate: Date,
     interval: 'day' | 'week' | 'month'
@@ -302,9 +302,9 @@ export class RevenueTrackingService {
   }
 
   /**
-   * Get user's Stripe connection from database
-   */
-  private static async getStripeConnection(userId: number) {
+    * Get user's Stripe connection from database
+    */
+  private static async getStripeConnection(userId: string) {
     const connections = await db
       .select()
       .from(paymentProviderConnections)
@@ -325,9 +325,9 @@ export class RevenueTrackingService {
   }
 
   /**
-   * Refresh Stripe access token if expired
-   */
-  static async refreshStripeToken(userId: number): Promise<boolean> {
+    * Refresh Stripe access token if expired
+    */
+  static async refreshStripeToken(userId: string): Promise<boolean> {
     try {
       const connection = await this.getStripeConnection(userId)
       if (!connection || !connection.refresh_token) {

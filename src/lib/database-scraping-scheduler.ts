@@ -28,7 +28,7 @@ export interface ScrapingJobConfig {
 }
 
 export interface CreateJobParams {
-  competitorId: number
+  competitorId: string
   userId: string
   jobType: JobType
   url: string

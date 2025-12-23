@@ -10,16 +10,17 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { provider: string } }
+  context: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const authResult = await verifyAuth(request)
+    const { provider } = await context.params
+    const authResult = await verifyAuth()
+    
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = parseInt(authResult.user.id)
-    const { provider } = params
+    const userId = authResult.user.id
 
     // Trigger revenue sync for the user
     // This will update the last_synced_at timestamp
@@ -35,4 +36,3 @@ export async function POST(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
-

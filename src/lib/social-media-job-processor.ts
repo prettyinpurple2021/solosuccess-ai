@@ -426,7 +426,7 @@ export class SocialMediaJobProcessor {
   /**
    * Run analysis for a specific competitor manually
    */
-  async analyzeCompetitorManually(competitorId: number): Promise<any> {
+  async analyzeCompetitorManually(competitorId: string): Promise<any> {
     try {
       const [competitor] = await db
         .select()

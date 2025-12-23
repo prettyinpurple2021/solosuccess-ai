@@ -21,7 +21,7 @@ export async function POST(
 ) {
   try {
     const params = await context.params
-    const { id } = params
+    const { id: alertId } = params
     
     const ip = request.headers.get('x-forwarded-for') || 'unknown'
     const { allowed } = rateLimitByIp('alerts:acknowledge', ip, 60_000, 50)
@@ -33,11 +33,6 @@ export async function POST(
     
     if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const alertId = parseInt(id)
-    if (isNaN(alertId)) {
-      return NextResponse.json({ error: 'Invalid alert ID' }, { status: 400 })
     }
 
     // Verify alert belongs to user

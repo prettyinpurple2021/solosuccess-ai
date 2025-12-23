@@ -12,8 +12,6 @@ import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competit
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
 
-
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
@@ -44,10 +42,7 @@ export async function POST(
     }
 
     const { id } = await context.params;
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
-      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
-    }
+    const competitorId = id
 
     // Parse request body
     const body = await request.json().catch(() => ({}))
@@ -102,7 +97,7 @@ export async function POST(
         : [],
       marketPosition: existingCompetitor.market_position 
         ? {
-            ...existingCompetitor.market_position,
+            ...(existingCompetitor.market_position as any),
             targetMarkets: (existingCompetitor.market_position as any)?.targetMarkets || [],
             competitiveAdvantages: (existingCompetitor.market_position as any)?.competitiveAdvantages || [],
             marketSegments: (existingCompetitor.market_position as any)?.marketSegments || []
@@ -173,7 +168,7 @@ export async function POST(
     if (enrichmentResult.data?.socialMediaHandles) {
       const existingHandles = existingCompetitor.social_media_handles || {}
       updateData.social_media_handles = {
-        ...existingHandles,
+        ...(existingHandles as any),
         ...enrichmentResult.data.socialMediaHandles,
       }
     }
@@ -301,10 +296,7 @@ export async function GET(
     }
 
     const { id } = await context.params;
-    const competitorId = parseInt(id)
-    if (isNaN(competitorId)) {
-      return NextResponse.json({ error: 'Invalid competitor ID' }, { status: 400 })
-    }
+    const competitorId = id
 
     // Get competitor profile to check enrichment status
     const [competitor] = await db
@@ -379,6 +371,7 @@ export async function GET(
           'Social media handle discovery',
           'Key personnel identification',
           'Competitive advantage analysis',
+          'Vulnerability identification'
         ]
       }
     })

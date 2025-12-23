@@ -26,16 +26,16 @@ const PostSchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { provider: string } }
+  context: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const authResult = await verifyAuth(request)
+    const { provider } = await context.params
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = parseInt(authResult.user.id)
-    const { provider } = params
+    const userId = authResult.user.id
     const { searchParams } = new URL(request.url)
     const action = searchParams.get('action')
 
@@ -76,16 +76,16 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { provider: string } }
+  context: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const authResult = await verifyAuth(request)
+    const { provider } = await context.params
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = parseInt(authResult.user.id)
-    const { provider } = params
+    const userId = authResult.user.id
     const body = await request.json()
     const validation = PostSchema.safeParse(body)
 
@@ -184,4 +184,3 @@ export async function POST(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
-

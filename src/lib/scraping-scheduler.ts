@@ -7,7 +7,7 @@ import type { CompetitorProfile } from './competitor-intelligence-types'
 // Types for scheduling system
 export interface ScrapingJob {
   id: string
-  competitorId: number
+  competitorId: string
   userId: string
   jobType: 'website' | 'pricing' | 'products' | 'jobs' | 'social'
   url: string
@@ -115,7 +115,7 @@ export class ScrapingScheduler {
    * Schedule a new scraping job
    */
   async scheduleJob(
-    competitorId: number,
+    competitorId: string,
     userId: string,
     jobType: ScrapingJob['jobType'],
     url: string,
@@ -293,7 +293,7 @@ export class ScrapingScheduler {
   /**
    * Get all jobs for a competitor
    */
-  getCompetitorJobs(competitorId: number): ScrapingJob[] {
+  getCompetitorJobs(competitorId: string): ScrapingJob[] {
     return Array.from(this.jobQueue.values()).filter(job => job.competitorId === competitorId)
   }
 
@@ -581,12 +581,12 @@ export class ScrapingScheduler {
     this.updateMetrics()
   }
 
-  private generateJobId(competitorId: number, jobType: string, url: string): string {
+  private generateJobId(competitorId: string, jobType: string, url: string): string {
     const hash = Buffer.from(`${competitorId}-${jobType}-${url}`).toString('base64')
     return `job_${hash.replace(/[^a-zA-Z0-9]/g, '').substring(0, 16)}`
   }
 
-  private calculateJobPriority(competitorId: number, jobType: string): ScrapingJob['priority'] {
+  private calculateJobPriority(competitorId: string, jobType: string): ScrapingJob['priority'] {
     // This would typically query the competitor's threat level from the database
     // For now, we'll use a simple heuristic
     

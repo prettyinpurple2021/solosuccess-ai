@@ -64,7 +64,7 @@ export interface MonitoringConfig {
 
 // Competitor Profile
 export interface CompetitorProfile {
-  id: number;
+  id: string; // UUID text in DB
   userId: string;
   name: string;
   domain?: string;
@@ -151,8 +151,8 @@ export interface Recommendation {
 
 // Intelligence Data Entry
 export interface IntelligenceData {
-  id: number;
-  competitorId: number;
+  id: string; // UUID text in DB
+  competitorId: string;
   userId: string;
   sourceType: SourceType;
   sourceUrl?: string;
@@ -185,10 +185,10 @@ export interface ActionItem {
 
 // Competitor Alert
 export interface CompetitorAlert {
-  id: number;
-  competitorId: number;
+  id: string; // UUID text in DB
+  competitorId: string;
   userId: string;
-  intelligenceId?: number;
+  intelligenceId?: string;
   alertType: string;
   severity: AlertSeverity;
   title: string;
@@ -240,7 +240,7 @@ export interface CompetitorFilters {
 }
 
 export interface IntelligenceFilters {
-  competitorIds?: number[];
+  competitorIds?: string[];
   sourceTypes?: SourceType[];
   dataTypes?: string[];
   importance?: ImportanceLevel[];
@@ -252,7 +252,7 @@ export interface IntelligenceFilters {
 }
 
 export interface AlertFilters {
-  competitorIds?: number[];
+  competitorIds?: string[];
   alertTypes?: AlertType[];
   severity?: AlertSeverity[];
   isRead?: boolean;

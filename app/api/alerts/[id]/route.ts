@@ -55,8 +55,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params
-    const { id } = params
+    const { id } = await context.params
     
     const { user, error } = await authenticateRequest()
     
@@ -64,10 +63,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const alertId = parseInt(id)
-    if (isNaN(alertId)) {
-      return NextResponse.json({ error: 'Invalid alert ID' }, { status: 400 })
-    }
+    const alertId = id
 
     // Get alert with competitor and intelligence info
     const alert = await db
@@ -155,8 +151,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params
-    const { id } = params
+    const { id } = await context.params
     
     const { user, error } = await authenticateRequest()
     
@@ -164,10 +159,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const alertId = parseInt(id)
-    if (isNaN(alertId)) {
-      return NextResponse.json({ error: 'Invalid alert ID' }, { status: 400 })
-    }
+    const alertId = id
 
     const body = await request.json()
     const parsed = AlertUpdateSchema.safeParse(body)
@@ -304,8 +296,7 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params
-    const { id } = params
+    const { id } = await context.params
     
     const { user, error } = await authenticateRequest()
     
@@ -313,10 +304,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const alertId = parseInt(id)
-    if (isNaN(alertId)) {
-      return NextResponse.json({ error: 'Invalid alert ID' }, { status: 400 })
-    }
+    const alertId = id
 
     // Verify alert belongs to user
     const existingAlert = await db

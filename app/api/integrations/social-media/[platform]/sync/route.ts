@@ -13,16 +13,17 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { platform: string } }
+  context: { params: Promise<{ platform: string }> }
 ) {
   try {
-    const authResult = await verifyAuth(request)
+    const { platform } = await context.params
+    const authResult = await verifyAuth()
+    
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userId = authResult.user.id
-    const platform = params.platform
 
     // Validate platform
     const validPlatforms = ['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']
@@ -75,4 +76,3 @@ export async function POST(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
-

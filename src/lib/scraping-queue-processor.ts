@@ -135,7 +135,7 @@ export class ScrapingQueueProcessor {
    * Add a new job to the queue
    */
   async addJob(params: {
-    competitorId: number
+    competitorId: string
     userId: string
     jobType: 'website' | 'pricing' | 'products' | 'jobs' | 'social'
     url: string
@@ -179,7 +179,7 @@ export class ScrapingQueueProcessor {
   /**
    * Get jobs for a specific competitor
    */
-  async getCompetitorJobs(competitorId: number, userId: string): Promise<any[]> {
+  async getCompetitorJobs(competitorId: string, userId: string): Promise<any[]> {
     return await db
       .select()
       .from(scrapingJobs)
@@ -195,7 +195,7 @@ export class ScrapingQueueProcessor {
   /**
    * Pause all jobs for a competitor
    */
-  async pauseCompetitorJobs(competitorId: number, userId: string): Promise<void> {
+  async pauseCompetitorJobs(competitorId: string, userId: string): Promise<void> {
     const jobs = await this.getCompetitorJobs(competitorId, userId)
     
     await Promise.all(
@@ -208,7 +208,7 @@ export class ScrapingQueueProcessor {
   /**
    * Resume all jobs for a competitor
    */
-  async resumeCompetitorJobs(competitorId: number, userId: string): Promise<void> {
+  async resumeCompetitorJobs(competitorId: string, userId: string): Promise<void> {
     const jobs = await this.getCompetitorJobs(competitorId, userId)
     
     await Promise.all(
@@ -221,7 +221,7 @@ export class ScrapingQueueProcessor {
   /**
    * Delete all jobs for a competitor
    */
-  async deleteCompetitorJobs(competitorId: number, userId: string): Promise<void> {
+  async deleteCompetitorJobs(competitorId: string, userId: string): Promise<void> {
     const jobs = await this.getCompetitorJobs(competitorId, userId)
     
     await Promise.all(
@@ -232,7 +232,7 @@ export class ScrapingQueueProcessor {
   /**
    * Create default monitoring jobs for a new competitor
    */
-  async createDefaultJobs(competitorId: number, userId: string, competitorData: {
+  async createDefaultJobs(competitorId: string, userId: string, competitorData: {
     domain?: string
     socialMediaHandles?: any
   }): Promise<string[]> {
@@ -377,7 +377,7 @@ export class ScrapingQueueProcessor {
   /**
    * Update job frequency based on competitor importance
    */
-  async updateJobFrequencies(competitorId: number, userId: string, threatLevel: string): Promise<void> {
+  async updateJobFrequencies(competitorId: string, userId: string, threatLevel: string): Promise<void> {
     const jobs = await this.getCompetitorJobs(competitorId, userId)
     
     // Adjust frequencies based on threat level

@@ -13,7 +13,7 @@ import type {
 
 // Echo-specific marketing intelligence types
 export interface MarketingIntelligenceAnalysis {
-  competitorId: number
+  competitorId: string
   analysisType: 'content_strategy' | 'brand_positioning' | 'campaign_effectiveness' | 'messaging_analysis' | 'content_gap_analysis'
   insights: MarketingInsight[]
   recommendations: MarketingRecommendation[]
@@ -37,7 +37,7 @@ export interface MarketingRecommendation extends Recommendation {
 }
 
 export interface ContentStrategyAnalysis {
-  competitorId: number
+  competitorId: string
   contentThemes: ContentTheme[]
   messagingPatterns: MessagingPattern[]
   contentGaps: ContentGap[]
@@ -91,7 +91,7 @@ export interface ContentPerformanceMetrics {
 }
 
 export interface BrandPositioningAnalysis {
-  competitorId: number
+  competitorId: string
   positioningStatement: string
   targetMarket: string[]
   valueProposition: string[]
@@ -104,7 +104,7 @@ export interface BrandPositioningAnalysis {
 }
 
 export interface CampaignEffectivenessAnalysis {
-  competitorId: number
+  competitorId: string
   campaigns: DetectedCampaign[]
   campaignTypes: CampaignTypeEffectiveness[]
   overallEffectiveness: number
@@ -162,7 +162,7 @@ export class EchoMarketingIntelligence {
   /**
    * Analyze competitor's content strategy and messaging patterns
    */
-  async analyzeContentStrategy(competitorId: number, days: number = 30): Promise<ContentStrategyAnalysis> {
+  async analyzeContentStrategy(competitorId: string, days: number = 30): Promise<ContentStrategyAnalysis> {
     // Get competitor data
     const competitor = await this.getCompetitorProfile(competitorId)
     const socialMediaData = await this.getSocialMediaIntelligence(competitorId, days)
@@ -191,7 +191,7 @@ export class EchoMarketingIntelligence {
   /**
    * Analyze competitor's brand positioning and messaging
    */
-  async analyzeBrandPositioning(competitorId: number, days: number = 60): Promise<BrandPositioningAnalysis> {
+  async analyzeBrandPositioning(competitorId: string, days: number = 60): Promise<BrandPositioningAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const allIntelligenceData = await this.getAllIntelligenceData(competitorId, days)
 
@@ -213,7 +213,7 @@ export class EchoMarketingIntelligence {
   /**
    * Analyze effectiveness of competitor's marketing campaigns
    */
-  async analyzeCampaignEffectiveness(competitorId: number, days: number = 90): Promise<CampaignEffectivenessAnalysis> {
+  async analyzeCampaignEffectiveness(competitorId: string, days: number = 90): Promise<CampaignEffectivenessAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const socialMediaData = await this.getSocialMediaIntelligence(competitorId, days)
     const newsData = await this.getNewsIntelligence(competitorId, days)
@@ -236,7 +236,7 @@ export class EchoMarketingIntelligence {
   /**
    * Identify content gaps and marketing opportunities
    */
-  async analyzeContentGaps(competitorIds: number[], userCompanyData?: any): Promise<ContentGap[]> {
+  async analyzeContentGaps(competitorIds: string[], userCompanyData?: any): Promise<ContentGap[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -260,7 +260,7 @@ export class EchoMarketingIntelligence {
   /**
    * Generate marketing intelligence briefing
    */
-  async generateMarketingBriefing(competitorIds: number[], timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly'): Promise<string> {
+  async generateMarketingBriefing(competitorIds: string[], timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly'): Promise<string> {
     const days = timeframe === 'daily' ? 1 : timeframe === 'weekly' ? 7 : 30
 
     const briefingData = await Promise.all(
@@ -285,7 +285,7 @@ export class EchoMarketingIntelligence {
 
   // Private helper methods
 
-  private async getCompetitorProfile(competitorId: number): Promise<CompetitorProfile> {
+  private async getCompetitorProfile(competitorId: string): Promise<CompetitorProfile> {
     const result = await db
       .select()
       .from(competitorProfiles)
@@ -299,7 +299,7 @@ export class EchoMarketingIntelligence {
     return (result[0] as unknown) as CompetitorProfile
   }
 
-  private async getAllIntelligenceData(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getAllIntelligenceData(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -317,7 +317,7 @@ export class EchoMarketingIntelligence {
     return (rows as unknown) as IntelligenceData[]
   }
 
-  private async getSocialMediaIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getSocialMediaIntelligence(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -336,7 +336,7 @@ export class EchoMarketingIntelligence {
     return (rows as unknown) as IntelligenceData[]
   }
 
-  private async getWebsiteIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getWebsiteIntelligence(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -355,7 +355,7 @@ export class EchoMarketingIntelligence {
     return (rows as unknown) as IntelligenceData[]
   }
 
-  private async getNewsIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getNewsIntelligence(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -596,7 +596,7 @@ As Echo, create a comprehensive marketing briefing with:
 Format your response as a professional marketing briefing document (Markdown).`
   }
 
-  private parseContentStrategyAnalysis(analysisText: string, competitorId: number): ContentStrategyAnalysis {
+  private parseContentStrategyAnalysis(analysisText: string, competitorId: string): ContentStrategyAnalysis {
     try {
       const jsonMatch = analysisText.match(/\{[\s\S]*\}/)
       const jsonString = jsonMatch ? jsonMatch[0] : analysisText
@@ -627,7 +627,7 @@ Format your response as a professional marketing briefing document (Markdown).`
     }
   }
 
-  private parseBrandPositioningAnalysis(analysisText: string, competitorId: number): BrandPositioningAnalysis {
+  private parseBrandPositioningAnalysis(analysisText: string, competitorId: string): BrandPositioningAnalysis {
     try {
       const jsonMatch = analysisText.match(/\{[\s\S]*\}/)
       const jsonString = jsonMatch ? jsonMatch[0] : analysisText
@@ -662,7 +662,7 @@ Format your response as a professional marketing briefing document (Markdown).`
     }
   }
 
-  private parseCampaignEffectivenessAnalysis(analysisText: string, competitorId: number): CampaignEffectivenessAnalysis {
+  private parseCampaignEffectivenessAnalysis(analysisText: string, competitorId: string): CampaignEffectivenessAnalysis {
     try {
       const jsonMatch = analysisText.match(/\{[\s\S]*\}/)
       const jsonString = jsonMatch ? jsonMatch[0] : analysisText
@@ -706,7 +706,7 @@ Format your response as a professional marketing briefing document (Markdown).`
   }
 
   private async storeMarketingIntelligence(
-    competitorId: number,
+    competitorId: string,
     analysisType: string,
     analysis: any
   ): Promise<void> {
@@ -730,7 +730,7 @@ Format your response as a professional marketing briefing document (Markdown).`
 
     // Store in intelligence data table
     await db.insert(intelligenceData).values({
-      competitor_id: Number(competitorId),
+      competitor_id: competitorId,
       user_id: owningUserId,
       source_type: 'manual',
       data_type: `echo_${analysisType}`,

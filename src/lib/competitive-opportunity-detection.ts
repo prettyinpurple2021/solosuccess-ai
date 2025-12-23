@@ -30,6 +30,7 @@ export type OpportunityType =
   | 'service_improvement'
   | 'technology_advantage'
   | 'market_entry'
+  | 'geographic'
 
 export interface OpportunityEvidence {
   type: 'customer_complaint' | 'review' | 'social_media' | 'hiring_data' | 'pricing_data' | 'product_data' | 'news' | 'partnership_change'
@@ -101,7 +102,7 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitor_id, Number(competitorId)),
+            eq(intelligenceData.competitor_id, competitorId),
             gte(intelligenceData.collected_at, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)) // Last 30 days
           )
         )
@@ -135,7 +136,7 @@ export class CompetitiveOpportunityDetector {
                 content: c.extractedData?.content || c.rawContent?.toString() || '',
                 sentiment: c.extractedData?.sentiment?.score,
                 relevance: 0.8,
-                collectedAt: c.collectedAt
+                collectedAt: c.collected_at
               })),
               opportunityPotential: this.calculateOpportunityPotential(complaints.length, avgSentiment)
             }
@@ -169,7 +170,7 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            inArray(intelligenceData.competitor_id, competitorIds.map((id) => Number(id))),
+            inArray(intelligenceData.competitor_id, competitorIds),
             inArray(intelligenceData.data_type, ['product', 'service', 'website', 'pricing'])
           )
         )
@@ -224,8 +225,8 @@ export class CompetitiveOpportunityDetector {
           )
         )
 
-      const competitorPricing = pricingData.filter((d: any) => d.competitor_id === Number(competitorId))
-      const marketPricing = pricingData.filter((d: any) => d.competitor_id !== Number(competitorId))
+      const competitorPricing = pricingData.filter((d: any) => d.competitor_id === competitorId)
+      const marketPricing = pricingData.filter((d: any) => d.competitor_id !== competitorId)
 
       for (const pricing of competitorPricing) {
         const analysis = this.analyzePricingPosition(pricing, marketPricing)
@@ -264,7 +265,7 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitor_id, Number(competitorId)),
+            eq(intelligenceData.competitor_id, competitorId),
             eq(intelligenceData.data_type, 'job_posting'),
             gte(intelligenceData.collected_at, new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)) // Last 60 days
           )
@@ -289,7 +290,7 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitor_id, Number(competitorId)),
+            eq(intelligenceData.competitor_id, competitorId),
             sql`${intelligenceData.data_type} IN ('social_media', 'news')`,
             gte(intelligenceData.collected_at, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
           )
@@ -322,7 +323,7 @@ export class CompetitiveOpportunityDetector {
         .from(intelligenceData)
         .where(
           and(
-            eq(intelligenceData.competitor_id, Number(competitorId)),
+            eq(intelligenceData.competitor_id, competitorId),
             sql`${intelligenceData.data_type} IN ('news', 'social_media', 'press_release')`,
             gte(intelligenceData.collected_at, new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)) // Last 90 days
           )

@@ -14,7 +14,7 @@ import {
 
 interface PricingIntelligenceData {
   competitor: {
-    id: number
+    id: string
     name: string
     threat_level: string
     industry?: string

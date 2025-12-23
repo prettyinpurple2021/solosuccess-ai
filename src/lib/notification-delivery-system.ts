@@ -545,8 +545,8 @@ Received: ${new Date(alert.created_at).toLocaleString()}
   ) {
     // Create a summary alert for batched notifications
     const summaryAlert: CompetitorAlert = {
-      id: 0,
-      competitor_id: 0,
+      id: 'batch_summary',
+      competitor_id: 'multiple_competitors',
       alert_type: 'social_activity' as AlertType,
       severity: 'info' as AlertSeverity,
       title: `${alerts.length} New Competitor Alerts`,
@@ -574,7 +574,7 @@ Received: ${new Date(alert.created_at).toLocaleString()}
 
       const settings = await db.select().from(userSettings).where(
         and(
-          eq(userSettings.user_id, parseInt(userId)),
+          eq(userSettings.user_id, userId),
           eq(userSettings.category, 'notification_preferences')
         )
       ).limit(1);
@@ -597,7 +597,7 @@ Received: ${new Date(alert.created_at).toLocaleString()}
 
       const existingSettings = await db.select().from(userSettings).where(
         and(
-          eq(userSettings.user_id, parseInt(userId)),
+          eq(userSettings.user_id, userId),
           eq(userSettings.category, 'notification_preferences')
         )
       ).limit(1);
@@ -608,7 +608,7 @@ Received: ${new Date(alert.created_at).toLocaleString()}
           .where(eq(userSettings.id, existingSettings[0].id));
       } else {
         await db.insert(userSettings).values({
-          user_id: parseInt(userId),
+          user_id: userId,
           category: 'notification_preferences',
           settings: preferences
         });

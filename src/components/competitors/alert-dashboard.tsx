@@ -83,7 +83,7 @@ export function AlertDashboard({ className }: AlertDashboardProps) {
     refreshInterval: 30000,
   });
 
-  const handleMarkAsRead = async (alertId: number) => {
+  const handleMarkAsRead = async (alertId: string) => {
     try {
       await markAsRead(alertId);
     } catch (error) {
@@ -91,7 +91,7 @@ export function AlertDashboard({ className }: AlertDashboardProps) {
     }
   };
 
-  const handleArchiveAlert = async (alertId: number) => {
+  const handleArchiveAlert = async (alertId: string) => {
     try {
       await archiveAlert(alertId);
     } catch (error) {

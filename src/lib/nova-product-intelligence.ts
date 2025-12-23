@@ -13,7 +13,7 @@ import type {
 
 // Nova-specific product and design intelligence types
 export interface ProductIntelligenceAnalysis {
-  competitorId: number
+  competitorId: string
   analysisType: 'product_features' | 'ux_trends' | 'design_patterns' | 'product_gaps' | 'roadmap_prediction'
   insights: ProductInsight[]
   recommendations: ProductRecommendation[]
@@ -44,7 +44,7 @@ export interface ProductRecommendation {
 }
 
 export interface UXAnalysis {
-  competitorId: number
+  competitorId: string
   trends: ProductInsight[]
   recommendations: ProductRecommendation[]
   confidence: number
@@ -52,7 +52,7 @@ export interface UXAnalysis {
 }
 
 export interface DesignPatternsAnalysis {
-  competitorId: number
+  competitorId: string
   patterns: ProductInsight[]
   recommendations: ProductRecommendation[]
   confidence: number
@@ -67,7 +67,7 @@ export interface ProductGapsAnalysis {
 }
 
 export interface RoadmapPrediction {
-  competitorId: number
+  competitorId: string
   predictions: ProductInsight[]
   confidence: number
   analyzedAt: Date
@@ -85,7 +85,7 @@ export interface ProductGap {
 }
 
 export interface ProductFeatureAnalysis {
-  competitorId: number
+  competitorId: string
   features: {
     new: ProductInsight[]
     updated: ProductInsight[]
@@ -108,7 +108,7 @@ export interface DesignPattern {
 }
 
 export interface ProductRoadmapPrediction {
-  competitorId: number
+  competitorId: string
   predictions: ProductInsight[]
   timeline: string
   confidence: number
@@ -127,7 +127,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze competitor product features and updates
    */
-  async analyzeProductFeatures(competitorId: number, userId: string, days: number = 60): Promise<ProductFeatureAnalysis> {
+  async analyzeProductFeatures(competitorId: string, userId: string, days: number = 60): Promise<ProductFeatureAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const websiteData = await this.getWebsiteIntelligence(competitorId, days)
     const appStoreData = await this.getAppStoreIntelligence(competitorId, days)
@@ -156,7 +156,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze UX/UI trends from competitor websites and apps
    */
-  async analyzeUXTrends(competitorId: number, userId: string, days: number = 90): Promise<UXAnalysis> {
+  async analyzeUXTrends(competitorId: string, userId: string, days: number = 90): Promise<UXAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const websiteData = await this.getWebsiteIntelligence(competitorId, days)
     const appStoreData = await this.getAppStoreIntelligence(competitorId, days)
@@ -179,7 +179,7 @@ export class NovaProductIntelligence {
   /**
    * Identify product gaps and missing features/markets
    */
-  async analyzeProductGaps(competitorIds: number[], userProductData?: any, userId?: string): Promise<ProductGap[]> {
+  async analyzeProductGaps(competitorIds: string[], userProductData?: any, userId?: string): Promise<ProductGap[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -213,7 +213,7 @@ export class NovaProductIntelligence {
   /**
    * Analyze design patterns for competitive advantage identification
    */
-  async analyzeDesignPatterns(competitorIds: number[], userId?: string): Promise<ProductInsight[]> {
+  async analyzeDesignPatterns(competitorIds: string[], userId?: string): Promise<ProductInsight[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -231,7 +231,7 @@ export class NovaProductIntelligence {
       maxOutputTokens: 1800,
     })
 
-    const patterns = this.parseDesignPatternsAnalysis(text, competitorIds[0] || 0)
+    const patterns = this.parseDesignPatternsAnalysis(text, competitorIds[0] || '0')
 
     // Store design pattern analysis
     for (const competitorId of competitorIds) {
@@ -244,7 +244,7 @@ export class NovaProductIntelligence {
   /**
    * Predict product roadmap based on competitor development patterns
    */
-  async predictProductRoadmap(competitorId: number, userId?: string): Promise<RoadmapPrediction> {
+  async predictProductRoadmap(competitorId: string, userId?: string): Promise<RoadmapPrediction> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const hiringData = await this.getHiringIntelligence(competitorId, 180)
     const productData = await this.getWebsiteIntelligence(competitorId, 180)
@@ -272,7 +272,7 @@ export class NovaProductIntelligence {
    * Generate product intelligence briefing
    */
   async generateProductBriefing(
-    competitorIds: number[], 
+    competitorIds: string[], 
     timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly'
   ): Promise<string> {
     const days = timeframe === 'daily' ? 1 : timeframe === 'weekly' ? 7 : 30
@@ -299,7 +299,7 @@ export class NovaProductIntelligence {
   }
 
   // Private helper methods (minimal implementations for build)
-  private async getCompetitorProfile(competitorId: number): Promise<any> {
+  private async getCompetitorProfile(competitorId: string): Promise<any> {
     const [competitor] = await db.select()
       .from(competitorProfiles)
       .where(eq(competitorProfiles.id, competitorId))
@@ -307,15 +307,15 @@ export class NovaProductIntelligence {
     return competitor || {}
   }
 
-  private async getWebsiteIntelligence(competitorId: number, days: number): Promise<any[]> {
+  private async getWebsiteIntelligence(competitorId: string, days: number): Promise<any[]> {
     return []
   }
 
-  private async getAppStoreIntelligence(competitorId: number, days: number): Promise<any[]> {
+  private async getAppStoreIntelligence(competitorId: string, days: number): Promise<any[]> {
     return []
   }
 
-  private async getSocialMediaIntelligence(competitorId: number, days: number): Promise<any[]> {
+  private async getSocialMediaIntelligence(competitorId: string, days: number): Promise<any[]> {
     return []
   }
 
@@ -323,7 +323,7 @@ export class NovaProductIntelligence {
     return `Analyze product features for ${competitor.name || 'competitor'}`
   }
 
-  private parseProductFeatureAnalysis(text: string, competitorId: number): ProductFeatureAnalysis {
+  private parseProductFeatureAnalysis(text: string, competitorId: string): ProductFeatureAnalysis {
     return {
       competitorId,
       features: { new: [], updated: [], deprecated: [] },
@@ -333,7 +333,7 @@ export class NovaProductIntelligence {
     }
   }
 
-  private async storeProductIntelligence(competitorId: number, type: string, analysis: any, userId: string): Promise<void> {
+  private async storeProductIntelligence(competitorId: string, type: string, analysis: any, userId: string): Promise<void> {
     // Store in database - minimal implementation
   }
 
@@ -341,7 +341,7 @@ export class NovaProductIntelligence {
     return `Analyze UX trends for ${competitor.name || 'competitor'}`
   }
 
-  private parseUXTrendsAnalysis(text: string, competitorId: number): any {
+  private parseUXTrendsAnalysis(text: string, competitorId: string): any {
     return { competitorId, trends: [], recommendations: [], confidence: 0.5, analyzedAt: new Date() }
   }
 
@@ -349,7 +349,7 @@ export class NovaProductIntelligence {
     return `Analyze design patterns for ${competitor.name || 'competitor'}`
   }
 
-  private parseDesignPatternsAnalysis(text: string, competitorId: number): any {
+  private parseDesignPatternsAnalysis(text: string, competitorId: string): any {
     return { competitorId, patterns: [], recommendations: [], confidence: 0.5, analyzedAt: new Date() }
   }
 
@@ -365,7 +365,7 @@ export class NovaProductIntelligence {
     return `Predict roadmap for ${competitor.name || 'competitor'}`
   }
 
-  private parseRoadmapPrediction(text: string, competitorId: number): any {
+  private parseRoadmapPrediction(text: string, competitorId: string): any {
     return { competitorId, predictions: [], confidence: 0.5, analyzedAt: new Date() }
   }
 
@@ -373,11 +373,11 @@ export class NovaProductIntelligence {
     return `Product intelligence briefing for ${timeframe}`
   }
 
-  private async getHiringIntelligence(competitorId: number, days: number): Promise<any[]> {
+  private async getHiringIntelligence(competitorId: string, days: number): Promise<any[]> {
     return []
   }
 
-  private async getProductAnnouncements(competitorId: number, days: number): Promise<any[]> {
+  private async getProductAnnouncements(competitorId: string, days: number): Promise<any[]> {
     return []
   }
 

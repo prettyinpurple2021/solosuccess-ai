@@ -18,7 +18,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 const createJobSchema = z.object({
-  competitorId: z.number(),
+  competitorId: z.string(),
   jobType: z.enum(['website', 'pricing', 'products', 'jobs', 'social']),
   url: z.string().url(),
   priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     // Create the scraping job
     const jobId = await queueProcessor.addJob({
-      ...validatedData,
+      ...(validatedData as any),
       userId: user.id
     })
 

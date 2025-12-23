@@ -5,8 +5,8 @@ import { AlertSeverity, AlertType } from '@/lib/competitor-alert-system';
 
 
 export interface CompetitorAlert {
-  id: number;
-  competitor_id: number;
+  id: string;
+  competitor_id: string;
   alert_type: AlertType;
   severity: AlertSeverity;
   title: string;
@@ -40,9 +40,9 @@ interface UseCompetitorAlertsReturn {
   loading: boolean;
   error: string | null;
   refreshAlerts: () => Promise<void>;
-  markAsRead: (alertId: number) => Promise<void>;
-  archiveAlert: (alertId: number) => Promise<void>;
-  processIntelligence: (intelligenceId: number) => Promise<void>;
+  markAsRead: (alertId: string) => Promise<void>;
+  archiveAlert: (alertId: string) => Promise<void>;
+  processIntelligence: (intelligenceId: string) => Promise<void>;
 }
 
 export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): UseCompetitorAlertsReturn {
@@ -93,7 +93,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
     await fetchAlerts();
   }, [fetchAlerts]);
 
-  const markAsRead = useCallback(async (alertId: number) => {
+  const markAsRead = useCallback(async (alertId: string) => {
     try {
       const response = await fetch(`/api/competitors/alerts/${alertId}`, {
         method: 'PATCH',
@@ -122,7 +122,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
     }
   }, [stats]);
 
-  const archiveAlert = useCallback(async (alertId: number) => {
+  const archiveAlert = useCallback(async (alertId: string) => {
     try {
       const response = await fetch(`/api/competitors/alerts/${alertId}`, {
         method: 'PATCH',
@@ -159,7 +159,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
     }
   }, [alerts, stats]);
 
-  const processIntelligence = useCallback(async (intelligenceId: number) => {
+  const processIntelligence = useCallback(async (intelligenceId: string) => {
     try {
       const response = await fetch('/api/competitors/alerts', {
         method: 'POST',
@@ -214,7 +214,7 @@ export function useCompetitorAlerts(options: UseCompetitorAlertsOptions = {}): U
 }
 
 // Hook for competitor-specific alerts
-export function useCompetitorSpecificAlerts(competitorId: number, limit: number = 20) {
+export function useCompetitorSpecificAlerts(competitorId: string, limit: number = 20) {
   const [alerts, setAlerts] = useState<CompetitorAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

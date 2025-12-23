@@ -12,13 +12,13 @@ import {
   TrendingUp, DollarSign, Target, BarChart3, Lightbulb, AlertTriangle, CheckCircle, Clock, Zap} from 'lucide-react'
 
 interface BlazeGrowthIntelligenceProps {
-  competitorId: number
+  competitorId: string
   competitorName: string
   threatLevel: 'low' | 'medium' | 'high' | 'critical'
 }
 
 interface PricingAnalysis {
-  competitorId: number
+  competitorId: string
   pricingModel: {
     type: string
     currency: string

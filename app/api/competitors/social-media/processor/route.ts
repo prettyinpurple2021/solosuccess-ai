@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const requestSchema = z.object({
       action: z.enum(['start', 'stop', 'process_now', 'analyze_competitor']),
-      competitor_id: z.number().optional(),
+      competitor_id: z.string().optional(),
       interval_minutes: z.number().min(5).max(1440).optional() // 5 minutes to 24 hours
     });
 
@@ -210,7 +210,7 @@ export async function PUT(request: NextRequest) {
 
     const existingSettings = await db.select().from(userSettings).where(
         and(
-            eq(userSettings.user_id, parseInt(user.id)), // Ensure number
+            eq(userSettings.user_id, user.id),
             eq(userSettings.category, 'processor')
         )
     ).limit(1);
@@ -229,7 +229,7 @@ export async function PUT(request: NextRequest) {
             .where(eq(userSettings.id, existingSettings[0].id));
     } else {
         await db.insert(userSettings).values({
-            user_id: parseInt(user.id),
+            user_id: user.id,
             category: 'processor',
             settings: newSettingsData
         });

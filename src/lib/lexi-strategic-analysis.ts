@@ -13,7 +13,7 @@ import type {
 
 // Lexi-specific strategic analysis types
 export interface StrategicAnalysis {
-  competitorId: number
+  competitorId: string
   analysisType: 'competitive_positioning' | 'market_trends' | 'strategic_moves' | 'threat_assessment' | 'opportunity_identification'
   insights: StrategicInsight[]
   recommendations: StrategicRecommendation[]
@@ -48,7 +48,7 @@ export interface DataPoint {
 }
 
 export interface CompetitivePositioningAnalysis {
-  competitorId: number
+  competitorId: string
   marketPosition: MarketPositionAnalysis
   competitiveAdvantages: CompetitiveAdvantage[]
   vulnerabilities: CompetitiveVulnerability[]
@@ -101,7 +101,7 @@ export interface MarketShareAnalysis {
 }
 
 export interface CompetitorShare {
-  competitorId: number
+  competitorId: string
   name: string
   estimatedShare: number
   trend: 'gaining' | 'losing' | 'stable'
@@ -116,7 +116,7 @@ export interface PositioningMapData {
 }
 
 export interface PositionedCompetitor {
-  competitorId: number
+  competitorId: string
   name: string
   xValue: number
   yValue: number
@@ -171,7 +171,7 @@ export interface IndustryTrend {
 }
 
 export interface CompetitorTrend {
-  competitorId: number
+  competitorId: string
   trend: string
   evidence: string[]
   confidence: number
@@ -208,7 +208,7 @@ export interface TrendPrediction {
 }
 
 export interface StrategicMoveAnalysis {
-  competitorId: number
+  competitorId: string
   detectedMoves: StrategicMove[]
   movePatterns: MovePattern[]
   predictedMoves: PredictedMove[]
@@ -255,7 +255,7 @@ export interface ResponseStrategy {
 }
 
 export interface ThreatAssessment {
-  competitorId: number
+  competitorId: string
   overallThreatLevel: 'critical' | 'high' | 'medium' | 'low'
   threatCategories: ThreatCategory[]
   competitiveThreats: CompetitiveThreat[]
@@ -302,7 +302,7 @@ export class LexiStrategicAnalysis {
   /**
    * Perform comprehensive competitive positioning analysis
    */
-  async analyzeCompetitivePositioning(competitorId: number, userId: string): Promise<CompetitivePositioningAnalysis> {
+  async analyzeCompetitivePositioning(competitorId: string, userId: string): Promise<CompetitivePositioningAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const allIntelligence = await this.getAllIntelligenceData(competitorId, 90)
     const marketData = await this.getMarketIntelligence(competitor.industry || '', 60)
@@ -325,7 +325,7 @@ export class LexiStrategicAnalysis {
   /**
    * Analyze market trends based on competitor activities
    */
-  async analyzeMarketTrends(competitorIds: number[], userId: string, industry?: string): Promise<MarketTrendAnalysis> {
+  async analyzeMarketTrends(competitorIds: string[], userId: string, industry?: string): Promise<MarketTrendAnalysis> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -358,7 +358,7 @@ export class LexiStrategicAnalysis {
   /**
    * Predict strategic moves based on competitor hiring and investments
    */
-  async analyzeStrategicMoves(competitorId: number, userId: string): Promise<StrategicMoveAnalysis> {
+  async analyzeStrategicMoves(competitorId: string, userId: string): Promise<StrategicMoveAnalysis> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const hiringData = await this.getHiringIntelligence(competitorId, 180)
     const investmentData = await this.getInvestmentIntelligence(competitorId, 365)
@@ -387,7 +387,7 @@ export class LexiStrategicAnalysis {
   /**
    * Build competitive threat assessment with actionable recommendations
    */
-  async assessCompetitiveThreats(competitorId: number, userId: string): Promise<ThreatAssessment> {
+  async assessCompetitiveThreats(competitorId: string, userId: string): Promise<ThreatAssessment> {
     const competitor = await this.getCompetitorProfile(competitorId)
     const recentIntelligence = await this.getAllIntelligenceData(competitorId, 60)
     const competitorProfile = await this.getCompetitorProfile(competitorId)
@@ -410,7 +410,7 @@ export class LexiStrategicAnalysis {
   /**
    * Identify market opportunities based on competitor gaps
    */
-  async identifyMarketOpportunities(competitorIds: number[], userId: string): Promise<EmergingOpportunity[]> {
+  async identifyMarketOpportunities(competitorIds: string[], userId: string): Promise<EmergingOpportunity[]> {
     const competitors = await Promise.all(
       competitorIds.map(id => this.getCompetitorProfile(id))
     )
@@ -442,7 +442,7 @@ export class LexiStrategicAnalysis {
    * Generate strategic intelligence briefing
    */
   async generateStrategicBriefing(
-    competitorIds: number[], 
+    competitorIds: string[], 
     timeframe: 'daily' | 'weekly' | 'monthly' = 'weekly'
   ): Promise<string> {
     const days = timeframe === 'daily' ? 1 : timeframe === 'weekly' ? 7 : 30
@@ -470,12 +470,12 @@ export class LexiStrategicAnalysis {
 
   // Private helper methods
 
-  private async getCompetitorProfile(competitorId: number): Promise<CompetitorProfile> {
-    const result = await db
-      .select()
-      .from(competitorProfiles)
-      .where(eq(competitorProfiles.id, competitorId))
-      .limit(1)
+  private async getCompetitorProfile(competitorId: string): Promise<CompetitorProfile> {
+      const result = await db
+        .select()
+        .from(competitorProfiles)
+        .where(eq(competitorProfiles.id, competitorId))
+        .limit(1)
 
     if (!result[0]) {
       throw new Error(`Competitor profile not found: ${competitorId}`)
@@ -484,7 +484,7 @@ export class LexiStrategicAnalysis {
     return (result[0] as unknown) as CompetitorProfile
   }
 
-  private async getAllIntelligenceData(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getAllIntelligenceData(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -528,7 +528,7 @@ export class LexiStrategicAnalysis {
     return rows as unknown as IntelligenceData[]
   }
 
-  private async getHiringIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getHiringIntelligence(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -546,7 +546,7 @@ export class LexiStrategicAnalysis {
     return rows as unknown as IntelligenceData[]
   }
 
-  private async getInvestmentIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getInvestmentIntelligence(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -564,7 +564,7 @@ export class LexiStrategicAnalysis {
     return rows as unknown as IntelligenceData[]
   }
 
-  private async getPartnershipIntelligence(competitorId: number, days: number): Promise<IntelligenceData[]> {
+  private async getPartnershipIntelligence(competitorId: string, days: number): Promise<IntelligenceData[]> {
     const dateThreshold = new Date()
     dateThreshold.setDate(dateThreshold.getDate() - days)
 
@@ -826,7 +826,7 @@ STRATEGIC INTELLIGENCE BRIEFING:`
 
   // Parsing methods (simplified for implementation)
 
-  private parsePositioningAnalysis(analysisText: string, competitorId: number): CompetitivePositioningAnalysis {
+  private parsePositioningAnalysis(analysisText: string, competitorId: string): CompetitivePositioningAnalysis {
     return {
       competitorId,
       marketPosition: {
@@ -870,7 +870,7 @@ STRATEGIC INTELLIGENCE BRIEFING:`
     }
   }
 
-  private parseStrategicMoveAnalysis(analysisText: string, competitorId: number): StrategicMoveAnalysis {
+  private parseStrategicMoveAnalysis(analysisText: string, competitorId: string): StrategicMoveAnalysis {
     return {
       competitorId,
       detectedMoves: [],
@@ -881,7 +881,7 @@ STRATEGIC INTELLIGENCE BRIEFING:`
     }
   }
 
-  private parseThreatAssessment(analysisText: string, competitorId: number): ThreatAssessment {
+  private parseThreatAssessment(analysisText: string, competitorId: string): ThreatAssessment {
     return {
       competitorId,
       overallThreatLevel: 'medium',
@@ -898,7 +898,7 @@ STRATEGIC INTELLIGENCE BRIEFING:`
   }
 
   private async storeStrategicAnalysis(
-    competitorId: number, 
+    competitorId: string, 
     analysisType: string, 
     analysis: any,
     userId: string

@@ -44,7 +44,7 @@ export interface SentimentScore {
 
 export interface SocialMediaAnalysis {
   platform: string;
-  competitorId: number;
+  competitorId: string;
   posts: SocialMediaPost[];
   engagementPatterns: EngagementPattern[];
   contentThemes: ContentTheme[];
@@ -127,7 +127,7 @@ export class SocialMediaMonitor {
         if (posts.length > 0) {
           const analysis = await this.createAnalysis(
             platform,
-            0, // Not competitor-specific - this is user's own account
+            '0', // Not competitor-specific - this is user's own account
             posts
           );
           analyses.push(analysis);
@@ -147,7 +147,7 @@ export class SocialMediaMonitor {
    * Monitor all social media platforms for a competitor
    * NOTE: This uses competitor's handles and requires the monitoring user to have API access
    */
-  async monitorCompetitor(competitorId: number, userId: number): Promise<SocialMediaAnalysis[]> {
+  async monitorCompetitor(competitorId: string, userId: string): Promise<SocialMediaAnalysis[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) {
       throw new Error(`Competitor with ID ${competitorId} not found`);
@@ -197,7 +197,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor LinkedIn company page for posts and updates
    */
-  async monitorLinkedInActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
+  async monitorLinkedInActivity(competitorId: string, userId: string): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -247,7 +247,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor Twitter/X for mentions, posts, and engagement
    */
-  async monitorTwitterActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
+  async monitorTwitterActivity(competitorId: string, userId: string): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -298,7 +298,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor Facebook business page with post analysis
    */
-  async monitorFacebookActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
+  async monitorFacebookActivity(competitorId: string, userId: string): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -347,7 +347,7 @@ export class SocialMediaMonitor {
   /**
    * Monitor Instagram business account with content and engagement metrics
    */
-  async monitorInstagramActivity(competitorId: number, userId: number): Promise<SocialMediaPost[]> {
+  async monitorInstagramActivity(competitorId: string, userId: string): Promise<SocialMediaPost[]> {
     const competitor = await this.getCompetitor(competitorId);
     if (!competitor) return [];
 
@@ -438,7 +438,7 @@ export class SocialMediaMonitor {
 
   // Private helper methods
 
-  private async getCompetitor(competitorId: number) {
+  private async getCompetitor(competitorId: string) {
     const [competitor] = await db
       .select()
       .from(competitorProfiles)
@@ -451,7 +451,7 @@ export class SocialMediaMonitor {
   private async monitorPlatform(
     platform: typeof this.platforms[number], 
     handle: string, 
-    competitorId: number
+    competitorId: string
   ): Promise<SocialMediaAnalysis | null> {
     switch (platform) {
       case 'linkedin':
@@ -476,7 +476,7 @@ export class SocialMediaMonitor {
 
   private async createAnalysis(
     platform: string, 
-    competitorId: number, 
+    competitorId: string, 
     posts: SocialMediaPost[]
   ): Promise<SocialMediaAnalysis> {
     return {
@@ -493,8 +493,8 @@ export class SocialMediaMonitor {
   }
 
   private async storeIntelligenceData(
-    competitorId: number, 
-    userId: number, 
+    competitorId: string, 
+    userId: string, 
     analysis: SocialMediaAnalysis
   ): Promise<void> {
     try {
@@ -546,7 +546,7 @@ export class SocialMediaMonitor {
       case 'facebook':
         return this.fetchFacebookPostsWithToken(connection.access_token, connection.account_id);
       case 'instagram':
-        return this.fetchInstagramBusinessPosts(connection.access_token); // Assumes token is enough
+        return this.fetchInstagramCompetitorPosts(connection.access_token, connection.account_handle || 'me');
       default:
         return [];
     }

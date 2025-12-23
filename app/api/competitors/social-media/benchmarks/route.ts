@@ -17,7 +17,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 const querySchema = z.object({
-  competitor_ids: z.string().transform(str => str.split(',').map(Number)),
+  competitor_ids: z.string().transform(str => str.split(',').filter(Boolean)),
   platform: z.enum(['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']).optional(),
   days: z.string().transform(Number).default('30'),
   metrics: z.string().transform(str => str.split(',')).default('engagement,frequency,reach,sentiment')
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           inArray(competitorProfiles.id, competitor_ids),
-          eq(competitorProfiles.user_id, Number(user.id))
+          eq(competitorProfiles.user_id, user.id)
         )
       );
 
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     // Parse request body
     const body = await request.json();
     const requestSchema = z.object({
-      competitor_ids: z.array(z.number()).min(1).max(10),
+      competitor_ids: z.array(z.string()).min(1).max(10),
       platform: z.enum(['linkedin', 'twitter', 'facebook', 'instagram', 'youtube']).optional(),
       days: z.number().min(7).max(365).default(30),
       metrics: z.array(z.enum(['engagement', 'frequency', 'reach', 'sentiment', 'growth'])).default(['engagement', 'frequency']),
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
       .where(
         and(
           inArray(competitorProfiles.id, competitor_ids),
-          eq(competitorProfiles.user_id, Number(user.id))
+          eq(competitorProfiles.user_id, user.id)
         )
       );
 
@@ -453,7 +453,7 @@ function generateBenchmarkSummary(benchmarks: any[]) {
 }
 
 // Placeholder functions for different benchmark types
-async function generatePerformanceBenchmarks(competitorIds: number[], platform?: string, days: number = 30, metrics: string[] = []) {
+async function generatePerformanceBenchmarks(competitorIds: string[], platform?: string, days: number = 30, metrics: string[] = []) {
   // Use the main competitive benchmarking method
   const benchmarks = await socialMediaAnalysisEngine.createCompetitiveBenchmarks(
     competitorIds,
@@ -468,7 +468,7 @@ async function generatePerformanceBenchmarks(competitorIds: number[], platform?:
   };
 }
 
-async function generateContentBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+async function generateContentBenchmarks(competitorIds: string[], platform?: string, days: number = 30) {
   const results = [];
   
   for (const id of competitorIds) {
@@ -486,7 +486,7 @@ async function generateContentBenchmarks(competitorIds: number[], platform?: str
   };
 }
 
-async function generateTimingBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+async function generateTimingBenchmarks(competitorIds: string[], platform?: string, days: number = 30) {
   const results = [];
   
   for (const id of competitorIds) {
@@ -503,7 +503,7 @@ async function generateTimingBenchmarks(competitorIds: number[], platform?: stri
   };
 }
 
-async function generateAudienceBenchmarks(competitorIds: number[], platform?: string, days: number = 30) {
+async function generateAudienceBenchmarks(competitorIds: string[], platform?: string, days: number = 30) {
   const results = [];
   
   for (const id of competitorIds) {

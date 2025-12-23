@@ -21,7 +21,7 @@ import { cn} from '@/lib/utils'
 
 interface ScrapingJob {
   id: string
-  competitorId: number
+  competitorId: string
   userId: string
   jobType: 'website' | 'pricing' | 'products' | 'jobs'
   url: string
@@ -59,7 +59,7 @@ interface ScrapingJobResult {
 }
 
 interface ScrapingManagerProps {
-  competitorId: number
+  competitorId: string
   competitorName: string
   competitorDomain?: string
 }

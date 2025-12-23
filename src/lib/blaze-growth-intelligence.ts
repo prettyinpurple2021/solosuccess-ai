@@ -15,7 +15,7 @@ import type {
 
 // Blaze-specific pricing and growth intelligence types
 export interface GrowthIntelligenceAnalysis {
-  competitorId: number
+  competitorId: string
   analysisType: 'pricing_strategy' | 'growth_analysis' | 'market_positioning' | 'revenue_optimization' | 'expansion_patterns'
   insights: GrowthInsight[]
   recommendations: GrowthRecommendation[]
@@ -108,7 +108,7 @@ export interface PricingRecommendation {
 }
 
 export interface PricingStrategyAnalysis {
-  competitorId: number
+  competitorId: string
   pricingModel: PricingModel
   pricePoints: PricePoint[]
   pricingTiers: PricingTier[]
@@ -120,7 +120,7 @@ export interface PricingStrategyAnalysis {
 }
 
 export interface GrowthPatternAnalysis {
-  competitorId: number
+  competitorId: string
   growthMetrics: GrowthMetric[]
   expansionPatterns: ExpansionPattern[]
   customerAcquisition: CustomerAcquisitionAnalysis
@@ -253,7 +253,7 @@ export class BlazeGrowthIntelligence {
   /**
    * Analyze competitor pricing strategies and changes
    */
-  async analyzePricingStrategy(competitorId: number, intelligenceData: IntelligenceData[]): Promise<PricingStrategyAnalysis> {
+  async analyzePricingStrategy(competitorId: string, intelligenceData: IntelligenceData[]): Promise<PricingStrategyAnalysis> {
     const competitor = await db
       .select()
       .from(competitorProfiles)
@@ -378,7 +378,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
    * Perform cost-benefit analysis for competitive pricing responses
    */
   async performCostBenefitAnalysis(
-    competitorId: number, 
+    competitorId: string, 
     proposedAction: string,
     marketData: any[]
   ): Promise<GrowthRecommendation[]> {
@@ -443,7 +443,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
   /**
    * Analyze competitor growth strategy based on expansion patterns
    */
-  async analyzeGrowthStrategy(competitorId: number, intelligenceData: IntelligenceData[]): Promise<GrowthPatternAnalysis> {
+  async analyzeGrowthStrategy(competitorId: string, intelligenceData: IntelligenceData[]): Promise<GrowthPatternAnalysis> {
     try {
       // Filter growth-related intelligence data
       const growthData = intelligenceData.filter(data => 
@@ -523,7 +523,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
    * Build market positioning recommendations based on competitive landscape
    */
   async buildMarketPositioningRecommendations(
-    competitorIds: number[],
+    competitorIds: string[],
     userBusinessContext: any
   ): Promise<GrowthRecommendation[]> {
     try {
@@ -601,7 +601,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
    * Add revenue optimization suggestions based on competitor pricing gaps
    */
   async generateRevenueOptimizationSuggestions(
-    competitorId: number,
+    competitorId: string,
     pricingAnalysis: PricingStrategyAnalysis
   ): Promise<GrowthRecommendation[]> {
     try {
@@ -657,7 +657,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
   /**
    * Parse pricing analysis from AI response
    */
-  private parsePricingAnalysis(analysisText: string, competitorId: number): PricingStrategyAnalysis {
+  private parsePricingAnalysis(analysisText: string, competitorId: string): PricingStrategyAnalysis {
     try {
       // Try to parse JSON response first
       const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
@@ -701,7 +701,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
   /**
    * Parse growth recommendations from AI response
    */
-  private parseGrowthRecommendations(responseText: string, competitorId: number): GrowthRecommendation[] {
+  private parseGrowthRecommendations(responseText: string, competitorId: string): GrowthRecommendation[] {
     const recommendations: GrowthRecommendation[] = [];
     
     // Extract recommendations from text
@@ -748,7 +748,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
   /**
    * Complete recommendation with default values
    */
-  private completeRecommendation(partial: Partial<GrowthRecommendation>, competitorId: number): GrowthRecommendation {
+  private completeRecommendation(partial: Partial<GrowthRecommendation>, competitorId: string): GrowthRecommendation {
     return {
       id: `blaze-rec-${competitorId}-${Date.now()}`,
       type: partial.type || 'strategic',
@@ -771,7 +771,7 @@ ${pricingSummary || 'No direct pricing intelligence available - infer using comp
   /**
    * Parse growth pattern analysis from AI response
    */
-  private parseGrowthPatternAnalysis(analysisText: string, competitorId: number): GrowthPatternAnalysis {
+  private parseGrowthPatternAnalysis(analysisText: string, competitorId: string): GrowthPatternAnalysis {
     return {
       competitorId,
       growthMetrics: [],

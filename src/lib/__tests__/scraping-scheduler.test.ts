@@ -1,5 +1,6 @@
 import { ScrapingScheduler } from '../database-scraping-scheduler'
 import { queueProcessor } from '../scraping-queue-processor'
+import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals'
 
 // Mock uuid to avoid ESM issues and generate unique values
 jest.mock('uuid', () => {
@@ -13,7 +14,8 @@ jest.mock('uuid', () => {
 jest.mock('@/db', () => ({
   db: {
     insert: jest.fn().mockReturnValue({
-      values: jest.fn().mockResolvedValue(undefined)
+      // @ts-ignore - Drizzle mocking types
+      values: jest.fn().mockResolvedValue([] as any)
     }),
     select: jest.fn().mockReturnValue({
       from: jest.fn().mockReturnValue({
@@ -27,11 +29,13 @@ jest.mock('@/db', () => ({
     }),
     update: jest.fn().mockReturnValue({
       set: jest.fn().mockReturnValue({
-        where: jest.fn().mockResolvedValue(undefined)
+        // @ts-ignore - Drizzle mocking types
+        where: jest.fn().mockResolvedValue([] as any)
       })
     }),
     delete: jest.fn().mockReturnValue({
-      where: jest.fn().mockResolvedValue(undefined)
+      // @ts-ignore - Drizzle mocking types
+      where: jest.fn().mockResolvedValue([] as any)
     })
   }
 }))
@@ -53,7 +57,7 @@ describe('ScrapingScheduler', () => {
   describe('createJob', () => {
     it('should create a new scraping job with valid parameters', async () => {
       const params = {
-        competitorId: 1,
+        competitorId: '1',
         userId: 'user123',
         jobType: 'website' as const,
         url: 'https://example.com',
@@ -76,7 +80,7 @@ describe('ScrapingScheduler', () => {
 
     it('should use default values for optional parameters', async () => {
       const params = {
-        competitorId: 1,
+        competitorId: '1',
         userId: 'user123',
         jobType: 'pricing' as const,
         url: 'https://example.com/pricing',
@@ -148,7 +152,7 @@ describe('ScrapingQueueProcessor', () => {
   describe('addJob', () => {
     it('should add a job to the queue', async () => {
       const params = {
-        competitorId: 1,
+        competitorId: '1',
         userId: 'user123',
         jobType: 'website' as const,
         url: 'https://example.com',
@@ -172,7 +176,7 @@ describe('ScrapingQueueProcessor', () => {
         }
       }
 
-      const jobIds = await queueProcessor.createDefaultJobs(1, 'user123', competitorData)
+      const jobIds = await queueProcessor.createDefaultJobs('1', 'user123', competitorData)
       
       expect(Array.isArray(jobIds)).toBe(true)
       expect(jobIds.length).toBeGreaterThan(0)
@@ -185,7 +189,7 @@ describe('ScrapingQueueProcessor', () => {
         }
       }
 
-      const jobIds = await queueProcessor.createDefaultJobs(1, 'user123', competitorData)
+      const jobIds = await queueProcessor.createDefaultJobs('1', 'user123', competitorData)
       
       expect(Array.isArray(jobIds)).toBe(true)
     })

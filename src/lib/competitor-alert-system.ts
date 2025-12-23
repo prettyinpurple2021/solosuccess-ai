@@ -135,7 +135,7 @@ export class CompetitorAlertSystem {
     this.alertTriggers.get(type)!.push(trigger);
   }
 
-  async processIntelligenceForAlerts(intelligenceId: number): Promise<AlertGenerationResult> {
+  async processIntelligenceForAlerts(intelligenceId: string): Promise<AlertGenerationResult> {
     const result: AlertGenerationResult = {
       alertsGenerated: 0,
       alertsDeduped: 0,
@@ -301,7 +301,7 @@ export class CompetitorAlertSystem {
 
   private async checkForDuplicateAlert(
     userId: string,
-    competitorId: number,
+    competitorId: string,
     alertType: AlertType,
     cooldownMinutes: number
   ): Promise<boolean> {
@@ -542,7 +542,7 @@ export class CompetitorAlertSystem {
       .limit(limit);
   }
 
-  async markAlertAsRead(alertId: number, userId: string): Promise<void> {
+  async markAlertAsRead(alertId: string, userId: string): Promise<void> {
     await db
       .update(competitorAlerts)
       .set({ 
@@ -558,7 +558,7 @@ export class CompetitorAlertSystem {
       );
   }
 
-  async archiveAlert(alertId: number, userId: string): Promise<void> {
+  async archiveAlert(alertId: string, userId: string): Promise<void> {
     await db
       .update(competitorAlerts)
       .set({ 
@@ -573,7 +573,7 @@ export class CompetitorAlertSystem {
       );
   }
 
-  async getAlertsByCompetitor(userId: string, competitorId: number, limit: number = 20): Promise<any[]> {
+  async getAlertsByCompetitor(userId: string, competitorId: string, limit: number = 20): Promise<any[]> {
     return await db
       .select()
       .from(competitorAlerts)

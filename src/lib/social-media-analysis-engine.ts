@@ -6,7 +6,7 @@ import type { SocialMediaPost, EngagementMetrics, SentimentScore } from './socia
 // Analysis result interfaces
 export interface EngagementPatternAnalysis {
   platform: string;
-  competitorId: number;
+  competitorId: string;
   patterns: {
     timeOfDay: EngagementTimePattern[];
     dayOfWeek: EngagementDayPattern[];
@@ -52,7 +52,7 @@ export interface HashtagPattern {
 
 export interface PostingFrequencyAnalysis {
   platform: string;
-  competitorId: number;
+  competitorId: string;
   frequency: {
     daily: FrequencyMetrics;
     weekly: FrequencyMetrics;
@@ -90,7 +90,7 @@ export interface DateGap {
 
 export interface AudienceAnalysis {
   platform: string;
-  competitorId: number;
+  competitorId: string;
   engagement: {
     totalReach: number;
     avgEngagementRate: number;
@@ -121,7 +121,7 @@ export interface AudienceAnalysis {
 
 export interface SocialMediaCampaignAnalysis {
   platform: string;
-  competitorId: number;
+  competitorId: string;
   campaigns: DetectedCampaign[];
   campaignTypes: CampaignTypeAnalysis[];
   performance: CampaignPerformanceMetrics;
@@ -171,7 +171,7 @@ export interface CampaignPerformanceMetrics {
 }
 
 export interface CompetitiveBenchmarkingMetrics {
-  competitorId: number;
+  competitorId: string;
   platform: string;
   benchmarks: {
     engagement: BenchmarkMetric;
@@ -200,7 +200,7 @@ export interface BenchmarkMetric {
 }
 
 export interface CompetitorComparison {
-  competitorId: number;
+  competitorId: string;
   competitorName: string;
   metrics: {
     engagement: number;
@@ -222,7 +222,7 @@ export class SocialMediaAnalysisEngine {
    * Analyze engagement patterns to identify successful content strategies
    */
   async analyzeEngagementPatterns(
-    competitorId: number,
+    competitorId: string,
     platform?: string,
     days: number = 30
   ): Promise<EngagementPatternAnalysis[]> {
@@ -270,7 +270,7 @@ export class SocialMediaAnalysisEngine {
    * Analyze posting frequency and timing patterns
    */
   async analyzePostingFrequency(
-    competitorId: number,
+    competitorId: string,
     platform?: string,
     days: number = 30
   ): Promise<PostingFrequencyAnalysis[]> {
@@ -311,7 +311,7 @@ export class SocialMediaAnalysisEngine {
    * Analyze audience based on social media interactions
    */
   async analyzeAudience(
-    competitorId: number,
+    competitorId: string,
     platform?: string,
     days: number = 30
   ): Promise<AudienceAnalysis[]> {
@@ -353,7 +353,7 @@ export class SocialMediaAnalysisEngine {
    * Detect and analyze social media campaigns
    */
   async analyzeCampaigns(
-    competitorId: number,
+    competitorId: string,
     platform?: string,
     days: number = 90
   ): Promise<SocialMediaCampaignAnalysis[]> {
@@ -395,7 +395,7 @@ export class SocialMediaAnalysisEngine {
    * Create competitive benchmarking metrics
    */
   async createCompetitiveBenchmarks(
-    competitorIds: number[],
+    competitorIds: string[],
     platform?: string,
     days: number = 30
   ): Promise<CompetitiveBenchmarkingMetrics[]> {
@@ -445,7 +445,7 @@ export class SocialMediaAnalysisEngine {
   // Private helper methods
 
   private async getSocialMediaData(
-    competitorId: number,
+    competitorId: string,
     platform?: string,
     dateThreshold?: Date
   ) {
@@ -1009,8 +1009,8 @@ export class SocialMediaAnalysisEngine {
   }
 
   private async createCompetitorComparisons(
-    competitorId: number,
-    otherCompetitorIds: number[],
+    competitorId: string,
+    otherCompetitorIds: string[],
     platform: string,
     days: number
   ): Promise<CompetitorComparison[]> {

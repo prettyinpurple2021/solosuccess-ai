@@ -29,7 +29,7 @@ export class SocialMediaScheduler {
    * Schedule social media monitoring for a competitor
    */
   async scheduleMonitoring(
-    competitorId: number,
+    competitorId: string,
     userId: string,
     config: Partial<SocialMediaJobConfig> = {}
   ): Promise<string[]> {
@@ -56,7 +56,7 @@ export class SocialMediaScheduler {
    * Create a social media monitoring job
    */
   private async createSocialMediaJob(
-    competitorId: number,
+    competitorId: string,
     userId: string,
     platform: string,
     config: SocialMediaJobConfig
@@ -246,7 +246,7 @@ export class SocialMediaScheduler {
    * Update social media monitoring configuration for a competitor
    */
   async updateMonitoringConfig(
-    competitorId: number,
+    competitorId: string,
     userId: string,
     config: Partial<SocialMediaJobConfig>
   ): Promise<void> {
@@ -304,7 +304,7 @@ export class SocialMediaScheduler {
   /**
    * Pause social media monitoring for a competitor
    */
-  async pauseMonitoring(competitorId: number, userId: string): Promise<void> {
+  async pauseMonitoring(competitorId: string, userId: string): Promise<void> {
     await db
       .update(scrapingJobs)
       .set({ status: 'paused' })
@@ -320,7 +320,7 @@ export class SocialMediaScheduler {
   /**
    * Resume social media monitoring for a competitor
    */
-  async resumeMonitoring(competitorId: number, userId: string): Promise<void> {
+  async resumeMonitoring(competitorId: string, userId: string): Promise<void> {
     await db
       .update(scrapingJobs)
       .set({ 
@@ -340,7 +340,7 @@ export class SocialMediaScheduler {
   /**
    * Get social media monitoring status for a competitor
    */
-  async getMonitoringStatus(competitorId: number, userId: string) {
+  async getMonitoringStatus(competitorId: string, userId: string) {
     const jobs = await db
       .select()
       .from(scrapingJobs)
