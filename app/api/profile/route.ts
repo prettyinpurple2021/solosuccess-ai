@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       id: users.id,
       email: users.email,
       full_name: users.full_name,
-      avatar_url: users.avatar_url,
+      image: users.image,
       subscription_tier: users.subscription_tier,
       subscription_status: users.subscription_status,
       stripe_customer_id: users.stripe_customer_id,
@@ -38,13 +38,7 @@ export async function GET(request: NextRequest) {
       current_period_start: users.current_period_start,
       current_period_end: users.current_period_end,
       cancel_at_period_end: users.cancel_at_period_end,
-      // level: users.level, // Not in schema currently
-      // total_points: users.total_points, // Not in schema currently
-      // current_streak: users.current_streak, // Not in schema currently
-      // wellness_score: users.wellness_score, // Not in schema currently
-      // focus_minutes: users.focus_minutes, // Not in schema currently
       onboarding_completed: users.onboarding_completed,
-      // preferred_ai_agent: users.preferred_ai_agent // Not in schema currently
     })
       .from(users)
       .where(eq(users.id, user.id))
@@ -97,9 +91,8 @@ export async function PATCH(request: NextRequest) {
 
     const BodySchema = z.object({
       full_name: z.string().min(1).max(200).nullable().optional(),
-      avatar_url: z.string().url().nullable().optional(),
+      image: z.string().url().nullable().optional(),
       onboarding_completed: z.boolean().optional(),
-      onboarding_data: z.unknown().optional(),
     })
     const parsed = BodySchema.safeParse(await request.json())
     if (!parsed.success) {
@@ -114,9 +107,7 @@ export async function PATCH(request: NextRequest) {
       })
       return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { full_name, avatar_url, onboarding_completed, onboarding_data } = parsed.data
-
-    const shouldUpdateOnboardingData = typeof onboarding_data !== 'undefined'
+    const { full_name, image, onboarding_completed } = parsed.data
 
     // Prepare update object
     const updateData: any = {
@@ -124,17 +115,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (full_name !== undefined) updateData.full_name = full_name
-    if (avatar_url !== undefined) updateData.avatar_url = avatar_url
+    if (image !== undefined) updateData.image = image
     if (onboarding_completed !== undefined) {
       updateData.onboarding_completed = onboarding_completed
-      if (onboarding_completed === true) {
-        updateData.onboarding_completed_at = new Date()
-      } else if (onboarding_completed === false) {
-        updateData.onboarding_completed_at = null
-      }
-    }
-    if (shouldUpdateOnboardingData) {
-      updateData.onboarding_data = onboarding_data
     }
 
     const db = getDb()
@@ -145,12 +128,10 @@ export async function PATCH(request: NextRequest) {
         id: users.id,
         email: users.email,
         full_name: users.full_name,
-        avatar_url: users.avatar_url,
+        image: users.image,
         subscription_tier: users.subscription_tier,
         subscription_status: users.subscription_status,
-        onboarding_completed: users.onboarding_completed,
-        onboarding_completed_at: users.onboarding_completed_at,
-        onboarding_data: users.onboarding_data
+        onboarding_completed: users.onboarding_completed
       })
 
     logInfo('Profile updated successfully', {
@@ -160,9 +141,8 @@ export async function PATCH(request: NextRequest) {
       meta: {
         updatedFields: {
           full_name: full_name !== undefined,
-          avatar_url: avatar_url !== undefined,
-          onboarding_completed: onboarding_completed !== undefined,
-          onboarding_data: shouldUpdateOnboardingData
+          image: image !== undefined,
+          onboarding_completed: onboarding_completed !== undefined
         },
         ip: request.headers.get('x-forwarded-for') || 'unknown'
       }

@@ -48,7 +48,7 @@ const ResumeSessionSchema = z.object({
 
 const TransferSessionSchema = z.object({
   action: z.literal('transfer'),
-  newOwnerId: z.number().int().positive('Invalid user ID'),
+  newOwnerId: z.string().min(1, 'Invalid user ID'),
   reason: z.string().optional(),
   preserveContext: z.boolean().default(true)
 })
@@ -104,7 +104,7 @@ export async function POST(
     const body = await request.json()
     const validatedAction = SessionControlSchema.parse(body)
 
-    const userId = parseInt(user.id.toString())
+    const userId = user.id
 
     // Handle different control actions
     switch (validatedAction.action) {
@@ -303,7 +303,7 @@ export async function GET(
 
     const resolvedParams = await params
     const sessionId = resolvedParams.id
-    const userId = parseInt(user.id.toString())
+    const userId = user.id
 
     // Validate session ID format
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sessionId)) {

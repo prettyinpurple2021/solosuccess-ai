@@ -183,7 +183,7 @@ async function gatherUserData(
   startDate: Date,
   endDate: Date,
   timeframeDays: number
-): Promise<{ analytics: UserAnalyticsData; recentTasks: Array<{ id: number; title: string; status: string; createdAt: string; completedAt: string | null }> }> {
+): Promise<{ analytics: UserAnalyticsData; recentTasks: Array<{ id: string; title: string; status: string; createdAt: string; completedAt: string | null }> }> {
   try {
     const taskRows = await db
       .select({

@@ -17,7 +17,7 @@ export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 const paramsSchema = z.object({
-  id: z.string().transform(Number)
+  id: z.string().min(1)
 });
 
 const scheduleSchema = z.object({

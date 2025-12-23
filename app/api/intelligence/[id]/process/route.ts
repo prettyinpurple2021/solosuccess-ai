@@ -90,10 +90,7 @@ export async function POST(
     }
 
     const params = await context.params
-    const intelligenceId = parseInt(params.id)
-    if (isNaN(intelligenceId)) {
-      return NextResponse.json({ error: 'Invalid intelligence ID' }, { status: 400 })
-    }
+    const intelligenceId = params.id
 
     const body = await request.json()
     const parsed = ProcessingRequestSchema.safeParse(body)
@@ -138,7 +135,12 @@ export async function POST(
     const mergedAnalysisResults = [...existingAnalysisResults, ...data.analysisResults]
 
     // Update extracted data if provided
-    const currentExtractedData = (currentIntelligence.extracted_data as ExtractedData) || {}
+    const currentExtractedData = (currentIntelligence.extracted_data as ExtractedData) || {
+      metadata: {},
+      entities: [],
+      topics: [],
+      keyInsights: []
+    }
     const updatedExtractedData = data.extractedData ? {
       ...currentExtractedData,
       ...data.extractedData,
@@ -178,8 +180,8 @@ export async function POST(
     const [updatedIntelligence] = await db
       .update(intelligenceData)
       .set({
-        extracted_data: updatedExtractedData,
-        analysis_results: mergedAnalysisResults,
+        extracted_data: updatedExtractedData as any,
+        analysis_results: mergedAnalysisResults as any,
         confidence: overallConfidence.toString(),
         importance: data.importance || currentIntelligence.importance,
         tags: updatedTags,

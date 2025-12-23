@@ -11,18 +11,13 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await verifyAuth(req)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userId = authResult.user.id
-    const { id } = await params
-    const templateId = parseInt(id)
-
-    if (isNaN(templateId)) {
-      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 })
-    }
+    const { id: templateId } = await params
 
     const updates = await req.json()
 
@@ -58,18 +53,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await verifyAuth(req)
+    const authResult = await verifyAuth()
     if (!authResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userId = authResult.user.id
-    const { id } = await params
-    const templateId = parseInt(id)
-
-    if (isNaN(templateId)) {
-      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 })
-    }
+    const { id: templateId } = await params
 
     // Verify ownership
     const existingTemplate = await db

@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic'
 
 // Validation schema for batch enrichment request
 const BatchEnrichmentRequestSchema = z.object({
-  competitorIds: z.array(z.number().int().positive()).min(1).max(10), // Limit to 10 competitors per batch
+  competitorIds: z.array(z.string().min(1)).min(1).max(10), // Limit to 10 competitors per batch
   userBusinessDomain: z.string().max(500).optional(),
   enableWebScraping: z.boolean().default(true),
   enableSocialMediaDiscovery: z.boolean().default(true),
@@ -29,7 +29,7 @@ const BatchEnrichmentRequestSchema = z.object({
 })
 
 interface EnrichmentJobResult {
-  competitorId: number
+  competitorId: string
   competitorName: string
   success: boolean
   confidence?: number
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
           
           // Merge social media handles
           if (enrichmentResult.data.socialMediaHandles) {
-            const existingHandles = existingCompetitor.social_media_handles || {}
+            const existingHandles = (existingCompetitor.social_media_handles as any) || {}
             updateData.social_media_handles = {
               ...existingHandles,
               ...enrichmentResult.data.socialMediaHandles,
@@ -315,7 +315,7 @@ export async function GET(_request: NextRequest) {
       averageEnrichmentScore: 0,
       lastEnrichmentDate: null as Date | null,
       recommendations: [] as Array<{
-        competitorId: number
+        competitorId: string
         competitorName: string
         priority: 'high' | 'medium' | 'low'
         reason: string

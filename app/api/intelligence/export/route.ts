@@ -26,7 +26,7 @@ const IntelligenceExportSchema = z.object({
   format: z.enum(['json', 'csv', 'xlsx']).default('json'),
   // Same filters as search
   query: z.string().optional(),
-  competitorIds: z.array(z.number().int().positive()).optional(),
+  competitorIds: z.array(z.string()).optional(),
   sourceTypes: z.array(z.enum(['website', 'social_media', 'news', 'job_posting', 'app_store', 'manual'])).optional(),
   dataTypes: z.array(z.string()).optional(),
   importance: z.array(z.enum(['low', 'medium', 'high', 'critical'])).optional(),

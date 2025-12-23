@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     await db
       .update(users)
       .set({ 
-        password_hash: hashedPassword,
+        password: hashedPassword,
         updated_at: new Date()
       })
       .where(eq(users.id, resetToken.user_id))

@@ -26,7 +26,7 @@ interface OpportunityResult {
 }
 
 interface AlertResult {
-    id: number
+    id: string
     title: string
     description: string | null
     severity: string
@@ -40,7 +40,7 @@ interface AlertResult {
 
 export async function GET(req: NextRequest) {
     try {
-        const authResult = await verifyAuth(req)
+        const authResult = await verifyAuth()
         if (!authResult.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
             if (alert.alert_type === 'trend') type = 'trend'
 
             return {
-                id: alert.id.toString(),
+                id: alert.id,
                 type,
                 title: alert.title,
                 description: alert.description,

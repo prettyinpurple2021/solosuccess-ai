@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 }
 
 const processIntelligenceSchema = z.object({
-  intelligence_id: z.number(),
+  intelligence_id: z.string(),
 });
 
 export async function POST(request: NextRequest) {

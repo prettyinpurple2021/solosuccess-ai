@@ -48,7 +48,7 @@ export async function DELETE(
 
     // If session is strictly in memory (for CollaborationHub):
     if (session) {
-      if (session.userId !== parseInt(user.id.toString())) {
+      if (session.userId !== user.id) {
         return NextResponse.json(
           { error: 'Forbidden', message: 'Access denied to this session' },
           { status: 403 }

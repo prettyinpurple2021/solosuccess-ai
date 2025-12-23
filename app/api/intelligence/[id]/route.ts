@@ -57,10 +57,7 @@ export async function GET(
     }
 
     const params = await context.params
-    const intelligenceId = parseInt(params.id)
-    if (isNaN(intelligenceId)) {
-      return NextResponse.json({ error: 'Invalid intelligence ID' }, { status: 400 })
-    }
+    const intelligenceId = params.id
 
     // Get intelligence entry with competitor info
     const intelligence = await db
@@ -143,10 +140,7 @@ export async function PUT(
     }
 
     const params = await context.params
-    const intelligenceId = parseInt(params.id)
-    if (isNaN(intelligenceId)) {
-      return NextResponse.json({ error: 'Invalid intelligence ID' }, { status: 400 })
-    }
+    const intelligenceId = params.id
 
     const body = await request.json()
     const parsed = IntelligenceUpdateSchema.safeParse(body)
@@ -263,10 +257,7 @@ export async function DELETE(
     }
 
     const params = await context.params
-    const intelligenceId = parseInt(params.id)
-    if (isNaN(intelligenceId)) {
-      return NextResponse.json({ error: 'Invalid intelligence ID' }, { status: 400 })
-    }
+    const intelligenceId = params.id
 
     // Verify intelligence entry belongs to user
     const existingIntelligence = await db

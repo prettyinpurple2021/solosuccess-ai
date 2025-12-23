@@ -80,7 +80,7 @@ export async function GET(
       .from(opportunityActions)
       .where(
         and(
-          eq(opportunityActions.id, parseInt(actionId)),
+          eq(opportunityActions.id, actionId),
           eq(opportunityActions.opportunity_id, opportunityId),
           eq(opportunityActions.user_id, user.id)
         )
@@ -157,7 +157,7 @@ export async function PUT(
       .from(opportunityActions)
       .where(
         and(
-          eq(opportunityActions.id, parseInt(actionId)),
+          eq(opportunityActions.id, actionId),
           eq(opportunityActions.opportunity_id, opportunityId),
           eq(opportunityActions.user_id, user.id)
         )
@@ -203,7 +203,7 @@ export async function PUT(
     const [updatedAction] = await db
       .update(opportunityActions)
       .set(updateData)
-      .where(eq(opportunityActions.id, parseInt(actionId)))
+      .where(eq(opportunityActions.id, actionId))
       .returning()
 
     return NextResponse.json({
@@ -277,7 +277,7 @@ export async function DELETE(
       .from(opportunityActions)
       .where(
         and(
-          eq(opportunityActions.id, parseInt(actionId)),
+          eq(opportunityActions.id, actionId),
           eq(opportunityActions.opportunity_id, opportunityId),
           eq(opportunityActions.user_id, user.id)
         )
@@ -294,7 +294,7 @@ export async function DELETE(
     // Delete action
     await db
       .delete(opportunityActions)
-      .where(eq(opportunityActions.id, parseInt(actionId)))
+      .where(eq(opportunityActions.id, actionId))
 
     return NextResponse.json({
       message: 'Action deleted successfully'
