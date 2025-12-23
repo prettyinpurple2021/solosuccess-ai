@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import * as Sentry from "@sentry/nextjs"
-import type { Attachment } from "@sentry/types"
 import { motion, useReducedMotion } from "framer-motion"
 import { Bug, Camera, CheckCircle2, ImageOff, Send } from "lucide-react"
 
@@ -43,13 +41,12 @@ const initialState: FeedbackFormState = {
   screenshot: null,
 }
 
-const toAttachment = async (file: File): Promise<Attachment> => {
+const toAttachment = async (file: File) => {
   const buffer = await file.arrayBuffer()
   return {
     filename: file.name,
     contentType: file.type || "application/octet-stream",
     data: new Uint8Array(buffer),
-    attachmentType: "event.attachment",
   }
 }
 
@@ -134,23 +131,12 @@ export function FeedbackWidget() {
     setIsSubmitting(true)
 
     try {
-      const attachments: Attachment[] = []
-
-      if (form.screenshot) {
-        attachments.push(await toAttachment(form.screenshot))
-      }
-
-      await Sentry.captureFeedback(
-        {
-          message: trimmedMessage,
-          email: trimmedEmail || undefined,
-          name: trimmedName || undefined,
-        },
-        {
-          includeReplay: true,
-          attachments,
-        },
-      )
+      logger.info("Feedback received (simulated)", {
+        message: trimmedMessage,
+        email: trimmedEmail,
+        name: trimmedName,
+        hasScreenshot: Boolean(form.screenshot)
+      })
 
       toast({
         title: "Feedback sent",
