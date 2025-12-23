@@ -7,7 +7,7 @@ import { rateLimitByIp} from '@/lib/rate-limit'
 import { competitorEnrichmentService} from '@/lib/competitor-enrichment-service'
 import { z} from 'zod'
 import { eq, and} from 'drizzle-orm'
-import type { ThreatLevel, MonitoringStatus, FundingStage } from '@/lib/competitor-intelligence-types'
+import type { ThreatLevel, MonitoringStatus, FundingStage, MarketPosition, SocialMediaHandles } from '@/lib/competitor-intelligence-types'
 
 // Edge runtime enabled after refactoring to jose and Neon HTTP
 export const runtime = 'edge'
@@ -97,10 +97,10 @@ export async function POST(
         : [],
       marketPosition: existingCompetitor.market_position 
         ? {
-            ...(existingCompetitor.market_position as any),
-            targetMarkets: (existingCompetitor.market_position as any)?.targetMarkets || [],
-            competitiveAdvantages: (existingCompetitor.market_position as any)?.competitiveAdvantages || [],
-            marketSegments: (existingCompetitor.market_position as any)?.marketSegments || []
+            ...(existingCompetitor.market_position as MarketPosition),
+            targetMarkets: (existingCompetitor.market_position as MarketPosition)?.targetMarkets || [],
+            competitiveAdvantages: (existingCompetitor.market_position as MarketPosition)?.competitiveAdvantages || [],
+            marketSegments: (existingCompetitor.market_position as MarketPosition)?.marketSegments || []
           }
         : {
             targetMarkets: [],
@@ -168,7 +168,7 @@ export async function POST(
     if (enrichmentResult.data?.socialMediaHandles) {
       const existingHandles = existingCompetitor.social_media_handles || {}
       updateData.social_media_handles = {
-        ...(existingHandles as any),
+        ...(existingHandles as SocialMediaHandles),
         ...enrichmentResult.data.socialMediaHandles,
       }
     }

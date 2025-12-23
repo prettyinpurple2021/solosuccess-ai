@@ -426,6 +426,47 @@ const rateLimited = await rateLimit(ip) // Rate limiting
 
 **REMEMBER**: This is a production application serving real users. Every line of code must be production-ready, secure, accessible, and aligned with the holographic design system. No compromises. No shortcuts. No fake data. 
 
+
+## 🏗️ PRODUCTION QUALITY STANDARDS (V1.0)
+
+### Core Principles
+1. **Code Quality First**: All code must be production-ready. No exceptions for deadlines.
+2. **Never Assume - Always Ask**: Clarify requirements, implementation, or testing strategy with the user.
+3. **No Incomplete Code**: Use feature flags for ongoing work. Do NOT comment out or disable unfinished features.
+4. **Data Integrity**: REAL DATA ONLY. No fake metrics, dummy data, or placeholder content in production.
+
+### TypeScript & React Standards
+- **Strict Mode**: Mandatory `"strict": true` in `tsconfig.json`.
+- **Zero `any` Types**: Use `unknown` or specific interfaces/types for all data structures.
+- **Explicit Types**: All function parameters and return types must be explicit.
+- **Functional Components**: Functional components with hooks only. No class components.
+- **Hook Efficiency**: Memoize expensive computations with `useMemo` and callbacks with `useCallback`.
+
+### API & Database Mandates
+- **RESTful Design**: Proper HTTP methods, status codes, and versioning (`/api/v1/...`).
+- **Standardized Responses**: Use `ApiResponse<T>` and `ApiError` interfaces.
+- **Type-Safe Queries**: Use Drizzle ORM with parameterized queries. No raw SQL.
+- **Performance**: Indexes required for frequently queried fields.
+
+### Testing Requirements
+- **100% Coverage**: Required for all public functions and critical workflows.
+- **80%+ Coverage**: Required for React components and API endpoints.
+- **Pattern**: Arrange-Act-Assert for all unit tests.
+- **Clean State**: Always clean up test data after integration/E2E tests.
+
+### Documentation & Security
+- **JSDoc**: Required for all exported functions and complex logic.
+- **Secret Management**: Environment variables only. Never commit secrets to git.
+- **Tenancy Enforcement**: All database queries MUST include `userId` filters.
+- **RBAC**: Implement role-based access control for all sensitive operations.
+
+### Deployment Readiness
+- **Zero Warnings**: Build must be free of all TypeScript errors and ESLint warnings.
+- **Core Web Vitals**: LCP < 2.5s, FID < 100ms, CLS < 0.1.
+- **Rollback Plan**: Mandatory for all production deployments.
+
+---
+
 Build with integrity. Ship with confidence. Serve users with excellence.
 
 <citations>

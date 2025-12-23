@@ -128,8 +128,15 @@ export async function POST(request: NextRequest) {
 
     // Create the scraping job
     const jobId = await queueProcessor.addJob({
-      ...(validatedData as any),
-      userId: user.id
+      competitorId: validatedData.competitorId,
+      userId: user.id,
+      jobType: validatedData.jobType,
+      url: validatedData.url,
+      priority: validatedData.priority,
+      frequencyType: validatedData.frequencyType,
+      frequencyValue: validatedData.frequencyValue,
+      frequencyTimezone: validatedData.frequencyTimezone,
+      config: validatedData.config
     })
 
     return NextResponse.json({
