@@ -628,38 +628,28 @@ export const documentActivity = pgTable('document_activity', {
   actionIdx: index('document_activity_action_idx').on(table.action),
   createdAtIdx: index('document_activity_created_at_idx').on(table.created_at),
 }));
-
-// Relations
-export const usersRelations = relations(users, ({ many, one }) => ({
-  briefcases: many(briefcases),
-  goals: many(goals),
-  tasks: many(tasks),
-  templates: many(templates),
-  taskCategories: many(taskCategories),
-  taskAnalytics: many(taskAnalytics),
-  productivityInsights: many(productivityInsights),
-  competitorProfiles: many(competitorProfiles),
-  intelligenceData: many(intelligenceData),
-  competitorAlerts: many(competitorAlerts),
-  scrapingJobs: many(scrapingJobs),
-  competitiveOpportunities: many(competitiveOpportunities),
-  opportunityActions: many(opportunityActions),
-  opportunityMetrics: many(opportunityMetrics),
-  competitiveStats: many(userCompetitiveStats),
-  documents: many(documents),
-  documentFolders: many(documentFolders),
-  documentVersions: many(documentVersions),
-  documentPermissions: many(documentPermissions),
-  documentShareLinks: many(documentShareLinks),
-  documentActivity: many(documentActivity),
-  brandSettings: one(userBrandSettings),
-  pushSubscriptions: many(pushSubscriptions),
-  competitorActivities: many(competitorActivities),
-  chatConversations: many(chatConversations),
-  chatMessages: many(chatMessages),
-  passwordResetTokens: many(passwordResetTokens),
-  feedback: many(feedback),
+// Feedback table for user submissions
+export const feedback = pgTable('feedback', {
+  id: text('id').primaryKey().$defaultFn(() => uuidv4()),
+  userId: text('userId').references(() => users.id, { onDelete: 'set null' }),
+  type: text('type').notNull(),
+  title: text('title'),
+  message: text('message').notNull(),
+  browserInfo: jsonb('browser_info'),
+  screenshotUrl: text('screenshot_url'),
+  status: text('status').notNull().default('pending'),
+  priority: text('priority').notNull().default('medium'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('feedback_user_id_idx').on(table.userId),
+  typeIdx: index('feedback_type_idx').on(table.type),
+  statusIdx: index('feedback_status_idx').on(table.status),
 }));
+
+
+
+
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({
   user: one(users, {
@@ -1518,28 +1508,43 @@ export const userApiKeys = pgTable('user_api_keys', {
   serviceIdx: index('user_api_keys_service_idx').on(table.service),
   userServiceIdx: index('user_api_keys_user_service_idx').on(table.user_id, table.service),
 }));
-// Feedback table for user submissions
-export const feedback = pgTable('feedback', {
-  id: text('id').primaryKey().$defaultFn(() => uuidv4()),
-  userId: text('userId').references(() => users.id, { onDelete: 'set null' }),
-  type: text('type').notNull(),
-  title: text('title'),
-  message: text('message').notNull(),
-  browserInfo: jsonb('browser_info'),
-  screenshotUrl: text('screenshot_url'),
-  status: text('status').notNull().default('pending'),
-  priority: text('priority').notNull().default('medium'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-}, (table) => ({
-  userIdIdx: index('feedback_user_id_idx').on(table.userId),
-  typeIdx: index('feedback_type_idx').on(table.type),
-  statusIdx: index('feedback_status_idx').on(table.status),
-}));
+
 
 export const feedbackRelations = relations(feedback, ({ one }) => ({
   user: one(users, {
     fields: [feedback.userId],
     references: [users.id],
   }),
+}));
+
+// Global Relations
+export const usersRelations = relations(users, ({ many, one }) => ({
+  briefcases: many(briefcases),
+  goals: many(goals),
+  tasks: many(tasks),
+  templates: many(templates),
+  taskCategories: many(taskCategories),
+  taskAnalytics: many(taskAnalytics),
+  productivityInsights: many(productivityInsights),
+  competitorProfiles: many(competitorProfiles),
+  intelligenceData: many(intelligenceData),
+  competitorAlerts: many(competitorAlerts),
+  scrapingJobs: many(scrapingJobs),
+  competitiveOpportunities: many(competitiveOpportunities),
+  opportunityActions: many(opportunityActions),
+  opportunityMetrics: many(opportunityMetrics),
+  competitiveStats: many(userCompetitiveStats),
+  documents: many(documents),
+  documentFolders: many(documentFolders),
+  documentVersions: many(documentVersions),
+  documentPermissions: many(documentPermissions),
+  documentShareLinks: many(documentShareLinks),
+  documentActivity: many(documentActivity),
+  brandSettings: one(userBrandSettings),
+  pushSubscriptions: many(pushSubscriptions),
+  competitorActivities: many(competitorActivities),
+  chatConversations: many(chatConversations),
+  chatMessages: many(chatMessages),
+  passwordResetTokens: many(passwordResetTokens),
+  feedback: many(feedback),
 }));
