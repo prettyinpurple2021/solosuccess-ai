@@ -658,6 +658,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   chatConversations: many(chatConversations),
   chatMessages: many(chatMessages),
   passwordResetTokens: many(passwordResetTokens),
+  feedback: many(feedback),
 }));
 
 export const briefcasesRelations = relations(briefcases, ({ one, many }) => ({

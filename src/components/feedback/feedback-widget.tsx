@@ -142,26 +142,32 @@ export function FeedbackWidget() {
     setIsSubmitting(true)
 
     try {
+      const getScreenBucket = () => {
+        const width = window.innerWidth;
+        if (width < 768) return 'mobile';
+        if (width < 1024) return 'tablet';
+        return 'desktop';
+      };
+
       const browserInfo = {
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        platform: (navigator as any).platform,
-        screenSize: `${window.innerWidth}x${window.innerHeight}`,
-        url: window.location.href,
+        platform: (navigator as any).userAgentData?.platform || (navigator as any).platform || 'unknown',
+        screenBucket: getScreenBucket(),
+        path: window.location.pathname,
         timestamp: new Date().toISOString(),
+      }
+
+      const formData = new FormData();
+      formData.append('type', form.type);
+      if (form.title) formData.append('title', form.title);
+      formData.append('message', trimmedMessage);
+      formData.append('browserInfo', JSON.stringify(browserInfo));
+      if (form.screenshot) {
+        formData.append('screenshot', form.screenshot);
       }
 
       const response = await fetch("/api/feedback", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: form.type,
-          title: form.title || undefined,
-          message: trimmedMessage,
-          browserInfo,
-          // Note: screenshotUrl implementation (e.g. S3 upload) TBD if needed
-          // For now, we're just recording the metadata and browser info
-        }),
+        body: formData,
       })
 
       if (!response.ok) {
@@ -169,8 +175,8 @@ export function FeedbackWidget() {
       }
 
       toast({
-        title: "Transmission successful",
-        description: "Your data has been logged into our secure systems.",
+        title: "Thanks — we got it!",
+        description: "Your message was sent successfully.",
         variant: "success",
       })
 
@@ -237,9 +243,9 @@ export function FeedbackWidget() {
           initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
           animate={{ opacity: 1, y: 0, transition: { duration: prefersReducedMotion ? 0 : 0.22 } }}
         >
-            <div className="bg-gradient-to-br from-slate-900/80 via-indigo-900/40 to-purple-900/40">
+            <div className="bg-linear-to-br from-slate-900/80 via-indigo-900/40 to-purple-900/40">
             <div className="mb-4 flex items-start gap-3">
-              <div className="rounded-2xl bg-gradient-to-br from-purple-500/30 via-indigo-500/20 to-cyan-500/30 p-3">
+              <div className="rounded-2xl bg-linear-to-br from-purple-500/30 via-indigo-500/20 to-cyan-500/30 p-3">
                 <Bug className="h-5 w-5 text-purple-100" aria-hidden />
               </div>
               <div className="space-y-1">
@@ -256,7 +262,7 @@ export function FeedbackWidget() {
                   <Label htmlFor="feedback-type">Category</Label>
                   <Select
                     value={form.type}
-                    onValueChange={(value: any) => setForm((prev) => ({ ...prev, type: value }))}
+                    onValueChange={(value: FeedbackFormState['type']) => setForm((prev) => ({ ...prev, type: value }))}
                   >
                     <SelectTrigger id="feedback-type">
                       <SelectValue placeholder="Select type" />
@@ -396,7 +402,7 @@ export function FeedbackWidget() {
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                     className="min-w-[140px]"
-                    variant="default"
+                    variant="purple"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center gap-2">
