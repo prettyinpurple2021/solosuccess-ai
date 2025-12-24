@@ -47,7 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({ email: z.string().email(), password: z.string().min(8) })
           .safeParse(credentials)
 
         if (parsedCredentials.success) {
@@ -66,4 +66,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  session: { strategy: "jwt" },
 })

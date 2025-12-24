@@ -4,13 +4,16 @@ export const authConfig = {
   pages: {
     signIn: '/login',
   },
+  session: { strategy: "jwt" },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname.startsWith('/admin')
       
       if (isOnDashboard) {
+        console.log(`Auth check for dashboard: isLoggedIn=${isLoggedIn}`);
         if (isLoggedIn) return true
+        console.log("Redirecting to login...");
         return false // Redirect unauthenticated users to login page
       }
       
