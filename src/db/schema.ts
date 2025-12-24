@@ -1,4 +1,4 @@
-import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid, foreignKey, primaryKey } from 'drizzle-orm/pg-core';
+import { integer, pgTable, varchar, text, timestamp, boolean, jsonb, decimal, index, uuid, foreignKey, primaryKey, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -628,19 +628,24 @@ export const documentActivity = pgTable('document_activity', {
   actionIdx: index('document_activity_action_idx').on(table.action),
   createdAtIdx: index('document_activity_created_at_idx').on(table.created_at),
 }));
+// Feedback enums
+export const feedbackTypeEnum = pgEnum('feedback_type', ['bug', 'feature_request', 'comment', 'error', 'other']);
+export const feedbackStatusEnum = pgEnum('feedback_status', ['pending', 'in_progress', 'resolved', 'closed', 'dismissed']);
+export const feedbackPriorityEnum = pgEnum('feedback_priority', ['low', 'medium', 'high', 'critical']);
+
 // Feedback table for user submissions
 export const feedback = pgTable('feedback', {
   id: text('id').primaryKey().$defaultFn(() => uuidv4()),
-  userId: text('userId').references(() => users.id, { onDelete: 'set null' }),
-  type: text('type').notNull(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'set null' }),
+  type: feedbackTypeEnum('type').notNull(),
   title: text('title'),
   message: text('message').notNull(),
   browserInfo: jsonb('browser_info'),
   screenshotUrl: text('screenshot_url'),
-  status: text('status').notNull().default('pending'),
-  priority: text('priority').notNull().default('medium'),
+  status: feedbackStatusEnum('status').notNull().default('pending'),
+  priority: feedbackPriorityEnum('priority').notNull().default('medium'),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 }, (table) => ({
   userIdIdx: index('feedback_user_id_idx').on(table.userId),
   typeIdx: index('feedback_type_idx').on(table.type),
