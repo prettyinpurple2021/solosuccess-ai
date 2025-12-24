@@ -15,17 +15,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // Use getDb() to bypass the Proxy issues, fallback to mock/null for build time
   adapter: (() => {
     try {
-      return DrizzleAdapter(getDb(), {
+      const adapter = DrizzleAdapter(getDb(), {
         usersTable: users,
         accountsTable: accounts,
         sessionsTable: sessions,
         verificationTokensTable: verificationTokens,
-      })
+      });
+      console.log("NextAuth DrizzleAdapter initialized successfully.");
+      return adapter;
     } catch (e) {
       // During build time or if DB is not available, return a partial/mock adapter
       // This prevents the "Unsupported database type" error from crashing the build
-      console.warn("Database not available for NextAuth adapter initialization (likely build time).")
-      return undefined
+      console.error("CRITICAL: Failed to initialize NextAuth adapter:", e);
+      return undefined;
     }
   })(),
   providers: [
