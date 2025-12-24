@@ -21,10 +21,19 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { logger } from "@/lib/logger"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type FeedbackFormState = {
   name: string
   email: string
+  type: 'bug' | 'feature_request' | 'comment' | 'error' | 'other'
+  title: string
   message: string
   screenshot: File | null
 }
@@ -37,6 +46,8 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const initialState: FeedbackFormState = {
   name: "",
   email: "",
+  type: "bug",
+  title: "",
   message: "",
   screenshot: null,
 }
@@ -131,16 +142,33 @@ export function FeedbackWidget() {
     setIsSubmitting(true)
 
     try {
-      logger.info("Feedback received (simulated)", {
-        message: trimmedMessage,
-        email: trimmedEmail,
-        name: trimmedName,
-        hasScreenshot: Boolean(form.screenshot)
+      const browserInfo = {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: (navigator as any).platform,
+        screenSize: `${window.innerWidth}x${window.innerHeight}`,
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+      }
+
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: form.type,
+          title: form.title || undefined,
+          message: trimmedMessage,
+          browserInfo,
+        }),
       })
 
+      if (!response.ok) {
+        throw new Error("Failed to transmit data")
+      }
+
       toast({
-        title: "Feedback sent",
-        description: "Thanks for helping us improve. We’re on it.",
+        title: "Transmission successful",
+        description: "Your data has been logged into our secure systems.",
         variant: "success",
       })
 
@@ -207,7 +235,7 @@ export function FeedbackWidget() {
           initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
           animate={{ opacity: 1, y: 0, transition: { duration: prefersReducedMotion ? 0 : 0.22 } }}
         >
-          <div emphasis="glow" className="bg-gradient-to-br from-slate-900/80 via-indigo-900/40 to-purple-900/40">
+            <div className="bg-gradient-to-br from-slate-900/80 via-indigo-900/40 to-purple-900/40">
             <div className="mb-4 flex items-start gap-3">
               <div className="rounded-2xl bg-gradient-to-br from-purple-500/30 via-indigo-500/20 to-cyan-500/30 p-3">
                 <Bug className="h-5 w-5 text-purple-100" aria-hidden />
@@ -221,6 +249,37 @@ export function FeedbackWidget() {
             </div>
 
             <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="h-feedback-type">Category</Label>
+                  <Select
+                    value={form.type}
+                    onValueChange={(value: any) => setForm((prev) => ({ ...prev, type: value }))}
+                  >
+                    <SelectTrigger id="h-feedback-type">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bug">Bug Report</SelectItem>
+                      <SelectItem value="feature_request">Feature Request</SelectItem>
+                      <SelectItem value="comment">General Comment</SelectItem>
+                      <SelectItem value="error">System Error</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="h-feedback-title">Subject (optional)</Label>
+                  <Input
+                    id="h-feedback-title"
+                    name="title"
+                    value={form.title}
+                    onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                    placeholder="Brief summary"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="feedback-name">Name (optional)</Label>

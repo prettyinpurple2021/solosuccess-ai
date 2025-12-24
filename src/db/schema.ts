@@ -1517,3 +1517,28 @@ export const userApiKeys = pgTable('user_api_keys', {
   serviceIdx: index('user_api_keys_service_idx').on(table.service),
   userServiceIdx: index('user_api_keys_user_service_idx').on(table.user_id, table.service),
 }));
+// Feedback table for user submissions
+export const feedback = pgTable('feedback', {
+  id: text('id').primaryKey().$defaultFn(() => uuidv4()),
+  userId: text('userId').references(() => users.id, { onDelete: 'set null' }),
+  type: text('type').notNull(),
+  title: text('title'),
+  message: text('message').notNull(),
+  browserInfo: jsonb('browser_info'),
+  screenshotUrl: text('screenshot_url'),
+  status: text('status').notNull().default('pending'),
+  priority: text('priority').notNull().default('medium'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  userIdIdx: index('feedback_user_id_idx').on(table.userId),
+  typeIdx: index('feedback_type_idx').on(table.type),
+  statusIdx: index('feedback_status_idx').on(table.status),
+}));
+
+export const feedbackRelations = relations(feedback, ({ one }) => ({
+  user: one(users, {
+    fields: [feedback.userId],
+    references: [users.id],
+  }),
+}));
